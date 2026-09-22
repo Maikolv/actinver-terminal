@@ -100,3 +100,18 @@ def test_env_ignorado_por_git():
     r = subprocess.run(["git", "check-ignore", ".env", "data/terminal.db", "_privado/x", "config/local.toml"], cwd=RAIZ,
                        capture_output=True, text=True)
     assert len(r.stdout.split()) == 4
+
+
+def test_cambio_de_modo_separa_bases_y_actualiza(cliente, monkeypatch):
+    from terminal import config, db, ingesta
+    llamadas = []
+    monkeypatch.setattr(ingesta, "actualizar_todo", lambda con, aj, prio=None, cliente=None: llamadas.append(aj.modo) or {"ok": 1})
+    h = {"X-CSRF-Token": TOKEN_CSRF}
+    assert cliente.post("/api/modo", headers=h, json={"modo": "otro"}).status_code == 422
+    assert cliente.post("/api/modo", json={"modo": "real"}).status_code == 403  # exige CSRF
+    r = cliente.post("/api/modo", headers=h, json={"modo": "demo"})
+    assert r.status_code == 200 and cliente.get("/api/estado").json()["modo"] == "demo"
+    assert db.ruta_db().parent.name == "demo"
+    r = cliente.post("/api/modo", headers=h, json={"modo": "real"})
+    assert r.status_code == 200 and r.json()["actualizacion"] == {"ok": 1} and llamadas[-1] == "real"
+    assert db.ruta_db().parent == config.DATA_DIR

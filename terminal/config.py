@@ -14,6 +14,23 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[1]
 CONFIG_DIR = RAIZ / "config"
 DATA_DIR = Path(os.environ.get("TERMINAL_DATA_DIR", RAIZ / "data"))
+MODOS = ("real", "demo")
+_MODO = {"activo": None}  # modo elegido en caliente desde la interfaz (tiene prioridad)
+
+
+def fijar_modo(modo: str) -> None:
+    if modo not in MODOS:
+        raise ValueError("modo no válido")
+    _MODO["activo"] = modo
+
+
+def modo_activo(predeterminado: str = "real") -> str:
+    return _MODO["activo"] or os.environ.get("TERMINAL_MODO") or predeterminado
+
+
+def data_dir(modo: str | None = None) -> Path:
+    """Base separada por modo: los datos sintéticos nunca se mezclan con los reales."""
+    return DATA_DIR / "demo" if (modo or modo_activo()) == "demo" else DATA_DIR
 
 # Nombres de variables de entorno aceptadas para credenciales (nunca sus valores en código).
 VARIABLES_CREDENCIALES = {
@@ -55,7 +72,7 @@ class Ajustes:
 
     @property
     def modo(self) -> str:
-        return os.environ.get("TERMINAL_MODO", self.datos["app"].get("modo", "real"))
+        return modo_activo(self.datos["app"].get("modo", "real"))
 
     @property
     def es_demo(self) -> bool:

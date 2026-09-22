@@ -8,7 +8,8 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .config import CONFIG_DIR, DATA_DIR
+from . import config
+from .config import CONFIG_DIR
 
 ESQUEMA = """
 PRAGMA journal_mode=WAL;
@@ -97,8 +98,9 @@ def ahora() -> str:
 
 
 def ruta_db() -> Path:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    return DATA_DIR / "terminal.db"
+    d = config.data_dir()
+    d.mkdir(parents=True, exist_ok=True)
+    return d / "terminal.db"
 
 
 def conectar(ruta: Path | str | None = None) -> sqlite3.Connection:

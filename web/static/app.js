@@ -104,6 +104,14 @@ async function cargarEstado() {
     const d = await api("/api/estado");
     estado.datos = d;
     document.getElementById("aviso-demo").hidden = d.modo !== "demo";
+    const bm = document.getElementById("btn-modo");
+    bm.hidden = false;
+    bm.dataset.destino = d.modo === "demo" ? "real" : "demo";
+    bm.textContent = d.modo === "demo" ? "Usar datos reales y vigentes" : "Ver demostración";
+    bm.classList.toggle("boton--real", d.modo === "demo");
+    bm.title = d.modo === "demo"
+      ? "Cambia a su base real y consulta ahora a los proveedores configurados (tipo de cambio, cierres)"
+      : "Cambia a la base de demostración con datos sintéticos (su base real no se modifica)";
     const v = d.vigencia || {};
     const partes = [
       h("span", { clase: "grupo" }, "Precios:",
@@ -567,7 +575,33 @@ document.getElementById("btn-actualizar").addEventListener("click", async (ev) =
   finally { ocupado([b], false); b.textContent = "Actualizar datos"; }
 });
 
+function resumenActualizacion(r) {
+  if (!r) return "";
+  if (r.modo === "demo") return "Datos sintéticos de demostración generados.";
+  const partes = [];
+  const fx = r.fx || {};
+  if (fx.estado === "ok" || fx.estado === "al_dia") partes.push(`Tipo de cambio ${fx.estado === "al_dia" ? "al día" : "actualizado"} (${fx.proveedor}).`);
+  else partes.push("Sin tipo de cambio disponible.");
+  const precios = Object.entries(r.precios || {});
+  const conDatos = precios.filter(([, v]) => v.registros || v.al_dia);
+  if (conDatos.length) partes.push(`Precios: ${conDatos.map(([k, v]) => `${k} ${v.registros} registros nuevos, ${v.al_dia} al día`).join("; ")}.`);
+  else partes.push("Ningún proveedor de precios configurado: las propuestas quedarán suspendidas hasta añadir claves en .env o importar precios (vea la pestaña Datos).");
+  return partes.join(" ");
+}
+document.getElementById("btn-modo").addEventListener("click", async (ev) => {
+  const b = ev.currentTarget, destino = b.dataset.destino;
+  ocupado([b], true);
+  b.textContent = destino === "real" ? "Consultando datos reales…" : "Cambiando a demostración…";
+  try {
+    const r = await api("/api/modo", { method: "POST", json: { modo: destino } });
+    const msg = `${destino === "real" ? "Modo real activo." : "Modo demostración activo."} ${resumenActualizacion(r.actualizacion)}`;
+    try { sessionStorage.setItem("aviso", msg); } catch { /* sin almacenamiento */ }
+    window.location.reload();
+  } catch (e) { notificar(e.message); ocupado([b], false); cargarEstado(); }
+});
+
 async function iniciar() {
+  try { const aviso = sessionStorage.getItem("aviso"); if (aviso) { sessionStorage.removeItem("aviso"); notificar(aviso); } } catch { /* sin almacenamiento */ }
   document.getElementById("form-operacion").elements.fecha.value = new Date().toISOString().slice(0, 10);
   ajustarCampos();
   let inicial = null;

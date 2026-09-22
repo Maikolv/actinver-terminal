@@ -9,13 +9,13 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import Body, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__, cartera, db, importar, ingesta, mercado, optimizador, vigencia
-from .config import RAIZ, cargar_ajustes
+from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
 from .seguridad import TOKEN_CSRF, Seguridad
 
 logging.getLogger("httpx").setLevel(logging.WARNING)  # evita registrar URLs con credenciales
@@ -192,6 +192,35 @@ def actualizar(con=Depends(con_db)):
     try:
         prio = [p["instrumento_id"] for p in _cartera(con)["posiciones"]]
         return {"resultado": ingesta.actualizar_todo(con, AJUSTES, prio)}
+    finally:
+        _calculo.release()
+
+
+@app.post("/api/modo")
+def cambiar_modo(cuerpo: dict = Body(...)):
+    """Cambia entre datos reales y demostración sin reiniciar. Cada modo usa su propia base de datos.
+    Al pasar a real se consulta de inmediato a los proveedores configurados para traer datos vigentes."""
+    modo = str((cuerpo or {}).get("modo", ""))
+    if modo not in MODOS:
+        raise cartera.ErrorValidacion(["modo: use «real» o «demo»"])
+    if not _calculo.acquire(blocking=False):
+        raise HTTPException(409, "Hay una actualización o cálculo en curso; intente en unos segundos")
+    try:
+        fijar_modo(modo)
+        con = db.conectar()
+        try:
+            db.inicializar(con)
+            if modo == "demo":
+                hay = con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone()
+                resultado = None if hay else ingesta.actualizar_todo(con, AJUSTES)
+            else:
+                prio = [p["instrumento_id"] for p in _cartera(con)["posiciones"]]
+                resultado = ingesta.actualizar_todo(con, AJUSTES, prio)
+            db.auditar(con, "modo", modo, "cambio")
+            con.commit()
+        finally:
+            con.close()
+        return {"modo": modo, "actualizacion": resultado}
     finally:
         _calculo.release()
 

@@ -92,8 +92,7 @@ def main() -> None:
     args = p.parse_args()
     if args.cmd == "demo":  # base separada: los datos sintéticos nunca se mezclan con los reales
         # Se fija antes de importar .config, que lee estas variables al cargarse.
-        os.environ["TERMINAL_MODO"] = "demo"
-        os.environ["TERMINAL_DATA_DIR"] = str(Path(__file__).resolve().parents[1] / "data" / "demo")
+        os.environ["TERMINAL_MODO"] = "demo"  # la base se separa sola en data/demo (config.data_dir)
     _logs()
     args.fn(args)
 

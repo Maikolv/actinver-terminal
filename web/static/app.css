@@ -68,6 +68,7 @@ a { color: var(--acento); }
 .boton { font: inherit; font-weight: 600; border-radius: var(--radio); padding: 9px 14px; min-height: 40px; cursor: pointer; border: 1px solid transparent; }
 .boton--primario { background: var(--acento); color: var(--acento-texto); }
 .boton--secundario { background: transparent; color: var(--texto); border-color: var(--borde); }
+.boton--real { border-color: var(--vigente); color: var(--vigente); background: var(--vigente-fondo); }
 .boton--texto { background: none; border: none; color: var(--acento); padding: 4px 6px; min-height: 32px; text-decoration: underline; }
 .boton[disabled] { opacity: .55; cursor: progress; }
 
