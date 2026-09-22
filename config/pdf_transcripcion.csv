@@ -1,0 +1,316 @@
+clave_pdf,serie_pdf,seccion_pdf,pagina
+AA1,*,Acciones,1
+AAL,*,Acciones,1
+AAPL,*,Acciones,1
+ABBV,*,Acciones,1
+ABNB,*,Acciones,1
+AC,*,Acciones,1
+ACTINVR,B,Acciones,1
+AFRM,*,Acciones,1
+AGNC,*,Acciones,1
+ALFA,A,Acciones,1
+ALPEK,A,Acciones,1
+ALSEA,*,Acciones,1
+AMAT,*,Acciones,1
+AMD,*,Acciones,1
+AMX,B,Acciones,1
+AMZN,*,Acciones,1
+ASUR,B,Acciones,1
+AVGO,*,Acciones,1
+AXP,*,Acciones,1
+BA,*,Acciones,1
+BABA,N,Acciones,1
+BAC,*,Acciones,1
+BBAJIO,O,Acciones,1
+BIMBO,A,Acciones,1
+BMY,*,Acciones,1
+BOLSA,A,Acciones,1
+BRKB,*,Acciones,1
+C,*,Acciones,1
+CAT,*,Acciones,1
+CCL1,N,Acciones,1
+CEMEX,CPO,Acciones,2
+CHDRAUI,B,Acciones,2
+CLF,*,Acciones,2
+COST,*,Acciones,2
+CPE,*,Acciones,2
+CRM,*,Acciones,2
+CSCO,*,Acciones,2
+CUERVO,*,Acciones,2
+CVS,*,Acciones,2
+CVX,*,Acciones,2
+DAL,*,Acciones,2
+DIS,*,Acciones,2
+DVN,*,Acciones,2
+ELEKTRA,*,Acciones,2
+ETSY,*,Acciones,2
+F,*,Acciones,2
+FANG,*,Acciones,2
+FCX,*,Acciones,2
+FDX,*,Acciones,2
+FEMSA,UBD,Acciones,2
+FIBRAMQ,12,Acciones,3
+FIBRAPL,14,Acciones,3
+FSLR,*,Acciones,3
+FUBO,*,Acciones,3
+FUNO,11,Acciones,3
+GAP,B,Acciones,3
+GCARSO,A1,Acciones,3
+GCC,*,Acciones,3
+GE,*,Acciones,3
+GENTERA,*,Acciones,3
+GFINBUR,O,Acciones,3
+GFNORTE,O,Acciones,3
+GM,*,Acciones,3
+GME,*,Acciones,3
+GMEXICO,B,Acciones,3
+GOLD,N,Acciones,3
+GOOGL,*,Acciones,3
+GRUMA,B,Acciones,3
+HD,*,Acciones,3
+INTC,*,Acciones,3
+JNJ,*,Acciones,3
+JPM,*,Acciones,3
+KIMBER,A,Acciones,3
+KO,*,Acciones,3
+KOF,UBL,Acciones,3
+LAB,B,Acciones,3
+LASITE,B-1,Acciones,3
+LCID,*,Acciones,3
+LIVEPOL,C-1,Acciones,3
+LLY,*,Acciones,3
+LUV,*,Acciones,4
+LVS,*,Acciones,4
+MA,*,Acciones,4
+MARA,*,Acciones,4
+MCD,*,Acciones,4
+MEGA,CPO,Acciones,4
+MELI,N,Acciones,4
+META,*,Acciones,4
+MFRISCO,A-1,Acciones,4
+MRK,*,Acciones,4
+MRNA,*,Acciones,4
+MRO,*,Acciones,4
+MSFT,*,Acciones,4
+MU,*,Acciones,4
+NCLH,N,Acciones,4
+NFLX,*,Acciones,4
+NKE,*,Acciones,4
+NU,N,Acciones,4
+NVAX,*,Acciones,4
+NVDA,*,Acciones,4
+OMA,B,Acciones,4
+ORBIA,*,Acciones,4
+ORCL,*,Acciones,4
+OXY1,*,Acciones,4
+PARA,*,Acciones,4
+PE&OLES,*,Acciones,4
+PEP,*,Acciones,4
+PFE,*,Acciones,4
+PG,*,Acciones,4
+PINFRA,*,Acciones,4
+PINS,*,Acciones,5
+PLTR,*,Acciones,5
+PYPL,*,Acciones,5
+Q,*,Acciones,5
+QCOM,*,Acciones,5
+R,A,Acciones,5
+RCL,*,Acciones,5
+RIOT,*,Acciones,5
+RIVN,*,Acciones,5
+SBUX,*,Acciones,5
+SHOP,N,Acciones,5
+SITES1,A-1,Acciones,5
+SOFI,*,Acciones,5
+SPCE,*,Acciones,5
+T,*,Acciones,5
+TERRA,13,Acciones,5
+TGT,*,Acciones,5
+TLEVISA,CPO,Acciones,5
+TMO,*,Acciones,5
+TSLA,*,Acciones,5
+TSM,N,Acciones,5
+TX,*,Acciones,5
+UAL,*,Acciones,5
+UBER,*,Acciones,5
+UNH,*,Acciones,5
+UPST,*,Acciones,5
+V,*,Acciones,5
+VESTA,*,Acciones,5
+VOLAR,A,Acciones,5
+VZ,*,Acciones,5
+WALMEX,*,Acciones,6
+WFC,*,Acciones,6
+WMT,*,Acciones,6
+XOM,*,Acciones,6
+XYZ,*,Acciones,6
+ZM,*,Acciones,6
+AA1,*,ETF's (rótulo del PDF),6
+AAL,*,ETF's (rótulo del PDF),6
+AAPL,*,ETF's (rótulo del PDF),6
+ABBV,*,ETF's (rótulo del PDF),6
+ABNB,*,ETF's (rótulo del PDF),6
+AC,*,ETF's (rótulo del PDF),6
+ACTINVR,B,ETF's (rótulo del PDF),6
+AFRM,*,ETF's (rótulo del PDF),6
+AGNC,*,ETF's (rótulo del PDF),6
+ALFA,A,ETF's (rótulo del PDF),6
+ALPEK,A,ETF's (rótulo del PDF),6
+ALSEA,*,ETF's (rótulo del PDF),6
+AMAT,*,ETF's (rótulo del PDF),6
+AMD,*,ETF's (rótulo del PDF),6
+AMX,B,ETF's (rótulo del PDF),6
+AMZN,*,ETF's (rótulo del PDF),6
+ASUR,B,ETF's (rótulo del PDF),6
+AVGO,*,ETF's (rótulo del PDF),6
+AXP,*,ETF's (rótulo del PDF),6
+BA,*,ETF's (rótulo del PDF),6
+BABA,N,ETF's (rótulo del PDF),7
+BAC,*,ETF's (rótulo del PDF),7
+BBAJIO,O,ETF's (rótulo del PDF),7
+BIMBO,A,ETF's (rótulo del PDF),7
+BMY,*,ETF's (rótulo del PDF),7
+BOLSA,A,ETF's (rótulo del PDF),7
+BRKB,*,ETF's (rótulo del PDF),7
+C,*,ETF's (rótulo del PDF),7
+CAT,*,ETF's (rótulo del PDF),7
+CCL1,N,ETF's (rótulo del PDF),7
+CEMEX,CPO,ETF's (rótulo del PDF),7
+CHDRAUI,B,ETF's (rótulo del PDF),7
+CLF,*,ETF's (rótulo del PDF),7
+COST,*,ETF's (rótulo del PDF),7
+CPE,*,ETF's (rótulo del PDF),7
+CRM,*,ETF's (rótulo del PDF),7
+CSCO,*,ETF's (rótulo del PDF),7
+CUERVO,*,ETF's (rótulo del PDF),7
+CVS,*,ETF's (rótulo del PDF),7
+CVX,*,ETF's (rótulo del PDF),7
+DAL,*,ETF's (rótulo del PDF),7
+DIS,*,ETF's (rótulo del PDF),7
+DVN,*,ETF's (rótulo del PDF),7
+ELEKTRA,*,ETF's (rótulo del PDF),7
+ETSY,*,ETF's (rótulo del PDF),7
+F,*,ETF's (rótulo del PDF),7
+FANG,*,ETF's (rótulo del PDF),7
+FCX,*,ETF's (rótulo del PDF),7
+FDX,*,ETF's (rótulo del PDF),7
+FEMSA,UBD,ETF's (rótulo del PDF),7
+FIBRAMQ,12,ETF's (rótulo del PDF),8
+FIBRAPL,14,ETF's (rótulo del PDF),8
+FSLR,*,ETF's (rótulo del PDF),8
+FUBO,*,ETF's (rótulo del PDF),8
+FUNO,11,ETF's (rótulo del PDF),8
+GAP,B,ETF's (rótulo del PDF),8
+GCARSO,A1,ETF's (rótulo del PDF),8
+GCC,*,ETF's (rótulo del PDF),8
+GE,*,ETF's (rótulo del PDF),8
+GENTERA,*,ETF's (rótulo del PDF),8
+GFINBUR,O,ETF's (rótulo del PDF),8
+GFNORTE,O,ETF's (rótulo del PDF),8
+GM,*,ETF's (rótulo del PDF),8
+GME,*,ETF's (rótulo del PDF),8
+GMEXICO,B,ETF's (rótulo del PDF),8
+GOLD,N,ETF's (rótulo del PDF),8
+GOOGL,*,ETF's (rótulo del PDF),8
+GRUMA,B,ETF's (rótulo del PDF),8
+HD,*,ETF's (rótulo del PDF),8
+INTC,*,ETF's (rótulo del PDF),8
+JNJ,*,ETF's (rótulo del PDF),8
+JPM,*,ETF's (rótulo del PDF),8
+KIMBER,A,ETF's (rótulo del PDF),8
+KO,*,ETF's (rótulo del PDF),8
+KOF,UBL,ETF's (rótulo del PDF),8
+LAB,B,ETF's (rótulo del PDF),8
+LASITE,B-1,ETF's (rótulo del PDF),8
+LCID,*,ETF's (rótulo del PDF),8
+LIVEPOL,C-1,ETF's (rótulo del PDF),8
+LLY,*,ETF's (rótulo del PDF),8
+LUV,*,ETF's (rótulo del PDF),9
+LVS,*,ETF's (rótulo del PDF),9
+MA,*,ETF's (rótulo del PDF),9
+MARA,*,ETF's (rótulo del PDF),9
+MCD,*,ETF's (rótulo del PDF),9
+MEGA,CPO,ETF's (rótulo del PDF),9
+MELI,N,ETF's (rótulo del PDF),9
+META,*,ETF's (rótulo del PDF),9
+MFRISCO,A-1,ETF's (rótulo del PDF),9
+MRK,*,ETF's (rótulo del PDF),9
+MRNA,*,ETF's (rótulo del PDF),9
+MRO,*,ETF's (rótulo del PDF),9
+MSFT,*,ETF's (rótulo del PDF),9
+MU,*,ETF's (rótulo del PDF),9
+NCLH,N,ETF's (rótulo del PDF),9
+NFLX,*,ETF's (rótulo del PDF),9
+NKE,*,ETF's (rótulo del PDF),9
+NU,N,ETF's (rótulo del PDF),9
+NVAX,*,ETF's (rótulo del PDF),9
+NVDA,*,ETF's (rótulo del PDF),9
+OMA,B,ETF's (rótulo del PDF),9
+ORBIA,*,ETF's (rótulo del PDF),9
+ORCL,*,ETF's (rótulo del PDF),9
+OXY1,*,ETF's (rótulo del PDF),9
+PARA,*,ETF's (rótulo del PDF),9
+PE&OLES,*,ETF's (rótulo del PDF),9
+PEP,*,ETF's (rótulo del PDF),9
+PFE,*,ETF's (rótulo del PDF),9
+PG,*,ETF's (rótulo del PDF),9
+PINFRA,*,ETF's (rótulo del PDF),9
+PINS,*,ETF's (rótulo del PDF),10
+PLTR,*,ETF's (rótulo del PDF),10
+PYPL,*,ETF's (rótulo del PDF),10
+Q,*,ETF's (rótulo del PDF),10
+QCOM,*,ETF's (rótulo del PDF),10
+R,A,ETF's (rótulo del PDF),10
+RCL,*,ETF's (rótulo del PDF),10
+RIOT,*,ETF's (rótulo del PDF),10
+RIVN,*,ETF's (rótulo del PDF),10
+SBUX,*,ETF's (rótulo del PDF),10
+SHOP,N,ETF's (rótulo del PDF),10
+SITES1,A-1,ETF's (rótulo del PDF),10
+SOFI,*,ETF's (rótulo del PDF),10
+SPCE,*,ETF's (rótulo del PDF),10
+T,*,ETF's (rótulo del PDF),10
+TERRA,13,ETF's (rótulo del PDF),10
+TGT,*,ETF's (rótulo del PDF),10
+TLEVISA,CPO,ETF's (rótulo del PDF),10
+TMO,*,ETF's (rótulo del PDF),10
+TSLA,*,ETF's (rótulo del PDF),10
+TSM,N,ETF's (rótulo del PDF),10
+TX,*,ETF's (rótulo del PDF),10
+UAL,*,ETF's (rótulo del PDF),10
+UBER,*,ETF's (rótulo del PDF),10
+UNH,*,ETF's (rótulo del PDF),10
+UPST,*,ETF's (rótulo del PDF),10
+V,*,ETF's (rótulo del PDF),10
+VESTA,*,ETF's (rótulo del PDF),10
+VOLAR,A,ETF's (rótulo del PDF),10
+VZ,*,ETF's (rótulo del PDF),10
+WALMEX,*,ETF's (rótulo del PDF),11
+WFC,*,ETF's (rótulo del PDF),11
+WMT,*,ETF's (rótulo del PDF),11
+XOM,*,ETF's (rótulo del PDF),11
+XYZ,*,ETF's (rótulo del PDF),11
+ZM,*,ETF's (rótulo del PDF),11
+ACTDUAL,,Fondos,11
+ACTI500,,Fondos,11
+ACTIAI,,Fondos,11
+ACTICOB,,Fondos,11
+ACTICRE,,Fondos,11
+ACTIG+,,Fondos,11
+ACTIG+2,,Fondos,11
+ACTIGOB,,Fondos,11
+ACTIMED,,Fondos,11
+ACTIPLU,,Fondos,11
+ACTIREN,,Fondos,11
+ACTIVAR,,Fondos,11
+ALTERN,,Fondos,11
+DINAMO,,Fondos,11
+ESCALA,,Fondos,11
+ESFERA,,Fondos,11
+JPMRVUS,,Fondos,11
+MAXIMO,,Fondos,11
+MAYA,,Fondos,11
+OPORT1,,Fondos,11
+ROBOTIK,,Fondos,11
+SALUD,,Fondos,11
+TEMATIK,,Fondos,11

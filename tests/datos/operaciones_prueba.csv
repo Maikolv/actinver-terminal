@@ -1,0 +1,9 @@
+fecha,tipo,instrumento_id,cantidad,precio,monto,comision,impuesto,moneda,tipo_cambio,nota
+2024-01-02,aportacion,,,,100000,,,MXN,1,Depósito inicial
+2024-01-03,compra,SIC:IVV,20,1500,,30,4.80,MXN,1,Compra de prueba
+2024-01-03,compra,FONDO:ACTIGOB,5000,5,,0,0,MXN,1,Fondo de deuda
+2024-06-03,compra,BMV:WALMEX,100,60,,15,2.40,MXN,1,
+2024-09-02,dividendo,BMV:WALMEX,,,150,,15,MXN,1,Dividendo
+2025-02-03,venta,SIC:IVV,5,1800,,22.5,3.60,MXN,1,Venta parcial
+2025-03-03,retiro,,,,5000,,,MXN,1,Retiro
+2025-03-03,compra,SIC:IVV,2,1700,,8.5,1.36,MXN,1,

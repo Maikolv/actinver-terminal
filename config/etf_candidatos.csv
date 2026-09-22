@@ -1,0 +1,14 @@
+clave,mercado_operable,listado_referencia,categoria,motivo_candidato,disponibilidad_actinver,fuente_url
+IVV,BMV-SIC,IVV,renta_variable_eeuu,"Núcleo S&P 500 de bajo costo",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+VOO,BMV-SIC,VOO,renta_variable_eeuu,"Alternativa S&P 500 de bajo costo",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+QQQ,BMV-SIC,QQQ,renta_variable_eeuu,"Nasdaq-100 (concentrado en tecnología)",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt
+VEA,BMV-SIC,VEA,renta_variable_desarrollados,"Mercados desarrollados fuera de EE. UU.",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+VWO,BMV-SIC,VWO,renta_variable_emergentes,"Mercados emergentes",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+AGG,BMV-SIC,AGG,deuda_usd,"Bonos grado de inversión de EE. UU. (agregado)",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+IEF,BMV-SIC,IEF,deuda_usd,"Bonos del Tesoro de EE. UU. 7-10 años",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt
+SHV,BMV-SIC,SHV,deuda_usd_corto,"Letras del Tesoro de EE. UU. de muy corto plazo",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt
+IAU,BMV-SIC,IAU,materias_primas_oro,"Oro físico",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+VNQ,BMV-SIC,VNQ,bienes_raices_eeuu,"REIT de EE. UU.",por_confirmar,https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt
+SMARTRC,BMV,,renta_variable_mx,"Tracker de Actinver sobre Morningstar Mexico Quality Value",confirmado_actinver,https://actinver.com/smartrc
+ANGELD,BMV,,apalancado_2x,"Tracker de Actinver 2x IPC diario: excluido por apalancamiento",excluido,https://actinver.com/angeld
+DIABLOI,BMV,,inverso,"Tracker de Actinver inverso al IPC: excluido por ser inverso",excluido,https://actinver.com/diabloi

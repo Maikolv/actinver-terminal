@@ -1,0 +1,99 @@
+# Configuración de ejemplo (versionada, SIN secretos).
+# Para personalizar: copie las secciones que quiera cambiar a config/local.toml (no versionado).
+# Las credenciales van en variables de entorno o en .env (ver .env.example), nunca aquí.
+
+[app]
+modo = "real"                 # "real" | "demo" (demo = datos SINTÉTICOS etiquetados, solo para pruebas)
+host = "127.0.0.1"            # solo escucha en la máquina local
+puerto = 8765
+moneda_base = "MXN"
+indice_referencia = "SIC:IVV" # comparación de la cartera: S&P 500 (IVV) convertido a MXN
+actualizacion_automatica = false  # true = el servidor consulta proveedores según [programacion]
+
+[programacion]
+# Consultas EOD tras el cierre (hora local de México). Respetan los límites de cada proveedor.
+hora_eod = "17:30"
+revisar_cada_min = 30
+
+[vigencia]
+# Umbrales para declarar un dato «vigente», «retrasado» o «vencido».
+# cierre / nav: sesiones hábiles de atraso toleradas respecto a la última sesión cerrada.
+cierre_sesiones_vigente = 0
+cierre_sesiones_retrasado = 1        # más de esto => vencido
+nav_sesiones_vigente = 1             # los fondos publican NAV con T+1 frecuentemente
+nav_sesiones_retrasado = 3
+fx_sesiones_vigente = 1
+fx_sesiones_retrasado = 5            # FRED publica con varios días de rezago
+retrasado_minutos_vigente = 20       # datos «retrasados» intradía
+tiempo_real_segundos_vigente = 120
+
+[proveedores.fred]
+activo = true                        # tipo de cambio USD/MXN (DEXMXUS), sin clave, diario con rezago
+peticiones_por_dia = 50
+
+[proveedores.banxico]
+activo = true                        # tipo de cambio FIX (SF43718); requiere BANXICO_TOKEN (gratuito)
+peticiones_por_dia = 200
+
+[proveedores.tiingo]
+activo = true                        # cierres EOD de EE. UU. (referencia SIC y ETF); requiere TIINGO_API_KEY
+peticiones_por_hora = 45
+peticiones_por_dia = 900
+
+[proveedores.eodhd]
+activo = true                        # cierres EOD de la BMV (.MX); requiere EODHD_API_KEY
+peticiones_por_dia = 18              # plan gratuito: 20/día; se deja margen
+
+[proveedores.archivo]
+activo = true                        # precios / valor liquidativo importados por el usuario (CSV)
+
+[perfil]
+# Valores iniciales; se editan desde la interfaz sin tocar código.
+riesgo = "moderado"                  # conservador | moderado | agresivo
+horizonte_anios = 5
+capital = 250000                     # MXN
+max_peso_activo = 0.12
+max_exposicion_usd = 0.75
+incluir_etf_por_confirmar = true     # ETF cuya disponibilidad en el SIC no se ha confirmado
+excluir = []                         # ids a excluir, p. ej. ["SIC:TSLA"]
+escenario = "base"                   # base | adverso | favorable (ajusta el rendimiento esperado)
+
+[perfiles.conservador]
+aversion_riesgo = 8.0
+vol_objetivo = 0.10
+min_deuda_mixta = 0.50
+[perfiles.moderado]
+aversion_riesgo = 4.0
+vol_objetivo = 0.15
+min_deuda_mixta = 0.25
+[perfiles.agresivo]
+aversion_riesgo = 1.5
+vol_objetivo = 0.22
+min_deuda_mixta = 0.0
+
+[costos]
+comision_pct = 0.0025                # comisión por operación (antes de IVA); ajuste a su contrato
+iva = 0.16
+spread_pct = { accion_sic = 0.0040, accion_bmv = 0.0020, etf = 0.0030, fibra = 0.0030, fondo = 0.0 }
+impuesto_ganancia = 0.10             # ISR sobre ganancia en BMV/SIC (configurable)
+impuesto_dividendo = 0.10
+
+[optimizacion]
+historia_min_sesiones = 504          # ~2 años de datos diarios por activo
+ventana_estimacion = 756             # ~3 años para estimar
+walk_forward_entrenamiento = 504
+walk_forward_prueba = 63
+banda_rebalanceo_pp = 2.0            # no sugerir cambios menores a 2 puntos de peso
+monto_minimo_operacion = 2000        # MXN
+max_activos = 15
+l2_regularizacion = 0.001           # γ: penaliza concentración y estabiliza pesos
+semilla = 42
+
+[puntuacion]
+# Pesos de cada criterio (se normalizan). Visibles y editables.
+rendimiento_ajustado = 0.25
+riesgo = 0.20
+diversificacion = 0.15
+liquidez = 0.10
+costos = 0.10
+calidad_datos = 0.20

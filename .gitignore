@@ -1,0 +1,23 @@
+# Entorno
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secretos y configuración local: nunca se versionan
+.env
+.env.*
+!.env.example
+config/local.toml
+
+# Datos del usuario y de mercado (se regeneran o son personales)
+data/*.db
+data/*.db-*
+data/respaldos/
+data/importaciones/
+data/referencias/
+data/logs/
+data/demo/
+
+# Material privado de auditoría (renders del PDF, descargas crudas)
+_privado/
