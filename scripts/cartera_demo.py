@@ -11,14 +11,14 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[1]
 DB = RAIZ / "data" / "demo" / "terminal.db"
 PLAN = [  # (fecha aproximada, tipo, instrumento, cantidad | monto)
-    ("2024-01-03", "aportacion", None, 300000),
-    ("2024-01-04", "compra", "SIC:IVV", 60),
-    ("2024-01-04", "compra", "FONDO:ACTIGOB", 800),
-    ("2024-02-01", "compra", "BMV:WALMEX", 300),
-    ("2024-03-01", "compra", "SIC:MSFT", 20),
-    ("2024-09-02", "dividendo", "BMV:WALMEX", 450),
-    ("2025-02-03", "venta", "SIC:IVV", 15),
-    ("2025-06-02", "retiro", None, 10000),
+    ("2024-01-03", "aportacion", None, 1000000),
+    ("2024-01-04", "compra", "SIC:IVV", 200),
+    ("2024-01-04", "compra", "FONDO:ACTIGOB", 2700),
+    ("2024-02-01", "compra", "BMV:WALMEX", 1000),
+    ("2024-03-01", "compra", "SIC:MSFT", 65),
+    ("2024-09-02", "dividendo", "BMV:WALMEX", 1500),
+    ("2025-02-03", "venta", "SIC:IVV", 50),
+    ("2025-06-02", "retiro", None, 30000),
 ]
 
 
