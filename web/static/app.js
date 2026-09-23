@@ -4,7 +4,7 @@
 
 const CSRF = document.querySelector('meta[name="csrf"]').content;
 const estado = {
-  propuestas: null, clasificacion: [], cartera: null, universo: null, datos: null, reto: null,
+  alertasResumen: null, propuestas: null, clasificacion: [], cartera: null, universo: null, datos: null, reto: null,
   universoSel: "acciones", lenteSel: "ajuste", lenteResumen: "ajuste", ultimoCiclo: null,
 };
 
@@ -100,7 +100,7 @@ function segmentado(id, valorActual, alCambiar) {
 
 /* ---------- pestañas (teclado: flechas, Inicio, Fin) ---------- */
 const CARGAS = {
-  "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
+  "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
   "tab-universo": () => cargarUniverso(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
 };
 function activarPestana(tab, enfocar) {
@@ -122,11 +122,12 @@ document.getElementById("lista-pestanas").addEventListener("keydown", (ev) => {
 });
 document.querySelectorAll('[role="tab"]').forEach((t) => t.addEventListener("click", () => activarPestana(t)));
 const irA = (id) => activarPestana(document.getElementById(id));
+const pestanaVisible = (id) => !document.getElementById(id).hidden;
 
 /* ---------- estado de datos y motor ---------- */
-async function cargarEstado() {
+async function cargarEstado(previo) {
   try {
-    const d = await api("/api/estado");
+    const d = previo || await api("/api/estado");
     estado.datos = d;
     document.getElementById("aviso-demo").hidden = d.modo !== "demo";
     const bm = document.getElementById("btn-modo");
@@ -257,7 +258,8 @@ async function pintarResumen() {
   const cont = [];
   if (d && d.alertas_pendientes) {
     let lista = [];
-    try { lista = (await api("/api/alertas?limite=5")).alertas.filter((a) => a.estado === "nueva"); } catch { /* sin detalle */ }
+    try { lista = (estado.alertasResumen || (await api("/api/alertas?limite=5")).alertas).filter((a) => a.estado === "nueva"); } catch { /* sin detalle */ }
+    estado.alertasResumen = null;
     cont.push(h("section", { clase: "franja-alertas", "aria-label": "Alertas nuevas" },
       h("strong", { texto: `${d.alertas_pendientes} alerta(s) nueva(s). ` }), lista.slice(0, 3).map((a) => a.titulo).join(" · "), " ",
       h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-alertas") }, "Revisar alertas")));
@@ -362,8 +364,8 @@ function pintarDetalle() {
       { t: "Variante", f: (f) => f.variante }, { t: "Cambio de pesos", f: (f) => (f.error ? f.error : pct(f.cambio_pesos)), num: true },
       { t: "Principales", f: (f) => (f.top || []).map((t) => `${t.id} ${pct(t.peso)}`).join(" · ") }], p.sensibilidad)));
   }
-  out.push(h("details", {}, h("summary", { texto: `Instrumentos excluidos (${(p.excluidos || []).length})` }),
-    tabla([{ t: "Instrumento", f: (f) => f.id }, { t: "Motivo", f: (f) => f.motivo }], p.excluidos || [])));
+  out.push(h("details", { ontoggle: (ev) => { if (ev.target.open && ev.target.children.length === 1) ev.target.append(tabla([{ t: "Instrumento", f: (f) => f.id }, { t: "Motivo", f: (f) => f.motivo }], p.excluidos || [])); } },
+    h("summary", { texto: `Instrumentos excluidos (${(p.excluidos || []).length})` })));
   if (p.reproducibilidad) {
     const r = p.reproducibilidad;
     out.push(h("details", {}, h("summary", { texto: "Reproducibilidad: objetivo, restricciones y datos" }),
@@ -710,7 +712,7 @@ async function cargarPropuestas() {
     estado.propuestas = d.propuestas; estado.clasificacion = d.clasificacion;
   } catch (e) { limpiar("resumen-contenido", errorCaja(e)); return; }
   try { estado.cartera = await api("/api/cartera"); } catch { /* se muestra en su pestaña */ }
-  pintarResumen(); pintarDetalle();
+  pintarResumen(); if (pestanaVisible("panel-propuestas")) pintarDetalle();
 }
 async function recalcular() {
   const botones = [document.getElementById("btn-calcular"), document.getElementById("btn-calcular-movil")];
@@ -719,7 +721,7 @@ async function recalcular() {
   try {
     const d = await api("/api/propuestas/calcular", { method: "POST", json: {} });
     estado.propuestas = d.propuestas; estado.clasificacion = d.clasificacion;
-    await cargarEstado(); pintarResumen(); pintarDetalle();
+    await cargarEstado(); pintarResumen(); if (pestanaVisible("panel-propuestas")) pintarDetalle();
     notificar("Propuestas recalculadas y alertas evaluadas.");
   } catch (e) { notificar(e.message); }
   finally { ocupado(botones, false); botones.forEach((b) => { b.textContent = b.dataset.t; }); }
@@ -761,10 +763,17 @@ async function iniciar() {
   document.getElementById("form-operacion").elements.fecha.value = new Date().toISOString().slice(0, 10);
   let inicial = null;
   try { inicial = localStorage.getItem("pestana"); } catch { /* sin almacenamiento */ }
-  await cargarEstado();
-  try { estado.reto = await api("/api/reto"); } catch { estado.reto = null; }
+  // Carga inicial en paralelo y un solo pintado (menos recálculos de estilo y diseño).
+  const [e, r, p, c, a] = await Promise.allSettled([api("/api/estado"), api("/api/reto"), api("/api/propuestas"),
+    api("/api/cartera"), api("/api/alertas?limite=5")]);
+  const valor = (x) => (x.status === "fulfilled" ? x.value : null);
+  estado.reto = valor(r);
+  estado.cartera = valor(c);
+  estado.alertasResumen = valor(a) && valor(a).alertas;
+  if (valor(p)) { estado.propuestas = valor(p).propuestas; estado.clasificacion = valor(p).clasificacion; }
+  await cargarEstado(valor(e) || undefined);
   ajustarCampos();
-  await cargarPropuestas();
+  if (estado.propuestas) pintarResumen(); else if (p.reason) limpiar("resumen-contenido", errorCaja(p.reason));
   const tab = inicial && document.getElementById(inicial);
   if (tab && tab.id !== "tab-resumen") activarPestana(tab);
   setInterval(cargarEstado, 60000); // detecta ciclos del motor y alertas nuevas

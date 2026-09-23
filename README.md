@@ -1,102 +1,86 @@
-# Terminal de portafolios (local)
+# Actinver Terminal
 
-Terminal local en español para comparar dos propuestas de portafolio —**solo acciones** y **acciones + ETF + fondos**— contra la cartera registrada del inversionista, con seguimiento de posiciones, flujos, costo promedio, rendimiento realizado y no realizado, dividendos, comisiones, evolución histórica y comparación con un índice de referencia.
+Terminal local en español para el **Reto Actinver 2026** (y para inversión personal): calcula y recalcula en todo momento las mejores carteras **Solo acciones** y **Acciones + ETF + fondos**, cada una con dos lentes —**máximo rendimiento esperado** y **ajuste a su perfil y cartera**—, sigue su cartera real y le avisa cuando conviene cambiar algo.
 
-**Solo informa y simula.** No existe ninguna ruta que envíe órdenes a una casa de bolsa. Los precios capturados en el PDF de origen nunca se muestran como cotizaciones actuales.
+**Solo informa y simula.** No existe ninguna ruta que envíe órdenes a una casa de bolsa ni al simulador del Reto. Los precios del PDF de origen nunca se muestran como cotizaciones actuales.
 
-## Inicio rápido (Windows, PowerShell o Git Bash)
+## Inicio en un comando (Windows)
 
-Requisitos: [uv](https://docs.astral.sh/uv/) (instala Python 3.12 automáticamente). Nada más.
-
-```bash
-cd C:\Users\MIKE\Desktop\Repos\actinver-terminal
-uv sync
-uv run terminal demo        # modo demostración: datos SINTÉTICOS etiquetados, sin credenciales
+```bat
+start.bat
 ```
 
-Se abre `http://127.0.0.1:8765`. Para usar datos reales:
+Requisito único: [uv](https://docs.astral.sh/uv/) (`winget install astral-sh.uv`). `start.bat demo` abre la demostración con datos **sintéticos** etiquetados en una base separada. Equivalentes: `uv run terminal iniciar` / `uv run terminal demo`. Se abre `http://127.0.0.1:8765`.
 
-```bash
-copy .env.example .env      # y complete las claves que tenga (ver «Fuentes de datos»)
-uv run terminal actualizar  # descarga tipo de cambio y precios respetando límites
-uv run terminal iniciar     # abre la terminal con datos reales
-```
-
-Sin ninguna clave, el modo real ya obtiene el tipo de cambio USD/MXN de FRED; las propuestas quedan **suspendidas** («sin datos suficientes») hasta que haya precios de un proveedor configurado o importados por usted. Esto es intencional: la terminal no simula cotizaciones.
+Para datos reales copie `.env.example` como `.env` y complete las claves que tenga. Sin ninguna clave ya funcionan el tipo de cambio (FRED), el calendario macro (ForexFactory) y los titulares (Seeking Alpha); las propuestas quedan **suspendidas** hasta tener precios (proveedor configurado o CSV propio): la terminal no simula cotizaciones.
 
 | Comando | Qué hace |
 |---|---|
-| `uv run terminal iniciar` | Servidor local en 127.0.0.1:8765 y abre el navegador |
-| `uv run terminal demo` | Igual, con base separada `data/demo/` y datos sintéticos etiquetados |
-| `uv run terminal actualizar` | Actualización incremental de datos (respeta límites por proveedor) |
-| `uv run terminal respaldar` | Copia verificada (`PRAGMA integrity_check`) en `data/respaldos/`, conserva 14 |
-| `uv run pytest` | 44 pruebas: libro, vigencia, universo, optimizador, seguridad y adaptadores |
+| `uv run terminal iniciar` | Servidor local + motor automático (recalcula y evalúa alertas) |
+| `uv run terminal demo` | Igual, con datos sintéticos en `data/demo/` |
+| `uv run terminal actualizar` | Actualización incremental de datos (respeta límites) |
+| `uv run terminal respaldar` | Respaldo verificado en `data/respaldos/` |
+| `uv run pytest` | 63 pruebas |
+| `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |
 
-## Uso
+## Qué muestra
 
-1. **Perfil**: riesgo, horizonte, capital, peso máximo por activo, exposición máxima al dólar, escenario y exclusiones. Se guardan en la base local sin tocar código.
-2. **Mi cartera**: registre operaciones manualmente o importe CSV (`operaciones`, `posiciones iniciales` o `precios / valor liquidativo`). Siempre hay vista previa; nada se guarda hasta confirmar. Duplicados detectados; el archivo original se conserva. Correcciones y anulaciones quedan en auditoría.
-3. **Recalcular propuestas**: calcula ambas, las compara con 1/N y con mantener su cartera, y muestra puntuación, motivos, riesgos, escenarios, sensibilidad y cambios sugeridos.
-4. **Datos**: proveedor, bolsa, moneda, zona horaria, hora del dato, tipo (cierre, valor liquidativo, tipo de cambio), retraso medido y vigencia de cada instrumento.
+- **Resumen**: estado de datos y del motor, alertas nuevas, Reto (sesiones restantes, reglas, pendientes), cartera (valor, resultado, caída, vs IPC) y las dos propuestas con selector de lente, clasificación, riesgos y cambios sugeridos.
+- **Propuestas**: pesos, montos, títulos enteros, razones, puntuación explicada, rendimiento esperado al cierre del Reto, validación fuera de muestra, escenarios, sensibilidad, cambios frente a su cartera y «Simular estos cambios».
+- **Alertas**: deriva con mejora neta de costos, stop-loss, toma de utilidad, caída desde máximo, evento macro, insider, noticia de alto impacto y alertas técnicas; notificación de escritorio de Windows; «Simular cambio».
+- **Mi cartera**: operaciones (captura o CSV con vista previa), posiciones, costo promedio, realizado/no realizado, dividendos, comisiones con IVA, curva de valor, caída, IPC/S&P 500/60-40, auditoría.
+- **Mercado**: calendario macro, titulares e insiders de sus emisoras; gráfica por activo (widget de TradingView).
+- **Datos**: proveedor, bolsa, moneda, zona horaria, hora, tipo de dato, retraso y vigencia de cada instrumento.
+- **Reto y perfil**: reglas oficiales (con «regla sin confirmar»), tareas pendientes, perfil y criterios.
 
-Plantillas CSV: `http://127.0.0.1:8765/api/plantilla/transacciones` (también `posiciones` y `precios`).
+## Reto Actinver 2026
 
-## Fuentes de datos
+Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-2026): 1 000 000 actipesos; práctica 28 sep–2 oct; competencia 5 oct–13 nov 15:00; comisión 0.10 % + IVA; al menos 5 emisoras; máximo 50 % por emisora; sin dividendos (sí splits); horario BMV 07:30–14:00 hasta el 2 nov y 08:30–15:00 desde el 3 nov. Importe la lista de instrumentos del simulador en «Mi cartera → Importar» para restringir el universo. La calificación por avance (Acelera Academy) no la cubre la terminal.
 
-| Proveedor | Uso en la terminal | Credencial | Condiciones |
-|---|---|---|---|
-| FRED (DEXMXUS) | Tipo de cambio USD/MXN diario (rezago de días) | No | Datos públicos, citar fuente |
-| Banxico SIE (SF43718) | Tipo de cambio FIX; prioridad sobre FRED | Token gratuito | Límites del SIE |
-| Tiingo EOD | Cierres de EE. UU. para emisoras del SIC y ETF (ajuste por dividendos/splits) | Clave gratuita | Uso personal, sin redistribución |
-| EODHD | Cierres de la BMV | Clave (20/día gratis) | Planes de pago para más cobertura |
-| Archivo CSV | Valor liquidativo de fondos y cualquier precio que usted obtenga legítimamente | No | — |
+## Fuentes y credenciales
 
-Detalle, evaluación de TradingView, Seeking Alpha, Forex Factory, InsiderFinance, Barchart y Dukascopy en [docs/10-fuentes.md](docs/10-fuentes.md). **Tiempo real**: ninguna de las fuentes configuradas lo ofrece; ver [docs/10-fuentes.md](docs/10-fuentes.md#tiempo-real).
+| Fuente | Uso | Credencial |
+|---|---|---|
+| FRED | USD/MXN (rezago 2–3 sesiones) | No |
+| Banxico SIE | USD/MXN FIX (prioritario) | `BANXICO_TOKEN` gratuito |
+| Tiingo | Cierres de EE. UU. (SIC y ETF) | `TIINGO_API_KEY` gratuita |
+| EODHD | Cierres de la BMV | `EODHD_API_KEY` (20/día gratis) |
+| Barchart OnDemand | Históricos | `BARCHART_API_KEY` (contrato) |
+| ForexFactory | Calendario macro | No |
+| Seeking Alpha RSS | Titulares por emisora | No |
+| SEC EDGAR | Formulario 4 (insiders) | `SEC_USER_AGENT` (su contacto) |
+| TradingView | Gráfica (widget oficial) | No |
+| CSV propio | NAV de fondos, precios, operaciones, universo del simulador | No |
+
+**Tiempo real**: ninguna fuente gratuita autorizada lo da para la BMV; todo se presenta como cierre con su fecha. Opciones en [docs/fuentes.md](docs/fuentes.md#tiempo-real).
 
 ## Configuración
 
-- `config/ajustes.ejemplo.toml`: valores por defecto versionados (vigencia, límites, perfiles, costos, optimización, pesos de la puntuación). Para cambiarlos cree `config/local.toml` (no versionado) con solo las secciones a modificar.
-- `.env`: credenciales. Ignorado por Git.
-- `config/universo.csv`: universo verificado (lo genera `scripts/verificar_universo.py`).
-
-## Estructura
-
-```
-terminal/            núcleo (Python)
-  adaptadores/       FRED, Banxico, Tiingo, EODHD, archivo, generador demo
-  vigencia.py        calendarios NYSE/BMV, festivos, umbrales por tipo de dato
-  mercado.py         precios normalizados a MXN con fuente y vigencia
-  cartera.py         libro de operaciones, costo promedio, TWR, TIR
-  importar.py        CSV validado con vista previa, duplicados y auditoría
-  optimizador.py     universo elegible, media-varianza (skfolio), walk-forward, escenarios, puntuación
-  app.py, seguridad.py  servidor local y controles HTTP
-web/                 interfaz (HTML/CSS/JS sin dependencias)
-config/              ajustes de ejemplo, universo verificado, fondos, candidatos ETF, transcripción del PDF
-scripts/             transcripción y verificación del universo, cartera demo, tareas de Windows
-docs/                diagnóstico, PRD, planes, decisiones, matriz de aplicabilidad, evidencia
-tests/               pruebas automatizadas
-```
+- `config/ajustes.ejemplo.toml` (versionado): vigencia, proveedores y límites, referencias, motor, alertas, perfiles, costos, optimización, puntuación. Cambios propios en `config/local.toml` (no versionado).
+- `config/reto.yaml`: reglas del Reto.
+- `.env`: credenciales (ignorado por Git).
 
 ## Documentación
 
 | Documento | Contenido |
 |---|---|
-| [00 Diagnóstico CAIO](docs/00-diagnostico-caio.md) | Definición, supuestos y evaluación de capacidades, arquitectura, información y operación |
-| [01 Bucle de datos](docs/01-bucle-datos.md) | Adquisición → validación → normalización → análisis → propuesta → visualización → seguimiento → evaluación |
-| [02 PRD](docs/02-prd.md) | Usuarios, casos de uso, criterios de aceptación y límites |
-| [03 Plan de implementación](docs/03-plan-implementacion.md) | Etapas, dependencias y riesgos |
-| [04 Adopción](docs/04-adopcion.md) | Instalación, configuración y uso |
-| [05 Recurrencia](docs/05-recurrencia.md) | Actualización, revisión del modelo, mantenimiento, respaldos, monitoreo |
-| [06 Decisiones](docs/06-decisiones.md) | Registro de decisiones (ADR) |
-| [07 Matriz de aplicabilidad](docs/07-matriz-aplicabilidad.md) | Seguridad, sitio, medición y diseño |
-| [08 Inventario de repositorios](docs/08-inventario-repositorios.md) | Qué se reutilizó, corrigió y descartó |
-| [09 Auditoría del PDF](docs/09-auditoria-pdf.md) | Revisión página por página y hallazgos |
-| [10 Fuentes](docs/10-fuentes.md) | Proveedores y URL candidatas: uso permitido, licencia, API |
-| [11 Diseño](docs/11-diseno.md) | Decisiones de interfaz |
-| [12 Seguridad](docs/12-seguridad.md) | Controles, revisión de secretos y rotación |
-| [13 Evidencia](docs/13-evidencia.md) | Pruebas de los criterios de aceptación |
+| [00 Diagnóstico CAIO](docs/00-diagnostico-caio.md) | Capacidades, arquitectura, información, operación; supuestos |
+| [01 Bucle de datos](docs/01-bucle-datos.md) | Adquisición → … → propuesta → alerta → visualización → seguimiento → evaluación |
+| [02 PRD](docs/02-prd.md) | Usuarios, casos de uso, criterios de aceptación, límites |
+| [03 Plan de implementación](docs/03-plan-implementacion.md) | Etapas, dependencias, riesgos |
+| [04 Adopción](docs/04-adopcion.md) | Instalación, configuración, primer uso en el Reto |
+| [05 Recurrencia](docs/05-recurrencia.md) | Datos, re-optimización, modelo, respaldos, monitoreo, rotación de claves |
+| [09 Auditoría del PDF](docs/09-auditoria-pdf.md) | Revisión página por página |
+| [13 Evidencia](docs/13-evidencia.md) | Criterios de aceptación con pruebas, Lighthouse y capturas |
+| [Repositorios](docs/repos.md) | 64 fichas (lectura fácil, técnico, uso, cambios) |
+| [Fuentes](docs/fuentes.md) | Tipo, retraso medido, límites, credenciales, condiciones |
+| [Decisiones](docs/decisiones.md) | Registro D-01 a D-30 |
+| [Seguridad](docs/seguridad.md) | Checklist aplicado / previsto / no aplica con evidencia |
+| [Matriz](docs/matriz.md) | Sitio, legal, SEO, indexación, medición |
+| [Diseño](docs/diseno.md) | Decisiones de interfaz |
+| [CHANGELOG](CHANGELOG.md) | Historial de cambios |
 
 ## Aviso
 
-Herramienta de análisis personal. No es asesoría de inversión ni una recomendación personalizada; los rendimientos esperados son estimaciones inciertas basadas en datos históricos. Verifique disponibilidad, costos y condiciones de cada instrumento con su casa de bolsa antes de operar.
+Herramienta de análisis personal. No es asesoría de inversión ni recomendación; los rendimientos esperados son estimaciones inciertas con datos históricos. Verifique disponibilidad, costos y reglas con Actinver y con las bases del Reto.

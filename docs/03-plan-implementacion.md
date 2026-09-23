@@ -12,7 +12,7 @@ Estado al 2026-09-22: etapas 0–6 **completadas** en esta entrega; etapa 7 depe
 | 5. Interfaz | Web local accesible y adaptable | 3, 4 | Complejidad visual; XSS | Seis pestañas, jerarquía clara; DOM por `textContent`; CSP | Hecho |
 | 6. Seguridad y pruebas | Controles HTTP, 44 pruebas, documentación | 1–5 | Regresiones | `uv run pytest` antes de cada cambio | Hecho |
 | 7. Datos reales | Credenciales, NAV de fondos, confirmación de ETF en el SIC | Usuario | Costos de planes; cobertura BMV | Empezar con Tiingo + Banxico gratis; EODHD de pago solo si hace falta la BMV diaria | Pendiente del usuario |
-| 8. Opcional | Tiempo real, acceso desde el móvil por red, notificaciones | 7 | Exposición de red; costos | Ver [12-seguridad.md](12-seguridad.md) antes de exponer | Previsto |
+| 8. Opcional | Tiempo real, acceso desde el móvil por red, notificaciones | 7 | Exposición de red; costos | Ver [seguridad.md](seguridad.md) antes de exponer | Previsto |
 
 ## Dependencias técnicas
 
@@ -25,3 +25,16 @@ Estado al 2026-09-22: etapas 0–6 **completadas** en esta entrega; etapa 7 depe
 2. **Precio SIC**: se valora con el mercado de origen convertido a MXN; puede diferir del precio en la BMV por spread y horario.
 3. **Modelo**: con datos ruidosos la selección de acciones rota bastante entre ventanas (se informa en «costos» y «estabilidad»).
 4. **Fondos**: sin API pública; dependen de la importación de NAV.
+
+## Etapas 2026-09-23 (Reto) — completadas
+
+| Etapa | Entregable | Riesgo | Mitigación |
+|---|---|---|---|
+| R1 Reglas | `config/reto.yaml` desde las bases oficiales | Reglas que cambian o no publicadas | Configuración, no código; `null` visible |
+| R2 Lentes | 4 propuestas coherentes | Estimadores inconsistentes | μ global (D-22), prueba de lentes |
+| R3 Motor | Ciclo automático | Cálculos simultáneos, consumo de límites | Candado, recálculo condicionado, límites persistentes |
+| R4 Alertas | 9 reglas + notificación | Ruido (spam) | Histéresis, enfriamiento, agrupación, silencio fuera de horario |
+| R5 Contexto | FF, SA, SEC, Barchart, TradingView | Condiciones de uso | Solo feeds/API/widget oficiales; límites por hora |
+| R6 Interfaz | Alertas, Mercado, Reto, esqueletos, cifras monoespaciadas | Rendimiento | Carga diferida, SQL único, memoización (D-29) |
+
+**Pendiente del usuario**: claves (Banxico, Tiingo/EODHD), `SEC_USER_AGENT`, exportar la lista de instrumentos del simulador, decidir tiempo real.

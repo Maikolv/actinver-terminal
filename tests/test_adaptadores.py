@@ -8,7 +8,7 @@ import pytest
 from terminal.adaptadores import Banxico, Eodhd, ErrorProveedor, Fred, LimiteAlcanzado, Tiingo
 from terminal.adaptadores.base import limpiar
 
-SECRETO = "clave-super-secreta-123"
+SECRETO = "clave-super-secreta-123"  # valor ficticio de prueba  # pragma: allowlist secret
 
 
 def cliente(respuestas):

@@ -18,7 +18,7 @@ PATRONES = {
     "google": r"AIza[0-9A-Za-z_-]{35}",
     "llave_privada": r"-----BEGIN [A-Z ]*PRIVATE KEY-----",
     "telegram": r"\b\d{8,10}:[A-Za-z0-9_-]{35}\b",
-    "asignacion": r"(?i)(api_?key|token|secret|password|passwd)\s*[=:]\s*['\"][A-Za-z0-9/+_\-]{16,}['\"]",
+    "asignacion": r"(?i:api_?key|token|secret|password|passwd)\s*[=:]\s*['\"][A-Za-z0-9/+_\-]{16,}['\"]",
 }
 EXPR = re.compile("|".join(f"(?P<{k}>{v})" for k, v in PATRONES.items()))
 

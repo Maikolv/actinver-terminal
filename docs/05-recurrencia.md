@@ -39,3 +39,24 @@ Tareas de Windows opcionales (las registra el usuario): `scripts/programar_tarea
 - Barra superior: conteo por vigencia, tipo de cambio y última sesión; «Operaciones reales: deshabilitadas».
 - Pestaña Datos: última corrida por proveedor, errores y peticiones restantes.
 - Tabla `ingestas` (SQLite) con cada corrida; tabla `auditoria` con cada alta, corrección, anulación, importación y cambio de perfil.
+
+## Re-optimización y alertas (automático)
+
+| Qué | Frecuencia | Detalle |
+|---|---|---|
+| Ciclo del motor | 15 min con mercado abierto, 60 min cerrado | Adquisición → recálculo condicionado → alertas |
+| Recálculo inmediato | Al registrar/anular/corregir operaciones, importar o cambiar el perfil | Hilo en segundo plano |
+| Calendario macro | ≤ 1/h | Feed de ForexFactory |
+| Titulares | ≤ 1 por emisora cada 30 min | RSS de Seeking Alpha |
+| Insiders | ≤ 1 por emisora cada 12 h | SEC EDGAR (si hay `SEC_USER_AGENT`) |
+| Revisión de umbrales de alertas | Semanal durante el Reto | `[alertas]` en `config/local.toml` |
+
+## Rotación de claves
+
+| Clave | Cuándo | Cómo |
+|---|---|---|
+| Tiingo, EODHD, Barchart, Banxico | Cada 6 meses o ante sospecha | Regenerar en el panel del proveedor → `.env` → reiniciar |
+| SMTP / Telegram | Ante sospecha o cambio de dispositivo | Nueva contraseña de aplicación / `/revoke` en BotFather |
+| Token CSRF | Cada arranque (automático) | — |
+
+Tras rotar: `uv run python scripts/escanear_secretos.py` y `uv run detect-secrets scan` para confirmar que ningún valor quedó en archivos versionados.

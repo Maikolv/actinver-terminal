@@ -8,7 +8,8 @@ El inversionista tiene acceso a una lista amplia de acciones (BMV y SIC), alguno
 
 | Usuario | Necesidad | Frecuencia |
 |---|---|---|
-| Inversionista individual (principal) | Ver su cartera, comparar propuestas, entender cambios y riesgos antes de decidir en su casa de bolsa | Semanal / tras cada operación |
+| Estudiante en el Reto Actinver 2026 (principal) | Saber cada día qué cartera conviene con 1 000 000 actipesos, cumplir las reglas (≥ 5 emisoras, ≤ 50 %), enterarse a tiempo cuando conviene cambiar algo y no olvidar el avance educativo | Diaria durante la competencia |
+| Inversionista individual | Ver su cartera, comparar propuestas, entender cambios y riesgos antes de decidir en su casa de bolsa | Semanal / tras cada operación |
 | Asesor o familiar de confianza (secundario, en la misma PC) | Revisar la lógica y los supuestos | Ocasional |
 
 ## Casos de uso
@@ -43,7 +44,7 @@ El inversionista tiene acceso a una lista amplia de acciones (BMV y SIC), alguno
 - Arranque en un comando; respuesta de consultas < 200 ms; cálculo de propuestas < 30 s con indicador de progreso.
 - Accesibilidad: contraste AA, navegación por teclado (incluidas pestañas con flechas), etiquetas en todos los campos, mensajes de error asociados.
 - Adaptable a 375 px sin desplazamiento horizontal de página.
-- Solo escucha en 127.0.0.1; ver [12-seguridad.md](12-seguridad.md).
+- Solo escucha en 127.0.0.1; ver [seguridad.md](seguridad.md).
 
 ## Criterios de aceptación
 
@@ -56,7 +57,7 @@ El inversionista tiene acceso a una lista amplia de acciones (BMV y SIC), alguno
 | CA-5 | Clasificación y motivos cambian de forma reproducible con riesgo, horizonte o restricciones | `test_optimizador.py::test_cambia_con_riesgo...`, `test_reproducible` |
 | CA-6 | Sin claves en el repositorio ni operaciones reales | `test_seguridad.py::test_sin_secretos...`, `test_no_existen_rutas_de_ordenes_reales` |
 | CA-7 | Escritorio y móvil; accesibilidad básica, errores y rendimiento verificados | [13-evidencia.md](13-evidencia.md) §5–7 |
-| CA-8 | Matriz de aplicabilidad completa | [07-matriz-aplicabilidad.md](07-matriz-aplicabilidad.md) |
+| CA-8 | Matriz de aplicabilidad completa | [matriz.md](matriz.md) |
 
 ## Límites (fuera de alcance)
 
@@ -64,5 +65,25 @@ El inversionista tiene acceso a una lista amplia de acciones (BMV y SIC), alguno
 - Datos en tiempo real (no contratados).
 - Asesoría personalizada o promesa de rendimientos.
 - Deducción de tenencias o rentabilidad a partir del PDF.
-- Multiusuario, acceso remoto y publicación en internet (previsto solo como plan en [12-seguridad.md](12-seguridad.md)).
+- Multiusuario, acceso remoto y publicación en internet (previsto solo como plan en [seguridad.md](seguridad.md)).
 - Cálculo fiscal definitivo (el ISR es una estimación configurable).
+
+## Ampliación 2026-09-23 (Reto)
+
+**Casos de uso nuevos**
+- **CU-8 Reto**: ver etapa, sesiones restantes, reglas (con «regla sin confirmar»), cumplimiento de su cartera y tareas pendientes (incluido el avance en Acelera Academy, que la terminal no cubre).
+- **CU-9 Lentes**: comparar «máximo rendimiento esperado» (agresiva, con riesgo explícito) y «ajuste a su perfil y cartera» en cada universo.
+- **CU-10 Alertas**: recibir un aviso de escritorio cuando la deriva supera el umbral con mejora neta de costos, cuando una posición toca stop/toma de utilidad/caída desde máximo, ante un evento macro de alto impacto, una operación de insider o una noticia relevante, o cuando un dato está vencido; simular el cambio sugerido.
+- **CU-11 Mercado**: calendario macro, titulares e insiders de sus emisoras; gráfica por activo.
+- **CU-12 Universo del simulador**: importar la lista de instrumentos del simulador para restringir el universo.
+
+**Criterios de aceptación añadidos**
+
+| # | Criterio | Evidencia |
+|---|---|---|
+| CA-9 | Las propuestas se recalculan solas al llegar datos nuevos y cambian de forma reproducible | `servicios.ciclo`, `test_reproducible`, estado del motor en la barra |
+| CA-10 | Cada regla de alerta dispara en una prueba simulada y respeta enfriamiento | `tests/test_alertas.py` |
+| CA-11 | Reglas del Reto aplicadas y visibles | `tests/test_reto.py` |
+| CA-12 | Cada repositorio tiene ficha; cada URL tiene uso documentado | `docs/repos.md` (64), `docs/fuentes.md` |
+
+**Límites añadidos**: la terminal no captura órdenes en el simulador ni automatiza la sesión del Reto (el reglamento solo reconoce órdenes del navegador); no hay tiempo real de la BMV sin contrato.

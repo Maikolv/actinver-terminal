@@ -1,5 +1,22 @@
 # 04 · Plan de adopción
 
+## Arranque en un comando
+
+```bat
+start.bat
+start.bat demo
+```
+
+El primero usa datos reales (con las claves de `.env`); el segundo, datos sintéticos en una base separada. `start.bat` verifica `uv`, instala dependencias la primera vez y abre `http://127.0.0.1:8765`.
+
+## Antes del 5 de octubre (Reto)
+
+1. Inscribirse en retoactinver.com (reglamento: hasta el 4 oct 23:59; la portada sugiere el 2 oct).
+2. En la semana de práctica (28 sep–2 oct), exportar o copiar la lista de instrumentos del simulador y cargarla en «Mi cartera → Importar → Lista de instrumentos del simulador».
+3. Configurar `.env` (Banxico, Tiingo y, si se quiere cobertura diaria de la BMV, EODHD) y opcionalmente `SEC_USER_AGENT`.
+4. El 5 oct, registrar la aportación de 1 000 000 y cada orden ejecutada en el simulador (la comisión de 0.10 % + IVA se calcula al capturar).
+5. Dejar la terminal abierta en horario de mercado: el motor recalcula y avisa.
+
 ## Semana 1 — Instalar y conocer (sin riesgo)
 
 1. Instalar uv (si no existe): `winget install astral-sh.uv`.

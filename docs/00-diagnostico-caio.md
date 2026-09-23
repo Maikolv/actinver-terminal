@@ -34,7 +34,7 @@ Los materiales no definen «CAIO». Para este proyecto se interpreta como un dia
 
 ## A · Arquitectura
 
-Se eligió la arquitectura más pequeña: **un proceso Python** (FastAPI + SQLite + skfolio) que sirve una interfaz estática. Sin Node en tiempo de ejecución, sin base de datos externa, sin contenedores, sin servicios en la nube. Justificación y alternativas descartadas en [06-decisiones.md](06-decisiones.md) y [08-inventario-repositorios.md](08-inventario-repositorios.md).
+Se eligió la arquitectura más pequeña: **un proceso Python** (FastAPI + SQLite + skfolio) que sirve una interfaz estática. Sin Node en tiempo de ejecución, sin base de datos externa, sin contenedores, sin servicios en la nube. Justificación y alternativas descartadas en [decisiones.md](decisiones.md) y [repos.md](repos.md).
 
 ```
 Navegador (127.0.0.1) ──HTTP──► FastAPI (seguridad, API) ──► SQLite local (data/terminal.db)
@@ -48,7 +48,7 @@ Navegador (127.0.0.1) ──HTTP──► FastAPI (seguridad, API) ──► SQL
 - **PDF**: 11 páginas, solo imágenes. 146 símbolos en «Acciones», la misma lista repetida bajo el rótulo «ETF's» (ningún ETF real) y 23 fondos cuya columna «1 año» aparece en 0.00 % para todos (dato no poblado). Detalle en [09-auditoria-pdf.md](09-auditoria-pdf.md).
 - **Calidad del universo**: 2 deslistados (CPE, MRO), 2 claves reasignadas a otra empresa (GOLD → hoy «Gold.com»; PARA → hoy «Banzai»), 2 claves de BMV por confirmar (ALFA, probable SIGMAF; ELEKTRA). Todos excluidos de las propuestas con motivo visible.
 - **ETF**: al no haber ETF en el PDF, se propone un conjunto candidato verificado como ETF en Nasdaq Trader (disponibilidad en el SIC por confirmar por el usuario) y el tracker SMARTRC de Actinver; ANGELD (2×) y DIABLOI (inverso) se excluyen por apalancamiento.
-- **Licencias**: solo fuentes con uso personal permitido y sin evasión de controles (Stooq exige desafío anti-bot y Yahoo limita el acceso automatizado: descartados). Ver [10-fuentes.md](10-fuentes.md).
+- **Licencias**: solo fuentes con uso personal permitido y sin evasión de controles (Stooq exige desafío anti-bot y Yahoo limita el acceso automatizado: descartados). Ver [fuentes.md](fuentes.md).
 
 ## O · Operación
 
@@ -63,4 +63,17 @@ Navegador (127.0.0.1) ──HTTP──► FastAPI (seguridad, API) ──► SQL
 1. Obtener y configurar credenciales (Tiingo, EODHD, Banxico) o importar precios propios.
 2. Confirmar con Actinver la disponibilidad en el SIC de los ETF candidatos y sus comisiones reales.
 3. Exportar e importar el valor liquidativo de los fondos (no hay API pública de Actinver).
-4. Decidir si contrata datos en tiempo real (ver [10-fuentes.md](10-fuentes.md#tiempo-real)).
+4. Decidir si contrata datos en tiempo real (ver [fuentes.md](fuentes.md#tiempo-real)).
+
+## Actualización 2026-09-23 — Reto Actinver 2026
+
+**Supuestos nuevos.** El usuario es un estudiante inscrito en el Reto Actinver 2026: opera 1 000 000 actipesos en el simulador de la BMV del 5 oct al 13 nov (práctica 28 sep–2 oct) y es evaluado por rendimiento y por avance educativo. Las reglas se tomaron de las bases oficiales (retoactinver.com, consultadas el 23-sep) y viven en `config/reto.yaml`; lo no publicado queda como «regla sin confirmar».
+
+| Dimensión | Cambio |
+|---|---|
+| Capacidades | 4 propuestas (2 universos × 2 lentes), motor automático, 9 reglas de alerta, notificación de escritorio, simulación de cambios, contexto macro/noticias/insiders, gráfica TradingView, reglas y tareas del Reto |
+| Arquitectura | Se mantiene un proceso local; se añaden un hilo de motor, `servicios.py` (casos de uso comunes a API y motor), `alertas.py`, `notificador.py`, `fuentes_web.py`, `reto.py` |
+| Información | Reglas oficiales del Reto (comisión 0.10 % + IVA, ≥ 5 emisoras, ≤ 50 %, sin dividendos, horarios); ForexFactory y Seeking Alpha funcionando sin clave; SEC exige User-Agent de contacto; tiempo real de la BMV: no disponible gratis |
+| Operación | `start.bat`; motor cada 15 min en mercado / 60 min fuera; alertas silenciadas fuera de horario; escaneo de secretos del historial y `pip-audit` |
+
+**Discrepancia registrada.** La portada del Reto dice «último día para inscribirte: 2 de octubre»; el reglamento (§5) fija el cierre de inscripción el 4 de octubre a las 23:59. Se usa el reglamento y se recomienda inscribirse antes del 2.

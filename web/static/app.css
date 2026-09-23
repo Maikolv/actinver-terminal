@@ -20,8 +20,8 @@
   --foco: #1f5f8b;
   --radio: 6px;
   --espacio: 16px;
-  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+  --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, ui-monospace, monospace;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -117,7 +117,7 @@ main:focus { outline: none; }
 table { border-collapse: collapse; width: 100%; font-size: .88rem; }
 caption { text-align: left; padding: 8px 10px; color: var(--texto-2); font-size: .82rem; }
 th, td { padding: 7px 10px; border-bottom: 1px solid var(--borde); text-align: left; vertical-align: top; }
-th { font-weight: 600; color: var(--texto-2); background: var(--superficie-2); position: sticky; top: 0; }
+th { font-weight: 600; color: var(--texto-2); background: var(--superficie-2); }
 td.num, th.num { text-align: right; white-space: nowrap; }
 tr:last-child td { border-bottom: none; }
 
@@ -172,7 +172,7 @@ summary { cursor: pointer; font-weight: 600; }
 td.num, th.num, .kpi .valor, .puntuacion .numero, .cifra, .barras .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
 /* Esqueletos de carga */
-.esqueleto { background: var(--superficie-2); border-color: transparent; border-radius: var(--radio); animation: pulso 1.2s ease-in-out infinite alternate; }
+.esqueleto { background: var(--superficie-2); border-color: transparent; border-radius: var(--radio); animation: pulso 1.2s ease-in-out 3 alternate; }
 .esqueleto--linea { display: inline-block; width: min(520px, 90%); height: 14px; }
 .esqueleto--bloque { min-height: 180px; }
 @keyframes pulso { from { opacity: .55; } to { opacity: 1; } }
@@ -217,8 +217,11 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
 
 @media (max-width: 720px) {
   .acciones-cabecera .boton--primario { display: none; }
-  .acciones-cabecera { width: 100%; }
-  .acciones-cabecera .boton { flex: 1 1 auto; }
+  .acciones-cabecera { width: 100%; flex-wrap: wrap; }
+  .acciones-cabecera .boton { flex: 1 1 140px; white-space: normal; }
+  .estado-datos { min-height: 7.5em; }
+  .estado-datos .grupo { flex-wrap: wrap; min-width: 0; }
+  .franja-alertas, .tarjeta, .alerta { overflow-wrap: anywhere; }
   .barra-movil { display: block; position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--superficie); border-top: 1px solid var(--borde); z-index: 15; }
   .barra-movil .boton { width: 100%; }
   .notificacion { bottom: 76px; }

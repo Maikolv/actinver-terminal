@@ -45,7 +45,7 @@ Contexto: práctica habitual en México para acciones. Decisión: comisiones de 
 Decisión: no se borran operaciones; se anulan o corrigen creando un registro que referencia al anterior, con motivo y auditoría. Importaciones todo-o-nada con archivo original conservado.
 
 ### D-15 Seguridad local por defecto
-Decisión: solo 127.0.0.1 (el CLI rechaza otro host), verificación de Host, CSRF de doble control, CSP sin `unsafe-inline`, límites de cuerpo y frecuencia, sin documentación OpenAPI expuesta. Ver [12-seguridad.md](12-seguridad.md).
+Decisión: solo 127.0.0.1 (el CLI rechaza otro host), verificación de Host, CSRF de doble control, CSP sin `unsafe-inline`, límites de cuerpo y frecuencia, sin documentación OpenAPI expuesta. Ver [seguridad.md](seguridad.md).
 
 ### D-16 Proveedores y extracción permitida
 Descartados: Stooq (desafío anti-bot), Yahoo (acceso automatizado restringido, 429), TradingView/Barchart/Seeking Alpha/Forex Factory/InsiderFinance sin API contratada (condiciones prohibitivas para extracción). Elegidos: FRED, Banxico, Tiingo, EODHD, CSV del usuario.
@@ -55,7 +55,7 @@ Descartados: Stooq (desafío anti-bot), Yahoo (acceso automatizado restringido, 
 - «Mejor portafolio» → mayor puntuación por criterios visibles, no certeza.
 - «Tiempo real» → solo si el proveedor lo ofrece y está contratado; hoy ninguno.
 - Números sueltos y errores tipográficos de las listas del encargo → no se tratan como metas ni requisitos.
-- Requisitos de sitio público → evaluados en la [matriz de aplicabilidad](07-matriz-aplicabilidad.md).
+- Requisitos de sitio público → evaluados en la [matriz de aplicabilidad](matriz.md).
 
 ### D-18 Renombre a `actinver-terminal`
 Contexto: el nombre `terminal-portafolios` no reflejaba que el uso inmediato es el Reto Actinver 2026. Decisión: renombrar paquete, carpeta y referencias en documentación. Consecuencias: ninguna funcional; solo nombres.
@@ -65,3 +65,33 @@ Contexto: capital, fechas, comisión, tope por emisora y mínimo de emisoras del
 
 ### D-20 Contexto de mercado sin generar órdenes
 Contexto: el encargo original menciona calendario macro, noticias e insiders como señales de apoyo. Decisión: `terminal/fuentes_web.py` consume solo vías explícitamente públicas y documentadas en su propio encabezado (feed de exportación de ForexFactory, RSS público de Seeking Alpha por emisora, Formulario 4 de SEC EDGAR con `SEC_USER_AGENT` de contacto obligatorio), con límite de frecuencia y sin sortear anti-bot ni paywalls. La clasificación de titulares es léxica y transparente por defecto; un LLM local opcional (Ollama, `OLLAMA_URL`) puede afinar el sentimiento de titulares de alto impacto sin que el texto salga del equipo. `terminal/alertas.py` y `terminal/notificador.py` convierten esto en avisos locales (nunca en operaciones automáticas).
+
+### D-21 Dos lentes por universo (cuatro propuestas)
+Contexto: el Reto premia el rendimiento absoluto, pero el inversionista tiene perfil y cartera propios. Decisión: cada universo se calcula con dos lentes: **máximo rendimiento esperado** (λ = 0.5, sin regularización, sin costo de salida desde la cartera actual, tope 20 % por activo ⇒ ≥ 5 emisoras) y **ajuste a su perfil y cartera** (λ del perfil, γ L2, costos frente a las posiciones, tope del perfil ≤ 50 % del Reto). La puntuación compara ambas con los mismos criterios; la agresiva muestra su riesgo (volatilidad, caída, p10) al lado. Consecuencias: 4 cálculos por ciclo (~20 s).
+
+### D-22 μ global para optimizar y evaluar
+Contexto: la preselección de acciones y la contracción de μ dentro del subconjunto producían un μ distinto al usado para comparar con la cartera actual (la lente agresiva salía con menor rendimiento esperado que la conservadora). Decisión: la propuesta final usa un μ global (James-Stein sobre todo el universo, con escenario) inyectado al optimizador (`MuFijo`) y el mismo μ mide rendimiento esperado y mejora neta. La validación walk-forward conserva la preselección dentro de cada ventana. Consecuencias: coherencia (prueba `test_lentes_cumplen_reglas_y_difieren`).
+
+### D-23 Reglas del Reto sobre precios y costos
+Decisión: con el Reto activo, (a) comisión del simulador 0.10 % + IVA a toda orden, más spread estimado; (b) precios **sin ajustar** por dividendos porque el Reto no los paga (§13); (c) horizonte = sesiones de la BMV hasta el 13 nov 15:00; (d) mínimo de deuda por horizonte corto desactivado (la regla de «horizonte corto ⇒ más deuda» es para inversión real, no para una competencia de 7 semanas); el perfil sigue decidiendo la deuda mínima en la lente de ajuste.
+
+### D-24 Motor automático con recálculo condicionado
+Decisión: hilo de fondo cada 15 min en horario de mercado y 60 min fuera; recalcula solo si hay datos nuevos, cambió el perfil, no hay propuestas o alguna quedó «no actual». Operaciones, importaciones y cambios de perfil disparan un ciclo inmediato. Un candado impide cálculos simultáneos entre API y motor. La interfaz consulta el estado cada 60 s y se refresca al terminar cada ciclo.
+
+### D-25 Alertas: flanco de subida, histéresis y enfriamiento
+Decisión: una alerta se dispara al pasar su condición de inactiva a activa, con enfriamiento de 6 h por (regla, clave); la deriva usa histéresis (5 pp / 3 pp) y exige mejora esperada neta de costos ≥ 0.5 %; los eventos puntuales (macro, insider, noticia) no se repiten. Fuera del horario de la BMV se registran pero no se notifican. Las notificaciones de un ciclo se agrupan en una sola. Cada alerta guarda motivo, datos, hora, fuente, acción sugerida y, si aplica, la lista de operaciones para «Simular cambio».
+
+### D-26 Notificaciones sin dependencias
+Decisión: toast nativo de Windows vía PowerShell (contenido en base64, sin interpolar texto en el script); correo SMTP y Telegram solo si el usuario los activa y configura en `.env`. Ningún mensaje incluye credenciales; los errores de Telegram no se registran porque su URL contiene el token.
+
+### D-27 TradingView por widget oficial en página aislada
+Decisión: la gráfica por activo es el widget embebible oficial en `/grafica/<id>`, con CSP propia que solo permite `s3.tradingview.com` y marcos de TradingView; la página principal conserva su CSP estricta. Se abre solo cuando el usuario lo pide (envía el símbolo a TradingView). No se extraen datos de TradingView.
+
+### D-28 Universo del simulador importable
+Decisión: el usuario puede importar la lista de instrumentos visible en el simulador; si existe, el universo del Reto se restringe a ella y el resto se excluye con motivo. Claves no reconocidas se listan pero no bloquean la importación.
+
+### D-29 Rendimiento percibido
+Decisión: el modo (demo/real) se inyecta en el HTML desde el servidor para que la cabecera no se desplace; la lista de 180 instrumentos se carga solo al enfocar el campo; una sola consulta SQL para últimas cotizaciones; cálculos de calendario memoizados; cliente HTTP perezoso (crear un contexto TLS por adaptador costaba ~300 ms en `/api/estado`).
+
+### D-30 Trabajo concurrente de otra sesión
+Contexto: una sesión paralela (Claude Sonnet 5) consolidó en commits (`4ff11b7`, `a04bafc`) parte del trabajo en curso y añadió `CLAUDE.md`, `CHANGELOG.md`, D-18–D-20 y variables en `.env.example`. Decisión: conservar sus aportes, integrarlos (CHANGELOG ampliado, referencias a documentos renombrados) y no reescribir su historial.

@@ -15,19 +15,20 @@ Terminal local (FastAPI + SQLite + HTML/CSS/JS sin build) para comparar dos
 propuestas de portafolio (solo acciones / acciones+ETF+fondos) contra la cartera
 real del inversionista, calibrada para el **Reto Actinver 2026**. Solo informa y
 simula: ninguna ruta envía órdenes a una casa de bolsa. Ver `README.md` para
-arranque rápido y `docs/` para el diseño completo (numerado 00–13).
+arranque rápido y `docs/` para el diseño completo.
 
-## Estado actual (2026-09-23)
+## Estado actual (2026-09-23, v0.2.0)
 
-- 63 pruebas en verde (`uv run pytest`).
-- Commit `4ff11b7`: renombre a `actinver-terminal` + reglas del Reto Actinver 2026
-  (`config/reto.yaml`, `terminal/reto.py`) integradas en el optimizador y en el
-  cumplimiento de cartera + alertas de contexto (`terminal/alertas.py`,
-  `terminal/notificador.py`, `terminal/fuentes_web.py`: calendario ForexFactory,
-  noticias Seeking Alpha, insiders SEC EDGAR) + `detect-secrets`/`pip-audit` en dev.
-- `docs/06-decisiones.md` tiene D-01 a D-20. Antes de cambiar algo ya decidido, léelo.
-- `docs/10-fuentes.md` documenta qué fuentes están evaluadas y cuáles quedaron
-  descartadas (D-16); no reintentes las descartadas sin una razón nueva.
+- 63 pruebas en verde (`uv run pytest`); Lighthouse escritorio 100/100/100, móvil 93/100/100.
+- 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con reglas del Reto
+  (`config/reto.yaml`), μ global coherente (D-22), motor automático (`servicios.ciclo`),
+  alertas con histéresis/enfriamiento y notificación de escritorio (`alertas.py`,
+  `notificador.py`), contexto FF/SA/SEC/Barchart (`fuentes_web.py`), widget de
+  TradingView en `/grafica/<id>`, simulación de cambios, universo del simulador.
+- Docs con nombres pedidos: `docs/repos.md` (64 fichas), `fuentes.md`, `decisiones.md`
+  (D-01 a D-30), `seguridad.md`, `matriz.md`, `diseno.md`; evidencia en `docs/13-evidencia.md`.
+- No reintentes fuentes descartadas (D-16) sin una razón nueva. Otra sesión puede trabajar
+  en paralelo en este repo (D-30): revisa `git log` y `git status` antes de commitear.
 
 ## Comandos
 
@@ -38,6 +39,7 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run pytest -q             # 63 pruebas
+start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq
 ```
 
@@ -48,24 +50,24 @@ importados por el usuario — es intencional (D-12), no un bug.
 ## Brechas conocidas / próximas mejoras (mayor impacto primero)
 
 1. **Datos en tiempo real verdadero**: ninguna fuente configurada lo ofrece hoy
-   (D-16, `docs/10-fuentes.md#tiempo-real`). Cerrar esto requeriría un proveedor de
+   (D-16, `docs/fuentes.md#tiempo-real`). Cerrar esto requeriría un proveedor de
    pago — **requiere decisión del usuario**, no se contrata solo.
 2. **Cobertura completa de BMV/SIC**: EODHD da 20 peticiones/día gratis; el universo
    verificado puede ir por delante de lo que se puede refrescar a diario. Vigilar
-   `docs/07-matriz-aplicabilidad.md` y considerar una cola de actualización que
+   `docs/matriz.md` y considerar una cola de actualización que
    priorice los instrumentos con posición abierta o en una propuesta activa.
 3. **`SEC_USER_AGENT` sin configurar** por defecto → la fuente de insiders queda
    inactiva hasta que el usuario ponga su contacto en `.env` (no es automatizable:
    es una declaración personal ante la SEC).
 4. **Backtests de más modelos** (D-03/D-04 ya cubren media-varianza con skfolio):
    evaluar HRP, CVaR y risk parity de skfolio contra el mismo walk-forward y dejar
-   el ranking automático si supera el actual fuera de muestra — ver `docs/07`.
+   el ranking automático si supera el actual fuera de muestra — ver `docs/matriz.md`.
 5. **Reportes automáticos** (pre-apertura 08:00, cierre 15:15, semanal del Reto):
    no implementados aún; `scripts/programar_tareas.ps1` ya crea tareas programadas
    de Windows para `actualizar`/`respaldar`, faltaría una tercera tarea que genere
    y guarde el reporte (reutilizar `terminal/servicios.py` para el cálculo).
-6. **CloudflareSpeedTest_duplicates_backup** y otros repos duplicados/mal ubicados
-   detectados en `docs/08-inventario-repositorios.md`: pendiente de limpieza fuera
+6. **CloudflareSpeedTest_duplicates_backup** (duplicado verificado: 28/28 archivos idénticos)
+   y otros repos mal ubicados detectados en `docs/repos.md`: pendiente de limpieza fuera
    de este repo (afecta a `Desktop/Repos`, no a `actinver-terminal`); dejar
    constancia en ese doc antes de borrar cualquier cosa, con respaldo o rama.
 
