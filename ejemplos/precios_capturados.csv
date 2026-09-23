@@ -1,0 +1,3 @@
+fecha,instrumento_id,precio,moneda,tipo_dato,fuente
+2026-10-05,BMV:AMX,17.62,MXN,cierre,EJEMPLO: cierre copiado a mano del portal
+2026-10-05,FONDO:ACTIGOB,5.234567,MXN,nav,EJEMPLO: valor liquidativo del estado de cuenta

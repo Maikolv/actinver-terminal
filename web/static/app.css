@@ -229,3 +229,14 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
   h1 { font-size: 1.2rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ---------- PASADO · PRESENTE · FUTURO ---------- */
+.espacio { border: 1px solid var(--borde); border-left-width: 6px; border-radius: var(--radio); padding: var(--espacio);
+  margin: 0 0 var(--espacio); background: var(--superficie); }
+.espacio--pasado { border-left-color: var(--sin-datos); }
+.espacio--presente { border-left-color: var(--vigente); }
+.espacio--futuro { border-left-color: var(--sintetico); border-style: dashed; border-left-style: solid; }
+.sello { display: inline-block; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; padding: 2px 8px;
+  border-radius: 4px; background: var(--superficie-2); color: var(--texto); margin-right: 6px; vertical-align: middle; }
+.sello--estimacion { background: var(--sintetico-fondo); color: var(--sintetico); }
+.aviso-caja { border: 1px solid var(--borde); background: var(--superficie-2); padding: 10px 12px; border-radius: var(--radio); margin: 0 0 12px; }

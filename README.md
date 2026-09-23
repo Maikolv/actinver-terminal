@@ -22,10 +22,23 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal respaldar` | Respaldo verificado en `data/respaldos/` |
 | `uv run terminal alpaca` | Comprueba las claves de Alpaca (solo datos) |
 | `uv run terminal telegram` | Detecta su chat de Telegram, lo guarda en `.env` y envía una prueba |
+| `uv run terminal investigar` | Experimento sin fuga de información (walk-forward → validación → prueba) y pronósticos |
+| `uv run terminal cobertura` | Verifica cobertura por símbolo y proveedor; escribe `docs/cobertura.md` |
+| `uv run terminal webhook-secreto` | Genera el secreto del webhook de TradingView en `.env` |
 | `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
-| `uv run pytest` | 82 pruebas |
+| `uv run pytest` | 106 pruebas |
 | `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |
+
+## Monitor y predicción (versión 0.5)
+
+- **Pasado · Presente · Futuro**: pestaña con tres espacios separados.
+  - **PASADO:** hechos con su hora de disponibilidad.
+  - **PRESENTE:** última cotización BMV confiable o «SIN PRECIO CONFIABLE», referencia externa aparte, efectivo, posiciones confirmadas, exposición, alertas y saldo del portal que usted captura.
+  - **FUTURO:** pronósticos a 1 y 5 sesiones con rangos, siempre etiquetados como estimaciones.
+- **Proveedores**: vea [docs/proveedores.md](docs/proveedores.md) y la tabla [docs/cobertura.md](docs/cobertura.md). Hoy no hay ninguna fuente BMV con licencia conectada; los conectores BMV, LSEG e ICE esperan su contrato y su documentación.
+- **Investigación**: vea [docs/investigacion.md](docs/investigacion.md). Si el modelo no supera a las referencias simples fuera de muestra, no se emite recomendación.
+- **Límites del Reto**: la terminal no inicia sesión en el portal, no extrae datos de él y no registra órdenes (reglamento §17).
 
 ## Qué muestra
 

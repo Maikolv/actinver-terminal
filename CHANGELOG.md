@@ -2,6 +2,39 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.5.0] — 2026-09-23
+
+### Añadido
+- **Proveedores intercambiables** (`terminal/cotizaciones.py`):
+  - Interfaz `MarketDataProvider`, con `BmvLicensedProvider`, `LsegProvider` e `IceProvider` (por especificación del contrato; hoy pendientes), `ManualOrCsvProvider`, `DemoProvider`, `EodhdBmvProvider` y `ReferenciaOrigenProvider`.
+  - Registro de cotizaciones con proveedor, símbolo de origen y normalizado, bolsa, precio, moneda, hora del evento, hora de recepción, latencia declarada y medida, y estado REAL_TIME/DELAYED/EOD/UNKNOWN.
+  - Caché, límite de consultas, métricas de fallos, reconexión, obsolescencia, conmutación solo con cobertura verificada y «SIN PRECIO CONFIABLE».
+- **Cobertura por símbolo:** `uv run terminal cobertura`, botón «Verificar cobertura» y `docs/cobertura.md`.
+- **Webhook de TradingView** (`TradingViewAlertReceiver`): secreto, símbolo, moneda, hora, duplicados y valores atípicos; `uv run terminal webhook-secreto`.
+- **Migraciones versionadas** con `event_time` / `available_at` y etapa de cada operación (práctica o competencia, con saldo reiniciado).
+- **Pestaña Pasado · Presente · Futuro:**
+  - Hechos con su disponibilidad.
+  - Precio BMV frente a referencia externa y a la valuación estimada.
+  - Captura del saldo del portal.
+  - Pronósticos etiquetados como estimaciones.
+- **Investigación predictiva** (`terminal/investigacion/`, `uv run terminal investigar`, `docs/investigacion.md`):
+  - División 70/15/15 con embargo y purga.
+  - Walk-forward purgado; filtro de correlación, PCA y Ridge ajustados solo con el entrenamiento.
+  - Prueba intacta y registro de experimentos.
+  - Tres referencias simples; métricas de error, calibración, estabilidad, rotación y resultado neto.
+  - Pronósticos con resultado observado posterior.
+- **Reglas del Reto:**
+  - Cinco acciones operadas.
+  - Advertencia de compra mayor al 50 % en propuestas y simulaciones.
+  - Comisión 0.10 % + IVA desglosada; ganancia absoluta y porcentual con comisión de salida estimada.
+- **Alertas nuevas:** cambio brusco, concentración, falta de cinco acciones, diferencia con el portal, pérdida máxima propia, evento corporativo, deterioro del modelo y eventos de TradingView. Todas invitan a «REVISAR» e incluyen cálculo e incertidumbre.
+- **Documentación y ejemplos:** `ejemplos/` (CSV y mensaje de alerta ficticios) y `docs/proveedores.md`.
+- **Pruebas:** `tests/test_monitor.py` y `tests/test_investigacion.py` (22 pruebas; 106 en total).
+
+### Cambiado
+- Los `INSERT` a tablas existentes nombran sus columnas: requisito para las columnas nuevas.
+- Los textos de acción de las alertas dejaron de sugerir vender o comprar; ahora invitan a revisar.
+
 ## [0.4.0] — 2026-09-23
 
 ### Añadido

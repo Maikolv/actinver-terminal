@@ -34,6 +34,19 @@ recalcular_cada_min = 5              # recalcula propuestas y alertas con precio
 umbral_movimiento = 0.01             # …o antes, si algún símbolo se mueve ≥ 1 % desde el último cálculo
 recalculo_minimo_seg = 120           # nunca dos cálculos en vivo con menos de 2 min de diferencia
 
+[investigacion]
+horizontes = [1, 5]                  # H: próxima sesión y próximos cinco días hábiles
+# L (ventana retrospectiva máxima) = 60 sesiones (terminal/investigacion/datos.py); proporciones 70/15/15, embargo = H
+
+[disponibilidad]
+# Horas tras el cierre en que cada proveedor publica su dato (available_at = cierre + retraso). Conservador.
+tiingo = 3
+alpaca = 1
+eodhd = 4
+archivo = 24
+fred = 72
+banxico = 1
+
 [vigencia]
 # Umbrales para declarar un dato «vigente», «retrasado» o «vencido».
 # cierre / nav: sesiones hábiles de atraso toleradas respecto a la última sesión cerrada.
@@ -97,6 +110,12 @@ caida_desde_maximo = -0.10           # caída desde el máximo desde la compra
 macro_horas = 24                     # evento de alto impacto USD/MXN en las próximas 24 h
 insider_valor_min_usd = 250000       # compras/ventas de insiders relevantes
 noticia_sentimiento_min = 1.0        # |sentimiento| mínimo para alerta de noticia de alto impacto
+cambio_brusco_pct = 0.05             # |cambio| entre los dos últimos precios de una posición
+concentracion_aviso = 0.45           # aviso desde 45 %; crítica sobre el tope del Reto (50 %)
+perdida_maxima = -0.10               # pérdida máxima que usted acepta frente al capital de la etapa
+diferencia_portal_pct = 0.01         # diferencia entre la estimación y el saldo capturado del portal
+evento_corporativo_dias = 10
+deterioro_razon = 1.10               # error de pronósticos resueltos > 1.10× «sin cambio» ⇒ deterioro
 enfriamiento_horas = 6               # no repetir la misma alerta antes de 6 h
 silenciar_fuera_de_horario = true    # fuera del horario de la BMV se registra pero no se notifica al escritorio
 notificar_escritorio = true

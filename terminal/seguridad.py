@@ -31,7 +31,11 @@ CABECERAS = {
     "Cross-Origin-Resource-Policy": "same-origin",
     "Cache-Control": "no-store",
 }
-LIMITES = {"/api/propuestas/calcular": 6, "/api/datos/actualizar": 4, "/api/importar": 20}
+LIMITES = {"/api/propuestas/calcular": 6, "/api/datos/actualizar": 4, "/api/importar": 20, "/api/investigacion/calcular": 4,
+           "/api/cobertura/verificar": 4}
+RUTA_WEBHOOK = "/webhook/tradingview"
+MAX_WEBHOOK = 10_000
+LIMITE_WEBHOOK = 30
 LIMITE_MUTACION = 60
 
 
@@ -60,6 +64,8 @@ class Seguridad(BaseHTTPMiddleware):
             return False
 
     async def dispatch(self, request: Request, call_next):
+        if request.url.path == RUTA_WEBHOOK:
+            return await self._webhook(request, call_next)
         if not _host_local(request.headers.get("host")):
             return JSONResponse({"error": "Host no permitido"}, status_code=400)
         if request.method not in ("GET", "HEAD", "OPTIONS"):
@@ -76,6 +82,26 @@ class Seguridad(BaseHTTPMiddleware):
                 return JSONResponse({"error": "Demasiadas solicitudes; espere un minuto"}, status_code=429)
         elif request.method == "OPTIONS":
             return JSONResponse({"error": "Método no permitido"}, status_code=405)
+        respuesta = await call_next(request)
+        for k, v in CABECERAS.items():
+            respuesta.headers.setdefault(k, v)
+        return respuesta
+
+    async def _webhook(self, request: Request, call_next):
+        """Webhook de TradingView: sin CSRF (lo envía un servidor externo), autenticado por secreto en el cuerpo.
+        Solo POST, cuerpo ≤ 10 KB, 30/min, y Host local o incluido en TRADINGVIEW_WEBHOOK_HOSTS (túnel del usuario)."""
+        import os
+        permitidos = {h.strip().lower() for h in os.environ.get("TRADINGVIEW_WEBHOOK_HOSTS", "").split(",") if h.strip()}
+        host = (request.headers.get("host") or "").lower()
+        if not (_host_local(host) or host.split(":")[0] in permitidos):
+            return JSONResponse({"error": "Host no permitido"}, status_code=400)
+        if request.method != "POST":
+            return JSONResponse({"error": "Método no permitido"}, status_code=405)
+        largo = request.headers.get("content-length")
+        if largo is None or not largo.isdigit() or int(largo) > MAX_WEBHOOK:
+            return JSONResponse({"error": "Cuerpo ausente o demasiado grande"}, status_code=413)
+        if self._excede(RUTA_WEBHOOK, LIMITE_WEBHOOK):
+            return JSONResponse({"error": "Demasiadas solicitudes"}, status_code=429)
         respuesta = await call_next(request)
         for k, v in CABECERAS.items():
             respuesta.headers.setdefault(k, v)

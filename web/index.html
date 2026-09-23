@@ -37,6 +37,7 @@
 <nav class="pestanas" aria-label="Secciones">
   <div role="tablist" id="lista-pestanas">
     <button role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Resumen</button>
+    <button role="tab" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Pasado · Presente · Futuro</button>
     <button role="tab" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
     <button role="tab" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
     <button role="tab" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi cartera</button>
@@ -68,6 +69,35 @@
       </div>
     </div>
     <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-tiempo" aria-labelledby="tab-tiempo" hidden>
+    <h1>Pasado · Presente · Futuro</h1>
+    <p class="ayuda">Tres espacios separados: lo que ya ocurrió (con la hora en que se supo), lo observable ahora y lo que se estima. Un pronóstico nunca aparece como precio, y un precio externo nunca aparece como el precio o saldo de Actinver.</p>
+    <section class="espacio espacio--pasado" aria-labelledby="h-pasado">
+      <h2 id="h-pasado"><span class="sello">PASADO</span> Hechos observados</h2>
+      <div id="pasado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    </section>
+    <section class="espacio espacio--presente" aria-labelledby="h-presente">
+      <h2 id="h-presente"><span class="sello">PRESENTE</span> Estado observable ahora</h2>
+      <div id="presente-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+      <h3>Saldo que muestra el portal de Actinver</h3>
+      <p class="ayuda">Cópielo a mano desde el portal (la terminal no entra al portal ni extrae datos de él). Sirve para comparar la estimación con la valuación oficial.</p>
+      <form id="form-portal" class="formulario" novalidate>
+        <div class="campos">
+          <label>Valor del portafolio (MXN)<input type="number" name="valor_portafolio" min="0" step="0.01" required></label>
+          <label>Efectivo (MXN)<input type="number" name="efectivo" min="0" step="0.01"></label>
+          <label>Fecha y hora en el portal<input type="datetime-local" name="hora_portal" required></label>
+          <label>Nota<input type="text" name="nota" maxlength="200"></label>
+        </div>
+        <button class="boton boton--secundario" type="submit">Guardar saldo del portal</button>
+      </form>
+    </section>
+    <section class="espacio espacio--futuro" aria-labelledby="h-futuro">
+      <h2 id="h-futuro"><span class="sello sello--estimacion">FUTURO · ESTIMACIONES</span> Escenarios y pronósticos</h2>
+      <p><button type="button" class="boton boton--secundario" id="btn-investigar">Calcular investigación y pronósticos</button> <span class="suave" id="investigacion-estado"></span></p>
+      <div id="futuro-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    </section>
   </section>
 
   <section role="tabpanel" id="panel-alertas" aria-labelledby="tab-alertas" hidden>
@@ -133,6 +163,10 @@
   <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>
     <h1>Datos e instrumentos</h1>
     <div id="proveedores"></div>
+    <h2>Cobertura por símbolo del catálogo</h2>
+    <p class="ayuda">Una fuente se usa para un instrumento solo si una consulta real confirmó ese instrumento exacto (serie, moneda MXN y mercado BMV local o SIC). Si no, el precio aparece como «SIN PRECIO CONFIABLE».</p>
+    <p><button type="button" class="boton boton--secundario" id="btn-cobertura">Verificar cobertura</button></p>
+    <div id="cobertura-contenido"></div>
     <h2>Universo verificado</h2>
     <div class="filtros">
       <label>Buscar<input type="search" id="filtro-texto" placeholder="Clave o nombre"></label>

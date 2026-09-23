@@ -1,0 +1,25 @@
+{
+  "_comentario": "PLANTILLA. Copie a config/proveedores/<proveedor>.json y reemplace cada valor con lo que diga la documentación de SU contrato. Ningún valor de esta plantilla es un endpoint real.",
+  "proveedor": "<nombre comercial del producto contratado>",
+  "documentacion": "<URL o nombre del documento técnico del contrato>",
+  "variable_url_base": "BMV_URL_BASE",
+  "variables_requeridas": [],
+  "autenticacion": {"tipo": "cabecera", "nombre": "<Authorization u otra cabecera>", "formato": "<p. ej. Bearer {clave}>"},
+  "cotizacion": {
+    "metodo": "GET",
+    "ruta": "<ruta relativa con {simbolo}>",
+    "parametros": {},
+    "campos": {
+      "precio": "<ruta.al.precio en el JSON>",
+      "moneda": "<ruta.a.la.moneda>",
+      "hora_evento": "<ruta.a.la.hora del evento de mercado>",
+      "unidad_hora": "s",
+      "bolsa": "<ruta.a.la.bolsa>",
+      "simbolo": "<ruta.al.simbolo devuelto>"
+    }
+  },
+  "plantilla_simbolo": "{clave}{serie}",
+  "mapa_simbolos": {"BMV:WALMEX": "<símbolo del proveedor>"},
+  "bolsa": "BMV",
+  "latencia_declarada_s": null
+}

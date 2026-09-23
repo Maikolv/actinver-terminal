@@ -1,0 +1,4 @@
+fecha,tipo,instrumento_id,cantidad,precio,monto,comision,impuesto,moneda,tipo_cambio,nota
+2026-10-05,compra,BMV:AMX,5000,17.50,,87.50,14.00,MXN,1,EJEMPLO: comisión 0.10 % = 87.50; IVA 16 % = 14.00
+2026-10-05,compra,BMV:GFNORTE,500,160.00,,80.00,12.80,MXN,1,EJEMPLO
+2026-10-06,compra,SIC:AAPL,100,4300.00,,430.00,68.80,MXN,1,EJEMPLO: SIC en pesos como lo muestra el portal

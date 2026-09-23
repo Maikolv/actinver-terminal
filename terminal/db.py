@@ -117,6 +117,56 @@ CREATE TABLE IF NOT EXISTS insiders (
     acciones REAL, precio REAL, valor REAL, enlace TEXT, fuente TEXT NOT NULL, obtenido_en TEXT NOT NULL
 );
 
+-- Registro de cotizaciones por proveedor (PRESENTE). Nunca se mezcla con pronósticos.
+-- estado_latencia: REAL_TIME | DELAYED | EOD | UNKNOWN, calculado con la latencia MEDIDA, no con la publicidad.
+CREATE TABLE IF NOT EXISTS cotizaciones_registro (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, proveedor TEXT NOT NULL, simbolo_origen TEXT NOT NULL,
+    simbolo_normalizado TEXT NOT NULL, instrumento_id TEXT, mercado TEXT NOT NULL, bolsa TEXT, precio REAL NOT NULL,
+    moneda TEXT NOT NULL, hora_evento TEXT NOT NULL, hora_recepcion TEXT NOT NULL, latencia_declarada_s REAL,
+    latencia_medida_s REAL, estado_latencia TEXT NOT NULL CHECK (estado_latencia IN ('REAL_TIME','DELAYED','EOD','UNKNOWN')),
+    sintetico INTEGER NOT NULL DEFAULT 0, detalle TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_cotreg ON cotizaciones_registro(instrumento_id, hora_recepcion);
+
+-- Cobertura verificada por proveedor e instrumento del catálogo (serie, moneda y mercado exactos).
+CREATE TABLE IF NOT EXISTS cobertura (
+    proveedor TEXT NOT NULL, instrumento_id TEXT NOT NULL, simbolo_origen TEXT, estado TEXT NOT NULL,
+    moneda_observada TEXT, bolsa_observada TEXT, mercado_observado TEXT, latencia_mediana_s REAL,
+    estado_latencia TEXT, detalle TEXT, verificado_en TEXT NOT NULL, PRIMARY KEY (proveedor, instrumento_id)
+);
+
+CREATE TABLE IF NOT EXISTS metricas_proveedor (
+    proveedor TEXT PRIMARY KEY, solicitudes INTEGER NOT NULL DEFAULT 0, fallos INTEGER NOT NULL DEFAULT 0,
+    fallos_consecutivos INTEGER NOT NULL DEFAULT 0, ultimo_exito TEXT, ultimo_fallo TEXT, ultimo_error TEXT
+);
+
+-- Eventos recibidos por webhook de TradingView (alertas voluntarias del usuario, no un flujo de precios).
+CREATE TABLE IF NOT EXISTS eventos_webhook (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, huella TEXT NOT NULL UNIQUE, recibido_en TEXT NOT NULL, simbolo_origen TEXT,
+    instrumento_id TEXT, precio REAL, moneda TEXT, hora_evento TEXT, alerta TEXT, estado TEXT NOT NULL, motivo TEXT
+);
+
+-- Saldo que muestra el portal de Actinver, capturado a mano por el participante (fuente oficial).
+CREATE TABLE IF NOT EXISTS saldos_portal (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, capturado_en TEXT NOT NULL, hora_portal TEXT NOT NULL, etapa TEXT,
+    valor_portafolio REAL NOT NULL, efectivo REAL, nota TEXT
+);
+
+-- FUTURO: pronósticos emitidos. Inmutables salvo el resultado observado, que se añade al conocerse.
+CREATE TABLE IF NOT EXISTS pronosticos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, emitido_en TEXT NOT NULL, datos_hasta TEXT NOT NULL, instrumento_id TEXT NOT NULL,
+    horizonte INTEGER NOT NULL, fecha_base TEXT NOT NULL, fecha_objetivo TEXT, modelo TEXT NOT NULL, version TEXT NOT NULL,
+    semilla INTEGER, prediccion REAL NOT NULL, p10 REAL, p90 REAL, prob_subida REAL, recomendacion_permitida INTEGER NOT NULL,
+    resultado REAL, resuelto_en TEXT, UNIQUE (emitido_en, instrumento_id, horizonte, modelo)
+);
+
+-- Registro de experimentos: versión, semilla, cortes temporales y resultados; marca si la prueba final ya se usó.
+CREATE TABLE IF NOT EXISTS experimentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, configuracion TEXT NOT NULL, huella_config TEXT NOT NULL,
+    huella_datos TEXT NOT NULL, semilla INTEGER NOT NULL, cortes TEXT NOT NULL, resultados TEXT NOT NULL,
+    prueba_ya_vista INTEGER NOT NULL DEFAULT 0, version_codigo TEXT
+);
+
 CREATE TABLE IF NOT EXISTS propuestas (
     id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, creado_en TEXT NOT NULL,
     parametros TEXT NOT NULL, resultado TEXT NOT NULL
@@ -151,9 +201,11 @@ def transaccion(con: sqlite3.Connection):
         raise
 
 
-def inicializar(con: sqlite3.Connection) -> None:
+def inicializar(con: sqlite3.Connection, ajustes=None) -> None:
     con.executescript(ESQUEMA)
     cargar_universo(con)
+    from . import migraciones
+    migraciones.migrar(con, ajustes)
 
 
 def cargar_universo(con: sqlite3.Connection, ruta: Path | None = None) -> int:

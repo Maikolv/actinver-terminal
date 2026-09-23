@@ -62,11 +62,11 @@ def reglas_deriva(con, cfg: dict, cartera: dict, propuestas: dict) -> list[Condi
         activa = max_dev >= umbral and (mejora >= cfg["mejora_neta_min"] or activa_prev)
         ops = [{"id": f["id"], "monto": f["monto_mxn"]} for f in filas if f["accion"] != "mantener"]
         out.append(Condicion(
-            "deriva", clave, activa, "aviso", f"Rebalanceo sugerido — {p['nombre']}",
+            "deriva", clave, activa, "aviso", f"Posible rebalanceo — {p['nombre']}",
             f"Desviación máxima {max_dev:.1f} pp (umbral {cfg['deriva_pp']} pp) y mejora esperada neta de costos "
             f"{mejora:.2%} (umbral {cfg['mejora_neta_min']:.2%}) en {p['mejora_esperada']['horizonte_sesiones']} sesiones.",
             {"desviacion_pp": max_dev, "mejora_neta": mejora, "operaciones": len(ops), "datos_hasta": p.get("datos_hasta")},
-            "propuesta " + p["clave"], f"Revisar {len(ops)} cambios sugeridos; costo estimado "
+            "propuesta " + p["clave"], f"REVISAR {len(ops)} cambios posibles; costo estimado "
             f"{p['cambios']['costo_total']:,.0f} MXN.", ops))
     return out
 
@@ -83,11 +83,11 @@ def reglas_posicion(con, cfg: dict, cartera: dict, precios_hist: pd.DataFrame, p
         out.append(Condicion("stop_loss", iid, rend <= cfg["stop_loss"], "critica",
                              f"Stop-loss: {pos.get('clave_operable') or iid} {rend:.1%}",
                              f"El precio ({px:,.2f} MXN) cayó {rend:.1%} frente al costo promedio ({cp:,.2f}); umbral "
-                             f"{cfg['stop_loss']:.0%}.", base, pos.get("proveedor") or "", "Evaluar reducir o cerrar la posición.", venta))
+                             f"{cfg['stop_loss']:.0%}.", base, pos.get("proveedor") or "", "REVISAR la posición y su tesis; la decisión y la orden son del participante.", venta))
         out.append(Condicion("take_profit", iid, rend >= cfg["take_profit"], "info",
                              f"Toma de utilidad: {pos.get('clave_operable') or iid} +{rend:.1%}",
                              f"Ganancia de {rend:.1%} sobre el costo promedio; umbral {cfg['take_profit']:.0%}.", base,
-                             pos.get("proveedor") or "", "Evaluar realizar parte de la ganancia.",
+                             pos.get("proveedor") or "", "REVISAR si la ganancia cambia su plan; la decisión es del participante.",
                              [{"id": iid, "monto": -round((pos["valor_mxn"] or 0) / 2, 2)}]))
         if iid in precios_hist.columns and iid in primeras_compras:
             serie = precios_hist[iid].loc[pd.Timestamp(primeras_compras[iid]):].dropna()
@@ -114,7 +114,7 @@ def reglas_macro(con, cfg: dict, ahora_dt: datetime) -> list[Condicion]:
                              f"{e['titulo']} ({e['pais']}) el {f.astimezone(reto.MX):%d-%m %H:%M} CDMX; pronóstico "
                              f"{e['pronostico'] or '—'}, previo {e['previo'] or '—'}.",
                              {"fecha": e["fecha"], "pronostico": e["pronostico"], "previo": e["previo"]}, "ForexFactory",
-                             "Revisar exposición a USD/MXN y a EE. UU. antes del evento; evitar operar en la publicación.",
+                             "REVISAR la exposición a USD/MXN y a EE. UU. antes del evento.",
                              rearme=False))
     return out
 
@@ -130,7 +130,7 @@ def reglas_insider(con, cfg: dict, ids: set[str], ahora_dt: datetime) -> list[Co
                              f"{r['nombre']} ({r['cargo'] or 'insider'}) registró una {tipo} de {r['acciones']:,.0f} acciones "
                              f"a {r['precio']:,.2f} USD (≈ {r['valor']:,.0f} USD) el {r['fecha']}.",
                              {"enlace": r["enlace"], "valor_usd": r["valor"]}, "SEC EDGAR (Formulario 4)",
-                             "Considerar como contexto; una operación de insider no implica por sí sola un cambio.", rearme=False))
+                             "REVISAR como contexto; una operación de insider no implica por sí sola un cambio.", rearme=False))
     return out
 
 
@@ -182,11 +182,31 @@ def _estado(con, regla: str, clave: str) -> bool:
     return bool(f and f["activa"])
 
 
+INCERTIDUMBRE = {
+    "deriva": "Media: depende del rendimiento esperado estimado (incierto) y de precios posiblemente no vigentes.",
+    "stop_loss": "Baja si el precio es vigente; el precio del portal puede diferir.",
+    "take_profit": "Baja si el precio es vigente; el precio del portal puede diferir.",
+    "caida_maximo": "Baja si el precio es vigente.", "macro": "Alta: el efecto del evento es desconocido.",
+    "insider": "Alta: señal de contexto, no predictiva por sí sola.", "noticia": "Alta: clasificación automática del titular.",
+}
+
+
+def _revisar(c: Condicion) -> Condicion:
+    """Toda alerta invita a REVISAR; nunca ordena comprar o vender."""
+    if not c.titulo.startswith("REVISAR"):
+        c.titulo = f"REVISAR: {c.titulo}"
+    if c.accion and not c.accion.upper().startswith("REVISAR"):
+        c.accion = f"REVISAR — {c.accion}"
+    c.datos = {"incertidumbre": INCERTIDUMBRE.get(c.regla, "Ver cálculo y vigencia del dato."), **(c.datos or {})}
+    return c
+
+
 def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, ahora_dt: datetime | None = None,
              notificar: bool = True) -> list[dict]:
     """Aplica flanco de subida + enfriamiento, guarda las alertas nuevas y notifica agrupadas."""
     ahora_dt = ahora_dt or datetime.now(UTC)
     nuevas = []
+    condiciones = [_revisar(c) for c in condiciones]
     with transaccion(con):
         for c in condiciones:
             fila = con.execute("SELECT activa, ultimo_disparo FROM estado_alertas WHERE regla=? AND clave=?",
@@ -222,6 +242,122 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
     return nuevas
 
 
+def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condicion]:
+    """Concentración, cinco acciones operadas, pérdida máxima del participante y diferencia con el saldo del portal."""
+    out = []
+    total = float(cartera.get("valor_total") or 0)
+    tope = float((reto.config().get("reglas") or {}).get("max_peso_emisora") or 0.5)
+    for p in cartera.get("posiciones", []):
+        w = p.get("peso")
+        if w is None:
+            continue
+        nivel = "critica" if w > tope else "aviso"
+        out.append(Condicion("concentracion", p["instrumento_id"], w >= float(cfg.get("concentracion_aviso", 0.45)), nivel,
+                             f"Concentración {p.get('clave_operable') or p['instrumento_id']} {w:.1%}",
+                             f"La posición vale {w:.1%} del portafolio estimado (tope del Reto {tope:.0%}; aviso desde "
+                             f"{cfg.get('concentracion_aviso', 0.45):.0%}).",
+                             {"calculo": f"{p.get('valor_mxn') or 0:,.2f} / {total:,.2f} = {w:.4f}", "peso": w},
+                             p.get("proveedor") or "cartera", "REVISAR la regla del 50 % antes de comprar más de esta emisora."))
+    etapa = cartera.get("etapa")
+    if etapa == "competencia" and reto.activo():
+        tx = [dict(r) for r in con.execute("SELECT * FROM transacciones WHERE anulada=0")]
+        ins = {r["id"]: dict(r) for r in con.execute("SELECT id, clase FROM instrumentos")}
+        a = reto.acciones_operadas(tx, ins, "competencia")
+        ses = reto.sesiones_restantes(ahora_dt)
+        out.append(Condicion("cinco_acciones", "competencia", not a["cumple"], "critica" if ses <= 5 else "aviso",
+                             f"Faltan {a['faltan']} de {a['minimo']} acciones distintas operadas",
+                             f"Llevas {a['n']} acciones distintas con compra confirmada en la competencia; quedan {ses} sesiones. "
+                             f"{a['nota']}", {"calculo": f"{a['n']} operadas: {', '.join(a['operadas']) or '—'}"},
+                             "operaciones confirmadas", "REVISAR la condición de 5 acciones del reglamento (§6)."))
+    base = float(cartera.get("aportacion_neta") or 0)  # en el Reto incluye el saldo inicial de la etapa
+    if base > 0 and total > 0 and cartera.get("completa", True):
+        rend = total / base - 1
+        lim = float(cfg.get("perdida_maxima", -0.10))
+        out.append(Condicion("perdida_maxima", etapa or "cartera", rend <= lim, "critica",
+                             f"Pérdida del portafolio {rend:.1%} (límite propio {lim:.0%})",
+                             f"Valor estimado {total:,.2f} vs base {base:,.2f}.",
+                             {"calculo": f"{total:,.2f} / {base:,.2f} − 1 = {rend:.4f}",
+                              "incertidumbre": "Estimación con precios de la terminal; compare con el saldo del portal."},
+                             "cartera", "REVISAR el plan y el riesgo; el límite lo definió usted."))
+    f = con.execute("SELECT * FROM saldos_portal ORDER BY id DESC LIMIT 1").fetchone()
+    if f and total > 0:
+        dif = total / f["valor_portafolio"] - 1
+        umbral = float(cfg.get("diferencia_portal_pct", 0.01))
+        out.append(Condicion("diferencia_portal", str(f["id"]), abs(dif) >= umbral, "aviso",
+                             f"Diferencia con el portal {dif:+.2%}",
+                             f"La terminal estima {total:,.2f}; el portal mostraba {f['valor_portafolio']:,.2f} "
+                             f"({f['hora_portal']}).",
+                             {"calculo": f"{total:,.2f} / {f['valor_portafolio']:,.2f} − 1 = {dif:.4f}",
+                              "incertidumbre": "Horas distintas, precios de referencia y comisiones pueden explicar la diferencia."},
+                             "saldo capturado del portal", "REVISAR operaciones registradas y precios; el portal es la valuación oficial."))
+    return out
+
+
+def reglas_cambio_brusco(cfg: dict, cartera: dict, precios_hist: pd.DataFrame) -> list[Condicion]:
+    out = []
+    umbral = float(cfg.get("cambio_brusco_pct", 0.05))
+    for p in cartera.get("posiciones", []):
+        iid = p["instrumento_id"]
+        if iid not in precios_hist.columns:
+            continue
+        s = precios_hist[iid].dropna()
+        if len(s) < 2:
+            continue
+        cambio = float(s.iloc[-1] / s.iloc[-2] - 1)
+        out.append(Condicion("cambio_brusco", f"{iid}|{s.index[-1].date()}", abs(cambio) >= umbral, "aviso",
+                             f"Cambio brusco {p.get('clave_operable') or iid} {cambio:+.1%}",
+                             f"De {s.iloc[-2]:,.2f} a {s.iloc[-1]:,.2f} MXN entre {s.index[-2].date()} y {s.index[-1].date()}.",
+                             {"calculo": f"{s.iloc[-1]:,.4f} / {s.iloc[-2]:,.4f} − 1 = {cambio:.4f}",
+                              "incertidumbre": "Media: puede reflejar un dato de referencia, no la cotización BMV."},
+                             p.get("proveedor") or "", "REVISAR noticias y la vigencia del precio.", rearme=False))
+    return out
+
+
+def reglas_evento_corporativo(con, cfg: dict, ids: set[str], ahora_dt: datetime) -> list[Condicion]:
+    out = []
+    desde = (ahora_dt - timedelta(days=int(cfg.get("evento_corporativo_dias", 10)))).date().isoformat()
+    for r in con.execute("SELECT * FROM eventos_corporativos WHERE fecha >= ?", (desde,)):
+        if r["instrumento_id"] not in ids:
+            continue
+        nota = ("El Reto NO paga dividendos (§13)." if r["tipo"] == "dividendo" else "El Reto sí reproduce splits.")
+        out.append(Condicion("evento_corporativo", f"{r['instrumento_id']}|{r['fecha']}|{r['tipo']}", True, "info",
+                             f"Evento corporativo: {r['tipo']} en {r['instrumento_id']}",
+                             f"{r['tipo'].capitalize()} de {r['valor']} el {r['fecha']} reportado por {r['proveedor']}. {nota}",
+                             {"calculo": f"valor {r['valor']}", "incertidumbre": "Baja: dato del proveedor; confirme en el portal."},
+                             r["proveedor"], "REVISAR la posición en el portal tras el evento.", rearme=False))
+    return out
+
+
+def reglas_webhook(con, ahora_dt: datetime) -> list[Condicion]:
+    """Alertas que el participante configuró en TradingView y llegaron por webhook (eventos, no precios)."""
+    desde = (ahora_dt - timedelta(hours=24)).isoformat()
+    out = []
+    for e in con.execute("SELECT * FROM eventos_webhook WHERE recibido_en >= ? AND estado IN ('aceptado','atipico')", (desde,)):
+        out.append(Condicion("tradingview", e["huella"][:16], True, "aviso" if e["estado"] == "atipico" else "info",
+                             f"Alerta de TradingView: {e['alerta'] or e['simbolo_origen']}",
+                             f"{e['simbolo_origen']} a {e['precio']:,.4f} {e['moneda']} (hora de la alerta {e['hora_evento']}). "
+                             f"{e['motivo'] or ''}",
+                             {"calculo": "evento recibido por webhook", "incertidumbre":
+                              "Retraso del dato de TradingView no declarado (estado UNKNOWN)."},
+                             "TradingView (webhook)", "REVISAR el gráfico y la cotización en el portal.", rearme=False))
+    return out
+
+
+def reglas_modelo(con, cfg: dict) -> list[Condicion]:
+    from .investigacion import pronosticos
+    d = pronosticos.deterioro(con)
+    if not d or d.get("razon") is None:
+        return []
+    lim = float(cfg.get("deterioro_razon", 1.10))
+    return [Condicion("deterioro_modelo", "modelo", d["razon"] > lim or d["cobertura_80"] < 0.65, "aviso",
+                      "Deterioro estadístico del modelo",
+                      f"Con {d['n']} pronósticos resueltos, su error es {d['razon']:.2f}× el de «sin cambio» y el "
+                      f"intervalo 80 % cubrió {d['cobertura_80']:.0%}.",
+                      {"calculo": f"MSE {d['mse']:.6f} / MSE sin cambio {d['mse_sin_cambio']:.6f}",
+                       "incertidumbre": "Muestra pequeña y dependiente en el tiempo."},
+                      "registro de pronósticos", "REVISAR: no use los pronósticos para decidir hasta revalidar el modelo.")]
+
+
 def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, notificar: bool = True,
             ahora_dt: datetime | None = None) -> list[dict]:
     cfg = ajustes["alertas"]
@@ -233,7 +369,10 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
     conds = (reglas_deriva(con, cfg, cartera, propuestas) + reglas_posicion(con, cfg, cartera, precios, compras)
              + reglas_macro(con, cfg, ahora_dt) + reglas_insider(con, cfg, ids, ahora_dt)
              + reglas_noticias(con, cfg, ids, ahora_dt)
-             + reglas_tecnicas(con, cfg, cartera, propuestas, mercado.ultimo_fx(con, ajustes)))
+             + reglas_tecnicas(con, cfg, cartera, propuestas, mercado.ultimo_fx(con, ajustes))
+             + reglas_reto(con, cfg, cartera, ahora_dt) + reglas_cambio_brusco(cfg, cartera, precios)
+             + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
+             + reglas_webhook(con, ahora_dt))
     return procesar(con, conds, cfg, ahora_dt, notificar)
 
 

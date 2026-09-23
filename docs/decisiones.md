@@ -109,4 +109,33 @@ Contexto: la mejora nº 4 pedía evaluar más modelos de skfolio contra el walk-
 Decisión: `terminal/comparador_modelos.py` (`uv run terminal comparar-modelos`) corre modelo vigente, 1/N, inversa de volatilidad, mínimo CVaR 95 %, paridad de riesgo y HRP con el mismo universo, topes, ventana y regla de costos que `optimizador._walk_forward`; ordena por Sharpe fuera de muestra neto de costos y guarda JSON en `data/comparacion_modelos/`.
 Honestidad de datos: la base real tiene 0 precios (sin proveedor configurado) y la demo es sintética, así que **no se declara ganador ni se cambia el modelo activo**; el ranking será concluyente solo con precios reales. El ranking aún no está conectado a `proponer()`: hacerlo requiere historia real.
 
----
+### D-34 Cotización BMV confiable o «SIN PRECIO CONFIABLE»
+Contexto: el usuario pidió no marcar ninguna fuente como tiempo real por su publicidad y no sustituir la cotización BMV en pesos por la de EE. UU. en dólares.
+Decisión: interfaz `MarketDataProvider` (`terminal/cotizaciones.py`). Una cotización es confiable solo si una consulta real verificó ese instrumento exacto (moneda MXN, mercado local o SIC) y no está obsoleta. El estado REAL_TIME/DELAYED/EOD/UNKNOWN sale de la latencia medida. La conmutación entre fuentes solo ocurre si la otra fuente también tiene cobertura verificada. El precio de origen en USD (Alpaca/Tiingo) se muestra como «referencia externa». Las propuestas estadísticas siguen usando la historia de origen como aproximación del rendimiento del SIC, y el PRESENTE nunca la presenta como precio BMV.
+
+### D-35 Conectores contratados por especificación, sin endpoints inventados
+Decisión: `BmvLicensedProvider`, `LsegProvider` e `IceProvider` son conectores REST descritos por un JSON que el usuario copia de la documentación de su contrato (`config/proveedores/ejemplo_especificacion.json`). Sin contrato, especificación, URL o credencial quedan «pendiente», con la lista exacta de lo que falta, y no hacen ninguna petición. Un contrato por streaming requerirá un adaptador de flujo aparte.
+
+### D-36 Webhook de TradingView como eventos
+Decisión: `POST /webhook/tradingview` es la única ruta sin CSRF. Se autentica con un secreto en el cuerpo. Acepta solo POST de ≤ 10 KB, 30 por minuto, con Host local o de un túnel declarado. Valida símbolo, moneda, hora (≤ 300 s y no futura), duplicados (huella) y valores. Registra el precio con estado UNKNOWN y genera una alerta «REVISAR». No es un flujo de precios. Exponerlo requiere un túnel HTTPS que decide el usuario.
+
+### D-37 Tiempos event_time / available_at y tres espacios
+Decisión: migración versionada (`terminal/migraciones.py`, tabla `version_esquema`) que añade `event_time` y `available_at` a precios, tipo de cambio, eventos, operaciones, noticias, calendario macro e insiders, más la etapa de cada operación. `available_at` nunca se sobrescribe. La interfaz separa PASADO, PRESENTE y FUTURO. Los pronósticos viven en su propia tabla y se etiquetan como estimaciones. El saldo del portal se captura a mano, como valuación oficial.
+
+### D-38 Investigación predictiva con prueba intacta
+Decisión:
+- División cronológica 70/15/15 con embargo e = max(H, mínimo) y purga por ventana de etiqueta.
+- Walk-forward purgado en el entrenamiento; imputación, escalado, filtro de correlación (|r| ≥ 0.95, prioridad declarada) y PCA ajustados solo con el entrenamiento de cada pliegue.
+- La validación elige la variante y calibra los intervalos. La prueba se usa una vez, y un reajuste posterior queda marcado `prueba_ya_vista`.
+- Comparación con tres referencias simples. Si el modelo no las supera en error y en resultado neto de costos, no se emite recomendación.
+
+Resultado con datos demo (sintéticos, sin valor para el mercado real): el modelo no superó a las referencias en H=1 ni en H=5.
+
+### D-39 Reglas del Reto re-verificadas (23-sep-2026)
+Decisión: práctica y competencia son carteras separadas; la competencia reinicia el saldo en 1 000 000 (§5). La regla de «5 acciones distintas» (§6) cuenta las compras confirmadas de acciones, FIBRAs y REIT en la competencia; los ETF no se cuentan hasta que el Comité lo confirme.
+
+Sobre el límite del 50 % (§6/§7) se advierten dos lecturas antes de presentar una propuesta:
+- **Crítica:** una compra individual mayor al 50 % del valor del portafolio.
+- **Aviso:** una compra cuya posición resultante supere el 50 %.
+
+Se incorpora la prohibición de automatización (§17): la terminal no entra al portal.

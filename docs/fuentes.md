@@ -35,6 +35,10 @@ Complementarias: Nasdaq Trader Symbol Directory y descarga pública de emisoras 
 | Yahoo Finance (API no oficial) | HTTP 429 y condiciones que restringen el acceso automatizado. |
 | Extraer páginas de TradingView, Barchart, Seeking Alpha o InsiderFinance | Sus condiciones lo prohíben; se usan widget, RSS, API oficial o la fuente primaria (SEC). |
 
+## Cotización BMV confiable (desde la versión 0.5)
+
+El PRESENTE solo muestra una cotización BMV en pesos si una fuente con **cobertura verificada** del instrumento exacto la entrega vigente. Si no, muestra **SIN PRECIO CONFIABLE**. Alpaca y Tiingo son **referencias externas** (bolsa de origen, USD). Vea [proveedores.md](proveedores.md) y [cobertura.md](cobertura.md).
+
 ## Tiempo real
 
 **Ninguna fuente gratuita y autorizada entrega tiempo real de las emisoras locales de la BMV.** El simulador del Reto usa la transmisión de la BMV, pero no ofrece API pública. Las emisoras locales se trabajan con cierres diarios y lo indica cada dato (tipo «cierre», fecha, retraso en horas).

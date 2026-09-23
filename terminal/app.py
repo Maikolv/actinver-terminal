@@ -15,7 +15,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, alertas, cartera, db, importar, ingesta, mercado, notificador, reto, servicios, tiempo_real, vigencia
+from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, notificador, reto,
+               servicios, tiempo_real, vigencia, webhook_tv)
 from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
 from .seguridad import TOKEN_CSRF, Seguridad
 
@@ -358,6 +359,126 @@ def calcular(con=Depends(con_db)):
 def get_alertas(limite: int = 200, con=Depends(con_db)):
     return {"alertas": alertas.listar(con, limite), "pendientes": alertas.pendientes(con),
             "configuracion": AJUSTES["alertas"]}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# PASADO / PRESENTE / FUTURO
+@app.get("/api/pasado")
+def get_pasado(con=Depends(con_db)):
+    return espacios.pasado(con, AJUSTES)
+
+
+@app.get("/api/presente")
+def get_presente(con=Depends(con_db)):
+    return espacios.presente(con, AJUSTES)
+
+
+@app.get("/api/futuro")
+def get_futuro(con=Depends(con_db)):
+    return espacios.futuro(con, AJUSTES)
+
+
+INVESTIGACION = {"estado": "inactivo", "inicio": None, "fin": None, "resultado": None}
+_bloqueo_inv = threading.Lock()
+
+
+def _investigar(horizontes: list[int]) -> None:
+    from .investigacion import pronosticos
+    con = db.conectar()
+    try:
+        INVESTIGACION["resultado"] = [pronosticos.emitir(con, AJUSTES.es_demo, h) for h in horizontes]
+        INVESTIGACION["estado"] = "terminado"
+    except Exception as e:  # noqa: BLE001
+        log.exception("fallo en investigación")
+        INVESTIGACION.update(estado="error", resultado=type(e).__name__)
+    finally:
+        INVESTIGACION["fin"] = db.ahora()
+        con.close()
+        _bloqueo_inv.release()
+
+
+@app.post("/api/investigacion/calcular")
+def calcular_investigacion(cuerpo: dict = Body(default={})):
+    """Corre el experimento (walk-forward → validación → prueba) y emite pronósticos. En segundo plano (~1 min)."""
+    horizontes = [int(h) for h in ((cuerpo or {}).get("horizontes") or AJUSTES.get("investigacion", {}).get("horizontes", [1, 5]))
+                  if 1 <= int(h) <= 20][:3]
+    if not _bloqueo_inv.acquire(blocking=False):
+        raise _ocupado()
+    INVESTIGACION.update(estado="calculando", inicio=db.ahora(), fin=None, resultado=None)
+    threading.Thread(target=_investigar, args=(horizontes,), daemon=True).start()
+    return {"estado": "calculando", "horizontes": horizontes}
+
+
+@app.get("/api/investigacion/estado")
+def estado_investigacion():
+    return INVESTIGACION
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Cobertura por símbolo, saldo del portal y webhook de TradingView
+@app.get("/api/cobertura")
+def get_cobertura(con=Depends(con_db)):
+    provs = cotizaciones.construir(con, AJUSTES.es_demo)
+    return {"tabla": cotizaciones.tabla_cobertura(con, provs), "proveedores": [p.estado() for p in provs.values()],
+            "latencias": cotizaciones.latencias_medidas(con),
+            "catalogo_simulador_importado": bool(con.execute("SELECT 1 FROM universo_simulador LIMIT 1").fetchone()),
+            "webhook_tradingview": {"configurado": webhook_tv.TradingViewAlertReceiver(con).configurado(),
+                                    "plantilla": webhook_tv.plantilla_mensaje()}}
+
+
+@app.post("/api/cobertura/verificar")
+def verificar_cobertura(con=Depends(con_db)):
+    provs = cotizaciones.construir(con, AJUSTES.es_demo)
+    filas = cotizaciones.verificar_cobertura(con, provs, cotizaciones.catalogo(con))
+    conteo: dict[str, dict[str, int]] = {}
+    for f in filas:
+        conteo.setdefault(f["proveedor"], {}).setdefault(f["estado"], 0)
+        conteo[f["proveedor"]][f["estado"]] += 1
+    return {"resumen": conteo}
+
+
+@app.post("/api/saldo-portal")
+def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """El participante copia a mano el valor y el efectivo que muestra el portal (la terminal no entra al portal)."""
+    errores = []
+    try:
+        valor = float(cuerpo.get("valor_portafolio"))
+        if not (0 < valor < 1e10):
+            raise ValueError
+    except (TypeError, ValueError):
+        errores.append("valor_portafolio: número positivo")
+        valor = 0
+    efectivo = cuerpo.get("efectivo")
+    try:
+        efectivo = None if efectivo in (None, "") else float(efectivo)
+    except (TypeError, ValueError):
+        errores.append("efectivo: número")
+    hora = str(cuerpo.get("hora_portal") or db.ahora())[:40]
+    if errores:
+        raise cartera.ErrorValidacion(errores)
+    cur = con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, nota) "
+                      "VALUES (?,?,?,?,?,?)", (db.ahora(), hora, reto.etapa_operativa(), valor, efectivo,
+                                               str(cuerpo.get("nota") or "")[:200]))
+    db.auditar(con, "saldo_portal", cur.lastrowid, "alta", despues={"valor": valor, "efectivo": efectivo, "hora": hora})
+    con.commit()
+    disparar_motor(False)
+    return {"id": cur.lastrowid}
+
+
+@app.post("/webhook/tradingview")
+async def webhook_tradingview(request: Request):
+    cuerpo = await request.body()
+    con = db.conectar()
+    try:
+        r = webhook_tv.TradingViewAlertReceiver(con, verificar_ip=bool(os.environ.get("TRADINGVIEW_VERIFICAR_IP"))).recibir(
+            cuerpo, request.client.host if request.client else None)
+    except webhook_tv.WebhookRechazado as e:
+        return JSONResponse({"error": str(e)}, status_code=e.codigo)
+    finally:
+        con.close()
+    if not r.get("duplicado"):
+        disparar_motor(False)
+    return r
 
 
 @app.post("/api/notificaciones/prueba")

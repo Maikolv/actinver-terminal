@@ -75,7 +75,7 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
             continue
         ts = ahora()
         with transaccion(con):
-            con.executemany("INSERT OR REPLACE INTO fx VALUES ('USDMXN',?,?,?,?,?)",
+            con.executemany("INSERT OR REPLACE INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
                             [(b.fecha, b.cierre, n, "fx", ts) for b in barras])
         _registrar(con, n, inicio, "ok", len(barras), "tipo de cambio USD/MXN")
         return {"proveedor": n, "estado": "ok", "registros": len(barras)}
@@ -121,7 +121,7 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
             moneda = ins["moneda_referencia"] or "MXN"
             with transaccion(con):
                 con.executemany(
-                    "INSERT OR REPLACE INTO precios VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    "INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)",
                     [(ins["id"], b.fecha, b.cierre, b.cierre_ajustado, b.volumen, moneda, n, a.tipo_dato, None, ts)
                      for b in barras])
                 # El cierre oficial sustituye a las cotizaciones en vivo del mismo día o anteriores.
@@ -130,7 +130,7 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                                 (ins["id"], PROVEEDOR_VIVO, max(b.fecha for b in barras)))
                 eventos = [(ins["id"], b.fecha, "dividendo", b.dividendo, n) for b in barras if b.dividendo]
                 eventos += [(ins["id"], b.fecha, "split", b.factor_split, n) for b in barras if b.factor_split != 1]
-                con.executemany("INSERT OR REPLACE INTO eventos_corporativos VALUES (?,?,?,?,?)", eventos)
+                con.executemany("INSERT OR REPLACE INTO eventos_corporativos (instrumento_id, fecha, tipo, valor, proveedor) VALUES (?,?,?,?,?)", eventos)
             resumen[n]["registros"] += len(barras)
             break
     for n in ORDEN_PRECIOS:
@@ -183,4 +183,6 @@ def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = 
                "nuevos": fx.get("registros", 0) + sum(v["registros"] for v in precios.values())}
     if contexto:
         out["contexto"] = actualizar_contexto(con, ajustes, ids_prioritarios or [], cliente)
+    from . import migraciones
+    migraciones.completar_tiempos(con, ajustes)
     return out

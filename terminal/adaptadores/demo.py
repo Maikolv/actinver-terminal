@@ -39,6 +39,9 @@ def generar(con: sqlite3.Connection, anios: int = 5, semilla: int = 42) -> int:
     instrs = con.execute("SELECT id, clase, categoria, moneda_referencia FROM instrumentos WHERE estado='activo'").fetchall()
     filas = []
     ts = ahora()
+    from ..migraciones import disponibilidad_precio
+    tiempos = {(f.date().isoformat(), m): disponibilidad_precio(f.date().isoformat(), PROVEEDOR, m, "sintetico", None, ts)
+               for f in fechas for m in ("USD", "MXN")}
     for ins in instrs:
         mu, vol, beta = PARAMS.get(ins["clase"], (0.07, 0.2, 0.7))
         r2 = np.random.default_rng(_semilla(ins["id"]) ^ semilla)
@@ -49,12 +52,13 @@ def generar(con: sqlite3.Connection, anios: int = 5, semilla: int = 42) -> int:
         precio = 100 * np.exp(np.cumsum(ret))
         moneda = ins["moneda_referencia"] or "MXN"
         for f, p in zip(fechas, precio):
-            filas.append((ins["id"], f.date().isoformat(), float(p), float(p), 1e6, moneda, PROVEEDOR,
-                          "sintetico", None, ts))
+            d = f.date().isoformat()
+            filas.append((ins["id"], d, float(p), float(p), 1e6, moneda, PROVEEDOR, "sintetico", None, ts,
+                          *tiempos[(d, "USD" if moneda == "USD" else "MXN")]))
     with transaccion(con):
         con.execute("DELETE FROM precios WHERE proveedor=?", (PROVEEDOR,))
-        con.executemany("INSERT INTO precios VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+        con.executemany("INSERT INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         con.execute("DELETE FROM fx WHERE proveedor=?", (PROVEEDOR,))
-        con.executemany("INSERT INTO fx VALUES ('USDMXN',?,?,?,?,?)",
+        con.executemany("INSERT INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
                         [(f.date().isoformat(), float(v), PROVEEDOR, "sintetico", ts) for f, v in zip(fechas, fx)])
     return len(filas)

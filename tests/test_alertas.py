@@ -63,11 +63,11 @@ def test_stop_take_y_caida_desde_maximo(con):
 
 
 def test_macro_insider_noticia_una_sola_vez(con):
-    con.execute("INSERT INTO eventos_macro VALUES ('e1', ?, 'USD', 'FOMC Statement', 'High', '', '', 'forexfactory', ?)",
+    con.execute("INSERT INTO eventos_macro (id, fecha, pais, titulo, impacto, pronostico, previo, fuente, obtenido_en) VALUES ('e1', ?, 'USD', 'FOMC Statement', 'High', '', '', 'forexfactory', ?)",
                 ((ABIERTO + timedelta(hours=5)).isoformat(), ABIERTO.isoformat()))
-    con.execute("INSERT INTO insiders VALUES ('i1','SIC:KO','2026-10-10','Jane Doe','CEO','S',10000,60,600000,'https://sec.gov/x','sec_edgar',?)",
+    con.execute("INSERT INTO insiders (id, instrumento_id, fecha, nombre, cargo, codigo, acciones, precio, valor, enlace, fuente, obtenido_en) VALUES ('i1','SIC:KO','2026-10-10','Jane Doe','CEO','S',10000,60,600000,'https://sec.gov/x','sec_edgar',?)",
                 (ABIERTO.isoformat(),))
-    con.execute("INSERT INTO noticias VALUES ('n1','SIC:KO','Coca-Cola downgraded after guidance cut','https://seekingalpha.com/x',?,"
+    con.execute("INSERT INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, sentimiento, motivo, obtenido_en) VALUES ('n1','SIC:KO','Coca-Cola downgraded after guidance cut','https://seekingalpha.com/x',?,"
                 "'seekingalpha_rss','alto',-1.0,'léxico',?)", ((ABIERTO - timedelta(hours=2)).isoformat(), ABIERTO.isoformat()))
     con.commit()
     conds = lambda: (alertas.reglas_macro(con, CFG, ABIERTO) + alertas.reglas_insider(con, CFG, {"SIC:KO"}, ABIERTO)  # noqa: E731

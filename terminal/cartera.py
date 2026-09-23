@@ -125,8 +125,18 @@ def registrar(con: sqlite3.Connection, t: dict, origen: str, ocurrencia: int = 1
         "INSERT INTO transacciones (fecha, tipo, instrumento_id, cantidad, precio, monto, comision, impuesto, moneda,"
         " tipo_cambio, nota, origen, huella, creado_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (*[t[c] for c in CAMPOS], origen, h, ahora()))
+    marcar_tiempos(con, cur.lastrowid, t["fecha"])
     auditar(con, "transaccion", cur.lastrowid, "alta", despues=t, motivo=origen)
     return cur.lastrowid
+
+
+def marcar_tiempos(con: sqlite3.Connection, tid: int, fecha: str) -> None:
+    """Etapa del Reto (práctica / competencia / fuera) y marcas event_time / available_at de una operación confirmada."""
+    from . import reto
+    cols = {r[1] for r in con.execute("PRAGMA table_info(transacciones)")}
+    if "etapa" in cols:
+        con.execute("UPDATE transacciones SET etapa=?, event_time=?, available_at=creado_en WHERE id=?",
+                    (reto.etapa_de_fecha(fecha), f"{fecha}T00:00:00-06:00", tid))
 
 
 def anular(con: sqlite3.Connection, tid: int, motivo: str) -> None:
@@ -159,6 +169,7 @@ def corregir(con: sqlite3.Connection, tid: int, nuevos: dict, instrumentos: dict
             "INSERT INTO transacciones (fecha, tipo, instrumento_id, cantidad, precio, monto, comision, impuesto, moneda,"
             " tipo_cambio, nota, origen, huella, reemplaza_id, creado_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (*[t[c] for c in CAMPOS], "correccion", h, tid, ahora()))
+        marcar_tiempos(con, cur.lastrowid, t["fecha"])
         calcular(listar(con), {})
         auditar(con, "transaccion", tid, "correccion", antes=dict(fila), despues={**t, "nuevo_id": cur.lastrowid},
                 motivo=motivo[:200])

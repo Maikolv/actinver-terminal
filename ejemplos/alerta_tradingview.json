@@ -1,0 +1,7 @@
+{
+  "secreto": "<pegue aquí TRADINGVIEW_WEBHOOK_SECRETO de su .env>",
+  "simbolo": "{{exchange}}:{{ticker}}",
+  "precio": {{close}},
+  "hora": "{{timenow}}",
+  "alerta": "AMX cruza 18"
+}

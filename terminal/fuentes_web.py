@@ -179,7 +179,7 @@ def actualizar_macro(con: sqlite3.Connection, ajustes: dict, cliente=None, forza
         return {"estado": "error", "mensaje": str(e)}
     ts = ahora()
     with transaccion(con):
-        con.executemany("INSERT OR REPLACE INTO eventos_macro VALUES (?,?,?,?,?,?,?,?,?)",
+        con.executemany("INSERT OR REPLACE INTO eventos_macro (id, fecha, pais, titulo, impacto, pronostico, previo, fuente, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?)",
                         [(e["id"], e["fecha"], e["pais"], e["titulo"], e["impacto"], e["pronostico"], e["previo"],
                           "forexfactory", ts) for e in ev])
     return {"estado": "ok", "registros": len(ev)}
@@ -208,7 +208,7 @@ def actualizar_noticias(con: sqlite3.Connection, ajustes: dict, instrumentos: li
             filas.append((ident, ins["id"], it["titulo"], it["enlace"], it["publicado"], "seekingalpha_rss",
                           c["impacto"], c["sentimiento"], c["motivo"], ts))
         with transaccion(con):
-            con.executemany("INSERT OR REPLACE INTO noticias VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+            con.executemany("INSERT OR REPLACE INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, sentimiento, motivo, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
         n += len(filas)
     return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5]}
 
@@ -230,7 +230,7 @@ def actualizar_insiders(con: sqlite3.Connection, ajustes: dict, instrumentos: li
             continue
         ts = ahora()
         with transaccion(con):
-            con.executemany("INSERT OR REPLACE INTO insiders VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [
+            con.executemany("INSERT OR REPLACE INTO insiders (id, instrumento_id, fecha, nombre, cargo, codigo, acciones, precio, valor, enlace, fuente, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [
                 (hashlib.sha1(f"{o['enlace']}|{o['fecha']}|{o['acciones']}|{o['codigo']}".encode()).hexdigest()[:16],
                  ins["id"], o["fecha"], o["nombre"], o["cargo"], o["codigo"], o["acciones"], o["precio"], o["valor"],
                  o["enlace"], "sec_edgar", ts) for o in ops])

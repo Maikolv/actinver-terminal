@@ -101,7 +101,7 @@ function segmentado(id, valorActual, alCambiar) {
 /* ---------- pestañas (teclado: flechas, Inicio, Fin) ---------- */
 const CARGAS = {
   "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
-  "tab-universo": () => cargarUniverso(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
+  "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
 };
 function activarPestana(tab, enfocar) {
   document.querySelectorAll('[role="tab"]').forEach((t) => {
@@ -626,6 +626,134 @@ async function cargarMercado() {
       d.insiders, { caption: `Fuente: ${d.fuentes.insiders}.`, vacio: "Sin operaciones de insiders registradas." }));
   } catch (e) { limpiar("mercado-contenido", errorCaja(e)); }
 }
+
+/* ---------- PASADO · PRESENTE · FUTURO ---------- */
+const LAT = { REAL_TIME: "vigente", DELAYED: "retrasado", EOD: "retrasado", UNKNOWN: "sin_datos" };
+function celdaPrecioBmv(pb) {
+  if (!pb || pb.estado !== "confiable") {
+    return h("span", { title: (pb && pb.motivos || []).join(" · ") }, chip("vencido", "SIN PRECIO CONFIABLE"));
+  }
+  const q = pb.cotizacion;
+  return h("span", {}, h("span", { clase: "cifra", texto: `${num(q.precio)} ${q.moneda}` }), " ", chip(LAT[q.estado_latencia], q.estado_latencia),
+    h("br"), h("span", { clase: "suave", texto: `${q.proveedor} · ${fechaLocal(q.hora_evento)} · latencia ${q.latencia_medida_s == null ? "—" : `${Math.round(q.latencia_medida_s)} s`}${q.sintetico ? " · FICTICIO" : ""}` }));
+}
+function celdaReferencia(r) {
+  if (!r) return "—";
+  return h("span", { title: r.etiqueta }, `${num(r.precio)} USD`, h("br"),
+    h("span", { clase: "suave", texto: `≈ ${mxn(r.precio_mxn_estimado, true)} estimado · ${r.estado_latencia} · ${r.proveedor}` }));
+}
+function pintarPresente(p) {
+  const g = p.ganancia, a = p.acciones_operadas;
+  limpiar("presente-contenido",
+    h("p", { clase: "suave", texto: `Hora ${fechaLocal(p.hora)} (America/Mexico_City) · etapa del Reto: ${ETAPAS[p.etapa_reto] || p.etapa_reto} · cartera: ${p.cartera_de} · BMV ${p.mercado_bmv_abierto ? "abierta" : "cerrada"}` }),
+    h("div", { clase: "kpis" }, kpi("Valor estimado", mxn(p.valor_estimado, true)), kpi("Efectivo", mxn(p.efectivo, true)),
+      kpi("Ganancia estimada", `${mxn(g.ganancia, true)} (${pct(g.ganancia_pct)})`, signo(g.ganancia)),
+      kpi("Comisiones pagadas", mxn(g.comisiones_pagadas, true)), kpi("Comisión si liquidara", mxn(g.comision_salida_estimada, true)),
+      kpi("Acciones operadas", `${a.n} de ${a.minimo}`, a.cumple ? "positivo" : "negativo")),
+    h("p", { clase: "suave", texto: g.nota }),
+    p.saldo_portal ? h("p", {}, `Portal (${p.saldo_portal.hora_portal}): ${mxn(p.saldo_portal.valor_portafolio, true)} · diferencia de la estimación `,
+      h("strong", { texto: pct(p.diferencia_portal) })) : h("p", { clase: "suave", texto: "Aún no se captura el saldo del portal." }),
+    tabla([
+      { t: "Posición confirmada", f: (f) => h("strong", { texto: f.clave_operable || f.instrumento_id }) },
+      { t: "Títulos", f: (f) => num(f.cantidad), num: true },
+      { t: "Precio BMV (MXN)", f: (f) => celdaPrecioBmv(f.precio_bmv) },
+      { t: "Referencia externa", f: (f) => celdaReferencia(f.referencia_externa) },
+      { t: "Valor estimado", f: (f) => mxn(f.valor_estimado, true), num: true },
+      { t: "Exposición", f: (f) => pct(f.peso), num: true }],
+      p.posiciones, { caption: "El precio BMV solo aparece si una fuente con cobertura verificada lo entrega vigente; la referencia externa es la bolsa de origen convertida a pesos.", vacio: "Sin posiciones confirmadas en esta cartera." }),
+    h("h3", { texto: `Alertas activas (${p.alertas_activas.length})` }),
+    p.alertas_activas.length ? h("ul", {}, p.alertas_activas.slice(0, 10).map((x) => h("li", { texto: `${x.titulo} — ${x.fuente || ""}` }))) : h("p", { clase: "suave", texto: "Ninguna." }),
+    h("h3", { texto: "Proveedores de precios" }),
+    tabla([{ t: "Proveedor", f: (f) => f.proveedor }, { t: "Descripción", f: (f) => f.descripcion },
+      { t: "Estado", f: (f) => (f.configurado ? chip("vigente", "Configurado") : chip("sin_datos", "Pendiente")) },
+      { t: "Pendiente", f: (f) => f.pendientes.join(" · ") || "—" }], p.proveedores),
+    h("p", { clase: "suave", texto: p.nota }));
+}
+function pintarPasado(p) {
+  const exps = p.experimentos || [];
+  limpiar("pasado-contenido",
+    h("p", { clase: "suave", texto: p.descripcion + (p.demo ? " Modo demostración: datos FICTICIOS." : "") }),
+    tabla([{ t: "Fuente", f: (f) => f.proveedor }, { t: "Tipo", f: (f) => f.tipo_dato }, { t: "Filas", f: (f) => num(f.filas), num: true },
+      { t: "Instrumentos", f: (f) => f.instrumentos, num: true }, { t: "Desde", f: (f) => f.desde }, { t: "Hasta", f: (f) => f.hasta },
+      { t: "Último available_at", f: (f) => fechaLocal(f.ultimo_disponible) }], p.fuentes, { caption: "Precios históricos", vacio: "Sin precios históricos." }),
+    tabla([{ t: "Fecha", f: (f) => f.fecha }, { t: "Tipo", f: (f) => f.tipo }, { t: "Instrumento", f: (f) => f.instrumento_id || "—" },
+      { t: "Títulos", f: (f) => num(f.cantidad), num: true }, { t: "Precio", f: (f) => num(f.precio), num: true },
+      { t: "Etapa", f: (f) => f.etapa || "fuera del Reto" }, { t: "Registrada (available_at)", f: (f) => fechaLocal(f.available_at) }],
+      p.operaciones_confirmadas, { caption: "Operaciones confirmadas", vacio: "Sin operaciones registradas." }),
+    exps.length ? tabla([{ t: "H", f: (f) => f.H, num: true }, { t: "Entrenamiento", f: (f) => (f.cortes.entrenamiento || []).join(" → ") },
+      { t: "Validación", f: (f) => (f.cortes.validacion || []).join(" → ") }, { t: "Prueba", f: (f) => (f.cortes.prueba || []).join(" → ") },
+      { t: "Embargo", f: (f) => `${f.cortes.embargo_sesiones} ses.`, num: true },
+      { t: "Purgados", f: (f) => `${f.purgados.entrenamiento} / ${f.purgados.validacion}` },
+      { t: "Variables eliminadas (|r| ≥ 0.95)", f: (f) => (f.variables_eliminadas_final || []).map((x) => `${x.variable}≈${x.conservada}`).join(", ") || "ninguna" },
+      { t: "Corr. media entre activos", f: (f) => num(f.correlacion_activos_entrenamiento && f.correlacion_activos_entrenamiento.media), num: true },
+      { t: "Semilla · versión", f: (f) => `${f.semilla} · ${f.version_codigo}+${f.huella_config}` }], exps,
+      { caption: "Cortes temporales de la investigación (sin barajar). La correlación entre activos es riesgo real: se informa, no se reduce." })
+      : h("p", { clase: "suave", texto: "Aún no se ejecuta la investigación." }),
+    tabla([{ t: "Publicado", f: (f) => fechaLocal(f.publicado) }, { t: "Conocido (available_at)", f: (f) => fechaLocal(f.available_at) },
+      { t: "Emisora", f: (f) => f.instrumento_id }, { t: "Titular", f: (f) => f.titulo }], p.noticias, { caption: "Noticias", vacio: "Sin noticias." }));
+}
+function pintarFuturo(f) {
+  const exps = f.experimentos || [];
+  limpiar("futuro-contenido",
+    h("div", { clase: f.recomendacion_permitida ? "aviso-caja" : "error-caja", role: "note", texto: `${f.etiqueta}. ${f.aviso}` }),
+    ...exps.map((e) => h("div", {},
+      h("h3", { texto: `Fuera de muestra, H = ${e.H} sesión(es) · ${e.datos}` }),
+      tabla([{ t: "Modelo / referencia", f: (m) => m.modelo }, { t: "MSE", f: (m) => (m.mse * 1e4).toFixed(3) + "e-4", num: true },
+        { t: "Acierto dirección", f: (m) => pct(m.acierto_direccion), num: true }, { t: "Cobertura 80 %", f: (m) => pct(m.cobertura_intervalo_80), num: true },
+        { t: "Brier", f: (m) => num(m.brier_prob_subida), num: true }, { t: "Meses mejor que «sin cambio»", f: (m) => m.meses_mejor_que_sin_cambio },
+        { t: "Rotación", f: (m) => num(m.rotacion_media), num: true }, { t: "Neto de costos", f: (m) => pct(m.resultado_neto), num: true }],
+        e.prueba, { caption: `${e.conclusion}${e.prueba_ya_vista ? " · Prueba ya vista: resultado no válido para elegir modelo." : ""}` }))),
+    tabla([{ t: "Instrumento", f: (p) => p.clave_operable || p.instrumento_id }, { t: "H", f: (p) => p.horizonte, num: true },
+      { t: "Desde (cierre)", f: (p) => p.fecha_base }, { t: "Estimación", f: (p) => pct(Math.expm1(p.prediccion)), num: true },
+      { t: "Rango 10–90 %", f: (p) => `${pct(Math.expm1(p.p10))} a ${pct(Math.expm1(p.p90))}` },
+      { t: "Prob. subida", f: (p) => pct(p.prob_subida), num: true }, { t: "Emitido · datos hasta", f: (p) => `${fechaLocal(p.emitido_en)} · ${fechaLocal(p.datos_hasta)}` }],
+      (f.pronosticos || []).slice(0, 60), { caption: "ESTIMACIONES con incertidumbre. No son cotizaciones ni recomendaciones de compra o venta.", vacio: "Sin pronósticos emitidos." }));
+}
+async function cargarTiempo() {
+  const [pa, pr, fu] = await Promise.allSettled([api("/api/pasado"), api("/api/presente"), api("/api/futuro")]);
+  pa.status === "fulfilled" ? pintarPasado(pa.value) : limpiar("pasado-contenido", errorCaja(pa.reason));
+  pr.status === "fulfilled" ? pintarPresente(pr.value) : limpiar("presente-contenido", errorCaja(pr.reason));
+  fu.status === "fulfilled" ? pintarFuturo(fu.value) : limpiar("futuro-contenido", errorCaja(fu.reason));
+}
+document.getElementById("form-portal").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = ev.currentTarget, datos = Object.fromEntries(new FormData(f));
+  try {
+    await api("/api/saldo-portal", { method: "POST", json: datos });
+    notificar("Saldo del portal guardado."); f.reset(); cargarTiempo();
+  } catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
+document.getElementById("btn-investigar").addEventListener("click", async (ev) => {
+  const b = ev.currentTarget, st = document.getElementById("investigacion-estado");
+  ocupado([b], true); st.textContent = "Calculando (≈1 min por horizonte)…";
+  try {
+    await api("/api/investigacion/calcular", { method: "POST", json: {} });
+    for (let i = 0; i < 90; i++) {
+      await new Promise((r) => setTimeout(r, 4000));
+      const e = await api("/api/investigacion/estado");
+      if (e.estado !== "calculando") { st.textContent = e.estado === "terminado" ? "Listo." : `Error: ${e.resultado}`; break; }
+    }
+    cargarTiempo();
+  } catch (e) { st.textContent = e.message; }
+  finally { ocupado([b], false); }
+});
+async function cargarCobertura() {
+  try {
+    const d = await api("/api/cobertura");
+    const provs = ["bmv_licenciado", "lseg", "ice", "eodhd_bmv", "manual_csv"];
+    const est = { verificado: "vigente", pendiente: "sin_datos", no_cubierto: "vencido", no_coincide: "vencido", no_aplica: "sin_datos", sin_verificar: "retrasado" };
+    limpiar("cobertura-contenido",
+      h("p", { clase: "suave", texto: d.catalogo_simulador_importado ? "Catálogo: lista del simulador importada." : "Catálogo: la lista del simulador aún no se importa; se muestra el universo verificado." }),
+      h("p", { clase: "suave", texto: `Latencias medidas: ${d.latencias.length ? d.latencias.map((l) => `${l.proveedor} mediana ${l.mediana_s} s`).join(" · ") : "ninguna todavía"}. Webhook TradingView: ${d.webhook_tradingview.configurado ? "configurado" : "sin secreto (uv run terminal webhook-secreto)"}.` }),
+      tabla([{ t: "Instrumento", f: (f) => f.clave_operable }, { t: "Mercado", f: (f) => f.mercado }, { t: "Moneda", f: (f) => f.moneda },
+        ...provs.map((p) => ({ t: p, f: (f) => chip(est[f[p]] || "sin_datos", f[p]) }))], d.tabla));
+  } catch (e) { limpiar("cobertura-contenido", errorCaja(e)); }
+}
+document.getElementById("btn-cobertura").addEventListener("click", async (ev) => {
+  const b = ev.currentTarget; ocupado([b], true);
+  try { await api("/api/cobertura/verificar", { method: "POST", json: {} }); await cargarCobertura(); notificar("Cobertura verificada."); }
+  catch (e) { notificar(e.message); } finally { ocupado([b], false); }
+});
 
 /* ---------- universo y proveedores ---------- */
 async function cargarUniverso() {

@@ -26,8 +26,25 @@ def perfil_actual(con, ajustes: Ajustes) -> dict:
     return {**base, **json.loads(fila["valor"])} if fila else base
 
 
+def operaciones_etapa(con, ahora=None) -> tuple[list[dict], str | None]:
+    """Operaciones CONFIRMADAS de la cartera que se monitorea. En la práctica o la competencia del Reto se usan solo las
+    de esa etapa, con el saldo inicial de 1,000,000 actipesos si no se registró una aportación (la competencia reinicia
+    el saldo). Si la etapa aún no tiene operaciones, se muestra el historial completo (seguimiento personal)."""
+    tx = [t for t in cartera.listar(con) if t.get("confirmada", 1)]
+    etapa = reto.etapa_operativa(ahora) if reto.activo() else None
+    propias = [t for t in tx if etapa and (t.get("etapa") or reto.etapa_de_fecha(t["fecha"])) == etapa]
+    if not propias:
+        return tx, None
+    if not any(t["tipo"] == "aportacion" for t in propias):
+        capital = float(reto.config().get("capital") or 0)
+        propias = [{"id": 0, "fecha": reto.inicio_etapa(etapa), "tipo": "aportacion", "instrumento_id": None,
+                    "cantidad": 0, "precio": 0, "monto": capital, "comision": 0, "impuesto": 0, "moneda": "MXN",
+                    "tipo_cambio": 1, "nota": "Saldo inicial del Reto (implícito)", "origen": "reto_saldo_inicial"}] + propias
+    return propias, etapa
+
+
 def cartera_actual(con, ajustes: Ajustes) -> dict:
-    tx = cartera.listar(con)
+    tx, etapa_cartera = operaciones_etapa(con)
     ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
     precios = {i: (q["precio_mxn"] if q.get("estado") not in ("sin_datos",) else None) for i, q in cot.items()}
@@ -39,7 +56,8 @@ def cartera_actual(con, ajustes: Ajustes) -> dict:
                   "tipo_dato": q.get("tipo_dato"), "bolsa": q.get("bolsa")})
     estados = [p["vigencia"] for p in res["posiciones"] if p.get("vigencia")]
     res["vigencia"] = vigencia.peor(estados) if estados else ("sin_datos" if res["posiciones"] else "vigente")
-    res["n_operaciones"] = len(tx)
+    res["n_operaciones"] = len([t for t in tx if t.get("origen") != "reto_saldo_inicial"])
+    res["etapa"] = etapa_cartera
     res["costo_comisiones_con_iva"] = res["comisiones"]
     if reto.activo():
         res["cumplimiento_reto"] = reto.cumplimiento({p["instrumento_id"]: (p["peso"] or 0) for p in res["posiciones"]})
@@ -57,7 +75,7 @@ def _serie_referencia(con, ajustes: Ajustes, iid: str, indice: pd.DatetimeIndex)
 def seguimiento(con, ajustes: Ajustes) -> dict:
     """Cartera + curva de valor, rendimiento ponderado por tiempo, caída desde máximo y referencias."""
     res = cartera_actual(con, ajustes)
-    tx = cartera.listar(con)
+    tx, _ = operaciones_etapa(con)
     ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]})
     res.update(historia=[], referencias=[], max_caida=None)
     if not tx:
@@ -124,10 +142,14 @@ def revalidar(p: dict, perfil: dict, ajustes: Ajustes) -> dict:
 
 def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
     out = {}
+    actual = None
     for tipo, lente in COMBINACIONES:
         clave = f"{tipo}_{lente}"
         f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()
         out[clave] = revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None
+        if out[clave] and "advertencias_reto" not in out[clave]:
+            actual = actual or cartera_actual(con, ajustes)
+            advertir_compras(out[clave], actual)
     return out
 
 
@@ -144,7 +166,23 @@ def calcular_propuestas(con, ajustes: Ajustes) -> dict:
             con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
                         (p["clave"], p["calculado_en"], json.dumps(perfil), js))
         res[p["clave"]] = revalidar(json.loads(js), perfil, ajustes)
+    for p in res.values():
+        advertir_compras(p, actual)
     return res
+
+
+def advertir_compras(p: dict, actual: dict) -> dict:
+    """Antes de presentar una propuesta: ¿alguna compra de una sola acción excede el 50 % del portafolio?"""
+    if not p or not reto.activo():
+        return p
+    filas = ((p.get("cambios") or {}).get("filas")) or []
+    compras = [{"id": f["id"], "monto": f.get("monto_mxn") or 0} for f in filas if (f.get("monto_mxn") or 0) > 0]
+    if not filas:  # sin cartera registrada: la compra inicial es toda la asignación
+        compras = [{"id": a["id"], "monto": a.get("monto_estimado") or a.get("monto_objetivo") or 0} for a in p.get("pesos") or []]
+    valor = float(actual.get("valor_total") or 0) or float(p.get("capital") or 0)
+    pos = {x["instrumento_id"]: float(x.get("valor_mxn") or 0) for x in actual.get("posiciones", [])}
+    p["advertencias_reto"] = reto.verificar_compras(compras, valor, pos)
+    return p
 
 
 def respuesta_propuestas(props: dict) -> dict:
@@ -194,7 +232,12 @@ def simular(con, ajustes: Ajustes, cambios: list[dict]) -> dict:
     return {"operaciones": detalle, "efectivo_resultante": round(efectivo, 2), "valor_total": round(total, 2),
             "costo_total": round(costo_total, 2), "pesos": {k: round(v, 4) for k, v in sorted(pesos.items(), key=lambda x: -x[1])},
             "emisoras": len(pesos), "cumplimiento_reto": reto.cumplimiento(pesos) if reto.activo() else [],
-            "avisos": avisos, "nota": "Simulación con el último precio disponible y costos estimados; no envía órdenes."}
+            "avisos": avisos, "advertencias_reto": reto.verificar_compras(
+                [{"id": c["id"], "monto": c["monto"]} for c in cambios if float(c["monto"]) > 0],
+                float(actual["valor_total"] or 0), {p["instrumento_id"]: float(p["valor_mxn"] or 0) for p in actual["posiciones"]})
+            if reto.activo() else [],
+            "costos_detalle": [reto.costo_detalle(d["importe"]) | {"id": d["id"]} for d in detalle],
+            "nota": "Simulación con el último precio disponible y costos estimados; no envía órdenes."}
 
 
 # --------------------------------------------------------------------------------------------------------------
@@ -219,6 +262,11 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     if motivo:
         props = calcular_propuestas(con, ajustes)
     cart = cartera_actual(con, ajustes)
+    try:
+        from .investigacion import pronosticos
+        pronosticos.resolver(con, ajustes.es_demo)  # añade resultados observados a pronósticos vencidos
+    except Exception:  # noqa: BLE001 - la investigación nunca detiene el monitor
+        log.exception("no se pudieron resolver pronósticos")
     nuevas = alertas.evaluar(con, ajustes, cart, props, notificar=notificar)
     estado = {"ultimo_ciclo": inicio.isoformat(timespec="seconds"), "duracion_s": round((datetime.now(UTC) - inicio).total_seconds(), 1),
               "recalculo": motivo or "no necesario", "nuevos_datos": act.get("nuevos", 0), "alertas_nuevas": len(nuevas),

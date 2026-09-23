@@ -48,9 +48,9 @@ def sembrar_precios(con, ids, fin=None, sesiones=900, semilla=7, proveedor="prue
         p = 100 * np.exp(np.cumsum(r))
         filas += [(iid, f.date().isoformat(), float(x), float(x), 1e6, moneda, proveedor, tipo, None, db.ahora())
                   for f, x in zip(fechas, p)]
-    con.executemany("INSERT OR REPLACE INTO precios VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+    con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
     if con_fx:
-        con.executemany("INSERT OR REPLACE INTO fx VALUES ('USDMXN',?,?,?,?,?)",
+        con.executemany("INSERT OR REPLACE INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
                         [(f.date().isoformat(), 17.0 + 0.001 * i, "fred", "fx", db.ahora()) for i, f in enumerate(fechas)])
     con.commit()
     return fechas

@@ -7,6 +7,9 @@
   uv run terminal telegram       # detecta su chat de Telegram, lo guarda en .env y envía un aviso de prueba
   uv run terminal comparar-modelos  # walk-forward: modelo vigente vs HRP, CVaR, paridad de riesgo
   uv run terminal alpaca         # comprueba las claves de Alpaca (solo datos) y muestra un precio de prueba
+  uv run terminal investigar     # experimento walk-forward → validación → prueba y pronósticos (H = 1 y 5)
+  uv run terminal cobertura      # verifica cobertura por símbolo y proveedor; escribe docs/cobertura.md
+  uv run terminal webhook-secreto  # genera TRADINGVIEW_WEBHOOK_SECRETO en .env (sin mostrarlo completo)
 """
 from __future__ import annotations
 
@@ -185,6 +188,79 @@ def alpaca(_args) -> None:
     print("Al iniciar la terminal, en horario de EE. UU. se abrirá el flujo en vivo (IEX, hasta 30 símbolos).")
 
 
+def investigar(args) -> None:
+    import json
+
+    from . import db
+    from .config import cargar_ajustes
+    from .investigacion import pronosticos
+    a = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con, a)
+    try:
+        for H in args.horizontes:
+            r = pronosticos.emitir(con, a.es_demo, H)
+            print(json.dumps({k: v for k, v in r.items() if not k.startswith("_")}, ensure_ascii=False, indent=1, default=str))
+        from .investigacion import evaluacion
+        for H in args.horizontes:
+            e = evaluacion.ultimo(con, H, a.es_demo)
+            if not e or e.get("estado") != "ok":
+                continue
+            print(f"\nH={H} · {e['datos']} · cortes {e['cortes']['entrenamiento']} | {e['cortes']['validacion']} | "
+                  f"{e['cortes']['prueba']} · embargo {e['cortes']['embargo_sesiones']} · variante {e['variante_elegida']}")
+            print(f"{'modelo':32} {'MSE':>10} {'dir.':>6} {'cob80':>6} {'neto':>8} {'rot':>6}")
+            for m in e["prueba"]:
+                d = m["acierto_direccion"]
+                print(f"{m['modelo']:32} {m['mse']:10.6f} {(f'{d:.3f}' if d is not None else '—'):>6} "
+                      f"{m['cobertura_intervalo_80']:6.3f} {m['resultado_neto']:8.4f} {m['rotacion_media']:6.3f}")
+            print(e["conclusion"] + (" (prueba ya vista: no válida para elegir)" if e.get("prueba_ya_vista") else ""))
+    finally:
+        con.close()
+
+
+def cobertura(_args) -> None:
+    from . import cotizaciones, db
+    from .config import RAIZ, cargar_ajustes
+    a = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con, a)
+    try:
+        provs = cotizaciones.construir(con, a.es_demo)
+        cotizaciones.verificar_cobertura(con, provs, cotizaciones.catalogo(con))
+        tabla = cotizaciones.tabla_cobertura(con, provs)
+        lat = cotizaciones.latencias_medidas(con)
+        importado = bool(con.execute("SELECT 1 FROM universo_simulador LIMIT 1").fetchone())
+        estados = [p.estado() for p in provs.values()]
+    finally:
+        con.close()
+    lineas = ["# Cobertura por símbolo y proveedor", "",
+              f"Generado por `uv run terminal cobertura` el {datetime.now():%Y-%m-%d %H:%M} (hora local).",
+              "Estados: `verificado` (consulta real con instrumento, moneda y mercado exactos), `pendiente` (falta contrato, "
+              "especificación o credencial), `no_cubierto`, `no_coincide`, `no_aplica`, `sin_verificar`.",
+              "", ("Catálogo: **lista del simulador importada**." if importado else
+                   "Catálogo: **la lista del simulador aún no se importa**; se usa el universo verificado (PDF + fuentes oficiales)."),
+              "", "## Proveedores", ""]
+    for e in estados:
+        lineas.append(f"- **{e['proveedor']}** — {e['descripcion']}. " + (
+            "Configurado." if e["configurado"] else "Pendiente: " + "; ".join(e["pendientes"])))
+    lineas += ["", "## Latencia medida", ""]
+    lineas += [f"- {x['proveedor']}: mediana {x['mediana_s']} s, p90 {x['p90_s']} s (n={x['n']})" for x in lat] or [
+        "- Sin cotizaciones registradas: ninguna latencia verificada todavía."]
+    cols = ["instrumento_id", "clave_operable", "mercado", "moneda"] + cotizaciones.PRIORIDAD
+    lineas += ["", "## Tabla", "", "| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
+    lineas += ["| " + " | ".join(str(f.get(c) or "") for c in cols) + " |" for f in tabla]
+    (RAIZ / "docs" / "cobertura.md").write_text("\n".join(lineas) + "\n", encoding="utf-8")
+    verificados = sum(1 for f in tabla for c in cotizaciones.PRIORIDAD if f[c] == "verificado")
+    print(f"{len(tabla)} instrumentos; {verificados} coberturas verificadas. Detalle en docs/cobertura.md")
+
+
+def webhook_secreto(_args) -> None:
+    import secrets as _s
+    valor = _s.token_urlsafe(32)
+    _fijar_env("TRADINGVIEW_WEBHOOK_SECRETO", valor)
+    print(f"Secreto guardado en .env (termina en …{valor[-4:]}). Cópielo desde .env al mensaje de su alerta de TradingView.")
+
+
 def main() -> None:
     p = argparse.ArgumentParser(prog="terminal", description="Terminal local de análisis de portafolios")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -205,6 +281,11 @@ def main() -> None:
     c.add_argument("--tipo", choices=["acciones", "mixta"], default="acciones")
     c.add_argument("--lente", choices=["ajuste", "rendimiento"], default="ajuste")
     c.set_defaults(fn=comparar_modelos)
+    inv = sub.add_parser("investigar", help="experimento sin fuga de información y pronósticos (FUTURO)")
+    inv.add_argument("--horizontes", type=int, nargs="+", default=[1, 5])
+    inv.set_defaults(fn=investigar)
+    sub.add_parser("cobertura", help="verifica cobertura por símbolo y proveedor (docs/cobertura.md)").set_defaults(fn=cobertura)
+    sub.add_parser("webhook-secreto", help="genera el secreto del webhook de TradingView en .env").set_defaults(fn=webhook_secreto)
     d = sub.add_parser("demo", help="inicia con datos SINTÉTICOS etiquetados (sin credenciales)")
     d.add_argument("--sin-navegador", action="store_true")
     d.set_defaults(fn=iniciar)

@@ -5,7 +5,8 @@
 activo: true                      # aplica reglas y costos del Reto a las propuestas
 nombre: "Reto Actinver 2026"
 fuente: "https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica"
-consultado: "2026-09-23"
+consultado: "2026-09-23"                # re-verificado el 2026-09-23 antes de esta versión (§1, §2, §5, §6, §8, §13, §17)
+prohibicion_automatizacion: "§17: prohibido usar robots, scripts, macros o programas en el portal. La terminal no entra al portal, no extrae datos de él ni captura órdenes."
 
 capital: 1000000                  # actipesos (reglamento §1)
 moneda: MXN
@@ -35,8 +36,8 @@ horario_bmv:                      # reglamento §8, lunes a viernes salvo festiv
     cierre: "15:00"
 
 reglas:
-  min_emisoras: 5                 # «por lo menos 5 emisoras diferentes»
-  max_peso_emisora: 0.50          # «NO comprar más del 50 % del portafolio en una sola emisora»
+  min_emisoras: 5                 # §6: «operaciones con por lo menos 5 (cinco) acciones distintas»
+  max_peso_emisora: 0.50          # §6/§7: «en ningún momento haber realizado compras en una sola acción por más del 50 %»
   ventas_en_corto: false          # §11
   apalancamiento: false
   dividendos_reproducidos: false  # §13: no se pagan dividendos; sí splits → se usa precio sin ajustar

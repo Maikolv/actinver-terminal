@@ -281,7 +281,7 @@ class FlujoVivo:
         con = db.conectar()
         try:
             with db.transaccion(con):
-                con.executemany("INSERT OR REPLACE INTO precios VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+                con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
         finally:
             con.close()
         with self._lock:
