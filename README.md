@@ -20,6 +20,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal demo` | Igual, con datos sintéticos en `data/demo/` |
 | `uv run terminal actualizar` | Actualización incremental de datos (respeta límites) |
 | `uv run terminal respaldar` | Respaldo verificado en `data/respaldos/` |
+| `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
 | `uv run pytest` | 63 pruebas |
 | `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |

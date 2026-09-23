@@ -17,14 +17,17 @@ real del inversionista, calibrada para el **Reto Actinver 2026**. Solo informa y
 simula: ninguna ruta envía órdenes a una casa de bolsa. Ver `README.md` para
 arranque rápido y `docs/` para el diseño completo.
 
-## Estado actual (2026-09-23, v0.2.0)
+## Estado actual (2026-09-23, v0.3.0)
 
-- 63 pruebas en verde (`uv run pytest`); Lighthouse escritorio 100/100/100, móvil 93/100/100.
+- 70 pruebas en verde (`uv run pytest`); Lighthouse escritorio 100/100/100, móvil 93/100/100.
 - 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con reglas del Reto
   (`config/reto.yaml`), μ global coherente (D-22), motor automático (`servicios.ciclo`),
   alertas con histéresis/enfriamiento y notificación de escritorio (`alertas.py`,
   `notificador.py`), contexto FF/SA/SEC/Barchart (`fuentes_web.py`), widget de
   TradingView en `/grafica/<id>`, simulación de cambios, universo del simulador.
+- Reportes automáticos (`terminal/reportes.py`): `uv run terminal reporte preapertura|cierre|semanal` escribe
+  `data/reportes/AAAA-MM-DD_<tipo>.md` (en `data/demo/reportes/` si el modo es demo); `scripts/programar_tareas.ps1`
+  registra las tareas de Windows (08:00, 15:15, sáb 09:00). Suspendida/desactualizada ⇒ el reporte no recomienda.
 - Docs con nombres pedidos: `docs/repos.md` (64 fichas), `fuentes.md`, `decisiones.md`
   (D-01 a D-30), `seguridad.md`, `matriz.md`, `diseno.md`; evidencia en `docs/13-evidencia.md`.
 - No reintentes fuentes descartadas (D-16) sin una razón nueva. Otra sesión puede trabajar
@@ -38,7 +41,8 @@ uv sync                      # entorno .venv (uv lo crea si falta)
 uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
-uv run pytest -q             # 63 pruebas
+uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
+uv run pytest -q             # 70 pruebas
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq
 ```
@@ -62,11 +66,7 @@ importados por el usuario — es intencional (D-12), no un bug.
 4. **Backtests de más modelos** (D-03/D-04 ya cubren media-varianza con skfolio):
    evaluar HRP, CVaR y risk parity de skfolio contra el mismo walk-forward y dejar
    el ranking automático si supera el actual fuera de muestra — ver `docs/matriz.md`.
-5. **Reportes automáticos** (pre-apertura 08:00, cierre 15:15, semanal del Reto):
-   no implementados aún; `scripts/programar_tareas.ps1` ya crea tareas programadas
-   de Windows para `actualizar`/`respaldar`, faltaría una tercera tarea que genere
-   y guarde el reporte (reutilizar `terminal/servicios.py` para el cálculo).
-6. **CloudflareSpeedTest_duplicates_backup** (duplicado verificado: 28/28 archivos idénticos)
+5. **CloudflareSpeedTest_duplicates_backup** (duplicado verificado: 28/28 archivos idénticos)
    y otros repos mal ubicados detectados en `docs/repos.md`: pendiente de limpieza fuera
    de este repo (afecta a `Desktop/Repos`, no a `actinver-terminal`); dejar
    constancia en ese doc antes de borrar cualquier cosa, con respaldo o rama.

@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.3.0] — 2026-09-23
+
+### Añadido
+- Reportes automáticos en Markdown (`terminal/reportes.py`, comando `terminal reporte preapertura|cierre|semanal`): Reto, motor, cartera con vigencia por posición, seguimiento (semanal), propuestas y alertas recientes. Una propuesta suspendida o desactualizada se reporta como tal y no emite recomendación; base vacía no inventa cifras. Se guardan en `data/reportes/` (o `data/demo/reportes/` en modo demo, sin mezclar datos sintéticos con reales) y quedan fuera de Git.
+- `scripts/programar_tareas.ps1` registra tres tareas más: pre-apertura 08:00 y cierre 15:15 (lun–vie) y semanal (sáb 09:00).
+- `tests/test_reportes.py` (7 pruebas; 70 en total).
+
 ## [0.2.0] — 2026-09-23
 
 ### Añadido

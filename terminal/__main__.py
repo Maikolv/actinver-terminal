@@ -1,8 +1,9 @@
-"""Línea de comandos: iniciar | actualizar | respaldar | demo.
+"""Línea de comandos: iniciar | actualizar | respaldar | reporte | demo.
 
   uv run terminal iniciar        # abre la terminal en http://127.0.0.1:8765
   uv run terminal actualizar     # consulta proveedores configurados (respeta límites)
   uv run terminal respaldar      # copia verificada de la base de datos local
+  uv run terminal reporte cierre # genera data/reportes/AAAA-MM-DD_cierre.md (preapertura | cierre | semanal)
 """
 from __future__ import annotations
 
@@ -76,6 +77,17 @@ def respaldar(args) -> None:
     print(f"Respaldo verificado: {destino} (integridad ok, {n} operaciones)")
 
 
+def reporte(args) -> None:
+    from . import db, reportes
+    from .config import cargar_ajustes
+    con = db.conectar()
+    db.inicializar(con)
+    try:
+        print(reportes.ejecutar(con, cargar_ajustes(), args.tipo, actualizar=not args.sin_actualizar))
+    finally:
+        con.close()
+
+
 def main() -> None:
     p = argparse.ArgumentParser(prog="terminal", description="Terminal local de análisis de portafolios")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -86,6 +98,10 @@ def main() -> None:
     r = sub.add_parser("respaldar", help="crea un respaldo verificado de la base local")
     r.add_argument("--conservar", type=int, default=14)
     r.set_defaults(fn=respaldar)
+    g = sub.add_parser("reporte", help="genera un reporte en Markdown (preapertura, cierre o semanal)")
+    g.add_argument("tipo", choices=["preapertura", "cierre", "semanal"])
+    g.add_argument("--sin-actualizar", action="store_true", help="no consulta proveedores antes de reportar")
+    g.set_defaults(fn=reporte)
     d = sub.add_parser("demo", help="inicia con datos SINTÉTICOS etiquetados (sin credenciales)")
     d.add_argument("--sin-navegador", action="store_true")
     d.set_defaults(fn=iniciar)
