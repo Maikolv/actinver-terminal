@@ -95,3 +95,12 @@ Decisión: el modo (demo/real) se inyecta en el HTML desde el servidor para que 
 
 ### D-30 Trabajo concurrente de otra sesión
 Contexto: una sesión paralela (Claude Sonnet 5) consolidó en commits (`4ff11b7`, `a04bafc`) parte del trabajo en curso y añadió `CLAUDE.md`, `CHANGELOG.md`, D-18–D-20 y variables en `.env.example`. Decisión: conservar sus aportes, integrarlos (CHANGELOG ampliado, referencias a documentos renombrados) y no reescribir su historial.
+
+### D-31 Precio en vivo del SIC con Alpaca (solo datos)
+Contexto: el usuario pidió cambios «en tiempo real» con fuentes gratuitas y dentro de las reglas del Reto. No existe fuente gratuita autorizada para la BMV local; las emisoras del SIC siguen a su bolsa de origen por el tipo de cambio.
+Decisión: adaptador `Alpaca` (barras diarias crudas y ajustadas; SIP con respaldo IEX) y flujo `terminal/tiempo_real.py` (WebSocket IEX, 30 símbolos, reconexión con espera creciente, respaldo REST). Solo dominios de datos; una prueba verifica que el código no contiene rutas de la API de operaciones. Las cotizaciones se guardan como `alpaca_vivo` y el cierre oficial las reemplaza. El motor recalcula «en vivo» sin consultar otros proveedores (evita agotar límites de ForexFactory/SEC).
+Descartado: leer el simulador del Reto (reglamento §11) y extraer páginas de cotizaciones (condiciones de uso).
+
+### D-32 Avisos por Telegram con detalle
+Decisión: Telegram activo por defecto y solo envía si `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` existen. El mensaje móvil incluye motivo y acción sugerida de cada alerta (máx. 5) y recuerda que las órdenes se capturan a mano. `uv run terminal telegram` detecta el chat, lo guarda en `.env` y envía una prueba sin mostrar el token; la pestaña Alertas tiene «Enviar aviso de prueba». Se mantiene el silencio fuera del horario de la BMV.
+

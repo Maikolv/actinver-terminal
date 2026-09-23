@@ -15,7 +15,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, alertas, cartera, db, importar, ingesta, mercado, reto, servicios, vigencia
+from . import __version__, alertas, cartera, db, importar, ingesta, mercado, notificador, reto, servicios, tiempo_real, vigencia
 from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
 from .seguridad import TOKEN_CSRF, Seguridad
 
@@ -43,14 +43,25 @@ def disparar_motor(forzar: bool = True) -> None:
     threading.Thread(target=servicios.ciclo_seguro, args=(AJUSTES, forzar), daemon=True).start()
 
 
+FLUJO: tiempo_real.FlujoVivo | None = None  # precios en vivo de EE. UU. (Alpaca IEX); None si el motor está apagado
+
+
 def _programador(stop: threading.Event) -> None:
-    """Motor automático: adquiere datos (respetando límites), recalcula si hay datos nuevos y evalúa alertas."""
+    """Motor automático: adquiere datos (respetando límites), recalcula si hay datos nuevos y evalúa alertas.
+    Entre ciclos completos, si el flujo en vivo trae precios que se movieron, recalcula sin consultar proveedores."""
+    import time
     prog = AJUSTES["programacion"]
-    espera = 5  # primer ciclo pocos segundos después de arrancar
-    while not stop.wait(espera):
-        servicios.ciclo_seguro(AJUSTES)
-        abierto = vigencia.mercado_abierto("XMEX") or vigencia.mercado_abierto("XNYS")
-        espera = int(prog["revisar_cada_min"] if abierto else prog["fuera_horario_min"]) * 60
+    siguiente = time.monotonic() + 5  # primer ciclo pocos segundos después de arrancar
+    while not stop.wait(15):
+        ahora = time.monotonic()
+        if ahora >= siguiente:
+            if servicios.ciclo_seguro(AJUSTES) is not None and FLUJO:
+                FLUJO.marcar_recalculo()
+            abierto = vigencia.mercado_abierto("XMEX") or vigencia.mercado_abierto("XNYS")
+            siguiente = time.monotonic() + int(prog["revisar_cada_min"] if abierto else prog["fuera_horario_min"]) * 60
+        elif FLUJO and FLUJO.debe_recalcular():
+            if servicios.ciclo_seguro(AJUSTES, forzar=True, en_vivo=True) is not None:
+                FLUJO.marcar_recalculo()
 
 
 @asynccontextmanager
@@ -60,11 +71,16 @@ async def vida(app: FastAPI):
     if AJUSTES.es_demo and not con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone():
         ingesta.actualizar_todo(con, AJUSTES)
     con.close()
+    global FLUJO
     stop = threading.Event()
     if AJUSTES["app"].get("actualizacion_automatica") and not os.environ.get("TERMINAL_SIN_MOTOR"):
+        FLUJO = tiempo_real.FlujoVivo(AJUSTES)
+        FLUJO.iniciar()
         threading.Thread(target=_programador, args=(stop,), daemon=True).start()
     yield
     stop.set()
+    if FLUJO:
+        FLUJO.detener()
 
 
 app = FastAPI(title="Actinver Terminal", version=__version__, docs_url=None, redoc_url=None, openapi_url=None,
@@ -190,7 +206,9 @@ def estado(con=Depends(con_db)):
         "fx": mercado.ultimo_fx(con, AJUSTES), "vigencia": conteo, "instrumentos_activos": len(activos),
         "instrumentos_total": len(ins), "proveedores": ingesta.estado_proveedores(con, AJUSTES),
         "motor": servicios.estado_motor(con), "alertas_pendientes": alertas.pendientes(con),
-        "tiempo_real": False, "operaciones_reales": False,
+        "tiempo_real": FLUJO.resumen() if FLUJO else {"activo": False, "modo": "apagado",
+                                                        "mensaje": "Motor automático desactivado"},
+        "notificaciones": notificador.configurados(), "operaciones_reales": False,
     }
 
 
@@ -340,6 +358,15 @@ def calcular(con=Depends(con_db)):
 def get_alertas(limite: int = 200, con=Depends(con_db)):
     return {"alertas": alertas.listar(con, limite), "pendientes": alertas.pendientes(con),
             "configuracion": AJUSTES["alertas"]}
+
+
+@app.post("/api/notificaciones/prueba")
+def probar_notificaciones():
+    """Envía un aviso de prueba por los canales configurados (escritorio, Telegram, correo)."""
+    cfg = {**AJUSTES["alertas"], "notificar_telegram": True}
+    texto = ("Si recibe este mensaje, los avisos de la terminal llegan a este canal. "
+             "Solo informativo: las órdenes se capturan a mano en el simulador del Reto.")
+    return {"resultado": notificador.enviar("Actinver Terminal — prueba de avisos", texto, cfg)}
 
 
 @app.post("/api/alertas/{aid}")

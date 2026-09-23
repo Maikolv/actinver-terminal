@@ -203,15 +203,17 @@ def estado_motor(con) -> dict:
     return json.loads(f["valor"]) if f else {}
 
 
-def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notificar: bool = True) -> dict:
-    """Adquisición → propuesta → alertas. Recalcula solo si hay datos nuevos, cambió el perfil o se fuerza."""
+def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notificar: bool = True,
+          en_vivo: bool = False) -> dict:
+    """Adquisición → propuesta → alertas. Recalcula solo si hay datos nuevos, cambió el perfil o se fuerza.
+    `en_vivo`: lo dispara el flujo de precios en vivo; no consulta proveedores (los precios nuevos ya están en la base)."""
     inicio = datetime.now(UTC)
     cart = cartera_actual(con, ajustes)
     prio = [p["instrumento_id"] for p in cart["posiciones"]]
-    act = ingesta.actualizar_todo(con, ajustes, prio, forzar_demo=False, contexto=True)
+    act = {"nuevos": 0} if en_vivo else ingesta.actualizar_todo(con, ajustes, prio, forzar_demo=False, contexto=True)
     perfil = perfil_actual(con, ajustes)
     props = propuestas_guardadas(con, ajustes, perfil)
-    motivo = ("forzado" if forzar else "datos nuevos" if act.get("nuevos") else
+    motivo = ("precios en vivo" if en_vivo else "forzado" if forzar else "datos nuevos" if act.get("nuevos") else
               "sin propuestas" if any(v is None for v in props.values()) else
               "perfil o datos cambiaron" if any(v and v.get("avisos") for v in props.values()) else "")
     if motivo:
@@ -227,7 +229,7 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     return estado
 
 
-def ciclo_seguro(ajustes: Ajustes, forzar: bool = False) -> dict | None:
+def ciclo_seguro(ajustes: Ajustes, forzar: bool = False, en_vivo: bool = False) -> dict | None:
     """Ejecuta un ciclo si no hay otro en curso (lo usan el programador y los disparadores de la API)."""
     if not bloqueo.acquire(blocking=False):
         return None
@@ -235,7 +237,7 @@ def ciclo_seguro(ajustes: Ajustes, forzar: bool = False) -> dict | None:
         con = db.conectar()
         try:
             db.inicializar(con)
-            return ciclo(con, ajustes, forzar=forzar)
+            return ciclo(con, ajustes, forzar=forzar, en_vivo=en_vivo)
         finally:
             con.close()
     except Exception:  # noqa: BLE001

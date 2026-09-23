@@ -17,7 +17,7 @@ CERRADO = datetime(2026, 10, 13, 23, 0, tzinfo=UTC)
 @pytest.fixture(autouse=True)
 def sin_notificaciones(monkeypatch):
     enviados = []
-    monkeypatch.setattr(alertas.notificador, "enviar", lambda t, x, c: enviados.append((t, x)) or {"escritorio": "prueba"})
+    monkeypatch.setattr(alertas.notificador, "enviar", lambda t, x, c, detalle=None: enviados.append((t, x)) or {"escritorio": "prueba"})
     return enviados
 
 

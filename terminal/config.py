@@ -39,7 +39,10 @@ VARIABLES_CREDENCIALES = {
     "banxico": "BANXICO_TOKEN",
     "barchart": "BARCHART_API_KEY",
     "sec_edgar": "SEC_USER_AGENT",
+    "alpaca": "ALPACA_API_KEY_ID",
 }
+# Proveedores que además de la clave usan un secreto (se leen aparte y nunca se exponen).
+VARIABLES_SECRETOS = {"alpaca": "ALPACA_API_SECRET_KEY"}
 
 
 def _cargar_env_local() -> None:
@@ -85,6 +88,11 @@ def credencial(proveedor: str) -> str | None:
     var = VARIABLES_CREDENCIALES.get(proveedor)
     val = os.environ.get(var) if var else None
     return val or None
+
+
+def secreto(proveedor: str) -> str | None:
+    var = VARIABLES_SECRETOS.get(proveedor)
+    return (os.environ.get(var) if var else None) or None
 
 
 def cargar_ajustes() -> Ajustes:

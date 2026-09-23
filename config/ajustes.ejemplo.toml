@@ -23,6 +23,17 @@ pesos_60_40 = [0.60, 0.40]
 revisar_cada_min = 15
 fuera_horario_min = 60
 
+[tiempo_real]
+# Flujo en vivo de Alpaca (WebSocket IEX, plan gratuito: 1 conexión, 30 símbolos). Solo emisoras de EE. UU. (SIC/ETF);
+# precio en MXN = precio en vivo × tipo de cambio más reciente (Banxico FIX o FRED). La BMV local sigue con cierres.
+activo = true
+feed = "iex"
+max_simbolos = 30
+guardar_cada_seg = 15                # cada cuánto se escriben en la base los últimos precios
+recalcular_cada_min = 5              # recalcula propuestas y alertas con precios nuevos al menos cada 5 min…
+umbral_movimiento = 0.01             # …o antes, si algún símbolo se mueve ≥ 1 % desde el último cálculo
+recalculo_minimo_seg = 120           # nunca dos cálculos en vivo con menos de 2 min de diferencia
+
 [vigencia]
 # Umbrales para declarar un dato «vigente», «retrasado» o «vencido».
 # cierre / nav: sesiones hábiles de atraso toleradas respecto a la última sesión cerrada.
@@ -51,6 +62,11 @@ peticiones_por_dia = 900
 [proveedores.eodhd]
 activo = true                        # cierres EOD de la BMV (.MX); requiere EODHD_API_KEY
 peticiones_por_dia = 18              # plan gratuito: 20/día; se deja margen
+
+[proveedores.alpaca]
+activo = true                        # barras diarias EE. UU. (solo datos); requiere ALPACA_API_KEY_ID y ALPACA_API_SECRET_KEY
+feed_historico = "sip"               # plan gratuito: SIP con 15 min de retraso; si la cuenta no lo permite se usa IEX
+peticiones_por_dia = 5000            # el plan gratuito permite 200 peticiones/min
 
 [proveedores.barchart]
 activo = true                        # históricos EE. UU. vía Barchart OnDemand; requiere BARCHART_API_KEY (contrato)
@@ -85,7 +101,7 @@ enfriamiento_horas = 6               # no repetir la misma alerta antes de 6 h
 silenciar_fuera_de_horario = true    # fuera del horario de la BMV se registra pero no se notifica al escritorio
 notificar_escritorio = true
 notificar_correo = false             # requiere SMTP_* en .env
-notificar_telegram = false           # requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en .env
+notificar_telegram = true            # se envía solo si TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID están en .env
 
 [perfil]
 # Valores iniciales; se editan desde la interfaz sin tocar código.

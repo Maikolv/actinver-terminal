@@ -208,7 +208,7 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
                      json.dumps(c.datos, default=str)[:4000], c.fuente[:200], c.accion[:300],
                      json.dumps(c.simulacion) if c.simulacion else None))
                 nuevas.append({"id": cur.lastrowid, "regla": c.regla, "clave": c.clave, "titulo": c.titulo,
-                               "severidad": c.severidad})
+                               "severidad": c.severidad, "motivo": c.motivo, "accion": c.accion})
     if nuevas and notificar:
         abierto = vigencia.mercado_abierto("XMEX", ahora_dt)
         if cfg.get("silenciar_fuera_de_horario", True) and not abierto:
@@ -216,7 +216,7 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
         else:
             titulo = nuevas[0]["titulo"] if len(nuevas) == 1 else f"{len(nuevas)} alertas nuevas"
             texto = " · ".join(a["titulo"] for a in nuevas[:3]) + (" …" if len(nuevas) > 3 else "")
-            marca = json.dumps(notificador.enviar(titulo, texto, cfg))
+            marca = json.dumps(notificador.enviar(titulo, texto, cfg, detalle=notificador.detalle(nuevas)))
         with transaccion(con):
             con.executemany("UPDATE alertas SET notificada=? WHERE id=?", [(marca, a["id"]) for a in nuevas])
     return nuevas

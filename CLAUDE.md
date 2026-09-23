@@ -19,7 +19,7 @@ arranque rápido y `docs/` para el diseño completo.
 
 ## Estado actual (2026-09-23, v0.3.0)
 
-- 70 pruebas en verde (`uv run pytest`); Lighthouse escritorio 100/100/100, móvil 93/100/100.
+- 82 pruebas en verde (`uv run pytest`); precio en vivo SIC/ETF con Alpaca (D-31) y avisos por Telegram (D-32); Lighthouse escritorio 100/100/100, móvil 93/100/100.
 - 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con reglas del Reto
   (`config/reto.yaml`), μ global coherente (D-22), motor automático (`servicios.ciclo`),
   alertas con histéresis/enfriamiento y notificación de escritorio (`alertas.py`,
@@ -42,7 +42,7 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
-uv run pytest -q             # 70 pruebas
+uv run pytest -q             # 82 pruebas
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq
 ```

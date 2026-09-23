@@ -125,6 +125,14 @@ const irA = (id) => activarPestana(document.getElementById(id));
 const pestanaVisible = (id) => !document.getElementById(id).hidden;
 
 /* ---------- estado de datos y motor ---------- */
+const MODOS_VIVO = { websocket: "en vivo (IEX)", consulta: "cada minuto (respaldo)", mercado_cerrado: "mercado de EE. UU. cerrado",
+  sin_credencial: "sin claves de Alpaca", demo: "no en demostración", error: "error", reconectando: "reconectando…",
+  conectando: "conectando…", desactivado: "desactivado", apagado: "apagado", iniciando: "iniciando…", sin_simbolos: "sin símbolos" };
+function textoVivo(t) {
+  if (!t) return "Tiempo real: no";
+  const base = `SIC/ETF en vivo: ${MODOS_VIVO[t.modo] || t.modo}`;
+  return t.activo ? `${base} · ${t.simbolos}/${t.limite_simbolos} símbolos${t.ultimo_precio ? ` · último ${fechaLocal(t.ultimo_precio)}` : ""}` : base;
+}
 async function cargarEstado(previo) {
   try {
     const d = previo || await api("/api/estado");
@@ -145,7 +153,7 @@ async function cargarEstado(previo) {
       h("span", { clase: "grupo" }, "USD/MXN:", d.fx.valor ? h("span", { clase: "cifra", texto: num(d.fx.valor) }) : "", d.fx.valor ? `(${d.fx.fecha}, ${d.fx.proveedor})` : "", chip(d.fx.estado, d.fx.etiqueta)),
       h("span", { clase: "grupo" }, `Sesión cerrada: NYSE ${d.ultima_sesion.NYSE} · BMV ${d.ultima_sesion.BMV}`),
       h("span", { clase: "grupo" }, m.ultimo_ciclo ? `Motor: ${fechaLocal(m.ultimo_ciclo)} · ${m.recalculo}` : "Motor: en espera"),
-      h("span", { clase: "grupo" }, "Tiempo real: no · Operaciones reales: deshabilitadas"));
+      h("span", { clase: "grupo" }, textoVivo(d.tiempo_real), " · Operaciones reales: deshabilitadas"));
     if (m.ultimo_ciclo && estado.ultimoCiclo && m.ultimo_ciclo !== estado.ultimoCiclo) {
       await cargarPropuestas(); // el motor terminó un ciclo: refrescar sin recargar la página
       if (m.alertas_nuevas) notificar(`${m.alertas_nuevas} alerta(s) nueva(s).`);
@@ -346,7 +354,7 @@ function pintarDetalle() {
         { t: "Precio MXN (fecha)", f: (f) => h("span", {}, mxn(f.precio_mxn, true), h("br"), h("span", { clase: "suave", texto: f.fecha_precio || "" })), num: true },
         { t: "Datos", f: (f) => chip(f.vigencia) },
         { t: "Razones", f: (f) => h("ul", { clase: "lista-motivos" }, f.motivos.map((m) => h("li", { texto: m }))) }],
-      p.pesos, { caption: `Capital ${mxn(p.capital)} · efectivo residual por redondeo ${mxn(p.efectivo_residual)}. Precios de cierre, no en tiempo real.` }));
+      p.pesos, { caption: `Capital ${mxn(p.capital)} · efectivo residual por redondeo ${mxn(p.efectivo_residual)}. Precios de la última cotización disponible (ver fecha y tipo en «Datos»).` }));
     out.push(h("h2", { texto: "Comparación fuera de muestra" }), tabla([
       { t: "Cartera", f: (f) => f.cartera }, { t: "Rend. anual", f: (f) => pct(f.rend_anual), num: true },
       { t: "Volatilidad", f: (f) => pct(f.volatilidad), num: true }, { t: "Sharpe", f: (f) => (vacio(f.sharpe) ? "—" : f.sharpe.toFixed(2)), num: true },
@@ -390,10 +398,27 @@ function escenarios(e) {
 }
 
 /* ---------- alertas ---------- */
+function pintarCanales() {
+  const n = (estado.datos && estado.datos.notificaciones) || {};
+  const t = (estado.datos && estado.datos.tiempo_real) || {};
+  const si = (x) => (x ? "configurado" : "sin configurar");
+  document.getElementById("canales").textContent = `Canales: escritorio ${si(n.escritorio)} · Telegram ${si(n.telegram)} · correo ${si(n.correo)}. ${textoVivo(t)}${t.mensaje ? ` (${t.mensaje})` : ""}.`;
+}
+document.getElementById("btn-probar-avisos").addEventListener("click", async (ev) => {
+  const b = ev.currentTarget;
+  ocupado([b], true);
+  try {
+    const r = (await api("/api/notificaciones/prueba", { method: "POST", json: {} })).resultado;
+    const txt = { enviada: "enviado", no_configurado: "sin configurar", error: "error", no_disponible: "no disponible" };
+    notificar(`Prueba: ${Object.entries(r).map(([k, v]) => `${k} ${txt[v] || v}`).join(" · ")}.`);
+  } catch (e) { notificar(e.message); }
+  finally { ocupado([b], false); }
+});
 async function cargarAlertas() {
   try {
     const d = await api("/api/alertas?limite=200");
     const c = d.configuracion;
+    pintarCanales();
     document.getElementById("alertas-config").textContent = `Deriva ≥ ${c.deriva_pp} pp (rearme < ${c.deriva_rearme_pp} pp) con mejora neta ≥ ${pct(c.mejora_neta_min)} · stop ${pct(c.stop_loss)} · toma de utilidad ${pct(c.take_profit)} · caída desde máximo ${pct(c.caida_desde_maximo)} · enfriamiento ${c.enfriamiento_horas} h · ${c.silenciar_fuera_de_horario ? "silencio fuera de horario BMV" : "notifica 24 h"}.`;
     if (!d.alertas.length) return limpiar("alertas-contenido", h("p", { clase: "vacio", texto: "Sin alertas. El motor evalúa las reglas en cada ciclo." }));
     limpiar("alertas-contenido", h("ul", { clase: "alertas" }, d.alertas.map((a) => h("li", { clase: `alerta alerta--${a.severidad}${a.estado !== "nueva" ? " alerta--vista" : ""}` },

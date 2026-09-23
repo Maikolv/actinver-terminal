@@ -73,6 +73,7 @@
   <section role="tabpanel" id="panel-alertas" aria-labelledby="tab-alertas" hidden>
     <h1>Alertas</h1>
     <p class="ayuda" id="alertas-config"></p>
+    <p class="ayuda"><span id="canales"></span> <button type="button" class="boton boton--secundario" id="btn-probar-avisos">Enviar aviso de prueba</button></p>
     <div id="alertas-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 
@@ -184,7 +185,7 @@
         <dt><span class="chip chip--sintetico">Sintético</span></dt><dd>Dato de demostración; nunca se presenta como actual.</dd>
       </dl>
       <h2>Tiempo real</h2>
-      <p>El simulador del Reto usa precios de la BMV en tiempo real. Esta terminal <strong>no tiene una fuente gratuita de tiempo real para la BMV</strong>: trabaja con cierres diarios y lo indica en cada dato. Vea «Datos» para el retraso de cada fuente.</p>
+      <p>El simulador del Reto usa precios de la BMV en tiempo real. <strong>No hay fuente gratuita de tiempo real para las emisoras locales de la BMV</strong>: se usan sus cierres diarios. Para las emisoras del SIC y los ETF, con claves de Alpaca (gratis) la terminal recibe el último precio de IEX en vivo (hasta 30 símbolos), lo convierte a pesos con el tipo de cambio más reciente y recalcula propuestas y alertas cuando el precio se mueve. Cada dato indica su tipo y retraso en «Datos».</p>
       <h2>Alertas</h2>
       <p>Se disparan una sola vez al cumplirse la condición, esperan un periodo de enfriamiento antes de repetirse y no le notifican fuera del horario de la BMV. «Simular cambio» calcula el efecto de la acción sugerida sin enviar nada.</p>
       <h2>CFD y apalancamiento</h2>

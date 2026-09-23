@@ -93,8 +93,15 @@ def evaluar(tipo_dato: str | None, fecha_dato: str | None, codigo: str, umbrales
         return {"estado": "sintetico", "etiqueta": ETIQUETAS["sintetico"], "sesiones_atraso": None,
                 "retraso_horas": retraso_h}
     if tipo_dato == "tiempo_real":
-        estado = "vigente" if retraso_h * 3600 <= umbrales["tiempo_real_segundos_vigente"] else "retrasado"
-        return {"estado": estado, "etiqueta": ETIQUETAS[estado], "sesiones_atraso": 0, "retraso_horas": retraso_h}
+        if retraso_h * 3600 <= umbrales["tiempo_real_segundos_vigente"]:
+            estado = "vigente"
+        elif mercado_abierto(codigo, ahora):
+            estado = "retrasado" if retraso_h * 60 <= umbrales["retrasado_minutos_vigente"] else "vencido"
+        else:
+            tipo_dato = "cierre"  # con el mercado cerrado, el último precio de la sesión equivale a su cierre
+            estado = None
+        if estado:
+            return {"estado": estado, "etiqueta": ETIQUETAS[estado], "sesiones_atraso": 0, "retraso_horas": retraso_h}
     if tipo_dato == "retrasado":
         estado = "retrasado" if retraso_h * 60 <= umbrales["retrasado_minutos_vigente"] else "vencido"
         if not mercado_abierto(codigo, ahora):

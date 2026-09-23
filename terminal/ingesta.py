@@ -7,19 +7,24 @@ from datetime import date, timedelta
 
 from . import vigencia
 from .adaptadores import CLASES, FX_USDMXN, ErrorProveedor, LimiteAlcanzado
-from .config import Ajustes, credencial
+from .config import Ajustes, credencial, secreto
 from .db import ahora, transaccion
 
 log = logging.getLogger("terminal.ingesta")
 
-ORDEN_PRECIOS = ["tiingo", "barchart", "eodhd"]  # los fondos solo se alimentan por archivo (NAV)
+ORDEN_PRECIOS = ["tiingo", "alpaca", "barchart", "eodhd"]  # los fondos solo se alimentan por archivo (NAV)
 ORDEN_FX = ["banxico", "fred"]
+PROVEEDOR_VIVO = "alpaca_vivo"  # cotizaciones intradía del flujo en vivo (terminal/tiempo_real.py)
 ANIOS_HISTORIA = 5
 
 
 def construir_adaptadores(con: sqlite3.Connection, ajustes: Ajustes, cliente=None) -> dict:
     prov = ajustes["proveedores"]
-    return {n: CLASES[n](con, prov.get(n, {}), credencial(n), cliente=cliente) for n in CLASES}
+    out = {}
+    for n, clase in CLASES.items():
+        extra = {"secreto": secreto(n)} if n == "alpaca" else {}
+        out[n] = clase(con, prov.get(n, {}), credencial(n), cliente=cliente, **extra)
+    return out
 
 
 def estado_proveedores(con: sqlite3.Connection, ajustes: Ajustes) -> list[dict]:
@@ -119,6 +124,10 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                     "INSERT OR REPLACE INTO precios VALUES (?,?,?,?,?,?,?,?,?,?)",
                     [(ins["id"], b.fecha, b.cierre, b.cierre_ajustado, b.volumen, moneda, n, a.tipo_dato, None, ts)
                      for b in barras])
+                # El cierre oficial sustituye a las cotizaciones en vivo del mismo día o anteriores.
+                if barras:
+                    con.execute("DELETE FROM precios WHERE instrumento_id=? AND proveedor=? AND fecha<=?",
+                                (ins["id"], PROVEEDOR_VIVO, max(b.fecha for b in barras)))
                 eventos = [(ins["id"], b.fecha, "dividendo", b.dividendo, n) for b in barras if b.dividendo]
                 eventos += [(ins["id"], b.fecha, "split", b.factor_split, n) for b in barras if b.factor_split != 1]
                 con.executemany("INSERT OR REPLACE INTO eventos_corporativos VALUES (?,?,?,?,?)", eventos)

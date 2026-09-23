@@ -20,8 +20,10 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal demo` | Igual, con datos sintéticos en `data/demo/` |
 | `uv run terminal actualizar` | Actualización incremental de datos (respeta límites) |
 | `uv run terminal respaldar` | Respaldo verificado en `data/respaldos/` |
+| `uv run terminal alpaca` | Comprueba las claves de Alpaca (solo datos) |
+| `uv run terminal telegram` | Detecta su chat de Telegram, lo guarda en `.env` y envía una prueba |
 | `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
-| `uv run pytest` | 63 pruebas |
+| `uv run pytest` | 82 pruebas |
 | `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |
 
@@ -47,6 +49,7 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 | Banxico SIE | USD/MXN FIX (prioritario) | `BANXICO_TOKEN` gratuito |
 | Tiingo | Cierres de EE. UU. (SIC y ETF) | `TIINGO_API_KEY` gratuita |
 | EODHD | Cierres de la BMV | `EODHD_API_KEY` (20/día gratis) |
+| Alpaca (solo datos) | Cierres de EE. UU. y **precio en vivo IEX** del SIC/ETF (30 símbolos) | `ALPACA_API_KEY_ID` + `ALPACA_API_SECRET_KEY` (gratis) |
 | Barchart OnDemand | Históricos | `BARCHART_API_KEY` (contrato) |
 | ForexFactory | Calendario macro | No |
 | Seeking Alpha RSS | Titulares por emisora | No |
@@ -54,7 +57,7 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 | TradingView | Gráfica (widget oficial) | No |
 | CSV propio | NAV de fondos, precios, operaciones, universo del simulador | No |
 
-**Tiempo real**: ninguna fuente gratuita autorizada lo da para la BMV; todo se presenta como cierre con su fecha. Opciones en [docs/fuentes.md](docs/fuentes.md#tiempo-real).
+**Tiempo real**: las emisoras del SIC y los ETF se actualizan en vivo con Alpaca (IEX, gratis) y se convierten a MXN con el tipo de cambio más reciente; las emisoras locales de la BMV no tienen fuente gratuita autorizada y se presentan como cierre con su fecha. Opciones en [docs/fuentes.md](docs/fuentes.md#tiempo-real).
 
 ## Configuración
 

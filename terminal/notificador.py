@@ -59,6 +59,32 @@ def correo(titulo: str, texto: str) -> str:
         return "error"
 
 
+ICONOS = {"critica": "🔴", "aviso": "🟠", "info": "🔵"}
+
+
+def detalle(alertas: list[dict]) -> str:
+    """Texto completo para canales móviles: motivo y acción sugerida de cada alerta (máx. 5)."""
+    partes = []
+    for a in alertas[:5]:
+        linea = f"{ICONOS.get(a.get('severidad'), '•')} {a.get('titulo', '')}"
+        if a.get("motivo"):
+            linea += f"\n{a['motivo']}"
+        if a.get("accion"):
+            linea += f"\n→ {a['accion']}"
+        partes.append(linea)
+    if len(alertas) > 5:
+        partes.append(f"… y {len(alertas) - 5} más en la terminal.")
+    partes.append("Solo informativo: revise y simule en la terminal; las órdenes se capturan a mano en el simulador.")
+    return "\n\n".join(partes)
+
+
+def configurados() -> dict:
+    """Qué canales tienen sus variables en .env (sin exponer valores)."""
+    return {"escritorio": sys.platform == "win32",
+            "telegram": bool(os.environ.get("TELEGRAM_BOT_TOKEN") and os.environ.get("TELEGRAM_CHAT_ID")),
+            "correo": bool(os.environ.get("SMTP_HOST") and os.environ.get("ALERTAS_CORREO_DESTINO"))}
+
+
 def telegram(titulo: str, texto: str) -> str:
     token, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if not token or not chat:
@@ -71,12 +97,32 @@ def telegram(titulo: str, texto: str) -> str:
         return "error"  # el mensaje de error no se registra: la URL contiene el token
 
 
-def enviar(titulo: str, texto: str, cfg: dict) -> dict:
+def enviar(titulo: str, texto: str, cfg: dict, detalle: str | None = None) -> dict:
+    """El escritorio recibe el resumen; correo y Telegram, el detalle completo (motivo y acción)."""
     res = {}
     if cfg.get("notificar_escritorio", True):
         res["escritorio"] = escritorio(titulo, texto)
     if cfg.get("notificar_correo"):
-        res["correo"] = correo(titulo, texto)
+        res["correo"] = correo(titulo, detalle or texto)
     if cfg.get("notificar_telegram"):
-        res["telegram"] = telegram(titulo, texto)
+        res["telegram"] = telegram(titulo, detalle or texto)
     return res
+
+
+# --- configuración asistida de Telegram (comando `terminal telegram`) -------------------------------------------
+def telegram_chats(token: str) -> tuple[str | None, list[dict]]:
+    """Nombre del bot y chats que le han escrito. El token solo viaja a api.telegram.org."""
+    try:
+        yo = httpx.get(f"https://api.telegram.org/bot{token}/getMe", timeout=20)
+        if yo.status_code != 200:
+            return None, []
+        act = httpx.get(f"https://api.telegram.org/bot{token}/getUpdates", timeout=20).json().get("result") or []
+    except (httpx.HTTPError, ValueError):
+        return None, []  # el mensaje de error no se muestra: la URL contiene el token
+    chats = {}
+    for u in act:
+        m = u.get("message") or u.get("my_chat_member") or {}
+        c = m.get("chat") or {}
+        if c.get("id") is not None:
+            chats[c["id"]] = {"id": c["id"], "nombre": c.get("title") or c.get("first_name") or c.get("username") or ""}
+    return yo.json()["result"].get("username"), list(chats.values())

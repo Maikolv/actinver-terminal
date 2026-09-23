@@ -2,6 +2,19 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.4.0] — 2026-09-23
+
+### Añadido
+- **Precio en vivo para emisoras del SIC y ETF** (`terminal/tiempo_real.py`): WebSocket IEX de Alpaca (plan gratuito, 30 símbolos, solo datos), respaldo por consulta REST, persistencia cada 15 s como dato `tiempo_real` y recálculo automático de propuestas y alertas cada 5 min o ante movimientos ≥ 1 %.
+- Adaptador `Alpaca` de barras diarias (crudas y ajustadas; SIP con respaldo IEX) como alternativa gratuita a Tiingo.
+- Telegram con detalle (motivo y acción) por defecto cuando está configurado; `uv run terminal telegram` detecta el chat y prueba el envío; `uv run terminal alpaca` comprueba las claves.
+- Botón «Enviar aviso de prueba» y estado de canales y del flujo en vivo en la interfaz; `/api/estado` informa `tiempo_real` y `notificaciones`.
+- `tests/test_tiempo_real.py` (13 pruebas; 82 en total), incluida una que impide rutas de la API de operaciones de Alpaca.
+
+### Cambiado
+- Vigencia de datos `tiempo_real`: vigente ≤ 120 s; con mercado abierto, retrasado ≤ 20 min y vencido después; con mercado cerrado se evalúa como cierre de sesión.
+- El cierre oficial reemplaza las cotizaciones en vivo del mismo día.
+
 ## [0.3.0] — 2026-09-23
 
 ### Añadido
