@@ -5,6 +5,7 @@
   uv run terminal respaldar      # copia verificada de la base de datos local
   uv run terminal reporte cierre # genera data/reportes/AAAA-MM-DD_cierre.md (preapertura | cierre | semanal)
   uv run terminal telegram       # detecta su chat de Telegram, lo guarda en .env y envía un aviso de prueba
+  uv run terminal comparar-modelos  # walk-forward: modelo vigente vs HRP, CVaR, paridad de riesgo
   uv run terminal alpaca         # comprueba las claves de Alpaca (solo datos) y muestra un precio de prueba
 """
 from __future__ import annotations
@@ -88,6 +89,28 @@ def reporte(args) -> None:
         print(reportes.ejecutar(con, cargar_ajustes(), args.tipo, actualizar=not args.sin_actualizar))
     finally:
         con.close()
+
+
+def comparar_modelos(args) -> None:
+    from . import comparador_modelos, db
+    from .config import cargar_ajustes
+    a = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con)
+    try:
+        res = comparador_modelos.comparar(con, a, {**a["perfil"], "capital": 100000}, args.tipo, args.lente)
+    finally:
+        con.close()
+    if res["estado"] != "calculada":
+        sys.exit("; ".join(res["motivos"]))
+    for f in res["ranking"]:
+        if "error" in f:
+            print(f"  {f['modelo']:<26} ERROR {f['error']}")
+        else:
+            print(f"  {f['modelo']:<26} Sharpe {f['sharpe']:.2f}  rend {f['rend_anual']:+.1%}  vol {f['volatilidad']:.1%}  "
+                  f"caída {f['max_caida']:.1%}  giro {f['giro_medio']:.2f}")
+    print(res["aviso"] or f"Ganador fuera de muestra: {res['ganador']}")
+    print(f"Guardado en {comparador_modelos.guardar(res)}")
 
 
 def _fijar_env(clave: str, valor: str) -> None:
@@ -178,6 +201,10 @@ def main() -> None:
     g.set_defaults(fn=reporte)
     sub.add_parser("telegram", help="configura y prueba los avisos por Telegram").set_defaults(fn=telegram)
     sub.add_parser("alpaca", help="comprueba las claves de Alpaca (solo datos de mercado)").set_defaults(fn=alpaca)
+    c = sub.add_parser("comparar-modelos", help="walk-forward de HRP, CVaR, paridad de riesgo y el modelo vigente")
+    c.add_argument("--tipo", choices=["acciones", "mixta"], default="acciones")
+    c.add_argument("--lente", choices=["ajuste", "rendimiento"], default="ajuste")
+    c.set_defaults(fn=comparar_modelos)
     d = sub.add_parser("demo", help="inicia con datos SINTÉTICOS etiquetados (sin credenciales)")
     d.add_argument("--sin-navegador", action="store_true")
     d.set_defaults(fn=iniciar)

@@ -5,6 +5,7 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 ## [0.4.0] — 2026-09-23
 
 ### Añadido
+- `uv run terminal comparar-modelos`: walk-forward de modelo vigente, 1/N, inversa de volatilidad, mínimo CVaR, paridad de riesgo y HRP (D-33); sin ganador con datos demo. `tests/test_comparador_modelos.py` (2 pruebas; 84 en total).
 - **Precio en vivo para emisoras del SIC y ETF** (`terminal/tiempo_real.py`): WebSocket IEX de Alpaca (plan gratuito, 30 símbolos, solo datos), respaldo por consulta REST, persistencia cada 15 s como dato `tiempo_real` y recálculo automático de propuestas y alertas cada 5 min o ante movimientos ≥ 1 %.
 - Adaptador `Alpaca` de barras diarias (crudas y ajustadas; SIP con respaldo IEX) como alternativa gratuita a Tiingo.
 - Telegram con detalle (motivo y acción) por defecto cuando está configurado; `uv run terminal telegram` detecta el chat y prueba el envío; `uv run terminal alpaca` comprueba las claves.

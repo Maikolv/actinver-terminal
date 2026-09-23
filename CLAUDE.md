@@ -19,7 +19,7 @@ arranque rápido y `docs/` para el diseño completo.
 
 ## Estado actual (2026-09-23, v0.3.0)
 
-- 82 pruebas en verde (`uv run pytest`); precio en vivo SIC/ETF con Alpaca (D-31) y avisos por Telegram (D-32); Lighthouse escritorio 100/100/100, móvil 93/100/100.
+- 84 pruebas en verde (`uv run pytest`); precio en vivo SIC/ETF con Alpaca (D-31) y avisos por Telegram (D-32); Lighthouse escritorio 100/100/100, móvil 93/100/100.
 - 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con reglas del Reto
   (`config/reto.yaml`), μ global coherente (D-22), motor automático (`servicios.ciclo`),
   alertas con histéresis/enfriamiento y notificación de escritorio (`alertas.py`,
@@ -42,7 +42,8 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
-uv run pytest -q             # 82 pruebas
+uv run pytest -q             # 84 pruebas
+uv run terminal comparar-modelos   # walk-forward de modelos (TERMINAL_MODO=demo solo como prueba funcional)
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq
 ```
@@ -63,9 +64,9 @@ importados por el usuario — es intencional (D-12), no un bug.
 3. **`SEC_USER_AGENT` sin configurar** por defecto → la fuente de insiders queda
    inactiva hasta que el usuario ponga su contacto en `.env` (no es automatizable:
    es una declaración personal ante la SEC).
-4. **Backtests de más modelos** (D-03/D-04 ya cubren media-varianza con skfolio):
-   evaluar HRP, CVaR y risk parity de skfolio contra el mismo walk-forward y dejar
-   el ranking automático si supera el actual fuera de muestra — ver `docs/matriz.md`.
+4. **Ranking de modelos** (D-33): el comparador ya existe; falta correrlo con precios
+   REALES (la base real tiene 0 precios hoy) y, si algún modelo supera al vigente fuera de
+   muestra, conectarlo a `proponer()`. Depende de configurar un proveedor (brecha 1).
 5. **CloudflareSpeedTest_duplicates_backup** (duplicado verificado: 28/28 archivos idénticos)
    y otros repos mal ubicados detectados en `docs/repos.md`: pendiente de limpieza fuera
    de este repo (afecta a `Desktop/Repos`, no a `actinver-terminal`); dejar

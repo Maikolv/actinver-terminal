@@ -104,3 +104,9 @@ Descartado: leer el simulador del Reto (reglamento §11) y extraer páginas de c
 ### D-32 Avisos por Telegram con detalle
 Decisión: Telegram activo por defecto y solo envía si `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` existen. El mensaje móvil incluye motivo y acción sugerida de cada alerta (máx. 5) y recuerda que las órdenes se capturan a mano. `uv run terminal telegram` detecta el chat, lo guarda en `.env` y envía una prueba sin mostrar el token; la pestaña Alertas tiene «Enviar aviso de prueba». Se mantiene el silencio fuera del horario de la BMV.
 
+### D-33 Comparador de modelos (HRP, CVaR, paridad de riesgo) con walk-forward
+Contexto: la mejora nº 4 pedía evaluar más modelos de skfolio contra el walk-forward vigente y dejar activo el mejor fuera de muestra.
+Decisión: `terminal/comparador_modelos.py` (`uv run terminal comparar-modelos`) corre modelo vigente, 1/N, inversa de volatilidad, mínimo CVaR 95 %, paridad de riesgo y HRP con el mismo universo, topes, ventana y regla de costos que `optimizador._walk_forward`; ordena por Sharpe fuera de muestra neto de costos y guarda JSON en `data/comparacion_modelos/`.
+Honestidad de datos: la base real tiene 0 precios (sin proveedor configurado) y la demo es sintética, así que **no se declara ganador ni se cambia el modelo activo**; el ranking será concluyente solo con precios reales. El ranking aún no está conectado a `proponer()`: hacerlo requiere historia real.
+
+---
