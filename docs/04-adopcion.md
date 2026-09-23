@@ -3,7 +3,7 @@
 ## Semana 1 — Instalar y conocer (sin riesgo)
 
 1. Instalar uv (si no existe): `winget install astral-sh.uv`.
-2. `cd C:\Users\MIKE\Desktop\Repos\terminal-portafolios` → `uv sync` → `uv run pytest` (deben pasar 44 pruebas).
+2. `cd C:\Users\MIKE\Desktop\Repos\actinver-terminal` → `uv sync` → `uv run pytest` (deben pasar 44 pruebas).
 3. `uv run terminal demo`: recorrer las seis pestañas con datos sintéticos (base separada en `data/demo/`). Opcional: `uv run python scripts/cartera_demo.py` e importar `data/demo/cartera_demo.csv` para ver el seguimiento.
 4. Leer «Ayuda» dentro de la terminal y [02-prd.md](02-prd.md) §Límites.
 

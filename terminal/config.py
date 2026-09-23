@@ -37,6 +37,8 @@ VARIABLES_CREDENCIALES = {
     "tiingo": "TIINGO_API_KEY",
     "eodhd": "EODHD_API_KEY",
     "banxico": "BANXICO_TOKEN",
+    "barchart": "BARCHART_API_KEY",
+    "sec_edgar": "SEC_USER_AGENT",
 }
 
 

@@ -86,6 +86,37 @@ CREATE TABLE IF NOT EXISTS importaciones (
 
 CREATE TABLE IF NOT EXISTS ajustes_usuario (clave TEXT PRIMARY KEY, valor TEXT NOT NULL, actualizado_en TEXT NOT NULL);
 
+-- Lista de instrumentos exportada del simulador del Reto (si se importa, restringe el universo).
+CREATE TABLE IF NOT EXISTS universo_simulador (id TEXT PRIMARY KEY, clave_operable TEXT, importado_en TEXT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS tareas_reto (id TEXT PRIMARY KEY, hecha INTEGER NOT NULL DEFAULT 0, actualizado_en TEXT NOT NULL);
+
+-- Alertas: cada disparo queda registrado; el estado por regla/clave implementa histéresis y enfriamiento.
+CREATE TABLE IF NOT EXISTS alertas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, regla TEXT NOT NULL, clave TEXT NOT NULL,
+    severidad TEXT NOT NULL CHECK (severidad IN ('info','aviso','critica')), titulo TEXT NOT NULL, motivo TEXT NOT NULL,
+    datos TEXT, fuente TEXT, accion TEXT, simulacion TEXT, estado TEXT NOT NULL DEFAULT 'nueva',
+    notificada TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_alertas_ts ON alertas(ts);
+CREATE TABLE IF NOT EXISTS estado_alertas (
+    regla TEXT NOT NULL, clave TEXT NOT NULL, activa INTEGER NOT NULL DEFAULT 0, ultimo_disparo TEXT,
+    PRIMARY KEY (regla, clave)
+);
+
+CREATE TABLE IF NOT EXISTS noticias (
+    id TEXT PRIMARY KEY, instrumento_id TEXT, titulo TEXT NOT NULL, enlace TEXT, publicado TEXT, fuente TEXT NOT NULL,
+    impacto TEXT, sentimiento REAL, motivo TEXT, obtenido_en TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS eventos_macro (
+    id TEXT PRIMARY KEY, fecha TEXT NOT NULL, pais TEXT, titulo TEXT NOT NULL, impacto TEXT, pronostico TEXT,
+    previo TEXT, fuente TEXT NOT NULL, obtenido_en TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS insiders (
+    id TEXT PRIMARY KEY, instrumento_id TEXT NOT NULL, fecha TEXT NOT NULL, nombre TEXT, cargo TEXT, codigo TEXT,
+    acciones REAL, precio REAL, valor REAL, enlace TEXT, fuente TEXT NOT NULL, obtenido_en TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS propuestas (
     id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, creado_en TEXT NOT NULL,
     parametros TEXT NOT NULL, resultado TEXT NOT NULL

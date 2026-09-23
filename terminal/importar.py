@@ -27,9 +27,10 @@ COLUMNAS = {
                       "moneda", "tipo_cambio", "nota"],
     "posiciones": ["fecha", "instrumento_id", "cantidad", "costo_promedio", "moneda", "tipo_cambio"],
     "precios": ["fecha", "instrumento_id", "precio", "moneda", "tipo_dato", "fuente"],
+    "universo": ["clave", "tipo", "nombre"],
 }
 OBLIGATORIAS = {"transacciones": {"fecha", "tipo"}, "posiciones": {"fecha", "instrumento_id", "cantidad", "costo_promedio"},
-                "precios": {"fecha", "instrumento_id", "precio"}}
+                "precios": {"fecha", "instrumento_id", "precio"}, "universo": {"clave"}}
 
 
 class ErrorArchivo(ValueError):
@@ -43,6 +44,7 @@ def plantilla(tipo: str) -> str:
                           "2025-03-20,dividendo,SIC:IVV,,,85.40,,8.54,MXN,1,Dividendo trimestral"],
         "posiciones": ["2025-01-01,FONDO:ACTIGOB,1000,5.123456,MXN,1"],
         "precios": ["2026-09-18,FONDO:ACTIGOB,5.234567,MXN,nav,Estado de cuenta"],
+        "universo": ["WALMEX *,accion,Walmart de México", "AAPL *,accion,Apple (SIC)", "ACTIGOB B,fondo,Fondo de deuda"],
     }
     return ",".join(COLUMNAS[tipo]) + "\n" + "\n".join(ejemplos[tipo]) + "\n"
 
@@ -86,6 +88,8 @@ def importar(con: sqlite3.Connection, contenido: bytes, nombre: str, tipo: str, 
              confirmar: bool = False) -> dict:
     """Valida todo el archivo. Con confirmar=False solo devuelve la vista previa (no escribe nada)."""
     filas = leer(contenido, nombre, tipo)
+    if tipo == "universo":
+        return _universo(con, filas, contenido, nombre, instrumentos, confirmar)
     reporte = {"archivo": nombre[:100], "tipo": tipo, "filas": len(filas), "aceptadas": 0, "duplicadas": 0,
                "rechazadas": 0, "detalle": [], "confirmado": False}
     validas: list[tuple[int, dict, int]] = []
@@ -140,6 +144,47 @@ def importar(con: sqlite3.Connection, contenido: bytes, nombre: str, tipo: str, 
         cartera.calcular(cartera.listar(con), {})  # la cartera resultante debe ser coherente
     reporte["confirmado"] = True
     return reporte
+
+
+def _normalizar_clave(txt: str) -> str:
+    return " ".join(txt.upper().replace(" ", " ").split())
+
+
+def _universo(con, filas: list[dict], contenido: bytes, nombre: str, instrumentos: dict, confirmar: bool) -> dict:
+    """Lista de instrumentos visible en el simulador del Reto: reemplaza la lista anterior al confirmar."""
+    por_operable = {_normalizar_clave(v.get("clave_operable") or ""): k for k, v in instrumentos.items()}
+    por_clave: dict[str, list[str]] = {}
+    for k, v in instrumentos.items():
+        por_clave.setdefault(_normalizar_clave(v["clave"]), []).append(k)
+    rep = {"archivo": nombre[:100], "tipo": "universo", "filas": len(filas), "aceptadas": 0, "duplicadas": 0,
+           "rechazadas": 0, "detalle": [], "confirmado": False}
+    ids: dict[str, str] = {}
+    for f in filas:
+        c = _normalizar_clave(f.get("clave", ""))
+        candidatos = por_clave.get(c.split(" ")[0], []) if c else []
+        iid = por_operable.get(c) or (candidatos[0] if len(candidatos) == 1 else None)
+        if not iid:
+            rep["rechazadas"] += 1
+            rep["detalle"].append({"linea": f["_linea"], "estado": "rechazada",
+                                   "errores": [f"«{c[:30]}» no coincide con el universo verificado (se ignorará)"]})
+        elif iid in ids:
+            rep["duplicadas"] += 1
+        else:
+            ids[iid] = c
+    rep["aceptables"] = len(ids)
+    rep["nota"] = "Las claves no reconocidas no bloquean la importación: se listan para revisión."
+    if not confirmar or not ids:
+        return rep
+    with transaccion(con):
+        con.execute("DELETE FROM universo_simulador")
+        con.executemany("INSERT INTO universo_simulador VALUES (?,?,?)", [(i, c, ahora()) for i, c in ids.items()])
+        cur = con.execute("INSERT INTO importaciones (ts, archivo, sha256, tipo, filas, aceptadas, duplicadas, rechazadas,"
+                          " contenido_original) VALUES (?,?,?,?,?,?,?,?,?)",
+                          (ahora(), nombre[:100], hashlib.sha256(contenido).hexdigest(), "universo", rep["filas"], len(ids),
+                           rep["duplicadas"], rep["rechazadas"], contenido))
+        auditar(con, "importacion", cur.lastrowid, "universo_simulador", despues={"instrumentos": len(ids)})
+    rep.update(aceptadas=len(ids), confirmado=True)
+    return rep
 
 
 def _posicion(f: dict, instrumentos: dict) -> dict:

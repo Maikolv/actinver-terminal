@@ -29,12 +29,12 @@ import sklearn.feature_selection as skf
 import sklearn.utils.validation as skv
 from skfolio import Portfolio, RiskMeasure
 from skfolio.model_selection import WalkForward, cross_val_predict
-from skfolio.moments import LedoitWolf, ShrunkMu
+from skfolio.moments import BaseMu, LedoitWolf, ShrunkMu
 from skfolio.optimization import EqualWeighted, MeanRisk, ObjectiveFunction
 from skfolio.prior import EmpiricalPrior
 from sklearn.pipeline import Pipeline
 
-from . import mercado, vigencia
+from . import mercado, reto, vigencia
 from .config import CONFIG_DIR, Ajustes
 
 CLASES_ACCIONES = ("accion", "reit")
@@ -97,10 +97,15 @@ def _clase_costo(ins: dict) -> str:
 
 
 def costo_unitario(ins: dict, ajustes: Ajustes) -> float:
+    """Costo de operar un peso: comisión con IVA + spread estimado. Con el Reto activo, la comisión es la del
+    simulador (0.10 % + IVA sobre toda orden, reglamento §8)."""
     c = ajustes["costos"]
+    spread = c["spread_pct"].get(_clase_costo(ins), 0.003)
+    if reto.activo() and reto.costo_operacion() is not None:
+        return reto.costo_operacion() + spread
     if ins["clase"].startswith("fondo"):
         return 0.0  # compra/venta de fondos sin comisión explícita; el costo va implícito en el NAV
-    return c["comision_pct"] * (1 + c["iva"]) + c["spread_pct"].get(_clase_costo(ins), 0.003)
+    return c["comision_pct"] * (1 + c["iva"]) + spread
 
 
 def universo(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
@@ -110,12 +115,15 @@ def universo(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     ins = mercado.instrumentos(con)
     fondos = _fondos_meta()
     candidatos, excluidos = [], []
-    excl_usuario = set(perfil.get("excluir") or [])
+    excl_usuario = set(perfil.get("excluir") or []) | set((reto.config().get("reglas") or {}).get("instrumentos_prohibidos") or [])
+    simulador = {r[0] for r in con.execute("SELECT id FROM universo_simulador")} if reto.activo() else set()
     for i in ins.values():
         if i["clase"] not in clases:
             continue
         motivo = None
-        if i["estado"] == "excluido":
+        if simulador and i["id"] not in simulador:
+            motivo = "No aparece en la lista importada del simulador del Reto"
+        elif i["estado"] == "excluido":
             motivo = "Excluido por regla (apalancado o inverso)"
         elif i["estado"] != "activo":
             motivo = f"Estado del instrumento: {i['estado']} — {i['detalle_verificacion']}"
@@ -135,7 +143,9 @@ def universo(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         else:
             candidatos.append(i)
     ids = [c["id"] for c in candidatos]
-    precios = mercado.precios_mxn(con, ajustes, ids)
+    # El Reto no paga dividendos (reglamento §13): se estima con precio sin ajustar, que es lo que valúa el simulador.
+    ajustados = not (reto.activo() and not (reto.config().get("reglas") or {}).get("dividendos_reproducidos", True))
+    precios = mercado.precios_mxn(con, ajustes, ids, ajustados=ajustados)
     cotiz = cotiz if cotiz is not None else mercado.cotizaciones(con, ajustes, ids)
     minimo = int(ajustes["optimizacion"]["historia_min_sesiones"])
     elegibles = []
@@ -174,17 +184,17 @@ def _grupos(elegibles: list[dict]) -> dict[str, list[str]]:
     return g
 
 
-def _restricciones(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict]) -> list[str]:
+def _restricciones(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], lente: str = "ajuste") -> list[str]:
     params = ajustes["perfiles"][perfil["riesgo"]]
     r = []
     usd_max = float(perfil.get("max_exposicion_usd", 1.0))
     hay_mxn = any(e["exposicion"] != "USD" for e in elegibles)
     if usd_max < 1 and hay_mxn:
         r.append(f"USD <= {usd_max}")
-    if tipo == "mixta":
+    if tipo == "mixta" and lente == "ajuste":  # la lente de máximo rendimiento no impone deuda mínima
         min_deuda = float(params["min_deuda_mixta"])
         h = float(perfil["horizonte_anios"])
-        if h < 3:  # horizonte corto: más estabilidad
+        if h < 3 and not reto.activo():  # horizonte corto fuera del Reto: más estabilidad
             min_deuda = max(min_deuda, 0.5 if h < 1.5 else 0.35)
         if min_deuda > 0 and any(e["clase"] == "fondo_deuda" for e in elegibles):
             r.append(f"Deuda >= {min_deuda}")
@@ -193,17 +203,66 @@ def _restricciones(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[di
     return r
 
 
+def _parametros_lente(lente: str, perfil: dict, ajustes: Ajustes) -> tuple[float, float]:
+    """(aversión al riesgo λ, tope por activo) de cada lente.
+    ajuste      -> perfil del inversionista (λ del perfil, tope del perfil, limitado por la regla del Reto).
+    rendimiento -> máximo rendimiento esperado (λ bajo explícito; tope que garantiza ≥ 5 emisoras)."""
+    rc = reto.config() if reto.activo() else {}
+    tope_reto = (rc.get("reglas") or {}).get("max_peso_emisora") or 1.0
+    if lente == "rendimiento":
+        p = rc.get("propuestas") or {}
+        return float(p.get("aversion_lente_rendimiento", 0.5)), min(float(p.get("tope_lente_rendimiento", 0.20)), tope_reto)
+    return float(ajustes["perfiles"][perfil["riesgo"]]["aversion_riesgo"]), min(float(perfil.get("max_peso_activo", 0.12)), tope_reto)
+
+
+class MuFijo(BaseMu):
+    """μ precalculado (contracción James-Stein sobre TODO el universo) para que la propuesta final, su
+    rendimiento esperado y la comparación con la cartera actual usen exactamente el mismo estimador."""
+
+    def __init__(self, mu=None):
+        self.mu = mu
+
+    def fit(self, X, y=None, **_):
+        X = np.asarray(X)
+        self.mu_ = np.asarray(self.mu, dtype=float)
+        if self.mu_.shape[0] != X.shape[1]:
+            raise ValueError("MuFijo: dimensión de μ distinta al número de activos")
+        return self
+
+
+def mu_global(X: pd.DataFrame) -> pd.Series:
+    return pd.Series(ShrunkMu().fit(X.values).mu_, index=X.columns)
+
+
+def _ajuste_final(tipo: str, perfil: dict, ajustes: Ajustes, elegibles_l: list[dict], previos: dict, X: pd.DataFrame,
+                  lente: str, aversion_mult: float = 1.0) -> tuple[pd.Series, pd.Series]:
+    """Preselección y optimización con μ global. Devuelve (pesos, μ usado)."""
+    mu = mu_global(X)
+    sd = X.std().replace(0, np.nan)
+    acciones = [e["id"] for e in elegibles_l if e["clase"] in CLASES_ACCIONES]
+    k = int(ajustes["optimizacion"]["max_activos"]) * 2
+    top = set((mu[acciones] / sd[acciones]).dropna().nlargest(k).index) if acciones else set()
+    cols = [c for c in X.columns if c not in acciones or c in top]
+    sub = [e for e in elegibles_l if e["id"] in cols]
+    modelo = _modelo(tipo, perfil, ajustes, sub, {k2: v for k2, v in previos.items() if k2 in cols},
+                     aversion_mult=aversion_mult, k_acciones=len(cols), lente=lente, mu_fijo=mu[cols].values)
+    modelo.fit(X[cols])
+    opt = modelo.named_steps["optimizacion"]
+    return pd.Series(opt.weights_, index=list(opt.feature_names_in_)), mu
+
+
 def _modelo(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], previos: dict[str, float],
-            aversion_mult: float = 1.0, k_acciones: int | None = None) -> Pipeline:
-    params = ajustes["perfiles"][perfil["riesgo"]]
-    tope = float(perfil.get("max_peso_activo", 0.12))
+            aversion_mult: float = 1.0, k_acciones: int | None = None, lente: str = "ajuste",
+            mu_fijo: np.ndarray | None = None) -> Pipeline:
+    aversion, tope = _parametros_lente(lente, perfil, ajustes)
     topes = {e["id"]: (min(tope, 0.10) if e["ventana_venta"] != "diaria" else tope) for e in elegibles}
-    if tipo == "mixta":  # los fondos de deuda son vehículos diversificados: tope mayor
+    if tipo == "mixta" and lente == "ajuste":  # los fondos de deuda son vehículos diversificados: tope mayor
+        tope_reto = (reto.config().get("reglas") or {}).get("max_peso_emisora") or 1.0 if reto.activo() else 1.0
         for e in elegibles:
             if e["clase"] == "fondo_deuda" and e["ventana_venta"] == "diaria":
-                topes[e["id"]] = max(tope, 0.35)
+                topes[e["id"]] = min(max(tope, 0.35), tope_reto)
             elif e["clase"] in ("etf", "fondo_renta_variable", "fondo_multiactivo"):
-                topes[e["id"]] = max(tope, 0.25)
+                topes[e["id"]] = min(max(tope, 0.25), tope_reto)
     n = len(elegibles)
     if sum(topes.values()) < 1:  # universo pequeño: relajar topes para que exista solución
         topes = {k: max(v, 1.0 / max(n, 1) + 0.01) for k, v in topes.items()}
@@ -212,16 +271,18 @@ def _modelo(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], pr
     opt = MeanRisk(
         objective_function=ObjectiveFunction.MAXIMIZE_UTILITY,
         risk_measure=RiskMeasure.VARIANCE,
-        risk_aversion=float(params["aversion_riesgo"]) * aversion_mult,  # misma unidad que μ y Σ diarios
-        prior_estimator=EmpiricalPrior(mu_estimator=ShrunkMu(), covariance_estimator=LedoitWolf()),
+        risk_aversion=aversion * aversion_mult,  # misma unidad que μ y Σ diarios
+        prior_estimator=EmpiricalPrior(mu_estimator=MuFijo(mu_fijo) if mu_fijo is not None else ShrunkMu(),
+                                       covariance_estimator=LedoitWolf()),
         max_weights=topes,
         # costo único amortizado en el horizonte (skfolio lo descuenta por observación diaria)
-        transaction_costs={e["id"]: costo_unitario(e, ajustes) / (max(float(perfil["horizonte_anios"]), 1.0) * DIAS)
+        transaction_costs={e["id"]: costo_unitario(e, ajustes) / (max(float(perfil["horizonte_anios"]), 5 / DIAS) * DIAS)
                            for e in elegibles},
-        previous_weights=previos or None,
+        previous_weights=(previos or None) if lente == "ajuste" else None,
         groups=_grupos(elegibles),
-        l2_coef=float(ajustes["optimizacion"].get("l2_regularizacion", 0.0)),  # estabiliza pesos ante ruido en μ
-        linear_constraints=_restricciones(tipo, perfil, ajustes, elegibles) or None,
+        # estabiliza pesos ante ruido en μ; la lente de máximo rendimiento no penaliza concentración
+        l2_coef=float(ajustes["optimizacion"].get("l2_regularizacion", 0.0)) if lente == "ajuste" else 0.0,
+        linear_constraints=_restricciones(tipo, perfil, ajustes, elegibles, lente) or None,
         fallback=[MeanRisk(objective_function=ObjectiveFunction.MINIMIZE_RISK, max_weights=topes)],
         raise_on_failure=True,
     )
@@ -462,15 +523,31 @@ def _huella_datos(X: pd.DataFrame) -> str:
     return hashlib.sha256(pd.util.hash_pandas_object(X.round(10), index=True).values.tobytes()).hexdigest()[:16]
 
 
+NOMBRES = {"acciones": "Solo acciones", "mixta": "Acciones + ETF + fondos"}
+LENTES = {"rendimiento": "Máximo rendimiento esperado", "ajuste": "Ajuste a su perfil y cartera"}
+
+
+def perfil_efectivo(perfil: dict) -> dict:
+    """Con el Reto activo y horizonte automático, el horizonte son las sesiones que faltan para el cierre."""
+    p = dict(perfil)
+    if reto.activo() and (reto.config().get("propuestas") or {}).get("horizonte_auto") and p.get("horizonte_reto", True):
+        p["horizonte_anios"] = round(reto.horizonte_anios(), 4)
+        p["horizonte_origen"] = f"Reto: {reto.sesiones_restantes()} sesiones hasta el cierre"
+    return p
+
+
 def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str, cartera_actual: dict,
-             cotiz: dict | None = None) -> dict:
+             cotiz: dict | None = None, lente: str = "ajuste") -> dict:
     """Calcula una propuesta completa. Si los datos no alcanzan, devuelve estado «suspendida» con motivos."""
     creado = datetime.now(UTC).isoformat(timespec="seconds")
+    perfil_usuario = perfil
+    perfil = perfil_efectivo(perfil)
     elegibles_l, excluidos, precios = universo(con, ajustes, perfil, tipo, cotiz)
     fx = mercado.ultimo_fx(con, ajustes)
-    base = {"tipo": tipo, "nombre": "Solo acciones" if tipo == "acciones" else "Acciones + ETF + fondos",
-            "calculado_en": creado, "perfil": perfil, "modo": ajustes.modo,
-            "excluidos": excluidos, "fx": fx}
+    base = {"tipo": tipo, "lente": lente, "clave": f"{tipo}_{lente}",
+            "nombre": f"{NOMBRES[tipo]} · {LENTES[lente]}", "universo_nombre": NOMBRES[tipo], "lente_nombre": LENTES[lente],
+            "calculado_en": creado, "perfil": perfil_usuario, "perfil_efectivo": perfil, "modo": ajustes.modo,
+            "excluidos": excluidos, "fx": fx, "reto": reto.activo()}
     motivos_susp = []
     clases = CLASES_ACCIONES if tipo == "acciones" else CLASES_MIXTA
     hay_usd = any(i["moneda_referencia"] == "USD" and i["clase"] in clases and i["estado"] == "activo"
@@ -500,11 +577,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
 
     # 1) propuesta final (con escenario)
     X_esc = _ajustar_escenario(X, elegibles, perfil.get("escenario", "base"))
-    modelo = _modelo(tipo, perfil, ajustes, elegibles_l, previos)
-    modelo.fit(X_esc)
-    opt = modelo.named_steps["optimizacion"]
-    nombres = list(opt.feature_names_in_)
-    pesos = pd.Series(opt.weights_, index=nombres)
+    pesos, mu_esc = _ajuste_final(tipo, perfil, ajustes, elegibles_l, previos, X_esc, lente)
     pesos[pesos < 0.005] = 0.0
     maxa = int(o["max_activos"]) if tipo == "acciones" else int(o["max_activos"]) + 5
     if (pesos > 0).sum() > maxa:
@@ -513,7 +586,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     pesos = pesos.reindex(ids).fillna(0.0)
 
     # 2) validación fuera de muestra (siempre con datos reales, sin ajuste de escenario)
-    modelo_v = _modelo(tipo, perfil, ajustes, elegibles_l, {})
+    modelo_v = _modelo(tipo, perfil, ajustes, elegibles_l, {}, lente=lente)
     oos, rot = _walk_forward(modelo_v, X_todo, ajustes, elegibles)
     m_modelo = _metricas(oos)
     ew = cross_val_predict(EqualWeighted(), X_todo, cv=WalkForward(train_size=int(o["walk_forward_entrenamiento"]),
@@ -535,11 +608,10 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         Xs = X_todo.iloc[-ventana:] if ventana else X
         if ventana and len(X_todo) < ventana:
             continue
-        ms = _modelo(tipo, perfil, ajustes, elegibles_l, previos, aversion_mult=mult)
         try:
-            ms.fit(_ajustar_escenario(Xs, elegibles, perfil.get("escenario", "base")))
-            ps = pd.Series(ms.named_steps["optimizacion"].weights_,
-                           index=list(ms.named_steps["optimizacion"].feature_names_in_)).reindex(ids).fillna(0)
+            ps, _ = _ajuste_final(tipo, perfil, ajustes, elegibles_l, previos,
+                                  _ajustar_escenario(Xs, elegibles, perfil.get("escenario", "base")), lente, mult)
+            ps = ps.reindex(ids).fillna(0)
             dif = float((ps - pesos).abs().sum() / 2)
             sens.append({"variante": etiqueta, "cambio_pesos": round(dif, 3),
                          "top": [{"id": k, "peso": round(float(v), 3)} for k, v in ps.nlargest(5).items()]})
@@ -559,8 +631,20 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     punt = _puntuar(m_modelo, pesos, elegibles, ajustes, perfil, cmb["costo_pct"], float(np.mean(rot[1:]) if len(rot) > 1 else 0))
     fechas_dato = [elegibles[k]["fecha_dato"] for k in pesos[pesos > 0].index if elegibles[k]["fecha_dato"]]
     vig = [elegibles[k]["vigencia"] for k in pesos[pesos > 0].index]
+    # Mejora esperada neta de costos frente a mantener la cartera actual (insumo de la alerta de deriva).
+    mu = mu_esc  # el mismo μ (con escenario) que usó el optimizador
+    h_dias = float(perfil["horizonte_anios"]) * DIAS
+    esperado_obj = float((pesos * mu).sum() * h_dias)
+    w_act = pd.Series(previos).reindex(ids).fillna(0.0)
+    esperado_act = float((w_act * mu).sum() * h_dias)
+    mejora = {"esperado_propuesta": esperado_obj, "esperado_actual": esperado_act,
+              "costo_cambio": float(cmb["costo_pct"]), "neta": esperado_obj - esperado_act - float(cmb["costo_pct"]),
+              "horizonte_sesiones": round(h_dias), "nota": "Estimación con μ contraída; incierta, no es una promesa."}
+    aversion, tope = _parametros_lente(lente, perfil, ajustes)
     return {
         **base, "estado": "demostracion" if ajustes.es_demo else "calculada",
+        "mejora_esperada": mejora,
+        "cumplimiento_reto": reto.cumplimiento(dict(pesos)) if reto.activo() else [],
         "vigencia_datos": vigencia.peor(vig), "datos_hasta": max(fechas_dato) if fechas_dato else None,
         "datos_desde_mas_antiguo": min(fechas_dato) if fechas_dato else None,
         "pesos": asignacion, "efectivo_residual": residuo, "capital": capital,
@@ -572,9 +656,11 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "reproducibilidad": {
             "funcion_objetivo": "max μᵀw − λ·wᵀΣw − Σc|Δw| − γ·‖w‖² ; μ James-Stein, Σ Ledoit-Wolf, varianza como riesgo",
             "regularizacion_l2_gamma": float(o.get("l2_regularizacion", 0.0)),
-            "aversion_riesgo_lambda": float(ajustes["perfiles"][perfil["riesgo"]]["aversion_riesgo"]),
-            "restricciones": _restricciones(tipo, perfil, ajustes, elegibles_l) + [f"tope por activo {perfil.get('max_peso_activo')}",
-                                                                                   "sin ventas en corto, sin apalancamiento"],
+            "lente": lente, "aversion_riesgo_lambda": aversion,
+            "horizonte_anios": float(perfil["horizonte_anios"]), "horizonte_origen": perfil.get("horizonte_origen", "perfil"),
+            "precios": "sin ajustar por dividendos (el Reto no los paga)" if reto.activo() else "ajustados por dividendos y splits",
+            "restricciones": _restricciones(tipo, perfil, ajustes, elegibles_l, lente) + [f"tope por activo {tope:.0%}",
+                                                                                          "sin ventas en corto, sin apalancamiento"],
             "ventana_estimacion": {"desde": X.index[0].date().isoformat(), "hasta": X.index[-1].date().isoformat(), "sesiones": len(X)},
             "walk_forward": {"entrenamiento": int(o["walk_forward_entrenamiento"]), "prueba": int(o["walk_forward_prueba"]),
                              "ventanas": len(rot)},
@@ -592,12 +678,13 @@ def clasificar(propuestas: list[dict], cartera_actual: dict) -> list[dict]:
     """Ordena las alternativas por puntuación total. Se presenta como resultado de criterios, no como certeza."""
     filas = []
     for p in propuestas:
+        clave = p.get("clave", p["tipo"])
         if p.get("estado") in ("calculada", "demostracion"):
-            filas.append({"alternativa": p["nombre"], "tipo": p["tipo"], "puntuacion": p["puntuacion"]["total"],
+            filas.append({"alternativa": p["nombre"], "tipo": p["tipo"], "clave": clave, "puntuacion": p["puntuacion"]["total"],
                           "estado": p["estado"]})
         else:
-            filas.append({"alternativa": p["nombre"], "tipo": p["tipo"], "puntuacion": None, "estado": p.get("estado"),
-                          "motivo": "; ".join(p.get("motivos", []))})
+            filas.append({"alternativa": p["nombre"], "tipo": p["tipo"], "clave": clave, "puntuacion": None,
+                          "estado": p.get("estado"), "motivo": "; ".join(p.get("motivos", []))})
     filas.sort(key=lambda f: -(f["puntuacion"] if f["puntuacion"] is not None else -1))
     for i, f in enumerate(filas, 1):
         f["posicion"] = i if f["puntuacion"] is not None else None

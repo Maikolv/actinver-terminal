@@ -1,20 +1,21 @@
 """Servidor local (FastAPI). Solo informa y simula: no existe ninguna ruta que envíe órdenes."""
 from __future__ import annotations
 
+import html
 import json
 import logging
+import os
+import re
 import threading
 from contextlib import asynccontextmanager
 from datetime import date
-from pathlib import Path
 
-import pandas as pd
 from fastapi import Body, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, cartera, db, importar, ingesta, mercado, optimizador, vigencia
+from . import __version__, alertas, cartera, db, importar, ingesta, mercado, reto, servicios, vigencia
 from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
 from .seguridad import TOKEN_CSRF, Seguridad
 
@@ -22,7 +23,6 @@ logging.getLogger("httpx").setLevel(logging.WARNING)  # evita registrar URLs con
 log = logging.getLogger("terminal")
 WEB = RAIZ / "web"
 AJUSTES = cargar_ajustes()
-_calculo = threading.Lock()
 
 RIESGOS = ("conservador", "moderado", "agresivo")
 ESCENARIOS = ("base", "adverso", "favorable")
@@ -36,34 +36,39 @@ def con_db():
         con.close()
 
 
+def disparar_motor(forzar: bool = True) -> None:
+    """Recalcula en segundo plano tras un cambio (operación, importación, perfil). No bloquea la respuesta."""
+    if os.environ.get("TERMINAL_SIN_MOTOR"):
+        return
+    threading.Thread(target=servicios.ciclo_seguro, args=(AJUSTES, forzar), daemon=True).start()
+
+
 def _programador(stop: threading.Event) -> None:
-    """Actualización automática opcional (EOD tras el cierre). Respeta los límites de cada proveedor."""
+    """Motor automático: adquiere datos (respetando límites), recalcula si hay datos nuevos y evalúa alertas."""
     prog = AJUSTES["programacion"]
-    while not stop.wait(int(prog["revisar_cada_min"]) * 60):
-        try:
-            con = db.conectar()
-            ingesta.actualizar_todo(con, AJUSTES, [p["instrumento_id"] for p in _cartera(con)["posiciones"]])
-            con.close()
-        except Exception:  # noqa: BLE001
-            log.exception("fallo en actualización programada")
+    espera = 5  # primer ciclo pocos segundos después de arrancar
+    while not stop.wait(espera):
+        servicios.ciclo_seguro(AJUSTES)
+        abierto = vigencia.mercado_abierto("XMEX") or vigencia.mercado_abierto("XNYS")
+        espera = int(prog["revisar_cada_min"] if abierto else prog["fuera_horario_min"]) * 60
 
 
 @asynccontextmanager
-async def ciclo(app: FastAPI):
+async def vida(app: FastAPI):
     con = db.conectar()
     db.inicializar(con)
     if AJUSTES.es_demo and not con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone():
         ingesta.actualizar_todo(con, AJUSTES)
     con.close()
     stop = threading.Event()
-    if AJUSTES["app"].get("actualizacion_automatica"):
+    if AJUSTES["app"].get("actualizacion_automatica") and not os.environ.get("TERMINAL_SIN_MOTOR"):
         threading.Thread(target=_programador, args=(stop,), daemon=True).start()
     yield
     stop.set()
 
 
-app = FastAPI(title="Terminal de portafolios", version=__version__, docs_url=None, redoc_url=None,
-              openapi_url=None, lifespan=ciclo)
+app = FastAPI(title="Actinver Terminal", version=__version__, docs_url=None, redoc_url=None, openapi_url=None,
+              lifespan=vida)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(Seguridad)
 
@@ -84,17 +89,14 @@ async def _err(_: Request, e: Exception):
     return JSONResponse({"error": "Error interno; revise data/logs/terminal.log"}, status_code=500)
 
 
-# --------------------------------------------------------------------------------------------
-# Perfil
-def perfil_actual(con) -> dict:
-    fila = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='perfil'").fetchone()
-    base = dict(AJUSTES["perfil"])
-    return {**base, **json.loads(fila["valor"])} if fila else base
+def _ocupado():
+    return HTTPException(409, "Hay una actualización o cálculo en curso; intente en unos segundos")
 
 
+# ------------------------------------------------------------------------------------------------------------
+# Perfil y Reto
 def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
-    e = []
-    out = {}
+    e, out = [], {}
     riesgo = str(p.get("riesgo", "")).strip().lower()
     if riesgo not in RIESGOS:
         e.append("riesgo: conservador, moderado o agresivo")
@@ -110,7 +112,8 @@ def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
             e.append(f"{campo}: {etiqueta}")
         return v
 
-    out["horizonte_anios"] = num("horizonte_anios", 0.25, 40, "entre 0.25 y 40 años")
+    out["horizonte_anios"] = num("horizonte_anios", 0.02, 40, "entre 0.02 y 40 años")
+    out["horizonte_reto"] = bool(p.get("horizonte_reto", True))
     out["capital"] = num("capital", 0, 1e10, "entre 0 y 10 000 millones")
     out["max_peso_activo"] = num("max_peso_activo", 0.02, 1, "entre 0.02 y 1 (2 % a 100 %)")
     out["max_exposicion_usd"] = num("max_exposicion_usd", 0, 1, "entre 0 y 1")
@@ -130,25 +133,47 @@ def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
 
 @app.get("/api/perfil")
 def get_perfil(con=Depends(con_db)):
-    return {"perfil": perfil_actual(con), "perfiles": AJUSTES["perfiles"], "puntuacion": AJUSTES["puntuacion"],
-            "costos": AJUSTES["costos"], "optimizacion": AJUSTES["optimizacion"]}
+    from .optimizador import perfil_efectivo
+    p = servicios.perfil_actual(con, AJUSTES)
+    return {"perfil": p, "perfil_efectivo": perfil_efectivo(p), "perfiles": AJUSTES["perfiles"],
+            "puntuacion": AJUSTES["puntuacion"], "costos": AJUSTES["costos"], "optimizacion": AJUSTES["optimizacion"],
+            "alertas": AJUSTES["alertas"]}
 
 
 @app.put("/api/perfil")
-async def put_perfil(request: Request, con=Depends(con_db)):
-    cuerpo = await request.json()
-    ids = set(mercado.instrumentos(con))
-    p = validar_perfil(cuerpo if isinstance(cuerpo, dict) else {}, ids)
-    antes = perfil_actual(con)
+def put_perfil(cuerpo: dict = Body(...), con=Depends(con_db)):
+    p = validar_perfil(cuerpo if isinstance(cuerpo, dict) else {}, set(mercado.instrumentos(con)))
+    antes = servicios.perfil_actual(con, AJUSTES)
     with db.transaccion(con):
         con.execute("INSERT INTO ajustes_usuario VALUES ('perfil', ?, ?) ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor,"
                     " actualizado_en=excluded.actualizado_en", (json.dumps(p), db.ahora()))
         db.auditar(con, "perfil", "perfil", "cambio", antes=antes, despues=p)
+    disparar_motor()
     return {"perfil": p}
 
 
-# --------------------------------------------------------------------------------------------
-# Estado de datos y universo
+@app.get("/api/reto")
+def get_reto(con=Depends(con_db)):
+    r = reto.resumen()
+    if r.get("activo"):
+        hechas = {f["id"]: bool(f["hecha"]) for f in con.execute("SELECT id, hecha FROM tareas_reto")}
+        r["tareas"] = [{**t, "hecha": hechas.get(t["id"], False)} for t in r["tareas"]]
+        r["universo_simulador"] = int(con.execute("SELECT COUNT(*) FROM universo_simulador").fetchone()[0])
+    return r
+
+
+@app.put("/api/reto/tareas/{tid}")
+def put_tarea(tid: str, cuerpo: dict = Body(...), con=Depends(con_db)):
+    if tid not in {t["id"] for t in reto.config().get("tareas", [])}:
+        raise HTTPException(404, "Tarea no encontrada")
+    with db.transaccion(con):
+        con.execute("INSERT INTO tareas_reto VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET hecha=excluded.hecha, "
+                    "actualizado_en=excluded.actualizado_en", (tid, int(bool(cuerpo.get("hecha"))), db.ahora()))
+    return {"id": tid, "hecha": bool(cuerpo.get("hecha"))}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Estado de datos, universo y motor
 @app.get("/api/estado")
 def estado(con=Depends(con_db)):
     ins = mercado.instrumentos(con)
@@ -164,7 +189,8 @@ def estado(con=Depends(con_db)):
         "mercado_abierto": {"NYSE": vigencia.mercado_abierto("XNYS"), "BMV": vigencia.mercado_abierto("XMEX")},
         "fx": mercado.ultimo_fx(con, AJUSTES), "vigencia": conteo, "instrumentos_activos": len(activos),
         "instrumentos_total": len(ins), "proveedores": ingesta.estado_proveedores(con, AJUSTES),
-        "operaciones_reales": False,
+        "motor": servicios.estado_motor(con), "alertas_pendientes": alertas.pendientes(con),
+        "tiempo_real": False, "operaciones_reales": False,
     }
 
 
@@ -172,6 +198,7 @@ def estado(con=Depends(con_db)):
 def get_universo(con=Depends(con_db)):
     ins = mercado.instrumentos(con)
     cot = mercado.cotizaciones(con, AJUSTES)
+    sim = {r[0] for r in con.execute("SELECT id FROM universo_simulador")}
     filas = []
     for i, v in ins.items():
         q = cot.get(i, {})
@@ -181,19 +208,19 @@ def get_universo(con=Depends(con_db)):
                                          "detalle_verificacion", "fecha_verificacion")}
                      | {k: q.get(k) for k in ("precio", "moneda", "precio_mxn", "fecha", "proveedor", "tipo_dato",
                                               "retraso_horas", "sesiones_atraso", "etiqueta", "nota")}
-                     | {"vigencia": q.get("estado")})
+                     | {"vigencia": q.get("estado"), "en_simulador": (i in sim) if sim else None,
+                        "grafica": simbolo_tradingview(v)})
     return {"instrumentos": filas}
 
 
 @app.post("/api/datos/actualizar")
 def actualizar(con=Depends(con_db)):
-    if not _calculo.acquire(blocking=False):
-        raise HTTPException(409, "Ya hay una actualización o cálculo en curso")
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
     try:
-        prio = [p["instrumento_id"] for p in _cartera(con)["posiciones"]]
-        return {"resultado": ingesta.actualizar_todo(con, AJUSTES, prio)}
+        return {"resultado": servicios.ciclo(con, AJUSTES)}
     finally:
-        _calculo.release()
+        servicios.bloqueo.release()
 
 
 @app.post("/api/modo")
@@ -203,8 +230,8 @@ def cambiar_modo(cuerpo: dict = Body(...)):
     modo = str((cuerpo or {}).get("modo", ""))
     if modo not in MODOS:
         raise cartera.ErrorValidacion(["modo: use «real» o «demo»"])
-    if not _calculo.acquire(blocking=False):
-        raise HTTPException(409, "Hay una actualización o cálculo en curso; intente en unos segundos")
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
     try:
         fijar_modo(modo)
         con = db.conectar()
@@ -214,71 +241,23 @@ def cambiar_modo(cuerpo: dict = Body(...)):
                 hay = con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone()
                 resultado = None if hay else ingesta.actualizar_todo(con, AJUSTES)
             else:
-                prio = [p["instrumento_id"] for p in _cartera(con)["posiciones"]]
+                prio = [p["instrumento_id"] for p in servicios.cartera_actual(con, AJUSTES)["posiciones"]]
                 resultado = ingesta.actualizar_todo(con, AJUSTES, prio)
             db.auditar(con, "modo", modo, "cambio")
             con.commit()
         finally:
             con.close()
-        return {"modo": modo, "actualizacion": resultado}
     finally:
-        _calculo.release()
+        servicios.bloqueo.release()
+    disparar_motor()
+    return {"modo": modo, "actualizacion": resultado}
 
 
-# --------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
 # Cartera y operaciones
-def _cartera(con) -> dict:
-    tx = cartera.listar(con)
-    ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]})
-    cot = mercado.cotizaciones(con, AJUSTES, ids) if ids else {}
-    precios = {i: (q["precio_mxn"] if q.get("estado") not in ("sin_datos",) else None) for i, q in cot.items()}
-    res = cartera.calcular(tx, precios)
-    for p in res["posiciones"] + res["cerradas"]:
-        q = cot.get(p["instrumento_id"], {})
-        p.update({"clave_operable": q.get("clave_operable"), "clase": q.get("clase"), "vigencia": q.get("estado"),
-                  "etiqueta_vigencia": q.get("etiqueta"), "fecha_precio": q.get("fecha"), "proveedor": q.get("proveedor"),
-                  "tipo_dato": q.get("tipo_dato")})
-    estados = [p["vigencia"] for p in res["posiciones"] if p.get("vigencia")]
-    res["vigencia"] = vigencia.peor(estados) if estados else ("sin_datos" if res["posiciones"] else "vigente")
-    res["n_operaciones"] = len(tx)
-    return res
-
-
 @app.get("/api/cartera")
 def get_cartera(con=Depends(con_db)):
-    res = _cartera(con)
-    tx = cartera.listar(con)
-    ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]})
-    historia, bench = [], None
-    if tx:
-        precios = mercado.precios_mxn(con, AJUSTES, ids, ajustados=False) if ids else pd.DataFrame()
-        if precios.empty:
-            cal = vigencia.calendario("XMEX")
-            fechas = cal.sessions_in_range(pd.Timestamp(tx[0]["fecha"]), pd.Timestamp(date.today()))
-            precios = pd.DataFrame(index=pd.DatetimeIndex(fechas.tz_localize(None) if fechas.tz else fechas))
-        serie = cartera.serie_historica(tx, precios)
-        ref_id = AJUSTES["app"]["indice_referencia"]
-        ref = mercado.precios_mxn(con, AJUSTES, [ref_id])
-        if not serie.empty:
-            if ref_id in ref.columns:
-                r = ref[ref_id].reindex(serie.index).ffill()
-                if r.notna().any():
-                    base = r.dropna().iloc[0]
-                    serie["referencia"] = r / base - 1
-                    bench = {"id": ref_id, "rend_acumulado": float(serie["referencia"].dropna().iloc[-1])}
-            historia = [{"fecha": d.date().isoformat(), "valor": round(float(f.valor), 2),
-                         "twr": round(float(f.twr_acumulado), 6), "completo": bool(f.completo),
-                         "referencia": (None if pd.isna(f.get("referencia", float("nan"))) else round(float(f.referencia), 6))}
-                        for d, f in serie.iterrows()]
-            flujos = [(pd.Timestamp(t["fecha"]), -(1 if t["tipo"] == "aportacion" else -1) * t["monto"] * t["tipo_cambio"])
-                      for t in tx if t["tipo"] in ("aportacion", "retiro")]
-            if res["completa"] and flujos:
-                flujos.append((serie.index[-1], float(serie["valor"].iloc[-1])))
-                res["tir_anual"] = cartera.xirr(sorted(flujos, key=lambda x: x[0]))
-            res["twr_acumulado"] = float(serie["twr_acumulado"].iloc[-1])
-    res["historia"] = historia[-1500:]
-    res["referencia"] = bench
-    return res
+    return servicios.seguimiento(con, AJUSTES)
 
 
 @app.get("/api/transacciones")
@@ -287,28 +266,28 @@ def get_tx(anuladas: bool = False, con=Depends(con_db)):
 
 
 @app.post("/api/transacciones")
-async def post_tx(request: Request, con=Depends(con_db)):
-    cuerpo = await request.json()
+def post_tx(cuerpo: dict = Body(...), con=Depends(con_db)):
     t = cartera.validar(cuerpo if isinstance(cuerpo, dict) else {}, mercado.instrumentos(con))
     with db.transaccion(con):
         tid = cartera.registrar(con, t, "manual", ocurrencia=int(con.execute("SELECT COUNT(*) FROM transacciones").fetchone()[0]) + 1)
+    disparar_motor()
     return {"id": tid, "transaccion": t}
 
 
 @app.post("/api/transacciones/{tid}/anular")
-async def anular_tx(tid: int, request: Request, con=Depends(con_db)):
-    cuerpo = await request.json()
+def anular_tx(tid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
     cartera.anular(con, tid, str((cuerpo or {}).get("motivo", ""))[:200])
+    disparar_motor()
     return {"ok": True}
 
 
 @app.post("/api/transacciones/{tid}/corregir")
-async def corregir_tx(tid: int, request: Request, con=Depends(con_db)):
-    cuerpo = await request.json()
+def corregir_tx(tid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
     if not isinstance(cuerpo, dict):
         raise cartera.ErrorValidacion(["Cuerpo no válido"])
     nuevos = {k: cuerpo[k] for k in cartera.CAMPOS if k in cuerpo}
     nid = cartera.corregir(con, tid, nuevos, mercado.instrumentos(con), str(cuerpo.get("motivo", ""))[:200])
+    disparar_motor()
     return {"id": nid}
 
 
@@ -324,6 +303,8 @@ async def post_importar(archivo: UploadFile = File(...), tipo: str = Form(...), 
     contenido = await archivo.read(importar.MAX_BYTES + 1)
     rep = importar.importar(con, contenido, archivo.filename or "", tipo, mercado.instrumentos(con),
                             confirmar=confirmar == "si")
+    if rep.get("confirmado"):
+        disparar_motor()
     return rep
 
 
@@ -335,63 +316,119 @@ def plantilla(tipo: str):
                              headers={"Content-Disposition": f'attachment; filename="plantilla_{tipo}.csv"'})
 
 
-# --------------------------------------------------------------------------------------------
-# Propuestas
-def _revalidar(p: dict, perfil: dict) -> dict:
-    """Una propuesta guardada nunca se presenta como actual si sus datos o el perfil cambiaron."""
-    avisos = []
-    if p.get("estado") in ("calculada", "demostracion"):
-        if p.get("perfil") != perfil:
-            avisos.append("El perfil cambió desde el cálculo: recalcule para ver la propuesta vigente.")
-        if p["estado"] == "calculada" and p.get("datos_hasta"):
-            atraso = vigencia.sesiones_de_atraso("XNYS", date.fromisoformat(p["datos_hasta"]),
-                                                 vigencia.ultima_sesion_cerrada("XNYS"))
-            if atraso > AJUSTES["vigencia"]["cierre_sesiones_retrasado"]:
-                avisos.append(f"Calculada con datos al {p['datos_hasta']} ({atraso} sesiones de atraso): no es actual.")
-                p = {**p, "estado": "desactualizada"}
-    return {**p, "avisos": avisos}
-
-
+# ------------------------------------------------------------------------------------------------------------
+# Propuestas, alertas y simulación
 @app.get("/api/propuestas")
 def get_propuestas(con=Depends(con_db)):
-    perfil = perfil_actual(con)
-    out = {}
-    for tipo in ("acciones", "mixta"):
-        f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (tipo,)).fetchone()
-        out[tipo] = _revalidar(json.loads(f["resultado"]), perfil) if f else None
-    presentes = [v for v in out.values() if v]
-    out["clasificacion"] = optimizador.clasificar(presentes, {}) if presentes else []
-    return out
+    perfil = servicios.perfil_actual(con, AJUSTES)
+    return servicios.respuesta_propuestas(servicios.propuestas_guardadas(con, AJUSTES, perfil))
 
 
 @app.post("/api/propuestas/calcular")
 def calcular(con=Depends(con_db)):
-    if not _calculo.acquire(blocking=False):
-        raise HTTPException(409, "Ya hay un cálculo en curso")
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
     try:
-        perfil = perfil_actual(con)
-        actual = _cartera(con)
-        ids = [i for i, v in mercado.instrumentos(con).items() if v["estado"] == "activo"]
-        cot = mercado.cotizaciones(con, AJUSTES, ids)
-        res = {}
-        for tipo in ("acciones", "mixta"):
-            p = optimizador.proponer(con, AJUSTES, perfil, tipo, actual, cot)
-            with db.transaccion(con):
-                con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
-                            (tipo, p["calculado_en"], json.dumps(perfil), json.dumps(p, default=str)))
-            res[tipo] = _revalidar(json.loads(json.dumps(p, default=str)), perfil)
-        res["clasificacion"] = optimizador.clasificar([res["acciones"], res["mixta"]], actual)
-        return res
+        props = servicios.calcular_propuestas(con, AJUSTES)
+        alertas.evaluar(con, AJUSTES, servicios.cartera_actual(con, AJUSTES), props)
+        return servicios.respuesta_propuestas(props)
     finally:
-        _calculo.release()
+        servicios.bloqueo.release()
 
 
-# --------------------------------------------------------------------------------------------
+@app.get("/api/alertas")
+def get_alertas(limite: int = 200, con=Depends(con_db)):
+    return {"alertas": alertas.listar(con, limite), "pendientes": alertas.pendientes(con),
+            "configuracion": AJUSTES["alertas"]}
+
+
+@app.post("/api/alertas/{aid}")
+def marcar_alerta(aid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    try:
+        alertas.marcar(con, aid, str(cuerpo.get("estado", "")))
+    except ValueError:
+        raise cartera.ErrorValidacion(["estado: vista, descartada o nueva"]) from None
+    return {"ok": True}
+
+
+@app.post("/api/simular")
+def post_simular(cuerpo: dict = Body(...), con=Depends(con_db)):
+    cambios = cuerpo.get("cambios") if isinstance(cuerpo, dict) else None
+    if not isinstance(cambios, list) or not 0 < len(cambios) <= 100:
+        raise cartera.ErrorValidacion(["cambios: lista de 1 a 100 elementos {id, monto}"])
+    limpios = []
+    for c in cambios:
+        try:
+            monto = float(c["monto"])
+            if abs(monto) > 1e10:
+                raise ValueError
+            limpios.append({"id": str(c["id"])[:40], "monto": monto})
+        except (KeyError, TypeError, ValueError):
+            raise cartera.ErrorValidacion(["cambios: cada elemento requiere id y monto numérico"]) from None
+    return servicios.simular(con, AJUSTES, limpios)
+
+
+@app.get("/api/mercado")
+def get_mercado(con=Depends(con_db)):
+    ids = [p["instrumento_id"] for p in servicios.cartera_actual(con, AJUSTES)["posiciones"]]
+    marcas = ",".join("?" * len(ids)) or "''"
+    macro = [dict(r) for r in con.execute("SELECT * FROM eventos_macro WHERE impacto IN ('High','Medium') AND "
+                                          "pais IN ('USD','MXN') ORDER BY fecha LIMIT 60")]
+    noticias = [dict(r) for r in con.execute(f"SELECT * FROM noticias WHERE instrumento_id IN ({marcas}) "  # noqa: S608
+                                             "ORDER BY publicado DESC LIMIT 60", ids)]
+    insiders = [dict(r) for r in con.execute(f"SELECT * FROM insiders WHERE instrumento_id IN ({marcas}) "  # noqa: S608
+                                             "ORDER BY fecha DESC LIMIT 60", ids)]
+    return {"macro": macro, "noticias": noticias, "insiders": insiders, "cartera": ids,
+            "fuentes": {"macro": "ForexFactory (feed de exportación)", "noticias": "Seeking Alpha (RSS)",
+                        "insiders": "SEC EDGAR Formulario 4"}}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Gráfica: widget oficial de TradingView en una página aislada con su propia CSP
+BOLSA_TV = {"NASDAQ": "NASDAQ", "NYSE": "NYSE", "NYSE Arca": "AMEX", "NYSE American": "AMEX", "Cboe BZX": "CBOE",
+            "BMV": "BMV"}
+
+
+def simbolo_tradingview(ins: dict) -> str | None:
+    if ins.get("clase", "").startswith("fondo") or ins.get("estado") not in ("activo",):
+        return None
+    if ins.get("mercado_operable") == "BMV":
+        return f"BMV:{ins['clave'].replace('&', '')}{(ins.get('serie') or '').replace('*', '').replace(' ', '')}"
+    pref = BOLSA_TV.get(ins.get("bolsa_referencia") or "")
+    return f"{pref}:{ins['listado_referencia']}" if pref and ins.get("listado_referencia") else None
+
+
+CSP_GRAFICA = ("default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; "
+               "frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; "
+               "img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'none'")
+
+
+@app.get("/grafica/{iid}", response_class=HTMLResponse)
+def grafica(iid: str, con=Depends(con_db)):
+    ins = mercado.instrumentos(con).get(iid)
+    sim = simbolo_tradingview(ins) if ins else None
+    if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
+        raise HTTPException(404, "Instrumento sin gráfica disponible")
+    cfg = json.dumps({"autosize": True, "symbol": sim, "interval": "D", "timezone": "America/Mexico_City",
+                      "theme": "dark", "style": "1", "locale": "es", "allow_symbol_change": False,
+                      "support_host": "https://www.tradingview.com"})
+    pagina = f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Gráfica {html.escape(sim)} — Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/grafica.css"></head><body>
+<header><strong>{html.escape(ins['clave_operable'])}</strong> · {html.escape(sim)} · Widget de TradingView (datos y
+retraso según TradingView; pueden diferir del simulador). <a href="/">Volver</a></header>
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{cfg}</script></div>
+</body></html>"""
+    return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA})
+
+
+# ------------------------------------------------------------------------------------------------------------
 # Interfaz
 @app.get("/", response_class=HTMLResponse)
 def index():
-    html = (WEB / "index.html").read_text(encoding="utf-8").replace("__CSRF__", TOKEN_CSRF)
-    return HTMLResponse(html)
+    return HTMLResponse((WEB / "index.html").read_text(encoding="utf-8").replace("__CSRF__", TOKEN_CSRF))
 
 
 @app.get("/salud")
@@ -412,9 +449,3 @@ async def no_encontrado(request: Request, _):
     if request.url.path.startswith("/api/"):
         return JSONResponse({"error": "Ruta no encontrada"}, status_code=404)
     return HTMLResponse((WEB / "404.html").read_text(encoding="utf-8"), status_code=404)
-
-
-def _ruta_log() -> Path:
-    p = db.ruta_db().parent / "logs"
-    p.mkdir(parents=True, exist_ok=True)
-    return p / "terminal.log"

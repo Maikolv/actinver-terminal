@@ -36,7 +36,7 @@ def test_mixta_incluye_etf_y_fondos_con_restricciones(con_datos, ajustes, perfil
     assert {"SIC:IVV", "FONDO:ACTIGOB", "BMV:FUNO"} <= univ
     deuda = sum(x["peso"] for x in p["pesos"] if x["clase"] == "fondo_deuda")
     assert deuda >= ajustes["perfiles"]["moderado"]["min_deuda_mixta"] - 0.02  # tolerancia por redondeo/umbral
-    assert abs(sum(x["peso"] for x in p["pesos"]) - 1) < 1e-6
+    assert abs(sum(x["peso"] for x in p["pesos"]) - 1) < 1e-3  # pesos publicados con 4 decimales
     assert all(x["motivos"] for x in p["pesos"])
 
 

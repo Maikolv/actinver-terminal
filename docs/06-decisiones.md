@@ -3,7 +3,7 @@
 Formato: contexto → decisión → consecuencias. Fecha de todas: 2026-09-22.
 
 ### D-01 Repositorio central nuevo
-Contexto: 63 repositorios con pilas y licencias heterogéneas. Decisión: crear `terminal-portafolios` y depender solo de bibliotecas publicadas. Consecuencias: builds reproducibles (`uv.lock`), sin acoplar a código de terceros no mantenido.
+Contexto: 63 repositorios con pilas y licencias heterogéneas. Decisión: crear `actinver-terminal` y depender solo de bibliotecas publicadas. Consecuencias: builds reproducibles (`uv.lock`), sin acoplar a código de terceros no mantenido.
 
 ### D-02 Un proceso Python + SQLite + HTML nativo
 Contexto: uso local, un usuario. Decisión: FastAPI sirve API e interfaz estática; SQLite en `data/`. Alternativas descartadas: Node/React (cadena de build), Postgres/Supabase (servicio adicional, RLS innecesario sin multiusuario), Electron (peso). Consecuencias: arranque con un comando; sin cuentas ni autenticación (no hay acceso remoto).
@@ -56,3 +56,12 @@ Descartados: Stooq (desafío anti-bot), Yahoo (acceso automatizado restringido, 
 - «Tiempo real» → solo si el proveedor lo ofrece y está contratado; hoy ninguno.
 - Números sueltos y errores tipográficos de las listas del encargo → no se tratan como metas ni requisitos.
 - Requisitos de sitio público → evaluados en la [matriz de aplicabilidad](07-matriz-aplicabilidad.md).
+
+### D-18 Renombre a `actinver-terminal`
+Contexto: el nombre `terminal-portafolios` no reflejaba que el uso inmediato es el Reto Actinver 2026. Decisión: renombrar paquete, carpeta y referencias en documentación. Consecuencias: ninguna funcional; solo nombres.
+
+### D-19 Reglas del Reto Actinver como configuración, no como código
+Contexto: capital, fechas, comisión, tope por emisora y mínimo de emisoras del Reto pueden cambiar de edición a edición. Decisión: `config/reto.yaml` (versionado, con la fuente y fecha de consulta) + `terminal/reto.py` como capa de lectura; regla no confirmada = `null` con aviso visible en la interfaz, nunca un valor inventado. Consecuencias: el optimizador (`optimizador.py`) aplica el tope de 50 % por emisora y el horizonte automático (sesiones hábiles hasta el cierre de la competencia) sin tocar código; `servicios.py` calcula `cumplimiento_reto` (mínimo de 5 emisoras, tope por emisora) sobre la cartera real y las propuestas.
+
+### D-20 Contexto de mercado sin generar órdenes
+Contexto: el encargo original menciona calendario macro, noticias e insiders como señales de apoyo. Decisión: `terminal/fuentes_web.py` consume solo vías explícitamente públicas y documentadas en su propio encabezado (feed de exportación de ForexFactory, RSS público de Seeking Alpha por emisora, Formulario 4 de SEC EDGAR con `SEC_USER_AGENT` de contacto obligatorio), con límite de frecuencia y sin sortear anti-bot ni paywalls. La clasificación de titulares es léxica y transparente por defecto; un LLM local opcional (Ollama, `OLLAMA_URL`) puede afinar el sentimiento de titulares de alto impacto sin que el texto salga del equipo. `terminal/alertas.py` y `terminal/notificador.py` convierten esto en avisos locales (nunca en operaciones automáticas).

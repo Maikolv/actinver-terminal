@@ -75,4 +75,4 @@ Revisión de `C:\Users\MIKE\Desktop\Repos` (63 carpetas) el 2026-09-22: remoto, 
 
 ## Correcciones realizadas en repositorios existentes
 
-Ninguna fue necesaria: la terminal se construyó en un repositorio nuevo (`terminal-portafolios`) y no depende del código de los demás. Solo se añadieron dos configuraciones de arranque locales en `tradingviewmcp/.claude/launch.json` (carpeta no versionada) para la verificación en el navegador integrado; pueden eliminarse sin efecto.
+Ninguna fue necesaria: la terminal se construyó en un repositorio nuevo (`actinver-terminal`) y no depende del código de los demás. Solo se añadieron dos configuraciones de arranque locales en `tradingviewmcp/.claude/launch.json` (carpeta no versionada) para la verificación en el navegador integrado; pueden eliminarse sin efecto.

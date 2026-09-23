@@ -126,4 +126,27 @@ class Archivo(Adaptador):
         raise ErrorProveedor("archivo: los precios se cargan desde la sección Importar")
 
 
+class Barchart(Adaptador):
+    """Barchart OnDemand (getHistory): históricos diarios. Requiere contrato/clave de Barchart."""
+    proveedor = "barchart"
+    tipo_dato = "cierre"
+    requiere_credencial = True
+    descripcion = "Históricos diarios vía Barchart OnDemand (alternativa a Tiingo para EE. UU.)"
+    uso_permitido = "Solo con clave de Barchart OnDemand (licencia de pago); el sitio web prohíbe extracción automatizada"
+    URL = "https://ondemand.websol.barchart.com/getHistory.json"
+
+    def soporta(self, instr: dict) -> bool:
+        return instr.get("moneda_referencia") == "USD" and bool(instr.get("listado_referencia"))
+
+    def historico(self, instr: dict, desde: date, hasta: date) -> list[Barra]:
+        r = self._get(self.URL, params={"apikey": self.credencial, "symbol": instr["listado_referencia"].replace(".", "/"),
+                                        "type": "daily", "startDate": desde.strftime("%Y%m%d"),
+                                        "endDate": hasta.strftime("%Y%m%d")})
+        d = r.json()
+        if (d.get("status") or {}).get("code") not in (200, None):
+            raise ErrorProveedor(f"barchart: {(d.get('status') or {}).get('message', 'error')}")
+        return [Barra(fecha=x["tradingDay"], cierre=float(x["close"]), volumen=float(x.get("volume") or 0))
+                for x in d.get("results") or []]
+
+
 FX_USDMXN = {"id": "FX:USDMXN", "moneda_referencia": "MXN"}

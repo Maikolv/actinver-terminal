@@ -50,7 +50,7 @@ Se revisaron nombres de variables y rutas; **ningún valor se copió a este info
 | `browser-use/.env` `BROWSER_USE_API_KEY` | No (ignorado) | Es un valor de ejemplo; nada que rotar. |
 | Patrones de clave en archivos versionados de yt-dlp, penpot (certificado autofirmado de desarrollo), pnpm (certificados de prueba), ccxt, FinceptTerminal, crewAI, hummingbot, paperclip, hyperframes, Plankton | Sí, pero son del proyecto original público | No son secretos del usuario; sin acción. |
 | Variables de entorno del sistema | — | No hay claves de proveedores financieros definidas. |
-| `terminal-portafolios` | — | Sin secretos; prueba automatizada lo verifica en cada ejecución. |
+| `actinver-terminal` | — | Sin secretos; prueba automatizada lo verifica en cada ejecución. |
 
 Procedimiento general de rotación de una clave de proveedor (Tiingo, EODHD, Banxico): entrar al panel del proveedor → revocar/regenerar la clave → pegar la nueva en `.env` → reiniciar la terminal → revisar la pestaña Datos. Si una clave llegara a un commit: rotarla primero y después limpiar el historial (p. ej. `git filter-repo`), porque la clave ya debe considerarse comprometida.
 

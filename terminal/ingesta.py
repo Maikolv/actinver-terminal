@@ -12,7 +12,7 @@ from .db import ahora, transaccion
 
 log = logging.getLogger("terminal.ingesta")
 
-ORDEN_PRECIOS = ["tiingo", "eodhd"]  # los fondos solo se alimentan por archivo (NAV)
+ORDEN_PRECIOS = ["tiingo", "barchart", "eodhd"]  # los fondos solo se alimentan por archivo (NAV)
 ORDEN_FX = ["banxico", "fred"]
 ANIOS_HISTORIA = 5
 
@@ -23,8 +23,14 @@ def construir_adaptadores(con: sqlite3.Connection, ajustes: Ajustes, cliente=Non
 
 
 def estado_proveedores(con: sqlite3.Connection, ajustes: Ajustes) -> list[dict]:
+    from . import fuentes_web as fw
+    prov = ajustes["proveedores"]
+    todos = dict(construir_adaptadores(con, ajustes))
+    todos["forexfactory"] = fw.ForexFactory(con, prov.get("forexfactory", {}))
+    todos["seekingalpha_rss"] = fw.SeekingAlphaRSS(con, prov.get("seekingalpha_rss", {}))
+    todos["sec_edgar"] = fw.SecEdgar(con, prov.get("sec_edgar", {}), credencial("sec_edgar"))
     out = []
-    for n, a in construir_adaptadores(con, ajustes).items():
+    for n, a in todos.items():
         ult = con.execute("SELECT fin, estado, mensaje, registros FROM ingestas WHERE proveedor=? ORDER BY id DESC LIMIT 1",
                           (n,)).fetchone()
         out.append({"proveedor": n, "descripcion": a.descripcion, "uso_permitido": a.uso_permitido,
@@ -128,11 +134,44 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
     return resumen
 
 
-def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = None, cliente=None) -> dict:
+def actualizar_contexto(con, ajustes: Ajustes, ids_cartera: list[str], cliente=None) -> dict:
+    """Calendario macro, titulares e insiders de las emisoras en cartera. Fallos de fuente no detienen nada."""
+    from . import fuentes_web as fw
+    prov = ajustes["proveedores"]
+    ins = [dict(r) for r in con.execute("SELECT * FROM instrumentos")]
+    cartera = [i for i in ins if i["id"] in set(ids_cartera or [])]
+    res = {}
+    for nombre, fn in (("forexfactory", lambda: fw.actualizar_macro(con, prov, cliente)),
+                       ("seekingalpha_rss", lambda: fw.actualizar_noticias(con, prov, cartera, cliente)),
+                       ("sec_edgar", lambda: fw.actualizar_insiders(con, prov, cartera, cliente))):
+        inicio = ahora()
+        try:
+            r = fn()
+        except Exception as e:  # noqa: BLE001 - una fuente caída no debe detener el motor
+            r = {"estado": "error", "mensaje": type(e).__name__}
+        if r.get("estado") not in ("al_dia", "desactivado"):
+            _registrar(con, nombre, inicio, r.get("estado", "ok"), int(r.get("registros", 0)),
+                       str(r.get("mensaje") or " | ".join(r.get("errores", [])) or ""))
+        res[nombre] = r
+    return res
+
+
+def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = None, cliente=None,
+                    forzar_demo: bool = True, contexto: bool = False) -> dict:
     if ajustes.es_demo:
         from .adaptadores import demo
-        n = demo.generar(con, semilla=ajustes["optimizacion"]["semilla"])
-        _registrar(con, "demo_sintetico", ahora(), "ok", n, "datos sintéticos regenerados (modo demostración)")
-        return {"modo": "demo", "registros": n}
-    ad = construir_adaptadores(con, ajustes, cliente=cliente)
-    return {"fx": actualizar_fx(con, ad), "precios": actualizar_precios(con, ad, ids_prioritarios)}
+        hay = con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone()
+        n = 0
+        if forzar_demo or not hay:
+            n = demo.generar(con, semilla=ajustes["optimizacion"]["semilla"])
+            _registrar(con, "demo_sintetico", ahora(), "ok", n, "datos sintéticos regenerados (modo demostración)")
+        out = {"modo": "demo", "registros": n, "nuevos": n}
+    else:
+        ad = construir_adaptadores(con, ajustes, cliente=cliente)
+        fx = actualizar_fx(con, ad)
+        precios = actualizar_precios(con, ad, ids_prioritarios)
+        out = {"fx": fx, "precios": precios,
+               "nuevos": fx.get("registros", 0) + sum(v["registros"] for v in precios.values())}
+    if contexto:
+        out["contexto"] = actualizar_contexto(con, ajustes, ids_prioritarios or [], cliente)
+    return out

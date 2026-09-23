@@ -8,12 +8,20 @@ host = "127.0.0.1"            # solo escucha en la máquina local
 puerto = 8765
 moneda_base = "MXN"
 indice_referencia = "SIC:IVV" # comparación de la cartera: S&P 500 (IVV) convertido a MXN
-actualizacion_automatica = false  # true = el servidor consulta proveedores según [programacion]
+actualizacion_automatica = true   # el motor consulta fuentes, recalcula propuestas y evalúa alertas en segundo plano
+
+[referencias]
+# Carteras de comparación del seguimiento. El S&P/BMV IPC no tiene fuente gratuita: se usa ACTIVAR,
+# fondo de Actinver que replica el índice de la BMV (NAV importado o EODHD). 60/40 = 60 % IPC + 40 % deuda gubernamental.
+ipc = "FONDO:ACTIVAR"
+sp500 = "SIC:IVV"
+deuda = "FONDO:ACTIGOB"
+pesos_60_40 = [0.60, 0.40]
 
 [programacion]
-# Consultas EOD tras el cierre (hora local de México). Respetan los límites de cada proveedor.
-hora_eod = "17:30"
-revisar_cada_min = 30
+# Motor automático: en horario de mercado revisa cada `revisar_cada_min`; fuera de horario cada `fuera_horario_min`.
+revisar_cada_min = 15
+fuera_horario_min = 60
 
 [vigencia]
 # Umbrales para declarar un dato «vigente», «retrasado» o «vencido».
@@ -44,8 +52,40 @@ peticiones_por_dia = 900
 activo = true                        # cierres EOD de la BMV (.MX); requiere EODHD_API_KEY
 peticiones_por_dia = 18              # plan gratuito: 20/día; se deja margen
 
+[proveedores.barchart]
+activo = true                        # históricos EE. UU. vía Barchart OnDemand; requiere BARCHART_API_KEY (contrato)
+peticiones_por_dia = 400
+
 [proveedores.archivo]
 activo = true                        # precios / valor liquidativo importados por el usuario (CSV)
+
+[proveedores.forexfactory]
+activo = true                        # calendario macro (feed de exportación); sin clave
+peticiones_por_hora = 2
+
+[proveedores.seekingalpha_rss]
+activo = true                        # titulares por emisora (RSS público); sin clave
+peticiones_por_hora = 60
+
+[proveedores.sec_edgar]
+activo = true                        # Formulario 4; requiere SEC_USER_AGENT (nombre + correo de contacto)
+peticiones_por_dia = 1000
+
+[alertas]
+deriva_pp = 5.0                      # disparo: alguna posición se aleja ≥ 5 pp del objetivo…
+deriva_rearme_pp = 3.0               # …y se rearma solo cuando vuelve a < 3 pp (histéresis)
+mejora_neta_min = 0.005              # …y la mejora esperada neta de costos supera 0.5 % en el horizonte
+stop_loss = -0.08                    # caída vs costo promedio
+take_profit = 0.15                   # ganancia vs costo promedio
+caida_desde_maximo = -0.10           # caída desde el máximo desde la compra
+macro_horas = 24                     # evento de alto impacto USD/MXN en las próximas 24 h
+insider_valor_min_usd = 250000       # compras/ventas de insiders relevantes
+noticia_sentimiento_min = 1.0        # |sentimiento| mínimo para alerta de noticia de alto impacto
+enfriamiento_horas = 6               # no repetir la misma alerta antes de 6 h
+silenciar_fuera_de_horario = true    # fuera del horario de la BMV se registra pero no se notifica al escritorio
+notificar_escritorio = true
+notificar_correo = false             # requiere SMTP_* en .env
+notificar_telegram = false           # requiere TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en .env
 
 [perfil]
 # Valores iniciales; se editan desde la interfaz sin tocar código.

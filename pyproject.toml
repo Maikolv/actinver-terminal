@@ -1,5 +1,5 @@
 [project]
-name = "terminal-portafolios"
+name = "actinver-terminal"
 version = "0.1.0"
 description = "Terminal local de análisis de portafolios (informativa, sin órdenes reales)"
 requires-python = ">=3.12"
@@ -10,6 +10,7 @@ dependencies = [
     "numpy>=1.26",
     "pandas>=2.2",
     "python-multipart>=0.0.9",
+    "pyyaml>=6.0.3",
     "skfolio>=1.3",
     "uvicorn>=0.30",
     "xlrd>=2.0.2",
@@ -27,6 +28,8 @@ packages = ["terminal"]
 
 [dependency-groups]
 dev = [
+    "detect-secrets>=1.5.0",
     "httpx>=0.28.1",
+    "pip-audit>=2.10.1",
     "pytest>=9.1.1",
 ]

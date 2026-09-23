@@ -59,7 +59,7 @@ class Adaptador:
         self.ajustes = ajustes or {}
         self.credencial = credencial
         self.cliente = cliente or httpx.Client(timeout=30, follow_redirects=True,
-                                               headers={"User-Agent": "terminal-portafolios/0.1 (uso personal local)"})
+                                               headers={"User-Agent": "actinver-terminal/0.1 (uso personal local)"})
 
     # --- capacidades -------------------------------------------------------------------------
     def configurado(self) -> bool:

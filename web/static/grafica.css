@@ -1,0 +1,5 @@
+html, body { margin: 0; height: 100%; background: #141517; color: #e8e6e1; font: 14px/1.4 system-ui, "Segoe UI", sans-serif; }
+header { padding: 8px 12px; border-bottom: 1px solid #34373c; }
+a { color: #6fb0dd; }
+.tradingview-widget-container { height: calc(100% - 40px); width: 100%; }
+.tradingview-widget-container__widget { height: 100%; width: 100%; }

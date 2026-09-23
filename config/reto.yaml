@@ -1,0 +1,78 @@
+# Reglas del Reto Actinver 2026. Se editan aquí sin tocar código.
+# Fuente: https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica (consultada 2026-09-23).
+# Un valor null = regla no confirmada: la interfaz lo muestra con el aviso «regla sin confirmar».
+
+activo: true                      # aplica reglas y costos del Reto a las propuestas
+nombre: "Reto Actinver 2026"
+fuente: "https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica"
+consultado: "2026-09-23"
+
+capital: 1000000                  # actipesos (reglamento §1)
+moneda: MXN
+
+fechas:
+  inscripcion_fin: "2026-10-04T23:59:59"   # reglamento §5 (la portada dice «2 de octubre»: se usa el reglamento)
+  practica_inicio: "2026-09-28T00:00:00"   # reglamento §5
+  practica_fin: "2026-10-02T23:59:59"
+  competencia_inicio: "2026-10-05T00:00:00"
+  competencia_fin: "2026-11-13T15:00:00"   # hora de la Ciudad de México
+  premiacion: "2026-12-08/2026-12-12"
+zona_horaria: "America/Mexico_City"
+
+costos:
+  comision_pct: 0.0010            # 0.10 % sobre el importe (reglamento §8)
+  iva_sobre_comision: 0.16        # 16 % sobre la comisión
+  spread_estimado: null           # el simulador ejecuta a precio real de la BMV; spread no publicado
+
+horario_bmv:                      # reglamento §8, lunes a viernes salvo festivos
+  - desde: "2026-01-01"
+    hasta: "2026-11-02"
+    apertura: "07:30"
+    cierre: "14:00"
+  - desde: "2026-11-03"
+    hasta: "2026-12-31"
+    apertura: "08:30"
+    cierre: "15:00"
+
+reglas:
+  min_emisoras: 5                 # «por lo menos 5 emisoras diferentes»
+  max_peso_emisora: 0.50          # «NO comprar más del 50 % del portafolio en una sola emisora»
+  ventas_en_corto: false          # §11
+  apalancamiento: false
+  dividendos_reproducidos: false  # §13: no se pagan dividendos; sí splits → se usa precio sin ajustar
+  splits_reproducidos: true
+  tipos_orden: [mercado, limitada]
+  vigencia_orden_limitada_dias: 1
+  min_operaciones: null           # no publicado como regla de rendimiento
+  operacion_semanal_track: true   # «opera al menos 1 título de la semana» cuando la plataforma lo indique
+  instrumentos_prohibidos: []     # ids a excluir (p. ej. apalancados); ANGELD y DIABLOI ya se excluyen por regla
+  comision_minima: null           # no publicada
+  limite_diario_operaciones: null # no publicado
+
+evaluacion:
+  rendimiento: "Mayor rendimiento del portafolio del 5 oct al 13 nov (3 primeros lugares por modalidad)"
+  avance: "Track del inversionista en Acelera Academy: 6 tracks semanales + quiz diario (≥3 correctos/semana)"
+  nota: "La terminal cubre solo la parte de portafolio; el avance educativo se hace en Acelera Academy."
+
+propuestas:
+  horizonte_auto: true            # horizonte = sesiones restantes hasta el cierre de la competencia
+  tope_lente_rendimiento: 0.20    # 20 % por activo ⇒ al menos 5 emisoras (cumple ambas reglas)
+  aversion_lente_rendimiento: 0.5 # lente «máximo rendimiento» (agresiva): aversión baja y explícita
+
+tareas:                           # lista de pendientes visibles (se marcan en la interfaz)
+  - id: inscripcion
+    texto: "Inscribirse en retoactinver.com (antes del 4 oct, 23:59)"
+  - id: practica
+    texto: "Probar el simulador en la semana de práctica (28 sep – 2 oct)"
+  - id: universo
+    texto: "Exportar la lista de instrumentos del simulador e importarla en la terminal"
+  - id: portafolio_inicial
+    texto: "Registrar el portafolio inicial del 5 oct en «Mi cartera»"
+  - id: cinco_emisoras
+    texto: "Tener o haber operado al menos 5 emisoras distintas"
+  - id: track_semanal
+    texto: "Completar el desafío semanal en Acelera Academy (6 semanas)"
+  - id: quiz_diario
+    texto: "Quiz diario: al menos 3 correctos por semana"
+  - id: cuenta_actinver
+    texto: "Abrir cuenta digital Actinver si se gana un premio (requisito para reclamarlo)"

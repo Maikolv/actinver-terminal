@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf" content="__CSRF__">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Terminal local para comparar dos propuestas de portafolio y dar seguimiento a la cartera propia. Solo informa; no envía órdenes.">
-<title>Terminal de portafolios</title>
+<meta name="description" content="Terminal local para el Reto Actinver: dos propuestas de portafolio, seguimiento de la cartera y alertas. Solo informa; no envía órdenes.">
+<meta name="theme-color" content="#141517">
+<title>Actinver Terminal</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/app.js" defer></script>
@@ -16,17 +17,17 @@
 <header class="cabecera">
   <div class="cabecera__fila">
     <div class="marca">
-      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Terminal de portafolios</span>
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Actinver Terminal</span>
     </div>
     <div class="acciones-cabecera">
       <button type="button" class="boton boton--secundario" id="btn-modo" hidden></button>
-      <button type="button" class="boton boton--secundario" id="btn-actualizar" title="Consulta a los proveedores configurados respetando sus límites">Actualizar datos</button>
+      <button type="button" class="boton boton--secundario" id="btn-actualizar" title="Consulta fuentes (respetando límites), recalcula si hay datos nuevos y evalúa alertas">Actualizar datos</button>
       <button type="button" class="boton boton--primario" id="btn-calcular">Recalcular propuestas</button>
     </div>
   </div>
   <div class="estado-datos" id="estado-datos" role="status" aria-live="polite">
-    <span class="cargando-linea">Cargando estado de datos…</span>
+    <span class="esqueleto esqueleto--linea" aria-hidden="true"></span><span class="oculto-visual">Cargando estado de datos</span>
   </div>
   <div class="aviso-demo" id="aviso-demo" hidden>
     <strong>Modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
@@ -37,9 +38,11 @@
   <div role="tablist" id="lista-pestanas">
     <button role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Resumen</button>
     <button role="tab" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
+    <button role="tab" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
     <button role="tab" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi cartera</button>
+    <button role="tab" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
     <button role="tab" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos</button>
-    <button role="tab" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Perfil</button>
+    <button role="tab" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
     <button role="tab" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
 </nav>
@@ -47,19 +50,35 @@
 <main id="principal" tabindex="-1">
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
     <h1 class="oculto-visual">Resumen</h1>
-    <div id="resumen-contenido"><p class="cargando">Cargando…</p></div>
+    <div id="resumen-contenido">
+      <div class="rejilla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    </div>
   </section>
+
   <section role="tabpanel" id="panel-propuestas" aria-labelledby="tab-propuestas" hidden>
     <h1>Propuestas</h1>
-    <div class="segmentado" role="radiogroup" aria-label="Propuesta a detallar" id="selector-propuesta">
-      <button type="button" role="radio" aria-checked="true" data-tipo="acciones">Solo acciones</button>
-      <button type="button" role="radio" aria-checked="false" data-tipo="mixta">Acciones + ETF + fondos</button>
+    <div class="selectores">
+      <div class="segmentado" role="radiogroup" aria-label="Universo" id="selector-universo">
+        <button type="button" role="radio" aria-checked="true" data-valor="acciones">Solo acciones</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="mixta">Acciones + ETF + fondos</button>
+      </div>
+      <div class="segmentado" role="radiogroup" aria-label="Lente" id="selector-lente">
+        <button type="button" role="radio" aria-checked="false" data-valor="rendimiento">Máximo rendimiento</button>
+        <button type="button" role="radio" aria-checked="true" data-valor="ajuste">Ajuste a su perfil</button>
+      </div>
     </div>
-    <div id="propuesta-detalle"><p class="cargando">Cargando…</p></div>
+    <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
+
+  <section role="tabpanel" id="panel-alertas" aria-labelledby="tab-alertas" hidden>
+    <h1>Alertas</h1>
+    <p class="ayuda" id="alertas-config"></p>
+    <div id="alertas-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
   <section role="tabpanel" id="panel-cartera" aria-labelledby="tab-cartera" hidden>
     <h1>Mi cartera</h1>
-    <div id="cartera-contenido"><p class="cargando">Cargando…</p></div>
+    <div id="cartera-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     <h2>Registrar una operación</h2>
     <form id="form-operacion" class="formulario" novalidate>
       <div class="campos">
@@ -72,16 +91,17 @@
             <option value="impuesto">Impuesto</option><option value="split">Split (factor)</option>
           </select>
         </label>
-        <label data-para="instrumento">Instrumento<input name="instrumento_id" list="lista-instrumentos" autocomplete="off" placeholder="p. ej. SIC:IVV o FONDO:ACTIGOB" maxlength="40"></label>
+        <label data-para="instrumento">Instrumento<input name="instrumento_id" list="lista-instrumentos" autocomplete="off" placeholder="p. ej. BMV:WALMEX o SIC:IVV" maxlength="40"></label>
         <label data-para="cantidad">Cantidad<input name="cantidad" inputmode="decimal" placeholder="Títulos o factor de split"></label>
         <label data-para="precio">Precio por título<input name="precio" inputmode="decimal"></label>
-        <label data-para="monto">Monto<input name="monto" inputmode="decimal" placeholder="Para aportación, retiro, dividendo…"></label>
-        <label data-para="comision">Comisión (con IVA)<input name="comision" inputmode="decimal" value="0"></label>
+        <label data-para="monto">Monto<input name="monto" inputmode="decimal" placeholder="Aportación, retiro, dividendo…"></label>
+        <label data-para="comision">Comisión con IVA<input name="comision" inputmode="decimal" value="0"></label>
         <label data-para="impuesto">Impuesto / retención<input name="impuesto" inputmode="decimal" value="0"></label>
         <label>Moneda<select name="moneda"><option>MXN</option><option>USD</option></select></label>
         <label data-para="tipo_cambio">Tipo de cambio<input name="tipo_cambio" inputmode="decimal" value="1"></label>
         <label class="ancho">Nota (opcional)<input name="nota" maxlength="200"></label>
       </div>
+      <p class="ayuda" id="ayuda-comision"></p>
       <div class="errores" id="errores-operacion" role="alert" aria-live="assertive"></div>
       <button class="boton boton--primario" type="submit">Guardar operación</button>
     </form>
@@ -91,7 +111,10 @@
     <form id="form-importar" class="formulario" novalidate>
       <div class="campos">
         <label>Tipo de archivo
-          <select name="tipo"><option value="transacciones">Operaciones</option><option value="posiciones">Posiciones iniciales</option><option value="precios">Precios / valor liquidativo</option></select>
+          <select name="tipo">
+            <option value="transacciones">Operaciones</option><option value="posiciones">Posiciones iniciales</option>
+            <option value="precios">Precios / valor liquidativo</option><option value="universo">Lista de instrumentos del simulador</option>
+          </select>
         </label>
         <label>Archivo CSV (máx. 1 MB)<input type="file" name="archivo" accept=".csv,text/csv" required></label>
       </div>
@@ -100,6 +123,12 @@
       <button class="boton boton--secundario" type="submit">Revisar archivo</button>
     </form>
   </section>
+
+  <section role="tabpanel" id="panel-mercado" aria-labelledby="tab-mercado" hidden>
+    <h1>Mercado</h1>
+    <div id="mercado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
   <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>
     <h1>Datos e instrumentos</h1>
     <div id="proveedores"></div>
@@ -109,11 +138,14 @@
       <label>Clase<select id="filtro-clase"><option value="">Todas</option></select></label>
       <label>Vigencia<select id="filtro-vigencia"><option value="">Todas</option><option value="vigente">Vigente</option><option value="retrasado">Retrasado</option><option value="vencido">Vencido</option><option value="sin_datos">Sin datos</option><option value="sintetico">Sintético</option></select></label>
     </div>
-    <div id="universo-tabla"><p class="cargando">Cargando…</p></div>
+    <div id="universo-tabla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
+
   <section role="tabpanel" id="panel-perfil" aria-labelledby="tab-perfil" hidden>
-    <h1>Perfil y criterios</h1>
-    <p class="ayuda">Estos valores definen qué se considera «mejor» para usted. Al guardarlos, recalcule las propuestas.</p>
+    <h1>Reto y perfil</h1>
+    <div id="reto-contenido"></div>
+    <h2>Perfil y criterios</h2>
+    <p class="ayuda">Definen qué es «mejor» para usted. Al guardarlos, las propuestas se recalculan solas.</p>
     <form id="form-perfil" class="formulario" novalidate>
       <fieldset class="segmentado-campo"><legend>Perfil de riesgo</legend>
         <label><input type="radio" name="riesgo" value="conservador"> Conservador</label>
@@ -121,14 +153,15 @@
         <label><input type="radio" name="riesgo" value="agresivo"> Agresivo</label>
       </fieldset>
       <div class="campos">
-        <label>Horizonte (años)<input name="horizonte_anios" inputmode="decimal" required></label>
+        <label class="casilla"><input type="checkbox" name="horizonte_reto"> Usar como horizonte las sesiones que faltan para el cierre del Reto</label>
+        <label>Horizonte propio (años)<input name="horizonte_anios" inputmode="decimal" required></label>
         <label>Capital a invertir (MXN)<input name="capital" inputmode="decimal" required></label>
         <label>Peso máximo por activo (%)<input name="max_peso_activo" inputmode="decimal" required></label>
         <label>Exposición máxima a dólar (%)<input name="max_exposicion_usd" inputmode="decimal" required></label>
         <label>Escenario de mercado
           <select name="escenario"><option value="base">Base (historia)</option><option value="adverso">Adverso</option><option value="favorable">Favorable</option></select>
         </label>
-        <label class="casilla"><input type="checkbox" name="incluir_etf_por_confirmar"> Incluir ETF cuya disponibilidad en el SIC no está confirmada</label>
+        <label class="casilla"><input type="checkbox" name="incluir_etf_por_confirmar"> Incluir ETF cuya disponibilidad no está confirmada</label>
         <label class="ancho">Excluir instrumentos (ids separados por coma)<input name="excluir" placeholder="SIC:TSLA, BMV:GMEXICO"></label>
       </div>
       <div class="errores" id="errores-perfil" role="alert" aria-live="assertive"></div>
@@ -136,38 +169,47 @@
     </form>
     <div id="criterios"></div>
   </section>
+
   <section role="tabpanel" id="panel-ayuda" aria-labelledby="tab-ayuda" hidden>
     <h1>Ayuda</h1>
     <div class="texto">
       <h2>Qué hace esta terminal</h2>
-      <p>Compara dos propuestas —solo acciones, y acciones con ETF y fondos— contra su cartera registrada y una referencia simple. Solo informa y simula: <strong>no envía órdenes a ninguna casa de bolsa</strong>.</p>
-      <h2>Cómo leer el estado de los datos</h2>
+      <p>Calcula en todo momento dos carteras —solo acciones, y acciones con ETF y fondos—, cada una con dos lentes: <strong>máximo rendimiento esperado</strong> (agresiva, con su riesgo explícito) y <strong>ajuste a su perfil y cartera</strong>. Las compara con su cartera registrada y le avisa cuando conviene cambiar algo. <strong>No envía órdenes</strong>: las operaciones se capturan en el simulador del Reto.</p>
+      <h2>Estado de los datos</h2>
       <dl class="glosario">
         <dt><span class="chip chip--vigente">Vigente</span></dt><dd>Corresponde a la última sesión esperada para su tipo (cierre, valor liquidativo o tipo de cambio).</dd>
-        <dt><span class="chip chip--retrasado">Dato retrasado</span></dt><dd>Atraso dentro de la tolerancia configurada. Se usa, pero baja la calidad de datos de la propuesta.</dd>
-        <dt><span class="chip chip--vencido">Dato vencido</span></dt><dd>Atraso mayor a la tolerancia. El instrumento se excluye y la propuesta que dependa de él se suspende.</dd>
+        <dt><span class="chip chip--retrasado">Dato retrasado</span></dt><dd>Atraso dentro de la tolerancia. Se usa, pero baja la calidad de datos.</dd>
+        <dt><span class="chip chip--vencido">Dato vencido</span></dt><dd>Atraso mayor a la tolerancia: el instrumento se excluye y se suspenden las recomendaciones que dependan de él.</dd>
         <dt><span class="chip chip--sin_datos">Sin datos suficientes</span></dt><dd>No hay historia suficiente para estimar su riesgo.</dd>
         <dt><span class="chip chip--sintetico">Sintético</span></dt><dd>Dato de demostración; nunca se presenta como actual.</dd>
       </dl>
-      <h2>Cómo se elige «la mejor» propuesta</h2>
-      <p>Cada alternativa recibe una puntuación de 0 a 100 que combina rendimiento ajustado por riesgo fuera de muestra, riesgo frente a su perfil, diversificación, liquidez, costos y calidad de datos. Los pesos de cada criterio están en <em>Perfil</em>. La clasificación depende de esos criterios y de datos históricos: no es una certeza ni una promesa de rendimiento.</p>
-      <h2>Importar operaciones</h2>
-      <p>Descargue la plantilla, llénela con sus operaciones (fechas AAAA-MM-DD, montos en la moneda indicada) y súbala. Se detectan duplicados y el archivo original se conserva. Para corregir una operación use «Corregir»: el registro original queda anulado y auditado.</p>
+      <h2>Tiempo real</h2>
+      <p>El simulador del Reto usa precios de la BMV en tiempo real. Esta terminal <strong>no tiene una fuente gratuita de tiempo real para la BMV</strong>: trabaja con cierres diarios y lo indica en cada dato. Vea «Datos» para el retraso de cada fuente.</p>
+      <h2>Alertas</h2>
+      <p>Se disparan una sola vez al cumplirse la condición, esperan un periodo de enfriamiento antes de repetirse y no le notifican fuera del horario de la BMV. «Simular cambio» calcula el efecto de la acción sugerida sin enviar nada.</p>
+      <h2>CFD y apalancamiento</h2>
+      <p>Los CFD son contratos por diferencias con apalancamiento (<a href="https://www.dukascopy.com/swiss/spanish/cfd/what-are-cfds/" rel="noopener noreferrer" target="_blank">explicación de Dukascopy</a>). Quedan fuera de ambas carteras y del Reto.</p>
       <h2>Limitaciones</h2>
       <ul>
-        <li>Los precios de acciones del SIC se valoran con el cierre del mercado de origen convertido a pesos; la cotización en la BMV puede diferir por spread y horario.</li>
-        <li>Los fondos solo se valoran con valor liquidativo que usted importe; su frecuencia es distinta a la de una acción.</li>
-        <li>No hay datos en tiempo real salvo que contrate y configure un proveedor que lo ofrezca.</li>
+        <li>Las emisoras del SIC se valoran con el cierre de su bolsa de origen convertido a pesos; el simulador puede diferir.</li>
+        <li>El Reto no paga dividendos: las propuestas usan precios sin ajustar por dividendos.</li>
+        <li>Los fondos se valoran con el valor liquidativo que usted importe.</li>
       </ul>
     </div>
   </section>
 </main>
+
+<dialog id="dialogo-simulacion" aria-labelledby="titulo-simulacion">
+  <div class="dialogo__cabecera"><h2 id="titulo-simulacion">Simulación de cambio</h2>
+    <button type="button" class="boton boton--texto" id="cerrar-simulacion" aria-label="Cerrar simulación">Cerrar</button></div>
+  <div id="simulacion-contenido"></div>
+</dialog>
 <div class="barra-movil">
   <button type="button" class="boton boton--primario" id="btn-calcular-movil">Recalcular propuestas</button>
 </div>
 <div class="notificacion" id="notificacion" role="status" aria-live="polite" hidden></div>
 <footer class="pie">
-  <p>Uso local y personal. Información con fines de análisis; no constituye asesoría de inversión. Sin operaciones reales habilitadas.</p>
+  <p>Uso local y personal. Información con fines de análisis; no es asesoría de inversión ni recomendación. Sin operaciones reales habilitadas.</p>
 </footer>
 </body>
 </html>

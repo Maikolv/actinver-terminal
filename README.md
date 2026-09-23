@@ -9,7 +9,7 @@ Terminal local en español para comparar dos propuestas de portafolio —**solo 
 Requisitos: [uv](https://docs.astral.sh/uv/) (instala Python 3.12 automáticamente). Nada más.
 
 ```bash
-cd C:\Users\MIKE\Desktop\Repos\terminal-portafolios
+cd C:\Users\MIKE\Desktop\Repos\actinver-terminal
 uv sync
 uv run terminal demo        # modo demostración: datos SINTÉTICOS etiquetados, sin credenciales
 ```
