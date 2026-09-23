@@ -79,14 +79,17 @@ def cotizaciones(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str] | Non
     ids = ids or list(ins)
     cond, par = _filtro_proveedor(ajustes)
     fx = ultimo_fx(con, ajustes)
+    # Una sola consulta: último registro por instrumento (evita N consultas).
+    ultimos = {r["instrumento_id"]: r for r in con.execute(
+        f"SELECT p.instrumento_id, p.fecha, p.cierre, p.moneda, p.proveedor, p.tipo_dato, p.hora_cotizacion, p.obtenido_en "
+        f"FROM precios p JOIN (SELECT instrumento_id, MAX(fecha) AS f FROM precios WHERE {cond} GROUP BY instrumento_id) m "
+        f"ON p.instrumento_id = m.instrumento_id AND p.fecha = m.f WHERE p.{cond}", (*par, *par))}
     out = {}
     for i in ids:
         meta = ins.get(i)
         if not meta:
             continue
-        f = con.execute(f"SELECT fecha, cierre, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en "
-                        f"FROM precios WHERE instrumento_id=? AND {cond} ORDER BY fecha DESC LIMIT 1",
-                        (i, *par)).fetchone()
+        f = ultimos.get(i)
         cal = vigencia.codigo_calendario(meta)
         base = {"id": i, "clave_operable": meta["clave_operable"], "nombre": meta["nombre"], "clase": meta["clase"],
                 "bolsa": meta["bolsa_referencia"], "mercado_operable": meta["mercado_operable"],

@@ -22,3 +22,6 @@ data/demo/
 # Material privado de auditoría (renders del PDF, descargas crudas)
 _privado/
 _renders/
+
+# Informes crudos (Lighthouse incluye el token CSRF efímero de la página)
+docs/evidencia/*.json

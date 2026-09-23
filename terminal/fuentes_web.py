@@ -28,11 +28,13 @@ from .db import ahora, transaccion
 
 # ---------------------------------------------------------------------------------------------------------------
 # Clasificación de titulares (léxico transparente; opcionalmente LLM local vía Ollama si OLLAMA_URL está definido)
-ALTO_IMPACTO = re.compile(r"\b(earnings|guidance|downgrad\w*|upgrad\w*|fda|sec\b|lawsuit|investigation|probe|merger|acqui\w+|"
+ALTO_IMPACTO = re.compile(r"\b(earnings (beat|miss)\w*|(beats?|miss(es)?) (estimates|expectations)|guidance|downgrad\w*|upgrad\w*|"
+                          r"fda|sec\b|lawsuit|investigation|probe|merger|acqui\w+|"
                           r"bankrupt\w*|chapter 11|ceo|resign\w*|recall|dividend (cut|suspend\w*)|delist\w*|halt\w*|"
                           r"fraud|restat\w*|layoffs?|default|tariff\w*|sanction\w*)\b", re.I)
 NEGATIVO = re.compile(r"\b(downgrad\w*|miss\w*|cut\w*|lawsuit|probe|investigation|recall|bankrupt\w*|plunge\w*|slump\w*|"
-                      r"fraud|delist\w*|halt\w*|warn\w*|layoffs?|default|falls?|drops?|sinks?|weak\w*|loss(es)?)\b", re.I)
+                      r"fraud|delist\w*|halt\w*|warn\w*|layoffs?|default|falls?|drops?|sinks?|weak\w*|loss(es)?|"
+                      r"illusor\w*|overvalued|bubble|risks?|concerns?|slow\w*|decline\w*)\b", re.I)
 POSITIVO = re.compile(r"\b(upgrad\w*|beats?|raises?|record|buyback|approv\w*|surg\w*|jumps?|soars?|strong|growth|outperform\w*)\b", re.I)
 
 

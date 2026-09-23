@@ -21,7 +21,7 @@
       <span>Actinver Terminal</span>
     </div>
     <div class="acciones-cabecera">
-      <button type="button" class="boton boton--secundario" id="btn-modo" hidden></button>
+      <button type="button" class="boton boton--secundario __CLASE_MODO__" id="btn-modo" data-destino="__DESTINO__">__TEXTO_MODO__</button>
       <button type="button" class="boton boton--secundario" id="btn-actualizar" title="Consulta fuentes (respetando límites), recalcula si hay datos nuevos y evalúa alertas">Actualizar datos</button>
       <button type="button" class="boton boton--primario" id="btn-calcular">Recalcular propuestas</button>
     </div>
@@ -29,7 +29,7 @@
   <div class="estado-datos" id="estado-datos" role="status" aria-live="polite">
     <span class="esqueleto esqueleto--linea" aria-hidden="true"></span><span class="oculto-visual">Cargando estado de datos</span>
   </div>
-  <div class="aviso-demo" id="aviso-demo" hidden>
+  <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
     <strong>Modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
   </div>
 </header>

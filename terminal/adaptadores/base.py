@@ -58,8 +58,15 @@ class Adaptador:
         self.con = con
         self.ajustes = ajustes or {}
         self.credencial = credencial
-        self.cliente = cliente or httpx.Client(timeout=30, follow_redirects=True,
-                                               headers={"User-Agent": "actinver-terminal/0.1 (uso personal local)"})
+        self._cliente = cliente
+
+    @property
+    def cliente(self) -> httpx.Client:
+        """Se crea al primer uso: construir el contexto TLS cuesta decenas de ms y el estado no lo necesita."""
+        if self._cliente is None:
+            self._cliente = httpx.Client(timeout=30, follow_redirects=True,
+                                         headers={"User-Agent": "actinver-terminal/0.1 (uso personal local)"})
+        return self._cliente
 
     # --- capacidades -------------------------------------------------------------------------
     def configurado(self) -> bool:

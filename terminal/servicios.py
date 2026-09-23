@@ -188,7 +188,7 @@ def simular(con, ajustes: Ajustes, cambios: list[dict]) -> dict:
                         "titulos": titulos, "precio_mxn": px, "fecha_precio": q.get("fecha"), "importe": round(importe, 2),
                         "costo": round(costo, 2)})
     total = efectivo + sum(valores.values())
-    pesos = {k: v / total for k, v in valores.items() if total > 0 and v > 1e-6}
+    pesos = {k: v / total for k, v in valores.items() if total > 0 and v > 0.5}  # < 0.5 MXN = residuo de redondeo
     if efectivo < -1e-6:
         avisos.append("Poder de compra insuficiente: el efectivo resultante es negativo (el simulador del Reto lo rechazaría).")
     return {"operaciones": detalle, "efectivo_resultante": round(efectivo, 2), "valor_total": round(total, 2),

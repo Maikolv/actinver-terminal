@@ -41,14 +41,19 @@ def _ahora(ahora: datetime | None) -> pd.Timestamp:
 
 
 def ultima_sesion_cerrada(codigo: str, ahora: datetime | None = None) -> date:
+    return _ultima_sesion(codigo, _ahora(ahora).floor("min"))
+
+
+@lru_cache(maxsize=256)
+def _ultima_sesion(codigo: str, ts: pd.Timestamp) -> date:  # memoizada por minuto
     cal = calendario(codigo)
-    ts = _ahora(ahora)
     sesion = cal.date_to_session(pd.Timestamp(ts.date()), direction="previous")
     while cal.session_close(sesion) > ts:  # sesión en curso o futura: retroceder
         sesion = cal.previous_session(sesion)
     return sesion.date()
 
 
+@lru_cache(maxsize=4096)
 def cierre_de_sesion(codigo: str, d: date) -> datetime | None:
     cal = calendario(codigo)
     s = pd.Timestamp(d)
@@ -57,6 +62,7 @@ def cierre_de_sesion(codigo: str, d: date) -> datetime | None:
     return cal.session_close(s).to_pydatetime()
 
 
+@lru_cache(maxsize=4096)
 def sesiones_de_atraso(codigo: str, fecha_dato: date, referencia: date) -> int:
     if fecha_dato >= referencia:
         return 0

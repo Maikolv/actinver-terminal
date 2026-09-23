@@ -61,7 +61,7 @@ a { color: var(--acento); }
 .cabecera__fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
 .marca { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 1.05rem; }
 .acciones-cabecera { display: flex; gap: 8px; }
-.estado-datos { max-width: 1280px; margin: 8px auto 0; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: .85rem; color: var(--texto-2); }
+.estado-datos { min-height: 3.4em; max-width: 1280px; margin: 8px auto 0; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: .85rem; color: var(--texto-2); }
 .estado-datos .grupo { display: inline-flex; gap: 6px; align-items: center; }
 .aviso-demo { max-width: 1280px; margin: 8px auto 0; padding: 8px 12px; border-radius: var(--radio); background: var(--sintetico-fondo); color: var(--sintetico); font-size: .9rem; }
 
@@ -79,7 +79,8 @@ a { color: var(--acento); }
 .pestanas [role="tab"] { font: inherit; background: none; border: none; border-bottom: 3px solid transparent; padding: 11px 12px; color: var(--texto-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
 .pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); font-weight: 600; }
 
-main { max-width: 1280px; margin: 0 auto; padding: 20px var(--espacio) 96px; }
+main { max-width: 1280px; margin: 0 auto; padding: 20px var(--espacio) 96px; min-height: 100vh; }
+#resumen-contenido { min-height: 60vh; }
 main:focus { outline: none; }
 
 /* Tarjetas y rejillas */
@@ -200,7 +201,8 @@ td.num, th.num, .kpi .valor, .puntuacion .numero, .cifra, .barras .num { font-fa
 .no-cumple { color: var(--vencido); font-weight: 600; }
 .sin-confirmar { color: var(--retrasado); font-size: .8rem; }
 
-.selectores { display: flex; flex-wrap: wrap; gap: 12px; }
+.selectores { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.selectores h2 { margin: 16px 0; }
 dialog { border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); padding: 16px; width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 64px); }
 dialog::backdrop { background: rgb(0 0 0 / .5); }
 .dialogo__cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; }

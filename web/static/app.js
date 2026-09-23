@@ -130,7 +130,6 @@ async function cargarEstado() {
     estado.datos = d;
     document.getElementById("aviso-demo").hidden = d.modo !== "demo";
     const bm = document.getElementById("btn-modo");
-    bm.hidden = false;
     bm.dataset.destino = d.modo === "demo" ? "real" : "demo";
     bm.textContent = d.modo === "demo" ? "Usar datos reales y vigentes" : "Ver demostración";
     bm.classList.toggle("boton--real", d.modo === "demo");
@@ -769,9 +768,14 @@ async function iniciar() {
   const tab = inicial && document.getElementById(inicial);
   if (tab && tab.id !== "tab-resumen") activarPestana(tab);
   setInterval(cargarEstado, 60000); // detecta ciclos del motor y alertas nuevas
-  api("/api/universo").then((u) => {
-    estado.universo = u.instrumentos;
-    document.getElementById("lista-instrumentos").replaceChildren(...u.instrumentos.filter((i) => i.estado === "activo").map((i) => h("option", { value: i.id, texto: `${i.clave_operable} — ${i.nombre || ""}` })));
-  }).catch(() => {});
 }
+/* La lista de instrumentos del formulario se carga solo al usar el campo (evita 137 KB al inicio). */
+document.querySelector('#form-operacion input[name="instrumento_id"]').addEventListener("focus", async () => {
+  const dl = document.getElementById("lista-instrumentos");
+  if (dl.children.length) return;
+  try {
+    if (!estado.universo) estado.universo = (await api("/api/universo")).instrumentos;
+    dl.replaceChildren(...estado.universo.filter((i) => i.estado === "activo").map((i) => h("option", { value: i.id, texto: `${i.clave_operable} — ${i.nombre || ""}` })));
+  } catch { /* el campo sigue aceptando la clave escrita */ }
+});
 iniciar();

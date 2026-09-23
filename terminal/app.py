@@ -428,7 +428,14 @@ retraso según TradingView; pueden diferir del simulador). <a href="/">Volver</a
 # Interfaz
 @app.get("/", response_class=HTMLResponse)
 def index():
-    return HTMLResponse((WEB / "index.html").read_text(encoding="utf-8").replace("__CSRF__", TOKEN_CSRF))
+    demo = AJUSTES.es_demo  # se decide en el servidor para que la cabecera no se desplace al cargar
+    reemplazos = {"__CSRF__": TOKEN_CSRF, "__OCULTO_DEMO__": "" if demo else "hidden",
+                  "__DESTINO__": "real" if demo else "demo", "__CLASE_MODO__": "boton--real" if demo else "",
+                  "__TEXTO_MODO__": "Usar datos reales y vigentes" if demo else "Ver demostración"}
+    pagina = (WEB / "index.html").read_text(encoding="utf-8")
+    for k, v in reemplazos.items():
+        pagina = pagina.replace(k, v)
+    return HTMLResponse(pagina)
 
 
 @app.get("/salud")
