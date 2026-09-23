@@ -652,7 +652,7 @@ async function cargarReto() {
           h("ul", {}, [["Semana de práctica", `${r.fechas.practica_inicio.slice(0, 10)} a ${r.fechas.practica_fin.slice(0, 10)}`],
             ["Competencia", `${r.fechas.competencia_inicio.slice(0, 10)} a ${r.fechas.competencia_fin.replace("T", " ").slice(0, 16)} CDMX`],
             ["Inscripción hasta", r.fechas.inscripcion_fin.replace("T", " ").slice(0, 16)], ["Capital", mxn(r.capital) + " actipesos"],
-            ["Comisión", `${pct(r.costo_operacion)} por orden (0.10 % + IVA)`],
+            ["Comisión", `${(r.costo_operacion * 100).toFixed(3)} % por orden (0.10 % + IVA)`],
             ["Horario BMV", r.horario_bmv.map((x) => `${x.apertura}–${x.cierre} (${x.desde} a ${x.hasta})`).join("; ")]].map(([a, b]) => h("li", {}, h("strong", { texto: `${a}: ` }), b))),
           h("p", { clase: "suave" }, "Fuente: ", externo(r.fuente, "bases y mecánica oficiales"), ` (consultado ${r.consultado}).`)),
         h("section", { clase: "tarjeta" }, h("h2", { texto: "Reglas de rendimiento" }),
