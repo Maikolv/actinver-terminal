@@ -228,3 +228,17 @@ def test_ruptura_de_tesis(con, ajustes):
                                 nivel_invalidacion=px * 1.1, direccion_invalidacion="debajo")
     conds = alertas.reglas_tesis(con, _cart(con, ajustes))
     assert conds and conds[0].activa and "impacto_mxn" in conds[0].datos
+
+
+def test_plan_inicial_sin_operaciones_usa_capital_supuesto(con, ajustes):
+    fin = vigencia.ultima_sesion_cerrada("XMEX")
+    sembrar_precios(con, ["BMV:AMX"], fin=fin, sesiones=300, proveedor="archivo", con_fx=False)
+    migraciones.completar_tiempos(con)
+    cart = _cart(con, ajustes)
+    assert not cart["n_operaciones"]
+    sin = boleta.construir(con, ajustes, {"id": "BMV:AMX", "accion": "comprar", "monto_mxn": 100_000}, cart)
+    assert sin["cantidad"] == 0                              # sin efectivo registrado no hay compra posible
+    con_plan = boleta.construir(con, ajustes, {"id": "BMV:AMX", "accion": "comprar", "monto_mxn": 100_000}, cart,
+                                efectivo_supuesto=1_000_000)
+    assert con_plan["plan_inicial"] and con_plan["cantidad"] > 0 and con_plan["tipo"] == "considerar compra"
+    assert any("aportación inicial" in f for f in con_plan["datos_faltantes"])

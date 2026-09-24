@@ -77,7 +77,8 @@ def _caducidad(ahora: datetime) -> datetime:
     return siguiente.to_pydatetime() + timedelta(minutes=VIGENCIA_MIN_ABIERTO)
 
 
-def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict, ahora: datetime | None = None) -> dict:
+def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict, ahora: datetime | None = None,
+              efectivo_supuesto: float | None = None) -> dict:
     """Boleta para una fila de cambios de una propuesta (id, accion, monto_mxn). Recalcula todo con datos actuales."""
     ahora = ahora or datetime.now(UTC)
     ins = mercado.instrumentos(con)
@@ -89,6 +90,10 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     calidad = cz.calidad_actual(q, ahora) if q else "SIN PRECIO CONFIABLE"
     total = float(cart.get("valor_total") or 0)
     efectivo = float(cart.get("efectivo") or 0)
+    plan_inicial = bool(efectivo_supuesto) and not cart.get("n_operaciones")
+    if plan_inicial:  # sin operaciones registradas: se planea con el capital del perfil, marcado como supuesto
+        efectivo = total = float(efectivo_supuesto)
+        faltan.append("Registrar la aportación inicial en «Mi cartera» (la boleta supone efectivo = capital del perfil)")
     pos_valor = {p["instrumento_id"]: float(p.get("valor_mxn") or 0) for p in cart.get("posiciones", [])}
     pos_tit = {p["instrumento_id"]: float(p.get("cantidad") or 0) for p in cart.get("posiciones", [])}
     monto = float(fila.get("monto_mxn") or 0)
@@ -152,6 +157,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         "aviso": "Propuesta para revisión humana. La terminal no registra órdenes; usted la captura en el portal si decide.",
         "creada_en": ahora.isoformat(timespec="seconds"), "caduca_en": caduca.isoformat(timespec="seconds"),
         "version_reglas": registro.estado_reglas(con).get("version"),
+        "plan_inicial": plan_inicial, "efectivo_supuesto": efectivo_supuesto if plan_inicial else None,
     }
     b["huella_datos"] = huella(b, cart)
     return b
@@ -175,7 +181,8 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, clave: str = "acciones_aj
     if not filas:  # sin cartera registrada: la asignación inicial completa
         filas = [{"id": a["id"], "accion": "comprar", "monto_mxn": a.get("monto_estimado") or a.get("monto_objetivo"),
                   "delta_pp": round(a["peso"] * 100, 2), "nota": "Asignación inicial de la propuesta"} for a in p.get("pesos") or []]
-    boletas = [construir(con, ajustes, f, cart) for f in filas]
+    sup = float(p.get("capital") or perfil.get("capital") or 0) if not cart.get("n_operaciones") else None
+    boletas = [construir(con, ajustes, f, cart, efectivo_supuesto=sup) for f in filas]
     direccionales = [b for b in boletas if b["tipo"] in ("considerar compra", "considerar venta")]
     ahora = datetime.now(UTC).isoformat(timespec="seconds")
     ids = []
@@ -207,7 +214,7 @@ def recalcular(con: sqlite3.Connection, ajustes: Ajustes, bid: int, ahora: datet
         fila = {"id": b["instrumento_id"], "accion": {"considerar compra": "comprar", "considerar venta": "vender"}.get(b["tipo"]),
                 "monto_mxn": (b["importe"] if b["lado"] == "compra" else -b["importe"]) if b["lado"] else 0,
                 "nota": b["razones"][-1] if b["razones"] else ""}
-        nueva = construir(con, ajustes, fila, cart, ahora)
+        nueva = construir(con, ajustes, fila, cart, ahora, efectivo_supuesto=b.get("efectivo_supuesto"))
         estado = "vigente"
         if b["precio_referencia"] and not nueva["precio_referencia"]:
             estado, motivo = "invalidada", "El precio dejó de ser confiable"
