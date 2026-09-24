@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "actinver-terminal",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "terminal", "iniciar", "--sin-navegador"],
+      "port": 8765
+    },
+    {
+      "name": "actinver-terminal-demo",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "terminal", "demo", "--sin-navegador"],
+      "port": 8765
+    }
+  ]
+}

@@ -17,21 +17,29 @@ real del inversionista, calibrada para el **Reto Actinver 2026**. Solo informa y
 simula: ninguna ruta envía órdenes a una casa de bolsa. Ver `README.md` para
 arranque rápido y `docs/` para el diseño completo.
 
-## Estado actual (2026-09-23, v0.3.0)
+## Cómo orientarte (Claude Code / Claude Cowork)
 
-- 129 pruebas en verde (`uv run pytest`); ampliación integral D-40–D-45 (rama ampliacion-integral); monitor PASADO/PRESENTE/FUTURO, proveedores con cobertura verificada e investigación sin fuga (D-34–D-39); precio en vivo SIC/ETF con Alpaca (D-31) y avisos por Telegram (D-32); Lighthouse escritorio 100/100/100, móvil 93/100/100.
-- 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con reglas del Reto
-  (`config/reto.yaml`), μ global coherente (D-22), motor automático (`servicios.ciclo`),
-  alertas con histéresis/enfriamiento y notificación de escritorio (`alertas.py`,
-  `notificador.py`), contexto FF/SA/SEC/Barchart (`fuentes_web.py`), widget de
-  TradingView en `/grafica/<id>`, simulación de cambios, universo del simulador.
-- Reportes automáticos (`terminal/reportes.py`): `uv run terminal reporte preapertura|cierre|semanal` escribe
-  `data/reportes/AAAA-MM-DD_<tipo>.md` (en `data/demo/reportes/` si el modo es demo); `scripts/programar_tareas.ps1`
-  registra las tareas de Windows (08:00, 15:15, sáb 09:00). Suspendida/desactualizada ⇒ el reporte no recomienda.
-- Docs con nombres pedidos: `docs/repos.md` (64 fichas), `fuentes.md`, `decisiones.md`
-  (D-01 a D-30), `seguridad.md`, `matriz.md`, `diseno.md`; evidencia en `docs/13-evidencia.md`.
-- No reintentes fuentes descartadas (D-16) sin una razón nueva. Otra sesión puede trabajar
-  en paralelo en este repo (D-30): revisa `git log` y `git status` antes de commitear.
+Abre esta carpeta como proyecto. Lee primero, en este orden:
+1. `docs/resumen-ejecutivo.md`: qué es, estado, resultados y decisiones pendientes (una página).
+2. `docs/initial-audit.md`: arquitectura y flujo de datos.
+3. `docs/actinver-rules.md`: reglas del Reto con su fragmento oficial y la prueba que las cubre.
+
+Antes de leer archivos completos, busca el fragmento mínimo con
+`uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
+El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
+
+## Estado actual (2026-09-23, v0.6.0, rama `main`)
+
+- 129 pruebas en verde (`uv run pytest`). Lighthouse: escritorio 100/100/100, móvil 93/100/100.
+- **Funciones:**
+  - 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con las reglas del Reto (`config/reto.yaml`, versionado en `versiones_reglas`).
+  - Pestaña PASADO / PRESENTE / FUTURO; operaciones confirmadas (práctica ≠ competencia); órdenes pendientes solo como referencia.
+  - Bitácora de decisiones y alertas con ficha de revisión e inhibición por datos.
+  - Receptor de webhooks de TradingView e investigación sin fuga (`terminal/investigacion/`).
+- **Precios:** `MarketDataProvider` (`terminal/cotizaciones.py`). Hoy **0/176 instrumentos con precio BMV verificado** (sin licencia ni claves): todo aparece como «SIN PRECIO CONFIABLE» a propósito.
+- **Resultados con datos reales (índices de FRED):** SIN VENTAJA DEMOSTRADA en H=1 y H=5 (`docs/model-card.md`). backtrader coincide exactamente con el cálculo independiente.
+- **Kronos:** dependencias en el grupo opcional `uv sync --group kronos --inexact`; pesos Kronos-mini en la caché de Hugging Face. El experimento completo (`scripts/experimento_kronos.py`) **no terminó**: el equipo se quedó sin memoria (5.9 GB, 0.3 GB libres). Reintentarlo con `--muestras 1 --contexto 256` y otras apps cerradas.
+- **Decisiones:** D-01 a D-45 en `docs/decisiones.md`. Otra sesión puede trabajar en paralelo (D-30): revisa `git log` y `git status` antes de commitear.
 
 ## Comandos
 
