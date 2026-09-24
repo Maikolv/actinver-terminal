@@ -89,3 +89,15 @@ def test_tipo_de_cambio_no_se_reconsulta_si_ya_se_obtuvo_hace_poco(con):
     con.execute("UPDATE ingestas SET fin='2000-01-01T00:00:00+00:00'")
     ingesta.actualizar_fx(con, ads)
     assert len(llamadas) == 2 and ahora()
+
+
+def test_fred_usa_api_oficial_con_clave_y_filtra_rango(con, monkeypatch):
+    monkeypatch.setenv("FRED_API_KEY", SECRETO)
+    c, llamadas = cliente([(200, {"observations": [{"date": "2026-09-17", "value": "17.18"}, {"date": "2026-09-18", "value": "."}]})])
+    b = Fred(con, {"peticiones_por_dia": 5}, cliente=c).historico({"id": "FX:USDMXN"}, date(2026, 9, 1), date(2026, 9, 18))
+    assert [(x.fecha, x.cierre) for x in b] == [("2026-09-17", 17.18)]
+    assert llamadas[0].url.host == "api.stlouisfed.org" and limpiar(str(llamadas[0].url)).count(SECRETO) == 0
+    monkeypatch.delenv("FRED_API_KEY")
+    c2, _ = cliente([(200, "observation_date,DEXMXUS\n1993-11-08,3.1520\n2026-09-17,17.18\n")])
+    b2 = Fred(con, {"peticiones_por_dia": 5}, cliente=c2).historico({"id": "FX:USDMXN"}, date(2026, 9, 1), date(2026, 9, 18))
+    assert [x.fecha for x in b2] == ["2026-09-17"]   # la historia completa que devuelve FRED se recorta al rango

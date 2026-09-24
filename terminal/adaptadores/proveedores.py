@@ -20,7 +20,21 @@ class Fred(Adaptador):
     def soporta(self, instr: dict) -> bool:
         return instr.get("id") == "FX:USDMXN"
 
+    API = "https://api.stlouisfed.org/fred/series/observations"
+
     def historico(self, instr: dict, desde: date, hasta: date) -> list[Barra]:
+        import os
+        clave = os.environ.get("FRED_API_KEY")
+        if clave:  # API oficial (clave gratuita): vía preferente y documentada
+            r = self._get(self.API, params={"series_id": "DEXMXUS", "api_key": clave, "file_type": "json",
+                                            "observation_start": desde.isoformat(), "observation_end": hasta.isoformat()})
+            out = []
+            for o in r.json().get("observations", []):
+                try:
+                    out.append(Barra(fecha=o["date"], cierre=float(o["value"])))
+                except (KeyError, ValueError):
+                    continue  # «.» = sin dato (festivo)
+            return out
         r = self._get(self.URL, params={"id": "DEXMXUS", "cosd": desde.isoformat(), "coed": hasta.isoformat()})
         out = []
         for fila in csv.reader(io.StringIO(r.text)):
@@ -30,7 +44,8 @@ class Fred(Adaptador):
                 v = float(fila[1])
             except ValueError:  # "." = sin dato ese día (festivo)
                 continue
-            out.append(Barra(fecha=fila[0], cierre=v))
+            if desde.isoformat() <= fila[0] <= hasta.isoformat():  # sin datos en el rango, FRED devuelve toda la serie
+                out.append(Barra(fecha=fila[0], cierre=v))
         return out
 
 

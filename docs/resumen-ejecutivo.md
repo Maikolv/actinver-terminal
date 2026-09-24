@@ -40,7 +40,7 @@ Además, cada operación paga comisión (0.10 %) más IVA. Sin una herramienta, 
 
 ## Evidencia de calidad
 
-- **129 pruebas automáticas**, incluidas pruebas que deben fallar ante datos mal etiquetados.
+- **131 pruebas automáticas**, incluidas pruebas que deben fallar ante datos mal etiquetados.
 - **Lighthouse:** escritorio 100/100/100; móvil 93/100/100 (rendimiento, accesibilidad, buenas prácticas).
 - **Backtest:** un motor independiente por eventos (backtrader) coincide **exactamente** con el cálculo propio, en datos sintéticos y reales.
 - **Secretos:** 0 hallazgos en el historial de Git.
@@ -60,15 +60,17 @@ Conclusión: **la terminal no emite recomendaciones de cambio basadas en el mode
 ## Limitaciones actuales
 
 1. **No hay precio BMV confiable para ningún instrumento (0 de 176).** Falta una fuente licenciada; mientras tanto, los precios se capturan a mano desde el portal.
-2. **No hay tiempo real.** Ninguna fuente gratuita y autorizada lo ofrece para la BMV.
-3. **Falta la lista oficial de instrumentos del simulador.** Se podrá descargar en la semana de práctica (28 de septiembre al 2 de octubre).
-4. **Evaluación del modelo:** solo se hizo con 3 índices de EE. UU., no con emisoras del Reto.
+2. **Tipo de cambio en riesgo:** sin `FRED_API_KEY` ni `BANXICO_TOKEN` (ambas gratuitas), el último dato es del 18-sep y la valuación en USD se suspenderá cuando venza.
+3. **No hay tiempo real.** Ninguna fuente gratuita y autorizada lo ofrece para la BMV.
+4. **Falta la lista oficial de instrumentos del simulador.** Se podrá descargar en la semana de práctica (28 de septiembre al 2 de octubre).
+5. **Evaluación del modelo:** solo se hizo con 3 índices de EE. UU., no con emisoras del Reto.
 
 ## Decisiones que necesita el participante
 
 | Decisión | Costo | Efecto |
 |---|---|---|
 | Contratar datos de la BMV (BMV o un distribuidor autorizado) | Según contrato | Precio confiable y, si el contrato lo cubre, tiempo real |
+| Registrar la clave gratuita de la API de FRED (`FRED_API_KEY`) | $0 | Tipo de cambio de respaldo estable: desde el 24-sep, el CSV público de FRED deja sin respuesta a clientes automatizados identificados |
 | Registrar una clave gratuita de EODHD | $0 (20 consultas al día) | Cierres diarios de la BMV |
 | Importar la lista del simulador | $0 | La cobertura deja de estar «pendiente» |
 | Capturar operaciones confirmadas y el saldo del portal | Tiempo | Seguimiento y alertas reales |

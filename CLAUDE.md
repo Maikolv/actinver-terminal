@@ -30,7 +30,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado actual (2026-09-23, v0.6.0, rama `main`)
 
-- 129 pruebas en verde (`uv run pytest`). Lighthouse: escritorio 100/100/100, móvil 93/100/100.
+- 131 pruebas en verde (`uv run pytest`). Lighthouse: escritorio 100/100/100, móvil 93/100/100.
 - **Funciones:**
   - 4 propuestas (acciones/mixta × lente rendimiento/ajuste) con las reglas del Reto (`config/reto.yaml`, versionado en `versiones_reglas`).
   - Pestaña PASADO / PRESENTE / FUTURO; operaciones confirmadas (práctica ≠ competencia); órdenes pendientes solo como referencia.
@@ -39,6 +39,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 - **Precios:** `MarketDataProvider` (`terminal/cotizaciones.py`). Hoy **0/176 instrumentos con precio BMV verificado** (sin licencia ni claves): todo aparece como «SIN PRECIO CONFIABLE» a propósito.
 - **Resultados con datos reales (índices de FRED):** SIN VENTAJA DEMOSTRADA en H=1 y H=5 (`docs/model-card.md`). backtrader coincide exactamente con el cálculo independiente.
 - **Kronos:** dependencias en el grupo opcional `uv sync --group kronos --inexact`; pesos Kronos-mini en la caché de Hugging Face. El experimento completo (`scripts/experimento_kronos.py`) **no terminó**: el equipo se quedó sin memoria (5.9 GB, 0.3 GB libres). Reintentarlo con `--muestras 1 --contexto 256` y otras apps cerradas.
+- **FRED (24-sep):** el CSV público deja colgadas las peticiones con el User-Agent de la terminal. No se falsifica el User-Agent: la vía es `FRED_API_KEY` (API oficial, gratis) o `BANXICO_TOKEN`.
 - **Decisiones:** D-01 a D-45 en `docs/decisiones.md`. Otra sesión puede trabajar en paralelo (D-30): revisa `git log` y `git status` antes de commitear.
 
 ## Comandos
@@ -50,7 +51,7 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
-uv run pytest -q             # 129 pruebas
+uv run pytest -q             # 131 pruebas
 uv run terminal comparar-modelos   # walk-forward de modelos (TERMINAL_MODO=demo solo como prueba funcional)
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq

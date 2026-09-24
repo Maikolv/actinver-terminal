@@ -26,7 +26,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal cobertura` | Verifica cobertura por símbolo y proveedor; escribe `docs/cobertura.md` |
 | `uv run terminal webhook-secreto` | Genera el secreto del webhook de TradingView en `.env` |
 | `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
-| `uv run pytest` | 129 pruebas |
+| `uv run pytest` | 131 pruebas |
 | `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |
 
@@ -39,7 +39,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 
 **Importar operaciones confirmadas.** Use «Mi cartera → Importar», con el tipo `transacciones` y el ejemplo `ejemplos/operaciones_confirmadas.csv`. También puede capturarlas una por una. Solo las operaciones **confirmadas** cambian posiciones y efectivo. Las órdenes pendientes se anotan como referencia en «Pasado · Presente · Futuro». Importe la lista del simulador con el tipo `universo` (ejemplo: `ejemplos/catalogo_simulador.csv`).
 
-**Pruebas.** `uv run pytest` ejecuta 129 pruebas. `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
+**Pruebas.** `uv run pytest` ejecuta 131 pruebas. `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
 
 **Mantenimiento desde el editor.** Abra la carpeta en su editor o agente (por ejemplo Cline o Claude Code). Las convenciones están en `CLAUDE.md`. Busque con `uv run python scripts/indice_contexto.py buscar "…"` antes de leer archivos completos.
 
