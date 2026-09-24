@@ -18,7 +18,7 @@ import pandas as pd
 # Orden de PRIORIDAD declarado antes de evaluar: ante dos variables casi duplicadas se conserva la que aparece primero
 # (las primeras son más simples y estables: retornos y volatilidad antes que osciladores derivados de ellos).
 VARIABLES = ["r1", "r5", "r20", "r60", "vol20", "vol60", "rel_r20", "mercado_r5", "dist_ma20", "dist_ma50", "rsi14",
-             "vol_rel20"]
+             "vol_rel20", "caida20", "noticias_5d"]
 L_MAX = 60  # ventana retrospectiva máxima de las variables (sesiones)
 TIPOS_DIARIOS = ("cierre", "nav", "sintetico")
 
@@ -58,13 +58,39 @@ def precios_hasta(con: sqlite3.Connection, demo: bool, T: pd.Timestamp | None = 
     return df.reset_index(drop=True)
 
 
+def noticias_hasta(con: sqlite3.Connection, T: pd.Timestamp | None = None) -> pd.DataFrame:
+    """Noticias de alto impacto con su available_at (cuándo las conoció la terminal). Solo las conocidas en T."""
+    q = "SELECT instrumento_id, available_at FROM noticias WHERE impacto='alto' AND available_at IS NOT NULL"
+    par: list = []
+    if T is not None:
+        q += " AND available_at <= ?"
+        par.append(pd.Timestamp(T).tz_convert("UTC").isoformat())
+    df = pd.read_sql_query(q, con, params=par)
+    if not df.empty:
+        df["available_at"] = _utc(df["available_at"])
+    return df
+
+
+def _conteo_noticias(d: pd.DataFrame, noticias: pd.DataFrame, dias: int = 5) -> pd.Series:
+    """Noticias de alto impacto conocidas en (disponible_en − dias, disponible_en]: nunca cuenta una noticia futura."""
+    if noticias is None or noticias.empty:
+        return pd.Series(0.0, index=d.index)
+    tiempos = np.sort(noticias.loc[noticias["instrumento_id"] == d["instrumento_id"].iloc[0], "available_at"].to_numpy())
+    if not len(tiempos):
+        return pd.Series(0.0, index=d.index)
+    fin = d["disponible_en"].to_numpy()
+    ini = (d["disponible_en"] - pd.Timedelta(days=dias)).to_numpy()
+    return pd.Series(np.searchsorted(tiempos, fin, side="right") - np.searchsorted(tiempos, ini, side="right"),
+                     index=d.index, dtype=float)
+
+
 def _rsi(r: pd.Series, n: int = 14) -> pd.Series:
     sube = r.clip(lower=0).rolling(n).mean()
     baja = (-r.clip(upper=0)).rolling(n).mean()
     return 100 - 100 / (1 + sube / baja.replace(0, np.nan))
 
 
-def construir_panel(precios: pd.DataFrame, H: int) -> pd.DataFrame:
+def construir_panel(precios: pd.DataFrame, H: int, noticias: pd.DataFrame | None = None) -> pd.DataFrame:
     """Un renglón por (instrumento, fecha) con variables, etiqueta a H sesiones y sus horas de disponibilidad."""
     if precios.empty:
         return pd.DataFrame()
@@ -84,6 +110,8 @@ def construir_panel(precios: pd.DataFrame, H: int) -> pd.DataFrame:
         d["rsi14"] = _rsi(r1) / 100
         v = g["volumen"].astype(float).where(g["volumen"] > 0)
         d["vol_rel20"] = np.log(v / v.rolling(20).mean())
+        d["caida20"] = p / p.rolling(20).max() - 1                      # drawdown de 20 sesiones
+        d["noticias_5d"] = _conteo_noticias(d, noticias)
         d["y"] = lp.shift(-H) - lp
         d["fecha_fin_etiqueta"] = g["fecha"].shift(-H)
         d["disponible_etiqueta"] = g["available_at"].shift(-H)

@@ -139,3 +139,22 @@ Sobre el límite del 50 % (§6/§7) se advierten dos lecturas antes de presentar
 - **Aviso:** una compra cuya posición resultante supere el 50 %.
 
 Se incorpora la prohibición de automatización (§17): la terminal no entra al portal.
+
+### D-40 Integridad temporal y de mercado en la base
+Decisión: disparadores de SQLite, además de las validaciones en Python. Así, un error de ingesta futuro no puede colar una noticia conocida antes de publicarse, un dato marcado REAL_TIME sin latencia medida ni una serie SIC en USD.
+
+### D-41 Inhibición direccional ante incertidumbre
+Decisión: sin precio BMV confiable, o con noticias de alto impacto de signo opuesto en 24 h, las alertas stop-loss, toma de utilidad, caída, cambio brusco y rebalanceo no se disparan. Se emite una alerta de datos. Se configura en `[alertas] exigir_precio_confiable`.
+
+### D-42 Veredicto con significancia
+Decisión: «VENTAJA» exige un error menor y significativo (Diebold-Mariano con Newey-West, p < 0.05) frente a cada referencia, **y** un resultado neto mayor que el de las estrategias de referencia. Con índices reales de FRED, en H=5 el error fue menor pero no significativo frente al cambio cero (p = 0.126) → SIN VENTAJA DEMOSTRADA.
+
+### D-43 backtrader como verificador externo
+Decisión: se usa desde su clon local (GPL-3.0), sin incorporarlo al código MIT, para comprobar la contabilidad del backtest (títulos enteros, comisión + IVA, efectivo). Coincidencia exacta con los datos sintéticos y con los reales.
+
+### D-44 Recursos que requieren autorización
+Decisión: Kronos (torch + pesos de Hugging Face) y whisper (torch) quedan con interfaz y pruebas, sin descarga. Descargar torch, del orden de cientos de MB, requiere autorización explícita del usuario.
+
+### D-45 Repositorio `reto-actinver`
+Contexto: la instrucción nombra `reto-actinver`, que no existe localmente. Decisión: se trabaja sobre `actinver-terminal`, que es el repositorio del Reto, en la rama `ampliacion-integral`, sin renombrarlo.
+

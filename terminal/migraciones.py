@@ -46,7 +46,48 @@ def _v1(con):
     con.execute("CREATE INDEX IF NOT EXISTS ix_precios_disp ON precios(available_at)")
 
 
-MIGRACIONES = [(1, _v1)]
+def _v2(con):
+    """ingested_at (cuándo entró a la terminal) y disparadores de integridad temporal y de mercado."""
+    for t, origen in (("precios", "obtenido_en"), ("fx", "obtenido_en"), ("noticias", "obtenido_en"),
+                      ("eventos_macro", "obtenido_en"), ("insiders", "obtenido_en"), ("transacciones", "creado_en"),
+                      ("eventos_corporativos", None)):
+        _agregar(con, t, "ingested_at", "TEXT")
+        if origen:
+            con.execute(f"UPDATE {t} SET ingested_at={origen} WHERE ingested_at IS NULL")  # noqa: S608 (nombres fijos)
+    con.executescript(DISPARADORES)
+
+
+# Una fila no puede «conocerse» antes de ocurrir; REAL_TIME exige latencia medida ≤ 15 s; el SIC se cotiza en MXN.
+DISPARADORES = """
+CREATE TRIGGER IF NOT EXISTS noticias_disponible_tras_publicacion BEFORE UPDATE OF available_at ON noticias
+WHEN NEW.available_at IS NOT NULL AND NEW.event_time IS NOT NULL AND julianday(NEW.available_at) < julianday(NEW.event_time)
+BEGIN SELECT RAISE(ABORT, 'temporalidad: una noticia no puede estar disponible antes de publicarse'); END;
+CREATE TRIGGER IF NOT EXISTS noticias_disponible_tras_publicacion_ins BEFORE INSERT ON noticias
+WHEN NEW.available_at IS NOT NULL AND NEW.event_time IS NOT NULL AND julianday(NEW.available_at) < julianday(NEW.event_time)
+BEGIN SELECT RAISE(ABORT, 'temporalidad: una noticia no puede estar disponible antes de publicarse'); END;
+CREATE TRIGGER IF NOT EXISTS precios_disponible_tras_evento BEFORE UPDATE OF available_at ON precios
+WHEN NEW.available_at IS NOT NULL AND NEW.event_time IS NOT NULL AND julianday(NEW.available_at) < julianday(NEW.event_time)
+BEGIN SELECT RAISE(ABORT, 'temporalidad: un precio no puede estar disponible antes del evento'); END;
+CREATE TRIGGER IF NOT EXISTS cotizacion_tiempo_real_verificada BEFORE INSERT ON cotizaciones_registro
+WHEN NEW.estado_latencia = 'REAL_TIME' AND (NEW.latencia_medida_s IS NULL OR NEW.latencia_medida_s > 15)
+BEGIN SELECT RAISE(ABORT, 'latencia: REAL_TIME exige latencia medida <= 15 s'); END;
+CREATE TRIGGER IF NOT EXISTS cotizacion_sic_en_pesos BEFORE INSERT ON cotizaciones_registro
+WHEN NEW.mercado IN ('SIC','local') AND NEW.moneda <> 'MXN'
+BEGIN SELECT RAISE(ABORT, 'mercado: una cotización BMV/SIC debe estar en MXN; el precio de origen es otra serie'); END;
+"""
+
+
+def _v3(con):
+    """Contexto trazable: autor y tipo de contenido de noticias; fecha de presentación y cobertura de insiders."""
+    _agregar(con, "noticias", "autor", "TEXT")
+    _agregar(con, "noticias", "tipo_contenido", "TEXT")
+    _agregar(con, "noticias", "verificado_fuente_primaria", "INTEGER NOT NULL DEFAULT 0")
+    _agregar(con, "insiders", "fecha_presentacion", "TEXT")
+    _agregar(con, "insiders", "cobertura", "TEXT")
+    _agregar(con, "eventos_macro", "actual", "TEXT")
+
+
+MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3)]
 
 
 def migrar(con: sqlite3.Connection, ajustes=None) -> int:
@@ -134,6 +175,10 @@ def completar_tiempos(con: sqlite3.Connection, ajustes=None) -> int:
                 "p.proveedor=eventos_corporativos.proveedor) WHERE available_at IS NULL")
     con.execute("UPDATE transacciones SET event_time = fecha || 'T00:00:00-06:00', available_at = creado_en "
                 "WHERE available_at IS NULL")
+    for t, origen in (("precios", "obtenido_en"), ("fx", "obtenido_en"), ("noticias", "obtenido_en"),
+                      ("eventos_macro", "obtenido_en"), ("insiders", "obtenido_en"), ("transacciones", "creado_en")):
+        if "ingested_at" in _col(con, t):
+            con.execute(f"UPDATE {t} SET ingested_at={origen} WHERE ingested_at IS NULL")  # noqa: S608
     for t, ev in (("noticias", "publicado"), ("eventos_macro", "fecha"), ("insiders", "fecha")):
         con.execute(f"UPDATE {t} SET event_time={ev}, available_at=obtenido_en WHERE available_at IS NULL")  # noqa: S608
     filas = con.execute("SELECT id, fecha FROM transacciones WHERE etapa IS NULL").fetchall()

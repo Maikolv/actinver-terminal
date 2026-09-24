@@ -240,3 +240,9 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
   border-radius: 4px; background: var(--superficie-2); color: var(--texto); margin-right: 6px; vertical-align: middle; }
 .sello--estimacion { background: var(--sintetico-fondo); color: var(--sintetico); }
 .aviso-caja { border: 1px solid var(--borde); background: var(--superficie-2); padding: 10px 12px; border-radius: var(--radio); margin: 0 0 12px; }
+.ficha { margin: 6px 0; }
+.ficha summary { cursor: pointer; color: var(--acento); }
+.ficha dl { display: grid; grid-template-columns: minmax(120px, max-content) 1fr; gap: 4px 12px; margin: 8px 0; }
+.ficha dt { color: var(--texto-2); }
+.ficha dd { margin: 0; }
+@media (max-width: 720px) { .ficha dl { grid-template-columns: 1fr; } }

@@ -37,7 +37,7 @@ CONFIG_BASE = {"proporciones": [0.70, 0.15, 0.15], "embargo_min": 0, "umbral_cor
 
 
 def modelo(variante: str, alfa: float, umbral: float, semilla: int) -> Pipeline:
-    pasos = [("imputar", SimpleImputer(strategy="median")), ("escalar", StandardScaler())]
+    pasos = [("imputar", SimpleImputer(strategy="median", keep_empty_features=True)), ("escalar", StandardScaler())]
     if variante == "filtro_correlacion":
         pasos.append(("filtro", FiltroCorrelacion(umbral, datos.VARIABLES)))
     elif variante == "pca":
@@ -60,15 +60,24 @@ def _mse(y, p):
     return float(np.mean((np.asarray(y) - np.asarray(p)) ** 2))
 
 
-def estrategia(df: pd.DataFrame, pred: np.ndarray, H: int, k: int, costo: float, mantener: bool = False) -> dict:
-    """Top-k por pronóstico (> 0), pesos iguales, rebalanceo cada H fechas sin traslape. Neto de comisión + IVA."""
+SIN_VENTAJA = "SIN VENTAJA DEMOSTRADA"
+MULT_COSTOS = (0.0, 1.0, 2.0, 5.0)
+
+
+def estrategia(df: pd.DataFrame, pred: np.ndarray, H: int, k: int, costo: float, mantener: bool = False,
+               iguales: bool = False) -> dict:
+    """Top-k por pronóstico (> 0), pesos iguales, rebalanceo cada H fechas sin traslape. Neto de comisión + IVA.
+    `mantener`: compra inicial de k emisoras y se conserva. `iguales`: todas las emisoras con el mismo peso."""
     d = df[["fecha", "instrumento_id", "y"]].assign(pred=pred)
     fechas = sorted(d["fecha"].unique())[::H]
     w_prev: dict[str, float] = {}
     valor, rot_total, n = 1.0, 0.0, 0
+    brutos, rots, expos = [], [], []
     for f in fechas:
         g = d[d["fecha"] == f]
-        if mantener and w_prev:
+        if iguales:
+            w = {i: 1 / len(g) for i in g["instrumento_id"]} if len(g) else {}
+        elif mantener and w_prev:
             w = {i: w_prev.get(i, 0.0) for i in w_prev if i in set(g["instrumento_id"])}
         elif mantener:
             sel = g.sort_values("instrumento_id").head(k)
@@ -79,10 +88,19 @@ def estrategia(df: pd.DataFrame, pred: np.ndarray, H: int, k: int, costo: float,
         rot = sum(abs(w.get(i, 0) - w_prev.get(i, 0)) for i in set(w) | set(w_prev))
         r = sum(w[i] * (np.exp(float(g.loc[g["instrumento_id"] == i, "y"].iloc[0])) - 1) for i in w)
         valor *= (1 + r - rot * costo)
+        brutos.append(r)
+        rots.append(rot)
+        expos.append(sum(w.values()))
         rot_total += rot
         n += 1
         w_prev = w
-    return {"resultado_neto": round(float(valor) - 1, 6), "rotacion_media": round(rot_total / max(n, 1), 4), "rebalanceos": n}
+    br, ro = np.array(brutos), np.array(rots)
+    curva = np.cumprod(1 + br - ro * costo) if n else np.array([1.0])
+    caida = float(np.min(curva / np.maximum.accumulate(curva) - 1)) if n else 0.0
+    sensibilidad = {f"x{m:g}": round(float(np.prod(1 + br - ro * costo * m)) - 1, 6) for m in MULT_COSTOS} if n else {}
+    return {"resultado_neto": round(float(valor) - 1, 6), "rotacion_media": round(rot_total / max(n, 1), 4), "rebalanceos": n,
+            "caida_maxima": round(caida, 6), "exposicion_media": round(float(np.mean(expos)) if expos else 0.0, 4),
+            "sensibilidad_costos": sensibilidad}
 
 
 def metricas(df: pd.DataFrame, pred: np.ndarray, residuos_val: np.ndarray, H: int, k: int, costo: float,
@@ -104,6 +122,26 @@ def metricas(df: pd.DataFrame, pred: np.ndarray, residuos_val: np.ndarray, H: in
             **estrategia(df, pred, H, k, costo, mantener=(nombre == "sin_cambio"))}
 
 
+def diebold_mariano(df: pd.DataFrame, pred_a: np.ndarray, pred_b: np.ndarray, H: int) -> dict:
+    """Prueba de Diebold-Mariano sobre la pérdida cuadrática, promediada por fecha (panel), con varianza de
+    Newey-West de H−1 rezagos (las etiquetas a H sesiones se solapan). d > 0 ⇒ A tiene menos error que B."""
+    from math import erf, sqrt
+    y = df["y"].to_numpy()
+    dif = pd.Series((y - pred_b) ** 2 - (y - pred_a) ** 2).groupby(df["fecha"].to_numpy()).mean().to_numpy()
+    n = len(dif)
+    if n < 20:
+        return {"n": n, "estadistico": None, "p_valor": None}
+    d = dif - dif.mean()
+    var = float(np.dot(d, d) / n)
+    for k in range(1, max(H, 1)):
+        var += 2 * (1 - k / H) * float(np.dot(d[k:], d[:-k]) / n)
+    if var <= 0:
+        return {"n": n, "estadistico": None, "p_valor": None}
+    est = float(dif.mean() / sqrt(var / n))
+    p = 1 - 0.5 * (1 + erf(est / sqrt(2)))  # unilateral: H1 = A mejor que B
+    return {"n": n, "estadistico": round(est, 4), "p_valor": round(float(p), 4)}
+
+
 def _huella(obj) -> str:
     return hashlib.sha256(json.dumps(obj, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -114,7 +152,7 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
     T = pd.Timestamp(T if T is not None else datetime.now(UTC))
     T = T.tz_localize("UTC") if T.tzinfo is None else T.tz_convert("UTC")
     precios = datos.precios_hasta(con, demo, T)
-    panel = datos.etiquetados_hasta(datos.construir_panel(precios, H), T)
+    panel = datos.etiquetados_hasta(datos.construir_panel(precios, H, datos.noticias_hasta(con, T)), T)
     if panel.empty:
         return {"estado": "sin_datos", "H": H, "mensaje": "No hay historia suficiente con available_at <= T para investigar."}
     try:
@@ -163,9 +201,14 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
     tabla = [metricas(pru, final.predict(_X(pru)), residuos["modelo"], H, k, costo, f"modelo ({elegido})")]
     for nombre, pr in referencias(pru, H).items():
         tabla.append(metricas(pru, pr, residuos[nombre], H, k, costo, nombre))
+    cero = np.zeros(len(pru))
+    estrategias_ref = [{"modelo": "pesos_iguales (todas las emisoras)", **estrategia(pru, cero, H, k, costo, iguales=True)}]
     mod, refs = tabla[0], tabla[1:]
-    supera_error = mod["mse"] < min(r["mse"] for r in refs)
-    supera_neto = mod["resultado_neto"] > max(r["resultado_neto"] for r in refs)
+    pred_mod = final.predict(_X(pru))
+    dm = {n: diebold_mariano(pru, pred_mod, pr, H) for n, pr in referencias(pru, H).items()}
+    significativo = all((v["p_valor"] is not None and v["p_valor"] < 0.05) for v in dm.values())
+    supera_error = mod["mse"] < min(r["mse"] for r in refs) and significativo
+    supera_neto = mod["resultado_neto"] > max([r["resultado_neto"] for r in refs] + [e["resultado_neto"] for e in estrategias_ref])
 
     huella_datos = _huella([demo, len(panel), cortes.a_dict(), round(float(panel["y"].sum()), 8)])
     config_reg = {k2: v2 for k2, v2 in cfg.items()}
@@ -181,11 +224,16 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
         "alfa_por_variante": alfa, "validacion_mse": val_mse, "variante_elegida": elegido,
         "filtro_correlacion_por_pliegue": filtros,
         "variables_eliminadas_final": (final.named_steps["filtro"].eliminadas_ if elegido == "filtro_correlacion" else []),
-        "prueba": tabla, "supera_referencias": bool(supera_error and supera_neto),
+        "prueba": tabla, "estrategias_referencia": estrategias_ref, "diebold_mariano_vs_referencias": dm,
+        "error_menor_sin_significancia": bool(mod["mse"] < min(r["mse"] for r in refs) and not significativo), "supera_referencias": bool(supera_error and supera_neto),
+        "veredicto": "VENTAJA FUERA DE MUESTRA" if (supera_error and supera_neto) else SIN_VENTAJA,
+        "nombres_referencias": {"sin_cambio": "cambio cero (y «mantener cartera» en la estrategia)",
+                                "historico_reciente": "media histórica de 60 sesiones", "regla_simple": "tendencia simple"},
         "recomendacion_permitida": bool(supera_error and supera_neto),
         "conclusion": ("El modelo supera a las tres referencias fuera de muestra en error y resultado neto de costos."
                        if supera_error and supera_neto else
-                       "El modelo NO supera a las referencias simples fuera de muestra: no se emite recomendación de cambio."),
+                       f"{SIN_VENTAJA}: el modelo no supera a las referencias simples fuera de muestra con significancia "
+                       "(Diebold-Mariano p < 0.05 frente a cada una) y en resultado neto; no se emite recomendación de cambio."),
         "correlacion_activos_entrenamiento": datos.correlacion_activos(
             precios, cortes.fechas[cortes.entrenamiento[0]:cortes.entrenamiento[1]]),
         "prueba_ya_vista": prueba_ya_vista,

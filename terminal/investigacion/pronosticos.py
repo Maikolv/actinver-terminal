@@ -22,7 +22,7 @@ def emitir(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | None =
     if exp.get("estado") != "ok":
         return {"emitidos": 0, **{k: v for k, v in exp.items() if not k.startswith("_")}}
     precios = datos.precios_hasta(con, demo, T)
-    panel = datos.construir_panel(precios, H)
+    panel = datos.construir_panel(precios, H, datos.noticias_hasta(con, T))
     panel = panel[panel["disponible_en"] <= T]
     entren = datos.etiquetados_hasta(panel, T)
     mdl = evaluacion.modelo(exp["variante_elegida"], exp["alfa_por_variante"][exp["variante_elegida"]],
@@ -34,6 +34,10 @@ def emitir(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | None =
     prob = 1 - np.searchsorted(res, -pred, side="right") / len(res)
     emitido, datos_hasta = T.isoformat(), base["disponible_en"].max().isoformat()
     version = f"{exp['version_codigo']}+{exp['huella_config']}"
+    from .. import registro
+    registro.registrar_version_modelo(con, version, {"variante": exp["variante_elegida"], "H": H,
+                                                     "alfa": exp["alfa_por_variante"][exp["variante_elegida"]]},
+                                      exp["semilla"], None, exp["recomendacion_permitida"], exp["veredicto"])
     filas = [(emitido, datos_hasta, r.instrumento_id, H, r.fecha, None, f"{exp['variante_elegida']}", version, exp["semilla"],
               float(p), float(p + q10), float(p + q90), float(pr), int(exp["recomendacion_permitida"]))
              for r, p, pr in zip(base.itertuples(), pred, prob, strict=True)]

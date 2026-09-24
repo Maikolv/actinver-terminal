@@ -423,6 +423,14 @@ async function cargarAlertas() {
     if (!d.alertas.length) return limpiar("alertas-contenido", h("p", { clase: "vacio", texto: "Sin alertas. El motor evalúa las reglas en cada ciclo." }));
     limpiar("alertas-contenido", h("ul", { clase: "alertas" }, d.alertas.map((a) => h("li", { clase: `alerta alerta--${a.severidad}${a.estado !== "nueva" ? " alerta--vista" : ""}` },
       h("h3", { texto: a.titulo }),
+      a.ficha ? h("details", { clase: "ficha" }, h("summary", { texto: "Ficha de revisión" }),
+        h("dl", {},
+          h("dt", { texto: "Qué ocurrió" }), h("dd", { texto: a.ficha.que_ocurrio }),
+          h("dt", { texto: "Qué datos lo sustentan" }), h("dd", { texto: Object.entries(a.ficha.datos_que_lo_sustentan).filter(([, v]) => v !== null && v !== undefined && typeof v !== "object").map(([k, v]) => `${k}: ${v}`).join(" · ") }),
+          h("dt", { texto: "Qué falta confirmar" }), h("dd", { texto: a.ficha.falta_confirmar.join(" ") }),
+          h("dt", { texto: "Costos" }), h("dd", { texto: a.ficha.costos ? `Importe ${mxn(a.ficha.costos.importe, true)} · comisión ${mxn(a.ficha.costos.comision, true)} · IVA ${mxn(a.ficha.costos.iva, true)} · total ${mxn(a.ficha.costos.total, true)}` : "No aplica" }),
+          h("dt", { texto: "Riesgos" }), h("dd", { texto: a.ficha.riesgos }),
+          h("dt", { texto: "Opciones para revisar" }), h("dd", { texto: a.ficha.opciones_para_revisar.join(" · ") }))) : null,
       h("div", { clase: "meta" }, `${fechaLocal(a.ts)} · ${a.fuente || "—"} · ${a.regla.replace("_", " ")} · ${a.estado}`, a.notificada === "silenciada_fuera_de_horario" ? " · no notificada (fuera de horario)" : ""),
       h("p", { texto: a.motivo }), a.accion ? h("p", {}, h("strong", { texto: "Acción sugerida: " }), a.accion) : null,
       a.datos && a.datos.enlace ? h("p", {}, externo(a.datos.enlace, "Ver fuente")) : null,
@@ -697,7 +705,7 @@ function pintarFuturo(f) {
   limpiar("futuro-contenido",
     h("div", { clase: f.recomendacion_permitida ? "aviso-caja" : "error-caja", role: "note", texto: `${f.etiqueta}. ${f.aviso}` }),
     ...exps.map((e) => h("div", {},
-      h("h3", { texto: `Fuera de muestra, H = ${e.H} sesión(es) · ${e.datos}` }),
+      h("h3", {}, `Fuera de muestra, H = ${e.H} sesión(es) · ${e.datos} `, chip(e.recomendacion_permitida ? "vigente" : "vencido", e.veredicto || (e.recomendacion_permitida ? "VENTAJA" : "SIN VENTAJA DEMOSTRADA"))),
       tabla([{ t: "Modelo / referencia", f: (m) => m.modelo }, { t: "MSE", f: (m) => (m.mse * 1e4).toFixed(3) + "e-4", num: true },
         { t: "Acierto dirección", f: (m) => pct(m.acierto_direccion), num: true }, { t: "Cobertura 80 %", f: (m) => pct(m.cobertura_intervalo_80), num: true },
         { t: "Brier", f: (m) => num(m.brier_prob_subida), num: true }, { t: "Meses mejor que «sin cambio»", f: (m) => m.meses_mejor_que_sin_cambio },
@@ -709,7 +717,34 @@ function pintarFuturo(f) {
       { t: "Prob. subida", f: (p) => pct(p.prob_subida), num: true }, { t: "Emitido · datos hasta", f: (p) => `${fechaLocal(p.emitido_en)} · ${fechaLocal(p.datos_hasta)}` }],
       (f.pronosticos || []).slice(0, 60), { caption: "ESTIMACIONES con incertidumbre. No son cotizaciones ni recomendaciones de compra o venta.", vacio: "Sin pronósticos emitidos." }));
 }
+async function pintarRegistro() {
+  try {
+    const [b, o] = await Promise.all([api("/api/bitacora"), api("/api/pendientes-portal?todas=true")]);
+    limpiar("bitacora-lista", tabla([{ t: "Fecha", f: (f) => fechaLocal(f.creada_en) }, { t: "Tipo", f: (f) => f.tipo },
+      { t: "Instrumento", f: (f) => f.instrumento_id || "—" }, { t: "Tesis", f: (f) => f.tesis || "—" },
+      { t: "Decisión humana", f: (f) => f.decision_humana }, { t: "Reglas · modelo", f: (f) => `v${f.version_reglas ?? "—"} · ${f.version_modelo || "—"}` }],
+      b.entradas, { vacio: "Sin entradas en la bitácora." }));
+    limpiar("ordenes-lista", h("p", { clase: "suave", texto: o.nota }), tabla([{ t: "Creada", f: (f) => fechaLocal(f.creada_en) },
+      { t: "Instrumento", f: (f) => f.instrumento_id }, { t: "Lado", f: (f) => f.lado }, { t: "Tipo", f: (f) => f.tipo_orden },
+      { t: "Cantidad", f: (f) => num(f.cantidad), num: true }, { t: "Límite", f: (f) => num(f.precio_limite), num: true },
+      { t: "Estado", f: (f) => f.estado }], o.ordenes, { vacio: "Sin órdenes pendientes registradas." }));
+  } catch (e) { limpiar("bitacora-lista", errorCaja(e)); }
+}
+document.getElementById("form-bitacora").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = ev.currentTarget, d = Object.fromEntries(new FormData(f));
+  d.fuentes = (d.fuentes || "").split(/\s+/).filter(Boolean);
+  try { await api("/api/bitacora", { method: "POST", json: d }); notificar("Decisión registrada en la bitácora."); f.reset(); pintarRegistro(); }
+  catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
+document.getElementById("form-orden").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = ev.currentTarget, d = Object.fromEntries(new FormData(f));
+  try { await api("/api/pendientes-portal", { method: "POST", json: d }); notificar("Orden pendiente registrada como referencia (no cambia su cartera)."); f.reset(); pintarRegistro(); }
+  catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
 async function cargarTiempo() {
+  pintarRegistro();
   const [pa, pr, fu] = await Promise.allSettled([api("/api/pasado"), api("/api/presente"), api("/api/futuro")]);
   pa.status === "fulfilled" ? pintarPasado(pa.value) : limpiar("pasado-contenido", errorCaja(pa.reason));
   pr.status === "fulfilled" ? pintarPresente(pr.value) : limpiar("presente-contenido", errorCaja(pr.reason));
@@ -793,13 +828,19 @@ function pintarUniverso() {
 ["filtro-texto", "filtro-clase", "filtro-vigencia"].forEach((id) => document.getElementById(id).addEventListener("input", () => estado.universo && pintarUniverso()));
 
 /* ---------- Reto y perfil ---------- */
+function avisoReglas(r) {
+  const v = r && r.version_reglas;
+  if (!v || !v.discrepancia) return null;
+  return h("div", { clase: "error-caja", role: "alert" }, `${v.aviso} (versión ${v.version}, huella ${v.huella}). `,
+    h("button", { type: "button", clase: "boton boton--secundario", onclick: async () => { await api(`/api/reto/reglas/${v.version}/revisada`, { method: "POST", json: {} }); cargarReto(); } }, "Marcar como revisadas"));
+}
 async function cargarReto() {
   try {
     const r = await api("/api/reto");
     estado.reto = r;
     if (!r.activo) return limpiar("reto-contenido", h("p", { clase: "vacio", texto: "Reglas del Reto desactivadas (config/reto.yaml → activo: false)." }));
     const reglas = Object.entries(r.reglas || {});
-    limpiar("reto-contenido",
+    limpiar("reto-contenido", avisoReglas(r),
       h("div", { clase: "rejilla" },
         h("section", { clase: "tarjeta" }, h("h2", { texto: r.nombre }),
           h("p", {}, `Etapa: ${ETAPAS[r.etapa] || r.etapa} · `, h("span", { clase: "cifra", texto: `${r.sesiones_restantes} sesiones` }), " hasta el cierre"),

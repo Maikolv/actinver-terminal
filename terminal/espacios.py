@@ -98,7 +98,8 @@ def futuro(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
         e = evaluacion.ultimo(con, H, ajustes.es_demo)
         if e:
             exps.append({k: e.get(k) for k in ("H", "hora_corte", "prueba", "supera_referencias", "recomendacion_permitida",
-                                               "conclusion", "prueba_ya_vista", "aviso", "datos", "variante_elegida")})
+                                               "conclusion", "prueba_ya_vista", "aviso", "datos", "variante_elegida", "veredicto",
+                                               "estrategias_referencia", "nombres_referencias")})
     permitido = bool(exps) and all(e["recomendacion_permitida"] for e in exps)
     return {"espacio": "FUTURO", "etiqueta": "ESTIMACIONES — no son cotizaciones ni hechos",
             "pronosticos": lista, "n_instrumentos": len(ids), "experimentos": exps, "recomendacion_permitida": permitido,

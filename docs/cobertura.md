@@ -1,6 +1,6 @@
 # Cobertura por símbolo y proveedor
 
-Generado por `uv run terminal cobertura` el 2026-09-23 14:00 (hora local).
+Generado por `uv run terminal cobertura` el 2026-09-23 20:11 (hora local).
 Estados: `verificado` (consulta real con instrumento, moneda y mercado exactos), `pendiente` (falta contrato, especificación o credencial), `no_cubierto`, `no_coincide`, `no_aplica`, `sin_verificar`.
 
 Catálogo: **la lista del simulador aún no se importa**; se usa el universo verificado (PDF + fuentes oficiales).

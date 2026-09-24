@@ -16,7 +16,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, notificador, reto,
-               servicios, tiempo_real, vigencia, webhook_tv)
+               registro, servicios, tiempo_real, vigencia, webhook_tv)
 from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
 from .seguridad import TOKEN_CSRF, Seguridad
 
@@ -176,7 +176,16 @@ def get_reto(con=Depends(con_db)):
         hechas = {f["id"]: bool(f["hecha"]) for f in con.execute("SELECT id, hecha FROM tareas_reto")}
         r["tareas"] = [{**t, "hecha": hechas.get(t["id"], False)} for t in r["tareas"]]
         r["universo_simulador"] = int(con.execute("SELECT COUNT(*) FROM universo_simulador").fetchone()[0])
+    r["version_reglas"] = registro.estado_reglas(con)
     return r
+
+
+@app.post("/api/reto/reglas/{version}/revisada")
+def reglas_revisadas(version: int, con=Depends(con_db)):
+    registro.marcar_reglas_revisadas(con, version)
+    db.auditar(con, "reglas", version, "revisada")
+    con.commit()
+    return registro.estado_reglas(con)
 
 
 @app.put("/api/reto/tareas/{tid}")
@@ -463,6 +472,59 @@ def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
     con.commit()
     disparar_motor(False)
     return {"id": cur.lastrowid}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Órdenes pendientes (solo referencia) y bitácora de decisiones humanas
+@app.get("/api/pendientes-portal")
+def get_ordenes(todas: bool = False, con=Depends(con_db)):
+    return {"ordenes": registro.ordenes(con, not todas),
+            "nota": "Referencia de órdenes capturadas por usted en el portal. No cambian posiciones ni efectivo: solo una "
+                    "operación CONFIRMADA registrada en «Mi cartera» lo hace. La terminal no envía órdenes."}
+
+
+@app.post("/api/pendientes-portal")
+def post_orden(cuerpo: dict = Body(...), con=Depends(con_db)):
+    iid = str(cuerpo.get("instrumento_id") or "")
+    if iid not in mercado.instrumentos(con):
+        raise cartera.ErrorValidacion(["instrumento_id: no está en el universo"])
+    try:
+        oid = registro.registrar_orden_pendiente(con, iid, str(cuerpo.get("lado")), str(cuerpo.get("tipo_orden", "limitada")),
+                                                 float(cuerpo.get("cantidad") or 0),
+                                                 float(cuerpo["precio_limite"]) if cuerpo.get("precio_limite") else None,
+                                                 str(cuerpo.get("nota") or ""))
+    except (TypeError, ValueError):
+        raise cartera.ErrorValidacion(["lado compra/venta, tipo mercado/limitada y cantidad positiva"]) from None
+    return {"id": oid}
+
+
+@app.post("/api/pendientes-portal/{oid}")
+def cerrar_orden(oid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    try:
+        registro.cerrar_orden(con, oid, str(cuerpo.get("estado")), cuerpo.get("transaccion_id"))
+    except ValueError:
+        raise cartera.ErrorValidacion(["estado: ejecutada, cancelada o expirada"]) from None
+    return {"ok": True}
+
+
+@app.get("/api/bitacora")
+def get_bitacora(con=Depends(con_db)):
+    return {"entradas": registro.bitacora(con)}
+
+
+@app.post("/api/bitacora")
+def post_bitacora(cuerpo: dict = Body(...), con=Depends(con_db)):
+    tipo = str(cuerpo.get("tipo") or "tesis")
+    if tipo not in ("tesis", "entrada", "salida", "revision", "error", "leccion"):
+        raise cartera.ErrorValidacion(["tipo: tesis, entrada, salida, revision, error o leccion"])
+    fuentes = [str(f)[:300] for f in (cuerpo.get("fuentes") or []) if str(f).startswith("https://")][:10]
+    try:
+        i = registro.registrar_decision(con, tipo, str(cuerpo.get("decision_humana") or ""), cuerpo.get("instrumento_id") or None,
+                                        str(cuerpo.get("tesis") or ""), fuentes, cuerpo.get("alerta_id"),
+                                        cuerpo.get("transaccion_id"), str(cuerpo.get("resultado") or ""))
+    except ValueError as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    return {"id": i}
 
 
 @app.post("/webhook/tradingview")

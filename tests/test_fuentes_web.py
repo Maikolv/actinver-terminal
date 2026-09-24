@@ -54,7 +54,8 @@ def test_macro_y_limite_por_hora(con):
 def test_formulario4_parseo():
     ops = fw.SecEdgar._parsear_f4(F4, "https://www.sec.gov/x.xml", "2026-09-19")
     assert ops == [{"fecha": "2026-09-18", "nombre": "Doe Jane", "cargo": "CFO", "codigo": "P", "acciones": 5000.0,
-                    "precio": 100.0, "valor": 500000.0, "enlace": "https://www.sec.gov/x.xml"}]
+                    "precio": 100.0, "valor": 500000.0, "enlace": "https://www.sec.gov/x.xml",
+                    "fecha_presentacion": "2026-09-19"}]  # operación (fecha) ≠ presentación ante la SEC
 
 
 def test_sec_requiere_user_agent(con):

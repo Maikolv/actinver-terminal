@@ -231,8 +231,32 @@ def cobertura(_args) -> None:
         lat = cotizaciones.latencias_medidas(con)
         importado = bool(con.execute("SELECT 1 FROM universo_simulador LIMIT 1").fetchone())
         estados = [p.estado() for p in provs.values()]
+        from . import registro
+        registro.poblar_correspondencia(con)
+        mapa = [dict(r) for r in con.execute("SELECT * FROM correspondencia_simbolos ORDER BY mercado, instrumento_id")]
+        ultimos = {r[0]: (r[1], r[2]) for r in con.execute(
+            "SELECT instrumento_id, MAX(fecha), proveedor FROM precios WHERE proveedor <> 'demo_sintetico' GROUP BY instrumento_id")}
+        cob = {}
+        for r in con.execute("SELECT instrumento_id, proveedor, estado, latencia_mediana_s FROM cobertura WHERE estado='verificado'"):
+            cob.setdefault(r[0], []).append(f"{r[1]} ({r[3]} s)")
     finally:
         con.close()
+    filas_m = ["# Matriz por instrumento", "",
+               f"Generada por `uv run terminal cobertura` el {datetime.now():%Y-%m-%d %H:%M}. ISIN: no disponible en las fuentes "
+               "usadas (se llenará con el catálogo del simulador o un proveedor licenciado). Un listado SIC en MXN y su acción de "
+               "origen en USD son series distintas.", "",
+               "| Símbolo Actinver | Emisor | Serie | ISIN | MIC · mercado | Moneda | Símbolo BMV | Origen (MIC · moneda) | "
+               "Proveedor verificado (latencia) | Último dato válido | Elegibilidad / causa de discrepancia |",
+               "|---|---|---|---|---|---|---|---|---|---|---|"]
+    for m in mapa:
+        u = ultimos.get(m["instrumento_id"])
+        origen = f"{m['simbolo_origen']} ({m['mic_origen']} · {m['moneda_origen']})" if m["simbolo_origen"] else "—"
+        causa = m["elegible"] + ("" if cob.get(m["instrumento_id"]) else "; SIN PRECIO CONFIABLE: ningún proveedor BMV verificado")
+        filas_m.append(f"| {m['simbolo_actinver']} | {(m['emisor'] or '').strip()[:40]} | {m['serie'] or ''} | {m['isin'] or 'n/d'} | "
+                       f"{m['mic']} · {m['mercado']} | {m['moneda']} | {m['simbolo_bmv'] or '—'} | {origen} | "
+                       f"{', '.join(cob.get(m['instrumento_id'], [])) or 'ninguno'} | "
+                       f"{(u[0] + ' (' + u[1] + ')') if u and u[0] else '—'} | {causa} |")
+    (RAIZ / "docs" / "instrument-matrix.md").write_text(chr(10).join(filas_m) + chr(10), encoding="utf-8")
     lineas = ["# Cobertura por símbolo y proveedor", "",
               f"Generado por `uv run terminal cobertura` el {datetime.now():%Y-%m-%d %H:%M} (hora local).",
               "Estados: `verificado` (consulta real con instrumento, moneda y mercado exactos), `pendiente` (falta contrato, "

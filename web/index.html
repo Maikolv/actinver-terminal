@@ -30,7 +30,7 @@
     <span class="esqueleto esqueleto--linea" aria-hidden="true"></span><span class="oculto-visual">Cargando estado de datos</span>
   </div>
   <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
-    <strong>Modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
+    <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
   </div>
 </header>
 
@@ -77,10 +77,35 @@
     <section class="espacio espacio--pasado" aria-labelledby="h-pasado">
       <h2 id="h-pasado"><span class="sello">PASADO</span> Hechos observados</h2>
       <div id="pasado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+      <h3>Bitácora de decisiones</h3>
+      <p class="ayuda">Tesis, fuentes y la decisión que tomó USTED. La terminal no decide ni opera.</p>
+      <form id="form-bitacora" class="formulario" novalidate>
+        <div class="campos">
+          <label>Tipo<select name="tipo"><option value="tesis">Tesis</option><option value="entrada">Entrada</option><option value="salida">Salida</option><option value="revision">Revisión</option><option value="error">Error</option><option value="leccion">Lección</option></select></label>
+          <label>Instrumento (id)<input type="text" name="instrumento_id" maxlength="40" placeholder="BMV:AMX"></label>
+          <label>Tesis<input type="text" name="tesis" maxlength="2000"></label>
+          <label>Decisión humana<input type="text" name="decision_humana" maxlength="1000" required></label>
+          <label>Fuentes (URL https, separadas por espacio)<input type="text" name="fuentes" maxlength="2000"></label>
+        </div>
+        <button class="boton boton--secundario" type="submit">Registrar decisión</button>
+      </form>
+      <div id="bitacora-lista"></div>
     </section>
     <section class="espacio espacio--presente" aria-labelledby="h-presente">
       <h2 id="h-presente"><span class="sello">PRESENTE</span> Estado observable ahora</h2>
       <div id="presente-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+      <h3>Órdenes pendientes (referencia)</h3>
+      <form id="form-orden" class="formulario" novalidate>
+        <div class="campos">
+          <label>Instrumento (id)<input type="text" name="instrumento_id" maxlength="40" required placeholder="BMV:AMX"></label>
+          <label>Lado<select name="lado"><option value="compra">Compra</option><option value="venta">Venta</option></select></label>
+          <label>Tipo<select name="tipo_orden"><option value="limitada">Limitada</option><option value="mercado">Mercado</option></select></label>
+          <label>Cantidad<input type="number" name="cantidad" min="1" step="1" required></label>
+          <label>Precio límite<input type="number" name="precio_limite" min="0" step="0.0001"></label>
+        </div>
+        <button class="boton boton--secundario" type="submit">Registrar referencia</button>
+      </form>
+      <div id="ordenes-lista"></div>
       <h3>Saldo que muestra el portal de Actinver</h3>
       <p class="ayuda">Cópielo a mano desde el portal (la terminal no entra al portal ni extrae datos de él). Sirve para comparar la estimación con la valuación oficial.</p>
       <form id="form-portal" class="formulario" novalidate>

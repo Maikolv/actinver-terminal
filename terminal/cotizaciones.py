@@ -120,6 +120,8 @@ def normalizar_simbolo(texto: str, instrumentos: dict[str, dict]) -> dict | None
     t = _limpiar(texto)
     if not t:
         return None
+    from .clasificacion import exigir_valor
+    exigir_valor(t)  # un CFD o un criptoactivo nunca se normaliza a un instrumento del Reto
     bolsa, _, tk = t.rpartition(":")
     tk = tk.replace(".MX", "").strip()
     serie = None
@@ -613,7 +615,8 @@ def verificar_cobertura(con: sqlite3.Connection, proveedores: dict[str, MarketDa
                                 mercado_observado=q.mercado, latencia_mediana_s=q.latencia_medida_s,
                                 estado_latencia=q.estado_latencia, estado="verificado" if ok else "no_coincide",
                                 detalle="" if ok else f"esperado {esperado}/{ins.get('moneda_operable')}")
-                    registrar(con, q)
+                    if ok:  # la base rechaza (disparador) registrar una serie BMV/SIC que no venga en MXN
+                        registrar(con, q)
                 except ProveedorNoDisponible as e:
                     fila.update(estado="no_cubierto", detalle=str(e)[:300])
             con.execute("INSERT OR REPLACE INTO cobertura (proveedor, instrumento_id, simbolo_origen, estado, moneda_observada, "

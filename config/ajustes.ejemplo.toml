@@ -116,6 +116,7 @@ perdida_maxima = -0.10               # pérdida máxima que usted acepta frente 
 diferencia_portal_pct = 0.01         # diferencia entre la estimación y el saldo capturado del portal
 evento_corporativo_dias = 10
 deterioro_razon = 1.10               # error de pronósticos resueltos > 1.10× «sin cambio» ⇒ deterioro
+exigir_precio_confiable = true       # sin precio BMV confiable o con noticias contradictorias: se inhiben alertas direccionales
 enfriamiento_horas = 6               # no repetir la misma alerta antes de 6 h
 silenciar_fuera_de_horario = true    # fuera del horario de la BMV se registra pero no se notifica al escritorio
 notificar_escritorio = true

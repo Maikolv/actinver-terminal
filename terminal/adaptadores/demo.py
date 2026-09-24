@@ -30,8 +30,9 @@ def _semilla(texto: str) -> int:
 
 
 def generar(con: sqlite3.Connection, anios: int = 5, semilla: int = 42) -> int:
-    fechas = calendario("XNYS").sessions_in_range(pd.Timestamp.today().normalize() - pd.DateOffset(years=anios),
-                                                   pd.Timestamp.today().normalize() - pd.Timedelta(days=1))
+    from ..vigencia import ultima_sesion_cerrada
+    fin = pd.Timestamp(ultima_sesion_cerrada("XNYS"))  # hasta la última sesión cerrada: la demo no queda «obsoleta» de noche
+    fechas = calendario("XNYS").sessions_in_range(fin - pd.DateOffset(years=anios), fin)
     n = len(fechas)
     rng = np.random.default_rng(semilla)
     mercado = rng.normal(0.0, 0.011, n)

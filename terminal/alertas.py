@@ -358,6 +358,75 @@ def reglas_modelo(con, cfg: dict) -> list[Condicion]:
                       "registro de pronósticos", "REVISAR: no use los pronósticos para decidir hasta revalidar el modelo.")]
 
 
+DIRECCIONALES = {"stop_loss", "take_profit", "caida_maximo", "cambio_brusco", "deriva"}
+RIESGOS = {
+    "deriva": "Cambiar posiciones cuesta comisión + IVA y el rendimiento esperado es incierto.",
+    "stop_loss": "Una venta tras la caída materializa la pérdida; mantener la posición expone a más caída.",
+    "take_profit": "Mantener expone a devolver la ganancia; vender genera costos.",
+    "caida_maximo": "La caída puede continuar o revertirse; el precio puede no ser el del portal.",
+    "concentracion": "Una sola emisora > 50 % viola la regla del Reto (§6/§7) y concentra el riesgo.",
+    "cinco_acciones": "Sin 5 acciones distintas operadas no se es elegible por rendimiento (§6).",
+    "perdida_maxima": "La pérdida supera el límite que usted definió.",
+    "datos_inciertos": "Decidir con un precio no confiable puede llevar a una operación equivocada.",
+}
+
+
+def contradictorias(con, ids: set[str], ahora_dt: datetime, horas: int = 24) -> set[str]:
+    """Emisoras con noticias de alto impacto de signo opuesto en la ventana: incertidumbre material."""
+    desde = (ahora_dt - timedelta(hours=horas)).isoformat()
+    signos: dict[str, set[int]] = {}
+    for n in con.execute("SELECT instrumento_id, sentimiento FROM noticias WHERE impacto='alto' AND publicado >= ? "
+                         "AND sentimiento IS NOT NULL AND sentimiento <> 0", (desde,)):
+        if n[0] in ids:
+            signos.setdefault(n[0], set()).add(1 if n[1] > 0 else -1)
+    return {i for i, s in signos.items() if len(s) > 1}
+
+
+def inhibir_direccionales(conds: list[Condicion], sin_precio: set[str], dudosas: set[str]) -> list[Condicion]:
+    """Ante incertidumbre material (sin precio confiable o noticias contradictorias) las alertas direccionales de esa
+    emisora no se disparan; en su lugar se emite UNA alerta de datos que explica por qué."""
+    afectadas: dict[str, str] = {**{i: "sin precio confiable" for i in sin_precio}, **{i: "noticias contradictorias" for i in dudosas}}
+    if not afectadas:
+        return conds
+    out, inhibidas = [], []
+    for c in conds:
+        iid = c.clave.split("|")[0]
+        if c.regla in DIRECCIONALES and c.activa and (iid in afectadas or (c.regla == "deriva" and afectadas)):
+            inhibidas.append(f"{c.regla}:{iid}")
+            c = Condicion(**{**c.__dict__, "activa": False})
+        out.append(c)
+    out.append(Condicion("datos_inciertos", "cartera", True, "aviso",
+                         f"Datos insuficientes para alertas direccionales ({len(afectadas)} emisoras)",
+                         "Se inhiben alertas de compra/venta potencial mientras falte un precio confiable o haya noticias "
+                         "contradictorias: " + "; ".join(f"{i}: {m}" for i, m in sorted(afectadas.items())) + ".",
+                         {"calculo": f"inhibidas: {', '.join(inhibidas) or 'ninguna activa'}",
+                          "incertidumbre": "Alta: el precio o el contexto no permiten una conclusión direccional."},
+                         "control de calidad de datos", "REVISAR el precio en el portal o capture un precio confirmado."))
+    return out
+
+
+def ficha_revision(a: dict) -> dict:
+    """Ficha para decidir con calma. Nunca incluye un botón para operar el simulador."""
+    datos = a.get("datos") or {}
+    sim = a.get("simulacion") or []
+    importe = sum(abs(float(x.get("monto") or 0)) for x in sim)
+    return {
+        "que_ocurrio": f"{a.get('titulo')}: {a.get('motivo')}",
+        "datos_que_lo_sustentan": {"calculo": datos.get("calculo"), "fuente": a.get("fuente"), "hora": a.get("ts"),
+                                   **{k: v for k, v in datos.items() if k not in ("calculo", "incertidumbre")}},
+        "falta_confirmar": [x for x in (datos.get("incertidumbre"),
+                                        "El precio y el saldo en el portal de Actinver (valuación oficial).",
+                                        "Que la fuente cite el hecho original (emisora, regulador o dato oficial)."
+                                        if a.get("regla") in ("noticia", "insider", "macro", "evento_corporativo") else None) if x],
+        "costos": reto.costo_detalle(importe) if importe else None,
+        "riesgos": RIESGOS.get(a.get("regla"), "Revise la vigencia del dato y el impacto en su cartera."),
+        "opciones_para_revisar": [o for o in (a.get("accion"),
+                                              "Simular el efecto (no envía órdenes)." if sim else None,
+                                              "Registrar en la bitácora la decisión que tome usted.",
+                                              "Descartar la alerta si no aplica.") if o],
+    }
+
+
 def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, notificar: bool = True,
             ahora_dt: datetime | None = None) -> list[dict]:
     cfg = ajustes["alertas"]
@@ -373,6 +442,14 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
              + reglas_reto(con, cfg, cartera, ahora_dt) + reglas_cambio_brusco(cfg, cartera, precios)
              + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
              + reglas_webhook(con, ahora_dt))
+    if cfg.get("exigir_precio_confiable", True):
+        from . import cotizaciones
+        provs = cotizaciones.construir(con, ajustes.es_demo)
+        prio = ["demo"] if ajustes.es_demo else None
+        ins = mercado.instrumentos(con)
+        sin_precio = {i for i in ids if i in ins and
+                      cotizaciones.precio_confiable(con, provs, ins[i], ahora_dt, prioridad=prio)["estado"] != "confiable"}
+        conds = inhibir_direccionales(conds, sin_precio, contradictorias(con, ids, ahora_dt))
     return procesar(con, conds, cfg, ahora_dt, notificar)
 
 
@@ -382,6 +459,7 @@ def listar(con: sqlite3.Connection, limite: int = 200) -> list[dict]:
         d = dict(r)
         d["datos"] = json.loads(d["datos"] or "{}")
         d["simulacion"] = json.loads(d["simulacion"]) if d["simulacion"] else None
+        d["ficha"] = ficha_revision(d)
         filas.append(d)
     return filas
 

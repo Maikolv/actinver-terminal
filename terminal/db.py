@@ -204,8 +204,9 @@ def transaccion(con: sqlite3.Connection):
 def inicializar(con: sqlite3.Connection, ajustes=None) -> None:
     con.executescript(ESQUEMA)
     cargar_universo(con)
-    from . import migraciones
+    from . import migraciones, registro
     migraciones.migrar(con, ajustes)
+    registro.inicializar(con)
 
 
 def cargar_universo(con: sqlite3.Connection, ruta: Path | None = None) -> int:

@@ -2,6 +2,37 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.6.0] — 2026-09-23 (rama `ampliacion-integral`)
+
+### Añadido
+- **Reglas del Reto versionadas** (`terminal/registro.py`, tabla `versiones_reglas`): aviso de discrepancia y los cálculos guardados conservan su versión. Las bases se re-verificaron el 23-sep (docs/actinver-rules.md).
+- **Entidades nuevas:**
+  - correspondencia de símbolos (MIC, serie, origen);
+  - órdenes pendientes solo como referencia, sin efecto en la tenencia;
+  - bitácora de decisiones humanas (método de LuxAlgo/trade-journal);
+  - instantáneas de cartera, versiones de modelo y licencias de fuente.
+- **Migraciones v2 y v3:**
+  - `ingested_at` en todas las tablas de hechos;
+  - **disparadores de SQLite** que rechazan una noticia disponible antes de publicarse, un precio disponible antes del evento, `REAL_TIME` sin latencia medida ≤ 15 s y una cotización BMV o SIC fuera de MXN;
+  - autor y tipo de contenido de Seeking Alpha;
+  - fecha de presentación y marca «NO CUBRE BMV» en insiders.
+- **Control de clasificación** (`terminal/clasificacion.py`): los CFD (ficha de Dukascopy) y los criptoactivos (formato de ccxt) nunca valúan el Reto.
+- **Alertas:**
+  - inhibición de las alertas direccionales sin precio confiable o con noticias contradictorias, con una alerta de datos en su lugar;
+  - **ficha de revisión**: qué ocurrió, datos, qué falta confirmar, costos, riesgos y opciones.
+- **Investigación:**
+  - variable de noticias sujeta a `available_at` y caída de 20 sesiones;
+  - estrategias de referencia «mantener» y «pesos iguales»;
+  - caída máxima, exposición y sensibilidad a costos (×0, ×1, ×2, ×5);
+  - **Diebold-Mariano con Newey-West** y veredicto «SIN VENTAJA DEMOSTRADA».
+- **Verificación cruzada con backtrader**, que coincide exactamente con el cálculo independiente. **Candidato Kronos** con verificación de disponibilidad.
+- **Experimento con índices reales de FRED** (`scripts/experimento_indices_fred.py`): sin ventaja demostrada en H=1 ni en H=5.
+- **Escenarios de estrés** (`terminal/escenarios.py`).
+- **Política de tokens** (`scripts/indice_contexto.py`, índice con hashes y caché) y uso de `codebase-memory-mcp`.
+- **Documentos:** initial-audit, actinver-rules, source-matrix con `sources/` (7 fichas), instrument-matrix, repository-adoption-matrix (63 repositorios), quant-methodology, model-card, token-budget, arquitectura y DESIGN.md.
+- **Interfaz:** bitácora, órdenes pendientes, ficha en cada alerta, veredicto en FUTURO, aviso de reglas y la banda «DATOS SIMULADOS».
+- `tests/test_ampliacion.py` (23 pruebas; 129 en total), incluidas pruebas que **deben fallar** ante una noticia futura en el pasado, un precio de EE. UU. como serie SIC o un dato de cierre marcado como tiempo real.
+
 ## [0.5.0] — 2026-09-23
 
 ### Añadido

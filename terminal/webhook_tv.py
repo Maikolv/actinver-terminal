@@ -64,7 +64,11 @@ class TradingViewAlertReceiver:
         if not secrets.compare_digest(str(d.get("secreto", "")), self.env["TRADINGVIEW_WEBHOOK_SECRETO"]):
             raise WebhookRechazado("Secreto inválido", 401)
         instrumentos = {r["id"]: dict(r) for r in self.con.execute("SELECT * FROM instrumentos")}
-        norm = cz.normalizar_simbolo(str(d.get("simbolo", "")), instrumentos)
+        from .clasificacion import InstrumentoNoElegible
+        try:
+            norm = cz.normalizar_simbolo(str(d.get("simbolo", "")), instrumentos)
+        except InstrumentoNoElegible as e:
+            raise WebhookRechazado(str(e)) from None
         if not norm:
             raise WebhookRechazado(f"Símbolo fuera del catálogo: {str(d.get('simbolo'))[:40]}")
         sim = {r[0] for r in self.con.execute("SELECT id FROM universo_simulador")}

@@ -76,6 +76,16 @@ class ForexFactory(Adaptador):
         return out
 
 
+def tipo_contenido(enlace: str) -> str:
+    """Seeking Alpha publica noticias (hechos reportados) en /news/ y análisis de autores (opinión/tesis) en /article/.
+    Ninguno es una señal: un hecho material se verifica con la emisora o el regulador."""
+    if "/news" in enlace:
+        return "hecho (noticia)"
+    if "/article/" in enlace:
+        return "opinión / análisis"
+    return "sin clasificar"
+
+
 class SeekingAlphaRSS(Adaptador):
     proveedor = "seekingalpha_rss"
     tipo_dato = "noticias"
@@ -95,8 +105,13 @@ class SeekingAlphaRSS(Adaptador):
                 fecha = parsedate_to_datetime(pub).astimezone(UTC).isoformat() if pub else None
             except (TypeError, ValueError):
                 fecha = None
+            autor = ""
+            for hijo in it:  # dc:creator o sa:author_name, según el feed
+                if hijo.tag.endswith(("creator", "author_name")) and (hijo.text or "").strip():
+                    autor = hijo.text.strip()[:120]
             if titulo and enlace.startswith("https://"):
-                out.append({"titulo": titulo[:300], "enlace": enlace[:500], "publicado": fecha})
+                out.append({"titulo": titulo[:300], "enlace": enlace[:500], "publicado": fecha, "autor": autor,
+                            "tipo_contenido": tipo_contenido(enlace)})
         return out
 
 
@@ -154,7 +169,8 @@ class SecEdgar(Adaptador):
             precio = float(t.findtext("transactionAmounts/transactionPricePerShare/value") or 0)
             fecha = t.findtext("transactionDate/value") or fecha_presentacion
             out.append({"fecha": fecha[:10], "nombre": nombre[:120], "cargo": cargo[:80], "codigo": codigo,
-                        "acciones": acc, "precio": precio, "valor": acc * precio, "enlace": url})
+                        "acciones": acc, "precio": precio, "valor": acc * precio, "enlace": url,
+                        "fecha_presentacion": (fecha_presentacion or "")[:10]})
         return out
 
 
@@ -206,9 +222,10 @@ def actualizar_noticias(con: sqlite3.Connection, ajustes: dict, instrumentos: li
             c = clasificar_titular(it["titulo"])
             ident = hashlib.sha1(it["enlace"].encode()).hexdigest()[:16]
             filas.append((ident, ins["id"], it["titulo"], it["enlace"], it["publicado"], "seekingalpha_rss",
-                          c["impacto"], c["sentimiento"], c["motivo"], ts))
+                          c["impacto"], c["sentimiento"], c["motivo"], ts, it.get("autor", ""), it.get("tipo_contenido")))
         with transaccion(con):
-            con.executemany("INSERT OR REPLACE INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, sentimiento, motivo, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+            con.executemany("INSERT OR REPLACE INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, sentimiento, "
+                            "motivo, obtenido_en, autor, tipo_contenido) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         n += len(filas)
     return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5]}
 
@@ -230,9 +247,11 @@ def actualizar_insiders(con: sqlite3.Connection, ajustes: dict, instrumentos: li
             continue
         ts = ahora()
         with transaccion(con):
-            con.executemany("INSERT OR REPLACE INTO insiders (id, instrumento_id, fecha, nombre, cargo, codigo, acciones, precio, valor, enlace, fuente, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", [
+            con.executemany("INSERT OR REPLACE INTO insiders (id, instrumento_id, fecha, nombre, cargo, codigo, acciones, precio, valor, "
+                            "enlace, fuente, obtenido_en, fecha_presentacion, cobertura) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
                 (hashlib.sha1(f"{o['enlace']}|{o['fecha']}|{o['acciones']}|{o['codigo']}".encode()).hexdigest()[:16],
                  ins["id"], o["fecha"], o["nombre"], o["cargo"], o["codigo"], o["acciones"], o["precio"], o["valor"],
-                 o["enlace"], "sec_edgar", ts) for o in ops])
+                 o["enlace"], "sec_edgar", ts, o.get("fecha_presentacion"),
+                 "emisora de EE. UU. (SEC); NO CUBRE BMV") for o in ops])
         n += len(ops)
     return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5]}

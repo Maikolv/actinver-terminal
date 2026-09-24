@@ -26,9 +26,33 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal cobertura` | Verifica cobertura por símbolo y proveedor; escribe `docs/cobertura.md` |
 | `uv run terminal webhook-secreto` | Genera el secreto del webhook de TradingView en `.env` |
 | `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
-| `uv run pytest` | 106 pruebas |
+| `uv run pytest` | 129 pruebas |
 | `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |
+
+## Instalación desde cero
+
+1. Instale [uv](https://docs.astral.sh/uv/): `winget install astral-sh.uv`.
+2. Clone o copie esta carpeta y abra una terminal **dentro de ella**. En PowerShell, los scripts de la carpeta actual se ejecutan con `.\`.
+3. Ejecute `.\start.bat`. La primera vez, `uv` crea el entorno con las versiones fijadas en `uv.lock`.
+4. Opcional: copie `.env.example` como `.env` y llene las claves que tenga. Vea [docs/proveedores.md](docs/proveedores.md).
+
+**Importar operaciones confirmadas.** Use «Mi cartera → Importar», con el tipo `transacciones` y el ejemplo `ejemplos/operaciones_confirmadas.csv`. También puede capturarlas una por una. Solo las operaciones **confirmadas** cambian posiciones y efectivo. Las órdenes pendientes se anotan como referencia en «Pasado · Presente · Futuro». Importe la lista del simulador con el tipo `universo` (ejemplo: `ejemplos/catalogo_simulador.csv`).
+
+**Pruebas.** `uv run pytest` ejecuta 129 pruebas. `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
+
+**Mantenimiento desde el editor.** Abra la carpeta en su editor o agente (por ejemplo Cline o Claude Code). Las convenciones están en `CLAUDE.md`. Busque con `uv run python scripts/indice_contexto.py buscar "…"` antes de leer archivos completos.
+
+### Resolución de fallos
+
+| Síntoma | Causa y solución |
+|---|---|
+| `start.bat` no se reconoce | Está en otra carpeta o falta `.\`: `cd …\actinver-terminal` y luego `.\start.bat` |
+| `Failed to spawn: terminal` | Ejecutó `uv run terminal` fuera de la carpeta del proyecto |
+| `terminal.exe` en uso al actualizar | Hay otra terminal abierta: ciérrela con `Ctrl+C` |
+| Todo aparece como «SIN PRECIO CONFIABLE» | No hay proveedor BMV verificado. Capture precios del portal o configure una fuente y ejecute `uv run terminal cobertura` |
+| Aviso «Las reglas del Reto cambiaron» | `config/reto.yaml` cambió: revíselo contra las bases y márquelo como revisado en la pestaña «Reto» |
+| Propuestas suspendidas | Faltan precios o el tipo de cambio: revise la pestaña «Datos» |
 
 ## Monitor y predicción (versión 0.5)
 
@@ -77,6 +101,19 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 - `config/ajustes.ejemplo.toml` (versionado): vigencia, proveedores y límites, referencias, motor, alertas, perfiles, costos, optimización, puntuación. Cambios propios en `config/local.toml` (no versionado).
 - `config/reto.yaml`: reglas del Reto.
 - `.env`: credenciales (ignorado por Git).
+
+## Documentación de la ampliación integral
+
+| Documento | Contenido |
+|---|---|
+| [initial-audit](docs/initial-audit.md) | Arquitectura observada y flujo de datos |
+| [actinver-rules](docs/actinver-rules.md) | Reglas con fragmento, versión y pruebas |
+| [source-matrix](docs/source-matrix.md) · [sources/](docs/sources/) | Seis sitios y la BMV: papel, modalidad, cobertura, latencia y condiciones |
+| [instrument-matrix](docs/instrument-matrix.md) | Símbolo, serie, MIC, moneda, origen, proveedor, latencia y discrepancia por instrumento |
+| [repository-adoption-matrix](docs/repository-adoption-matrix.md) | Los 63 repositorios, con commit, licencia, uso y evidencia |
+| [quant-methodology](docs/quant-methodology.md) · [model-card](docs/model-card.md) | Metodología y resultados fuera de muestra |
+| [token-budget](docs/token-budget.md) | Índice con hashes, fragmentos mínimos y caché |
+| [arquitectura](docs/arquitectura.md) · [DESIGN.md](DESIGN.md) | Diagramas y sistema visual |
 
 ## Documentación
 

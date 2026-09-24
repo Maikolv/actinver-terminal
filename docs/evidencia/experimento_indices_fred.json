@@ -1,0 +1,497 @@
+{
+ "fuente": "FRED (St. Louis Fed)",
+ "series": {
+  "SP500": {
+   "observaciones": 2512,
+   "desde": "2016-09-26",
+   "hasta": "2026-09-23"
+  },
+  "NASDAQCOM": {
+   "observaciones": 2696,
+   "desde": "2016-01-04",
+   "hasta": "2026-09-22"
+  },
+  "DJIA": {
+   "observaciones": 2512,
+   "desde": "2016-09-26",
+   "hasta": "2026-09-23"
+  }
+ },
+ "ejecutado": "2026-09-24T02:05:56+00:00",
+ "horizontes": {
+  "1": {
+   "estado": "ok",
+   "mensaje": null,
+   "cortes": {
+    "H": 1,
+    "embargo_sesiones": 1,
+    "n_fechas": 2635,
+    "entrenamiento": [
+     "2016-03-31",
+     "2023-07-26"
+    ],
+    "validacion": [
+     "2023-07-28",
+     "2025-02-21"
+    ],
+    "prueba": [
+     "2025-02-25",
+     "2026-09-21"
+    ],
+    "fechas_embargadas": 2
+   },
+   "n_ejemplos": {
+    "entrenamiento": 5162,
+    "validacion": 1182,
+    "prueba": 1185
+   },
+   "purgados": {
+    "entrenamiento": 0,
+    "validacion": 0
+   },
+   "variante_elegida": "pca",
+   "alfa_por_variante": {
+    "filtro_correlacion": 1000.0,
+    "ridge": 1000.0,
+    "pca": 1000.0
+   },
+   "validacion_mse": {
+    "filtro_correlacion": 8.035864923832513e-05,
+    "ridge": 8.036341415231573e-05,
+    "pca": 8.013420679713728e-05
+   },
+   "prueba": [
+    {
+     "modelo": "modelo (pca)",
+     "n": 1185,
+     "mse": 0.0001354859348580555,
+     "mae": 0.007824050425837241,
+     "acierto_direccion": 0.5164556962025316,
+     "r2_vs_sin_cambio": 0.007852706974417756,
+     "cobertura_intervalo_80": 0.7662447257383966,
+     "brier_prob_subida": 0.2522485244763876,
+     "meses_mejor_que_sin_cambio": "11/20",
+     "resultado_neto": -0.186659,
+     "rotacion_media": 0.9924,
+     "rebalanceos": 395,
+     "caida_maxima": -0.216262,
+     "exposicion_media": 0.7595,
+     "sensibilidad_costos": {
+      "x0": 0.281211,
+      "x1": -0.186659,
+      "x2": -0.48412,
+      "x5": -0.869051
+     }
+    },
+    {
+     "modelo": "sin_cambio",
+     "n": 1185,
+     "mse": 0.00013655828707135527,
+     "mae": 0.007833665718715738,
+     "acierto_direccion": null,
+     "r2_vs_sin_cambio": 0.0,
+     "cobertura_intervalo_80": 0.7645569620253164,
+     "brier_prob_subida": 0.24806195722358976,
+     "meses_mejor_que_sin_cambio": "0/20",
+     "resultado_neto": 0.187572,
+     "rotacion_media": 0.0025,
+     "rebalanceos": 395,
+     "caida_maxima": -0.141314,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.188957,
+      "x1": 0.187572,
+      "x2": 0.186187,
+      "x5": 0.182031
+     }
+    },
+    {
+     "modelo": "historico_reciente",
+     "n": 1185,
+     "mse": 0.00013893018831661217,
+     "mae": 0.007882708282285397,
+     "acierto_direccion": 0.5257383966244725,
+     "r2_vs_sin_cambio": -0.017369149072714363,
+     "cobertura_intervalo_80": 0.7620253164556962,
+     "brier_prob_subida": 0.25311957788342465,
+     "meses_mejor_que_sin_cambio": "7/20",
+     "resultado_neto": 0.331616,
+     "rotacion_media": 0.0532,
+     "rebalanceos": 395,
+     "caida_maxima": -0.078512,
+     "exposicion_media": 0.7772,
+     "sensibilidad_costos": {
+      "x0": 0.364365,
+      "x1": 0.331616,
+      "x2": 0.299588,
+      "x5": 0.20769
+     }
+    },
+    {
+     "modelo": "regla_simple",
+     "n": 1185,
+     "mse": 0.0001381443826330664,
+     "mae": 0.007903707518829305,
+     "acierto_direccion": 0.536046511627907,
+     "r2_vs_sin_cambio": -0.011614788056636627,
+     "cobertura_intervalo_80": 0.7493670886075949,
+     "brier_prob_subida": 0.25302503405519117,
+     "meses_mejor_que_sin_cambio": "6/20",
+     "resultado_neto": 0.24066,
+     "rotacion_media": 0.2203,
+     "rebalanceos": 395,
+     "caida_maxima": -0.137683,
+     "exposicion_media": 0.7519,
+     "sensibilidad_costos": {
+      "x0": 0.372466,
+      "x1": 0.24066,
+      "x2": 0.121278,
+      "x5": -0.173306
+     }
+    }
+   ],
+   "estrategias_referencia": [
+    {
+     "modelo": "pesos_iguales (todas las emisoras)",
+     "resultado_neto": 0.306201,
+     "rotacion_media": 0.0025,
+     "rebalanceos": 395,
+     "caida_maxima": -0.165604,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.307719,
+      "x1": 0.306201,
+      "x2": 0.304683,
+      "x5": 0.30013
+     }
+    }
+   ],
+   "veredicto": "SIN VENTAJA DEMOSTRADA",
+   "conclusion": "SIN VENTAJA DEMOSTRADA: el modelo no supera a las referencias simples fuera de muestra con significancia (Diebold-Mariano p < 0.05 frente a cada una) y en resultado neto; no se emite recomendación de cambio.",
+   "variables_eliminadas_final": [],
+   "diebold_mariano_vs_referencias": {
+    "sin_cambio": {
+     "n": 395,
+     "estadistico": 0.3087,
+     "p_valor": 0.3788
+    },
+    "historico_reciente": {
+     "n": 395,
+     "estadistico": 0.725,
+     "p_valor": 0.2342
+    },
+    "regla_simple": {
+     "n": 395,
+     "estadistico": 0.7261,
+     "p_valor": 0.2339
+    }
+   },
+   "error_menor_sin_significancia": true,
+   "correlacion_activos_entrenamiento": {
+    "media": 0.9176,
+    "n_activos": 3,
+    "pares": [
+     {
+      "a": "REF:DJIA",
+      "b": "REF:SP500",
+      "r": 0.9606
+     },
+     {
+      "a": "REF:NASDAQCOM",
+      "b": "REF:SP500",
+      "r": 0.9467
+     },
+     {
+      "a": "REF:DJIA",
+      "b": "REF:NASDAQCOM",
+      "r": 0.8456
+     },
+     {
+      "a": "REF:DJIA",
+      "b": "REF:DJIA",
+      "r": NaN
+     },
+     {
+      "a": "REF:NASDAQCOM",
+      "b": "REF:DJIA",
+      "r": NaN
+     },
+     {
+      "a": "REF:NASDAQCOM",
+      "b": "REF:NASDAQCOM",
+      "r": NaN
+     },
+     {
+      "a": "REF:SP500",
+      "b": "REF:DJIA",
+      "r": NaN
+     },
+     {
+      "a": "REF:SP500",
+      "b": "REF:NASDAQCOM",
+      "r": NaN
+     },
+     {
+      "a": "REF:SP500",
+      "b": "REF:SP500",
+      "r": NaN
+     }
+    ],
+    "nota": "Correlación real entre activos: indica riesgo concentrado. No se modifica."
+   },
+   "huella_config": "521c44134dc1ef07",
+   "huella_datos": "3761847f0a46f037"
+  },
+  "5": {
+   "estado": "ok",
+   "mensaje": null,
+   "cortes": {
+    "H": 5,
+    "embargo_sesiones": 5,
+    "n_fechas": 2631,
+    "entrenamiento": [
+     "2016-03-31",
+     "2023-07-21"
+    ],
+    "validacion": [
+     "2023-07-31",
+     "2025-02-14"
+    ],
+    "prueba": [
+     "2025-02-25",
+     "2026-09-15"
+    ],
+    "fechas_embargadas": 10
+   },
+   "n_ejemplos": {
+    "entrenamiento": 5153,
+    "validacion": 1167,
+    "prueba": 1173
+   },
+   "purgados": {
+    "entrenamiento": 0,
+    "validacion": 0
+   },
+   "variante_elegida": "pca",
+   "alfa_por_variante": {
+    "filtro_correlacion": 1000.0,
+    "ridge": 1000.0,
+    "pca": 1000.0
+   },
+   "validacion_mse": {
+    "filtro_correlacion": 0.00040176527942012696,
+    "ridge": 0.00040179964488609916,
+    "pca": 0.0003974036760422755
+   },
+   "prueba": [
+    {
+     "modelo": "modelo (pca)",
+     "n": 1173,
+     "mse": 0.000547686899622926,
+     "mae": 0.016967680352735225,
+     "acierto_direccion": 0.566069906223359,
+     "r2_vs_sin_cambio": 0.03865858016726775,
+     "cobertura_intervalo_80": 0.7766410912190963,
+     "brier_prob_subida": 0.24480064093714796,
+     "meses_mejor_que_sin_cambio": "12/20",
+     "resultado_neto": 0.377546,
+     "rotacion_media": 0.4177,
+     "rebalanceos": 79,
+     "caida_maxima": -0.164403,
+     "exposicion_media": 0.9873,
+     "sensibilidad_costos": {
+      "x0": 0.431258,
+      "x1": 0.377546,
+      "x2": 0.325737,
+      "x5": 0.181107
+     }
+    },
+    {
+     "modelo": "sin_cambio",
+     "n": 1173,
+     "mse": 0.0005697111227332952,
+     "mae": 0.017389164644268353,
+     "acierto_direccion": null,
+     "r2_vs_sin_cambio": 0.0,
+     "cobertura_intervalo_80": 0.7885763000852515,
+     "brier_prob_subida": 0.24317355246224784,
+     "meses_mejor_que_sin_cambio": "0/20",
+     "resultado_neto": 0.187542,
+     "rotacion_media": 0.0127,
+     "rebalanceos": 79,
+     "caida_maxima": -0.116041,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.188957,
+      "x1": 0.187542,
+      "x2": 0.186127,
+      "x5": 0.181883
+     }
+    },
+    {
+     "modelo": "historico_reciente",
+     "n": 1173,
+     "mse": 0.0006284252847482499,
+     "mae": 0.017849533508349114,
+     "acierto_direccion": 0.5694799658994032,
+     "r2_vs_sin_cambio": -0.10305953258076239,
+     "cobertura_intervalo_80": 0.80306905370844,
+     "brier_prob_subida": 0.259425875660066,
+     "meses_mejor_que_sin_cambio": "6/20",
+     "resultado_neto": 0.276801,
+     "rotacion_media": 0.1139,
+     "rebalanceos": 79,
+     "caida_maxima": -0.060178,
+     "exposicion_media": 0.7722,
+     "sensibilidad_costos": {
+      "x0": 0.290082,
+      "x1": 0.276801,
+      "x2": 0.263631,
+      "x5": 0.224785
+     }
+    },
+    {
+     "modelo": "regla_simple",
+     "n": 1173,
+     "mse": 0.000602080647115954,
+     "mae": 0.018049995556582217,
+     "acierto_direccion": 0.5679156908665105,
+     "r2_vs_sin_cambio": -0.05681743446987664,
+     "cobertura_intervalo_80": 0.793691389599318,
+     "brier_prob_subida": 0.25538155453438105,
+     "meses_mejor_que_sin_cambio": "5/20",
+     "resultado_neto": 0.364061,
+     "rotacion_media": 0.3797,
+     "rebalanceos": 79,
+     "caida_maxima": -0.09776,
+     "exposicion_media": 0.7468,
+     "sensibilidad_costos": {
+      "x0": 0.411963,
+      "x1": 0.364061,
+      "x2": 0.31769,
+      "x5": 0.187307
+     }
+    }
+   ],
+   "estrategias_referencia": [
+    {
+     "modelo": "pesos_iguales (todas las emisoras)",
+     "resultado_neto": 0.3061,
+     "rotacion_media": 0.0127,
+     "rebalanceos": 79,
+     "caida_maxima": -0.139401,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.307666,
+      "x1": 0.3061,
+      "x2": 0.304534,
+      "x5": 0.299836
+     }
+    }
+   ],
+   "veredicto": "SIN VENTAJA DEMOSTRADA",
+   "conclusion": "SIN VENTAJA DEMOSTRADA: el modelo no supera a las referencias simples fuera de muestra con significancia (Diebold-Mariano p < 0.05 frente a cada una) y en resultado neto; no se emite recomendación de cambio.",
+   "variables_eliminadas_final": [],
+   "diebold_mariano_vs_referencias": {
+    "sin_cambio": {
+     "n": 391,
+     "estadistico": 1.1472,
+     "p_valor": 0.1257
+    },
+    "historico_reciente": {
+     "n": 391,
+     "estadistico": 1.7751,
+     "p_valor": 0.0379
+    },
+    "regla_simple": {
+     "n": 391,
+     "estadistico": 1.8128,
+     "p_valor": 0.0349
+    }
+   },
+   "error_menor_sin_significancia": true,
+   "correlacion_activos_entrenamiento": {
+    "media": 0.9177,
+    "n_activos": 3,
+    "pares": [
+     {
+      "a": "REF:DJIA",
+      "b": "REF:SP500",
+      "r": 0.9606
+     },
+     {
+      "a": "REF:NASDAQCOM",
+      "b": "REF:SP500",
+      "r": 0.9467
+     },
+     {
+      "a": "REF:DJIA",
+      "b": "REF:NASDAQCOM",
+      "r": 0.8457
+     },
+     {
+      "a": "REF:DJIA",
+      "b": "REF:DJIA",
+      "r": NaN
+     },
+     {
+      "a": "REF:NASDAQCOM",
+      "b": "REF:DJIA",
+      "r": NaN
+     },
+     {
+      "a": "REF:NASDAQCOM",
+      "b": "REF:NASDAQCOM",
+      "r": NaN
+     },
+     {
+      "a": "REF:SP500",
+      "b": "REF:DJIA",
+      "r": NaN
+     },
+     {
+      "a": "REF:SP500",
+      "b": "REF:NASDAQCOM",
+      "r": NaN
+     },
+     {
+      "a": "REF:SP500",
+      "b": "REF:SP500",
+      "r": NaN
+     }
+    ],
+    "nota": "Correlación real entre activos: indica riesgo concentrado. No se modifica."
+   },
+   "huella_config": "06fd8abc5779338d",
+   "huella_datos": "6441b3326e326964"
+  }
+ },
+ "verificacion_backtest": {
+  "referencia": {
+   "motor": "cálculo independiente",
+   "valor_final": 1359744.51,
+   "costos": 1839.09,
+   "operaciones": 291,
+   "titulos": {
+    "REF:DJIA": 3611,
+    "REF:NASDAQCOM": 3063,
+    "REF:SP500": 3342
+   },
+   "efectivo": 1706.44
+  },
+  "backtrader": {
+   "motor": "backtrader 1.9.78.123",
+   "valor_final": 1359744.51,
+   "operaciones": 291,
+   "efectivo": 1706.44,
+   "titulos": {
+    "REF:DJIA": 3611,
+    "REF:NASDAQCOM": 3063,
+    "REF:SP500": 3342
+   }
+  },
+  "diferencia_relativa": 0.0,
+  "coinciden": true,
+  "titulos_iguales": true
+ }
+}
