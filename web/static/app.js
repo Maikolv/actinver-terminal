@@ -5,7 +5,7 @@
 const CSRF = document.querySelector('meta[name="csrf"]').content;
 const estado = {
   alertasResumen: null, propuestas: null, clasificacion: [], cartera: null, universo: null, datos: null, reto: null,
-  universoSel: "acciones", lenteSel: "ajuste", lenteResumen: "ajuste", ultimoCiclo: null,
+  universoSel: "acciones", lenteSel: "ajuste", mercadoSel: "ambos", lenteResumen: "ajuste", ultimoCiclo: null,
 };
 
 /* ---------- utilidades ---------- */
@@ -321,11 +321,19 @@ function resumenCambios(p) {
 }
 
 /* ---------- detalle de propuesta ---------- */
+function clavePropuestaSel() {
+  const base = `${estado.universoSel}_${estado.lenteSel}`;
+  const v = `${base}_${estado.mercadoSel}`;
+  return estado.lenteSel === "puntuacion" && estado.mercadoSel !== "ambos" && estado.propuestas && v in estado.propuestas ? v : base;
+}
 function pintarDetalle() {
   segmentado("selector-universo", estado.universoSel, (v) => { estado.universoSel = v; pintarDetalle(); });
   segmentado("selector-lente", estado.lenteSel, (v) => { estado.lenteSel = v; pintarDetalle(); });
+  const hayVariantes = estado.lenteSel === "puntuacion" && estado.propuestas && `${estado.universoSel}_puntuacion_nacionales` in estado.propuestas;
+  document.getElementById("selector-mercado-propuesta").hidden = !hayVariantes;
+  segmentado("selector-mercado-propuesta", estado.mercadoSel, (v) => { estado.mercadoSel = v; pintarDetalle(); });
   if (!estado.propuestas) return;
-  const p = estado.propuestas[`${estado.universoSel}_${estado.lenteSel}`];
+  const p = estado.propuestas[clavePropuestaSel()];
   if (!p) return limpiar("propuesta-detalle", h("p", { clase: "vacio", texto: "Sin propuesta calculada todavía; el motor la calculará en el próximo ciclo." }));
   const out = [];
   (p.avisos || []).forEach((a) => out.push(h("div", { clase: "aviso-caja", texto: a })));
@@ -775,7 +783,7 @@ async function ejecutarBoleta(b) {
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 }
 document.getElementById("btn-boletas").addEventListener("click", async () => {
-  try { await api("/api/boletas/generar", { method: "POST", json: { propuesta: "acciones_ajuste" } }); pintarBoletas(); }
+  try { await api("/api/boletas/generar", { method: "POST", json: { propuesta: clavePropuestaSel() } }); pintarBoletas(); }
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 });
 async function cargarTiempo() {

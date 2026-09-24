@@ -16,6 +16,14 @@ from .config import Ajustes
 
 log = logging.getLogger("terminal.servicios")
 COMBINACIONES = [(t, lente) for t in ("acciones", "mixta") for lente in ("rendimiento", "ajuste", "puntuacion")]
+# Con el perfil en «ambos», la lente de máxima puntuación se calcula además por separado para cada mercado
+VARIANTES_MERCADO = {"nacionales": "Solo nacionales (BMV)", "extranjeras": "Solo extranjeras (SIC)"}
+
+
+def claves_variantes(perfil: dict) -> list[tuple[str, str]]:
+    if perfil.get("mercado_acciones", "ambos") != "ambos":
+        return []
+    return [(t, m) for t in ("acciones", "mixta") for m in VARIANTES_MERCADO]
 bloqueo = threading.Lock()  # un solo cálculo/actualización a la vez (API y motor)
 
 
@@ -150,6 +158,13 @@ def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
         if out[clave] and "advertencias_reto" not in out[clave]:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
+    for tipo, m in claves_variantes(perfil):
+        clave = f"{tipo}_puntuacion_{m}"
+        f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()
+        out[clave] = revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None
+        if out[clave] and "advertencias_reto" not in out[clave]:
+            actual = actual or cartera_actual(con, ajustes)
+            advertir_compras(out[clave], actual)
     return out
 
 
@@ -161,6 +176,15 @@ def calcular_propuestas(con, ajustes: Ajustes) -> dict:
     res = {}
     for tipo, lente in COMBINACIONES:
         p = optimizador.proponer(con, ajustes, perfil, tipo, actual, cot, lente=lente)
+        js = json.dumps(p, default=str)
+        with db.transaccion(con):
+            con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
+                        (p["clave"], p["calculado_en"], json.dumps(perfil), js))
+        res[p["clave"]] = revalidar(json.loads(js), perfil, ajustes)
+    for tipo, m in claves_variantes(perfil):
+        p = optimizador.proponer(con, ajustes, {**perfil, "mercado_acciones": m}, tipo, actual, cot, lente="puntuacion")
+        p.update({"clave": f"{tipo}_puntuacion_{m}", "nombre": f"{p['nombre']} · {VARIANTES_MERCADO[m]}",
+                  "mercado_variante": m, "perfil": perfil})  # el perfil del usuario sigue en «ambos»
         js = json.dumps(p, default=str)
         with db.transaccion(con):
             con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",

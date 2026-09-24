@@ -69,6 +69,11 @@
         <button type="button" role="radio" aria-checked="true" data-valor="ajuste">Ajuste a su perfil</button>
         <button type="button" role="radio" aria-checked="false" data-valor="puntuacion">Máxima puntuación</button>
       </div>
+      <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-mercado-propuesta" hidden>
+        <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras</button>
+      </div>
     </div>
     <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
@@ -98,7 +103,7 @@
       <div id="presente-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
       <h3>Boletas de decisión</h3>
       <p class="ayuda">Propuestas completas para que USTED capture la orden en el portal. Se recalculan al mostrarse y se invalidan si el precio deja de ser confiable o se mueve más de 1 %. Ninguna se envía.</p>
-      <p><button type="button" class="boton boton--secundario" id="btn-boletas">Generar boletas (Solo acciones · ajuste)</button></p>
+      <p><button type="button" class="boton boton--secundario" id="btn-boletas">Generar boletas de la propuesta seleccionada</button></p>
       <div id="boletas-lista"></div>
       <h3>Órdenes pendientes (referencia)</h3>
       <form id="form-orden" class="formulario" novalidate>

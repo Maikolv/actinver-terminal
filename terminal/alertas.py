@@ -163,7 +163,7 @@ def reglas_tecnicas(con, cfg: dict, cartera: dict, propuestas: dict, fx: dict) -
                          f"(último {fx.get('fecha') or '—'}): se suspende la valoración de activos en dólares.",
                          {"fecha": fx.get("fecha")}, fx.get("proveedor") or "", "Configurar Banxico o revisar FRED."))
     for clave, p in propuestas.items():
-        if not p:
+        if not p or p.get("mercado_variante"):  # las variantes por mercado son informativas: no generan alertas críticas
             continue
         mal = p.get("estado") in ("suspendida", "desactualizada")
         out.append(Condicion("propuesta_suspendida", clave, mal, "critica", f"Propuesta sin recomendación: {p['nombre']}",

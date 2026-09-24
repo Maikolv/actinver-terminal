@@ -61,3 +61,15 @@ def test_alertas_silenciadas_se_entregan_al_abrir(con, monkeypatch):
     nuevas = alertas.procesar(con, [], cfg, abierto)
     assert nuevas == [] and len(enviados) == 1                     # la diferida se entrega; no cuenta como nueva
     assert con.execute("SELECT notificada FROM alertas").fetchone()[0] != "silenciada_fuera_de_horario"
+
+
+def test_variantes_por_mercado_sin_cambiar_el_perfil(con, ajustes):
+    _preparar(con)
+    props = servicios.calcular_propuestas(con, ajustes)
+    for m, prefijo in (("nacionales", "BMV:"), ("extranjeras", "SIC:")):
+        p = props[f"acciones_puntuacion_{m}"]
+        assert p["estado"] == "calculada" and p["mercado_variante"] == m and not p["avisos"]
+        assert all(a["id"].startswith(prefijo) for a in p["pesos"])
+    assert servicios.perfil_actual(con, ajustes).get("mercado_acciones", "ambos") == "ambos"
+    guardadas = servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes))
+    assert guardadas["mixta_puntuacion_nacionales"]["clave"] == "mixta_puntuacion_nacionales"
