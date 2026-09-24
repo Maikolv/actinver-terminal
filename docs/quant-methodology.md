@@ -94,3 +94,19 @@ Ante incertidumbre material se **inhiben** las alertas direccionales y se emite 
 ## 10. Agentes y LLM
 
 Se evaluaron TradingAgents, AutoHedge, Vibe-Trading, crewAI y RD-Agent. Ningún agente decide ni fabrica precios. El único LLM opcional es local (Ollama) y solo para clasificar titulares.
+
+## 11. Banco de estrategias simples y boleta
+
+- **Hipótesis predefinidas:**
+  - impulso a 20, 60 y 120 sesiones;
+  - reversión a 5 y 10 sesiones;
+  - inversa de volatilidad a 60 sesiones;
+  - impulso con tamaño por riesgo.
+- **Referencias:** efectivo, pesos iguales, comprar y mantener.
+- **Selección:** el parámetro de cada familia se elige solo en el entrenamiento; la prueba se evalúa una vez.
+- **Evaluación:** subperiodos anuales, deslizamiento de 0, 0.1 % y 0.5 %, y bootstrap por bloques del exceso diario frente a pesos iguales.
+- **Registro:** todas las configuraciones, no solo las ganadoras.
+- **Veredicto:** «VENTAJA NO DEMOSTRADA» salvo que se superen efectivo y pesos iguales, se ganen la mayoría de los años y p < 0.05.
+- **Pendiente:** sensibilidad al tipo de cambio del SIC y diversificación por sector, porque requieren series BMV y SIC reales y un catálogo con sector.
+- **Boleta de decisión:** usa una estimación **histórica** (no el modelo, que no tiene ventaja demostrada). Ver [decision-workflow.md](decision-workflow.md).
+

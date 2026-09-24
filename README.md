@@ -26,7 +26,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal cobertura` | Verifica cobertura por símbolo y proveedor; escribe `docs/cobertura.md` |
 | `uv run terminal webhook-secreto` | Genera el secreto del webhook de TradingView en `.env` |
 | `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
-| `uv run pytest` | 131 pruebas |
+| `uv run pytest` | 146 pruebas |
 | `uv run python scripts/escanear_secretos.py` | Escaneo de secretos en todo el historial de Git |
 | `uv run python scripts/verificar_universo.py --descargar` | Re-verifica el universo contra Nasdaq Trader y la BMV |
 
@@ -39,7 +39,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 
 **Importar operaciones confirmadas.** Use «Mi cartera → Importar», con el tipo `transacciones` y el ejemplo `ejemplos/operaciones_confirmadas.csv`. También puede capturarlas una por una. Solo las operaciones **confirmadas** cambian posiciones y efectivo. Las órdenes pendientes se anotan como referencia en «Pasado · Presente · Futuro». Importe la lista del simulador con el tipo `universo` (ejemplo: `ejemplos/catalogo_simulador.csv`).
 
-**Pruebas.** `uv run pytest` ejecuta 131 pruebas. `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
+**Pruebas.** `uv run pytest` ejecuta 146 pruebas. `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
 
 **Mantenimiento desde el editor.** Abra la carpeta en su editor o agente (por ejemplo Cline o Claude Code). Las convenciones están en `CLAUDE.md`. Busque con `uv run python scripts/indice_contexto.py buscar "…"` antes de leer archivos completos.
 
@@ -112,6 +112,7 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 | [instrument-matrix](docs/instrument-matrix.md) | Símbolo, serie, MIC, moneda, origen, proveedor, latencia y discrepancia por instrumento |
 | [repository-adoption-matrix](docs/repository-adoption-matrix.md) | Los 63 repositorios, con commit, licencia, uso y evidencia |
 | [quant-methodology](docs/quant-methodology.md) · [model-card](docs/model-card.md) | Metodología y resultados fuera de muestra |
+| [decision-workflow](docs/decision-workflow.md) · [data-providers](docs/data-providers.md) · [instrument-mapping](docs/instrument-mapping.md) | Boleta, estados de orden y registro manual; proveedores; correspondencia de series |
 | [token-budget](docs/token-budget.md) | Índice con hashes, fragmentos mínimos y caché |
 | [arquitectura](docs/arquitectura.md) · [DESIGN.md](DESIGN.md) | Diagramas y sistema visual |
 

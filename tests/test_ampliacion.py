@@ -118,7 +118,8 @@ def test_ficha_de_revision_sin_boton_de_operar():
     f = alertas.ficha_revision({"regla": "stop_loss", "titulo": "REVISAR: x", "motivo": "cayó", "fuente": "archivo",
                                 "ts": "2026-10-06T15:00:00+00:00", "accion": "REVISAR la posición",
                                 "datos": {"calculo": "a/b-1", "incertidumbre": "baja"}, "simulacion": [{"id": "BMV:AMX", "monto": -100000}]})
-    assert set(f) == {"que_ocurrio", "datos_que_lo_sustentan", "falta_confirmar", "costos", "riesgos", "opciones_para_revisar"}
+    assert {"que_ocurrio", "cuando", "datos_que_lo_sustentan", "falta_confirmar", "costos", "riesgos", "opciones_para_revisar",
+            "impacto_en_portafolio_mxn", "prioridad", "caduca_en"} <= set(f)
     assert f["costos"]["total"] == 116.0
     assert not any("comprar" in o.lower() or "vender" in o.lower() for o in f["opciones_para_revisar"])
 

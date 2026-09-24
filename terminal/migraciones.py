@@ -87,7 +87,17 @@ def _v3(con):
     _agregar(con, "eventos_macro", "actual", "TEXT")
 
 
-MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3)]
+def _v4(con):
+    """Prioridad y caducidad de alertas; versiones del calendario macro (consenso y dato publicado con su hora)."""
+    _agregar(con, "alertas", "prioridad", "INTEGER")
+    _agregar(con, "alertas", "caduca_en", "TEXT")
+    _agregar(con, "alertas", "impacto_mxn", "REAL")
+    con.execute("""CREATE TABLE IF NOT EXISTS eventos_macro_versiones (
+        evento_id TEXT NOT NULL, obtenido_en TEXT NOT NULL, fecha TEXT, pais TEXT, titulo TEXT, impacto TEXT,
+        pronostico TEXT, previo TEXT, actual TEXT, fuente TEXT NOT NULL, PRIMARY KEY (evento_id, obtenido_en))""")
+
+
+MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4)]
 
 
 def migrar(con: sqlite3.Connection, ajustes=None) -> int:

@@ -94,6 +94,10 @@
     <section class="espacio espacio--presente" aria-labelledby="h-presente">
       <h2 id="h-presente"><span class="sello">PRESENTE</span> Estado observable ahora</h2>
       <div id="presente-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+      <h3>Boletas de decisión</h3>
+      <p class="ayuda">Propuestas completas para que USTED capture la orden en el portal. Se recalculan al mostrarse y se invalidan si el precio deja de ser confiable o se mueve más de 1 %. Ninguna se envía.</p>
+      <p><button type="button" class="boton boton--secundario" id="btn-boletas">Generar boletas (Solo acciones · ajuste)</button></p>
+      <div id="boletas-lista"></div>
       <h3>Órdenes pendientes (referencia)</h3>
       <form id="form-orden" class="formulario" novalidate>
         <div class="campos">
@@ -170,6 +174,8 @@
           <select name="tipo">
             <option value="transacciones">Operaciones</option><option value="posiciones">Posiciones iniciales</option>
             <option value="precios">Precios / valor liquidativo</option><option value="universo">Lista de instrumentos del simulador</option>
+            <option value="confirmaciones">Confirmaciones del simulador (con folio)</option><option value="saldos">Saldos del portal</option>
+            <option value="notas_sa">Notas de Seeking Alpha</option><option value="insiderfinance">Exportación de InsiderFinance</option>
           </select>
         </label>
         <label>Archivo CSV (máx. 1 MB)<input type="file" name="archivo" accept=".csv,text/csv" required></label>

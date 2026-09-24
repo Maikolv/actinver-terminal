@@ -415,6 +415,26 @@ class IceProvider(ConectorContratado):
 
 
 # ----------------------------------------------------------------------------------------------------------------
+class ForeignMarketLicensedProvider(ConectorContratado):
+    """Cotizaciones de la BOLSA DE ORIGEN (acciones, ETF y fondos extranjeros) con licencia y cobertura comprobadas.
+    Nunca entrega la serie SIC en MXN: su mercado es «origen_extranjero» y su uso es de referencia e investigación."""
+    nombre = "extranjero_licenciado"
+    descripcion = "Proveedor contratado de la bolsa de origen (USD u otra moneda); referencia, no serie BMV"
+    prefijo = "EXT"
+    entrega_mercado = ("origen_extranjero",)
+    requisito_contrato = ("Contrato con un proveedor de datos de la bolsa de origen (NYSE/Nasdaq/otras) que permita uso "
+                          "programático personal, con su documentación")
+
+    def _consultar(self, instrumento: dict) -> Cotizacion:
+        q = super()._consultar({**instrumento, "clave": instrumento.get("listado_referencia") or instrumento.get("clave"),
+                                "serie": ""})
+        if q.moneda in ("MXN", ""):
+            raise ProveedorNoDisponible(f"{self.nombre}: moneda {q.moneda or 'ausente'} no corresponde a la bolsa de origen")
+        return Cotizacion(q.proveedor, q.simbolo_origen, f"{instrumento.get('bolsa_referencia')}:{instrumento.get('listado_referencia')}",
+                          instrumento["id"], "origen_extranjero", q.bolsa, q.precio, q.moneda, q.hora_evento, q.hora_recepcion,
+                          q.latencia_declarada_s, q.estado_latencia, detalle="Bolsa de origen; no es la cotización SIC en MXN")
+
+
 class ManualOrCsvProvider(MarketDataProvider):
     """Precios que el participante captura o importa (CSV) y operaciones confirmadas. Siempre EOD o UNKNOWN."""
     nombre = "manual_csv"
@@ -517,7 +537,8 @@ class EodhdBmvProvider(MarketDataProvider):
 def construir(con: sqlite3.Connection, modo_demo: bool, entorno: dict | None = None) -> dict[str, MarketDataProvider]:
     env = entorno if entorno is not None else os.environ
     ps = [BmvLicensedProvider(con, env), LsegProvider(con, env), IceProvider(con, env), EodhdBmvProvider(con, env),
-          ManualOrCsvProvider(con, env), DemoProvider(con, env, modo_demo=modo_demo), ReferenciaOrigenProvider(con, env)]
+          ManualOrCsvProvider(con, env), DemoProvider(con, env, modo_demo=modo_demo), ReferenciaOrigenProvider(con, env),
+          ForeignMarketLicensedProvider(con, env)]
     return {p.nombre: p for p in ps}
 
 
@@ -543,6 +564,16 @@ def es_obsoleta(q: Cotizacion, instrumento: dict, ahora: datetime | None = None)
     # EOD, UNKNOWN o mercado cerrado: vale si corresponde a la última sesión cerrada de la BMV
     ultima = vigencia.ultima_sesion_cerrada(cal, ahora)
     return _utc(q.hora_evento).tz_convert("America/Mexico_City").date() < ultima
+
+
+CALIDADES = ("REAL_TIME", "DELAYED", "EOD", "STALE", "UNKNOWN")
+
+
+def calidad_actual(q: dict | Cotizacion, ahora: datetime | None = None) -> str:
+    """REAL_TIME / DELAYED / EOD / UNKNOWN según la latencia medida al recibirla; STALE si ya no es vigente ahora."""
+    if isinstance(q, dict):
+        q = Cotizacion(**{k: q[k] for k in Cotizacion.__dataclass_fields__})
+    return "STALE" if es_obsoleta(q, {}, ahora) else q.estado_latencia
 
 
 def cobertura_verificada(con: sqlite3.Connection, proveedor: str, instrumento_id: str) -> dict | None:
@@ -578,8 +609,8 @@ def precio_confiable(con: sqlite3.Connection, proveedores: dict[str, MarketDataP
         if es_obsoleta(q, instrumento, ahora):
             motivos.append(f"{nombre}: dato obsoleto ({q.hora_evento})")
             continue
-        return {"estado": "confiable", "cotizacion": q.a_dict(), "motivos": motivos}
-    return {"estado": SIN_PRECIO, "cotizacion": None, "motivos": motivos}
+        return {"estado": "confiable", "cotizacion": q.a_dict(), "calidad": calidad_actual(q, ahora), "motivos": motivos}
+    return {"estado": SIN_PRECIO, "cotizacion": None, "calidad": SIN_PRECIO, "motivos": motivos}
 
 
 def normalizar_mercado(instrumento: dict) -> str:

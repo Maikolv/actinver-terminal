@@ -27,3 +27,4 @@ _renders/
 # Informes crudos (Lighthouse incluye el token CSRF efímero de la página)
 docs/evidencia/*.json
 !docs/evidencia/experimento_indices_fred.json
+!docs/evidencia/experimento_estrategias.json

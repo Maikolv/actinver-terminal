@@ -72,7 +72,8 @@ class ForexFactory(Adaptador):
         for e in r.json():
             ident = hashlib.sha1(f"{e.get('title')}|{e.get('country')}|{e.get('date')}".encode()).hexdigest()[:16]
             out.append({"id": ident, "fecha": e.get("date"), "pais": e.get("country"), "titulo": e.get("title"),
-                        "impacto": e.get("impact"), "pronostico": e.get("forecast"), "previo": e.get("previous")})
+                        "impacto": e.get("impact"), "pronostico": e.get("forecast"), "previo": e.get("previous"),
+                        "actual": e.get("actual")})  # el feed semanal normalmente no lo trae
         return out
 
 
@@ -198,7 +199,40 @@ def actualizar_macro(con: sqlite3.Connection, ajustes: dict, cliente=None, forza
         con.executemany("INSERT OR REPLACE INTO eventos_macro (id, fecha, pais, titulo, impacto, pronostico, previo, fuente, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?)",
                         [(e["id"], e["fecha"], e["pais"], e["titulo"], e["impacto"], e["pronostico"], e["previo"],
                           "forexfactory", ts) for e in ev])
+        registrar_versiones_macro(con, ev, ts)
     return {"estado": "ok", "registros": len(ev)}
+
+
+def registrar_versiones_macro(con: sqlite3.Connection, eventos: list[dict], ts: str) -> int:
+    """Guarda una versión nueva de cada evento solo si cambió el consenso, el previo o el dato publicado.
+    Así se sabe QUÉ se conocía y CUÁNDO (revisiones incluidas)."""
+    n = 0
+    for e in eventos:
+        ult = con.execute("SELECT pronostico, previo, actual FROM eventos_macro_versiones WHERE evento_id=? "
+                          "ORDER BY obtenido_en DESC LIMIT 1", (e["id"],)).fetchone()
+        nuevo = (e.get("pronostico") or "", e.get("previo") or "", e.get("actual") or "")
+        if ult is None or tuple(x or "" for x in ult) != nuevo:
+            con.execute("INSERT OR IGNORE INTO eventos_macro_versiones (evento_id, obtenido_en, fecha, pais, titulo, impacto, "
+                        "pronostico, previo, actual, fuente) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                        (e["id"], ts, e.get("fecha"), e.get("pais"), e.get("titulo"), e.get("impacto"), *nuevo, "forexfactory"))
+            n += 1
+    con.commit()
+    return n
+
+
+def macro_conocido_en(con: sqlite3.Connection, evento_id: str, T: str) -> dict | None:
+    """Lo que se sabía del evento a la hora T: el consenso vigente y el dato efectivo SOLO si ya se había publicado
+    (hora del evento ≤ T) y la terminal ya lo había obtenido (obtenido_en ≤ T)."""
+    f = con.execute("SELECT * FROM eventos_macro_versiones WHERE evento_id=? AND obtenido_en<=? ORDER BY obtenido_en DESC LIMIT 1",
+                    (evento_id, T)).fetchone()
+    if not f:
+        return None
+    d = dict(f)
+    publicado = d["fecha"] and datetime.fromisoformat(d["fecha"]) <= datetime.fromisoformat(T)
+    if not publicado:
+        d["actual"] = None
+    d["actual_publicado"] = bool(publicado and d["actual"])
+    return d
 
 
 def actualizar_noticias(con: sqlite3.Connection, ajustes: dict, instrumentos: list[dict], cliente=None) -> dict:
