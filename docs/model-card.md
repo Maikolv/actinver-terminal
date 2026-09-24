@@ -39,3 +39,25 @@ No tienen valor para el mercado real. El modelo no supera a las referencias en H
 - El embargo y la purga evitan fugas de información; **no** garantizan que el modelo acierte.
 - La probabilidad de subida está calibrada con residuos de validación; su cobertura observada fue de 0.75 a 0.80 contra el 0.80 nominal.
 - Kronos está pendiente de autorización para descargar torch y sus pesos.
+
+## Banco de estrategias simples frente a referencias (índices reales de FRED)
+
+Script: `scripts/experimento_estrategias.py`; código: `terminal/investigacion/estrategias.py`.
+
+- **Periodos:** entrenamiento 2016-09-26 → 2023-09-19; embargo de 5 sesiones; prueba 2023-09-27 → 2026-09-22.
+- **Parámetros elegidos solo con el entrenamiento** (mayor Sharpe): {'impulso': {'L': 60}, 'reversion': {'L': 10}, 'inversa_vol': {'L': 60}, 'impulso_riesgo': {'L': 60, 'Lv': 60}}.
+- **Configuraciones registradas:** 28.
+- **Ejecución:** señal con el cierre de t, operación al cierre de t+1; rebalanceo cada 5 sesiones; tope de 50 %; costo de 0.116 % + deslizamiento de 0.1 %.
+
+| Estrategia | Parámetros | Neto de la prueba | Neto con deslizamiento 0.5 % | Sharpe | Caída máx. | Rotación | Años mejores que pesos iguales | p (bootstrap) | Veredicto |
+|---|---|---|---|---|---|---|---|---|---|
+| efectivo | — | +0.0% | +0.0% | 0.00 | +0.0% | 0.0 | 0/4 | — | referencia |
+| pesos_iguales | — | +79.2% | +77.9% | 1.33 | -19.5% | 1.8 | 0/4 | — | referencia |
+| comprar_y_mantener | — | +79.9% | +79.2% | 1.33 | -19.7% | 1.0 | 3/4 | — | referencia |
+| impulso | {'L': 60} | +55.2% | +39.6% | 1.23 | -10.6% | 26.4 | 0/4 | 0.834 | VENTAJA NO DEMOSTRADA |
+| reversion | {'L': 10} | +61.7% | +24.3% | 1.08 | -20.8% | 65.6 | 0/4 | 0.983 | VENTAJA NO DEMOSTRADA |
+| inversa_vol | {'L': 60} | +76.0% | +73.7% | 1.33 | -18.9% | 3.2 | 0/4 | 0.949 | VENTAJA NO DEMOSTRADA |
+| impulso_riesgo | {'L': 60, 'Lv': 60} | +55.2% | +39.6% | 1.23 | -10.6% | 26.4 | 0/4 | 0.834 | VENTAJA NO DEMOSTRADA |
+
+**Veredicto global: VENTAJA NO DEMOSTRADA.** Ninguna regla supera a pesos iguales ni en resultado neto ni en años ganados (p entre 0.83 y 0.98). Con solo 3 índices, «impulso con riesgo» coincide con «impulso», porque el tope del 50 % iguala los pesos. Se conserva la estrategia base transparente: diversificación con reglas del Reto (skfolio), sin señales direccionales.
+

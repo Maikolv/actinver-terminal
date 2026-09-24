@@ -338,7 +338,8 @@ async def post_importar(archivo: UploadFile = File(...), tipo: str = Form(...), 
 
 @app.get("/api/plantilla/{tipo}")
 def plantilla(tipo: str):
-    if tipo not in importar.COLUMNAS:
+    from . import importar_contexto
+    if tipo not in importar.COLUMNAS and tipo not in importar_contexto.COLUMNAS:
         raise HTTPException(404, "Plantilla no encontrada")
     return PlainTextResponse(importar.plantilla(tipo), media_type="text/csv; charset=utf-8",
                              headers={"Content-Disposition": f'attachment; filename="plantilla_{tipo}.csv"'})
@@ -525,6 +526,56 @@ def post_bitacora(cuerpo: dict = Body(...), con=Depends(con_db)):
     except ValueError as e:
         raise cartera.ErrorValidacion([str(e)]) from None
     return {"id": i}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Boletas de decisión (para captura MANUAL en el portal; nunca se envían)
+@app.get("/api/boletas")
+def get_boletas(con=Depends(con_db)):
+    from . import boleta
+    return {"boletas": boleta.listar(con, AJUSTES, recalcular_vigentes=True),
+            "aviso": "Cada boleta vigente se recalculó justo ahora. Una boleta no es una orden: usted la captura en el portal."}
+
+
+@app.post("/api/boletas/generar")
+def generar_boletas(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    from . import boleta
+    clave = str((cuerpo or {}).get("propuesta") or "acciones_ajuste")
+    try:
+        return {"resultado": boleta.generar(con, AJUSTES, clave)}
+    except ValueError as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+
+
+@app.post("/api/boletas/{bid}/recalcular")
+def recalcular_boleta(bid: int, con=Depends(con_db)):
+    from . import boleta
+    try:
+        return boleta.recalcular(con, AJUSTES, bid)
+    except ValueError as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+
+
+@app.post("/api/boletas/{bid}/descartar")
+def descartar_boleta(bid: int, cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    from . import boleta
+    boleta.descartar(con, bid, str((cuerpo or {}).get("motivo") or ""))
+    return {"ok": True}
+
+
+@app.post("/api/boletas/{bid}/ejecutada")
+def boleta_ejecutada(bid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    """El participante declara la ejecución CONFIRMADA en el portal (folio, cantidad y precio reales)."""
+    from . import boleta
+    try:
+        tid = boleta.marcar_ejecutada(con, bid, str(cuerpo.get("folio") or ""), str(cuerpo.get("fecha") or ""),
+                                      float(cuerpo.get("cantidad") or 0), float(cuerpo.get("precio") or 0),
+                                      cuerpo.get("comision"), cuerpo.get("impuesto"))
+    except (ValueError, TypeError) as e:
+        errores = getattr(e, "errores", None) or [str(e)]
+        raise cartera.ErrorValidacion(errores) from None
+    disparar_motor()
+    return {"transaccion_id": tid}
 
 
 @app.post("/webhook/tradingview")

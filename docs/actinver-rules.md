@@ -40,3 +40,10 @@ Una orden registrada como pendiente (`/api/pendientes-portal`) es solo una refer
 ## Cambios en las bases
 
 Si `config/reto.yaml` cambia, se abre una versión nueva. La pestaña «Reto» muestra un **aviso de discrepancia** hasta que el participante la marque como revisada. Las instantáneas, la bitácora y los pronósticos guardan la versión con que se calcularon: no se recalculan en silencio. Lo verifica `test_reglas_versionadas_y_aviso_de_discrepancia`.
+
+## Estados de orden, deslizamiento y conciliación (v0.7)
+
+- **Estados:** `enviada`, `pendiente`, `ejecutada`, `cancelada`, `expirada`. Solo `ejecutada`, enlazada a una operación confirmada con folio, cambia posiciones y efectivo (`test_estados_de_orden_solo_ejecutada_con_confirmacion`).
+- **Costos:** comisión 0.10 % + IVA 16 % sobre la comisión, con escenarios de deslizamiento de 0, 0.1 % y 0.5 %, y el caso de no ejecución de una orden limitada (`terminal/boleta.py`).
+- **Conciliación:** los saldos del portal se capturan o importan; si la diferencia con la estimación es de 1 % o más, se genera una alerta.
+

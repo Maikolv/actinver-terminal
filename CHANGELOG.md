@@ -2,6 +2,24 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.7.0] — 2026-09-24 (rama `boleta-decision`)
+
+### Añadido
+- **Boleta de decisión** (`terminal/boleta.py`, `/api/boletas`), para captura manual:
+  - serie exacta, cantidad entera y precio límite;
+  - costos con deslizamiento y caso de no ejecución;
+  - efecto en efectivo y concentración, rango histórico y pérdida plausible;
+  - liquidez, alternativa, invalidación y caducidad;
+  - recálculo antes de presentarla y marcado manual de la ejecución con folio.
+- **Órdenes:** estados enviada/pendiente/ejecutada/cancelada/expirada; «ejecutada» solo con la operación confirmada.
+- **Precios:** calidad `STALE` y `ForeignMarketLicensedProvider`, que cubre la bolsa de origen y nunca la serie SIC.
+- **Importadores** con plantilla: confirmaciones con folio, saldos del portal, notas de Seeking Alpha y exportación de InsiderFinance.
+- **Calendario macro versionado** (`eventos_macro_versiones`) y `macro_conocido_en(T)`, que oculta el dato efectivo antes de publicarse.
+- **Alertas:** prioridad, caducidad, impacto en MXN y ruptura de tesis (nivel de invalidación en la bitácora).
+- **Banco de estrategias simples** (`terminal/investigacion/estrategias.py`) frente a efectivo, pesos iguales y comprar y mantener. Con índices reales de FRED: **VENTAJA NO DEMOSTRADA** (28 configuraciones registradas).
+- **Documentos:** decision-workflow, data-providers e instrument-mapping; model-card, quant-methodology y actinver-rules actualizados.
+- `tests/test_boleta.py` (15 pruebas; 146 en total).
+
 ## [0.6.0] — 2026-09-23 (rama `ampliacion-integral`)
 
 ### Añadido

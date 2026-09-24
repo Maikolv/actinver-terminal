@@ -743,8 +743,43 @@ document.getElementById("form-orden").addEventListener("submit", async (ev) => {
   try { await api("/api/pendientes-portal", { method: "POST", json: d }); notificar("Orden pendiente registrada como referencia (no cambia su cartera)."); f.reset(); pintarRegistro(); }
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 });
+async function pintarBoletas() {
+  try {
+    const d = await api("/api/boletas");
+    const est = { vigente: "vigente", invalidada: "vencido", caducada: "sin_datos", descartada: "sin_datos", marcada_ejecutada: "vigente" };
+    limpiar("boletas-lista", h("p", { clase: "suave", texto: d.aviso }), tabla([
+      { t: "Emisora", f: (b) => h("strong", { texto: b.emisora_serie || b.instrumento_id }) },
+      { t: "Tipo", f: (b) => b.tipo }, { t: "Lado · títulos", f: (b) => (b.lado ? `${b.lado} · ${num(b.cantidad)}` : "—") },
+      { t: "Límite", f: (b) => (b.precio_limite ? mxn(b.precio_limite, true) : "—"), num: true },
+      { t: "Costo (com.+IVA)", f: (b) => (b.costos ? mxn(b.costos.total, true) : "—"), num: true },
+      { t: "Efectivo después", f: (b) => mxn(b.efecto.efectivo_despues, true), num: true },
+      { t: "Peso después", f: (b) => pct(b.efecto.peso_emisora_despues), num: true },
+      { t: "Rango 10–90 % (estimado)", f: (b) => (b.rango && b.rango.disponible ? `${pct(b.rango.p10)} a ${pct(b.rango.p90)}` : "—") },
+      { t: "Precio", f: (b) => chip(b.calidad_precio === "SIN PRECIO CONFIABLE" || b.calidad_precio === "STALE" ? "vencido" : "vigente", b.calidad_precio) },
+      { t: "Estado", f: (b) => h("span", { title: b.motivo_estado || "" }, chip(est[b.estado] || "sin_datos", b.estado)) },
+      { t: "Falta", f: (b) => (b.datos_faltantes || []).join(" · ") || "—" },
+      { t: "", f: (b) => (b.estado === "vigente" && b.lado ? h("span", {},
+          h("button", { type: "button", clase: "boton boton--secundario", onclick: () => ejecutarBoleta(b) }, "Marcar ejecutada"), " ",
+          h("button", { type: "button", clase: "boton boton--secundario", onclick: async () => { await api(`/api/boletas/${b.id}/descartar`, { method: "POST", json: {} }); pintarBoletas(); } }, "Descartar")) : "") }],
+      d.boletas.slice(0, 40), { vacio: "Sin boletas. Genérelas desde la propuesta vigente." }));
+  } catch (e) { limpiar("boletas-lista", errorCaja(e)); }
+}
+async function ejecutarBoleta(b) {
+  const folio = window.prompt(`Folio de la confirmación del portal para ${b.emisora_serie}:`);
+  if (!folio) return;
+  const cantidad = window.prompt("Títulos ejecutados (según la confirmación):", String(b.cantidad));
+  const precio = window.prompt("Precio ejecutado (según la confirmación):", String(b.precio_limite));
+  const fecha = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Mexico_City" }).format(new Date());
+  try { await api(`/api/boletas/${b.id}/ejecutada`, { method: "POST", json: { folio, cantidad, precio, fecha } }); notificar("Operación confirmada registrada."); cargarTiempo(); }
+  catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+}
+document.getElementById("btn-boletas").addEventListener("click", async () => {
+  try { await api("/api/boletas/generar", { method: "POST", json: { propuesta: "acciones_ajuste" } }); pintarBoletas(); }
+  catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
 async function cargarTiempo() {
   pintarRegistro();
+  pintarBoletas();
   const [pa, pr, fu] = await Promise.allSettled([api("/api/pasado"), api("/api/presente"), api("/api/futuro")]);
   pa.status === "fulfilled" ? pintarPasado(pa.value) : limpiar("pasado-contenido", errorCaja(pa.reason));
   pr.status === "fulfilled" ? pintarPresente(pr.value) : limpiar("presente-contenido", errorCaja(pr.reason));
