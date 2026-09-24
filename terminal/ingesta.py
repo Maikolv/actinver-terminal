@@ -57,6 +57,14 @@ def _registrar(con, proveedor: str, inicio: str, estado: str, registros: int, me
     con.commit()
 
 
+def _consultado_hace_poco(con, proveedor: str, horas: float) -> bool:
+    f = con.execute("SELECT fin FROM ingestas WHERE proveedor=? AND estado='ok' ORDER BY id DESC LIMIT 1", (proveedor,)).fetchone()
+    if not f or not f[0]:
+        return False
+    from datetime import UTC, datetime
+    return datetime.now(UTC) - datetime.fromisoformat(f[0]) < timedelta(hours=horas)
+
+
 def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
     hoy = hoy or date.today()
     for n in ORDEN_FX:
@@ -67,6 +75,10 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
         ult = _ultima_fecha(con, "fx", "par", "USDMXN", n)
         desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA + 30)
         if desde > hoy:
+            return {"proveedor": n, "estado": "al_dia", "registros": 0}
+        if _consultado_hace_poco(con, n, horas=6):
+            # FRED publica con días de rezago y Banxico una vez al día: volver a preguntar cada 15 min solo agota el
+            # límite diario y produce falsas alertas de «fuente caída».
             return {"proveedor": n, "estado": "al_dia", "registros": 0}
         try:
             barras = a.historico(FX_USDMXN, desde, hoy)

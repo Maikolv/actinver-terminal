@@ -5,7 +5,7 @@ from datetime import date
 import httpx
 import pytest
 
-from terminal.adaptadores import Banxico, Eodhd, ErrorProveedor, Fred, LimiteAlcanzado, Tiingo
+from terminal.adaptadores import Banxico, Barra, Eodhd, ErrorProveedor, Fred, LimiteAlcanzado, Tiingo
 from terminal.adaptadores.base import limpiar
 
 SECRETO = "clave-super-secreta-123"  # valor ficticio de prueba  # pragma: allowlist secret
@@ -70,3 +70,22 @@ def test_reintenta_429_y_oculta_credencial(con, monkeypatch):
         a.historico({"clave": "WALMEX", "serie": "*"}, date(2026, 1, 1), date(2026, 1, 2))
     assert len(llamadas) == 3 and SECRETO not in str(e.value)
     assert limpiar(f"https://x/?api_token={SECRETO}&fmt=json") == "https://x/?api_token=***&fmt=json"
+
+
+def test_tipo_de_cambio_no_se_reconsulta_si_ya_se_obtuvo_hace_poco(con):
+    """FRED publica con rezago: tras una consulta exitosa no se vuelve a pedir en 6 h (evita agotar el límite)."""
+    from terminal import ingesta
+    from terminal.db import ahora
+    llamadas = []
+
+    class Fx:
+        def configurado(self): return True
+        def historico(self, *a):
+            llamadas.append(a)
+            return [Barra(fecha="2020-01-02", cierre=18.9)]
+    ads = {"banxico": type("X", (), {"configurado": lambda s: False})(), "fred": Fx()}
+    assert ingesta.actualizar_fx(con, ads)["estado"] == "ok" and len(llamadas) == 1
+    assert ingesta.actualizar_fx(con, ads)["estado"] == "al_dia" and len(llamadas) == 1
+    con.execute("UPDATE ingestas SET fin='2000-01-01T00:00:00+00:00'")
+    ingesta.actualizar_fx(con, ads)
+    assert len(llamadas) == 2 and ahora()
