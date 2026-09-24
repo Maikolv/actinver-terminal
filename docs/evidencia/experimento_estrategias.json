@@ -1,0 +1,576 @@
+{
+ "n_sesiones": 2511,
+ "entrenamiento": [
+  "2016-09-26",
+  "2023-09-19"
+ ],
+ "prueba": [
+  "2023-09-27",
+  "2026-09-22"
+ ],
+ "embargo": 5,
+ "k": 2,
+ "parametros_elegidos_con_entrenamiento": {
+  "impulso": {
+   "L": 60
+  },
+  "reversion": {
+   "L": 10
+  },
+  "inversa_vol": {
+   "L": 60
+  },
+  "impulso_riesgo": {
+   "L": 60,
+   "Lv": 60
+  }
+ },
+ "resumen": [
+  {
+   "estrategia": "efectivo",
+   "parametros": {},
+   "neto_prueba": 0.0,
+   "neto_sin_desliz": 0.0,
+   "neto_desliz_0.5%": 0.0,
+   "sharpe": 0.0,
+   "caida_maxima": 0.0,
+   "rotacion": 0.0,
+   "exposicion_media": 0.0,
+   "subperiodos_ganados_vs_pesos_iguales": "0/4",
+   "p_bootstrap_vs_pesos_iguales": null,
+   "veredicto": "referencia"
+  },
+  {
+   "estrategia": "pesos_iguales",
+   "parametros": {},
+   "neto_prueba": 0.7918006419882726,
+   "neto_sin_desliz": 0.7950611598095398,
+   "neto_desliz_0.5%": 0.7787996640869517,
+   "sharpe": 1.3306155039844472,
+   "caida_maxima": -0.1953161675707712,
+   "rotacion": 1.8160416579529968,
+   "exposicion_media": 0.9986648865153538,
+   "subperiodos_ganados_vs_pesos_iguales": "0/4",
+   "p_bootstrap_vs_pesos_iguales": null,
+   "veredicto": "referencia"
+  },
+  {
+   "estrategia": "comprar_y_mantener",
+   "parametros": {},
+   "neto_prueba": 0.7994838003287317,
+   "neto_sin_desliz": 0.8012871794279168,
+   "neto_desliz_0.5%": 0.7922702839320024,
+   "sharpe": 1.3290275126265272,
+   "caida_maxima": -0.19659526965694962,
+   "rotacion": 1.0,
+   "exposicion_media": 0.9986648865153545,
+   "subperiodos_ganados_vs_pesos_iguales": "3/4",
+   "p_bootstrap_vs_pesos_iguales": null,
+   "veredicto": "referencia"
+  },
+  {
+   "estrategia": "impulso",
+   "parametros": {
+    "L": 60
+   },
+   "neto_prueba": 0.5519686249144267,
+   "neto_sin_desliz": 0.5935649390888649,
+   "neto_desliz_0.5%": 0.3958100803886595,
+   "sharpe": 1.233963849603926,
+   "caida_maxima": -0.1056199153730435,
+   "rotacion": 26.445690925300315,
+   "exposicion_media": 0.8318135583042261,
+   "subperiodos_ganados_vs_pesos_iguales": "0/4",
+   "p_bootstrap_vs_pesos_iguales": 0.834,
+   "veredicto": "VENTAJA NO DEMOSTRADA"
+  },
+  {
+   "estrategia": "reversion",
+   "parametros": {
+    "L": 10
+   },
+   "neto_prueba": 0.616885776712869,
+   "neto_sin_desliz": 0.7266274236050387,
+   "neto_desliz_0.5%": 0.24255536029787406,
+   "sharpe": 1.0759739606279928,
+   "caida_maxima": -0.20781432881990092,
+   "rotacion": 65.58986491764352,
+   "exposicion_media": 0.9986648865153538,
+   "subperiodos_ganados_vs_pesos_iguales": "0/4",
+   "p_bootstrap_vs_pesos_iguales": 0.9825,
+   "veredicto": "VENTAJA NO DEMOSTRADA"
+  },
+  {
+   "estrategia": "inversa_vol",
+   "parametros": {
+    "L": 60
+   },
+   "neto_prueba": 0.7599420928180733,
+   "neto_sin_desliz": 0.7655989570985582,
+   "neto_desliz_0.5%": 0.7374768385961146,
+   "sharpe": 1.3293610232852453,
+   "caida_maxima": -0.1888349314412835,
+   "rotacion": 3.2067761529567447,
+   "exposicion_media": 0.9986648865153538,
+   "subperiodos_ganados_vs_pesos_iguales": "0/4",
+   "p_bootstrap_vs_pesos_iguales": 0.949,
+   "veredicto": "VENTAJA NO DEMOSTRADA"
+  },
+  {
+   "estrategia": "impulso_riesgo",
+   "parametros": {
+    "L": 60,
+    "Lv": 60
+   },
+   "neto_prueba": 0.5519686249144267,
+   "neto_sin_desliz": 0.5935649390888642,
+   "neto_desliz_0.5%": 0.39581008038865906,
+   "sharpe": 1.2339638496039267,
+   "caida_maxima": -0.1056199153730435,
+   "rotacion": 26.445690925300312,
+   "exposicion_media": 0.8318135583042261,
+   "subperiodos_ganados_vs_pesos_iguales": "0/4",
+   "p_bootstrap_vs_pesos_iguales": 0.834,
+   "veredicto": "VENTAJA NO DEMOSTRADA"
+  }
+ ],
+ "configuraciones_registradas": [
+  {
+   "tramo": "entrenamiento",
+   "familia": "impulso",
+   "parametros": {
+    "L": 20
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.32851201535147245,
+   "vol_anual": 0.12666336050920876,
+   "sharpe": 0.3891914931722545,
+   "caida_maxima": -0.23184571104407592,
+   "rotacion_total": 117.57163616511781,
+   "rebalanceos": 347,
+   "exposicion_media": 0.7171285740410066
+  },
+  {
+   "tramo": "entrenamiento",
+   "familia": "impulso",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.504448511597408,
+   "vol_anual": 0.12785492633753592,
+   "sharpe": 0.5389222351573069,
+   "caida_maxima": -0.2896174584583916,
+   "rotacion_total": 80.75139632136246,
+   "rebalanceos": 339,
+   "exposicion_media": 0.7592081927155573
+  },
+  {
+   "tramo": "entrenamiento",
+   "familia": "impulso",
+   "parametros": {
+    "L": 120
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.4934989682901858,
+   "vol_anual": 0.1386513684372975,
+   "sharpe": 0.5153712788463204,
+   "caida_maxima": -0.20993784871087073,
+   "rotacion_total": 49.918937415240464,
+   "rebalanceos": 327,
+   "exposicion_media": 0.7825182406570106
+  },
+  {
+   "tramo": "entrenamiento",
+   "familia": "reversion",
+   "parametros": {
+    "L": 5
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.3888133216868408,
+   "vol_anual": 0.2028907107171302,
+   "sharpe": 0.3348933607805876,
+   "caida_maxima": -0.3478535120513043,
+   "rotacion_total": 209.20538200722896,
+   "rebalanceos": 350,
+   "exposicion_media": 0.9994288977727013
+  },
+  {
+   "tramo": "entrenamiento",
+   "familia": "reversion",
+   "parametros": {
+    "L": 10
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.5439255258864799,
+   "vol_anual": 0.20281175277685853,
+   "sharpe": 0.4110003851492681,
+   "caida_maxima": -0.3545692671457249,
+   "rotacion_total": 116.16593227870706,
+   "rebalanceos": 349,
+   "exposicion_media": 0.9994272623138603
+  },
+  {
+   "tramo": "entrenamiento",
+   "familia": "inversa_vol",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 1.042274362681788,
+   "vol_anual": 0.19772821664508042,
+   "sharpe": 0.6360866222871617,
+   "caida_maxima": -0.33563972176750856,
+   "rotacion_total": 5.767373483871786,
+   "rebalanceos": 339,
+   "exposicion_media": 0.9994103773584906
+  },
+  {
+   "tramo": "entrenamiento",
+   "familia": "impulso_riesgo",
+   "parametros": {
+    "L": 60,
+    "Lv": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.5044485115974073,
+   "vol_anual": 0.1278549263375359,
+   "sharpe": 0.538922235157307,
+   "caida_maxima": -0.2896174584583917,
+   "rotacion_total": 80.75139632136242,
+   "rebalanceos": 339,
+   "exposicion_media": 0.7592081927155573
+  },
+  {
+   "tramo": "prueba",
+   "familia": "efectivo",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.0,
+   "vol_anual": 0.0,
+   "sharpe": 0.0,
+   "caida_maxima": 0.0,
+   "rotacion_total": 0.0,
+   "rebalanceos": 150,
+   "exposicion_media": 0.0
+  },
+  {
+   "tramo": "prueba",
+   "familia": "efectivo",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.0,
+   "vol_anual": 0.0,
+   "sharpe": 0.0,
+   "caida_maxima": 0.0,
+   "rotacion_total": 0.0,
+   "rebalanceos": 150,
+   "exposicion_media": 0.0
+  },
+  {
+   "tramo": "prueba",
+   "familia": "efectivo",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.0,
+   "vol_anual": 0.0,
+   "sharpe": 0.0,
+   "caida_maxima": 0.0,
+   "rotacion_total": 0.0,
+   "rebalanceos": 150,
+   "exposicion_media": 0.0
+  },
+  {
+   "tramo": "prueba",
+   "familia": "pesos_iguales",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.7950611598095398,
+   "vol_anual": 0.1566935382228451,
+   "sharpe": 1.3345767676346272,
+   "caida_maxima": -0.19527920645155117,
+   "rotacion_total": 1.8160416579529968,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "pesos_iguales",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.7918006419882726,
+   "vol_anual": 0.15670082789231438,
+   "sharpe": 1.3306155039844472,
+   "caida_maxima": -0.1953161675707712,
+   "rotacion_total": 1.8160416579529968,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "pesos_iguales",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.7787996640869517,
+   "vol_anual": 0.15675152886552826,
+   "sharpe": 1.3145934453859505,
+   "caida_maxima": -0.1954639983837464,
+   "rotacion_total": 1.8160416579529968,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "comprar_y_mantener",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.8012871794279168,
+   "vol_anual": 0.15813750111177138,
+   "sharpe": 1.3311997482983131,
+   "caida_maxima": -0.19659526965694996,
+   "rotacion_total": 1.0,
+   "rebalanceos": 1,
+   "exposicion_media": 0.9986648865153545
+  },
+  {
+   "tramo": "prueba",
+   "familia": "comprar_y_mantener",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.7994838003287317,
+   "vol_anual": 0.15814281576685874,
+   "sharpe": 1.3290275126265272,
+   "caida_maxima": -0.19659526965694962,
+   "rotacion_total": 1.0,
+   "rebalanceos": 1,
+   "exposicion_media": 0.9986648865153545
+  },
+  {
+   "tramo": "prueba",
+   "familia": "comprar_y_mantener",
+   "parametros": {},
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.7922702839320024,
+   "vol_anual": 0.1581853432964437,
+   "sharpe": 1.3201625026315247,
+   "caida_maxima": -0.1965952696569495,
+   "rotacion_total": 1.0,
+   "rebalanceos": 1,
+   "exposicion_media": 0.9986648865153545
+  },
+  {
+   "tramo": "prueba",
+   "familia": "impulso",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.5935649390888649,
+   "vol_anual": 0.126296377418986,
+   "sharpe": 1.3048982286318693,
+   "caida_maxima": -0.10560265430561988,
+   "rotacion_total": 26.445690925300315,
+   "rebalanceos": 150,
+   "exposicion_media": 0.8318135583042261
+  },
+  {
+   "tramo": "prueba",
+   "familia": "impulso",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.5519686249144267,
+   "vol_anual": 0.12634592463002897,
+   "sharpe": 1.233963849603926,
+   "caida_maxima": -0.1056199153730435,
+   "rotacion_total": 26.445690925300315,
+   "rebalanceos": 150,
+   "exposicion_media": 0.8318135583042261
+  },
+  {
+   "tramo": "prueba",
+   "familia": "impulso",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.3958100803886595,
+   "vol_anual": 0.12718519309622223,
+   "sharpe": 0.9459893723126847,
+   "caida_maxima": -0.10568895821809021,
+   "rotacion_total": 26.445690925300315,
+   "rebalanceos": 150,
+   "exposicion_media": 0.8318135583042261
+  },
+  {
+   "tramo": "prueba",
+   "familia": "reversion",
+   "parametros": {
+    "L": 10
+   },
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.7266274236050387,
+   "vol_anual": 0.1622352031475226,
+   "sharpe": 1.213650857560212,
+   "caida_maxima": -0.2030007376957782,
+   "rotacion_total": 65.58986491764352,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "reversion",
+   "parametros": {
+    "L": 10
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.616885776712869,
+   "vol_anual": 0.16248467130308097,
+   "sharpe": 1.0759739606279928,
+   "caida_maxima": -0.20781432881990092,
+   "rotacion_total": 65.58986491764352,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "reversion",
+   "parametros": {
+    "L": 10
+   },
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.24255536029787406,
+   "vol_anual": 0.1647073868577707,
+   "sharpe": 0.5255307886435588,
+   "caida_maxima": -0.22893507009388148,
+   "rotacion_total": 65.58986491764352,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "inversa_vol",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.7655989570985582,
+   "vol_anual": 0.15172349051520592,
+   "sharpe": 1.3365621975074502,
+   "caida_maxima": -0.188768943424926,
+   "rotacion_total": 3.2067761529567447,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "inversa_vol",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.7599420928180733,
+   "vol_anual": 0.1517337751161382,
+   "sharpe": 1.3293610232852453,
+   "caida_maxima": -0.1888349314412835,
+   "rotacion_total": 3.2067761529567447,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "inversa_vol",
+   "parametros": {
+    "L": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.7374768385961146,
+   "vol_anual": 0.15179804093425203,
+   "sharpe": 1.3003679360795728,
+   "caida_maxima": -0.18909884219394568,
+   "rotacion_total": 3.2067761529567447,
+   "rebalanceos": 150,
+   "exposicion_media": 0.9986648865153538
+  },
+  {
+   "tramo": "prueba",
+   "familia": "impulso_riesgo",
+   "parametros": {
+    "L": 60,
+    "Lv": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.0,
+   "resultado_neto": 0.5935649390888642,
+   "vol_anual": 0.126296377418986,
+   "sharpe": 1.3048982286318693,
+   "caida_maxima": -0.10560265430561988,
+   "rotacion_total": 26.445690925300312,
+   "rebalanceos": 150,
+   "exposicion_media": 0.8318135583042261
+  },
+  {
+   "tramo": "prueba",
+   "familia": "impulso_riesgo",
+   "parametros": {
+    "L": 60,
+    "Lv": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.001,
+   "resultado_neto": 0.5519686249144267,
+   "vol_anual": 0.12634592463002894,
+   "sharpe": 1.2339638496039267,
+   "caida_maxima": -0.1056199153730435,
+   "rotacion_total": 26.445690925300312,
+   "rebalanceos": 150,
+   "exposicion_media": 0.8318135583042261
+  },
+  {
+   "tramo": "prueba",
+   "familia": "impulso_riesgo",
+   "parametros": {
+    "L": 60,
+    "Lv": 60
+   },
+   "k": 2,
+   "deslizamiento": 0.005,
+   "resultado_neto": 0.39581008038865906,
+   "vol_anual": 0.12718519309622223,
+   "sharpe": 0.9459893723126845,
+   "caida_maxima": -0.10568895821809021,
+   "rotacion_total": 26.445690925300312,
+   "rebalanceos": 150,
+   "exposicion_media": 0.8318135583042261
+  }
+ ],
+ "veredicto_global": "VENTAJA NO DEMOSTRADA",
+ "fuente": "FRED: S&P 500, Nasdaq Composite, Dow Jones (índices; no son instrumentos del Reto)",
+ "ejecutado": "2026-09-24T05:27:42+00:00"
+}
