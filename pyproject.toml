@@ -28,9 +28,25 @@ build-backend = "hatchling.build"
 packages = ["terminal"]
 
 [dependency-groups]
+# Candidato experimental Kronos (shiyu-coder/Kronos). Opcional: uv sync --group kronos (torch CPU, varios cientos de MB).
+kronos = [
+    "torch>=2.0",
+    "einops==0.8.1",
+    "huggingface_hub==0.33.1",
+    "safetensors==0.6.2",
+    "tqdm>=4.66",
+]
 dev = [
     "detect-secrets>=1.5.0",
     "httpx>=0.28.1",
     "pip-audit>=2.10.1",
     "pytest>=9.1.1",
 ]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
