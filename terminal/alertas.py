@@ -182,6 +182,12 @@ def _estado(con, regla: str, clave: str) -> bool:
     return bool(f and f["activa"])
 
 
+PRIORIDAD = {"critica": 1, "aviso": 2, "info": 3}
+# Horas de vigencia de una alerta antes de marcarse «caducada» (datos y precios cambian rápido; eventos duran más).
+CADUCIDAD_H = {"datos_inciertos": 6, "dato_vencido": 6, "cambio_brusco": 8, "stop_loss": 24, "take_profit": 24,
+               "deriva": 24, "concentracion": 24, "ruptura_tesis": 24, "macro": 48, "evento_corporativo": 72, "noticia": 48,
+               "insider": 72, "cinco_acciones": 24, "diferencia_portal": 24, "deterioro_modelo": 168}
+
 INCERTIDUMBRE = {
     "deriva": "Media: depende del rendimiento esperado estimado (incierto) y de precios posiblemente no vigentes.",
     "stop_loss": "Baja si el precio es vigente; el precio del portal puede diferir.",
@@ -222,11 +228,13 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
                         (c.regla, c.clave, int(estado_nuevo), ahora_dt.isoformat(timespec="seconds") if dispara else None))
             if dispara:
                 cur = con.execute(
-                    "INSERT INTO alertas (ts, regla, clave, severidad, titulo, motivo, datos, fuente, accion, simulacion) "
-                    "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO alertas (ts, regla, clave, severidad, titulo, motivo, datos, fuente, accion, simulacion, prioridad, "
+                    "caduca_en, impacto_mxn) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (ahora_dt.isoformat(timespec="seconds"), c.regla, c.clave, c.severidad, c.titulo[:200], c.motivo[:1000],
                      json.dumps(c.datos, default=str)[:4000], c.fuente[:200], c.accion[:300],
-                     json.dumps(c.simulacion) if c.simulacion else None))
+                     json.dumps(c.simulacion) if c.simulacion else None, PRIORIDAD.get(c.severidad, 3),
+                     (ahora_dt + timedelta(hours=CADUCIDAD_H.get(c.regla, 24))).isoformat(timespec="seconds"),
+                     (c.datos or {}).get("impacto_mxn")))
                 nuevas.append({"id": cur.lastrowid, "regla": c.regla, "clave": c.clave, "titulo": c.titulo,
                                "severidad": c.severidad, "motivo": c.motivo, "accion": c.accion})
     if nuevas and notificar:
@@ -256,7 +264,8 @@ def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condi
                              f"Concentración {p.get('clave_operable') or p['instrumento_id']} {w:.1%}",
                              f"La posición vale {w:.1%} del portafolio estimado (tope del Reto {tope:.0%}; aviso desde "
                              f"{cfg.get('concentracion_aviso', 0.45):.0%}).",
-                             {"calculo": f"{p.get('valor_mxn') or 0:,.2f} / {total:,.2f} = {w:.4f}", "peso": w},
+                             {"calculo": f"{p.get('valor_mxn') or 0:,.2f} / {total:,.2f} = {w:.4f}", "peso": w,
+                              "impacto_mxn": round(float(p.get("valor_mxn") or 0), 2)},
                              p.get("proveedor") or "cartera", "REVISAR la regla del 50 % antes de comprar más de esta emisora."))
     etapa = cartera.get("etapa")
     if etapa == "competencia" and reto.activo():
@@ -276,7 +285,7 @@ def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condi
         out.append(Condicion("perdida_maxima", etapa or "cartera", rend <= lim, "critica",
                              f"Pérdida del portafolio {rend:.1%} (límite propio {lim:.0%})",
                              f"Valor estimado {total:,.2f} vs base {base:,.2f}.",
-                             {"calculo": f"{total:,.2f} / {base:,.2f} − 1 = {rend:.4f}",
+                             {"calculo": f"{total:,.2f} / {base:,.2f} − 1 = {rend:.4f}", "impacto_mxn": round(total - base, 2),
                               "incertidumbre": "Estimación con precios de la terminal; compare con el saldo del portal."},
                              "cartera", "REVISAR el plan y el riesgo; el límite lo definió usted."))
     f = con.execute("SELECT * FROM saldos_portal ORDER BY id DESC LIMIT 1").fetchone()
@@ -325,6 +334,27 @@ def reglas_evento_corporativo(con, cfg: dict, ids: set[str], ahora_dt: datetime)
                              f"{r['tipo'].capitalize()} de {r['valor']} el {r['fecha']} reportado por {r['proveedor']}. {nota}",
                              {"calculo": f"valor {r['valor']}", "incertidumbre": "Baja: dato del proveedor; confirme en el portal."},
                              r["proveedor"], "REVISAR la posición en el portal tras el evento.", rearme=False))
+    return out
+
+
+def reglas_tesis(con, cartera: dict) -> list[Condicion]:
+    """Ruptura de tesis: el participante registró en la bitácora un nivel que invalida su tesis y el precio lo cruzó."""
+    precios = {p["instrumento_id"]: p for p in cartera.get("posiciones", [])}
+    out = []
+    for b in con.execute("SELECT * FROM bitacora_decisiones WHERE nivel_invalidacion IS NOT NULL AND instrumento_id IS NOT NULL"):
+        p = precios.get(b["instrumento_id"])
+        if not p or p.get("precio_mxn") is None or p.get("vigencia") in ("vencido", "sin_datos"):
+            continue
+        px, nivel = float(p["precio_mxn"]), float(b["nivel_invalidacion"])
+        rota = px < nivel if (b["direccion_invalidacion"] or "debajo") == "debajo" else px > nivel
+        impacto = (px - float(p.get("costo_promedio") or px)) * float(p.get("cantidad") or 0)
+        out.append(Condicion("ruptura_tesis", str(b["id"]), rota, "aviso",
+                             f"Ruptura de tesis: {p.get('clave_operable') or b['instrumento_id']}",
+                             f"El precio {px:,.2f} cruzó el nivel de invalidación {nivel:,.2f} ({b['direccion_invalidacion'] or 'debajo'}) "
+                             f"de su tesis: «{(b['tesis'] or '')[:120]}».",
+                             {"calculo": f"{px:,.4f} vs {nivel:,.4f}", "impacto_mxn": round(impacto, 2),
+                              "incertidumbre": "Depende de la vigencia del precio; confirme en el portal."},
+                             "bitácora de decisiones", "REVISAR la tesis registrada y decidir si sigue vigente."))
     return out
 
 
@@ -412,6 +442,8 @@ def ficha_revision(a: dict) -> dict:
     importe = sum(abs(float(x.get("monto") or 0)) for x in sim)
     return {
         "que_ocurrio": f"{a.get('titulo')}: {a.get('motivo')}",
+        "cuando": a.get("ts"), "prioridad": a.get("prioridad"), "caduca_en": a.get("caduca_en"),
+        "impacto_en_portafolio_mxn": a.get("impacto_mxn") if a.get("impacto_mxn") is not None else datos.get("impacto_mxn"),
         "datos_que_lo_sustentan": {"calculo": datos.get("calculo"), "fuente": a.get("fuente"), "hora": a.get("ts"),
                                    **{k: v for k, v in datos.items() if k not in ("calculo", "incertidumbre")}},
         "falta_confirmar": [x for x in (datos.get("incertidumbre"),
@@ -441,7 +473,7 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
              + reglas_tecnicas(con, cfg, cartera, propuestas, mercado.ultimo_fx(con, ajustes))
              + reglas_reto(con, cfg, cartera, ahora_dt) + reglas_cambio_brusco(cfg, cartera, precios)
              + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
-             + reglas_webhook(con, ahora_dt))
+             + reglas_webhook(con, ahora_dt) + reglas_tesis(con, cartera))
     if cfg.get("exigir_precio_confiable", True):
         from . import cotizaciones
         provs = cotizaciones.construir(con, ajustes.es_demo)
@@ -471,5 +503,13 @@ def marcar(con: sqlite3.Connection, aid: int, estado: str) -> None:
         con.execute("UPDATE alertas SET estado=? WHERE id=?", (estado, aid))
 
 
+def caducar(con: sqlite3.Connection, ahora_dt: datetime | None = None) -> int:
+    t = (ahora_dt or datetime.now(UTC)).isoformat(timespec="seconds")
+    n = con.execute("UPDATE alertas SET estado='caducada' WHERE estado='nueva' AND caduca_en IS NOT NULL AND caduca_en < ?", (t,)).rowcount
+    con.commit()
+    return n
+
+
 def pendientes(con: sqlite3.Connection) -> int:
+    caducar(con)
     return int(con.execute("SELECT COUNT(*) FROM alertas WHERE estado='nueva'").fetchone()[0])

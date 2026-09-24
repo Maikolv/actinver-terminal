@@ -25,8 +25,15 @@ CREATE TABLE IF NOT EXISTS ordenes_pendientes (
     id INTEGER PRIMARY KEY AUTOINCREMENT, creada_en TEXT NOT NULL, instrumento_id TEXT NOT NULL, lado TEXT NOT NULL
     CHECK (lado IN ('compra','venta')), tipo_orden TEXT NOT NULL CHECK (tipo_orden IN ('mercado','limitada')),
     cantidad REAL NOT NULL, precio_limite REAL, estado TEXT NOT NULL DEFAULT 'pendiente'
-    CHECK (estado IN ('pendiente','ejecutada','cancelada','expirada')), transaccion_id INTEGER, nota TEXT,
-    ingested_at TEXT NOT NULL
+    CHECK (estado IN ('enviada','pendiente','ejecutada','cancelada','expirada')), transaccion_id INTEGER, nota TEXT,
+    ingested_at TEXT NOT NULL, folio TEXT, boleta_id INTEGER
+);
+-- Boleta de decisión: propuesta completa para que el PARTICIPANTE capture la orden a mano. No es una orden.
+CREATE TABLE IF NOT EXISTS boletas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, creada_en TEXT NOT NULL, caduca_en TEXT NOT NULL, instrumento_id TEXT NOT NULL,
+    tipo TEXT NOT NULL CHECK (tipo IN ('mantener','investigar','considerar compra','considerar venta','considerar rebalanceo')),
+    estado TEXT NOT NULL DEFAULT 'vigente' CHECK (estado IN ('vigente','invalidada','caducada','descartada','marcada_ejecutada')),
+    contenido TEXT NOT NULL, huella_datos TEXT NOT NULL, motivo_estado TEXT, folio TEXT, marcada_en TEXT, transaccion_id INTEGER
 );
 CREATE TABLE IF NOT EXISTS bitacora_decisiones (
     id INTEGER PRIMARY KEY AUTOINCREMENT, creada_en TEXT NOT NULL, instrumento_id TEXT, tipo TEXT NOT NULL
@@ -60,8 +67,29 @@ def ahora() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
 
 
+def _migrar_ordenes(con: sqlite3.Connection) -> None:
+    """Versiones previas no tenían el estado «enviada», folio ni boleta: se reconstruye la tabla conservando filas."""
+    f = con.execute("SELECT sql FROM sqlite_master WHERE name='ordenes_pendientes'").fetchone()
+    if f and "'enviada'" not in f[0]:
+        con.execute("ALTER TABLE ordenes_pendientes RENAME TO ordenes_pendientes_v1")
+        con.executescript(ESQUEMA)
+        con.execute("INSERT INTO ordenes_pendientes (id, creada_en, instrumento_id, lado, tipo_orden, cantidad, precio_limite, "
+                    "estado, transaccion_id, nota, ingested_at) SELECT id, creada_en, instrumento_id, lado, tipo_orden, cantidad, "
+                    "precio_limite, estado, transaccion_id, nota, ingested_at FROM ordenes_pendientes_v1")
+        con.execute("DROP TABLE ordenes_pendientes_v1")
+        con.commit()
+    cols = {r[1] for r in con.execute("PRAGMA table_info(bitacora_decisiones)")}
+    if not cols:
+        return
+    for c, t in (("nivel_invalidacion", "REAL"), ("direccion_invalidacion", "TEXT")):
+        if c not in cols:
+            con.execute(f"ALTER TABLE bitacora_decisiones ADD COLUMN {c} {t}")  # noqa: S608 (nombres fijos)
+
+
 def inicializar(con: sqlite3.Connection) -> None:
+    _migrar_ordenes(con)
     con.executescript(ESQUEMA)
+    _migrar_ordenes(con)
     registrar_version_reglas(con)
     poblar_correspondencia(con)
 
@@ -118,21 +146,26 @@ def registrar_orden_pendiente(con, instrumento_id: str, lado: str, tipo_orden: s
 def cerrar_orden(con, oid: int, estado: str, transaccion_id: int | None = None) -> None:
     """Marca la referencia como ejecutada/cancelada/expirada. La tenencia solo cambia si el usuario registra la
     operación CONFIRMADA en «Mi cartera»; aquí únicamente se enlaza su id."""
-    if estado not in ("ejecutada", "cancelada", "expirada"):
+    if estado not in ("enviada", "pendiente", "ejecutada", "cancelada", "expirada"):
         raise ValueError("estado inválido")
+    if estado == "ejecutada" and not transaccion_id:
+        raise ValueError("una orden solo es «ejecutada» con la operación CONFIRMADA registrada (transaccion_id)")
     con.execute("UPDATE ordenes_pendientes SET estado=?, transaccion_id=? WHERE id=?", (estado, transaccion_id, oid))
     con.commit()
 
 
 def ordenes(con, solo_pendientes: bool = True) -> list[dict]:
-    q = "SELECT * FROM ordenes_pendientes" + (" WHERE estado='pendiente'" if solo_pendientes else "") + " ORDER BY id DESC"
+    q = "SELECT * FROM ordenes_pendientes" + (" WHERE estado IN ('enviada','pendiente')" if solo_pendientes else "") + " ORDER BY id DESC"
     return [dict(r) for r in con.execute(q)]
 
 
 # --- bitácora de decisiones ------------------------------------------------------------------------------------------
 def registrar_decision(con, tipo: str, decision_humana: str, instrumento_id: str | None = None, tesis: str = "",
                        fuentes: list[str] | None = None, alerta_id: int | None = None, transaccion_id: int | None = None,
-                       resultado: str = "") -> int:
+                       resultado: str = "", nivel_invalidacion: float | None = None,
+                       direccion_invalidacion: str | None = None) -> int:
+    if direccion_invalidacion not in (None, "debajo", "arriba"):
+        raise ValueError("direccion_invalidacion: debajo o arriba")
     if not decision_humana.strip():
         raise ValueError("decision_humana: obligatoria (la decisión es del participante)")
     ver = estado_reglas(con).get("version")
@@ -142,6 +175,9 @@ def registrar_decision(con, tipo: str, decision_humana: str, instrumento_id: str
                       (ahora(), instrumento_id, tipo, tesis[:2000], decision_humana[:1000],
                        json.dumps(fuentes or [], ensure_ascii=False), alerta_id, transaccion_id, ver,
                        modelo[0] if modelo else None, resultado[:1000]))
+    if nivel_invalidacion is not None:
+        con.execute("UPDATE bitacora_decisiones SET nivel_invalidacion=?, direccion_invalidacion=? WHERE id=?",
+                    (float(nivel_invalidacion), direccion_invalidacion or "debajo", cur.lastrowid))
     con.commit()
     return cur.lastrowid
 

@@ -38,6 +38,13 @@ class ErrorArchivo(ValueError):
 
 
 def plantilla(tipo: str) -> str:
+    from . import importar_contexto as ic
+    if tipo in ic.COLUMNAS:
+        return ic.plantilla(tipo)
+    return _plantilla(tipo)
+
+
+def _plantilla(tipo: str) -> str:
     ejemplos = {
         "transacciones": ["2025-01-10,aportacion,,,,50000,,,MXN,1,Depósito inicial",
                           "2025-01-13,compra,SIC:IVV,5,10250.50,,31.25,5.00,MXN,1,",
@@ -50,7 +57,10 @@ def plantilla(tipo: str) -> str:
 
 
 def leer(contenido: bytes, nombre: str, tipo: str) -> list[dict]:
-    if tipo not in COLUMNAS:
+    from . import importar_contexto as ic
+    columnas = {**COLUMNAS, **ic.COLUMNAS}
+    obligatorias = {**OBLIGATORIAS, **ic.OBLIGATORIAS}
+    if tipo not in columnas:
         raise ErrorArchivo("Tipo de importación no reconocido")
     if not nombre.lower().endswith(".csv"):
         raise ErrorArchivo("Solo se aceptan archivos .csv")
@@ -71,14 +81,14 @@ def leer(contenido: bytes, nombre: str, tipo: str) -> list[dict]:
     if not lector.fieldnames:
         raise ErrorArchivo("El archivo está vacío")
     encabezados = {h.strip().lower(): h for h in lector.fieldnames if h}
-    faltan = OBLIGATORIAS[tipo] - set(encabezados)
+    faltan = obligatorias[tipo] - set(encabezados)
     if faltan:
         raise ErrorArchivo(f"Faltan columnas obligatorias: {', '.join(sorted(faltan))}. Descargue la plantilla.")
     filas = []
     for i, fila in enumerate(lector, start=2):
         if i - 1 > MAX_FILAS:
             raise ErrorArchivo(f"Máximo {MAX_FILAS} filas por archivo")
-        norm = {k: (fila.get(v) or "").strip() for k, v in encabezados.items() if k in COLUMNAS[tipo]}
+        norm = {k: (fila.get(v) or "").strip() for k, v in encabezados.items() if k in columnas[tipo]}
         if any(norm.values()):
             filas.append({"_linea": i, **norm})
     return filas
@@ -87,6 +97,9 @@ def leer(contenido: bytes, nombre: str, tipo: str) -> list[dict]:
 def importar(con: sqlite3.Connection, contenido: bytes, nombre: str, tipo: str, instrumentos: dict,
              confirmar: bool = False) -> dict:
     """Valida todo el archivo. Con confirmar=False solo devuelve la vista previa (no escribe nada)."""
+    from . import importar_contexto as ic
+    if tipo in ic.COLUMNAS:
+        return ic.importar(con, leer(contenido, nombre, tipo), contenido, nombre, tipo, instrumentos, confirmar)
     filas = leer(contenido, nombre, tipo)
     if tipo == "universo":
         return _universo(con, filas, contenido, nombre, instrumentos, confirmar)
