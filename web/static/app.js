@@ -49,7 +49,7 @@ const CLASES = { accion: "Acción", reit: "Acción (REIT)", etf: "ETF", fibra: "
   fondo_renta_variable: "Fondo de renta variable", fondo_multiactivo: "Fondo multiactivo" };
 const ETAPAS = { inscripcion: "Inscripción", practica: "Semana de práctica", previa_competencia: "Antes de la competencia",
   competencia: "Competencia", concluido: "Concluido" };
-const LENTES = { rendimiento: "Máximo rendimiento", ajuste: "Ajuste a su perfil" };
+const LENTES = { rendimiento: "Máximo rendimiento", ajuste: "Ajuste a su perfil", puntuacion: "Máxima puntuación" };
 
 function externo(url, texto) {
   if (typeof url !== "string" || !url.startsWith("https://")) return h("span", { texto });
@@ -101,7 +101,8 @@ function segmentado(id, valorActual, alCambiar) {
 /* ---------- pestañas (teclado: flechas, Inicio, Fin) ---------- */
 const CARGAS = {
   "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
-  "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
+  "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
+  "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
 };
 function activarPestana(tab, enfocar) {
   document.querySelectorAll('[role="tab"]').forEach((t) => {
@@ -825,6 +826,32 @@ document.getElementById("btn-cobertura").addEventListener("click", async (ev) =>
   catch (e) { notificar(e.message); } finally { ocupado([b], false); }
 });
 
+/* ---------- ranking de todas las acciones ---------- */
+estado.rankingFiltro = "ambos";
+async function cargarRanking() {
+  segmentado("selector-ranking", estado.rankingFiltro, (v) => { estado.rankingFiltro = v; cargarRanking(); });
+  try {
+    const d = await api(`/api/ranking?mercado_filtro=${estado.rankingFiltro}`);
+    document.getElementById("ranking-aviso").textContent = `${d.aviso} Criterio: 30 % rendimiento 20 sesiones, 30 % rendimiento 60 sesiones, 20 % estabilidad, 20 % tendencia.`;
+    document.getElementById("ranking-hora").textContent = `Actualizado ${fechaLocal(new Date().toISOString())} · ${d.n} de ${d.universo} emisoras con historia suficiente. Se refresca cada minuto.`;
+    limpiar("ranking-contenido", tabla([
+      { t: "#", f: (f) => f.posicion, num: true },
+      { t: "Emisora", f: (f) => h("span", {}, h("strong", { texto: f.clave_operable }), h("br"), h("span", { clase: "suave", texto: f.nombre })) },
+      { t: "Mercado", f: (f) => f.mercado },
+      { t: "Puntuación", f: (f) => h("span", {}, h("span", { clase: "cifra", texto: f.puntuacion.toFixed(1) }), " ", barraPct(f.puntuacion, 100)), num: true },
+      { t: "Precio MXN", f: (f) => h("span", { title: f.precio_es_referencia ? "Referencia: bolsa de origen × tipo de cambio (no es el precio SIC)" : "" }, mxn(f.precio_mxn, true), f.precio_es_referencia ? " *" : ""), num: true },
+      { t: "1 día", f: (f) => h("span", { clase: signo(f.rend_1) }, pct(f.rend_1)), num: true },
+      { t: "5 días", f: (f) => h("span", { clase: signo(f.rend_5) }, pct(f.rend_5)), num: true },
+      { t: "20 días", f: (f) => h("span", { clase: signo(f.rend_20) }, pct(f.rend_20)), num: true },
+      { t: "60 días", f: (f) => h("span", { clase: signo(f.rend_60) }, pct(f.rend_60)), num: true },
+      { t: "Volatilidad", f: (f) => pct(f.vol_60), num: true },
+      { t: "Caída 60 d", f: (f) => pct(f.caida_60), num: true },
+      { t: "Dato", f: (f) => h("span", {}, chip(f.vigencia), h("br"), h("span", { clase: "suave", texto: `${f.tipo_dato || "—"} · ${f.fecha || "—"} · ${f.proveedor || "—"}` })) }],
+      d.filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC.", vacio: "Sin emisoras con al menos 61 sesiones de precio." }));
+  } catch (e) { limpiar("ranking-contenido", errorCaja(e)); }
+}
+setInterval(() => { if (pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
+
 /* ---------- universo y proveedores ---------- */
 async function cargarUniverso() {
   try {
@@ -905,6 +932,7 @@ async function cargarPerfil() {
     f.elements.max_peso_activo.value = Math.round(d.perfil.max_peso_activo * 100);
     f.elements.max_exposicion_usd.value = Math.round(d.perfil.max_exposicion_usd * 100);
     f.elements.escenario.value = d.perfil.escenario || "base";
+    f.elements.mercado_acciones.value = d.perfil.mercado_acciones || "ambos";
     f.elements.incluir_etf_por_confirmar.checked = !!d.perfil.incluir_etf_por_confirmar;
     f.elements.excluir.value = (d.perfil.excluir || []).join(", ");
     limpiar("criterios", h("h2", { texto: "Criterios de puntuación, costos y alertas" }),
@@ -923,6 +951,7 @@ document.getElementById("form-perfil").addEventListener("submit", async (ev) => 
     horizonte_anios: n(f.elements.horizonte_anios.value), capital: n(f.elements.capital.value),
     max_peso_activo: n(f.elements.max_peso_activo.value) / 100, max_exposicion_usd: n(f.elements.max_exposicion_usd.value) / 100,
     escenario: f.elements.escenario.value, incluir_etf_por_confirmar: f.elements.incluir_etf_por_confirmar.checked,
+    mercado_acciones: f.elements.mercado_acciones.value,
     excluir: f.elements.excluir.value.split(/[,;\s]+/).map((x) => x.trim().toUpperCase()).filter(Boolean),
   };
   try {

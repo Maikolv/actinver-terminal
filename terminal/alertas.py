@@ -237,8 +237,16 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
                      (c.datos or {}).get("impacto_mxn")))
                 nuevas.append({"id": cur.lastrowid, "regla": c.regla, "clave": c.clave, "titulo": c.titulo,
                                "severidad": c.severidad, "motivo": c.motivo, "accion": c.accion})
+    reales = list(nuevas)  # lo que devuelve la función: solo alertas nuevas de este ciclo
+    abierto = vigencia.mercado_abierto("XMEX", ahora_dt)
+    if notificar and abierto:
+        # Lo silenciado fuera de horario se entrega al abrir la BMV (no se pierde), si sigue nueva y vigente.
+        diferidas = [dict(r) for r in con.execute(
+            "SELECT id, regla, clave, titulo, severidad, motivo, accion FROM alertas WHERE notificada='silenciada_fuera_de_horario' "
+            "AND estado='nueva' AND (caduca_en IS NULL OR caduca_en > ?)", (ahora_dt.isoformat(timespec="seconds"),))]
+        vistas_ids = {a["id"] for a in nuevas}
+        nuevas = nuevas + [d for d in diferidas if d["id"] not in vistas_ids]
     if nuevas and notificar:
-        abierto = vigencia.mercado_abierto("XMEX", ahora_dt)
         if cfg.get("silenciar_fuera_de_horario", True) and not abierto:
             marca = "silenciada_fuera_de_horario"
         else:
@@ -247,7 +255,7 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
             marca = json.dumps(notificador.enviar(titulo, texto, cfg, detalle=notificador.detalle(nuevas)))
         with transaccion(con):
             con.executemany("UPDATE alertas SET notificada=? WHERE id=?", [(marca, a["id"]) for a in nuevas])
-    return nuevas
+    return reales
 
 
 def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condicion]:

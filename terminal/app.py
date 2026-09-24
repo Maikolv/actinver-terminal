@@ -139,6 +139,10 @@ def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
         e.append("escenario: base, adverso o favorable")
     out["escenario"] = esc
     out["incluir_etf_por_confirmar"] = bool(p.get("incluir_etf_por_confirmar", True))
+    mercado_acc = str(p.get("mercado_acciones", "ambos")).lower()
+    if mercado_acc not in ("ambos", "nacionales", "extranjeras"):
+        e.append("mercado_acciones: ambos, nacionales o extranjeras")
+    out["mercado_acciones"] = mercado_acc
     excl = p.get("excluir") or []
     if not isinstance(excl, list) or len(excl) > 300 or any(str(x) not in ids_validos for x in excl):
         e.append("excluir: lista de identificadores del universo")
@@ -576,6 +580,14 @@ def boleta_ejecutada(bid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
         raise cartera.ErrorValidacion(errores) from None
     disparar_motor()
     return {"transaccion_id": tid}
+
+
+@app.get("/api/ranking")
+def get_ranking(mercado_filtro: str = "ambos", con=Depends(con_db)):
+    from . import ranking
+    if mercado_filtro not in ("ambos", "nacionales", "extranjeras"):
+        raise cartera.ErrorValidacion(["mercado_filtro: ambos, nacionales o extranjeras"])
+    return ranking.calcular(con, AJUSTES, mercado_filtro)
 
 
 @app.post("/webhook/tradingview")

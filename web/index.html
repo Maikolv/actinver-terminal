@@ -39,6 +39,7 @@
     <button role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Resumen</button>
     <button role="tab" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Pasado · Presente · Futuro</button>
     <button role="tab" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
+    <button role="tab" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
     <button role="tab" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
     <button role="tab" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi cartera</button>
     <button role="tab" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
@@ -66,6 +67,7 @@
       <div class="segmentado" role="radiogroup" aria-label="Lente" id="selector-lente">
         <button type="button" role="radio" aria-checked="false" data-valor="rendimiento">Máximo rendimiento</button>
         <button type="button" role="radio" aria-checked="true" data-valor="ajuste">Ajuste a su perfil</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="puntuacion">Máxima puntuación</button>
       </div>
     </div>
     <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
@@ -127,6 +129,18 @@
       <p><button type="button" class="boton boton--secundario" id="btn-investigar">Calcular investigación y pronósticos</button> <span class="suave" id="investigacion-estado"></span></p>
       <div id="futuro-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     </section>
+  </section>
+
+  <section role="tabpanel" id="panel-ranking" aria-labelledby="tab-ranking" hidden>
+    <h1>Ranking de acciones</h1>
+    <p class="ayuda" id="ranking-aviso"></p>
+    <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-ranking">
+      <button type="button" role="radio" aria-checked="true" data-valor="ambos">Todas</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Nacionales (BMV)</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Extranjeras (SIC)</button>
+    </div>
+    <p class="suave" id="ranking-hora"></p>
+    <div id="ranking-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 
   <section role="tabpanel" id="panel-alertas" aria-labelledby="tab-alertas" hidden>
@@ -226,6 +240,9 @@
         <label>Exposición máxima a dólar (%)<input name="max_exposicion_usd" inputmode="decimal" required></label>
         <label>Escenario de mercado
           <select name="escenario"><option value="base">Base (historia)</option><option value="adverso">Adverso</option><option value="favorable">Favorable</option></select>
+        </label>
+        <label>Emisoras con las que opera
+          <select name="mercado_acciones"><option value="ambos">Nacionales y extranjeras</option><option value="nacionales">Solo nacionales (BMV)</option><option value="extranjeras">Solo extranjeras (SIC)</option></select>
         </label>
         <label class="casilla"><input type="checkbox" name="incluir_etf_por_confirmar"> Incluir ETF cuya disponibilidad no está confirmada</label>
         <label class="ancho">Excluir instrumentos (ids separados por coma)<input name="excluir" placeholder="SIC:TSLA, BMV:GMEXICO"></label>

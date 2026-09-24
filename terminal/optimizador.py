@@ -129,6 +129,10 @@ def universo(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
             motivo = f"Estado del instrumento: {i['estado']} — {i['detalle_verificacion']}"
         elif i["id"] in excl_usuario:
             motivo = "Excluido por el usuario"
+        elif perfil.get("mercado_acciones", "ambos") == "nacionales" and i["mercado_operable"] == "BMV-SIC":
+            motivo = "Excluido por su elección de mercado: solo emisoras nacionales"
+        elif perfil.get("mercado_acciones", "ambos") == "extranjeras" and i["mercado_operable"] != "BMV-SIC":
+            motivo = "Excluido por su elección de mercado: solo emisoras extranjeras (SIC)"
         elif i["clase"] == "etf" and "por confirmar" in (i["detalle_verificacion"] or "") and not perfil.get(
                 "incluir_etf_por_confirmar", True):
             motivo = "ETF con disponibilidad en el SIC por confirmar"
@@ -524,7 +528,45 @@ def _huella_datos(X: pd.DataFrame) -> str:
 
 
 NOMBRES = {"acciones": "Solo acciones", "mixta": "Acciones + ETF + fondos"}
-LENTES = {"rendimiento": "Máximo rendimiento esperado", "ajuste": "Ajuste a su perfil y cartera"}
+LENTES = {"rendimiento": "Máximo rendimiento esperado", "ajuste": "Ajuste a su perfil y cartera",
+          "puntuacion": "Máxima puntuación"}
+# Candidatos declarados ANTES de evaluar para la lente «Máxima puntuación»: multiplicador de aversión × tope por emisora.
+CANDIDATOS_PUNTUACION = [(m, t) for t in (0.12, 0.20, 0.30) for m in (1.0, 3.0, 10.0, 30.0)]
+
+
+def _buscar_puntuacion(tipo, perfil, ajustes, elegibles_l, elegibles, previos, X_esc, X_todo, cartera_actual, capital,
+                       instrumentos) -> dict:
+    """Elige la cartera candidata con mayor puntuación en la PRIMERA mitad de la validación fuera de muestra y reporta
+    la puntuación de la SEGUNDA mitad, que no se usó para elegir (así la cifra no queda inflada por la selección)."""
+    tope_reto = ((reto.config().get("reglas") or {}).get("max_peso_emisora") or 1.0) if reto.activo() else 1.0
+    ids = list(elegibles)
+    filas = []
+    for mult, tope in CANDIDATOS_PUNTUACION:
+        t = min(tope, tope_reto)
+        pc = {**perfil, "max_peso_activo": t}
+        try:
+            modelo = _modelo(tipo, pc, ajustes, elegibles_l, {}, aversion_mult=mult, lente="ajuste")
+            oos, rot = _walk_forward(modelo, X_todo, ajustes, elegibles)
+            w, _ = _ajuste_final(tipo, pc, ajustes, elegibles_l, previos, X_esc, "ajuste", mult)
+        except Exception as e:  # noqa: BLE001 - un candidato que no converge se informa y se descarta
+            filas.append({"aversion_mult": mult, "tope": t, "error": str(e)[:100]})
+            continue
+        w = w.reindex(ids).fillna(0.0)
+        w[w < 0.005] = 0.0
+        w = w / w.sum()
+        cmb = cambios(w, elegibles, cartera_actual, capital, ajustes, instrumentos)
+        mitad = len(oos) // 2
+        r_rot = float(np.mean(rot[1:]) if len(rot) > 1 else 0)
+        sel = _puntuar(_metricas(oos.iloc[:mitad]), w, elegibles, ajustes, perfil, cmb["costo_pct"], r_rot)["total"]
+        ver = _puntuar(_metricas(oos.iloc[mitad:]), w, elegibles, ajustes, perfil, cmb["costo_pct"], r_rot)["total"]
+        filas.append({"aversion_mult": mult, "tope": t, "puntuacion_seleccion": sel, "puntuacion_verificacion": ver})
+    validas = [f for f in filas if "error" not in f]
+    if not validas:
+        raise ValueError("Ningún candidato de la lente «Máxima puntuación» convergió")
+    mejor = max(validas, key=lambda f: f["puntuacion_seleccion"])
+    return {"elegido": mejor, "candidatos": filas,
+            "nota": "Se eligió con la primera mitad de la validación; la puntuación de verificación (segunda mitad) no se "
+                    "usó para elegir y es la cifra honesta. Una puntuación alta no garantiza rendimiento."}
 
 
 def perfil_efectivo(perfil: dict) -> dict:
@@ -577,7 +619,13 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
 
     # 1) propuesta final (con escenario)
     X_esc = _ajustar_escenario(X, elegibles, perfil.get("escenario", "base"))
-    pesos, mu_esc = _ajuste_final(tipo, perfil, ajustes, elegibles_l, previos, X_esc, lente)
+    lente_calc, mult_base, busqueda = lente, 1.0, None
+    if lente == "puntuacion":
+        busqueda = _buscar_puntuacion(tipo, perfil, ajustes, elegibles_l, elegibles, previos, X_esc, X_todo, cartera_actual,
+                                      float(perfil.get("capital") or 0), mercado.instrumentos(con))
+        perfil = {**perfil, "max_peso_activo": busqueda["elegido"]["tope"]}
+        lente_calc, mult_base = "ajuste", busqueda["elegido"]["aversion_mult"]
+    pesos, mu_esc = _ajuste_final(tipo, perfil, ajustes, elegibles_l, previos, X_esc, lente_calc, mult_base)
     pesos[pesos < 0.005] = 0.0
     maxa = int(o["max_activos"]) if tipo == "acciones" else int(o["max_activos"]) + 5
     if (pesos > 0).sum() > maxa:
@@ -586,7 +634,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     pesos = pesos.reindex(ids).fillna(0.0)
 
     # 2) validación fuera de muestra (siempre con datos reales, sin ajuste de escenario)
-    modelo_v = _modelo(tipo, perfil, ajustes, elegibles_l, {}, lente=lente)
+    modelo_v = _modelo(tipo, perfil, ajustes, elegibles_l, {}, aversion_mult=mult_base, lente=lente_calc)
     oos, rot = _walk_forward(modelo_v, X_todo, ajustes, elegibles)
     m_modelo = _metricas(oos)
     ew = cross_val_predict(EqualWeighted(), X_todo, cv=WalkForward(train_size=int(o["walk_forward_entrenamiento"]),
@@ -610,7 +658,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
             continue
         try:
             ps, _ = _ajuste_final(tipo, perfil, ajustes, elegibles_l, previos,
-                                  _ajustar_escenario(Xs, elegibles, perfil.get("escenario", "base")), lente, mult)
+                                  _ajustar_escenario(Xs, elegibles, perfil.get("escenario", "base")), lente_calc, mult * mult_base)
             ps = ps.reindex(ids).fillna(0)
             dif = float((ps - pesos).abs().sum() / 2)
             sens.append({"variante": etiqueta, "cambio_pesos": round(dif, 3),
@@ -629,6 +677,9 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         a["vigencia"] = elegibles[a["id"]]["vigencia"]
     cmb = cambios(pesos, elegibles, cartera_actual, capital, ajustes, mercado.instrumentos(con))
     punt = _puntuar(m_modelo, pesos, elegibles, ajustes, perfil, cmb["costo_pct"], float(np.mean(rot[1:]) if len(rot) > 1 else 0))
+    if busqueda:
+        punt["verificacion"] = busqueda["elegido"]["puntuacion_verificacion"]
+        punt["seleccion"] = busqueda["elegido"]["puntuacion_seleccion"]
     fechas_dato = [elegibles[k]["fecha_dato"] for k in pesos[pesos > 0].index if elegibles[k]["fecha_dato"]]
     vig = [elegibles[k]["vigencia"] for k in pesos[pesos > 0].index]
     # Mejora esperada neta de costos frente a mantener la cartera actual (insumo de la alerta de deriva).
@@ -640,7 +691,8 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     mejora = {"esperado_propuesta": esperado_obj, "esperado_actual": esperado_act,
               "costo_cambio": float(cmb["costo_pct"]), "neta": esperado_obj - esperado_act - float(cmb["costo_pct"]),
               "horizonte_sesiones": round(h_dias), "nota": "Estimación con μ contraída; incierta, no es una promesa."}
-    aversion, tope = _parametros_lente(lente, perfil, ajustes)
+    aversion, tope = _parametros_lente(lente_calc, perfil, ajustes)
+    aversion *= mult_base
     return {
         **base, "estado": "demostracion" if ajustes.es_demo else "calculada",
         "mejora_esperada": mejora,
@@ -651,7 +703,8 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "metricas_estimacion": _metricas(_serie_pesos(X, pesos)),
         "comparacion": comparacion, "sensibilidad": sens, "estabilidad": round(estabilidad, 3),
         "escenarios": esc, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil),
-        "cambios": cmb, "puntuacion": punt,
+        "cambios": cmb, "puntuacion": punt, "busqueda_puntuacion": busqueda,
+        "mercado_acciones": perfil.get("mercado_acciones", "ambos"),
         "n_elegibles": len(elegibles), "n_excluidos": len(excluidos),
         "reproducibilidad": {
             "funcion_objetivo": "max μᵀw − λ·wᵀΣw − Σc|Δw| − γ·‖w‖² ; μ James-Stein, Σ Ledoit-Wolf, varianza como riesgo",
@@ -659,7 +712,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
             "lente": lente, "aversion_riesgo_lambda": aversion,
             "horizonte_anios": float(perfil["horizonte_anios"]), "horizonte_origen": perfil.get("horizonte_origen", "perfil"),
             "precios": "sin ajustar por dividendos (el Reto no los paga)" if reto.activo() else "ajustados por dividendos y splits",
-            "restricciones": _restricciones(tipo, perfil, ajustes, elegibles_l, lente) + [f"tope por activo {tope:.0%}",
+            "restricciones": _restricciones(tipo, perfil, ajustes, elegibles_l, lente_calc) + [f"tope por activo {tope:.0%}",
                                                                                           "sin ventas en corto, sin apalancamiento"],
             "ventana_estimacion": {"desde": X.index[0].date().isoformat(), "hasta": X.index[-1].date().isoformat(), "sesiones": len(X)},
             "walk_forward": {"entrenamiento": int(o["walk_forward_entrenamiento"]), "prueba": int(o["walk_forward_prueba"]),

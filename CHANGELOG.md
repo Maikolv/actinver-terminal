@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.8.0] — 2026-09-24
+
+### Añadido
+- **Lente «Máxima puntuación»** (`acciones_puntuacion`, `mixta_puntuacion`):
+  - busca en una rejilla de 12 candidatos (aversión × tope por emisora ≤ 50 %);
+  - elige con la 1.ª mitad del periodo fuera de muestra y verifica con la 2.ª;
+  - con datos reales: acciones 83.7 (verificación 90.8), mixta 87.1 (verificación 88.9).
+- **Mercado de emisoras** en «Reto y perfil»: nacionales y extranjeras, solo nacionales (BMV) o solo extranjeras (SIC).
+- **Pestaña Ranking** (`terminal/ranking.py`, `GET /api/ranking`):
+  - ordena todas las acciones, FIBRA y ETF con ≥ 61 sesiones, sin depender de la cartera;
+  - puntuación por percentiles (rendimiento a 20 y 60 sesiones, estabilidad y tendencia);
+  - filtro por mercado; se refresca cada minuto.
+- **Alertas diferidas:** las silenciadas fuera de horario se entregan (escritorio y Telegram) al abrir la BMV.
+
 ## [0.7.0] — 2026-09-24 (rama `boleta-decision`)
 
 ### Añadido

@@ -15,7 +15,7 @@ from . import alertas, cartera, db, ingesta, mercado, optimizador, reto, vigenci
 from .config import Ajustes
 
 log = logging.getLogger("terminal.servicios")
-COMBINACIONES = [(t, lente) for t in ("acciones", "mixta") for lente in ("rendimiento", "ajuste")]
+COMBINACIONES = [(t, lente) for t in ("acciones", "mixta") for lente in ("rendimiento", "ajuste", "puntuacion")]
 bloqueo = threading.Lock()  # un solo cálculo/actualización a la vez (API y motor)
 
 
