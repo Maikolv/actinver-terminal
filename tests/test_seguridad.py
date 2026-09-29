@@ -115,3 +115,29 @@ def test_cambio_de_modo_separa_bases_y_actualiza(cliente, monkeypatch):
     r = cliente.post("/api/modo", headers=h, json={"modo": "real"})
     assert r.status_code == 200 and r.json()["actualizacion"] == {"ok": 1} and llamadas[-1] == "real"
     assert db.ruta_db().parent == config.DATA_DIR
+
+
+HOST_TS = "mi-pc.tail1234.ts.net"
+
+
+def test_acceso_remoto_solo_por_tailscale_serve(monkeypatch):
+    monkeypatch.setenv("TERMINAL_HOSTS_REMOTOS", HOST_TS)
+    monkeypatch.delenv("TERMINAL_USUARIOS_REMOTOS", raising=False)
+    with TestClient(app, base_url=f"https://{HOST_TS}") as c:
+        assert c.get("/", headers={"Tailscale-User-Login": "yo@ejemplo.com"}).status_code == 200      # red privada
+        assert c.get("/").status_code == 400                        # sin identidad (p. ej. Funnel / público)
+        ok = c.post("/api/notificaciones/prueba", json={}, headers={"Tailscale-User-Login": "yo@ejemplo.com",
+                    "X-CSRF-Token": "x", "Origin": "https://otro.example"})
+        assert ok.status_code == 403                                 # origen ajeno
+    with TestClient(app, base_url="https://otra-pc.tail1234.ts.net") as c:
+        assert c.get("/", headers={"Tailscale-User-Login": "yo@ejemplo.com"}).status_code == 400   # host no autorizado
+    monkeypatch.setenv("TERMINAL_USUARIOS_REMOTOS", "yo@ejemplo.com")
+    with TestClient(app, base_url=f"https://{HOST_TS}") as c:
+        assert c.get("/", headers={"Tailscale-User-Login": "intruso@ejemplo.com"}).status_code == 400
+        assert c.get("/", headers={"Tailscale-User-Login": "yo@ejemplo.com"}).status_code == 200
+
+
+def test_un_nombre_publico_nunca_se_acepta_aunque_se_configure(monkeypatch):
+    monkeypatch.setenv("TERMINAL_HOSTS_REMOTOS", "algo.trycloudflare.com")
+    with TestClient(app, base_url="https://algo.trycloudflare.com") as c:
+        assert c.get("/", headers={"Tailscale-User-Login": "yo@ejemplo.com"}).status_code == 400

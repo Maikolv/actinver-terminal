@@ -1,6 +1,10 @@
 """Controles de seguridad HTTP para uso local.
 
 * Solo se aceptan cabeceras Host locales (mitiga DNS rebinding).
+* Acceso remoto opcional SOLO por Tailscale Serve (red privada del participante): el nombre *.ts.net debe estar en
+  TERMINAL_HOSTS_REMOTOS y la petición debe traer la identidad del usuario de la red (cabecera Tailscale-User-Login,
+  que Tailscale Serve añade y Funnel —acceso público— no). Si TERMINAL_USUARIOS_REMOTOS está definido, el usuario
+  debe estar en esa lista. El servidor sigue escuchando solo en 127.0.0.1.
 * Mutaciones exigen token CSRF (cabecera X-CSRF-Token) y Origin local cuando el navegador lo envía.
 * CSP estricta sin scripts ni estilos en línea; cabeceras de endurecimiento en todas las respuestas.
 * Límite de tamaño de cuerpo y de peticiones por minuto por ruta.
@@ -39,6 +43,22 @@ LIMITE_WEBHOOK = 30
 LIMITE_MUTACION = 60
 
 
+def _lista(var: str) -> set[str]:
+    import os
+    return {x.strip().lower() for x in os.environ.get(var, "").split(",") if x.strip()}
+
+
+def acceso_remoto_valido(host: str | None, usuario: str | None) -> bool:
+    """Host *.ts.net autorizado + identidad de Tailscale Serve (+ usuario permitido, si se configuró)."""
+    if not host or not usuario:
+        return False
+    nombre = host.split(":")[0].lower()
+    if not nombre.endswith(".ts.net") or nombre not in _lista("TERMINAL_HOSTS_REMOTOS"):
+        return False
+    usuarios = _lista("TERMINAL_USUARIOS_REMOTOS")
+    return not usuarios or usuario.strip().lower() in usuarios
+
+
 def _host_local(host: str | None) -> bool:
     if not host:
         return False
@@ -66,11 +86,14 @@ class Seguridad(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.url.path == RUTA_WEBHOOK:
             return await self._webhook(request, call_next)
-        if not _host_local(request.headers.get("host")):
+        host = request.headers.get("host")
+        remoto = not _host_local(host)
+        if remoto and not acceso_remoto_valido(host, request.headers.get("tailscale-user-login")):
             return JSONResponse({"error": "Host no permitido"}, status_code=400)
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             origen = request.headers.get("origin")
-            if origen and not _host_local(origen.split("://", 1)[-1]):
+            destino = origen.split("://", 1)[-1] if origen else None
+            if origen and not (_host_local(destino) or (remoto and destino and destino.split(":")[0].lower() == host.split(":")[0].lower())):
                 return JSONResponse({"error": "Origen no permitido"}, status_code=403)
             if not secrets.compare_digest(request.headers.get("x-csrf-token", ""), TOKEN_CSRF):
                 return JSONResponse({"error": "Token CSRF ausente o inválido; recargue la página"}, status_code=403)

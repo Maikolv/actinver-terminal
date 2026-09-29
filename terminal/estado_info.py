@@ -82,8 +82,8 @@ def calcular(con: sqlite3.Connection, ajustes) -> dict:
     if fondos_sin:
         item("Fondos Actinver", "falta",
              f"{len(fondos_sin)} fondos sin valor por unidad ({', '.join(f.split(':')[1] for f in fondos_sin[:5])}). La hoja "
-             "oficial de Actinver se importa sola cada día; un fondo cuya serie no aparece en ella (p. ej. JPMRVUS solo "
-             "publica B-1) no se asigna por aproximación.",
+             "oficial de Actinver se importa sola cada día; un fondo cuya serie no aparece en ella no se asigna por "
+             "aproximación.",
              "Confirme en el simulador qué serie opera; si es otra, importe su precio en «Datos» o avísenos para ajustar la serie.")
     # 3. Tipo de cambio
     fx = mercado.ultimo_fx(con, ajustes)
