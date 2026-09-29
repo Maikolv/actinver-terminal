@@ -5,6 +5,11 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 ## [0.11.0] — 2026-09-29 (auditoría integral)
 
 ### Añadido (boletas)
+- **Bot de Telegram** (`terminal/bot_telegram.py`):
+  - atiende solo al chat de `TELEGRAM_CHAT_ID`;
+  - comandos `/plan`, `/boletas` (genera y envía las del plan del día), `/estado`, `/alertas`, `/cartera` y `/ayuda`, con menú en la app;
+  - responde preguntas libres con Claude (`claude-opus-5-5` con `fallbacks: "default"`; opcional: `uv add anthropic` y credencial), con Ollama o con los datos de la terminal (ficha por emisora);
+  - tope de 20 consultas por hora; nunca ejecuta órdenes.
 - **Boletas del plan del día:**
   - se generan con el botón «Generar boletas del plan del día» (Propuestas), con `uv run terminal boletas` o con `POST /api/boletas/generar {"propuesta": "plan_del_dia"}`;
   - usan la misma propuesta que el mensaje de Telegram y reemplazan las boletas vigentes anteriores para no duplicar órdenes.

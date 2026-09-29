@@ -79,8 +79,15 @@ async def vida(app: FastAPI):
         FLUJO = tiempo_real.FlujoVivo(AJUSTES)
         FLUJO.iniciar()
         threading.Thread(target=_programador, args=(stop,), daemon=True).start()
+    bot = None
+    if not os.environ.get("TERMINAL_SIN_MOTOR"):
+        from .bot_telegram import BotTelegram
+        bot = BotTelegram(AJUSTES)
+        bot.iniciar()  # solo si TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID están en .env
     yield
     stop.set()
+    if bot:
+        bot.detener()
     if FLUJO:
         FLUJO.detener()
 
