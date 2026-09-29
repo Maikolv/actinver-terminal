@@ -1,4 +1,5 @@
 """Cada regla de alerta dispara en un escenario simulado; enfriamiento, histéresis y silencio se respetan."""
+import json
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
@@ -91,3 +92,22 @@ def test_agrupa_notificaciones(con, sin_notificaciones):
     conds = [alertas.Condicion("noticia", f"k{i}", True, titulo=f"t{i}", motivo="m") for i in range(4)]
     alertas.procesar(con, conds, CFG, ABIERTO)
     assert len(sin_notificaciones) == 1 and sin_notificaciones[0][0] == "4 alertas nuevas"
+
+
+def test_reintenta_solo_el_canal_que_fallo(con, monkeypatch):
+    intentos = []
+    def enviar(titulo, texto, cfg, detalle=None):
+        intentos.append(dict(cfg))
+        return {canal: ("error" if canal == "telegram" and len(intentos) == 1 else "enviada")
+                for canal in ("escritorio", "telegram") if cfg.get(f"notificar_{canal}")}
+    monkeypatch.setattr(alertas.notificador, "enviar", enviar)
+    monkeypatch.setattr(alertas.notificador, "configurados", lambda: {"escritorio": True, "telegram": True, "correo": False})
+    cfg = {**CFG, "notificar_telegram": True}
+    cond = [alertas.Condicion("cambio_portal", "captura:1", True, titulo="Cambio del Reto", motivo="Saldo nuevo")]
+    alertas.procesar(con, cond, cfg, ABIERTO)
+    assert len(intentos) == 1
+    alertas.procesar(con, cond, cfg, ABIERTO + timedelta(minutes=5))
+    assert len(intentos) == 1
+    alertas.procesar(con, cond, cfg, ABIERTO + timedelta(minutes=11))
+    assert len(intentos) == 2 and not intentos[1]["notificar_escritorio"] and intentos[1]["notificar_telegram"]
+    assert json.loads(alertas.listar(con)[0]["notificada"])["telegram"] == "enviada"

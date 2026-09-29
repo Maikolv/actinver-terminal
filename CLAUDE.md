@@ -28,7 +28,14 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado actual (2026-09-23, v0.6.0, rama `main`)
+## Estado comprobado (2026-09-29, v0.10.0, rama `main`)
+
+- 171 pruebas en verde. La cuenta del Reto se captura manualmente desde el portal; no existe acceso automático de la terminal a la sesión personal.
+- «Mi cartera» separa la captura del portal y el registro local. La captura exige hora, efectivo, valor total y posiciones coherentes; si faltan precios de la terminal conserva los valores copiados del portal.
+- Las alertas de cambio, captura pendiente y posible movimiento llegan por Telegram y escritorio. Los canales fallidos se reintentan tras diez minutos sin repetir los ya entregados. Correo espera configuración SMTP en `.env`.
+- Faltan la primera captura real del usuario, la licencia y credenciales de Infosel para BMV/SIC en tiempo real, y los valores de fondos sin fuente. No representar la aportación local de práctica como saldo confirmado del Reto.
+
+## Registro histórico (2026-09-23, v0.6.0)
 
 - 146 pruebas en verde (`uv run pytest`). v0.7: boleta de decisión (`terminal/boleta.py`, `docs/decision-workflow.md`) y banco de estrategias (VENTAJA NO DEMOSTRADA). Lighthouse: escritorio 100/100/100, móvil 93/100/100.
 - **Funciones:**

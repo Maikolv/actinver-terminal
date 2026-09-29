@@ -216,6 +216,8 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
              notificar: bool = True) -> list[dict]:
     """Aplica flanco de subida + enfriamiento, guarda las alertas nuevas y notifica agrupadas."""
     ahora_dt = ahora_dt or datetime.now(UTC)
+    if notificar:
+        _reintentar_notificaciones(con, cfg, ahora_dt)
     nuevas = []
     condiciones = [_revisar(c) for c in condiciones]
     with transaccion(con):
@@ -268,6 +270,39 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
             with transaccion(con):
                 con.executemany("UPDATE alertas SET notificada=? WHERE id=?", [(marca, a["id"]) for a in lote])
     return reales
+
+
+def _reintentar_notificaciones(con: sqlite3.Connection, cfg: dict, ahora_dt: datetime) -> None:
+    """Reintenta solo los canales fallidos; nunca duplica una entrega confirmada."""
+    disponibles = notificador.configurados()
+    filas = con.execute(
+        "SELECT id, ts, titulo, motivo, accion, fuente, severidad, notificada FROM alertas "
+        "WHERE estado='nueva' AND (caduca_en IS NULL OR caduca_en > ?) "
+        "AND (notificada LIKE '%\"error\"%' OR notificada LIKE '%\"no_configurado\"%') "
+        "ORDER BY id DESC LIMIT 5", (ahora_dt.isoformat(timespec="seconds"),)).fetchall()
+    for f in filas:
+        try:
+            estado = json.loads(f["notificada"])
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(estado, dict):
+            continue
+        intento = _dt(estado.get("_reintento_en") or f["ts"])
+        if intento and ahora_dt - intento < timedelta(minutes=10):
+            continue
+        activos = {canal: estado.get(canal) in ("error", "no_configurado") and disponibles.get(canal)
+                   and cfg.get(f"notificar_{canal}", canal == "escritorio")
+                   for canal in ("escritorio", "correo", "telegram")}
+        if not any(activos.values()):
+            continue
+        alerta = dict(f)
+        cfg_reintento = {f"notificar_{canal}": activo for canal, activo in activos.items()}
+        resultado = notificador.enviar(f["titulo"], f["titulo"], cfg_reintento,
+                                      detalle=notificador.detalle([alerta]))
+        estado.update(resultado)
+        estado["_reintento_en"] = ahora_dt.isoformat(timespec="seconds")
+        with transaccion(con):
+            con.execute("UPDATE alertas SET notificada=? WHERE id=?", (json.dumps(estado), f["id"]))
 
 
 def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condicion]:
