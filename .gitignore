@@ -28,3 +28,7 @@ _renders/
 docs/evidencia/*.json
 !docs/evidencia/experimento_indices_fred.json
 !docs/evidencia/experimento_estrategias.json
+
+# Especificaciones de contratos de datos (pueden contener detalles del contrato): solo locales
+config/proveedores/*.json
+!config/proveedores/ejemplo_especificacion.json
