@@ -391,11 +391,36 @@ class ConectorContratado(MarketDataProvider):
 
 class BmvLicensedProvider(ConectorContratado):
     nombre = "bmv_licenciado"
-    descripcion = "Producto de datos de Grupo BMV (o distribuidor autorizado) con acceso programático contratado"
+    descripcion = ("Producto de datos de Grupo BMV (Web Services de Grupo BMV o distribuidor autorizado) con acceso "
+                   "programático contratado. SiBolsa es la plataforma de consulta de Grupo BMV: su pantalla no se "
+                   "extrae; su equivalente programático es este contrato")
     prefijo = "BMV"
     entrega_mercado = ("local", "SIC")
     requisito_contrato = ("Contrato de datos de mercado con Grupo BMV o un distribuidor autorizado que permita acceso "
                           "programático a cotizaciones del mercado local y del SIC (uso no profesional) y su documentación técnica")
+
+
+class InfoselProvider(ConectorContratado):
+    """APIs financieras de Infosel (Infosel HUB): último hecho y mejores posturas de BMV y BIVA en tiempo real, histórico
+    e intradía. Solo con contrato y la documentación de la API que Infosel entrega; la terminal no inventa endpoints."""
+    nombre = "infosel"
+    descripcion = "Infosel (APIs financieras / Infosel HUB) — tiempo real BMV y BIVA con acceso contratado"
+    prefijo = "INFOSEL"
+    entrega_mercado = ("local", "SIC")
+    requisito_contrato = ("Contrato de las APIs financieras de Infosel (infosel.com/apis) con derechos de BMV/BIVA para uso "
+                          "no profesional y su documentación técnica")
+
+
+class EdimexProvider(ConectorContratado):
+    """Edimex / EDI Financial (Economatica). Su sitio es de consulta; no publica una API abierta. Solo con un acceso
+    programático contratado (API o archivo de entrega) y su documentación; mientras tanto, sus exportaciones se importan
+    como CSV de precios con la columna «fuente»."""
+    nombre = "edimex"
+    descripcion = "Edimex / EDI Financial — solo con acceso programático contratado"
+    prefijo = "EDIMEX"
+    entrega_mercado = ("local", "SIC", "fondo")
+    requisito_contrato = ("Contrato con Edimex / EDI Financial que incluya acceso programático (API o archivo de entrega) y "
+                          "su documentación; sin él, importe sus exportaciones como CSV de precios (fuente=Edimex)")
 
 
 class LsegProvider(ConectorContratado):
@@ -536,13 +561,13 @@ class EodhdBmvProvider(MarketDataProvider):
 # ----------------------------------------------------------------------------------------------------------------
 def construir(con: sqlite3.Connection, modo_demo: bool, entorno: dict | None = None) -> dict[str, MarketDataProvider]:
     env = entorno if entorno is not None else os.environ
-    ps = [BmvLicensedProvider(con, env), LsegProvider(con, env), IceProvider(con, env), EodhdBmvProvider(con, env),
+    ps = [BmvLicensedProvider(con, env), InfoselProvider(con, env), LsegProvider(con, env), EdimexProvider(con, env), IceProvider(con, env), EodhdBmvProvider(con, env),
           ManualOrCsvProvider(con, env), DemoProvider(con, env, modo_demo=modo_demo), ReferenciaOrigenProvider(con, env),
           ForeignMarketLicensedProvider(con, env)]
     return {p.nombre: p for p in ps}
 
 
-PRIORIDAD = ["bmv_licenciado", "lseg", "ice", "eodhd_bmv", "manual_csv"]
+PRIORIDAD = ["bmv_licenciado", "infosel", "lseg", "ice", "edimex", "eodhd_bmv", "manual_csv"]
 VIGENCIA_S = {"REAL_TIME": 120, "DELAYED": 30 * 60}
 
 
@@ -690,6 +715,6 @@ def a_json(obj) -> str:
     return json.dumps(obj, ensure_ascii=False, default=str)
 
 
-__all__ = ["MarketDataProvider", "BmvLicensedProvider", "LsegProvider", "IceProvider", "ManualOrCsvProvider",
+__all__ = ["MarketDataProvider", "BmvLicensedProvider", "InfoselProvider", "EdimexProvider", "LsegProvider", "IceProvider", "ManualOrCsvProvider",
            "DemoProvider", "ReferenciaOrigenProvider", "EodhdBmvProvider", "Cotizacion", "SIN_PRECIO", "ProveedorNoDisponible",
            "normalizar_simbolo", "precio_confiable", "verificar_cobertura", "clasificar_latencia", "construir"]

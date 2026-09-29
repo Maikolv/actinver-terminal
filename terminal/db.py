@@ -167,6 +167,14 @@ CREATE TABLE IF NOT EXISTS experimentos (
     prueba_ya_vista INTEGER NOT NULL DEFAULT 0, version_codigo TEXT
 );
 
+-- Calificaciones de terceros importadas por el participante (p. ej. exportación de Seeking Alpha Premium). Contexto:
+-- se muestran en el Ranking con su fecha; no entran al optimizador (no hay historia sin sesgo de anticipación).
+CREATE TABLE IF NOT EXISTS calificaciones (
+    id TEXT PRIMARY KEY, instrumento_id TEXT NOT NULL, fecha TEXT NOT NULL, fuente TEXT NOT NULL,
+    quant REAL, autores REAL, wall_street REAL, valuacion TEXT, crecimiento TEXT, rentabilidad TEXT, momentum TEXT,
+    revisiones TEXT, importado_en TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS propuestas (
     id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, creado_en TEXT NOT NULL,
     parametros TEXT NOT NULL, resultado TEXT NOT NULL

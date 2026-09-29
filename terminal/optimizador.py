@@ -465,6 +465,37 @@ def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: l
     return out
 
 
+def consolidar_ordenes(pesos: pd.Series, peso_minimo: float, tope: float, min_emisoras: int) -> tuple[pd.Series, dict]:
+    """Plan de órdenes ejecutable: una posición con menos peso que la banda de rebalanceo nunca llegaría a operarse (la
+    boleta la dejaría en «mantener»), así que se elimina y su peso se reparte entre las demás en proporción a su peso,
+    sin que ninguna pase de su límite (el tope por emisora, o su propio peso si el optimizador ya le dio más, como a un
+    fondo de deuda obligatorio). Se conservan al menos las emisoras mínimas del Reto. Si el peso no cabe, no se elimina."""
+    w = pesos[pesos > 0].astype(float).copy()
+    w = w / w.sum()
+    limite = np.maximum(w, tope)
+    eliminadas = []
+    while len(w) > int(min_emisoras) and w.min() < peso_minimo:
+        k = w.idxmin()
+        resto, lim = w.drop(k), limite.drop(k)
+        if float((lim - resto).sum()) < float(w[k]) - 1e-12:
+            break  # no cabe sin romper topes: se conserva
+        extra = float(w[k])
+        for _ in range(100):  # llenado por niveles con límites individuales
+            libres = resto < lim - 1e-12
+            if extra < 1e-12 or not libres.any():
+                break
+            add = extra * resto[libres] / resto[libres].sum()
+            nuevo = np.minimum(resto[libres] + add, lim[libres])
+            extra -= float((nuevo - resto[libres]).sum())
+            resto[libres] = nuevo
+        eliminadas.append({"id": k, "peso": round(float(w[k]), 4)})
+        w, limite = resto / resto.sum(), lim
+    info = {"posiciones": int(len(w)), "eliminadas": eliminadas, "peso_minimo": peso_minimo, "tope": tope,
+            "criterio": (f"Cada posición pesa al menos {peso_minimo:.0%} (la banda de rebalanceo), porque una orden menor "
+                         f"no se ejecutaría; mínimo {min_emisoras} emisoras y tope de {tope:.0%} por emisora.")}
+    return w.reindex(pesos.index).fillna(0.0), info
+
+
 def _asignacion_discreta(pesos: pd.Series, elegibles: dict, capital: float) -> tuple[list[dict], float]:
     filas, usado = [], 0.0
     for k, w in pesos[pesos > 0].sort_values(ascending=False).items():
@@ -632,6 +663,9 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         pesos[pesos.rank(ascending=False) > maxa] = 0.0
     pesos = pesos / pesos.sum()
     pesos = pesos.reindex(ids).fillna(0.0)
+    min_emisoras = int(((reto.config() if reto.activo() else {}).get("reglas") or {}).get("min_emisoras") or 5)
+    pesos, plan_ordenes = consolidar_ordenes(pesos, float(o["banda_rebalanceo_pp"]) / 100,
+                                             _parametros_lente(lente_calc, perfil, ajustes)[1], min_emisoras)
 
     # 2) validación fuera de muestra (siempre con datos reales, sin ajuste de escenario)
     modelo_v = _modelo(tipo, perfil, ajustes, elegibles_l, {}, aversion_mult=mult_base, lente=lente_calc)
@@ -676,6 +710,14 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         a["contribucion_riesgo"] = round(float(contrib.get(a["id"], 0)), 4)
         a["vigencia"] = elegibles[a["id"]]["vigencia"]
     cmb = cambios(pesos, elegibles, cartera_actual, capital, ajustes, mercado.instrumentos(con))
+    ops = [f for f in cmb["filas"] if f["accion"] != "mantener"]
+    plan_ordenes.update({"total": len(ops), "compras": sum(f["accion"] == "comprar" for f in ops),
+                         "ventas": sum(f["accion"] == "vender" for f in ops),
+                         # SIC: el precio es referencia de la bolsa de origen; la boleta pide el del portal
+                         "sin_precio": sum(1 for f in ops if f["accion"] != "mantener" and (not elegibles.get(f["id"])
+                                           or elegibles[f["id"]].get("mercado_operable") == "BMV-SIC"
+                                           or not elegibles[f["id"]].get("precio_mxn"))),
+                         "costo_total": cmb["costo_total"]})
     punt = _puntuar(m_modelo, pesos, elegibles, ajustes, perfil, cmb["costo_pct"], float(np.mean(rot[1:]) if len(rot) > 1 else 0))
     if busqueda:
         punt["verificacion"] = busqueda["elegido"]["puntuacion_verificacion"]
@@ -703,7 +745,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "metricas_estimacion": _metricas(_serie_pesos(X, pesos)),
         "comparacion": comparacion, "sensibilidad": sens, "estabilidad": round(estabilidad, 3),
         "escenarios": esc, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil),
-        "cambios": cmb, "puntuacion": punt, "busqueda_puntuacion": busqueda,
+        "cambios": cmb, "ordenes": plan_ordenes, "puntuacion": punt, "busqueda_puntuacion": busqueda,
         "mercado_acciones": perfil.get("mercado_acciones", "ambos"),
         "n_elegibles": len(elegibles), "n_excluidos": len(excluidos),
         "reproducibilidad": {

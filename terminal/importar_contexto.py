@@ -4,6 +4,8 @@
   guardan como noticias con fuente «seekingalpha_manual»; available_at = hora de importación (nunca antes).
 - insiderfinance: exportación CSV del plan del usuario (si su plan la incluye). Fecha de operación y de divulgación
   separadas; cobertura «NO CUBRE BMV»; conviene confirmarlas con SEC EDGAR (Formulario 4).
+- calificaciones_sa: calificaciones que el participante exporta de su cuenta de Seeking Alpha (Quant, autores, Wall
+  Street de 1 a 5 y notas por factor A+…F). Se muestran en el Ranking como contexto fechado; no alimentan el optimizador.
 - saldos: valor del portafolio y efectivo que muestra el portal, con su fecha y hora (conciliación).
 - confirmaciones: ejecuciones CONFIRMADAS del simulador con su folio; registran operaciones y enlazan boletas.
 Ninguna importación se etiqueta como cotización actual.
@@ -25,20 +27,27 @@ COLUMNAS = {
     "notas_sa": ["fecha_publicacion", "instrumento_id", "titulo", "url", "tipo_contenido", "autor", "tesis_usuario"],
     "insiderfinance": ["instrumento_id", "insider", "cargo", "codigo", "fecha_operacion", "fecha_divulgacion", "acciones",
                        "precio", "valor", "moneda", "url"],
+    "calificaciones_sa": ["fecha", "instrumento_id", "quant", "autores", "wall_street", "valuacion", "crecimiento",
+                          "rentabilidad", "momentum", "revisiones"],
     "saldos": ["fecha_hora_portal", "valor_portafolio", "efectivo", "nota"],
     "confirmaciones": ["folio", "fecha", "instrumento_id", "lado", "cantidad", "precio", "comision", "iva"],
 }
 OBLIGATORIAS = {"notas_sa": {"fecha_publicacion", "titulo", "url"},
                 "insiderfinance": {"instrumento_id", "fecha_operacion", "fecha_divulgacion", "acciones", "precio"},
+                "calificaciones_sa": {"fecha", "instrumento_id"},
                 "saldos": {"fecha_hora_portal", "valor_portafolio"},
                 "confirmaciones": {"folio", "fecha", "instrumento_id", "lado", "cantidad", "precio"}}
 EJEMPLOS = {
     "notas_sa": ["2026-10-06T13:00:00-06:00,SIC:AAPL,Apple reporta ventas trimestrales,https://seekingalpha.com/news/000000,"
                  "hecho (noticia),Autor ejemplo,EJEMPLO: revisar margen bruto en el reporte oficial"],
     "insiderfinance": ["SIC:AAPL,Jane Doe,CFO,S,2026-10-01,2026-10-03,10000,230.5,2305000,USD,https://www.sec.gov/ejemplo"],
+    "calificaciones_sa": ["2026-10-06,SIC:AAPL,3.45,3.20,4.10,D,C+,A+,B,C"],
     "saldos": ["2026-10-06T15:05:00-06:00,1003250.75,501200.10,EJEMPLO: copiado del portal"],
     "confirmaciones": ["F-EJEMPLO-001,2026-10-06,BMV:AMX,compra,5000,17.50,87.50,14.00"],
 }
+
+
+NOTAS_FACTOR = {"A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"}
 
 
 class ErrorImportacion(ValueError):
@@ -104,6 +113,23 @@ def validar(tipo: str, f: dict, instrumentos: dict) -> dict:
         r = {"instrumento_id": iid, "nombre": (f.get("insider") or "")[:120], "cargo": (f.get("cargo") or "")[:80],
              "codigo": (f.get("codigo") or "")[:4].upper(), "fecha": op, "fecha_presentacion": di, "acciones": acc,
              "precio": px, "valor": (acc or 0) * (px or 0), "enlace": (f.get("url") or "")[:500]}
+    elif tipo == "calificaciones_sa":
+        if not iid:
+            e.append("instrumento_id: obligatorio")
+        r = {"instrumento_id": iid, "fecha": _fecha(f.get("fecha"), "fecha", e)}
+        for k in ("quant", "autores", "wall_street"):
+            v = (f.get(k) or "").strip()
+            x = None if not v else _num(v, k, e)
+            if x is not None and not 1 <= x <= 5:
+                e.append(f"{k}: escala de 1 a 5")
+            r[k] = x
+        for k in ("valuacion", "crecimiento", "rentabilidad", "momentum", "revisiones"):
+            v = (f.get(k) or "").strip().upper()
+            if v and v not in NOTAS_FACTOR:
+                e.append(f"{k}: nota A+ … F")
+            r[k] = v or None
+        if all(r[k] is None for k in ("quant", "autores", "wall_street")):
+            e.append("al menos una calificación (quant, autores o wall_street)")
     elif tipo == "saldos":
         r = {"hora_portal": _fecha(f.get("fecha_hora_portal"), "fecha_hora_portal", e, con_hora=True),
              "valor_portafolio": _num(f.get("valor_portafolio"), "valor_portafolio", e),
@@ -170,6 +196,12 @@ def importar(con: sqlite3.Connection, filas: list[dict], contenido: bytes, nombr
                             (f"if-{clave}", r["instrumento_id"], r["fecha"], r["nombre"], r["cargo"], r["codigo"], r["acciones"],
                              r["precio"], r["valor"], r["enlace"], "insiderfinance_csv", ts, r["fecha_presentacion"],
                              "EE. UU.; NO CUBRE BMV; confirmar con SEC Form 4"))
+            elif tipo == "calificaciones_sa":
+                con.execute("INSERT INTO calificaciones (id, instrumento_id, fecha, fuente, quant, autores, wall_street, valuacion, "
+                            "crecimiento, rentabilidad, momentum, revisiones, importado_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                            (f"sa-{clave}", r["instrumento_id"], r["fecha"], "seekingalpha_export", r["quant"], r["autores"],
+                             r["wall_street"], r["valuacion"], r["crecimiento"], r["rentabilidad"], r["momentum"],
+                             r["revisiones"], ts))
             elif tipo == "saldos":
                 con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, nota) "
                             "VALUES (?,?,?,?,?,?)", (ts, r["hora_portal"], reto.etapa_de_fecha(r["hora_portal"][:10]),
@@ -197,6 +229,9 @@ def _existe(con, tipo: str, r: dict, clave: str) -> bool:
         return bool(con.execute("SELECT 1 FROM noticias WHERE id=? OR enlace=?", (f"sam-{clave}", r["url"])).fetchone())
     if tipo == "insiderfinance":
         return bool(con.execute("SELECT 1 FROM insiders WHERE id=?", (f"if-{clave}",)).fetchone())
+    if tipo == "calificaciones_sa":
+        return bool(con.execute("SELECT 1 FROM calificaciones WHERE id=? OR (instrumento_id=? AND fecha=? AND fuente=?)",
+                                (f"sa-{clave}", r["instrumento_id"], r["fecha"], "seekingalpha_export")).fetchone())
     if tipo == "saldos":
         return bool(con.execute("SELECT 1 FROM saldos_portal WHERE hora_portal=? AND valor_portafolio=?",
                                 (r["hora_portal"], r["valor_portafolio"])).fetchone())

@@ -235,7 +235,8 @@ function tarjetaPropuesta(p, mejor) {
     cuerpo.push(h("div", { clase: "kpis" },
       kpi(`Esperado a ${me.horizonte_sesiones || "—"} sesiones`, pct(me.esperado_propuesta), signo(me.esperado_propuesta)),
       kpi("Volatilidad anual (fuera de muestra)", pct(m.volatilidad)), kpi("Caída máxima (fuera de muestra)", pct(m.max_caida), "negativo"),
-      kpi("Escenario adverso (p10)", pct(p.escenarios && p.escenarios.adverso_p10), "negativo")));
+      kpi("Escenario adverso (p10)", pct(p.escenarios && p.escenarios.adverso_p10), "negativo"),
+      kpi("Órdenes a capturar", p.ordenes ? `${p.ordenes.total} (${p.ordenes.compras} compra · ${p.ordenes.ventas} venta)` : "—")));
     if ((p.cumplimiento_reto || []).length) cuerpo.push(h("p", { clase: "suave" }, "Reglas del Reto: ",
       ...p.cumplimiento_reto.map((c) => h("span", { clase: c.cumple ? "cumple" : "no-cumple", texto: `${c.cumple ? "✓" : "✗"} ${c.detalle}  ` }))));
     cuerpo.push(h("h3", { texto: "Mayores pesos" }), barrasPesos(p.pesos.slice(0, 6)));
@@ -355,6 +356,16 @@ function pintarDetalle() {
         h("p", { clase: "suave", texto: `${me.nota || ""} Horizonte: ${p.reproducibilidad.horizonte_origen}.` }),
         (p.cumplimiento_reto || []).length ? h("ul", {}, p.cumplimiento_reto.map((c) => h("li", {}, h("span", { clase: c.cumple ? "cumple" : "no-cumple", texto: c.cumple ? "Cumple: " : "No cumple: " }), `${c.regla} (${c.detalle})`))) : null),
       h("section", { clase: "tarjeta" }, h("h2", { texto: "Escenarios" }), escenarios(p.escenarios))));
+    if (p.ordenes) {
+      const o = p.ordenes;
+      out.push(h("section", { clase: "tarjeta" }, h("h2", { texto: `Plan de órdenes: ${o.total} órdenes` }),
+        h("div", { clase: "kpis" }, kpi("Compras", String(o.compras)), kpi("Ventas", String(o.ventas)),
+          kpi("Emisoras finales", String(o.posiciones)), kpi("Costo estimado", mxn(o.costo_total)),
+          kpi("Precio a tomar del portal (SIC)", String(o.sin_precio))),
+        h("p", { clase: "suave", texto: o.criterio }),
+        o.eliminadas.length ? h("p", { clase: "suave", texto: `Consolidadas por ser menores al mínimo: ${o.eliminadas.map((e) => `${e.id.split(":")[1]} ${pct(e.peso)}`).join(", ")}; su peso se repartió entre las demás.` }) : null,
+        o.sin_precio ? h("p", { clase: "aviso-caja", texto: `${o.sin_precio} orden(es) del SIC: la terminal solo tiene el precio de la bolsa de origen como referencia; la boleta sale como «investigar» y los títulos se calculan con el precio del portal.` }) : null));
+    }
     out.push(h("h2", { texto: "Pesos, montos, títulos y razones" }),
       tabla([
         { t: "Instrumento", f: (f) => h("span", {}, h("strong", { texto: f.clave_operable }), h("br"), h("span", { clase: "suave", texto: `${CLASES[f.clase] || f.clase} · ${f.id}` })) },
@@ -783,7 +794,11 @@ async function ejecutarBoleta(b) {
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 }
 document.getElementById("btn-boletas").addEventListener("click", async () => {
-  try { await api("/api/boletas/generar", { method: "POST", json: { propuesta: clavePropuestaSel() } }); pintarBoletas(); }
+  try {
+    const r = (await api("/api/boletas/generar", { method: "POST", json: { propuesta: clavePropuestaSel() } })).resultado[0];
+    notificar(`${r.numero_ordenes} órdenes a capturar (${r.ordenes_compra} compra · ${r.ordenes_venta} venta)` + (r.por_investigar ? ` y ${r.por_investigar} por investigar sin precio` : "") + ".");
+    pintarBoletas();
+  }
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 });
 async function cargarTiempo() {
@@ -854,6 +869,7 @@ async function cargarRanking() {
       { t: "60 días", f: (f) => h("span", { clase: signo(f.rend_60) }, pct(f.rend_60)), num: true },
       { t: "Volatilidad", f: (f) => pct(f.vol_60), num: true },
       { t: "Caída 60 d", f: (f) => pct(f.caida_60), num: true },
+      { t: "Seeking Alpha", f: (f) => (f.calificacion_sa ? h("span", { title: `Autores ${f.calificacion_sa.autores ?? "—"} · Wall Street ${f.calificacion_sa.wall_street ?? "—"} · importada ${f.calificacion_sa.fecha}` }, `Quant ${f.calificacion_sa.quant ?? "—"}`) : "—") },
       { t: "Dato", f: (f) => h("span", {}, chip(f.vigencia), h("br"), h("span", { clase: "suave", texto: `${f.tipo_dato || "—"} · ${f.fecha || "—"} · ${f.proveedor || "—"}` })) }],
       d.filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC.", vacio: "Sin emisoras con al menos 61 sesiones de precio." }));
   } catch (e) { limpiar("ranking-contenido", errorCaja(e)); }

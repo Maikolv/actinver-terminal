@@ -47,12 +47,19 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "a
             "fecha": q.get("fecha"), "tipo_dato": q.get("tipo_dato"), "vigencia": q.get("estado"), "proveedor": q.get("proveedor"),
             "precio_es_referencia": ins[i]["mercado_operable"] == "BMV-SIC",
         })
+    cal = {r["instrumento_id"]: dict(r) for r in con.execute(
+        "SELECT c.* FROM calificaciones c JOIN (SELECT instrumento_id, MAX(fecha) f FROM calificaciones GROUP BY instrumento_id) u "
+        "ON c.instrumento_id=u.instrumento_id AND c.fecha=u.f")}
+    for f in filas:
+        c = cal.get(f["id"])
+        f["calificacion_sa"] = ({"quant": c["quant"], "autores": c["autores"], "wall_street": c["wall_street"],
+                                 "fecha": c["fecha"]} if c else None)
     if filas:
         df = pd.DataFrame(filas)
         df["puntuacion"] = sum(df[k].rank(pct=True) * w for k, w in PESOS.items()) * 100
         df = df.sort_values("puntuacion", ascending=False).reset_index(drop=True)
         df["posicion"] = df.index + 1
-        filas = df.round(6).to_dict("records")
+        filas = df.round(6).astype(object).where(df.notna(), None).to_dict("records")
     return {"filas": filas, "n": len(filas), "universo": len(ids), "criterio": PESOS, "filtro": mercado_filtro,
             "aviso": ("Ordena por comportamiento reciente y estabilidad; no es recomendación ni pronóstico. Se actualiza con "
                       "cada precio nuevo: hoy los precios BMV son cierres (EOD) y los del SIC son referencia de su bolsa de "

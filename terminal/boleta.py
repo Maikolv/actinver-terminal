@@ -192,6 +192,10 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, clave: str = "acciones_aj
         ids.append(cur.lastrowid)
     con.commit()
     resumen = {"tipo": "considerar rebalanceo" if len(direccionales) >= 2 else None, "boletas": ids, "propuesta": clave,
+               "numero_ordenes": len(direccionales),
+               "ordenes_compra": sum(b["tipo"] == "considerar compra" for b in boletas),
+               "ordenes_venta": sum(b["tipo"] == "considerar venta" for b in boletas),
+               "por_investigar": sum(b["tipo"] == "investigar" for b in boletas),
                "costo_total": round(sum((b["costos"] or {}).get("total", 0) for b in boletas), 2)}
     return [resumen] + [{**b, "id": i} for b, i in zip(boletas, ids, strict=True)]
 

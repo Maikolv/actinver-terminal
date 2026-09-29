@@ -2,6 +2,18 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.9.0] — 2026-09-29
+
+### Añadido
+- **Plan de órdenes en cada propuesta** (`ordenes`: total, compras, ventas, emisoras finales, costo y órdenes del SIC):
+  - `consolidar_ordenes` elimina las posiciones menores a la banda de rebalanceo (2 %), que nunca llegarían a
+    ejecutarse, y reparte su peso sin romper topes ni el mínimo de 5 emisoras;
+  - el número de órdenes aparece en las tarjetas, en el detalle («Plan de órdenes») y al generar boletas.
+- **Conectores contratados** `InfoselProvider` (APIs de Infosel / Infosel HUB, tiempo real BMV y BIVA) y `EdimexProvider`:
+  - quedan «pendiente» con la lista exacta de lo que falta;
+  - `BmvLicensedProvider` documenta que SiBolsa se consume vía los Web Services de Grupo BMV.
+- **Importador de calificaciones de Seeking Alpha** (`calificaciones_sa`): se muestran en el Ranking como contexto fechado.
+
 ## [0.8.0] — 2026-09-24
 
 ### Añadido
