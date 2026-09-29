@@ -327,6 +327,25 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     return estado
 
 
+def resumen_seguro(ajustes: Ajustes) -> dict | None:
+    """Plan del día por Telegram (una vez por sesión hábil, desde la hora configurada). Lo revisa el programador."""
+    from . import resumen
+    try:
+        con = db.conectar()
+        try:
+            if not resumen.toca(ajustes, datetime.now(UTC), resumen._estado(con)):
+                return None
+            with bloqueo:  # no convive con un cálculo en curso
+                perfil = perfil_actual(con, ajustes)
+                return resumen.enviar_si_toca(con, ajustes, cartera_actual(con, ajustes),
+                                              propuestas_guardadas(con, ajustes, perfil))
+        finally:
+            con.close()
+    except Exception:  # noqa: BLE001 - el resumen nunca detiene el monitor
+        log.exception("no se pudo enviar el plan del día")
+        return None
+
+
 def ciclo_seguro(ajustes: Ajustes, forzar: bool = False, en_vivo: bool = False) -> dict | None:
     """Ejecuta un ciclo si no hay otro en curso (lo usan el programador y los disparadores de la API)."""
     if not bloqueo.acquire(blocking=False):

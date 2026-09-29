@@ -121,6 +121,8 @@ enfriamiento_horas = 6               # no repetir la misma alerta antes de 6 h
 silenciar_fuera_de_horario = true    # fuera del horario de la BMV se registra pero no se notifica al escritorio
 notificar_escritorio = true
 notificar_correo = true              # solo envía si SMTP_HOST y ALERTAS_CORREO_DESTINO están en .env
+resumen_matutino = true             # plan del día por Telegram cada sesión hábil de la BMV
+resumen_matutino_hora = "07:00"     # hora de la Ciudad de México (la BMV abre 07:30 hasta el 2 de nov., luego 08:30)
 notificar_telegram = true            # se envía solo si TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID están en .env
 
 [perfil]

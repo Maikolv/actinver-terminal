@@ -102,10 +102,22 @@ def telegram(titulo: str, texto: str) -> str:
     token, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if not token or not chat:
         return "no_configurado"
+    completo = texto if texto.startswith(titulo) else f"{titulo}\n{texto}"
+    partes, actual = [], ""
+    for linea in completo.split("\n"):  # Telegram admite 4096 caracteres por mensaje: se parte por líneas
+        if len(actual) + len(linea) + 1 > 3900 and actual:
+            partes.append(actual)
+            actual = ""
+        actual += linea[:3900] + "\n"
+    partes.append(actual)
     try:
-        r = httpx.post(f"https://api.telegram.org/bot{token}/sendMessage", timeout=20,
-                       data={"chat_id": chat, "text": f"{titulo}\n{texto}"[:4000]})
-        return "enviada" if r.status_code == 200 else "error"
+        for i, parte in enumerate(partes):
+            pie = f"\n({i + 1}/{len(partes)})" if len(partes) > 1 else ""
+            r = httpx.post(f"https://api.telegram.org/bot{token}/sendMessage", timeout=20,
+                           data={"chat_id": chat, "text": parte.rstrip() + pie})
+            if r.status_code != 200:
+                return "error"
+        return "enviada"
     except httpx.HTTPError:
         return "error"  # el mensaje de error no se registra: la URL contiene el token
 

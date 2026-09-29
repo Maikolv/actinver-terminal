@@ -5,6 +5,12 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 ## [0.10.0] — 2026-09-29
 
 ### Añadido
+- **Plan del día por Telegram** (`terminal/resumen.py`): cada sesión hábil de la BMV a las 07:00 (CDMX, configurable en
+  `resumen_matutino_hora`), una sola vez, con:
+  - las órdenes de la propuesta mejor puntuada, con títulos enteros, precio y monto;
+  - los cambios frente al plan del día anterior;
+  - el porqué (criterios de la puntuación, motivo por emisora y riesgo principal).
+  - `POST /api/resumen/muestra` envía una muestra en cualquier momento; los mensajes largos se parten en varios.
 - **Cuenta del Reto según el portal** (`terminal/portal.py`, `GET/POST /api/portal/captura`):
   - el participante copia la tabla de su cuenta y la pega en «Mi cartera», con vista previa, cuadre y detección de duplicados;
   - la terminal nunca entra al portal (reglamento §17);

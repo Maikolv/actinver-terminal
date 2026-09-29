@@ -54,6 +54,7 @@ def _programador(stop: threading.Event) -> None:
     prog = AJUSTES["programacion"]
     siguiente = time.monotonic() + 5  # primer ciclo pocos segundos después de arrancar
     while not stop.wait(15):
+        servicios.resumen_seguro(AJUSTES)  # plan del día por Telegram a primera hora (una vez por sesión)
         ahora = time.monotonic()
         if ahora >= siguiente:
             if servicios.ciclo_seguro(AJUSTES) is not None and FLUJO:
@@ -640,6 +641,15 @@ async def webhook_tradingview(request: Request):
     if not r.get("duplicado"):
         disparar_motor(False)
     return r
+
+
+@app.post("/api/resumen/muestra")
+def muestra_resumen(con=Depends(con_db)):
+    """Envía ahora por Telegram una MUESTRA del plan del día con los datos actuales (no cuenta como el envío diario)."""
+    from . import resumen
+    perfil = servicios.perfil_actual(con, AJUSTES)
+    return resumen.enviar_muestra(con, AJUSTES, servicios.cartera_actual(con, AJUSTES),
+                                  servicios.propuestas_guardadas(con, AJUSTES, perfil))
 
 
 @app.post("/api/notificaciones/prueba")
