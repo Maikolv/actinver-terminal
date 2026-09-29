@@ -10,6 +10,7 @@
   uv run terminal investigar     # experimento walk-forward → validación → prueba y pronósticos (H = 1 y 5)
   uv run terminal cobertura      # verifica cobertura por símbolo y proveedor; escribe docs/cobertura.md
   uv run terminal webhook-secreto  # genera TRADINGVIEW_WEBHOOK_SECRETO en .env (sin mostrarlo completo)
+  uv run terminal claude         # comprueba la credencial de Claude del chatbot de Telegram (una consulta mínima)
   uv run terminal boletas        # boletas del plan del día (o --propuesta CLAVE; --telegram para enviarlas) para captura manual
 """
 from __future__ import annotations
@@ -219,6 +220,31 @@ def investigar(args) -> None:
         con.close()
 
 
+def claude(_args) -> None:
+    """Una consulta mínima para confirmar que el chatbot puede usar Claude. La clave nunca se muestra."""
+    from .bot_telegram import credencial_claude
+    if not credencial_claude():
+        sys.exit("Falta ANTHROPIC_API_KEY en .env (créela en console.anthropic.com, sección API Keys). No se muestra ni se registra.")
+    try:
+        import anthropic
+    except ImportError:
+        sys.exit("Falta el SDK: uv add anthropic")
+    try:
+        r = anthropic.Anthropic(max_retries=1, timeout=60.0).messages.create(
+            model="claude-opus-5-5", max_tokens=200, output_config={"effort": "low"},
+            messages=[{"role": "user", "content": "Responde solo: OK"}])
+    except anthropic.AuthenticationError:
+        sys.exit("Claude rechazó la clave (HTTP 401): revise ANTHROPIC_API_KEY en .env.")
+    except anthropic.PermissionDeniedError:
+        sys.exit("La clave no tiene permiso para este modelo (HTTP 403).")
+    except anthropic.APIStatusError as e:
+        sys.exit(f"Claude respondió HTTP {e.status_code}; intente más tarde o revise su saldo en console.anthropic.com.")
+    except anthropic.APIConnectionError:
+        sys.exit("Sin conexión con la API de Claude.")
+    texto = "".join(b.text for b in r.content if b.type == "text").strip()
+    print(f"Claude activo ({r.model}): respondió «{texto[:40]}». Reinicie la terminal para que el bot lo use.")
+
+
 def _hora_mx(iso: str) -> str:
     import pandas as pd
     return pd.Timestamp(iso).tz_convert("America/Mexico_City").strftime("%d-%m %H:%M") + " (CDMX)"
@@ -342,6 +368,7 @@ def main() -> None:
     inv.set_defaults(fn=investigar)
     sub.add_parser("cobertura", help="verifica cobertura por símbolo y proveedor (docs/cobertura.md)").set_defaults(fn=cobertura)
     sub.add_parser("webhook-secreto", help="genera el secreto del webhook de TradingView en .env").set_defaults(fn=webhook_secreto)
+    sub.add_parser("claude", help="comprueba la credencial de Claude del chatbot (una consulta mínima)").set_defaults(fn=claude)
     bo = sub.add_parser("boletas", help="genera las boletas del plan del día (captura manual en el simulador)")
     bo.add_argument("--propuesta", default="plan_del_dia", help="clave de la propuesta (por omisión, la del plan del día)")
     bo.add_argument("--telegram", action="store_true", help="además, enviarlas por Telegram")

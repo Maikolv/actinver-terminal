@@ -56,3 +56,12 @@ def test_pregunta_con_claude_usa_contexto_de_solo_lectura_y_tope(con, ajustes):
 def test_negativa_de_claude(con, ajustes):
     cb = bt.Chatbot(ajustes, cliente_claude=_Claude(stop="refusal"))
     assert "No puedo responder" in cb.responder(con, "pregunta")
+
+
+def test_sin_credencial_no_se_activa_claude(ajustes, monkeypatch, tmp_path):
+    for v in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_PROFILE", "OLLAMA_URL"):
+        monkeypatch.delenv(v, raising=False)
+    monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
+    assert not bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "local"
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-prueba")
+    assert bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "claude"

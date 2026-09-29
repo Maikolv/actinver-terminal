@@ -187,6 +187,14 @@ def contexto(con, ajustes, emisoras: list[str]) -> dict:
 
 
 # ------------------------------------------------------------------------------------------------------------------
+def credencial_claude() -> bool:
+    """¿Hay una credencial de Claude? (ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN o un perfil de `ant auth login`)."""
+    from pathlib import Path
+    if os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_PROFILE"):
+        return True
+    return (Path.home() / ".config" / "anthropic").exists()
+
+
 class Chatbot:
     """Respuestas a preguntas libres. El cliente de Claude es opcional e inyectable (pruebas)."""
 
@@ -200,10 +208,13 @@ class Chatbot:
     def _cliente_claude(self):
         if not self._claude_probado:
             self._claude_probado = True
+            if not credencial_claude():
+                self._claude = None
+                return None
             try:
                 import anthropic  # opcional: uv add anthropic
                 self._claude = anthropic.Anthropic(max_retries=2, timeout=60.0)
-            except Exception:  # noqa: BLE001 - sin SDK o sin credencial se usa otra vía
+            except Exception:  # noqa: BLE001 - sin SDK se usa otra vía
                 self._claude = None
         return self._claude
 
@@ -224,9 +235,12 @@ class Chatbot:
     def _preguntar_claude(self, pregunta: str, ctx: dict) -> str | None:
         try:
             import anthropic  # los tipos de error del SDK; en pruebas el cliente es falso y el SDK puede faltar
-            no_autorizado, transitorios = anthropic.AuthenticationError, (anthropic.APIStatusError, anthropic.APIConnectionError)
+            # AnthropicError sin respuesta HTTP = credencial ausente o inválida en el cliente: se desactiva Claude
+            no_autorizado = (anthropic.AuthenticationError, anthropic.PermissionDeniedError)
+            transitorios = (anthropic.APIStatusError, anthropic.APIConnectionError)
+            base = anthropic.AnthropicError
         except ImportError:
-            no_autorizado, transitorios = (), ()
+            no_autorizado, transitorios, base = (), (), ()
         try:
             r = self._claude.beta.messages.create(
                 model="claude-opus-5-5", max_tokens=2000, system=SISTEMA,
@@ -241,6 +255,10 @@ class Chatbot:
                 return None
             if transitorios and isinstance(e, transitorios):
                 log.warning("chatbot: Claude no disponible (%s)", type(e).__name__)
+                return None
+            if base and isinstance(e, base):
+                log.warning("chatbot: Claude sin credencial utilizable (%s); se usan respuestas locales", type(e).__name__)
+                self._claude = None
                 return None
             raise
         if r.stop_reason == "refusal":
