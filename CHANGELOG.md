@@ -9,6 +9,9 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
   - `consolidar_ordenes` elimina las posiciones menores a la banda de rebalanceo (2 %), que nunca llegarían a
     ejecutarse, y reparte su peso sin romper topes ni el mínimo de 5 emisoras;
   - el número de órdenes aparece en las tarjetas, en el detalle («Plan de órdenes») y al generar boletas.
+- **`InfoselProvider` implementado con la API pública de Infosel Market v3**: último hecho BMV y SIC en MXN, hora del
+  hecho en la Ciudad de México convertida a UTC, posturas de compra/venta, verificación de serie exacta y token rechazado
+  explicado. Solo requiere `INFOSEL_URL_BASE` e `INFOSEL_API_KEY`.
 - **Conectores contratados** `InfoselProvider` (APIs de Infosel / Infosel HUB, tiempo real BMV y BIVA) y `EdimexProvider`:
   - quedan «pendiente» con la lista exacta de lo que falta;
   - `BmvLicensedProvider` documenta que SiBolsa se consume vía los Web Services de Grupo BMV.

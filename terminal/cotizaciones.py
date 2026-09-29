@@ -401,14 +401,72 @@ class BmvLicensedProvider(ConectorContratado):
 
 
 class InfoselProvider(ConectorContratado):
-    """APIs financieras de Infosel (Infosel HUB): último hecho y mejores posturas de BMV y BIVA en tiempo real, histórico
-    e intradía. Solo con contrato y la documentación de la API que Infosel entrega; la terminal no inventa endpoints."""
+    """Infosel Market API v3 (Infosel HUB): último hecho y mejores posturas de BMV y del SIC en MXN.
+
+    Contrato público de la API (documentación Swagger de su entorno de pruebas, versión 3.21):
+      GET {INFOSEL_URL_BASE}/api/v3/instruments/last?instrumentKey=<mercado>/<tipoValor>/<bolsa>/<símbolo>
+      autenticación: cabecera «Authorization: Bearer <JWT>» (el token lo entrega Infosel con el contrato)
+      claves: BMV local «1/12576/0/AC*», BMV-SIC «1/12609/0/AAPL*»; símbolo = emisora + serie sin espacios
+      respuesta: {"data": [{"uniqueKey", "emisora", "serie", "precioActual", "fechaPrecioActual" (DD-MM-AAAA),
+                 "hora" (HH:MM:SS, hora de la Ciudad de México), "posturaPrecioCompra", "posturaPrecioVenta", ...}]}
+    La especificación JSON es opcional: solo sirve para corregir símbolos con «mapa_simbolos»."""
     nombre = "infosel"
-    descripcion = "Infosel (APIs financieras / Infosel HUB) — tiempo real BMV y BIVA con acceso contratado"
+    descripcion = "Infosel Market API v3 (Infosel HUB) — último hecho BMV y SIC en MXN con acceso contratado"
     prefijo = "INFOSEL"
     entrega_mercado = ("local", "SIC")
-    requisito_contrato = ("Contrato de las APIs financieras de Infosel (infosel.com/apis) con derechos de BMV/BIVA para uso "
-                          "no profesional y su documentación técnica")
+    requisito_contrato = ("Contrato de las APIs financieras de Infosel (infosel.com/apis) con derechos de BMV para uso "
+                          "no profesional")
+    RUTA = "/api/v3/instruments/last"
+    MERCADOS_CLAVE = {"local": "1/12576/0", "SIC": "1/12609/0"}
+    CAMPOS = "uniqueKey,emisora,serie,precioActual,fechaPrecioActual,hora,posturaPrecioCompra,posturaPrecioVenta"
+
+    def pendientes(self) -> list[str]:
+        faltan = []
+        if not self.env.get("INFOSEL_API_KEY"):
+            faltan.append(f"{self.requisito_contrato}; token INFOSEL_API_KEY (JWT que entrega Infosel con el contrato)")
+        if not self.env.get("INFOSEL_URL_BASE"):
+            faltan.append("INFOSEL_URL_BASE (URL de producción que indique su contrato; la de pruebas es "
+                          "https://hub-market-qa.infosel-digitalfactory.com)")
+        if self.env.get("INFOSEL_ESPECIFICACION") and self.especificacion() is None:
+            faltan.append("INFOSEL_ESPECIFICACION apunta a un archivo inexistente")
+        return faltan
+
+    def clave_instrumento(self, instrumento: dict) -> str:
+        mapa = (self.especificacion() or {}).get("mapa_simbolos") or {}
+        if instrumento["id"] in mapa:
+            return mapa[instrumento["id"]]
+        mercado = "SIC" if instrumento.get("mercado_operable") == "BMV-SIC" else "local"
+        simbolo = f"{instrumento.get('clave', '')}{instrumento.get('serie') or ''}".replace(" ", "")
+        return f"{self.MERCADOS_CLAVE[mercado]}/{simbolo}"
+
+    def _consultar(self, instrumento: dict) -> Cotizacion:
+        clave_inst = self.clave_instrumento(instrumento)
+        url = self.env["INFOSEL_URL_BASE"].rstrip("/") + self.RUTA
+        r = self.con_reintentos(lambda: self.cliente.get(
+            url, params={"instrumentKey": clave_inst, "fields": self.CAMPOS},
+            headers={"Authorization": f"Bearer {self.env['INFOSEL_API_KEY']}"}))
+        if r.status_code in (401, 403):
+            raise ProveedorNoDisponible(f"{self.nombre}: token rechazado (HTTP {r.status_code}); pida uno nuevo a Infosel")
+        if r.status_code != 200:
+            raise ProveedorNoDisponible(f"{self.nombre}: HTTP {r.status_code}")
+        recepcion = ahora_iso()
+        datos = [d for d in (r.json().get("data") or []) if d]
+        simbolo = clave_inst.split("/", 3)[-1].replace(" ", "")
+        d = next((x for x in datos if str(x.get("uniqueKey", "")).replace(" ", "") == clave_inst.replace(" ", "")
+                  or f"{x.get('emisora', '')}{x.get('serie', '')}".replace(" ", "") == simbolo), None)  # serie exacta
+        if not d or d.get("precioActual") in (None, 0):
+            raise ProveedorNoDisponible(f"{self.nombre}: sin último hecho para {clave_inst}")
+        if not d.get("fechaPrecioActual") or not d.get("hora"):
+            raise ProveedorNoDisponible(f"{self.nombre}: la respuesta no trae fecha y hora del hecho")
+        hora = pd.Timestamp(pd.to_datetime(f"{d['fechaPrecioActual']} {d['hora']}", format="%d-%m-%Y %H:%M:%S"),
+                            tz="America/Mexico_City").tz_convert("UTC").isoformat()
+        mercado = "SIC" if clave_inst.startswith(self.MERCADOS_CLAVE["SIC"]) else "local"
+        detalle = ""
+        if d.get("posturaPrecioCompra") and d.get("posturaPrecioVenta"):
+            detalle = f"Posturas: compra {d['posturaPrecioCompra']} / venta {d['posturaPrecioVenta']}"
+        return Cotizacion(self.nombre, str(d.get("uniqueKey") or clave_inst), instrumento["id"], instrumento["id"], mercado,
+                          "BMV", float(d["precioActual"]), "MXN", hora, recepcion, None,
+                          clasificar_latencia(hora, recepcion), detalle=detalle)
 
 
 class EdimexProvider(ConectorContratado):

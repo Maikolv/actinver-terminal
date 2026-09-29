@@ -1,5 +1,6 @@
 """Plan de órdenes ejecutable, conectores contratados nuevos (Infosel, Edimex) y calificaciones de Seeking Alpha."""
 import pandas as pd
+import pytest
 
 from terminal import cotizaciones as cz, importar, mercado, optimizador, ranking, servicios
 
@@ -49,3 +50,43 @@ def test_calificaciones_sa_se_importan_y_aparecen_en_el_ranking(con, ajustes):
     assert importar.importar(con, ok.encode(), "sa.csv", "calificaciones_sa", ins, confirmar=True)["aceptadas"] == 1
     fila = next(f for f in ranking.calcular(con, ajustes)["filas"] if f["id"] == ids[0])
     assert fila["calificacion_sa"]["quant"] == 4.5
+
+
+def _infosel(con, responder, env=None):
+    import httpx
+    env = env or {"INFOSEL_API_KEY": "token-de-prueba", "INFOSEL_URL_BASE": "https://infosel.test"}
+    return cz.InfoselProvider(con, env, cliente=httpx.Client(transport=httpx.MockTransport(responder)))
+
+
+def test_infosel_consulta_el_ultimo_hecho_bmv_y_sic(con):
+    llamadas = []
+
+    def responder(req):
+        llamadas.append(req)
+        clave = req.url.params["instrumentKey"]
+        emisora, serie = ("AMX", "B") if "AMX" in clave else ("AAPL", "*")
+        return __import__("httpx").Response(200, json={"data": [{
+            "uniqueKey": clave, "emisora": emisora, "serie": serie, "precioActual": 17.25,
+            "fechaPrecioActual": "29-09-2026", "hora": "10:15:30", "posturaPrecioCompra": 17.24, "posturaPrecioVenta": 17.26}]})
+
+    p = _infosel(con, responder)
+    q = p.cotizacion({"id": "BMV:AMX", "clave": "AMX", "serie": "B", "mercado_operable": "BMV"})
+    r = llamadas[0]
+    assert r.url.path == "/api/v3/instruments/last" and r.url.params["instrumentKey"] == "1/12576/0/AMXB"
+    assert r.headers["Authorization"] == "Bearer token-de-prueba"
+    assert q.precio == 17.25 and q.moneda == "MXN" and q.mercado == "local"
+    assert q.hora_evento.startswith("2026-09-29T16:15:30")                    # 10:15:30 en CDMX = 16:15:30 UTC
+    s = p.cotizacion({"id": "SIC:AAPL", "clave": "AAPL", "serie": "*", "mercado_operable": "BMV-SIC"})
+    assert llamadas[1].url.params["instrumentKey"] == "1/12609/0/AAPL*" and s.mercado == "SIC"
+
+
+def test_infosel_rechaza_serie_distinta_y_token_invalido(con):
+    import httpx
+    otra = _infosel(con, lambda r: httpx.Response(200, json={"data": [{"uniqueKey": "1/12576/0/AMXL", "emisora": "AMX",
+                    "serie": "L", "precioActual": 1.0, "fechaPrecioActual": "29-09-2026", "hora": "10:00:00"}]}))
+    with pytest.raises(cz.ProveedorNoDisponible):
+        otra.cotizacion({"id": "BMV:AMX", "clave": "AMX", "serie": "B", "mercado_operable": "BMV"})
+    malo = _infosel(con, lambda r: httpx.Response(401, json={"message": "Access token is missing or invalid"}))
+    with pytest.raises(cz.ProveedorNoDisponible, match="token rechazado"):
+        malo.cotizacion({"id": "BMV:AMX", "clave": "AMX", "serie": "B", "mercado_operable": "BMV"})
+    assert cz.InfoselProvider(con, {}).pendientes()
