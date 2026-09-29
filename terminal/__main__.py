@@ -222,7 +222,9 @@ def investigar(args) -> None:
 
 def claude(_args) -> None:
     """Una consulta mínima para confirmar que el chatbot puede usar Claude. La clave nunca se muestra."""
+    from .config import _cargar_env_local
     from .bot_telegram import credencial_claude
+    _cargar_env_local()
     if not credencial_claude():
         sys.exit("Falta ANTHROPIC_API_KEY en .env (créela en console.anthropic.com, sección API Keys). No se muestra ni se registra.")
     try:
