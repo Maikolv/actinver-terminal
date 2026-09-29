@@ -90,3 +90,21 @@ def test_infosel_rechaza_serie_distinta_y_token_invalido(con):
     with pytest.raises(cz.ProveedorNoDisponible, match="token rechazado"):
         malo.cotizacion({"id": "BMV:AMX", "clave": "AMX", "serie": "B", "mercado_operable": "BMV"})
     assert cz.InfoselProvider(con, {}).pendientes()
+
+
+def test_preseleccion_conserva_acciones_en_pesos_para_el_tope_usd():
+    import numpy as np
+    rng = np.random.default_rng(1)
+    cols = [f"SIC:U{i}" for i in range(10)] + [f"BMV:M{i}" for i in range(6)]
+    X = pd.DataFrame(rng.normal(0, 0.01, (200, 16)), columns=cols)
+    X[cols[:10]] += 0.003                                   # las de dólares dominan la razón rendimiento/volatilidad
+    sel = optimizador.PreseleccionAcciones(k=5, acciones=tuple(cols), mxn=tuple(cols[10:]), min_mxn=4).fit(X)
+    kept = [c for c, k in zip(cols, sel.to_keep_) if k]
+    assert sum(c.startswith("BMV:") for c in kept) == 4 and len(kept) == 9
+
+
+def test_respetar_usd_mueve_el_excedente_a_pesos():
+    w = pd.Series({"SIC:A": 0.3, "SIC:B": 0.3, "SIC:C": 0.2, "BMV:X": 0.1, "BMV:Y": 0.1})
+    r = optimizador.respetar_usd(w, {"SIC:A", "SIC:B", "SIC:C"}, 0.75, 0.20)
+    assert abs(r[["SIC:A", "SIC:B", "SIC:C"]].sum() - 0.75) < 1e-9 and abs(r.sum() - 1) < 1e-9
+    assert (r[["BMV:X", "BMV:Y"]] <= 0.20 + 1e-9).all()

@@ -53,9 +53,11 @@ class PreseleccionAcciones(skf.SelectorMixin, skb.BaseEstimator):
     """Conserva las k acciones con mayor razón rendimiento/volatilidad de la ventana de entrenamiento
     y todos los instrumentos que no son acciones. Se ajusta dentro de cada ventana (sin mirar el futuro)."""
 
-    def __init__(self, k: int = 30, acciones: tuple = ()):
+    def __init__(self, k: int = 30, acciones: tuple = (), mxn: tuple = (), min_mxn: int = 0):
         self.k = k
         self.acciones = acciones
+        self.mxn = mxn          # acciones con exposición en pesos
+        self.min_mxn = min_mxn  # mínimo de ellas a conservar para que el tope de exposición USD sea alcanzable
 
     def fit(self, X, y=None):
         nombres = list(X.columns) if hasattr(X, "columns") else None
@@ -66,8 +68,16 @@ class PreseleccionAcciones(skf.SelectorMixin, skb.BaseEstimator):
         keep = ~es_acc
         idx = np.where(es_acc)[0]
         if len(idx):
-            top = idx[np.argsort(-razon[idx])][: int(self.k)]
-            keep[top] = True
+            orden = idx[np.argsort(-razon[idx])]
+            keep[orden[: int(self.k)]] = True
+            en_mxn = [i for i in orden if nombres[i] in set(self.mxn)]
+            faltan = int(self.min_mxn) - sum(1 for i in en_mxn if keep[i])
+            for i in en_mxn:  # las mejores en pesos que no entraron, hasta cubrir el mínimo
+                if faltan <= 0:
+                    break
+                if not keep[i]:
+                    keep[i] = True
+                    faltan -= 1
         self.to_keep_ = keep
         return self
 
@@ -178,6 +188,17 @@ def rendimientos(precios: pd.DataFrame, ids: list[str], ventana: int | None = No
     return r.iloc[-ventana:] if ventana else r
 
 
+def _min_mxn(perfil: dict, elegibles: list[dict], tope: float) -> int:
+    """Acciones en pesos que la preselección debe conservar para que «USD <= máximo» tenga solución con el tope."""
+    usd_max = float(perfil.get("max_exposicion_usd", 1.0))
+    if usd_max >= 1 or tope <= 0:
+        return 0
+    otras_mxn = [e for e in elegibles if e["exposicion"] != "USD" and e["clase"] not in CLASES_ACCIONES]
+    if otras_mxn:  # fondos/ETF en pesos también cubren la parte en MXN
+        return 0
+    return math.ceil((1 - usd_max) / tope) + 2
+
+
 def _grupos(elegibles: list[dict]) -> dict[str, list[str]]:
     g = {}
     for e in elegibles:
@@ -193,7 +214,8 @@ def _restricciones(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[di
     r = []
     usd_max = float(perfil.get("max_exposicion_usd", 1.0))
     hay_mxn = any(e["exposicion"] != "USD" for e in elegibles)
-    if usd_max < 1 and hay_mxn:
+    hay_usd = any(e["exposicion"] == "USD" for e in elegibles)
+    if usd_max < 1 and hay_mxn and hay_usd:
         r.append(f"USD <= {usd_max}")
     if tipo == "mixta" and lente == "ajuste":  # la lente de máximo rendimiento no impone deuda mínima
         min_deuda = float(params["min_deuda_mixta"])
@@ -245,7 +267,17 @@ def _ajuste_final(tipo: str, perfil: dict, ajustes: Ajustes, elegibles_l: list[d
     sd = X.std().replace(0, np.nan)
     acciones = [e["id"] for e in elegibles_l if e["clase"] in CLASES_ACCIONES]
     k = int(ajustes["optimizacion"]["max_activos"]) * 2
-    top = set((mu[acciones] / sd[acciones]).dropna().nlargest(k).index) if acciones else set()
+    razon = (mu[acciones] / sd[acciones]).dropna() if acciones else pd.Series(dtype=float)
+    top = set(razon.nlargest(k).index)
+    mxn = [i for i in razon.sort_values(ascending=False).index if not any(
+        e["id"] == i and e["exposicion"] == "USD" for e in elegibles_l)]
+    faltan = _min_mxn(perfil, elegibles_l, _parametros_lente(lente, perfil, ajustes)[1]) - sum(1 for i in mxn if i in top)
+    for i in mxn:  # conservar suficientes acciones en pesos para respetar el tope de exposición en dólares
+        if faltan <= 0:
+            break
+        if i not in top:
+            top.add(i)
+            faltan -= 1
     cols = [c for c in X.columns if c not in acciones or c in top]
     sub = [e for e in elegibles_l if e["id"] in cols]
     modelo = _modelo(tipo, perfil, ajustes, sub, {k2: v for k2, v in previos.items() if k2 in cols},
@@ -287,11 +319,18 @@ def _modelo(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], pr
         # estabiliza pesos ante ruido en μ; la lente de máximo rendimiento no penaliza concentración
         l2_coef=float(ajustes["optimizacion"].get("l2_regularizacion", 0.0)) if lente == "ajuste" else 0.0,
         linear_constraints=_restricciones(tipo, perfil, ajustes, elegibles, lente) or None,
-        fallback=[MeanRisk(objective_function=ObjectiveFunction.MINIMIZE_RISK, max_weights=topes)],
+        # el respaldo conserva las restricciones del perfil: nunca se relajan en silencio
+        # el respaldo conserva las restricciones del perfil; solo si el universo las hace imposibles se relajan, y la
+        # propuesta lo declara en «riesgos» como NO CUMPLE SU PERFIL
+        fallback=[MeanRisk(objective_function=ObjectiveFunction.MINIMIZE_RISK, max_weights=topes, groups=_grupos(elegibles),
+                           linear_constraints=_restricciones(tipo, perfil, ajustes, elegibles, lente) or None),
+                  MeanRisk(objective_function=ObjectiveFunction.MINIMIZE_RISK, max_weights=topes)],
         raise_on_failure=True,
     )
     # set_output por instancia: la configuración global de sklearn es por hilo y el servidor calcula en otro hilo
-    return Pipeline([("preseleccion", PreseleccionAcciones(k=k, acciones=acciones)),
+    mxn = tuple(e["id"] for e in elegibles if e["clase"] in CLASES_ACCIONES and e["exposicion"] != "USD")
+    return Pipeline([("preseleccion", PreseleccionAcciones(k=k, acciones=acciones, mxn=mxn,
+                                                           min_mxn=_min_mxn(perfil, elegibles, tope))),
                      ("optimizacion", opt)]).set_output(transform="pandas")
 
 
@@ -451,6 +490,10 @@ def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: l
     out.append(f"Concentración: las 3 mayores posiciones suman {top3:.0%} (mayor: {w.index[0]} {w.iloc[0]:.0%}).")
     usd = sum(v for k, v in w.items() if elegibles[k]["exposicion"] == "USD")
     out.append(f"Riesgo cambiario: {usd:.0%} expuesto al dólar u otras divisas; una apreciación del peso reduce su valor en MXN.")
+    usd_max = float(perfil.get("max_exposicion_usd", 1.0))
+    if usd > usd_max + 0.005 and perfil.get("mercado_acciones", "ambos") != "extranjeras":
+        out.insert(0, f"NO CUMPLE SU PERFIL: {usd:.0%} en dólares frente al máximo de {usd_max:.0%}; el universo disponible no "
+                      "tiene suficientes instrumentos en pesos con precio. Amplíe el universo o ajuste el máximo en «Reto y perfil».")
     if m.get("max_caida") is not None:
         out.append(f"Caída máxima en la validación fuera de muestra: {m['max_caida']:.0%}; "
                    f"peor trimestre histórico con estos pesos: {esc['peor_trimestre_historico']:.0%}.")
@@ -494,6 +537,24 @@ def consolidar_ordenes(pesos: pd.Series, peso_minimo: float, tope: float, min_em
             "criterio": (f"Cada posición pesa al menos {peso_minimo:.0%} (la banda de rebalanceo), porque una orden menor "
                          f"no se ejecutaría; mínimo {min_emisoras} emisoras y tope de {tope:.0%} por emisora.")}
     return w.reindex(pesos.index).fillna(0.0), info
+
+
+def respetar_usd(pesos: pd.Series, usd: set, usd_max: float, tope: float) -> pd.Series:
+    """Si el reparto posterior (consolidación de órdenes) dejó la exposición en dólares sobre el máximo del perfil,
+    reduce en proporción las posiciones en USD y pasa el excedente a las de pesos sin rebasar su tope."""
+    w = pesos.copy()
+    en_usd = [k for k in w.index if k in usd and w[k] > 0]
+    en_mxn = [k for k in w.index if k not in usd and w[k] > 0]
+    exceso = float(w[en_usd].sum()) - usd_max
+    if exceso <= 1e-9 or not en_mxn:
+        return w
+    capacidad = (np.maximum(w[en_mxn], tope) - w[en_mxn]).clip(lower=0)
+    mover = min(exceso, float(capacidad.sum()))
+    if mover <= 0:
+        return w
+    w[en_usd] *= 1 - mover / float(w[en_usd].sum())
+    w[en_mxn] += mover * capacidad / float(capacidad.sum())
+    return w
 
 
 def _asignacion_discreta(pesos: pd.Series, elegibles: dict, capital: float) -> tuple[list[dict], float]:
@@ -664,8 +725,11 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     pesos = pesos / pesos.sum()
     pesos = pesos.reindex(ids).fillna(0.0)
     min_emisoras = int(((reto.config() if reto.activo() else {}).get("reglas") or {}).get("min_emisoras") or 5)
-    pesos, plan_ordenes = consolidar_ordenes(pesos, float(o["banda_rebalanceo_pp"]) / 100,
-                                             _parametros_lente(lente_calc, perfil, ajustes)[1], min_emisoras)
+    tope_lente = _parametros_lente(lente_calc, perfil, ajustes)[1]
+    pesos, plan_ordenes = consolidar_ordenes(pesos, float(o["banda_rebalanceo_pp"]) / 100, tope_lente, min_emisoras)
+    if any(e["exposicion"] != "USD" for e in elegibles_l):
+        pesos = respetar_usd(pesos, {e["id"] for e in elegibles_l if e["exposicion"] == "USD"},
+                             float(perfil.get("max_exposicion_usd", 1.0)), tope_lente)
 
     # 2) validación fuera de muestra (siempre con datos reales, sin ajuste de escenario)
     modelo_v = _modelo(tipo, perfil, ajustes, elegibles_l, {}, aversion_mult=mult_base, lente=lente_calc)

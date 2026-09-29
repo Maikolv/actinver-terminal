@@ -58,7 +58,8 @@ def test_formulario4_parseo():
                     "fecha_presentacion": "2026-09-19"}]  # operación (fecha) ≠ presentación ante la SEC
 
 
-def test_sec_requiere_user_agent(con):
+def test_sec_requiere_user_agent(con, monkeypatch):
+    monkeypatch.delenv("SEC_USER_AGENT", raising=False)  # aislada del .env del participante
     with pytest.raises(SinCredencial):
         fw.SecEdgar(con, {}, None).formularios4("AAPL")
     assert fw.actualizar_insiders(con, {}, [])["estado"] == "requiere_configuracion"

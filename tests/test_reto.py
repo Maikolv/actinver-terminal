@@ -68,6 +68,7 @@ def test_universo_del_simulador_restringe(con, ajustes):
     p = optimizador.proponer(con, ajustes, ajustes["perfil"], "acciones", VACIA)
     assert set(p["reproducibilidad"]["universo"]) <= {"BMV:WALMEX", "SIC:AAPL", "SIC:MSFT", "SIC:KO", "SIC:JNJ"}
     assert any("simulador" in e["motivo"] for e in p["excluidos"])
+    assert "NO CUMPLE SU PERFIL" in p["riesgos"][0]   # 1 emisora en pesos no alcanza el mínimo en MXN: se declara
 
 
 def test_simular_aplica_costos_y_poder_de_compra(con, ajustes):
