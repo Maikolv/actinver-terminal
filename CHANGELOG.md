@@ -2,6 +2,12 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.12.1] — 2026-09-29 (serie exacta de JPMRVUS)
+
+### Corregido
+- `JPMRVUS` ahora usa la serie **B-1** y la clave operable `JPMRVUS B-1`, coherentes con el identificador oficial `52_JPMRVUS_B-1`. Se volvió a importar la hoja oficial conservada del 28-sep-2026: 23 de 23 fondos con NAV, incluido `JPMRVUS` a 1.344672 MXN.
+- Se actualizó la prueba de coincidencia exacta de series. La suite completa pasó: 203 pruebas. Cobertura observada: 148 de 174 instrumentos con precio; 26 emisoras BMV sin datos. El millón inicial sigue siendo un registro local, sin captura confirmada del portal; no hay cotización BMV/SIC en tiempo real.
+
 ## [0.12.0] — 2026-09-29 (cobertura de precios)
 
 ### Corregido

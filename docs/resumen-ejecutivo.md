@@ -1,6 +1,6 @@
 # Resumen ejecutivo — Actinver Terminal
 
-*Estado al 23 de septiembre de 2026 · versión 0.6.0*
+*Estado comprobado al 29 de septiembre de 2026 · versión 0.12.1*
 
 ## Qué es
 
@@ -40,7 +40,7 @@ Además, cada operación paga comisión (0.10 %) más IVA. Sin una herramienta, 
 
 ## Evidencia de calidad
 
-- **131 pruebas automáticas**, incluidas pruebas que deben fallar ante datos mal etiquetados.
+- **203 pruebas automáticas** superadas el 29-sep-2026, incluidas pruebas que detectan series de fondos incorrectas y datos mal etiquetados.
 - **Lighthouse:** escritorio 100/100/100; móvil 93/100/100 (rendimiento, accesibilidad, buenas prácticas).
 - **Backtest:** un motor independiente por eventos (backtrader) coincide **exactamente** con el cálculo propio, en datos sintéticos y reales.
 - **Secretos:** 0 hallazgos en el historial de Git.
@@ -57,24 +57,26 @@ Se probó el modelo predictivo con datos reales de índices de EE. UU. (FRED, 20
 
 Conclusión: **la terminal no emite recomendaciones de cambio basadas en el modelo**. Sus propuestas se apoyan en diversificación y control de riesgo, no en predecir precios. El modelo fundacional Kronos quedó instalado, pero su experimento completo no terminó por falta de memoria en el equipo.
 
-## Limitaciones actuales
+## Estado de datos y limitaciones actuales
 
-1. **No hay precio BMV confiable para ningún instrumento (0 de 176).** Falta una fuente licenciada; mientras tanto, los precios se capturan a mano desde el portal.
-2. **Tipo de cambio en riesgo:** sin `FRED_API_KEY` ni `BANXICO_TOKEN` (ambas gratuitas), el último dato es del 18-sep y la valuación en USD se suspenderá cuando venza.
-3. **No hay tiempo real.** Ninguna fuente gratuita y autorizada lo ofrece para la BMV.
-4. **Falta la lista oficial de instrumentos del simulador.** Se podrá descargar en la semana de práctica (28 de septiembre al 2 de octubre).
-5. **Evaluación del modelo:** solo se hizo con 3 índices de EE. UU., no con emisoras del Reto.
+La terminal muestra **148 de 174 instrumentos con precio**: 41 vigentes, 107 retrasados porque corresponden al cierre de la sesión anterior y 26 emisoras BMV sin datos. Los 23 fondos Actinver tienen NAV en la hoja oficial del 28-sep-2026; `JPMRVUS` está identificado como serie B-1. El tipo de cambio proviene de Banxico. Las cotizaciones del SIC son referencias calculadas a partir del mercado de origen y el tipo de cambio, no precios ejecutables del SIC.
 
-## Decisiones que necesita el participante
+1. **Cuenta del Reto:** aún no hay captura del saldo y posiciones del portal. El millón inicial de la terminal es un registro local de práctica; no está confirmado por Actinver. El participante debe copiar la tabla del portal en «Mi cartera» → «Capturar desde el portal».
+2. **Precios BMV pendientes:** el cupo gratuito de EODHD permite cargar gradualmente 24 de las 26 emisoras sin historia; TERRA 13 y SMARTRC requieren otra fuente o confirmación de cobertura. La actualización completa diaria supera el cupo gratuito.
+3. **Tiempo real:** no hay licencia activa para BMV/SIC en tiempo real. La integración Infosel está preparada, pero requiere contrato, URL de producción y credencial. Ningún cierre diario debe mostrarse como una cotización actual.
+4. **Catálogo del simulador:** la elegibilidad de instrumentos dudosos, en particular TERRA 13 y SMARTRC, requiere cotejo visual con el portal oficial.
+5. **Alertas:** escritorio y Telegram están activos; el correo requiere los parámetros SMTP del usuario. La terminal propone y avisa, pero cada orden la decide y captura el participante.
+6. **Modelo predictivo:** la validación histórica no demostró ventaja; las puntuaciones de propuestas se calculan con una ventana fuera de muestra corta y no garantizan rentabilidad.
 
-| Decisión | Costo | Efecto |
+## Acciones para completar la operación
+
+| Acción | Quién la realiza | Resultado |
 |---|---|---|
-| Contratar datos de la BMV (BMV o un distribuidor autorizado) | Según contrato | Precio confiable y, si el contrato lo cubre, tiempo real |
-| Registrar la clave gratuita de la API de FRED (`FRED_API_KEY`) | $0 | Tipo de cambio de respaldo estable: desde el 24-sep, el CSV público de FRED deja sin respuesta a clientes automatizados identificados |
-| Registrar una clave gratuita de EODHD | $0 (20 consultas al día) | Cierres diarios de la BMV |
-| Importar la lista del simulador | $0 | La cobertura deja de estar «pendiente» |
-| Capturar operaciones confirmadas y el saldo del portal | Tiempo | Seguimiento y alertas reales |
-| Exponer el webhook de TradingView con un túnel | $0 (Cloudflare Quick Tunnel) | Alertas de gráficos en la terminal |
+| Capturar saldo, efectivo, fecha y posiciones visibles del portal | Participante | Cartera confirmada y comparación de cambios real |
+| Confirmar TERRA 13 y SMARTRC en el catálogo del portal | Participante | Elegibilidad sustentada para las propuestas |
+| Mantener la terminal encendida para la cola de EODHD | Terminal | Recuperación gradual de emisoras BMV dentro del cupo gratuito |
+| Contratar una fuente con licencia BMV/SIC y aportar su configuración | Participante, si desea tiempo real | Cotizaciones según cobertura y derechos del contrato |
+| Configurar correo SMTP | Participante, si desea ese canal | Alertas por correo además de Telegram y escritorio |
 
 ## Cómo usarla
 

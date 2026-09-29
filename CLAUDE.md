@@ -28,12 +28,13 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-09-29, v0.10.0, rama `main`)
+## Estado comprobado (2026-09-29, v0.12.1, rama `main`)
 
-- 171 pruebas en verde. La cuenta del Reto se captura manualmente desde el portal; no existe acceso automático de la terminal a la sesión personal.
-- «Mi cartera» separa la captura del portal y el registro local. La captura exige hora, efectivo, valor total y posiciones coherentes; si faltan precios de la terminal conserva los valores copiados del portal.
-- Las alertas de cambio, captura pendiente y posible movimiento llegan por Telegram y escritorio. Los canales fallidos se reintentan tras diez minutos sin repetir los ya entregados. Correo espera configuración SMTP en `.env`.
-- Faltan la primera captura real del usuario, la licencia y credenciales de Infosel para BMV/SIC en tiempo real, y los valores de fondos sin fuente. No representar la aportación local de práctica como saldo confirmado del Reto.
+- 203 pruebas en verde. Hay 148 de 174 instrumentos con precio: 41 vigentes, 107 retrasados (cierre de la sesión anterior) y 26 emisoras BMV sin datos. Son cierres diarios o NAV, no cotizaciones BMV/SIC en tiempo real.
+- La hoja oficial Actinver del 28-sep-2026 aporta NAV a los 23 fondos; JPMRVUS usa exactamente la serie B-1.
+- «Mi cartera» separa la captura del portal y el registro local. Aún no hay captura confirmada del Reto: el millón mostrado es local. La captura exige hora, efectivo, valor total y posiciones coherentes.
+- Las alertas de cambio, captura pendiente y posible movimiento llegan por Telegram y escritorio. Correo espera configuración SMTP en `.env`.
+- Faltan la primera captura real del usuario y un contrato de datos con credenciales para BMV/SIC en tiempo real. EODHD gratuito recupera las emisoras faltantes paulatinamente, con cupo diario.
 
 ## Registro histórico (2026-09-23, v0.6.0)
 
@@ -77,12 +78,11 @@ importados por el usuario — es intencional (D-12), no un bug.
    verificado puede ir por delante de lo que se puede refrescar a diario. Vigilar
    `docs/matriz.md` y considerar una cola de actualización que
    priorice los instrumentos con posición abierta o en una propuesta activa.
-3. **`SEC_USER_AGENT` sin configurar** por defecto → la fuente de insiders queda
-   inactiva hasta que el usuario ponga su contacto en `.env` (no es automatizable:
-   es una declaración personal ante la SEC).
-4. **Ranking de modelos** (D-33): el comparador ya existe; falta correrlo con precios
-   REALES (la base real tiene 0 precios hoy) y, si algún modelo supera al vigente fuera de
-   muestra, conectarlo a `proponer()`. Depende de configurar un proveedor (brecha 1).
+3. **Cuenta del Reto**: no hay captura confirmada del portal. El usuario debe copiar
+   saldo y posiciones manualmente para comparar propuestas y alertas con su cartera real.
+4. **Ranking de modelos** (D-33): el comparador ya existe; falta evaluarlo con las
+   series reales disponibles y una prueba fuera de muestra suficiente. La cobertura
+   parcial y la historia corta impiden declarar una ventaja predictiva.
 5. **CloudflareSpeedTest_duplicates_backup** (duplicado verificado: 28/28 archivos idénticos)
    y otros repos mal ubicados detectados en `docs/repos.md`: pendiente de limpieza fuera
    de este repo (afecta a `Desktop/Repos`, no a `actinver-terminal`); dejar

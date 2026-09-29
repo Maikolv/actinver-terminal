@@ -68,7 +68,8 @@ def test_importar_hoja_asigna_serie_exacta_y_verifica_cobertura(con, monkeypatch
     r = fa.importar(con, b"%PDF-1.7 prueba", "hoja.pdf")
     precios = {p["id"]: p["precio"] for p in r["precios"]}
     assert precios["FONDO:ACTIGOB"] == 7.025596 and precios["FONDO:ACTICOB"] == 24.177216        # MXN, no USD
-    assert "FONDO:JPMRVUS" in r["sin_serie_en_documento"]                                          # B-1 ≠ B
+    assert "FONDO:JPMRVUS" not in r["sin_serie_en_documento"]
+    assert precios["FONDO:JPMRVUS"] == 1.344672  # serie B-1 exacta, en MXN
     fila = con.execute("SELECT tipo_dato, moneda, fecha FROM precios WHERE instrumento_id='FONDO:ACTIGOB'").fetchone()
     assert tuple(fila) == ("nav", "MXN", "2026-09-28")
     assert cz.cobertura_verificada(con, "actinver_pdf", "FONDO:ACTIGOB")
