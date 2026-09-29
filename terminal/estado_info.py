@@ -68,16 +68,22 @@ def calcular(con: sqlite3.Connection, ajustes) -> dict:
          "(referencia, no la cotización del SIC).",
          "Para tiempo real hace falta un contrato de datos (Infosel) o claves de Alpaca (referencia EE. UU.).")
     if bmv_sin:
+        from .ingesta import RESERVA_HISTORIA_NUEVA
+        dias = -(-len(bmv_sin) // max(RESERVA_HISTORIA_NUEVA, 1))
         item("Emisoras BMV sin precio", "falta",
-             f"{len(bmv_sin)} emisoras sin historia todavía (EODHD gratuito: 20 consultas al día). Se cargan solas, primero "
-             "las que usan las propuestas.", "Nada que hacer; o un plan de pago de EODHD para cargarlas de inmediato.")
+             f"{len(bmv_sin)} emisoras sin historia. Recuperación programada: {RESERVA_HISTORIA_NUEVA} por día con EODHD "
+             f"(≈ {dias} sesiones); TERRA 13 y SMARTRC no están en EODHD. Con el plan gratuito (20 consultas/día) solo "
+             "~18 emisoras BMV pueden actualizarse cada día: el resto rota y puede quedar retrasado.",
+             "Para cubrir todas a diario: plan de pago de EODHD, o Twelve Data Pro (TWELVEDATA_API_KEY; cubre 37 de 44).")
     if sic_venc:
         item("Emisoras SIC atrasadas", "vencido",
              f"{len(sic_venc)} con cierre atrasado (Tiingo limita consultas por hora). Se ponen al día solas.")
     if fondos_sin:
         item("Fondos Actinver", "falta",
-             f"{len(fondos_sin)} fondos sin valor por unidad: no hay fuente gratuita; las propuestas mixtas los excluyen.",
-             "Importe su valor por unidad (estado de cuenta o portal) en «Datos» → «Precios / valor liquidativo».")
+             f"{len(fondos_sin)} fondos sin valor por unidad ({', '.join(f.split(':')[1] for f in fondos_sin[:5])}). La hoja "
+             "oficial de Actinver se importa sola cada día; un fondo cuya serie no aparece en ella (p. ej. JPMRVUS solo "
+             "publica B-1) no se asigna por aproximación.",
+             "Confirme en el simulador qué serie opera; si es otra, importe su precio en «Datos» o avísenos para ajustar la serie.")
     # 3. Tipo de cambio
     fx = mercado.ultimo_fx(con, ajustes)
     item("Tipo de cambio", "confirmado" if fx.get("estado") == "vigente" else "vencido",

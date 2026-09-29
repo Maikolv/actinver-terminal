@@ -236,6 +236,14 @@
   <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>
     <h1>Datos e instrumentos</h1>
     <div id="proveedores"></div>
+    <h2>Fondos Actinver: hoja oficial de precios</h2>
+    <p class="ayuda">La terminal lee la hoja pública «Reporte Diario» de actinver.com (PDF) una vez al día y asigna el precio por fondo y serie exactos, con la fecha de valuación que declara el documento (valor por unidad del día hábil anterior). Si la descarga falla, descargue el PDF en actinver.com/fondos («Hoja de precios y rendimientos») y súbalo aquí.</p>
+    <form id="form-hoja-fondos" class="formulario" novalidate>
+      <label>PDF de la hoja de precios<input type="file" name="archivo" accept="application/pdf,.pdf"></label>
+      <button type="submit" class="boton boton--secundario">Importar PDF</button>
+      <button type="button" class="boton boton--secundario" id="btn-hoja-descargar">Descargar la hoja de hoy</button>
+    </form>
+    <div id="hoja-fondos-resultado"></div>
     <h2>Cobertura por símbolo del catálogo</h2>
     <p class="ayuda">Una fuente se usa para un instrumento solo si una consulta real confirmó ese instrumento exacto (serie, moneda MXN y mercado BMV local o SIC). Si no, el precio aparece como «SIN PRECIO CONFIABLE».</p>
     <p><button type="button" class="boton boton--secundario" id="btn-cobertura">Verificar cobertura</button></p>

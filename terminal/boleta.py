@@ -143,7 +143,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         "instrumento_id": i["id"], "emisora_serie": i.get("clave_operable"), "mercado": cz.normalizar_mercado(i),
         "tipo": tipo, "lado": lado, "cantidad": cantidad, "precio_referencia": precio, "precio_limite": limite,
         "tipo_orden": "limitada" if lado else None, "vigencia_orden": "día" if lado else None,
-        "calidad_precio": calidad, "fuente_precio": q and {k: q[k] for k in ("proveedor", "hora_evento", "estado_latencia")},
+        "calidad_precio": calidad, "fuente_precio": q and {k: q[k] for k in ("proveedor", "hora_evento", "estado_latencia", "moneda", "mercado")},
         "importe": round(importe, 2), "costos": c,
         "efecto": {"efectivo_antes": round(efectivo, 2), "efectivo_despues": round(efectivo_post, 2),
                    "peso_emisora_despues": peso_post, "advertencias_reto": advert},
@@ -318,8 +318,12 @@ def texto_telegram(boletas: list[dict]) -> str:
         lineas.append(f"Listas ({len(listas)}), orden limitada del día:")
         for b in listas:
             icono = "🟢 COMPRA" if b.get("lado") == "compra" else "🔴 VENTA"
+            f = b.get("fuente_precio") or {}
+            tipo = {"REAL_TIME": "tiempo real", "DELAYED": "retrasado", "EOD": "cierre diario"}.get(f.get("estado_latencia"), "sin clasificar")
+            cuando = pd.Timestamp(f["hora_evento"]).tz_convert("America/Mexico_City").strftime("%d-%m") if f.get("hora_evento") else "—"
             lineas.append(f"{icono} {b.get('emisora_serie') or b['instrumento_id']}: {int(b['cantidad']):,} títulos, "
-                          f"límite ${b['precio_limite']:,.2f} (≈ ${b.get('importe') or 0:,.0f}) · boleta #{b['id']}")
+                          f"límite ${b['precio_limite']:,.2f} (≈ ${b.get('importe') or 0:,.0f}) · boleta #{b['id']}\n"
+                          f"   precio: {f.get('proveedor', '—')}, {f.get('moneda', 'MXN')}, {tipo} del {cuando}")
         costo = sum(((b.get("costos") or {}).get("total") or 0) for b in listas)
         lineas.append(f"Costo estimado (comisión + IVA): ${costo:,.2f}.")
     if otras:

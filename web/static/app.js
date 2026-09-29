@@ -814,6 +814,30 @@ document.getElementById("form-orden").addEventListener("submit", async (ev) => {
   try { await api("/api/pendientes-portal", { method: "POST", json: d }); notificar("Orden pendiente registrada como referencia (no cambia su cartera)."); f.reset(); pintarRegistro(); }
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 });
+const TIPO_PRECIO = { REAL_TIME: "tiempo real", DELAYED: "retrasado", EOD: "cierre diario", UNKNOWN: "sin clasificar", STALE: "vencido" };
+function datoPrecio(b) {
+  const f = b.fuente_precio;
+  if (!f) return h("span", {}, chip("sin_datos", "Sin datos"), h("br"), h("span", { clase: "suave", texto: "sin cotización fiable: no se calcula la orden" }));
+  const cal = b.calidad_precio === "STALE" ? "vencido" : (b.calidad_precio === "REAL_TIME" ? "vigente" : "retrasado");
+  return h("span", {}, chip(cal, TIPO_PRECIO[b.calidad_precio] || b.calidad_precio), h("br"),
+    h("span", { clase: "suave", texto: `${f.proveedor} · ${f.moneda || "MXN"} · ${fechaLocal(f.hora_evento)} · ${TIPO_PRECIO[f.estado_latencia] || f.estado_latencia}` }));
+}
+async function importarHoja(fd) {
+  try {
+    const r = await fetch("/api/fondos/hoja", { method: "POST", body: fd, headers: { "X-CSRF-Token": CSRF } });
+    const d = await r.json();
+    if (!r.ok) throw Object.assign(new Error(d.error || "Error"), { errores: d.errores });
+    limpiar("hoja-fondos-resultado", h("div", { clase: "info-caja", texto: d.estado === "al_dia" ? `Ya está al día (valuación ${d.fecha_valuacion}).`
+      : `Valuación al ${d.fecha_valuacion}: ${d.asignados} fondos con precio.` + ((d.sin_serie_en_documento || []).length ? ` Sin la serie del universo en el documento: ${d.sin_serie_en_documento.join(", ")}.` : "") }));
+  } catch (e) { limpiar("hoja-fondos-resultado", errorCaja(e)); }
+}
+document.getElementById("form-hoja-fondos").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const fd = new FormData(ev.target);
+  if (!fd.get("archivo") || !fd.get("archivo").size) { notificar("Elija el PDF de la hoja de precios."); return; }
+  importarHoja(fd);
+});
+document.getElementById("btn-hoja-descargar").addEventListener("click", () => importarHoja(new FormData()));
 async function pintarBoletas() {
   try {
     const d = await api("/api/boletas");
@@ -826,7 +850,7 @@ async function pintarBoletas() {
       { t: "Efectivo después", f: (b) => mxn(b.efecto.efectivo_despues, true), num: true },
       { t: "Peso después", f: (b) => pct(b.efecto.peso_emisora_despues), num: true },
       { t: "Rango 10–90 % (estimado)", f: (b) => (b.rango && b.rango.disponible ? `${pct(b.rango.p10)} a ${pct(b.rango.p90)}` : "—") },
-      { t: "Precio", f: (b) => chip(b.calidad_precio === "SIN PRECIO CONFIABLE" || b.calidad_precio === "STALE" ? "vencido" : "vigente", b.calidad_precio) },
+      { t: "Precio (fuente · moneda · fecha y hora · tipo)", f: datoPrecio },
       { t: "Estado", f: (b) => h("span", { title: b.motivo_estado || "" }, chip(est[b.estado] || "sin_datos", b.estado)) },
       { t: "Falta", f: (b) => (b.datos_faltantes || []).join(" · ") || "—" },
       { t: "", f: (b) => (b.estado === "vigente" && b.lado ? h("span", {},

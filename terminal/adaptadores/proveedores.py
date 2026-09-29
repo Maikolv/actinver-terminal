@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import csv
 import io
+import json
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 
 from .base import Adaptador, Barra, ErrorProveedor
 
@@ -111,9 +113,15 @@ class Eodhd(Adaptador):
     def soporta(self, instr: dict) -> bool:
         return instr.get("mercado_operable") == "BMV" and instr.get("clase") in ("accion", "fibra", "etf")
 
+    @staticmethod
+    def simbolo(instr: dict) -> str:
+        """Código EODHD de la serie exacta (verificado contra exchange-symbol-list/MX el 29-sep-2026):
+        clave + serie sin «*» ni espacios; se conservan «&» (PE&OLES) y «-» (LASITEB-1, LIVEPOLC-1)."""
+        return instr["clave"] + (instr.get("serie") or "").replace("*", "").replace(" ", "")
+
     def historico(self, instr: dict, desde: date, hasta: date) -> list[Barra]:
-        clave = instr["clave"] + (instr.get("serie") or "").replace("*", "").replace(" ", "")
-        r = self._get(self.URL.format(t=clave.replace("&", "")),
+        from urllib.parse import quote
+        r = self._get(self.URL.format(t=quote(self.simbolo(instr), safe="-")),
                       params={"api_token": self.credencial, "fmt": "json", "from": desde.isoformat(),
                               "to": hasta.isoformat()})
         out = []
@@ -123,6 +131,51 @@ class Eodhd(Adaptador):
             out.append(Barra(fecha=d["date"], cierre=float(d["close"]),
                              cierre_ajustado=float(d.get("adjusted_close") or d["close"]),
                              volumen=float(d.get("volume") or 0)))
+        return out
+
+
+class TwelveData(Adaptador):
+    """Twelve Data: cierres diarios de la BMV (MIC XMEX). Su lista de mercados indica para México «EOD» y plan
+    mínimo **Pro** (consultado el 29-sep-2026): nunca es tiempo real. Solo se consulta un instrumento si su símbolo
+    exacto aparece en la lista pública de Twelve Data (`uv run terminal cobertura-twelvedata` genera
+    config/proveedores/twelvedata_bmv.json) y existe TWELVEDATA_API_KEY de un plan que incluya XMEX."""
+    proveedor = "twelvedata"
+    tipo_dato = "cierre"
+    requiere_credencial = True
+    descripcion = "Cierres diarios de la BMV (XMEX, EOD) — requiere plan Pro de Twelve Data"
+    uso_permitido = "Según el plan contratado; la BMV requiere plan Pro o superior; sin redistribución."
+    URL = "https://api.twelvedata.com/time_series"
+    MAPA = Path(__file__).resolve().parents[2] / "config" / "proveedores" / "twelvedata_bmv.json"
+
+    @staticmethod
+    def simbolo(instr: dict) -> str:
+        """Convención de Twelve Data: clave + serie sin «*» ni espacios; el guion de la serie es punto (LIVEPOLC.1)."""
+        return (instr["clave"] + (instr.get("serie") or "").replace("*", "").replace(" ", "")).replace("-", ".")
+
+    def verificados(self) -> set[str]:
+        try:
+            return set(json.loads(self.MAPA.read_text(encoding="utf-8")).get("verificados", []))
+        except (OSError, ValueError):
+            return set()
+
+    def soporta(self, instr: dict) -> bool:
+        return instr.get("mercado_operable") == "BMV" and instr["id"] in self.verificados()
+
+    def historico(self, instr: dict, desde: date, hasta: date) -> list[Barra]:
+        r = self._get(self.URL, params={"symbol": self.simbolo(instr), "mic_code": "XMEX", "interval": "1day",
+                                        "start_date": desde.isoformat(), "end_date": hasta.isoformat(),
+                                        "order": "asc", "apikey": self.credencial})
+        d = r.json()
+        if d.get("status") == "error":
+            if int(d.get("code") or 0) in (401, 403):
+                raise ErrorProveedor("twelvedata: el plan de la clave no incluye la BMV (se requiere Pro) o la clave no es válida")
+            raise ErrorProveedor(f"twelvedata: {str(d.get('message', 'error'))[:120]}")
+        out = []
+        for v in d.get("values") or []:
+            if v.get("close") in (None, ""):
+                continue
+            out.append(Barra(fecha=v["datetime"][:10], cierre=float(v["close"]), cierre_ajustado=float(v["close"]),
+                             volumen=float(v.get("volume") or 0)))
         return out
 
 

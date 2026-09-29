@@ -15,6 +15,17 @@ def _filtro_proveedor(ajustes: Ajustes) -> tuple[str, tuple]:
     return ("proveedor = ?", (DEMO,)) if ajustes.es_demo else ("proveedor <> ?", (DEMO,))
 
 
+# Prioridad entre fuentes para UNA MISMA fecha (menor = preferida). Entre fechas distintas siempre gana la más reciente,
+# así que un precio antiguo nunca sustituye a uno nuevo. Contratos BMV > cierres BMV > NAV oficial de fondos >
+# referencias de la bolsa de origen > precio capturado a mano > cotización en vivo del día (la sustituye el cierre).
+PRIORIDAD_FUENTE = {"bmv_licenciado": 0, "infosel": 1, "lseg": 2, "ice": 3, "edimex": 4, "eodhd": 10, "twelvedata": 11,
+                    "actinver_pdf": 12, "tiingo": 20, "alpaca": 21, "barchart": 22, "archivo": 30, "alpaca_vivo": 40}
+
+
+def prioridad_fuente(proveedor: str | None) -> int:
+    return PRIORIDAD_FUENTE.get(proveedor or "", 35)
+
+
 def instrumentos(con: sqlite3.Connection) -> dict[str, dict]:
     return {r["id"]: dict(r) for r in con.execute("SELECT * FROM instrumentos")}
 
@@ -56,7 +67,8 @@ def precios_mxn(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str], ajust
     df = pd.DataFrame(con.execute(q, (*ids, *par)).fetchall(), columns=["id", "fecha", "p", "moneda", "proveedor"])
     if df.empty:
         return pd.DataFrame()
-    df = df.sort_values(["id", "fecha", "proveedor"]).drop_duplicates(["id", "fecha"], keep="last")
+    df["prio"] = df["proveedor"].map(prioridad_fuente)
+    df = df.sort_values(["id", "fecha", "prio"]).drop_duplicates(["id", "fecha"], keep="first")
     ancho = df.pivot(index="fecha", columns="id", values="p")
     ancho.index = pd.to_datetime(ancho.index)
     monedas = df.drop_duplicates("id").set_index("id")["moneda"]
@@ -80,10 +92,14 @@ def cotizaciones(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str] | Non
     cond, par = _filtro_proveedor(ajustes)
     fx = ultimo_fx(con, ajustes)
     # Una sola consulta: último registro por instrumento (evita N consultas).
-    ultimos = {r["instrumento_id"]: r for r in con.execute(
-        f"SELECT p.instrumento_id, p.fecha, p.cierre, p.moneda, p.proveedor, p.tipo_dato, p.hora_cotizacion, p.obtenido_en "
-        f"FROM precios p JOIN (SELECT instrumento_id, MAX(fecha) AS f FROM precios WHERE {cond} GROUP BY instrumento_id) m "
-        f"ON p.instrumento_id = m.instrumento_id AND p.fecha = m.f WHERE p.{cond}", (*par, *par))}
+    ultimos = {}
+    for r in con.execute(
+            f"SELECT p.instrumento_id, p.fecha, p.cierre, p.moneda, p.proveedor, p.tipo_dato, p.hora_cotizacion, p.obtenido_en "
+            f"FROM precios p JOIN (SELECT instrumento_id, MAX(fecha) AS f FROM precios WHERE {cond} GROUP BY instrumento_id) m "
+            f"ON p.instrumento_id = m.instrumento_id AND p.fecha = m.f WHERE p.{cond}", (*par, *par)):
+        previo = ultimos.get(r["instrumento_id"])  # misma fecha en varias fuentes: gana la de mayor prioridad
+        if previo is None or prioridad_fuente(r["proveedor"]) < prioridad_fuente(previo["proveedor"]):
+            ultimos[r["instrumento_id"]] = r
     out = {}
     for i in ids:
         meta = ins.get(i)

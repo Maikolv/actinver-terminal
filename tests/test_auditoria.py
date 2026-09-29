@@ -17,7 +17,7 @@ def test_cola_de_precios_por_prioridad(con):
     sembrar_precios(con, ["BMV:WALMEX", "BMV:AMX"], sesiones=30)
     con.execute("DELETE FROM precios WHERE instrumento_id='BMV:AMX' AND fecha > (SELECT MIN(fecha) FROM precios)")
     instrs = [{"id": i} for i in ("BMV:ZZZ", "BMV:WALMEX", "BMV:AMX", "SIC:AAPL", "BMV:GMEXICO")]
-    orden = [i["id"] for i in ingesta.orden_cola(con, instrs, ["SIC:AAPL"], ["BMV:GMEXICO"])]
+    orden = [i["id"] for i in ingesta.orden_cola(con, instrs, ["SIC:AAPL"], ["BMV:GMEXICO"], reserva_nuevos=0)]
     # cartera → propuesta → con datos (el más atrasado primero) → nunca cargados
     assert orden == ["SIC:AAPL", "BMV:GMEXICO", "BMV:AMX", "BMV:WALMEX", "BMV:ZZZ"]
 

@@ -51,3 +51,16 @@ La suscripción personal (Premium o Pro) **no** da acceso a una API. Las calific
 - **Técnico:** URL base, autenticación, formato de símbolo y un ejemplo de respuesta, para escribir la especificación como con Infosel.
 
 Mientras no exista esa licencia, las calificaciones importadas son contexto fechado en el Ranking y no entran al optimizador.
+
+
+## Cobertura de precios (revisión del 29-sep-2026)
+
+| Fuente | Qué cubre | Tipo y retraso | Acceso | Estado |
+|---|---|---|---|---|
+| EODHD (`eodhd`, plan gratuito) | 41 de 44 emisoras BMV del universo con el código exacto (verificado contra `exchange-symbol-list/MX`) | Cierre diario (EOD); un año de historia | `EODHD_API_KEY`; 20 consultas/día | **Funciona.** Se corrigió `PE&OLES`, que se pedía como «PEOLES». Recupera 6 emisoras nuevas por día. Con el cupo gratuito solo ~18 se actualizan a diario. |
+| Twelve Data (`twelvedata`) | 37 de 44 (lista pública `/stocks?exchange=BMV`, símbolo por símbolo en `config/proveedores/twelvedata_bmv.json`). Sin cobertura: CEMEX CPO, FEMSA UBD, KOF UBL, LASITE B-1, MEGA CPO, SMARTRC, TERRA 13 | **EOD**: su lista de mercados indica para México «EOD» y plan **Pro** | `TWELVEDATA_API_KEY` de plan Pro | Preparado; inactivo sin clave |
+| Hoja oficial de fondos Actinver (`actinver_pdf`) | 22 de 23 fondos (serie B en MXN); JPMRVUS publica solo B-1 | NAV del día hábil anterior («precios de valuación al …») | PDF público de actinver.com (`robots.txt` no restringe `/documents/`); se descarga como máximo cada 3 h hasta tener la valuación | **Funciona**; guarda la huella SHA-256 y copia en `data/fuentes/actinver/` |
+| Infosel Market API v3 (`infosel`) | BMV y SIC | Tiempo real o retrasado, según el contrato (se mide la latencia) | Contrato de APIs, URL de producción y token JWT | Conector listo; faltan contrato y credenciales |
+| Grupo BMV INTRA | Tiempo real de Capitales, Dinero y Derivados, consolidado BMV/BIVA y SIC | Tiempo real (multicast); retrasado en algunos índices | Contrato de licencia de información para casas de bolsa, vendors e instituciones; infraestructura multicast o Web Services; tarifas 2025-2026 (marketdatasales@grupobmv.com.mx) | No es un producto para una persona. Para uso individual, un distribuidor como Infosel |
+
+**Prioridad para una misma fecha** (`mercado.PRIORIDAD_FUENTE`), de mayor a menor: contratos BMV (INTRA, Infosel, LSEG, ICE, Edimex) → EODHD → Twelve Data → hoja de Actinver → referencias de la bolsa de origen (Tiingo, Alpaca) → captura manual → cotización en vivo del día. Entre fechas distintas siempre gana la más reciente.

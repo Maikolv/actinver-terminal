@@ -72,6 +72,13 @@ activo = true                        # cierres EOD de EE. UU. (referencia SIC y 
 peticiones_por_hora = 45
 peticiones_por_dia = 900
 
+[proveedores.twelvedata]
+activo = true                        # alternativa BMV (EOD); solo con TWELVEDATA_API_KEY de plan Pro y símbolos verificados
+peticiones_por_dia = 700
+
+[proveedores.actinver_pdf]
+activo = true                        # hoja pública «Reporte Diario» de actinver.com (PDF): valor por unidad de los fondos
+
 [proveedores.eodhd]
 activo = true                        # cierres EOD de la BMV (.MX); requiere EODHD_API_KEY
 peticiones_por_dia = 18              # plan gratuito: 20/día; se deja margen

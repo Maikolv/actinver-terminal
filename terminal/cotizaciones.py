@@ -533,10 +533,9 @@ class ManualOrCsvProvider(MarketDataProvider):
             raise ProveedorNoDisponible(f"{self.nombre}: sin precio capturado para {instrumento['id']}")
         mercado = "SIC" if instrumento.get("mercado_operable") == "BMV-SIC" else (
             "fondo" if str(instrumento.get("clase", "")).startswith("fondo") else "local")
-        ev = f["event_time"] or f["fecha"]
         return Cotizacion(self.nombre, instrumento.get("clave_operable") or instrumento["id"], instrumento["id"],
                           instrumento["id"], mercado, "BMV" if mercado != "fondo" else "Fondos Actinver", f["cierre"],
-                          f["moneda"], _utc(ev).isoformat(), _utc(f["obtenido_en"]).isoformat(), None,
+                          f["moneda"], hora_cierre(f["event_time"], f["fecha"]), _utc(f["obtenido_en"]).isoformat(), None,
                           "EOD" if f["tipo_dato"] in ("cierre", "nav") else "UNKNOWN",
                           detalle="Capturado por el participante; verifique contra el portal")
 
@@ -597,35 +596,81 @@ class ReferenciaOrigenProvider(MarketDataProvider):
                           detalle="Bolsa de origen en USD; no es el precio del SIC en la BMV")
 
 
-class EodhdBmvProvider(MarketDataProvider):
+def hora_cierre(event_time: str | None, fecha: str) -> str:
+    """Hora del evento de un cierre. Si solo hay fecha, se usa el cierre de esa sesión de la BMV (hora de la Ciudad de
+    México); tomarla como medianoche UTC la movería al día anterior y la marcaría obsoleta."""
+    if event_time:
+        return _utc(event_time).isoformat()
+    c = vigencia.cierre_de_sesion("XMEX", pd.Timestamp(fecha).date())
+    return (_utc(c) if c else pd.Timestamp(f"{fecha} 23:59", tz="America/Mexico_City").tz_convert("UTC")).isoformat()
+
+
+class CierreAlmacenadoProvider(MarketDataProvider):
+    """Último cierre (o NAV) que ya guardó un adaptador de descarga. Siempre EOD: nunca se presenta como tiempo real.
+    La cobertura se verifica al descargar la serie exacta (ver ingesta.registrar_cobertura)."""
+    fuente = ""
+    mercado = "local"
+    bolsa = "BMV"
+    variable = ""
+    requisito = ""
+
+    def pendientes(self) -> list[str]:
+        return [] if (not self.variable or self.env.get(self.variable)) else [self.requisito]
+
+    def simbolo(self, instrumento: dict) -> str:
+        return instrumento.get("clave_operable") or instrumento["id"]
+
+    def _consultar(self, instrumento: dict) -> Cotizacion:
+        f = self.con.execute("SELECT fecha, cierre, moneda, obtenido_en, event_time FROM precios WHERE instrumento_id=? "
+                             "AND proveedor=? ORDER BY fecha DESC LIMIT 1", (instrumento["id"], self.fuente)).fetchone()
+        if not f:
+            raise ProveedorNoDisponible(f"{self.nombre}: sin cierre descargado para {instrumento['id']}")
+        return Cotizacion(self.nombre, self.simbolo(instrumento), instrumento["id"], instrumento["id"], self.mercado,
+                          self.bolsa, f["cierre"], f["moneda"], hora_cierre(f["event_time"], f["fecha"]),
+                          _utc(f["obtenido_en"]).isoformat(), None, "EOD")
+
+
+class EodhdBmvProvider(CierreAlmacenadoProvider):
     """Cierres diarios de la BMV (MXN) que ya descarga el adaptador EODHD. Siempre EOD."""
     nombre = "eodhd_bmv"
     descripcion = "Cierre diario de la BMV en MXN (EODHD); requiere EODHD_API_KEY"
     entrega_mercado = ("local",)
+    fuente, variable = "eodhd", "EODHD_API_KEY"
+    requisito = "credencial EODHD_API_KEY (plan gratuito: 20 peticiones/día)"
 
-    def pendientes(self) -> list[str]:
-        return [] if self.env.get("EODHD_API_KEY") else ["credencial EODHD_API_KEY (plan gratuito: 20 peticiones/día)"]
+    def simbolo(self, instrumento: dict) -> str:
+        return (instrumento.get("clave", "") + (instrumento.get("serie") or "").replace("*", "").replace(" ", "")) + ".MX"
 
-    def _consultar(self, instrumento: dict) -> Cotizacion:
-        f = self.con.execute("SELECT fecha, cierre, moneda, obtenido_en, event_time FROM precios WHERE instrumento_id=? "
-                             "AND proveedor='eodhd' ORDER BY fecha DESC LIMIT 1", (instrumento["id"],)).fetchone()
-        if not f:
-            raise ProveedorNoDisponible(f"{self.nombre}: sin cierre descargado para {instrumento['id']}")
-        return Cotizacion(self.nombre, f"{instrumento.get('clave')}.MX", instrumento["id"], instrumento["id"], "local",
-                          "BMV", f["cierre"], f["moneda"], _utc(f["event_time"] or f["fecha"]).isoformat(),
-                          _utc(f["obtenido_en"]).isoformat(), None, "EOD")
+
+class TwelveDataBmvProvider(CierreAlmacenadoProvider):
+    """Cierres diarios de la BMV (XMEX) descargados de Twelve Data; plan Pro. Siempre EOD."""
+    nombre = "twelvedata_bmv"
+    descripcion = "Cierre diario de la BMV en MXN (Twelve Data, plan Pro); requiere TWELVEDATA_API_KEY"
+    entrega_mercado = ("local",)
+    fuente, variable = "twelvedata", "TWELVEDATA_API_KEY"
+    requisito = "credencial TWELVEDATA_API_KEY de un plan Pro o superior (la BMV no está en planes menores)"
+
+
+class ActinverPdfProvider(CierreAlmacenadoProvider):
+    """Valor por unidad de los fondos Actinver tomado de su hoja oficial «Reporte Diario» (PDF). EOD (NAV)."""
+    nombre = "actinver_pdf"
+    descripcion = "Precio (NAV) de fondos Actinver de la hoja oficial de precios y rendimientos"
+    entrega_mercado = ("fondo",)
+    fuente, mercado, bolsa = "actinver_pdf", "fondo", "Fondos Actinver"
 
 
 # ----------------------------------------------------------------------------------------------------------------
 def construir(con: sqlite3.Connection, modo_demo: bool, entorno: dict | None = None) -> dict[str, MarketDataProvider]:
     env = entorno if entorno is not None else os.environ
     ps = [BmvLicensedProvider(con, env), InfoselProvider(con, env), LsegProvider(con, env), EdimexProvider(con, env), IceProvider(con, env), EodhdBmvProvider(con, env),
+          TwelveDataBmvProvider(con, env), ActinverPdfProvider(con, env),
           ManualOrCsvProvider(con, env), DemoProvider(con, env, modo_demo=modo_demo), ReferenciaOrigenProvider(con, env),
           ForeignMarketLicensedProvider(con, env)]
     return {p.nombre: p for p in ps}
 
 
-PRIORIDAD = ["bmv_licenciado", "infosel", "lseg", "ice", "edimex", "eodhd_bmv", "manual_csv"]
+PRIORIDAD = ["bmv_licenciado", "infosel", "lseg", "ice", "edimex", "eodhd_bmv", "twelvedata_bmv", "actinver_pdf",
+             "manual_csv"]
 VIGENCIA_S = {"REAL_TIME": 120, "DELAYED": 30 * 60}
 
 
@@ -646,6 +691,8 @@ def es_obsoleta(q: Cotizacion, instrumento: dict, ahora: datetime | None = None)
         return edad > VIGENCIA_S[q.estado_latencia]
     # EOD, UNKNOWN o mercado cerrado: vale si corresponde a la última sesión cerrada de la BMV
     ultima = vigencia.ultima_sesion_cerrada(cal, ahora)
+    if q.mercado == "fondo":  # los fondos publican el valor por unidad con un día de desfase (T+1)
+        ultima = vigencia.calendario(cal).previous_session(pd.Timestamp(ultima)).date()
     return _utc(q.hora_evento).tz_convert("America/Mexico_City").date() < ultima
 
 
@@ -774,5 +821,5 @@ def a_json(obj) -> str:
 
 
 __all__ = ["MarketDataProvider", "BmvLicensedProvider", "InfoselProvider", "EdimexProvider", "LsegProvider", "IceProvider", "ManualOrCsvProvider",
-           "DemoProvider", "ReferenciaOrigenProvider", "EodhdBmvProvider", "Cotizacion", "SIN_PRECIO", "ProveedorNoDisponible",
+           "DemoProvider", "ReferenciaOrigenProvider", "EodhdBmvProvider", "TwelveDataBmvProvider", "ActinverPdfProvider", "Cotizacion", "SIN_PRECIO", "ProveedorNoDisponible",
            "normalizar_simbolo", "precio_confiable", "verificar_cobertura", "clasificar_latencia", "construir"]

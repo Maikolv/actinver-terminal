@@ -337,6 +337,26 @@ def get_auditoria(limite: int = 200, con=Depends(con_db)):
     return {"eventos": [dict(f) for f in filas]}
 
 
+@app.post("/api/fondos/hoja")
+async def post_hoja_fondos(archivo: UploadFile | None = File(None), confirmar: str = Form("si"), con=Depends(con_db)):
+    """Hoja oficial de precios de los fondos Actinver: PDF subido por el participante o, sin archivo, la descarga
+    pública de actinver.com. Solo asigna fondo y serie exactos con la fecha de valuación del documento."""
+    from . import fondos_actinver as fa
+    try:
+        if archivo is not None:
+            contenido = await archivo.read(5_000_001)
+            if len(contenido) > 5_000_000:
+                raise cartera.ErrorValidacion(["El PDF excede 5 MB."])
+            rep = fa.importar(con, contenido, archivo.filename or "hoja.pdf", confirmar=confirmar == "si")
+        else:
+            rep = fa.actualizar(con, AJUSTES)
+    except fa.ErrorHoja as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    if rep.get("confirmado") or rep.get("estado") == "ok":
+        disparar_motor()
+    return rep
+
+
 @app.post("/api/importar")
 async def post_importar(archivo: UploadFile = File(...), tipo: str = Form(...), confirmar: str = Form("no"),
                         con=Depends(con_db)):

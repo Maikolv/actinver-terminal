@@ -12,7 +12,9 @@ from .db import ahora, transaccion
 
 log = logging.getLogger("terminal.ingesta")
 
-ORDEN_PRECIOS = ["tiingo", "alpaca", "barchart", "eodhd"]  # los fondos solo se alimentan por archivo (NAV)
+# BMV: EODHD primero y Twelve Data como alternativa (solo símbolos verificados y con clave). Los fondos se alimentan
+# con la hoja oficial de Actinver (fondos_actinver) o por archivo (NAV).
+ORDEN_PRECIOS = ["tiingo", "alpaca", "barchart", "eodhd", "twelvedata"]
 ORDEN_FX = ["banxico", "fred"]
 PROVEEDOR_VIVO = "alpaca_vivo"  # cotizaciones intradía del flujo en vivo (terminal/tiempo_real.py)
 ANIOS_HISTORIA = 5
@@ -94,16 +96,40 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
     return {"proveedor": None, "estado": "sin_proveedor", "registros": 0}
 
 
+RESERVA_HISTORIA_NUEVA = 6  # consultas diarias reservadas para cargar instrumentos que nunca han tenido precio
+
+
+PROVEEDOR_CONFIABLE = {"eodhd": "eodhd_bmv", "twelvedata": "twelvedata_bmv", "actinver_pdf": "actinver_pdf"}
+
+
+def registrar_cobertura(con, proveedor_descarga: str, instrumento_id: str, simbolo: str, detalle: str) -> None:
+    """La descarga exitosa de la serie exacta (símbolo verificado contra la lista del proveedor) verifica la
+    cobertura del proveedor de cotizaciones correspondiente; así la boleta puede usar ese cierre."""
+    nombre = PROVEEDOR_CONFIABLE.get(proveedor_descarga)
+    if not nombre:
+        return
+    con.execute("INSERT OR REPLACE INTO cobertura (proveedor, instrumento_id, simbolo_origen, estado, moneda_observada, "
+                "bolsa_observada, mercado_observado, latencia_mediana_s, estado_latencia, detalle, verificado_en) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                (nombre, instrumento_id, simbolo, "verificado", "MXN",
+                 "Fondos Actinver" if nombre == "actinver_pdf" else "BMV",
+                 "fondo" if nombre == "actinver_pdf" else "local", None, "EOD", detalle[:300], ahora()))
+
+
 def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = None,
-               ids_propuesta: list[str] | None = None) -> list[dict]:
+               ids_propuesta: list[str] | None = None, reserva_nuevos: int = RESERVA_HISTORIA_NUEVA) -> list[dict]:
     """Orden de consulta con cupos limitados (EODHD 20/día, Tiingo por hora):
-    0 cartera y captura del portal · 1 instrumentos de las propuestas · 2 con datos pero atrasados (el más antiguo
-    primero: mantiene vigente lo que ya se usa) · 3 nunca cargados (historia nueva)."""
+    0 cartera y captura del portal · 1 instrumentos de las propuestas · 2 los primeros `reserva_nuevos` nunca cargados
+    (recuperación programada: sin esta reserva, las actualizaciones diarias agotan el cupo y nunca entran) ·
+    3 con datos pero atrasados (el más antiguo primero) · 4 el resto de los nunca cargados."""
     prio, prop = set(ids_prioritarios or []), set(ids_propuesta or [])
     ult = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, MAX(fecha) FROM precios GROUP BY instrumento_id")}
+    nuevos = sorted(i["id"] for i in instrs if i["id"] not in ult and i["id"] not in prio and i["id"] not in prop)
+    reservados = set(nuevos[:max(0, reserva_nuevos)])
 
     def clave(i):
-        nivel = 0 if i["id"] in prio else 1 if i["id"] in prop else 2 if i["id"] in ult else 3
+        nivel = (0 if i["id"] in prio else 1 if i["id"] in prop else 2 if i["id"] in reservados
+                 else 3 if i["id"] in ult else 4)
         return (nivel, ult.get(i["id"]) or "", i["id"])
     return sorted(instrs, key=clave)
 
@@ -124,7 +150,7 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                 continue
             if n in agotados:
                 resumen[n]["omitidos_limite"] += 1
-                break
+                continue  # cupo agotado: se prueba la siguiente fuente que cubra el instrumento
             ult = _ultima_fecha(con, "precios", "instrumento_id", ins["id"], n)
             esperada = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(ins))
             if ult and ult >= esperada:
@@ -149,6 +175,9 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                     "INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)",
                     [(ins["id"], b.fecha, b.cierre, b.cierre_ajustado, b.volumen, moneda, n, a.tipo_dato, None, ts)
                      for b in barras])
+                if barras and n in PROVEEDOR_CONFIABLE and ins.get("mercado_operable") == "BMV" and moneda == "MXN":
+                    registrar_cobertura(con, n, ins["id"], a.simbolo(ins) if hasattr(a, "simbolo") else ins["id"],
+                                        f"serie exacta descargada de {n} ({len(barras)} cierres)")
                 # El cierre oficial sustituye a las cotizaciones en vivo del mismo día o anteriores.
                 if barras:
                     con.execute("DELETE FROM precios WHERE instrumento_id=? AND proveedor=? AND fecha<=?",
@@ -190,6 +219,18 @@ def actualizar_contexto(con, ajustes: Ajustes, ids_cartera: list[str], cliente=N
     return res
 
 
+def actualizar_fondos(con, ajustes: Ajustes, cliente=None) -> dict:
+    """Hoja oficial de precios de los fondos Actinver (PDF público), a lo sumo cada 3 h hasta tener la valuación."""
+    from . import fondos_actinver as fa
+    inicio = ahora()
+    r = fa.actualizar(con, ajustes, cliente=cliente)
+    if r["estado"] in ("ok", "error"):
+        msg = (f"valuación {r.get('fecha_valuacion')}: {r.get('asignados')} fondos; sin la serie en el documento: "
+               f"{', '.join(r.get('sin_serie_en_documento') or []) or 'ninguno'}") if r["estado"] == "ok" else r.get("mensaje", "")
+        _registrar(con, fa.PROVEEDOR, inicio, r["estado"], r.get("asignados", 0), msg)
+    return r
+
+
 def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = None, cliente=None,
                     forzar_demo: bool = True, contexto: bool = False, ids_propuesta: list[str] | None = None) -> dict:
     if ajustes.es_demo:
@@ -204,8 +245,9 @@ def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = 
         ad = construir_adaptadores(con, ajustes, cliente=cliente)
         fx = actualizar_fx(con, ad)
         precios = actualizar_precios(con, ad, ids_prioritarios, ids_propuesta=ids_propuesta)
-        out = {"fx": fx, "precios": precios,
-               "nuevos": fx.get("registros", 0) + sum(v["registros"] for v in precios.values())}
+        fondos = actualizar_fondos(con, ajustes, cliente)
+        out = {"fx": fx, "precios": precios, "fondos_actinver": fondos,
+               "nuevos": fx.get("registros", 0) + sum(v["registros"] for v in precios.values()) + fondos.get("asignados", 0)}
     if contexto:
         # titulares e insiders: cartera y, si no hay posiciones, las emisoras de la propuesta de referencia
         out["contexto"] = actualizar_contexto(con, ajustes, list(dict.fromkeys((ids_prioritarios or []) + (ids_propuesta or [])))[:25],

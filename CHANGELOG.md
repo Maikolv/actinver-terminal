@@ -2,6 +2,26 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.12.0] — 2026-09-29 (cobertura de precios)
+
+### Corregido
+- **EODHD pedía Peñoles como «PEOLES»:** su código es `PE&OLES`; ahora se conserva el `&` (codificado en la URL). El resto del mapeo se verificó contra la lista oficial de la BMV en EODHD.
+- **Las emisoras BMV nunca cargadas no recibían cupo:** las actualizaciones diarias consumían las 18 consultas. Ahora se reservan 6 por día para emisoras nuevas.
+- **Zona horaria:** un precio con solo fecha se tomaba como medianoche UTC (el día anterior en CDMX) y se marcaba obsoleto. Ahora usa la hora de cierre de la sesión.
+- **Desempate entre fuentes con la misma fecha:** antes era alfabético; ahora sigue una prioridad explícita (`PRIORIDAD_FUENTE`).
+- Si se agota el cupo de una fuente, se prueba la siguiente que cubra el instrumento.
+
+### Añadido
+- **Hoja oficial de precios de los fondos Actinver** (`terminal/fondos_actinver.py`):
+  - 22 de 23 fondos con NAV y fecha de valuación del propio documento, huella SHA-256 y copia local del PDF;
+  - descarga diaria automática, subida manual en «Datos» o `uv run terminal fondos [--archivo PDF]`.
+- **Twelve Data** (`TwelveData`):
+  - alternativa de cierre diario para la BMV (plan Pro);
+  - solo para los 37 símbolos verificados con `uv run terminal cobertura-twelvedata`, y solo con `TWELVEDATA_API_KEY`.
+- **Fuentes confiables para boletas** `twelvedata_bmv` y `actinver_pdf`: la cobertura se verifica al descargar la serie exacta.
+- **Boletas** (pantalla y Telegram) muestran fuente, moneda, fecha y hora, y tipo (tiempo real, retrasado o cierre diario); sin cotización fiable muestran «Sin datos» y no calculan la orden.
+- Documentación de Grupo BMV INTRA: qué contrato, infraestructura y contacto requiere.
+
 ## [0.11.0] — 2026-09-29 (auditoría integral)
 
 ### Añadido (boletas)

@@ -35,3 +35,4 @@ config/proveedores/*.json
 
 # Datos locales (base de datos, respaldos, reportes y documentos descargados): nunca al repositorio
 data/
+!config/proveedores/twelvedata_bmv.json

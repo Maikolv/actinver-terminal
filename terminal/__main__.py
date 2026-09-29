@@ -10,6 +10,8 @@
   uv run terminal investigar     # experimento walk-forward → validación → prueba y pronósticos (H = 1 y 5)
   uv run terminal cobertura      # verifica cobertura por símbolo y proveedor; escribe docs/cobertura.md
   uv run terminal webhook-secreto  # genera TRADINGVIEW_WEBHOOK_SECRETO en .env (sin mostrarlo completo)
+  uv run terminal fondos         # importa la hoja oficial de precios de los fondos Actinver (o --archivo PDF descargado)
+  uv run terminal cobertura-twelvedata  # verifica símbolo por símbolo la cobertura BMV de Twelve Data (lista pública)
   uv run terminal claude         # comprueba la credencial de Claude del chatbot de Telegram (una consulta mínima)
   uv run terminal boletas        # boletas del plan del día (o --propuesta CLAVE; --telegram para enviarlas) para captura manual
 """
@@ -220,6 +222,64 @@ def investigar(args) -> None:
         con.close()
 
 
+def fondos(args) -> None:
+    """Precios por fondo y serie con la fecha de valuación que declara el propio documento de Actinver."""
+    from pathlib import Path
+    from . import db, fondos_actinver as fa
+    con = db.conectar()
+    db.inicializar(con)
+    try:
+        if args.archivo:
+            rep = fa.importar(con, Path(args.archivo).read_bytes(), Path(args.archivo).name)
+        else:
+            import httpx
+            r = httpx.get(fa.URL, timeout=60, follow_redirects=True,
+                          headers={"User-Agent": "actinver-terminal/uso-personal (lectura de la hoja pública)"})
+            if r.status_code != 200:
+                sys.exit(f"No se pudo descargar la hoja (HTTP {r.status_code}); descárguela en actinver.com/fondos y use --archivo.")
+            rep = fa.importar(con, r.content, fa.URL)
+    except fa.ErrorHoja as e:
+        sys.exit(f"Hoja rechazada: {e}")
+    print(f"Valuación al {rep['fecha_valuacion']} · {rep['asignados']} fondos con precio · documento sha256 {rep['sha256'][:16]}…")
+    for p in rep["precios"]:
+        print(f"  {p['id']:<16} {p['precio']:>14,.6f} MXN")
+    if rep["sin_serie_en_documento"]:
+        print("Sin la serie del universo en el documento (no se asigna por aproximación):", ", ".join(rep["sin_serie_en_documento"]))
+
+
+def cobertura_twelvedata(_args) -> None:
+    """Compara el universo BMV con la lista pública de Twelve Data (sin clave) y guarda los símbolos exactos verificados."""
+    import json
+    from datetime import date
+    import httpx
+    from . import db, mercado
+    from .adaptadores.proveedores import TwelveData
+    r = httpx.get("https://api.twelvedata.com/stocks", params={"exchange": "BMV"}, timeout=60)
+    lista = {x["symbol"]: x for x in (r.json().get("data") or [])} if r.status_code == 200 else {}
+    etf = httpx.get("https://api.twelvedata.com/etfs", params={"exchange": "BMV"}, timeout=60)
+    if etf.status_code == 200:
+        lista.update({x["symbol"]: x for x in (etf.json().get("data") or [])})
+    if not lista:
+        sys.exit(f"No se pudo leer la lista pública de Twelve Data (HTTP {r.status_code}).")
+    con = db.conectar()
+    ins = mercado.instrumentos(con)
+    bmv = sorted(i for i, v in ins.items() if v["estado"] == "activo" and v["mercado_operable"] == "BMV" and v["clase"] in ("accion", "fibra", "etf"))
+    verificados, filas = [], []
+    for i in bmv:
+        s = TwelveData.simbolo(ins[i])
+        ok = s in lista and lista[s].get("currency") == "MXN"
+        verificados += [i] if ok else []
+        filas.append((i, s, "sí" if ok else "no"))
+    TwelveData.MAPA.parent.mkdir(parents=True, exist_ok=True)
+    TwelveData.MAPA.write_text(json.dumps({"fuente": "https://api.twelvedata.com/stocks?exchange=BMV (+ /etfs)",
+                                           "verificado_en": date.today().isoformat(), "plan_requerido": "Pro (XMEX, EOD)",
+                                           "verificados": verificados}, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"{len(verificados)} de {len(bmv)} instrumentos BMV con símbolo exacto en Twelve Data (plan Pro, cierre diario).")
+    for i, s, ok in filas:
+        if ok == "no":
+            print(f"  sin cobertura verificada: {i} (símbolo {s})")
+
+
 def claude(_args) -> None:
     """Una consulta mínima para confirmar que el chatbot puede usar Claude. La clave nunca se muestra."""
     from .config import _cargar_env_local
@@ -370,6 +430,11 @@ def main() -> None:
     inv.set_defaults(fn=investigar)
     sub.add_parser("cobertura", help="verifica cobertura por símbolo y proveedor (docs/cobertura.md)").set_defaults(fn=cobertura)
     sub.add_parser("webhook-secreto", help="genera el secreto del webhook de TradingView en .env").set_defaults(fn=webhook_secreto)
+    fo = sub.add_parser("fondos", help="importa la hoja oficial de precios de los fondos Actinver (PDF)")
+    fo.add_argument("--archivo", help="PDF descargado a mano de actinver.com/fondos (si se omite, se descarga)")
+    fo.set_defaults(fn=fondos)
+    sub.add_parser("cobertura-twelvedata", help="verifica la cobertura BMV de Twelve Data símbolo por símbolo").set_defaults(
+        fn=cobertura_twelvedata)
     sub.add_parser("claude", help="comprueba la credencial de Claude del chatbot (una consulta mínima)").set_defaults(fn=claude)
     bo = sub.add_parser("boletas", help="genera las boletas del plan del día (captura manual en el simulador)")
     bo.add_argument("--propuesta", default="plan_del_dia", help="clave de la propuesta (por omisión, la del plan del día)")
