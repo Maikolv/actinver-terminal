@@ -32,3 +32,6 @@ docs/evidencia/*.json
 # Especificaciones de contratos de datos (pueden contener detalles del contrato): solo locales
 config/proveedores/*.json
 !config/proveedores/ejemplo_especificacion.json
+
+# Datos locales (base de datos, respaldos, reportes y documentos descargados): nunca al repositorio
+data/
