@@ -5,6 +5,10 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 ## [0.11.0] — 2026-09-29 (auditoría integral)
 
 ### Corregido
+- **Plan del día:**
+  - un envío fallido ya no cuenta como enviado: se reintenta cada 10 minutos, hasta 12 veces al día;
+  - la base de comparación es el último plan que sí llegó;
+  - si las propuestas se están recalculando, espera hasta 60 minutos para no mandar un plan viejo.
 - **Las propuestas se recalculan solas al cambiar el código o la configuración:**
   - cada propuesta guarda `huella_calculo`, un sha256 de `optimizador`, `servicios`, `mercado`, `portal`, `reto`, `vigencia`, `config/reto.yaml` y las secciones de configuración del cálculo;
   - si no coincide, la propuesta deja de ser actual y el motor la recalcula en su siguiente ciclo.

@@ -110,14 +110,31 @@ def _estado(con: sqlite3.Connection) -> dict:
     return json.loads(f["valor"]) if f else {}
 
 
+REINTENTO_MIN = 10
+MAX_INTENTOS = 12
+ESPERA_RECALCULO_MIN = 60
+
+
+def entregado(estado: dict) -> bool:
+    """Solo cuenta como enviado si Telegram lo confirmó (o si Telegram no está configurado y otro canal sí)."""
+    r = estado.get("resultado") or {}
+    return r.get("telegram") == "enviada" or (r.get("telegram") in (None, "no_configurado") and "enviada" in r.values())
+
+
 def toca(ajustes, ahora: datetime, estado: dict) -> bool:
     cfg = ajustes["alertas"]
     if not cfg.get("resumen_matutino", True):
         return False
     local = pd.Timestamp(ahora).tz_convert(ZONA)
     h, m = (int(x) for x in str(cfg.get("resumen_matutino_hora", "07:00")).split(":"))
-    if (local.hour, local.minute) < (h, m) or estado.get("fecha") == local.date().isoformat():
+    if (local.hour, local.minute) < (h, m):
         return False
+    if estado.get("fecha") == local.date().isoformat():
+        if entregado(estado) or int(estado.get("intentos", 1)) >= MAX_INTENTOS:
+            return False
+        ultimo = pd.Timestamp(estado.get("enviado_en") or ahora)
+        if pd.Timestamp(ahora) - ultimo < pd.Timedelta(minutes=REINTENTO_MIN):
+            return False  # reintento tras un fallo de canal, cada 10 minutos
     return bool(vigencia.calendario("XMEX").is_session(local.date().isoformat()))
 
 
@@ -129,6 +146,10 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
     if not toca(ajustes, ahora, estado):
         return None
     local = pd.Timestamp(ahora).tz_convert(ZONA)
+    h, m = (int(x) for x in str(ajustes["alertas"].get("resumen_matutino_hora", "07:00")).split(":"))
+    minutos = (local.hour - h) * 60 + (local.minute - m)
+    if any(p and p.get("recalcular") for p in propuestas.values()) and minutos < ESPERA_RECALCULO_MIN:
+        return None  # las propuestas se están recalculando: se espera para no enviar un plan viejo
     p = propuesta_referencia(propuestas)
     if p is None:
         titulo, texto, ords = (f"☀️ Plan del día — {local:%d-%m-%Y}",
@@ -138,9 +159,13 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
         titulo, texto, ords = construir(p, cartera, estado.get("ordenes"), local)
     cfg = {**ajustes["alertas"], "notificar_escritorio": False, "notificar_telegram": True}
     res = notificador.enviar(titulo, texto, cfg, detalle=texto)
+    ok = entregado({"resultado": res})
     nuevo = {"fecha": local.date().isoformat(), "enviado_en": ahora.isoformat(timespec="seconds"), "resultado": res,
+             "intentos": int(estado.get("intentos", 1)) + 1 if estado.get("fecha") == local.date().isoformat() else 1,
              "propuesta": p["clave"] if p else None,
-             "ordenes": [{k: o[k] for k in ("id", "clave", "accion", "titulos")} for o in ords] if p else estado.get("ordenes")}
+             # base para comparar el próximo plan: el último que SÍ llegó
+             "ordenes": [{k: o[k] for k in ("id", "clave", "accion", "titulos")} for o in ords] if (p and ok)
+             else estado.get("ordenes")}
     with db.transaccion(con):
         con.execute("INSERT INTO ajustes_usuario VALUES ('resumen_matutino', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
                     "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(nuevo), db.ahora()))

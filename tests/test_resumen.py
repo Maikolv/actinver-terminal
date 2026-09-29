@@ -62,3 +62,25 @@ def test_telegram_parte_mensajes_largos(monkeypatch):
     texto = "\n".join(f"línea {i} " + "x" * 90 for i in range(100))
     assert notificador.telegram("Plan", texto) == "enviada"
     assert len(enviados) == 3 and all(len(t) <= 4096 for t in enviados) and enviados[-1].endswith("(3/3)")
+
+
+def test_un_envio_fallido_se_reintenta_y_no_cuenta_como_enviado(con, ajustes, monkeypatch):
+    resultados = iter([{"telegram": "error"}, {"telegram": "enviada"}])
+    enviados = []
+    monkeypatch.setattr(notificador, "enviar", lambda t, x, c, detalle=None: enviados.append(detalle) or next(resultados))
+    props = {"mixta_puntuacion": PROP}
+    cart = {"fuente": "local", "posiciones": []}
+    assert resumen.enviar_si_toca(con, ajustes, cart, props, MANANA)["resultado"] == {"telegram": "error"}
+    assert resumen.enviar_si_toca(con, ajustes, cart, props, datetime(2026, 9, 30, 13, 10, tzinfo=UTC)) is None  # < 10 min
+    r = resumen.enviar_si_toca(con, ajustes, cart, props, datetime(2026, 9, 30, 13, 16, tzinfo=UTC))
+    assert r["resultado"] == {"telegram": "enviada"} and r["intentos"] == 2 and len(enviados) == 2
+    assert resumen.enviar_si_toca(con, ajustes, cart, props, datetime(2026, 9, 30, 14, 0, tzinfo=UTC)) is None  # ya llegó
+
+
+def test_espera_si_las_propuestas_se_estan_recalculando(con, ajustes, monkeypatch):
+    monkeypatch.setattr(notificador, "enviar", lambda *a, **k: {"telegram": "enviada"})
+    props = {"mixta_puntuacion": {**PROP, "recalcular": True, "avisos": ["se recalculará"]}}
+    cart = {"fuente": "local", "posiciones": []}
+    assert resumen.enviar_si_toca(con, ajustes, cart, props, MANANA) is None                       # 07:05: espera
+    tarde = datetime(2026, 9, 30, 14, 5, tzinfo=UTC)                                                # 08:05: no espera más
+    assert "No hay una propuesta vigente" in resumen.enviar_si_toca(con, ajustes, cart, props, tarde)["texto"]
