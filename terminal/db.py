@@ -175,6 +175,17 @@ CREATE TABLE IF NOT EXISTS calificaciones (
     revisiones TEXT, importado_en TEXT NOT NULL
 );
 
+-- Capturas del portal del Reto que el participante copia y pega (la terminal no entra al portal, reglamento §17).
+CREATE TABLE IF NOT EXISTS capturas_portal (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, capturado_en TEXT NOT NULL, hora_portal TEXT NOT NULL, etapa TEXT,
+    valor_portafolio REAL NOT NULL, efectivo REAL, fuente TEXT NOT NULL, n_posiciones INTEGER NOT NULL DEFAULT 0,
+    tabla_reconocida INTEGER NOT NULL DEFAULT 0, saldo_id INTEGER, huella TEXT NOT NULL UNIQUE
+);
+CREATE TABLE IF NOT EXISTS posiciones_portal (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, captura_id INTEGER NOT NULL REFERENCES capturas_portal(id),
+    instrumento_id TEXT NOT NULL, texto TEXT, titulos REAL NOT NULL, costo_promedio REAL, precio REAL, valor REAL
+);
+
 CREATE TABLE IF NOT EXISTS propuestas (
     id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, creado_en TEXT NOT NULL,
     parametros TEXT NOT NULL, resultado TEXT NOT NULL

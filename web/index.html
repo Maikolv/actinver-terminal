@@ -157,6 +157,26 @@
 
   <section role="tabpanel" id="panel-cartera" aria-labelledby="tab-cartera" hidden>
     <h1>Mi cartera</h1>
+    <section class="tarjeta" aria-labelledby="h-portal">
+      <h2 id="h-portal">Cuenta del Reto según el portal</h2>
+      <div id="portal-resumen"><p class="cargando">Cargando…</p></div>
+      <details id="portal-captura">
+        <summary>Capturar desde el portal (copiar y pegar)</summary>
+        <p class="ayuda">El simulador no ofrece conexión automática y el reglamento (§17) prohíbe robots y programas en el portal, así que la terminal no entra a él. En su cuenta del Reto seleccione con el ratón la tabla de posiciones <strong>con sus encabezados</strong> y las líneas de <strong>efectivo</strong> y <strong>valor del portafolio</strong>, cópiela (Ctrl+C) y péguela aquí (Ctrl+V). Revise la vista previa y guárdela.</p>
+        <form id="form-captura" class="formulario" novalidate>
+          <label>Contenido copiado del portal<textarea name="texto" rows="8" maxlength="200000" placeholder="Emisora	Serie	Títulos	Costo promedio	Precio	Valor de mercado&#10;AMX	B	5,000	17.20	17.55	87,750.00&#10;Efectivo disponible: $912,250.00&#10;Valor del portafolio: $1,000,000.00"></textarea></label>
+          <div class="campos">
+            <label>Fecha y hora que muestra el portal<input type="datetime-local" name="hora_portal" required></label>
+            <label>Efectivo (si no venía en lo copiado)<input type="number" name="efectivo" min="0" step="0.01"></label>
+            <label>Valor del portafolio (si no venía)<input type="number" name="valor_portafolio" min="0" step="0.01"></label>
+          </div>
+          <button class="boton boton--secundario" type="submit" data-accion="previa">Vista previa</button>
+          <button class="boton" type="submit" data-accion="guardar">Guardar captura</button>
+        </form>
+        <div id="captura-previa"></div>
+      </details>
+    </section>
+    <h2>Registro de la terminal</h2>
     <div id="cartera-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     <h2>Registrar una operación</h2>
     <form id="form-operacion" class="formulario" novalidate>

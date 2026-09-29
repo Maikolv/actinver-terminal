@@ -2,6 +2,25 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.10.0] — 2026-09-29
+
+### Añadido
+- **Cuenta del Reto según el portal** (`terminal/portal.py`, `GET/POST /api/portal/captura`):
+  - el participante copia la tabla de su cuenta y la pega en «Mi cartera», con vista previa, cuadre y detección de duplicados;
+  - la terminal nunca entra al portal (reglamento §17);
+  - propuestas y alertas usan esa captura mientras sea la información más reciente;
+  - el registro local (p. ej., la aportación virtual de práctica) se rotula aparte y nunca como saldo confirmado.
+- **Alertas nuevas**, sin duplicados por clave y entregadas aunque la BMV esté cerrada:
+  - `cambio_portal`: saldo, efectivo y títulos entre capturas;
+  - `captura_pendiente`: recordatorio al cierre si no hay captura del día;
+  - `plan_propuesta`: una sola vez por cada conjunto de órdenes distinto de la propuesta mejor puntuada.
+- Cada aviso de Telegram y correo trae la hora de detección (CDMX) y la fuente de los datos.
+- `notificar_correo` activo por omisión: solo envía si `SMTP_HOST` y `ALERTAS_CORREO_DESTINO` están en `.env`.
+- La prueba de canales usa el formato real de las alertas.
+
+### Corregido
+- El tope de exposición en dólares del perfil se ignoraba cuando la preselección dejaba pocas acciones en pesos.
+
 ## [0.9.0] — 2026-09-29
 
 ### Añadido

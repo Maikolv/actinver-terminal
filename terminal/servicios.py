@@ -51,12 +51,34 @@ def operaciones_etapa(con, ahora=None) -> tuple[list[dict], str | None]:
     return propias, etapa
 
 
-def cartera_actual(con, ajustes: Ajustes) -> dict:
+def captura_vigente(con) -> dict | None:
+    """Última captura del portal de la etapa actual, si es posterior a la última operación registrada a mano.
+    Si después de capturar se registró una operación local, manda el registro local hasta la siguiente captura."""
+    from . import portal
+    c = portal.captura(con)
+    if not c:
+        return None
+    etapa = reto.etapa_operativa() if reto.activo() else None
+    if etapa and c.get("etapa") and c["etapa"] != etapa:
+        return None
+    ultima_local = con.execute("SELECT MAX(creado_en) FROM transacciones WHERE anulada=0 AND tipo IN ('compra','venta')").fetchone()[0]
+    return None if (ultima_local and ultima_local > c["capturado_en"]) else c
+
+
+def cartera_actual(con, ajustes: Ajustes, solo_local: bool = False) -> dict:
+    from . import portal
     tx, etapa_cartera = operaciones_etapa(con)
-    ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]})
+    c = None if solo_local else captura_vigente(con)
+    ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]} | {p["instrumento_id"] for p in (c or {}).get("posiciones", [])})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
     precios = {i: (q["precio_mxn"] if q.get("estado") not in ("sin_datos",) else None) for i, q in cot.items()}
-    res = cartera.calcular(tx, precios)
+    if c:
+        res = portal.cartera(con, cot, c)
+        res.update(fuente="portal", captura={k: c[k] for k in ("id", "hora_portal", "capturado_en", "valor_portafolio",
+                                                                "efectivo", "fuente", "n_posiciones")})
+    else:
+        res = cartera.calcular(tx, precios)
+        res.update(fuente="local", captura=None)
     for p in res["posiciones"] + res["cerradas"]:
         q = cot.get(p["instrumento_id"], {})
         p.update({"clave_operable": q.get("clave_operable"), "clase": q.get("clase"), "vigencia": q.get("estado"),
@@ -64,7 +86,7 @@ def cartera_actual(con, ajustes: Ajustes) -> dict:
                   "tipo_dato": q.get("tipo_dato"), "bolsa": q.get("bolsa")})
     estados = [p["vigencia"] for p in res["posiciones"] if p.get("vigencia")]
     res["vigencia"] = vigencia.peor(estados) if estados else ("sin_datos" if res["posiciones"] else "vigente")
-    res["n_operaciones"] = len([t for t in tx if t.get("origen") != "reto_saldo_inicial"])
+    res["n_operaciones"] = len([t for t in tx if t.get("origen") != "reto_saldo_inicial"]) + (1 if c else 0)
     res["etapa"] = etapa_cartera
     res["costo_comisiones_con_iva"] = res["comisiones"]
     if reto.activo():
@@ -84,6 +106,10 @@ def seguimiento(con, ajustes: Ajustes) -> dict:
     """Cartera + curva de valor, rendimiento ponderado por tiempo, caída desde máximo y referencias."""
     res = cartera_actual(con, ajustes)
     tx, _ = operaciones_etapa(con)
+    if res.get("fuente") == "portal":  # el registro local se muestra aparte, rotulado como tal
+        loc = cartera_actual(con, ajustes, solo_local=True)
+        res["registro_local"] = {k: loc.get(k) for k in ("valor_total", "efectivo", "aportacion_neta", "n_operaciones")}
+        return {**res, "historia": [], "referencias": [], "max_caida": None}
     ids = sorted({t["instrumento_id"] for t in tx if t["instrumento_id"]})
     res.update(historia=[], referencias=[], max_caida=None)
     if not tx:

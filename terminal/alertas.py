@@ -8,6 +8,7 @@ Ninguna alerta ejecuta operaciones: solo informa y ofrece «simular cambio».
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 from dataclasses import dataclass, field
@@ -186,7 +187,11 @@ PRIORIDAD = {"critica": 1, "aviso": 2, "info": 3}
 # Horas de vigencia de una alerta antes de marcarse «caducada» (datos y precios cambian rápido; eventos duran más).
 CADUCIDAD_H = {"datos_inciertos": 6, "dato_vencido": 6, "cambio_brusco": 8, "stop_loss": 24, "take_profit": 24,
                "deriva": 24, "concentracion": 24, "ruptura_tesis": 24, "macro": 48, "evento_corporativo": 72, "noticia": 48,
-               "insider": 72, "cinco_acciones": 24, "diferencia_portal": 24, "deterioro_modelo": 168}
+               "insider": 72, "cinco_acciones": 24, "diferencia_portal": 24, "deterioro_modelo": 168,
+               "cambio_portal": 48, "captura_pendiente": 16, "plan_propuesta": 24}
+# Avisos que el participante espera en cuanto ocurren (su propia captura, el recordatorio de cierre y un plan nuevo):
+# no se silencian fuera del horario de la BMV.
+SIEMPRE = {"cambio_portal", "captura_pendiente", "plan_propuesta"}
 
 INCERTIDUMBRE = {
     "deriva": "Media: depende del rendimiento esperado estimado (incierto) y de precios posiblemente no vigentes.",
@@ -236,7 +241,8 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
                      (ahora_dt + timedelta(hours=CADUCIDAD_H.get(c.regla, 24))).isoformat(timespec="seconds"),
                      (c.datos or {}).get("impacto_mxn")))
                 nuevas.append({"id": cur.lastrowid, "regla": c.regla, "clave": c.clave, "titulo": c.titulo,
-                               "severidad": c.severidad, "motivo": c.motivo, "accion": c.accion})
+                               "severidad": c.severidad, "motivo": c.motivo, "accion": c.accion, "fuente": c.fuente,
+                               "ts": ahora_dt.isoformat(timespec="seconds")})
     reales = list(nuevas)  # lo que devuelve la función: solo alertas nuevas de este ciclo
     abierto = vigencia.mercado_abierto("XMEX", ahora_dt)
     if notificar and abierto:
@@ -247,14 +253,20 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
         vistas_ids = {a["id"] for a in nuevas}
         nuevas = nuevas + [d for d in diferidas if d["id"] not in vistas_ids]
     if nuevas and notificar:
-        if cfg.get("silenciar_fuera_de_horario", True) and not abierto:
-            marca = "silenciada_fuera_de_horario"
-        else:
-            titulo = nuevas[0]["titulo"] if len(nuevas) == 1 else f"{len(nuevas)} alertas nuevas"
-            texto = " · ".join(a["titulo"] for a in nuevas[:3]) + (" …" if len(nuevas) > 3 else "")
-            marca = json.dumps(notificador.enviar(titulo, texto, cfg, detalle=notificador.detalle(nuevas)))
-        with transaccion(con):
-            con.executemany("UPDATE alertas SET notificada=? WHERE id=?", [(marca, a["id"]) for a in nuevas])
+        silenciar = cfg.get("silenciar_fuera_de_horario", True) and not abierto
+        inmediatas = [a for a in nuevas if a["regla"] in SIEMPRE or not silenciar]
+        calladas = [a for a in nuevas if a not in inmediatas]
+        for lote, callado in ((inmediatas, False), (calladas, True)):
+            if not lote:
+                continue
+            if callado:
+                marca = "silenciada_fuera_de_horario"
+            else:
+                titulo = lote[0]["titulo"] if len(lote) == 1 else f"{len(lote)} alertas nuevas"
+                texto = " · ".join(a["titulo"] for a in lote[:3]) + (" …" if len(lote) > 3 else "")
+                marca = json.dumps(notificador.enviar(titulo, texto, cfg, detalle=notificador.detalle(lote)))
+            with transaccion(con):
+                con.executemany("UPDATE alertas SET notificada=? WHERE id=?", [(marca, a["id"]) for a in lote])
     return reales
 
 
@@ -308,6 +320,61 @@ def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condi
                               "incertidumbre": "Horas distintas, precios de referencia y comisiones pueden explicar la diferencia."},
                              "saldo capturado del portal", "REVISAR operaciones registradas y precios; el portal es la valuación oficial."))
     return out
+
+
+def reglas_portal(con, ahora_dt: datetime) -> list[Condicion]:
+    """Cambios entre capturas del portal y recordatorio de captura al cierre de cada sesión del Reto."""
+    from . import portal
+    out = []
+    c = portal.captura(con)
+    if c:
+        cambios = portal.cambios(portal.anterior(con, c), c)
+        hora = pd.Timestamp(c["hora_portal"]).tz_convert("America/Mexico_City").strftime("%d-%m-%Y %H:%M")
+        out.append(Condicion("cambio_portal", f"captura:{c['id']}", bool(cambios), "aviso",
+                             f"Cambio en tu cuenta del Reto ({len(cambios)} {'cambio' if len(cambios) == 1 else 'cambios'})",
+                             " ".join(cambios[:8]), {"captura_id": c["id"], "cambios": cambios,
+                                                     "incertidumbre": "Baja: son los datos que copió del portal."},
+                             f"{c['fuente']}; hora del portal {hora}",
+                             "REVISAR que coincida con las órdenes que capturó; las propuestas se recalculan con este saldo.",
+                             rearme=False))
+    if reto.activo() and reto.etapa_operativa(ahora_dt):
+        hoy = pd.Timestamp(ahora_dt).tz_convert("America/Mexico_City").date()
+        cerrada = vigencia.ultima_sesion_cerrada("XMEX", ahora_dt)
+        capturada_hoy = c and pd.Timestamp(c["hora_portal"]).tz_convert("America/Mexico_City").date() >= hoy
+        out.append(Condicion("captura_pendiente", f"cierre:{hoy.isoformat()}", cerrada == hoy and not capturada_hoy, "info",
+                             "Actualiza la captura de tu cuenta del Reto",
+                             "La BMV ya cerró y la terminal no tiene el saldo y las posiciones del portal de hoy. Sin ellos, las "
+                             "propuestas y alertas usan el registro local.",
+                             {"sesion": hoy.isoformat()}, "calendario BMV y capturas registradas",
+                             "Copia la tabla de tu cuenta en el portal y pégala en «Mi cartera» → «Captura del portal».",
+                             rearme=False))
+    return out
+
+
+def reglas_plan_propuesta(cartera: dict, propuestas: dict) -> list[Condicion]:
+    """Aviso cuando la propuesta mejor puntuada (vigente) pide un conjunto de órdenes distinto al último avisado."""
+    cands = [p for p in propuestas.values() if p and not p.get("mercado_variante") and p.get("estado") == "calculada"
+             and not p.get("avisos") and p.get("puntuacion")]
+    if not cands:
+        return []
+    p = max(cands, key=lambda x: x["puntuacion"]["total"])
+    ops = [f for f in (p.get("cambios") or {}).get("filas", []) if f["accion"] != "mantener"]
+    if not ops:
+        return []
+    firma = hashlib.sha256(json.dumps(sorted((f["id"], f["accion"]) for f in ops)).encode()).hexdigest()[:12]
+    base = "tu cuenta del Reto (captura del portal)" if cartera.get("fuente") == "portal" else "el registro local de la terminal"
+    lineas = [f"{'Comprar' if f['accion'] == 'comprar' else 'Vender'} {f.get('clave_operable') or f['id']} "
+              f"≈ {abs(f['monto_mxn']):,.0f} MXN ({f['delta_pp']:+.1f} pp)" for f in ops[:6]]
+    return [Condicion("plan_propuesta", f"{p['clave']}:{firma}", True, "aviso",
+                      f"Posible movimiento: {len(ops)} {'orden' if len(ops) == 1 else 'órdenes'} según «{p['nombre']}»",
+                      f"Frente a {base}, la propuesta con mayor puntuación ({p['puntuacion']['total']:.1f}/100) sugiere: "
+                      + "; ".join(lineas) + (" …" if len(ops) > 6 else "") + ".",
+                      {"propuesta": p["clave"], "ordenes": len(ops), "datos_hasta": p.get("datos_hasta"),
+                       "costo_estimado": (p.get("cambios") or {}).get("costo_total"),
+                       "incertidumbre": "Media: estimación con datos de cierre; no es una promesa de rendimiento."},
+                      f"propuesta {p['clave']} (datos al {p.get('datos_hasta')}); cartera: {base}",
+                      "REVISAR en «Propuestas» y generar boletas; ninguna orden se envía, usted la captura a mano.",
+                      rearme=False)]
 
 
 def reglas_cambio_brusco(cfg: dict, cartera: dict, precios_hist: pd.DataFrame) -> list[Condicion]:
@@ -481,7 +548,8 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
              + reglas_tecnicas(con, cfg, cartera, propuestas, mercado.ultimo_fx(con, ajustes))
              + reglas_reto(con, cfg, cartera, ahora_dt) + reglas_cambio_brusco(cfg, cartera, precios)
              + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
-             + reglas_webhook(con, ahora_dt) + reglas_tesis(con, cartera))
+             + reglas_webhook(con, ahora_dt) + reglas_tesis(con, cartera)
+             + reglas_portal(con, ahora_dt) + reglas_plan_propuesta(cartera, propuestas))
     if cfg.get("exigir_precio_confiable", True):
         from . import cotizaciones
         provs = cotizaciones.construir(con, ajustes.es_demo)

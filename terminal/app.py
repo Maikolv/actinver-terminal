@@ -451,6 +451,42 @@ def verificar_cobertura(con=Depends(con_db)):
     return {"resumen": conteo}
 
 
+@app.get("/api/portal/captura")
+def get_captura_portal(con=Depends(con_db)):
+    """Última captura del portal del Reto (la que el participante pegó), con sus cambios frente a la anterior."""
+    from . import portal
+    c = portal.captura(con)
+    if not c:
+        return {"captura": None, "cambios": [], "vigente": False,
+                "aviso": "Sin captura del portal: «Mi cartera» muestra el registro local de la terminal."}
+    return {"captura": c, "cambios": portal.cambios(portal.anterior(con, c), c),
+            "vigente": servicios.captura_vigente(con) is not None, "fuente": portal.FUENTE}
+
+
+@app.post("/api/portal/captura")
+def post_captura_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Vista previa o registro de lo que el participante copió de su cuenta del Reto (la terminal no entra al portal)."""
+    from . import portal
+
+    def num(k):
+        v = cuerpo.get(k)
+        if v in (None, ""):
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            raise cartera.ErrorValidacion([f"{k}: número"]) from None
+    try:
+        r = portal.guardar(con, str(cuerpo.get("texto") or ""), str(cuerpo.get("hora_portal") or ""),
+                           mercado.instrumentos(con), efectivo=num("efectivo"), valor_portafolio=num("valor_portafolio"),
+                           confirmar=bool(cuerpo.get("confirmar")))
+    except portal.ErrorCaptura as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    if r.get("confirmado"):
+        disparar_motor()
+    return r
+
+
 @app.post("/api/saldo-portal")
 def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
     """El participante copia a mano el valor y el efectivo que muestra el portal (la terminal no entra al portal)."""
@@ -612,7 +648,12 @@ def probar_notificaciones():
     cfg = {**AJUSTES["alertas"], "notificar_telegram": True}
     texto = ("Si recibe este mensaje, los avisos de la terminal llegan a este canal. "
              "Solo informativo: las órdenes se capturan a mano en el simulador del Reto.")
-    return {"resultado": notificador.enviar("Actinver Terminal — prueba de avisos", texto, cfg)}
+    ejemplo = [{"severidad": "info", "titulo": "PRUEBA — así se ve una alerta de la terminal",
+                "motivo": "Cambio detectado: (ejemplo) Efectivo 1,000,000.00 → 912,250.00. " + texto,
+                "accion": "Nada que hacer: es una prueba de entrega.", "fuente": "prueba de canales de la terminal",
+                "ts": db.ahora()}]
+    return {"resultado": notificador.enviar("Actinver Terminal — prueba de avisos", texto, cfg,
+                                            detalle=notificador.detalle(ejemplo))}
 
 
 @app.post("/api/alertas/{aid}")

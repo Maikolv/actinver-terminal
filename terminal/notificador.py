@@ -7,7 +7,9 @@ import os
 import smtplib
 import subprocess
 import sys
+from datetime import datetime
 from email.message import EmailMessage
+from zoneinfo import ZoneInfo
 from xml.sax.saxutils import escape
 
 import httpx
@@ -71,6 +73,17 @@ def detalle(alertas: list[dict]) -> str:
             linea += f"\n{a['motivo']}"
         if a.get("accion"):
             linea += f"\n→ {a['accion']}"
+        pie = []
+        if a.get("ts"):
+            try:
+                pie.append("detectada " + datetime.fromisoformat(a["ts"]).astimezone(ZoneInfo("America/Mexico_City"))
+                           .strftime("%d-%m-%Y %H:%M") + " (CDMX)")
+            except ValueError:
+                pass
+        if a.get("fuente"):
+            pie.append(f"fuente: {a['fuente']}")
+        if pie:
+            linea += "\n" + " · ".join(pie)
         partes.append(linea)
     if len(alertas) > 5:
         partes.append(f"… y {len(alertas) - 5} más en la terminal.")

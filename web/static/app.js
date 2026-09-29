@@ -468,14 +468,54 @@ async function marcarAlerta(id, est) {
 /* ---------- cartera ---------- */
 async function cargarCartera() {
   try {
-    const [c, tx] = await Promise.all([api("/api/cartera"), api("/api/transacciones?anuladas=true")]);
+    const [c, tx, cp] = await Promise.all([api("/api/cartera"), api("/api/transacciones?anuladas=true"), api("/api/portal/captura")]);
     estado.cartera = c;
+    pintarPortal(cp, c);
     pintarCartera(c, tx.transacciones);
   } catch (e) { limpiar("cartera-contenido", errorCaja(e)); }
 }
+function pintarPortal(cp, c) {
+  const k = cp.captura;
+  if (!k) {
+    limpiar("portal-resumen", h("div", { clase: "aviso-caja", texto: "Aún no hay datos de su cuenta del Reto. Lo que aparece abajo es el registro LOCAL de la terminal (por ejemplo, la aportación virtual de 1,000,000 de la semana de práctica): no es un saldo confirmado del portal. Capture su cuenta con «Capturar desde el portal»." }));
+    return;
+  }
+  const out = [h("div", { clase: "kpis" },
+    kpi("Valor del portafolio (portal)", mxn(k.valor_portafolio)), kpi("Efectivo (portal)", mxn(k.efectivo)),
+    kpi("Posiciones (portal)", String(k.n_posiciones))),
+  h("p", { clase: "suave", texto: `Fuente: ${k.fuente}. Hora del portal: ${fechaLocal(k.hora_portal)}; capturado en la terminal: ${fechaLocal(k.capturado_en)}.` })];
+  if (!cp.vigente) out.push(h("div", { clase: "aviso-caja", texto: "Registró operaciones a mano después de esta captura: propuestas y alertas usan el registro local hasta la siguiente captura." }));
+  if (cp.cambios.length) out.push(h("p", {}, h("strong", { texto: "Cambios frente a la captura anterior: " }), cp.cambios.join(" ")));
+  out.push(tabla([{ t: "Emisora", f: (f) => f.texto || f.instrumento_id }, { t: "Instrumento", f: (f) => f.instrumento_id },
+    { t: "Títulos", f: (f) => num(f.titulos), num: true }, { t: "Costo prom.", f: (f) => mxn(f.costo_promedio, true), num: true },
+    { t: "Precio (portal)", f: (f) => mxn(f.precio, true), num: true }, { t: "Valor (portal)", f: (f) => mxn(f.valor), num: true }],
+  k.posiciones, { caption: "Tal como se copió del portal. Abajo, la terminal los valúa con sus propios precios.", vacio: "La captura no incluyó posiciones." }));
+  limpiar("portal-resumen", ...out);
+}
+document.getElementById("form-captura").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = ev.target, guardar = ev.submitter && ev.submitter.dataset.accion === "guardar";
+  try {
+    const r = await api("/api/portal/captura", { method: "POST", json: {
+      texto: f.elements.texto.value, hora_portal: f.elements.hora_portal.value, efectivo: f.elements.efectivo.value,
+      valor_portafolio: f.elements.valor_portafolio.value, confirmar: guardar } });
+    const out = [];
+    (r.errores || []).forEach((e) => out.push(h("div", { clase: "error-caja", texto: e })));
+    (r.advertencias || []).forEach((a) => out.push(h("div", { clase: "aviso-caja", texto: a })));
+    out.push(h("p", { texto: `Valor del portafolio: ${mxn(r.valor_portafolio)} · Efectivo: ${mxn(r.efectivo)} · ${r.posiciones.length} posiciones reconocidas.` }),
+      tabla([{ t: "Copiado", f: (x) => x.texto }, { t: "Instrumento", f: (x) => x.instrumento_id }, { t: "Títulos", f: (x) => num(x.titulos), num: true },
+        { t: "Costo prom.", f: (x) => mxn(x.costo_promedio, true), num: true }, { t: "Precio", f: (x) => mxn(x.precio, true), num: true },
+        { t: "Valor", f: (x) => mxn(x.valor), num: true }], r.posiciones, { vacio: "Sin posiciones reconocidas." }));
+    if (r.confirmado) { out.unshift(h("div", { clase: "info-caja", texto: "Captura guardada. Las propuestas se recalculan con su cuenta del Reto y recibirá un aviso con los cambios." })); f.reset(); cargarCartera(); }
+    limpiar("captura-previa", ...out);
+  } catch (e) { limpiar("captura-previa", errorCaja(e)); }
+});
 const COLORES = ["var(--serie-1)", "var(--serie-2)", "var(--sin-datos)", "var(--sintetico)"];
 function pintarCartera(c, txs) {
   const out = [];
+  out.push(c.fuente === "portal"
+    ? h("div", { clase: "info-caja", texto: `Propuestas y alertas usan su cuenta del Reto (captura del ${fechaLocal(c.captura.hora_portal)}) valuada con los precios de la terminal.` + (c.registro_local ? ` El registro local de la terminal (${mxn(c.registro_local.valor_total)}) se conserva aparte.` : "") })
+    : h("div", { clase: "aviso-caja", texto: "Registro LOCAL de la terminal: aportaciones y operaciones capturadas a mano. No es el saldo confirmado del portal del Reto." }));
   if (!c.n_operaciones) {
     out.push(h("div", { clase: "info-caja", texto: "Sin operaciones. Registre su aportación de 1,000,000 actipesos y sus compras, o importe un archivo. La terminal no deduce posiciones del PDF." }));
   } else {
