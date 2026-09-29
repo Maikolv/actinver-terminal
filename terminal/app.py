@@ -595,6 +595,13 @@ def generar_boletas(cuerpo: dict = Body(default={}), con=Depends(con_db)):
         raise cartera.ErrorValidacion([str(e)]) from None
 
 
+@app.post("/api/boletas/telegram")
+def boletas_telegram(con=Depends(con_db)):
+    """Envía por Telegram las boletas vigentes (recalculadas justo antes de enviar)."""
+    from . import boleta
+    return boleta.enviar_telegram(con, AJUSTES)
+
+
 @app.post("/api/boletas/{bid}/recalcular")
 def recalcular_boleta(bid: int, con=Depends(con_db)):
     from . import boleta

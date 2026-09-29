@@ -302,3 +302,37 @@ def listar(con: sqlite3.Connection, ajustes: Ajustes, recalcular_vigentes: bool 
             out.append({**json.loads(g["contenido"]), "id": g["id"], "estado": g["estado"], "motivo_estado": g["motivo_estado"],
                         "folio": g["folio"]})
     return out
+
+
+def texto_telegram(boletas: list[dict]) -> str:
+    """Boletas vigentes en texto para Telegram: lo necesario para capturar cada orden a mano en el simulador."""
+    import pandas as pd
+    vig = [b for b in boletas if b.get("estado", "vigente") == "vigente"]
+    if not vig:
+        return "No hay boletas vigentes. Genere nuevas en la terminal («Generar boletas del plan del día»)."
+    vence = min(b["caduca_en"] for b in vig)
+    listas = [b for b in vig if b["tipo"] in ("considerar compra", "considerar venta") and b.get("cantidad")]
+    otras = [b for b in vig if b not in listas and b["tipo"] != "mantener"]
+    lineas = [f"🧾 Boletas para capturar a mano — vencen {pd.Timestamp(vence).tz_convert('America/Mexico_City'):%d-%m %H:%M} (CDMX)", ""]
+    if listas:
+        lineas.append(f"Listas ({len(listas)}), orden limitada del día:")
+        for b in listas:
+            icono = "🟢 COMPRA" if b.get("lado") == "compra" else "🔴 VENTA"
+            lineas.append(f"{icono} {b.get('emisora_serie') or b['instrumento_id']}: {int(b['cantidad']):,} títulos, "
+                          f"límite ${b['precio_limite']:,.2f} (≈ ${b.get('importe') or 0:,.0f}) · boleta #{b['id']}")
+        costo = sum(((b.get("costos") or {}).get("total") or 0) for b in listas)
+        lineas.append(f"Costo estimado (comisión + IVA): ${costo:,.2f}.")
+    if otras:
+        lineas += ["", f"Por investigar ({len(otras)}): sin precio confiable en la terminal; tome el precio del portal:"]
+        lineas.append(", ".join(f"{b.get('emisora_serie') or b['instrumento_id']} (#{b['id']})" for b in otras))
+    lineas += ["", "Antes de capturar: revise el precio en el portal; si se movió más de 1 %, genere boletas nuevas. "
+                   "Después, márquela como ejecutada con su folio. La terminal no envía órdenes."]
+    return "\n".join(lineas)
+
+
+def enviar_telegram(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
+    """Envía por Telegram las boletas vigentes (recalculadas justo antes de enviar)."""
+    from . import notificador
+    texto = texto_telegram(listar(con, ajustes, recalcular_vigentes=True))
+    cfg = {**ajustes["alertas"], "notificar_escritorio": False, "notificar_telegram": True, "notificar_correo": False}
+    return {"resultado": notificador.enviar("🧾 Boletas para capturar", texto, cfg, detalle=texto), "texto": texto}

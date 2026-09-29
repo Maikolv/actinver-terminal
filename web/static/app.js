@@ -853,6 +853,12 @@ async function boletasPlanDelDia() {
   } catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 }
 document.getElementById("btn-boletas-plan").addEventListener("click", boletasPlanDelDia);
+document.getElementById("btn-boletas-telegram").addEventListener("click", async () => {
+  try {
+    const r = await api("/api/boletas/telegram", { method: "POST", json: {} });
+    notificar(r.resultado.telegram === "enviada" ? "Boletas enviadas por Telegram." : `Telegram: ${r.resultado.telegram || "no configurado"}.`);
+  } catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
 document.getElementById("btn-boletas").addEventListener("click", async () => {
   try {
     const r = (await api("/api/boletas/generar", { method: "POST", json: { propuesta: clavePropuestaSel() } })).resultado[0];

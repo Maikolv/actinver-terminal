@@ -10,7 +10,7 @@
   uv run terminal investigar     # experimento walk-forward → validación → prueba y pronósticos (H = 1 y 5)
   uv run terminal cobertura      # verifica cobertura por símbolo y proveedor; escribe docs/cobertura.md
   uv run terminal webhook-secreto  # genera TRADINGVIEW_WEBHOOK_SECRETO en .env (sin mostrarlo completo)
-  uv run terminal boletas        # boletas del plan del día (o --propuesta CLAVE) para capturar a mano en el simulador
+  uv run terminal boletas        # boletas del plan del día (o --propuesta CLAVE; --telegram para enviarlas) para captura manual
 """
 from __future__ import annotations
 
@@ -245,6 +245,9 @@ def boletas(args) -> None:
         print(f"  #{b['id']:>4}  {b['tipo']:<18} {lado:<7} {cant:>7} {b.get('emisora_serie') or b['instrumento_id']:<12} "
               f"límite {lim}  vence {_hora_mx(b['caduca_en'])}")
     print("Solo informativo: capture cada orden a mano en el simulador del Reto. La terminal no envía órdenes.")
+    if args.telegram:
+        from .config import cargar_ajustes as _c
+        print("Telegram:", boleta.enviar_telegram(con, _c())["resultado"].get("telegram"))
 
 
 def cobertura(_args) -> None:
@@ -341,6 +344,7 @@ def main() -> None:
     sub.add_parser("webhook-secreto", help="genera el secreto del webhook de TradingView en .env").set_defaults(fn=webhook_secreto)
     bo = sub.add_parser("boletas", help="genera las boletas del plan del día (captura manual en el simulador)")
     bo.add_argument("--propuesta", default="plan_del_dia", help="clave de la propuesta (por omisión, la del plan del día)")
+    bo.add_argument("--telegram", action="store_true", help="además, enviarlas por Telegram")
     bo.set_defaults(fn=boletas)
     d = sub.add_parser("demo", help="inicia con datos SINTÉTICOS etiquetados (sin credenciales)")
     d.add_argument("--sin-navegador", action="store_true")

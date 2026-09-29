@@ -100,3 +100,16 @@ def test_boletas_del_plan_del_dia_usan_la_propuesta_de_referencia_y_reemplazan(c
     assert r2[0]["reemplazadas"] == len(r1) - 1                                  # no se duplican órdenes vigentes
     vigentes = con.execute("SELECT COUNT(*) FROM boletas WHERE estado='vigente'").fetchone()[0]
     assert vigentes == len(r2) - 1
+
+
+def test_texto_de_boletas_para_telegram():
+    from terminal import boleta
+    bs = [{"id": 84, "estado": "vigente", "tipo": "considerar compra", "lado": "compra", "cantidad": 5418, "precio_limite": 14.87,
+           "importe": 80566.0, "costos": {"total": 93.4}, "emisora_serie": "ALPEK A", "instrumento_id": "BMV:ALPEK",
+           "caduca_en": "2026-09-29T19:10:00+00:00"},
+          {"id": 83, "estado": "vigente", "tipo": "investigar", "lado": "compra", "cantidad": 0, "precio_limite": None,
+           "emisora_serie": "FUBO *", "instrumento_id": "SIC:FUBO", "caduca_en": "2026-09-29T19:10:00+00:00"},
+          {"id": 80, "estado": "caducada", "tipo": "considerar compra", "emisora_serie": "CAT *", "caduca_en": "x"}]
+    t = boleta.texto_telegram(bs)
+    assert "vencen 29-09 13:10 (CDMX)" in t and "🟢 COMPRA ALPEK A: 5,418 títulos, límite $14.87" in t
+    assert "FUBO * (#83)" in t and "CAT" not in t and "no envía órdenes" in t
