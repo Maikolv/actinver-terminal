@@ -5,6 +5,10 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 ## [0.11.0] — 2026-09-29 (auditoría integral)
 
 ### Corregido
+- **Las propuestas se recalculan solas al cambiar el código o la configuración:**
+  - cada propuesta guarda `huella_calculo`, un sha256 de `optimizador`, `servicios`, `mercado`, `portal`, `reto`, `vigencia`, `config/reto.yaml` y las secciones de configuración del cálculo;
+  - si no coincide, la propuesta deja de ser actual y el motor la recalcula en su siguiente ciclo.
+  - Solo disparan recálculo los avisos que se resuelven recalculando (código, perfil o datos). El bloqueo por captura incompleta ya no provoca un recálculo en cada ciclo.
 - **Seeking Alpha colapsaba todos los titulares de una emisora en uno:**
   - el enlace del RSS es genérico y servía como identificador;
   - ahora se usa el `guid` y el enlace real de la nota;

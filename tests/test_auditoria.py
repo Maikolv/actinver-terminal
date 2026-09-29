@@ -72,3 +72,33 @@ def test_estado_informacion_no_presenta_el_saldo_local_como_confirmado(con, ajus
     portal.guardar(con, TEXTO, "2026-09-28T14:05", mercado.instrumentos(con), confirmar=True)
     cuenta = next(i for i in estado_info.calcular(con, ajustes)["items"] if i["tema"] == "Cuenta del Reto")
     assert cuenta["nivel"] == "confirmado"
+
+
+def test_propuestas_se_recalculan_solas_si_cambia_el_calculo(con, ajustes, monkeypatch):
+    ids = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE id LIKE 'BMV:%' AND clase='accion' AND estado='activo' LIMIT 8")]
+    sembrar_precios(con, ids, sesiones=300)
+    servicios.calcular_propuestas(con, ajustes)
+    perfil = servicios.perfil_actual(con, ajustes)
+    p = servicios.propuestas_guardadas(con, ajustes, perfil)["acciones_ajuste"]
+    assert p["huella_calculo"] == servicios.huella_calculo(ajustes) and not p["recalcular"]
+    monkeypatch.setattr(servicios, "_huella_codigo", "codigo-nuevo")          # simula una versión nueva del código
+    p = servicios.propuestas_guardadas(con, ajustes, perfil)["acciones_ajuste"]
+    assert p["recalcular"] and any("se actualizó" in a for a in p["avisos"])
+    monkeypatch.setattr(ingesta, "actualizar_todo", lambda *a, **k: {"nuevos": 0})
+    monkeypatch.setattr(alertas, "evaluar", lambda *a, **k: [])
+    estado = servicios.ciclo(con, ajustes, notificar=False)
+    assert estado["recalculo"].startswith("código")
+    p = servicios.propuestas_guardadas(con, ajustes, perfil)["acciones_ajuste"]
+    assert not p["recalcular"] and not p["avisos"]
+    assert servicios.ciclo(con, ajustes, notificar=False)["recalculo"] == "no necesario"   # ya no repite
+
+
+def test_un_bloqueo_por_captura_no_provoca_recalculos_inutiles(con, ajustes):
+    ids = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE id LIKE 'BMV:%' AND id <> 'BMV:AMX' AND clase='accion' AND estado='activo' LIMIT 8")]
+    sembrar_precios(con, ids, sesiones=300)
+    servicios.calcular_propuestas(con, ajustes)
+    portal.guardar(con, TEXTO, "2026-09-28T14:05", mercado.instrumentos(con), confirmar=True)
+    con.execute("UPDATE posiciones_portal SET precio=NULL, valor=NULL")
+    con.commit()
+    props = servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes))
+    assert all(p["avisos"] and not p["recalcular"] for p in props.values() if p)

@@ -1,12 +1,14 @@
 """Casos de uso compartidos por la API y el motor automático."""
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import math
 import sqlite3
 import threading
 from datetime import UTC, date, datetime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -159,19 +161,47 @@ def seguimiento(con, ajustes: Ajustes) -> dict:
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Código y configuración que determinan una propuesta. Si cambian, las propuestas guardadas dejan de ser actuales.
+ARCHIVOS_CALCULO = ("optimizador.py", "servicios.py", "mercado.py", "portal.py", "reto.py", "vigencia.py")
+SECCIONES_CALCULO = ("optimizacion", "perfiles", "costos", "puntuacion", "vigencia")
+_huella_codigo: str | None = None
+
+
+def huella_calculo(ajustes: Ajustes) -> str:
+    """Huella (sha256 corta) del código del cálculo, las reglas del Reto y la configuración que lo afecta."""
+    global _huella_codigo
+    if _huella_codigo is None:  # el código no cambia mientras el proceso vive: se lee una vez
+        h = hashlib.sha256()
+        base = Path(__file__).parent
+        for nombre in ARCHIVOS_CALCULO:
+            h.update((base / nombre).read_bytes())
+        reglas = base.parent / "config" / "reto.yaml"
+        if reglas.exists():
+            h.update(reglas.read_bytes())
+        _huella_codigo = h.hexdigest()
+    conf = json.dumps({k: ajustes.get(k) for k in SECCIONES_CALCULO}, sort_keys=True, default=str)
+    return hashlib.sha256((_huella_codigo + conf).encode()).hexdigest()[:16]
+
+
 def revalidar(p: dict, perfil: dict, ajustes: Ajustes) -> dict:
-    """Una propuesta guardada nunca se presenta como actual si sus datos o el perfil cambiaron."""
-    avisos = []
+    """Una propuesta guardada nunca se presenta como actual si cambiaron sus datos, el perfil, el código o la
+    configuración del cálculo. «recalcular» indica que un nuevo cálculo lo resuelve (el motor lo hace solo)."""
+    avisos, recalcular = [], False
     if p.get("estado") in ("calculada", "demostracion"):
+        if p.get("huella_calculo") != huella_calculo(ajustes):
+            avisos.append("El cálculo de la terminal se actualizó desde esta propuesta: se recalculará en el próximo ciclo.")
+            recalcular = True
         if p.get("perfil") != perfil:
             avisos.append("El perfil cambió desde el cálculo: se recalculará en el próximo ciclo.")
+            recalcular = True
         if p["estado"] == "calculada" and p.get("datos_hasta"):
             atraso = vigencia.sesiones_de_atraso("XNYS", date.fromisoformat(p["datos_hasta"]),
                                                  vigencia.ultima_sesion_cerrada("XNYS"))
             if atraso > ajustes["vigencia"]["cierre_sesiones_retrasado"]:
                 avisos.append(f"Calculada con datos al {p['datos_hasta']} ({atraso} sesiones de atraso): no es actual.")
                 p = {**p, "estado": "desactualizada"}
-    return {**p, "avisos": avisos}
+                recalcular = True
+    return {**p, "avisos": avisos, "recalcular": recalcular}
 
 
 def bloqueo_cartera(actual: dict) -> str | None:
@@ -216,6 +246,7 @@ def calcular_propuestas(con, ajustes: Ajustes) -> dict:
     res = {}
     for tipo, lente in COMBINACIONES:
         p = optimizador.proponer(con, ajustes, perfil, tipo, actual, cot, lente=lente)
+        p["huella_calculo"] = huella_calculo(ajustes)
         js = json.dumps(p, default=str)
         with db.transaccion(con):
             con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
@@ -225,6 +256,7 @@ def calcular_propuestas(con, ajustes: Ajustes) -> dict:
         p = optimizador.proponer(con, ajustes, {**perfil, "mercado_acciones": m}, tipo, actual, cot, lente="puntuacion")
         p.update({"clave": f"{tipo}_puntuacion_{m}", "nombre": f"{p['nombre']} · {VARIANTES_MERCADO[m]}",
                   "mercado_variante": m, "perfil": perfil})  # el perfil del usuario sigue en «ambos»
+        p["huella_calculo"] = huella_calculo(ajustes)
         js = json.dumps(p, default=str)
         with db.transaccion(con):
             con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
@@ -334,7 +366,8 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
                                                                 ids_propuesta=ids_prop)
     motivo = ("precios en vivo" if en_vivo else "forzado" if forzar else "datos nuevos" if act.get("nuevos") else
               "sin propuestas" if any(v is None for v in props.values()) else
-              "perfil o datos cambiaron" if any(v and v.get("avisos") for v in props.values()) else "")
+              "código, configuración, perfil o datos cambiaron" if any(v and v.get("recalcular") for v in props.values())
+              else "")
     if motivo:
         props = calcular_propuestas(con, ajustes)
     cart = cartera_actual(con, ajustes)
