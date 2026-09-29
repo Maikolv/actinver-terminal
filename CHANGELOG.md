@@ -4,6 +4,11 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 
 ## [0.11.0] — 2026-09-29 (auditoría integral)
 
+### Añadido (boletas)
+- **Boletas del plan del día:**
+  - se generan con el botón «Generar boletas del plan del día» (Propuestas), con `uv run terminal boletas` o con `POST /api/boletas/generar {"propuesta": "plan_del_dia"}`;
+  - usan la misma propuesta que el mensaje de Telegram y reemplazan las boletas vigentes anteriores para no duplicar órdenes.
+
 ### Corregido
 - **Plan del día:**
   - un envío fallido ya no cuenta como enviado: se reintenta cada 10 minutos, hasta 12 veces al día;

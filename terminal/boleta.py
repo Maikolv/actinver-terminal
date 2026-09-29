@@ -170,9 +170,25 @@ def huella(b: dict, cart: dict) -> str:
     return hashlib.sha256(json.dumps(base, default=str).encode()).hexdigest()[:16]
 
 
+PLAN_DEL_DIA = "plan_del_dia"
+
+
 def generar(con: sqlite3.Connection, ajustes: Ajustes, clave: str = "acciones_ajuste") -> list[dict]:
+    """Boletas de una propuesta. Con clave «plan_del_dia» usa la misma propuesta que el plan de Telegram (la vigente
+    mejor puntuada) y reemplaza las boletas vigentes anteriores para no duplicar órdenes."""
     perfil = servicios.perfil_actual(con, ajustes)
     props = servicios.propuestas_guardadas(con, ajustes, perfil)
+    reemplazadas = 0
+    if clave == PLAN_DEL_DIA:
+        from . import resumen
+        p = resumen.propuesta_referencia(props)
+        if not p:
+            avisos = sorted({a for v in props.values() if v for a in v.get("avisos") or []})
+            raise ValueError("No hay una propuesta vigente para el plan del día" + (": " + "; ".join(avisos) if avisos else "."))
+        clave = p["clave"]
+        cur = con.execute("UPDATE boletas SET estado='descartada', motivo_estado='reemplazada por las boletas del plan del día' "
+                          "WHERE estado='vigente'")
+        reemplazadas = cur.rowcount
     p = props.get(clave)
     if not p:
         raise ValueError("No hay propuesta calculada con esa clave")
@@ -195,6 +211,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, clave: str = "acciones_aj
         ids.append(cur.lastrowid)
     con.commit()
     resumen = {"tipo": "considerar rebalanceo" if len(direccionales) >= 2 else None, "boletas": ids, "propuesta": clave,
+               "nombre_propuesta": p["nombre"], "puntuacion": p["puntuacion"]["total"], "reemplazadas": reemplazadas,
                "numero_ordenes": len(direccionales),
                "ordenes_compra": sum(b["tipo"] == "considerar compra" for b in boletas),
                "ordenes_venta": sum(b["tipo"] == "considerar venta" for b in boletas),

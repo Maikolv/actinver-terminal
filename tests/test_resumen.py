@@ -84,3 +84,19 @@ def test_espera_si_las_propuestas_se_estan_recalculando(con, ajustes, monkeypatc
     assert resumen.enviar_si_toca(con, ajustes, cart, props, MANANA) is None                       # 07:05: espera
     tarde = datetime(2026, 9, 30, 14, 5, tzinfo=UTC)                                                # 08:05: no espera más
     assert "No hay una propuesta vigente" in resumen.enviar_si_toca(con, ajustes, cart, props, tarde)["texto"]
+
+
+def test_boletas_del_plan_del_dia_usan_la_propuesta_de_referencia_y_reemplazan(con, ajustes):
+    from terminal import boleta, servicios
+    from conftest import sembrar_precios
+    ids = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE id LIKE 'BMV:%' AND clase='accion' AND estado='activo' LIMIT 8")]
+    sembrar_precios(con, ids, sesiones=300)
+    servicios.calcular_propuestas(con, ajustes)
+    props = servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes))
+    ref = resumen.propuesta_referencia(props)
+    r1 = boleta.generar(con, ajustes, boleta.PLAN_DEL_DIA)
+    assert r1[0]["propuesta"] == ref["clave"] and r1[0]["numero_ordenes"] + r1[0]["por_investigar"] >= 5 and r1[0]["reemplazadas"] == 0
+    r2 = boleta.generar(con, ajustes, boleta.PLAN_DEL_DIA)
+    assert r2[0]["reemplazadas"] == len(r1) - 1                                  # no se duplican órdenes vigentes
+    vigentes = con.execute("SELECT COUNT(*) FROM boletas WHERE estado='vigente'").fetchone()[0]
+    assert vigentes == len(r2) - 1

@@ -100,8 +100,8 @@ def construir(p: dict, cartera: dict, anterior: list[dict] | None, ahora_local: 
         lineas.append(f"• {o['clave']}: {o['motivo']}")
     if p.get("riesgos"):
         lineas.append(f"• Riesgo principal: {p['riesgos'][0]}")
-    lineas += ["", "Solo informativo. Genere las boletas en la terminal (precio límite actualizado) y capture cada orden "
-                   "a mano en el simulador."]
+    lineas += ["", "Solo informativo. Boletas con precio límite actualizado: en la terminal, «Propuestas» → «Generar boletas "
+                   "del plan del día» (o `uv run terminal boletas`). Capture cada orden a mano en el simulador."]
     return cab, "\n".join(lineas), ords
 
 

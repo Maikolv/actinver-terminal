@@ -10,6 +10,7 @@
   uv run terminal investigar     # experimento walk-forward → validación → prueba y pronósticos (H = 1 y 5)
   uv run terminal cobertura      # verifica cobertura por símbolo y proveedor; escribe docs/cobertura.md
   uv run terminal webhook-secreto  # genera TRADINGVIEW_WEBHOOK_SECRETO en .env (sin mostrarlo completo)
+  uv run terminal boletas        # boletas del plan del día (o --propuesta CLAVE) para capturar a mano en el simulador
 """
 from __future__ import annotations
 
@@ -218,6 +219,34 @@ def investigar(args) -> None:
         con.close()
 
 
+def _hora_mx(iso: str) -> str:
+    import pandas as pd
+    return pd.Timestamp(iso).tz_convert("America/Mexico_City").strftime("%d-%m %H:%M") + " (CDMX)"
+
+
+def boletas(args) -> None:
+    """Imprime las boletas generadas. Ninguna se envía: cada orden se captura a mano en el simulador del Reto."""
+    from . import boleta, db
+    from .config import cargar_ajustes
+    con = db.conectar()
+    db.inicializar(con)
+    try:
+        r = boleta.generar(con, cargar_ajustes(), args.propuesta)
+    except ValueError as e:
+        sys.exit(f"No se generaron boletas: {e}")
+    res, filas = r[0], r[1:]
+    print(f"Boletas de «{res['nombre_propuesta']}» ({res['puntuacion']:.1f}/100): {res['numero_ordenes']} órdenes, "
+          f"{res['por_investigar']} por investigar; costo estimado ${res['costo_total']:,.2f}."
+          + (f" Se reemplazaron {res['reemplazadas']} boletas anteriores." if res.get("reemplazadas") else ""))
+    for b in filas:
+        lado = (b.get("lado") or "—").upper()
+        cant = f"{int(b['cantidad']):,}" if b.get("cantidad") else "—"
+        lim = f"${b['precio_limite']:,.2f}" if b.get("precio_limite") else "precio del portal"
+        print(f"  #{b['id']:>4}  {b['tipo']:<18} {lado:<7} {cant:>7} {b.get('emisora_serie') or b['instrumento_id']:<12} "
+              f"límite {lim}  vence {_hora_mx(b['caduca_en'])}")
+    print("Solo informativo: capture cada orden a mano en el simulador del Reto. La terminal no envía órdenes.")
+
+
 def cobertura(_args) -> None:
     from . import cotizaciones, db
     from .config import RAIZ, cargar_ajustes
@@ -310,6 +339,9 @@ def main() -> None:
     inv.set_defaults(fn=investigar)
     sub.add_parser("cobertura", help="verifica cobertura por símbolo y proveedor (docs/cobertura.md)").set_defaults(fn=cobertura)
     sub.add_parser("webhook-secreto", help="genera el secreto del webhook de TradingView en .env").set_defaults(fn=webhook_secreto)
+    bo = sub.add_parser("boletas", help="genera las boletas del plan del día (captura manual en el simulador)")
+    bo.add_argument("--propuesta", default="plan_del_dia", help="clave de la propuesta (por omisión, la del plan del día)")
+    bo.set_defaults(fn=boletas)
     d = sub.add_parser("demo", help="inicia con datos SINTÉTICOS etiquetados (sin credenciales)")
     d.add_argument("--sin-navegador", action="store_true")
     d.set_defaults(fn=iniciar)

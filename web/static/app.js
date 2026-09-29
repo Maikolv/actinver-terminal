@@ -844,6 +844,15 @@ async function ejecutarBoleta(b) {
   try { await api(`/api/boletas/${b.id}/ejecutada`, { method: "POST", json: { folio, cantidad, precio, fecha } }); notificar("Operación confirmada registrada."); cargarTiempo(); }
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 }
+async function boletasPlanDelDia() {
+  try {
+    const r = (await api("/api/boletas/generar", { method: "POST", json: { propuesta: "plan_del_dia" } })).resultado[0];
+    notificar(`Plan del día (${r.nombre_propuesta}, ${r.puntuacion.toFixed(1)}/100): ${r.numero_ordenes} órdenes a capturar (${r.ordenes_compra} compra · ${r.ordenes_venta} venta)`
+      + (r.por_investigar ? ` y ${r.por_investigar} por investigar sin precio` : "") + (r.reemplazadas ? `; se reemplazaron ${r.reemplazadas} boletas anteriores` : "") + ".");
+    irA("tab-propuestas"); pintarBoletas();
+  } catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+}
+document.getElementById("btn-boletas-plan").addEventListener("click", boletasPlanDelDia);
 document.getElementById("btn-boletas").addEventListener("click", async () => {
   try {
     const r = (await api("/api/boletas/generar", { method: "POST", json: { propuesta: clavePropuestaSel() } })).resultado[0];
