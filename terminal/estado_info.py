@@ -63,7 +63,8 @@ def calcular(con: sqlite3.Connection, ajustes) -> dict:
     sic_venc = [i for i in ids if ins[i]["mercado_operable"] == "BMV-SIC" and cot[i].get("estado") == "vencido"]
     nivel = "estimado" if cuenta.get("vigente") else "falta"
     item("Precios", nivel,
-         f"{cuenta.get('vigente', 0)} vigentes, {cuenta.get('vencido', 0)} vencidos y {cuenta.get('sin_datos', 0)} sin datos de "
+         f"{cuenta.get('vigente', 0)} vigentes, {cuenta.get('retrasado', 0)} retrasados (cierre de la sesión anterior), "
+         f"{cuenta.get('vencido', 0)} vencidos y {cuenta.get('sin_datos', 0)} sin datos de "
          f"{len(ids)}. Son CIERRES DIARIOS, no tiempo real. Los del SIC son el precio de la bolsa de origen convertido a pesos "
          "(referencia, no la cotización del SIC).",
          "Para tiempo real hace falta un contrato de datos (Infosel) o claves de Alpaca (referencia EE. UU.).")
