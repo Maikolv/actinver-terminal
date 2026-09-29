@@ -13,6 +13,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import math
 import re
 import sqlite3
 import unicodedata
@@ -202,6 +203,26 @@ def guardar(con: sqlite3.Connection, texto: str, hora_portal: str, instrumentos:
         hora = None
     if not r["valor_portafolio"] or r["valor_portafolio"] <= 0:
         errores.append("valor del portafolio: no se encontró; cópielo con la tabla o captúrelo")
+    if r["valor_portafolio"] is not None and not math.isfinite(r["valor_portafolio"]):
+        errores.append("valor del portafolio: debe ser un número finito")
+    if r["efectivo"] is None or not math.isfinite(r["efectivo"]) or r["efectivo"] < 0:
+        errores.append("efectivo: indique un saldo válido, mayor o igual a cero")
+    if r["no_reconocidas"]:
+        errores.append("hay emisoras sin reconocer; corrija la tabla antes de guardar")
+    if any(p["titulos"] < 0 or not p["titulos"].is_integer() for p in r["posiciones"]):
+        errores.append("los títulos deben ser enteros y no negativos")
+    if not r["posiciones"] and r["valor_portafolio"] is not None and r["efectivo"] is not None:
+        if abs(r["valor_portafolio"] - r["efectivo"]) > 0.01:
+            errores.append("faltan posiciones: el valor total y el efectivo difieren")
+    valores = [p["valor"] for p in r["posiciones"]]
+    if valores and all(v is not None for v in valores) and r["efectivo"] is not None and r["valor_portafolio"]:
+        diferencia = abs((sum(valores) + r["efectivo"]) / r["valor_portafolio"] - 1)
+        if diferencia > TOLERANCIA_CUADRE:
+            errores.append("posiciones y efectivo no cuadran con el valor total (diferencia mayor al 1 %)")
+    if confirmar and not errores:
+        ultima = captura(con)
+        if ultima and pd.Timestamp(hora) < pd.Timestamp(ultima["hora_portal"]):
+            errores.append("hora_portal: es anterior a la última captura guardada")
     r.update(hora_portal=hora, errores=errores, fuente=FUENTE, confirmado=False)
     if not confirmar or errores:
         return r
@@ -280,7 +301,9 @@ def cartera(con: sqlite3.Connection, cot: dict, c: dict) -> dict:
         origen_precio = "terminal"
         if precio is None and p["precio"]:
             precio, origen_precio = p["precio"], "portal"
-        valor = p["titulos"] * precio if precio else None
+        valor = p["titulos"] * precio if precio is not None else p["valor"]
+        if precio is None and valor is not None:
+            origen_precio = "valor_portal"
         if valor is None:
             sin_precio.append(p["instrumento_id"])
         else:

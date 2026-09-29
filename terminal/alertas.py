@@ -343,8 +343,8 @@ def reglas_portal(con, ahora_dt: datetime) -> list[Condicion]:
         capturada_hoy = c and pd.Timestamp(c["hora_portal"]).tz_convert("America/Mexico_City").date() >= hoy
         out.append(Condicion("captura_pendiente", f"cierre:{hoy.isoformat()}", cerrada == hoy and not capturada_hoy, "info",
                              "Actualiza la captura de tu cuenta del Reto",
-                             "La BMV ya cerró y la terminal no tiene el saldo y las posiciones del portal de hoy. Sin ellos, las "
-                             "propuestas y alertas usan el registro local.",
+                             "La BMV ya cerró y la terminal no tiene el saldo y las posiciones del portal de hoy. "
+                             "Las propuestas y alertas pueden basarse en una captura anterior o en el registro local.",
                              {"sesion": hoy.isoformat()}, "calendario BMV y capturas registradas",
                              "Copia la tabla de tu cuenta en el portal y pégala en «Mi cartera» → «Captura del portal».",
                              rearme=False))

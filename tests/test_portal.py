@@ -37,6 +37,37 @@ def test_advierte_si_no_cuadra_y_no_adivina_emisoras(con):
         portal.interpretar("texto sin tabla ni saldo", _ins(con))
 
 
+def test_no_guarda_capturas_incompletas_o_incoherentes(con):
+    hora = "2026-09-28T14:05"
+    casos = (
+        (TEXTO.replace("AAPL\t*", "NOEXISTE\t*"), None, None, "emisoras sin reconocer"),
+        (TEXTO.replace("870,250.00", "800,000.00"), None, None, "no cuadran"),
+        (TEXTO.replace("Efectivo disponible:\t$870,250.00\n", ""), None, None, "efectivo"),
+        ("", 800_000, 1_000_000, "faltan posiciones"),
+    )
+    for texto, efectivo, total, mensaje in casos:
+        r = portal.guardar(con, texto, hora, _ins(con), efectivo=efectivo,
+                           valor_portafolio=total, confirmar=True)
+        assert not r["confirmado"] and any(mensaje in e for e in r["errores"])
+    assert con.execute("SELECT COUNT(*) FROM capturas_portal").fetchone()[0] == 0
+
+
+def test_no_retrocede_a_una_captura_anterior(con):
+    portal.guardar(con, TEXTO, "2026-09-28T15:00", _ins(con), confirmar=True)
+    r = portal.guardar(con, TEXTO, "2026-09-28T14:05", _ins(con), confirmar=True)
+    assert not r["confirmado"] and any("anterior" in e for e in r["errores"])
+    assert con.execute("SELECT COUNT(*) FROM capturas_portal").fetchone()[0] == 1
+
+
+def test_conserva_valor_copiado_si_falta_precio_de_la_terminal(con):
+    texto = TEXTO.replace("Precio actual\t", "").replace("17.55\t", "").replace("4,200.00\t", "")
+    r = portal.guardar(con, texto, "2026-09-28T14:05", _ins(con), confirmar=True)
+    assert r["confirmado"]
+    c = portal.cartera(con, {}, portal.captura(con))
+    assert c["valor_total"] == 1_000_000 and c["sin_precio"] == []
+    assert all(p["origen_precio"] == "valor_portal" for p in c["posiciones"])
+
+
 def test_vista_previa_guardado_y_duplicado(con):
     prev = portal.guardar(con, TEXTO, "2026-09-28T14:05", _ins(con))
     assert not prev["confirmado"] and not prev["errores"]

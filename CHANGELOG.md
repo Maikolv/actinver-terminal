@@ -19,6 +19,9 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 - La prueba de canales usa el formato real de las alertas.
 
 ### Corregido
+- La captura del portal rechaza emisoras no reconocidas, efectivo ausente, descuadres mayores al 1 %, títulos inválidos
+  y capturas anteriores a la última guardada. Si falta una cotización de la terminal, conserva el valor copiado del portal.
+- Los recordatorios distinguen una captura anterior del registro local y la pantalla explica cuándo cambia la etapa.
 - El tope de exposición en dólares del perfil se ignoraba cuando la preselección dejaba pocas acciones en pesos.
 
 ## [0.9.0] — 2026-09-29

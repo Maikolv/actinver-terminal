@@ -484,7 +484,7 @@ function pintarPortal(cp, c) {
     kpi("Valor del portafolio (portal)", mxn(k.valor_portafolio)), kpi("Efectivo (portal)", mxn(k.efectivo)),
     kpi("Posiciones (portal)", String(k.n_posiciones))),
   h("p", { clase: "suave", texto: `Fuente: ${k.fuente}. Hora del portal: ${fechaLocal(k.hora_portal)}; capturado en la terminal: ${fechaLocal(k.capturado_en)}.` })];
-  if (!cp.vigente) out.push(h("div", { clase: "aviso-caja", texto: "Registró operaciones a mano después de esta captura: propuestas y alertas usan el registro local hasta la siguiente captura." }));
+  if (!cp.vigente) out.push(h("div", { clase: "aviso-caja", texto: "Esta captura ya no alimenta las propuestas: pudo cambiar la etapa del Reto o registrarse una operación local después. La terminal usa el registro local hasta recibir una captura nueva." }));
   if (cp.cambios.length) out.push(h("p", {}, h("strong", { texto: "Cambios frente a la captura anterior: " }), cp.cambios.join(" ")));
   out.push(tabla([{ t: "Emisora", f: (f) => f.texto || f.instrumento_id }, { t: "Instrumento", f: (f) => f.instrumento_id },
     { t: "Títulos", f: (f) => num(f.titulos), num: true }, { t: "Costo prom.", f: (f) => mxn(f.costo_promedio, true), num: true },

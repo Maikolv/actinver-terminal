@@ -39,7 +39,9 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 
 **Importar operaciones confirmadas.** Use «Mi cartera → Importar», con el tipo `transacciones` y el ejemplo `ejemplos/operaciones_confirmadas.csv`. También puede capturarlas una por una. Solo las operaciones **confirmadas** cambian posiciones y efectivo. Las órdenes pendientes se anotan como referencia en «Pasado · Presente · Futuro». Importe la lista del simulador con el tipo `universo` (ejemplo: `ejemplos/catalogo_simulador.csv`).
 
-**Pruebas.** `uv run pytest` ejecuta 146 pruebas. `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
+**Cuenta del Reto.** En «Mi cartera → Capturar desde el portal», copie usted la tabla de posiciones, el efectivo y el valor total desde su sesión del Reto; péguelos, revise la vista previa e indique la hora que muestra el portal. La terminal no accede al portal. Rechaza capturas incompletas, descuadradas o anteriores a la última. Mientras no haya una captura válida de la etapa actual, el saldo local se muestra claramente como registro de la terminal, no como saldo confirmado del Reto. Telegram y escritorio avisan de cambios entre capturas y de posibles movimientos sugeridos; el correo requiere configurar SMTP en `.env`.
+
+**Pruebas.** `uv run pytest` ejecuta la suite (170 pruebas al 29-sep-2026). `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
 
 **Mantenimiento desde el editor.** Abra la carpeta en su editor o agente (por ejemplo Cline o Claude Code). Las convenciones están en `CLAUDE.md`. Busque con `uv run python scripts/indice_contexto.py buscar "…"` antes de leer archivos completos.
 
