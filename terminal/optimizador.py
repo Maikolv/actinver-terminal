@@ -494,6 +494,9 @@ def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: l
     if usd > usd_max + 0.005 and perfil.get("mercado_acciones", "ambos") != "extranjeras":
         out.insert(0, f"NO CUMPLE SU PERFIL: {usd:.0%} en dólares frente al máximo de {usd_max:.0%}; el universo disponible no "
                       "tiene suficientes instrumentos en pesos con precio. Amplíe el universo o ajuste el máximo en «Reto y perfil».")
+    if m.get("sesiones") and m["sesiones"] < 126:
+        out.append(f"Validación corta: solo {m['sesiones']} sesiones fuera de muestra (menos de medio año); la puntuación "
+                   "no se puede verificar bien con los datos actuales.")
     if m.get("max_caida") is not None:
         out.append(f"Caída máxima en la validación fuera de muestra: {m['max_caida']:.0%}; "
                    f"peor trimestre histórico con estos pesos: {esc['peor_trimestre_historico']:.0%}.")

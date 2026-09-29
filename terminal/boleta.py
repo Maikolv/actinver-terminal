@@ -176,6 +176,9 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, clave: str = "acciones_aj
     p = props.get(clave)
     if not p:
         raise ValueError("No hay propuesta calculada con esa clave")
+    if p.get("estado") != "calculada" or p.get("avisos"):
+        raise ValueError("No se generan boletas con esta propuesta: " + ("; ".join(p.get("avisos") or [])
+                         or f"estado «{p.get('estado')}»") + ".")
     cart = servicios.cartera_actual(con, ajustes)
     filas = (p.get("cambios") or {}).get("filas") or []
     if not filas:  # sin cartera registrada: la asignación inicial completa

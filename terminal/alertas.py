@@ -256,6 +256,12 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
         nuevas = nuevas + [d for d in diferidas if d["id"] not in vistas_ids]
     if nuevas and notificar:
         silenciar = cfg.get("silenciar_fuera_de_horario", True) and not abierto
+        hora_local = pd.Timestamp(ahora_dt).tz_convert("America/Mexico_City").hour
+        noche = not (7 <= hora_local < 21)
+        for a in [a for a in nuevas if a["regla"] == "plan_propuesta" and noche]:
+            with transaccion(con):  # de noche no se envía: el plan del día de la mañana lo incluye
+                con.execute("UPDATE alertas SET notificada='incluida_en_plan_del_dia' WHERE id=?", (a["id"],))
+        nuevas = [a for a in nuevas if not (a["regla"] == "plan_propuesta" and noche)]
         inmediatas = [a for a in nuevas if a["regla"] in SIEMPRE or not silenciar]
         calladas = [a for a in nuevas if a not in inmediatas]
         for lote, callado in ((inmediatas, False), (calladas, True)):

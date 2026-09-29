@@ -24,7 +24,7 @@ La licencia de cada fuente está en la tabla `licencias_fuente` y en su ficha.
 | Calificaciones de Seeking Alpha (CSV) | Quant, autores y Wall Street (1–5) y notas por factor | Emisoras de EE. UU. | Exportación de la cuenta del participante | Fecha de la exportación | **Importador listo**; se muestran en el Ranking, no entran al optimizador |
 | `EodhdBmvProvider` | Cierre diario BMV local | Ninguna | Plan gratuito (20/día) | EOD | Pendiente: `EODHD_API_KEY` |
 | `ManualOrCsvProvider` | Precios y NAV copiados del portal | Lo que el participante capture | Datos propios | EOD | **Funciona** |
-| Seeking Alpha RSS | Titulares, autor, tipo de contenido | Emisoras de EE. UU. | RSS público; lectura humana del texto | Respuesta 0.23 s; titular con ~13 h | **Funciona** (contexto, no precios) |
+| Seeking Alpha RSS | Titulares fechados, autor, tipo (noticia / análisis / transcripción), otras emisoras mencionadas | Emisoras de EE. UU. en cartera o en la propuesta (hasta 25) | RSS público; solo titular y enlace | Verificado 29-sep: 30 notas distintas de MRNA | **Funciona**: se identifica por `guid` y se descartan notas que no mencionan la emisora |
 | Notas de Seeking Alpha (CSV) | Tesis del participante con URL y fecha | — | Propias | Disponibles al importarse | **Funciona** |
 | InsiderFinance (CSV) | Operaciones de insiders con fechas de operación y divulgación | EE. UU.; NO CUBRE BMV | Exportación del plan, si existe | — | Importador listo |
 | SEC EDGAR (Form 4) | Fuente primaria de insiders | EE. UU. | API oficial; exige `SEC_USER_AGENT` | Hasta 2 días hábiles (regla SEC) | Pendiente: `SEC_USER_AGENT` |
@@ -40,3 +40,14 @@ La licencia de cada fuente está en la tabla `licencias_fuente` y en su ficha.
 - Datos BMV: según contrato.
 - EODHD: plan de pago si hacen falta más de 20 consultas al día.
 - Túnel para el webhook: gratuito (Cloudflare Quick Tunnel).
+
+
+## Seeking Alpha: qué exigiría una integración automática adicional
+
+La suscripción personal (Premium o Pro) **no** da acceso a una API. Las calificaciones Quant, las notas por factor y los artículos Premium no se extraen de forma automática: se importan desde una exportación que hace el participante (CSV, tipo `calificaciones_sa`). Para automatizarlas haría falta un **acuerdo de licencia de datos con Seeking Alpha** que especifique:
+
+- **Datos:** calificaciones Quant, de autores y de Wall Street con su fecha de cálculo; notas por factor (valuación, crecimiento, rentabilidad, momentum y revisiones); histórico fechado para validar sin sesgo de anticipación.
+- **Permisos:** uso programático personal no comercial, almacenamiento local, cantidad de consultas por día y tiempo de conservación.
+- **Técnico:** URL base, autenticación, formato de símbolo y un ejemplo de respuesta, para escribir la especificación como con Infosel.
+
+Mientras no exista esa licencia, las calificaciones importadas son contexto fechado en el Ranking y no entran al optimizador.

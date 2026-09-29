@@ -94,12 +94,25 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
     return {"proveedor": None, "estado": "sin_proveedor", "registros": 0}
 
 
+def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = None,
+               ids_propuesta: list[str] | None = None) -> list[dict]:
+    """Orden de consulta con cupos limitados (EODHD 20/día, Tiingo por hora):
+    0 cartera y captura del portal · 1 instrumentos de las propuestas · 2 con datos pero atrasados (el más antiguo
+    primero: mantiene vigente lo que ya se usa) · 3 nunca cargados (historia nueva)."""
+    prio, prop = set(ids_prioritarios or []), set(ids_propuesta or [])
+    ult = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, MAX(fecha) FROM precios GROUP BY instrumento_id")}
+
+    def clave(i):
+        nivel = 0 if i["id"] in prio else 1 if i["id"] in prop else 2 if i["id"] in ult else 3
+        return (nivel, ult.get(i["id"]) or "", i["id"])
+    return sorted(instrs, key=clave)
+
+
 def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | None = None,
-                       hoy: date | None = None) -> dict:
+                       hoy: date | None = None, ids_propuesta: list[str] | None = None) -> dict:
     hoy = hoy or date.today()
-    instrs = [dict(r) for r in con.execute("SELECT * FROM instrumentos WHERE estado='activo'")]
-    prio = set(ids_prioritarios or [])
-    instrs.sort(key=lambda i: (i["id"] not in prio, i["id"]))
+    instrs = orden_cola(con, [dict(r) for r in con.execute("SELECT * FROM instrumentos WHERE estado='activo'")],
+                        ids_prioritarios, ids_propuesta)
     resumen = {n: {"registros": 0, "errores": 0, "omitidos_limite": 0, "al_dia": 0} for n in ORDEN_PRECIOS}
     agotados: set[str] = set()
     inicios = {n: ahora() for n in ORDEN_PRECIOS}
@@ -178,7 +191,7 @@ def actualizar_contexto(con, ajustes: Ajustes, ids_cartera: list[str], cliente=N
 
 
 def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = None, cliente=None,
-                    forzar_demo: bool = True, contexto: bool = False) -> dict:
+                    forzar_demo: bool = True, contexto: bool = False, ids_propuesta: list[str] | None = None) -> dict:
     if ajustes.es_demo:
         from .adaptadores import demo
         hay = con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone()
@@ -190,11 +203,13 @@ def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = 
     else:
         ad = construir_adaptadores(con, ajustes, cliente=cliente)
         fx = actualizar_fx(con, ad)
-        precios = actualizar_precios(con, ad, ids_prioritarios)
+        precios = actualizar_precios(con, ad, ids_prioritarios, ids_propuesta=ids_propuesta)
         out = {"fx": fx, "precios": precios,
                "nuevos": fx.get("registros", 0) + sum(v["registros"] for v in precios.values())}
     if contexto:
-        out["contexto"] = actualizar_contexto(con, ajustes, ids_prioritarios or [], cliente)
+        # titulares e insiders: cartera y, si no hay posiciones, las emisoras de la propuesta de referencia
+        out["contexto"] = actualizar_contexto(con, ajustes, list(dict.fromkeys((ids_prioritarios or []) + (ids_propuesta or [])))[:25],
+                                              cliente)
     from . import migraciones
     migraciones.completar_tiempos(con, ajustes)
     return out

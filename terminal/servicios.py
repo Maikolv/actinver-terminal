@@ -174,6 +174,14 @@ def revalidar(p: dict, perfil: dict, ajustes: Ajustes) -> dict:
     return {**p, "avisos": avisos}
 
 
+def bloqueo_cartera(actual: dict) -> str | None:
+    """Motivo para no usar una propuesta: la cuenta del Reto capturada tiene posiciones sin precio."""
+    if actual.get("fuente") == "portal" and not actual.get("completa", True):
+        return (f"Bloqueada: la captura del portal tiene posiciones sin precio ({', '.join(actual.get('sin_precio') or [])}); "
+                "los cambios sugeridos no se pueden verificar. Pegue una captura con precio o espere a que se carguen.")
+    return None
+
+
 def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
     out = {}
     actual = None
@@ -191,6 +199,12 @@ def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
         if out[clave] and "advertencias_reto" not in out[clave]:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
+    actual = actual or cartera_actual(con, ajustes)
+    motivo = bloqueo_cartera(actual)
+    if motivo:
+        for p in out.values():
+            if p and motivo not in p.get("avisos", []):
+                p["avisos"] = [*p.get("avisos", []), motivo]
     return out
 
 
@@ -296,6 +310,16 @@ def estado_motor(con) -> dict:
     return json.loads(f["valor"]) if f else {}
 
 
+def ids_propuestas(props: dict) -> list[str]:
+    """Instrumentos de las propuestas guardadas, primero los de la mejor puntuada y por peso."""
+    from . import resumen
+    ref = resumen.propuesta_referencia(props)
+    orden = [a["id"] for a in sorted((ref or {}).get("pesos") or [], key=lambda a: -a["peso"])]
+    for p in props.values():
+        orden += [a["id"] for a in (p or {}).get("pesos") or []]
+    return list(dict.fromkeys(orden))
+
+
 def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notificar: bool = True,
           en_vivo: bool = False) -> dict:
     """Adquisición → propuesta → alertas. Recalcula solo si hay datos nuevos, cambió el perfil o se fuerza.
@@ -303,9 +327,11 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     inicio = datetime.now(UTC)
     cart = cartera_actual(con, ajustes)
     prio = [p["instrumento_id"] for p in cart["posiciones"]]
-    act = {"nuevos": 0} if en_vivo else ingesta.actualizar_todo(con, ajustes, prio, forzar_demo=False, contexto=True)
     perfil = perfil_actual(con, ajustes)
     props = propuestas_guardadas(con, ajustes, perfil)
+    ids_prop = ids_propuestas(props)
+    act = {"nuevos": 0} if en_vivo else ingesta.actualizar_todo(con, ajustes, prio, forzar_demo=False, contexto=True,
+                                                                ids_propuesta=ids_prop)
     motivo = ("precios en vivo" if en_vivo else "forzado" if forzar else "datos nuevos" if act.get("nuevos") else
               "sin propuestas" if any(v is None for v in props.values()) else
               "perfil o datos cambiaron" if any(v and v.get("avisos") for v in props.values()) else "")

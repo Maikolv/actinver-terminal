@@ -63,3 +63,27 @@ def test_sec_requiere_user_agent(con, monkeypatch):
     with pytest.raises(SinCredencial):
         fw.SecEdgar(con, {}, None).formularios4("AAPL")
     assert fw.actualizar_insiders(con, {}, [])["estado"] == "requiere_configuracion"
+
+
+RSS_SA = b"""<?xml version="1.0"?><rss xmlns:sa="https://seekingalpha.com/api/1.0"><channel>
+<item><title>Moderna rallies 12%</title><link>https://seekingalpha.com/symbol/MRNA/news?source=feed_symbol_MRNA</link>
+<guid isPermaLink="false">https://seekingalpha.com/MarketCurrent:111</guid><pubDate>Mon, 21 Sep 2026 16:48:29 -0400</pubDate>
+<sa:author_name>Autor</sa:author_name><sa:stock><sa:symbol>MRNA</sa:symbol></sa:stock><sa:stock><sa:symbol>SP500</sa:symbol></sa:stock></item>
+<item><title>Otra nota del mismo feed</title><link>https://seekingalpha.com/symbol/MRNA/news?source=feed_symbol_MRNA</link>
+<guid isPermaLink="false">https://seekingalpha.com/MarketCurrent:112</guid><pubDate>Mon, 21 Sep 2026 17:00:00 -0400</pubDate>
+<sa:stock><sa:symbol>MRNA</sa:symbol></sa:stock><sa:stock><sa:symbol>PFE</sa:symbol></sa:stock></item>
+<item><title>Nota de otra emisora</title><link>https://seekingalpha.com/symbol/MRNA/news?source=feed_symbol_MRNA</link>
+<guid isPermaLink="false">https://seekingalpha.com/MarketCurrent:113</guid><pubDate>Mon, 21 Sep 2026 18:00:00 -0400</pubDate>
+<sa:stock><sa:symbol>PFE</sa:symbol></sa:stock></item>
+<item><title>Moderna Presents at Conference</title><link>https://seekingalpha.com/article/4949052-moderna</link>
+<guid isPermaLink="false">https://seekingalpha.com/Article:4949052</guid><pubDate>Wed, 23 Sep 2026 12:39:29 -0400</pubDate>
+<sa:author_name>SA Transcripts</sa:author_name></item>
+</channel></rss>"""
+
+
+def test_rss_usa_guid_filtra_emisora_y_clasifica(con):
+    t = fw.SeekingAlphaRSS(con, {}, cliente=cliente({"MRNA.xml": RSS_SA})).titulares("MRNA")
+    assert [x["enlace"] for x in t] == ["https://seekingalpha.com/news/111", "https://seekingalpha.com/news/112",
+                                        "https://seekingalpha.com/article/4949052-moderna"]   # la de PFE no se vincula
+    assert t[1]["otras_emisoras"] == ["PFE"] and t[2]["tipo_contenido"].startswith("transcripción")
+    assert t[0]["tipo_contenido"] == "hecho (noticia)"

@@ -77,14 +77,20 @@ class ForexFactory(Adaptador):
         return out
 
 
-def tipo_contenido(enlace: str) -> str:
-    """Seeking Alpha publica noticias (hechos reportados) en /news/ y análisis de autores (opinión/tesis) en /article/.
+def tipo_contenido(enlace: str, guid: str = "", autor: str = "") -> str:
+    """Seeking Alpha publica noticias (hechos reportados, guid «MarketCurrent:…», /news/), análisis de autores
+    (opinión/tesis, guid «Article:…», /article/) y transcripciones de eventos corporativos (autor «SA Transcripts»).
     Ninguno es una señal: un hecho material se verifica con la emisora o el regulador."""
-    if "/news" in enlace:
+    if "transcript" in autor.lower():
+        return "transcripción (evento corporativo)"
+    if "MarketCurrent:" in guid or "/news/" in enlace:
         return "hecho (noticia)"
-    if "/article/" in enlace:
+    if "Article:" in guid or "/article/" in enlace:
         return "opinión / análisis"
     return "sin clasificar"
+
+
+INDICES_SA = {"SP500", "COMP:IND", "DJI", "RUT", "NDX", "VIX"}
 
 
 class SeekingAlphaRSS(Adaptador):
@@ -106,13 +112,23 @@ class SeekingAlphaRSS(Adaptador):
                 fecha = parsedate_to_datetime(pub).astimezone(UTC).isoformat() if pub else None
             except (TypeError, ValueError):
                 fecha = None
-            autor = ""
-            for hijo in it:  # dc:creator o sa:author_name, según el feed
+            autor, simbolos = "", []
+            for hijo in it:  # dc:creator o sa:author_name, según el feed; sa:stock/sa:symbol = emisoras mencionadas
                 if hijo.tag.endswith(("creator", "author_name")) and (hijo.text or "").strip():
                     autor = hijo.text.strip()[:120]
+                if hijo.tag.endswith("stock"):
+                    simbolos += [(s.text or "").strip().upper() for s in hijo if s.tag.endswith("symbol") and (s.text or "").strip()]
+            guid = (it.findtext("guid") or "").strip()
+            m = re.search(r"MarketCurrent:(\d+)", guid)
+            if m and "/symbol/" in enlace:  # el enlace del feed es genérico: la nota se identifica por su guid
+                enlace = f"https://seekingalpha.com/news/{m.group(1)}"
+            emisoras = [s for s in simbolos if s not in INDICES_SA]
+            if emisoras and ticker.upper() not in emisoras:
+                continue  # la nota no menciona a la emisora consultada: no se vincula
             if titulo and enlace.startswith("https://"):
                 out.append({"titulo": titulo[:300], "enlace": enlace[:500], "publicado": fecha, "autor": autor,
-                            "tipo_contenido": tipo_contenido(enlace)})
+                            "guid": guid or enlace, "otras_emisoras": [s for s in emisoras if s != ticker.upper()],
+                            "tipo_contenido": tipo_contenido(enlace, guid, autor)})
         return out
 
 
@@ -239,10 +255,11 @@ def actualizar_noticias(con: sqlite3.Connection, ajustes: dict, instrumentos: li
     a = SeekingAlphaRSS(con, ajustes.get("seekingalpha_rss", {}), cliente=cliente)
     if not a.configurado():
         return {"estado": "desactivado"}
-    n, errores = 0, []
+    n, errores, consultadas = 0, [], 0
     for ins in instrumentos:
-        if ins.get("moneda_referencia") != "USD" or not ins.get("listado_referencia"):
-            continue  # el feed cubre emisoras de EE. UU. (emisoras del SIC)
+        if ins.get("moneda_referencia") != "USD" or not ins.get("listado_referencia") or ins.get("clase") == "etf":
+            continue  # el feed cubre emisoras de EE. UU. (emisoras del SIC); los ETF no tienen feed por emisora
+        consultadas += 1
         if _reciente(con, "noticias", "seekingalpha_rss", 30, "AND instrumento_id=?", (ins["id"],)):
             continue
         try:
@@ -254,14 +271,19 @@ def actualizar_noticias(con: sqlite3.Connection, ajustes: dict, instrumentos: li
         filas = []
         for it in items[:20]:
             c = clasificar_titular(it["titulo"])
-            ident = hashlib.sha1(it["enlace"].encode()).hexdigest()[:16]
+            ident = hashlib.sha1(f"{ins['id']}|{it.get('guid') or it['enlace']}".encode()).hexdigest()[:16]
+            motivo = c["motivo"] + (f" · también menciona: {', '.join(it['otras_emisoras'][:5])}"
+                                    if it.get("otras_emisoras") else "")
             filas.append((ident, ins["id"], it["titulo"], it["enlace"], it["publicado"], "seekingalpha_rss",
-                          c["impacto"], c["sentimiento"], c["motivo"], ts, it.get("autor", ""), it.get("tipo_contenido")))
+                          c["impacto"], c["sentimiento"], motivo[:300], ts, it.get("autor", ""), it.get("tipo_contenido")))
         with transaccion(con):
             con.executemany("INSERT OR REPLACE INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, sentimiento, "
                             "motivo, obtenido_en, autor, tipo_contenido) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         n += len(filas)
-    return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5]}
+    if not consultadas:
+        return {"estado": "sin_emisoras", "registros": 0,
+                "mensaje": "Sin emisoras del SIC en cartera ni en la propuesta de referencia: no hay titulares que pedir."}
+    return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5], "emisoras": consultadas}
 
 
 def actualizar_insiders(con: sqlite3.Connection, ajustes: dict, instrumentos: list[dict], cliente=None) -> dict:

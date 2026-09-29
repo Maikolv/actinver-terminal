@@ -452,6 +452,13 @@ def verificar_cobertura(con=Depends(con_db)):
     return {"resumen": conteo}
 
 
+@app.get("/api/estado-informacion")
+def get_estado_informacion(con=Depends(con_db)):
+    """Qué está confirmado, estimado, vencido o falta, con la acción concreta (para personas no técnicas)."""
+    from . import estado_info
+    return estado_info.calcular(con, AJUSTES)
+
+
 @app.get("/api/portal/captura")
 def get_captura_portal(con=Depends(con_db)):
     """Última captura del portal del Reto (la que el participante pegó), con sus cambios frente a la anterior."""

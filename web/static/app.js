@@ -275,7 +275,10 @@ async function pintarResumen() {
       h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-alertas") }, "Revisar alertas")));
   }
   const tr = tarjetaReto(estado.reto, c);
-  const tc = h("section", { clase: "tarjeta", "aria-labelledby": "t-cartera" }, h("h2", { id: "t-cartera", texto: "Cartera actual" }));
+  const tc = h("section", { clase: "tarjeta", "aria-labelledby": "t-cartera" }, h("h2", { id: "t-cartera", texto: "Cartera actual" }),
+    c ? h("p", {}, c.fuente === "portal"
+      ? h("span", {}, chip("vigente", "Confirmado"), ` Cuenta del Reto copiada del portal (${fechaLocal(c.captura.hora_portal)}); valuación estimada con cierres.`)
+      : h("span", {}, chip("sin_datos", "Local"), " Registro de la terminal, NO confirmado por el portal del Reto.")) : null);
   if (!c) tc.append(h("div", { clase: "esqueleto esqueleto--bloque", "aria-hidden": "true" }));
   else if (!c.n_operaciones) tc.append(h("p", { clase: "vacio", texto: "Sin operaciones registradas. Regístrelas o impórtelas en «Mi cartera» para comparar las propuestas con su posición real." }));
   else {
@@ -287,6 +290,14 @@ async function pintarResumen() {
     h("p", { clase: "suave" }, "Precios: ", chip(c.vigencia), c.sin_precio.length ? ` · ${c.sin_precio.length} posición(es) sin precio: total incompleto` : ""));
   }
   cont.push(h("div", { clase: "rejilla" }, tr, tc));
+  try {
+    const ei = await api("/api/estado-informacion");
+    const NIV = { confirmado: ["vigente", "Confirmado"], estimado: ["retrasado", "Estimado"], vencido: ["vencido", "Vencido"], falta: ["sin_datos", "Falta"] };
+    cont.push(h("section", { clase: "tarjeta", "aria-labelledby": "t-estado-info" }, h("h2", { id: "t-estado-info", texto: "¿En qué puedo confiar hoy?" }),
+      tabla([{ t: "Tema", f: (f) => f.tema }, { t: "Estado", f: (f) => chip(...NIV[f.nivel]) }, { t: "Qué hay", f: (f) => f.texto },
+        { t: "Qué falta hacer", f: (f) => f.accion || "—" }], ei.items,
+      { caption: Object.entries(ei.leyenda).map(([k, v]) => `${NIV[k][1]}: ${v}`).join(" · ") })));
+  } catch { /* el resto del resumen se muestra igual */ }
   if (!p) cont.push(h("div", { clase: "tarjeta esqueleto esqueleto--bloque", "aria-hidden": "true" }));
   else {
     const L = estado.lenteResumen;
@@ -685,7 +696,7 @@ async function cargarMercado() {
         { t: "Titular", f: (f) => externo(f.enlace, f.titulo) },
         { t: "Impacto", f: (f) => (f.impacto === "alto" ? chip("retrasado", "Alto") : chip("sin_datos", "Normal")) },
         { t: "Sentimiento", f: (f) => h("span", { clase: signo(f.sentimiento), texto: f.sentimiento > 0 ? "Positivo" : f.sentimiento < 0 ? "Negativo" : "Neutro" }) }],
-      d.noticias, { caption: `Fuente: ${d.fuentes.noticias}; clasificación por léxico (o LLM local si está configurado). Solo emisoras de EE. UU. en cartera.`, vacio: d.cartera.length ? "Sin titulares recientes." : "Registre posiciones para ver titulares de sus emisoras." }),
+      d.noticias, { caption: `Fuente: ${d.fuentes.noticias}; clasificación por léxico (o LLM local si está configurado). Emisoras de EE. UU. en cartera o, sin posiciones, las de la propuesta de referencia. Noticia = hecho reportado; análisis = opinión de un autor; ninguna es una señal.`, vacio: d.cartera.length ? "Sin titulares recientes." : "Registre posiciones para ver titulares de sus emisoras." }),
       h("h2", { texto: "Operaciones de insiders" }),
       insiderEstado && !insiderEstado.configurado ? h("div", { clase: "aviso-caja", texto: "Requiere configuración: defina SEC_USER_AGENT (nombre y correo de contacto) en .env para consultar SEC EDGAR." }) : null,
       tabla([{ t: "Fecha", f: (f) => f.fecha }, { t: "Emisora", f: (f) => f.instrumento_id }, { t: "Persona", f: (f) => `${f.nombre} (${f.cargo || "—"})` },

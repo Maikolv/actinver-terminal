@@ -2,6 +2,31 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.11.0] — 2026-09-29 (auditoría integral)
+
+### Corregido
+- **Seeking Alpha colapsaba todos los titulares de una emisora en uno:**
+  - el enlace del RSS es genérico y servía como identificador;
+  - ahora se usa el `guid` y el enlace real de la nota;
+  - se descartan notas que no mencionan la emisora y se registran las otras emisoras mencionadas;
+  - el tipo se clasifica como noticia, análisis o transcripción.
+- **Titulares y cola de precios quedaban vacíos sin posiciones:**
+  - titulares, insiders y la cola usan también las emisoras de las propuestas;
+  - un ciclo sin emisoras ya no se reporta como «ok».
+- **Cola de precios alfabética:**
+  - el orden es cartera → propuestas → atrasadas (la más antigua primero) → nunca cargadas;
+  - así rinden los cupos de EODHD (20 al día) y Tiingo.
+
+### Añadido
+- **«¿En qué puedo confiar hoy?»** (`/api/estado-informacion`, en Resumen): confirmado, estimado, vencido o falta, con la acción concreta.
+- **Bloqueos:**
+  - una captura del portal con posiciones sin precio bloquea propuestas, boletas y avisos de movimiento;
+  - no se generan boletas con propuestas que tengan avisos.
+- «Riesgos» advierte la validación corta (menos de 126 sesiones).
+- El aviso «Posible movimiento» no se envía de noche (21:00–07:00): lo incluye el plan del día.
+- Resumen rotula la cartera como «Confirmado» (captura del portal) o «Local» (registro de la terminal).
+- Nueva guía para personas no técnicas: `docs/guia-rapida.md`.
+
 ## [0.10.0] — 2026-09-29
 
 ### Añadido
