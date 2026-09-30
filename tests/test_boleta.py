@@ -242,3 +242,20 @@ def test_plan_inicial_sin_operaciones_usa_capital_supuesto(con, ajustes):
                                 efectivo_supuesto=1_000_000)
     assert con_plan["plan_inicial"] and con_plan["cantidad"] > 0 and con_plan["tipo"] == "considerar compra"
     assert any("aportación inicial" in f for f in con_plan["datos_faltantes"])
+
+
+def test_sic_sin_cotizacion_confiable_da_referencia_condicional_no_ejecutable(con, ajustes):
+    sembrar_precios(con, ["SIC:AAPL"], fin=vigencia.ultima_sesion_cerrada("XNYS"), sesiones=300, proveedor="tiingo")
+    migraciones.completar_tiempos(con)
+    t = cartera.validar({"fecha": "2026-09-01", "tipo": "aportacion", "monto": 1_000_000, "moneda": "MXN", "tipo_cambio": 1}, _ins(con))
+    cartera.registrar(con, t, "prueba")
+    con.commit()
+    b = boleta.construir(con, ajustes, {"id": "SIC:AAPL", "accion": "comprar", "monto_mxn": 50_000}, _cart(con, ajustes))
+    r = b["referencia_condicional"]
+    assert b["tipo"] == "investigar" and b["lado"] is None and b["cantidad"] == 0 and b["precio_limite"] is None
+    assert r["lado_sugerido"] == "compra" and r["fuente"] == "tiingo" and r["tipo_cambio"]
+    assert r["precio_min"] < r["precio_ref_mxn"] < r["precio_max"]
+    assert r["titulos_aprox"] == int(50_000 // (r["precio_ref_mxn"] * 1.02)) or abs(r["titulos_aprox"] - 50_000 / r["precio_max"]) < 1
+    assert "REFERENCIA" in r["nota"]
+    txt = boleta.texto_telegram([{**b, "id": 1, "estado": "vigente"}])
+    assert "Condicionales (1)" in txt and "banda" in txt and "Listas" not in txt

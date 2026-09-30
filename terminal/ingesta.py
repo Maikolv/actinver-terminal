@@ -223,7 +223,11 @@ def actualizar_fondos(con, ajustes: Ajustes, cliente=None) -> dict:
     """Hoja oficial de precios de los fondos Actinver (PDF público), a lo sumo cada 3 h hasta tener la valuación."""
     from . import fondos_actinver as fa
     inicio = ahora()
-    r = fa.actualizar(con, ajustes, cliente=cliente)
+    try:
+        r = fa.actualizar(con, ajustes, cliente=cliente)
+    except Exception as e:  # noqa: BLE001 - un fallo de esta fuente nunca detiene el ciclo (precios y propuestas siguen)
+        log.exception("hoja de fondos Actinver")
+        r = {"estado": "error", "mensaje": f"{type(e).__name__}: {str(e)[:150]}"}
     if r["estado"] in ("ok", "error"):
         msg = (f"valuación {r.get('fecha_valuacion')}: {r.get('asignados')} fondos; sin la serie en el documento: "
                f"{', '.join(r.get('sin_serie_en_documento') or []) or 'ninguno'}") if r["estado"] == "ok" else r.get("mensaje", "")

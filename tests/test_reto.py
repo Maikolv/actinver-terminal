@@ -48,7 +48,7 @@ def test_lentes_cumplen_reglas_y_difieren(con, ajustes):
     for p in (r, a):
         assert p["estado"] == "calculada" and all(c["cumple"] for c in p["cumplimiento_reto"])
         assert p["reproducibilidad"]["horizonte_origen"].startswith("Reto")
-        assert "sin ajustar" in p["reproducibilidad"]["precios"]
+        assert "solo por splits" in p["reproducibilidad"]["precios"]
     assert max(x["peso"] for x in r["pesos"]) <= 0.2 + 1e-6
     assert r["mejora_esperada"]["esperado_propuesta"] >= a["mejora_esperada"]["esperado_propuesta"] - 1e-9
     assert r["reproducibilidad"]["aversion_riesgo_lambda"] < a["reproducibilidad"]["aversion_riesgo_lambda"]

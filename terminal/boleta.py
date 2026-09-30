@@ -32,6 +32,7 @@ MARGEN_LIMITE = 0.002               # precio límite: ±0.2 % sobre el último p
 DESLIZAMIENTOS = (0.0, 0.001, 0.005)
 CONTRACCION_MEDIA = 0.5             # declarada antes de evaluar: la media histórica se reduce a la mitad
 VIGENCIA_MIN_ABIERTO = 15
+BANDA_REFERENCIA = 0.02             # SIC sin cotización confiable: solo capturar si el portal está a ±2 % de la referencia
 
 
 def _tick(precio: float) -> float:
@@ -105,6 +106,13 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         tipo = "investigar"  # sin precio confiable se inhibe cualquier propuesta direccional
         faltan.append("Precio BMV confiable de la serie exacta (" + "; ".join(conf.get("motivos", [])[:2]) + ")")
     precio = float(q["precio"]) if q else None
+    condicional = None
+    if not q and lado:
+        condicional = referencia_condicional(con, ajustes, i["id"], monto, lado)
+        if condicional:
+            faltan.append(f"Confirmar en el portal que el precio esté entre ${condicional['precio_min']:,.2f} y "
+                          f"${condicional['precio_max']:,.2f} MXN; con él, títulos = monto ÷ precio del portal")
+        lado = None  # sin precio confiable no hay orden: la referencia condicional es solo una guía
     cantidad, limite, importe = 0, None, 0.0
     if q and lado:
         limite = _tick(precio * (1 + MARGEN_LIMITE) if lado == "compra" else precio * (1 - MARGEN_LIMITE))
@@ -123,7 +131,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     valor_emisora_post = pos_valor.get(i["id"], 0) + signo * importe
     peso_post = valor_emisora_post / total if total > 0 else None
     advert = reto.verificar_compras([{"id": i["id"], "monto": importe}], total, pos_valor) if lado == "compra" and importe else []
-    serie = mercado.precios_mxn(con, ajustes, [i["id"]], ajustados=False)
+    serie = mercado.precios_mxn(con, ajustes, [i["id"]], ajustados="splits")
     h = max(reto.sesiones_restantes(ahora), 1)
     est = estimacion_historica(serie[i["id"]].dropna().values, h) if i["id"] in serie.columns else {"disponible": False,
                                                                                                     "motivo": "sin historia"}
@@ -157,6 +165,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         "aviso": "Propuesta para revisión humana. La terminal no registra órdenes; usted la captura en el portal si decide.",
         "creada_en": ahora.isoformat(timespec="seconds"), "caduca_en": caduca.isoformat(timespec="seconds"),
         "version_reglas": registro.estado_reglas(con).get("version"),
+        "referencia_condicional": condicional,
         "plan_inicial": plan_inicial, "efectivo_supuesto": efectivo_supuesto if plan_inicial else None,
     }
     b["huella_datos"] = huella(b, cart)
@@ -304,6 +313,27 @@ def listar(con: sqlite3.Connection, ajustes: Ajustes, recalcular_vigentes: bool 
     return out
 
 
+def referencia_condicional(con, ajustes: Ajustes, iid: str, monto: float, lado: str) -> dict | None:
+    """Guía para una emisora sin cotización confiable (típicamente SIC): cierre de la bolsa de origen convertido a MXN.
+
+    NO es la cotización del SIC ni habilita la boleta: da títulos aproximados y una banda de ±2 % fuera de la cual el
+    participante no debe capturar sin regenerar. Solo con referencia vigente o retrasada (nunca vencida ni ausente)."""
+    q = mercado.cotizaciones(con, ajustes, [iid]).get(iid) or {}
+    ref = q.get("precio_mxn")
+    if not ref or q.get("estado") not in ("vigente", "retrasado"):
+        return None
+    fx = mercado.ultimo_fx(con, ajustes) if q.get("moneda") != "MXN" else {}
+    return {"lado_sugerido": lado, "monto_mxn": round(abs(monto), 2), "precio_ref_mxn": round(float(ref), 2),
+            "precio_min": round(ref * (1 - BANDA_REFERENCIA), 2), "precio_max": round(ref * (1 + BANDA_REFERENCIA), 2),
+            "titulos_aprox": math.floor(abs(monto) / (ref * (1 + BANDA_REFERENCIA))),
+            "fuente": q.get("proveedor"), "fecha": q.get("fecha"), "tipo_dato": q.get("tipo_dato"),
+            "estado": q.get("estado"), "moneda_origen": q.get("moneda"), "precio_origen": q.get("precio"),
+            "tipo_cambio": fx.get("valor"), "tipo_cambio_fecha": fx.get("fecha"), "tipo_cambio_fuente": fx.get("proveedor"),
+            "nota": ("REFERENCIA, no cotización del SIC: cierre de la bolsa de origen × tipo de cambio. " if q.get("moneda") != "MXN"
+                     else f"REFERENCIA: último cierre disponible ({q.get('fecha')}, {q.get('estado')}), no cotización actual. ")
+                    + "Verifique el precio en el portal; si está fuera de la banda, no capture y regenere las boletas."}
+
+
 def texto_telegram(boletas: list[dict]) -> str:
     """Boletas vigentes en texto para Telegram: lo necesario para capturar cada orden a mano en el simulador."""
     import pandas as pd
@@ -327,8 +357,24 @@ def texto_telegram(boletas: list[dict]) -> str:
         costo = sum(((b.get("costos") or {}).get("total") or 0) for b in listas)
         lineas.append(f"Costo estimado (comisión + IVA): ${costo:,.2f}.")
     if otras:
-        lineas += ["", f"Por investigar ({len(otras)}): sin precio confiable en la terminal; tome el precio del portal:"]
-        lineas.append(", ".join(f"{b.get('emisora_serie') or b['instrumento_id']} (#{b['id']})" for b in otras))
+        cond = [b for b in otras if b.get("referencia_condicional")]
+        resto = [b for b in otras if not b.get("referencia_condicional")]
+        if cond:
+            lineas += ["", f"Condicionales ({len(cond)}) — sin cotización confiable (SIC: cierre de origen × tipo de cambio; "
+                           "BMV: último cierre). Capture SOLO si el precio del portal está dentro de la banda; títulos = monto ÷ "
+                           "precio del portal:"]
+            for b in cond:
+                r = b["referencia_condicional"]
+                icono = "🟡 COMPRA" if r["lado_sugerido"] == "compra" else "🟠 VENTA"
+                lineas.append(f"{icono} {b.get('emisora_serie') or b['instrumento_id']}: ≈ {r['titulos_aprox']:,} títulos "
+                              f"(≈ ${r['monto_mxn']:,.0f}), banda ${r['precio_min']:,.2f}–${r['precio_max']:,.2f} · #{b['id']}\n"
+                              + (f"   referencia: {r['fuente']} {r['moneda_origen']} {r['precio_origen']} del {r['fecha']} × "
+                                 f"USD/MXN {r['tipo_cambio']} ({r['tipo_cambio_fuente']}, {r['tipo_cambio_fecha']})"
+                                 if r.get("tipo_cambio") else f"   referencia: {r['fuente']} MXN {r['precio_origen']} del "
+                                 f"{r['fecha']} ({r['estado']})"))
+        if resto:
+            lineas += ["", f"Por investigar ({len(resto)}): sin precio confiable ni referencia vigente; no capture sin revisar:"]
+            lineas.append(", ".join(f"{b.get('emisora_serie') or b['instrumento_id']} (#{b['id']})" for b in resto))
     lineas += ["", "Antes de capturar: revise el precio en el portal; si se movió más de 1 %, genere boletas nuevas. "
                    "Después, márquela como ejecutada con su folio. La terminal no envía órdenes."]
     return "\n".join(lineas)

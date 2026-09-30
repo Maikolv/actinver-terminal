@@ -131,3 +131,19 @@ def test_sesion_objetivo():
     assert resumen.sesion_objetivo(datetime(2026, 9, 29, 16, 0, tzinfo=UTC)).isoformat() == "2026-09-29"  # sesión abierta
     assert resumen.sesion_objetivo(datetime(2026, 9, 30, 3, 0, tzinfo=UTC)).isoformat() == "2026-09-30"   # tras el cierre
     assert resumen.sesion_objetivo(datetime(2026, 10, 3, 18, 0, tzinfo=UTC)).isoformat() == "2026-10-05"  # sábado → lunes
+
+
+def test_plan_corregido_si_el_recalculo_cambia_las_ordenes_antes_de_la_apertura(con, ajustes, monkeypatch):
+    enviados = []
+    monkeypatch.setattr(notificador, "enviar", lambda t, x, c, detalle=None: enviados.append(t) or {"telegram": "enviada"})
+    cart = {"fuente": "local", "posiciones": []}
+    noche = datetime(2026, 9, 30, 3, 0, tzinfo=UTC)
+    assert resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": PROP}, noche)
+    otra = {**PROP, "cambios": {"costo_total": 90.0, "filas": [PROP["cambios"]["filas"][0]]}}  # ya no compra AAPL
+    r = resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": otra}, datetime(2026, 9, 30, 6, 0, tzinfo=UTC))
+    assert r and r["correcciones"] == 1 and enviados[-1].startswith("🔁 PLAN CORREGIDO")
+    assert "AAPL" in r["texto"]  # «Cambios frente al plan anterior» menciona lo que salió
+    # sin cambios nuevos no se reenvía; tras la apertura (07:30) tampoco
+    assert resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": otra}, datetime(2026, 9, 30, 7, 0, tzinfo=UTC)) is None
+    assert resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": PROP}, datetime(2026, 9, 30, 14, 0, tzinfo=UTC)) is None
+    assert len(enviados) == 2

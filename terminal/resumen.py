@@ -116,6 +116,41 @@ def _estado(con: sqlite3.Connection) -> dict:
 REINTENTO_MIN = 10
 MAX_INTENTOS = 12
 ESPERA_RECALCULO_MIN = 60
+MAX_CORRECCIONES = 2  # reenvíos «plan corregido» por sesión, solo antes de la apertura
+
+
+def ultima_propuesta_id(con: sqlite3.Connection) -> int:
+    return int(con.execute("SELECT COALESCE(MAX(id), 0) FROM propuestas").fetchone()[0])
+
+
+def _firma(ords: list[dict] | None) -> set:
+    return {(o["id"], o["accion"]) for o in ords or []}
+
+
+def puede_corregir(estado: dict, ahora: datetime) -> bool:
+    """Tras un plan entregado, un recálculo posterior puede cambiarlo: se admite un reenvío corregido mientras la
+    sesión objetivo no haya abierto y no se agoten las correcciones."""
+    obj = sesion_objetivo(ahora)
+    if estado.get("fecha") != obj.isoformat() or not entregado(estado):
+        return False
+    if int(estado.get("correcciones", 0)) >= MAX_CORRECCIONES:
+        return False
+    return pd.Timestamp(ahora) < apertura(obj)
+
+
+def apertura(sesion: date) -> pd.Timestamp:
+    """Apertura según el horario publicado en las bases del Reto (07:30 hasta el 2-nov-2026, 08:30 después); sin él,
+    la del calendario de la BMV."""
+    for h in (reto.config().get("horario_bmv") or []) if reto.activo() else []:
+        if str(h["desde"]) <= sesion.isoformat() <= str(h["hasta"]):
+            return pd.Timestamp(f"{sesion.isoformat()} {h['apertura']}", tz=ZONA)
+    return vigencia.calendario("XMEX").session_open(pd.Timestamp(sesion))
+
+
+def _guardar(con: sqlite3.Connection, estado: dict) -> None:
+    with db.transaccion(con):
+        con.execute("INSERT INTO ajustes_usuario VALUES ('resumen_matutino', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
+                    "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(estado), db.ahora()))
 
 
 def entregado(estado: dict) -> bool:
@@ -159,8 +194,16 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
     ahora = ahora or datetime.now(UTC)
     estado = _estado(con)
     ref = propuesta_referencia(propuestas)
+    correccion = False
     if not toca(ajustes, ahora, estado, (ref or {}).get("datos_hasta")):
-        return None
+        if not (ref and puede_corregir(estado, ahora)) or any(p and p.get("recalcular") for p in propuestas.values()):
+            return None
+        nuevas = ordenes(ref, cartera)
+        if _firma(nuevas) == _firma(estado.get("ordenes")) and ref["clave"] == estado.get("propuesta"):
+            if estado.get("propuestas_max_id") != ultima_propuesta_id(con):  # recalculada sin cambios: no se reenvía
+                _guardar(con, {**estado, "propuestas_max_id": ultima_propuesta_id(con)})
+            return None
+        correccion = True
     local = pd.Timestamp(ahora).tz_convert(ZONA)
     obj = sesion_objetivo(ahora)
     h, m = (int(x) for x in str(ajustes["alertas"].get("resumen_matutino_hora", "07:00")).split(":"))
@@ -174,19 +217,25 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
                                "pestaña Datos de la terminal; no se sugieren órdenes hoy.", [])
     else:
         titulo, texto, ords = construir(p, cartera, estado.get("ordenes"), local, obj)
+    if correccion:
+        titulo = "🔁 PLAN CORREGIDO — " + titulo
+        texto = ("🔁 PLAN CORREGIDO: la terminal recalculó la propuesta después del envío anterior y las órdenes cambiaron. "
+                 "Este mensaje REEMPLAZA al anterior; «Cambios frente al plan anterior» compara contra él.\n\n" + texto)
     cfg = {**ajustes["alertas"], "notificar_escritorio": False, "notificar_telegram": True}
     res = notificador.enviar(titulo, texto, cfg, detalle=texto)
     ok = entregado({"resultado": res})
+    if correccion and not ok:
+        return None  # la corrección no llegó: se conserva el estado del plan entregado y se reintenta en otra revisión
     nuevo = {"fecha": obj.isoformat(), "enviado_en": ahora.isoformat(timespec="seconds"), "resultado": res,
-             "intentos": int(estado.get("intentos", 1)) + 1 if estado.get("fecha") == obj.isoformat() else 1,
+             "intentos": (1 if correccion else int(estado.get("intentos", 1)) + 1) if estado.get("fecha") == obj.isoformat() else 1,
+             "correcciones": int(estado.get("correcciones", 0)) + (1 if correccion else 0) if estado.get("fecha") == obj.isoformat() else 0,
+             "propuestas_max_id": ultima_propuesta_id(con),
              "propuesta": p["clave"] if p else None,
              # base para comparar el próximo plan: el último que SÍ llegó
              "ordenes": [{k: o[k] for k in ("id", "clave", "accion", "titulos")} for o in ords] if (p and ok)
              else estado.get("ordenes")}
-    with db.transaccion(con):
-        con.execute("INSERT INTO ajustes_usuario VALUES ('resumen_matutino', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
-                    "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(nuevo), db.ahora()))
-    log.info("plan del día enviado: %s", res)
+    _guardar(con, nuevo)
+    log.info("plan del día %s: %s", "corregido" if correccion else "enviado", res)
     return {**nuevo, "texto": texto}
 
 

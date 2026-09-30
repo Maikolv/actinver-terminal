@@ -185,6 +185,7 @@ def _universo(con, filas: list[dict], contenido: bytes, nombre: str, instrumento
         else:
             ids[iid] = c
     rep["aceptables"] = len(ids)
+    rep["ids"] = sorted(ids)
     rep["nota"] = "Las claves no reconocidas no bloquean la importación: se listan para revisión."
     if not confirmar or not ids:
         return rep

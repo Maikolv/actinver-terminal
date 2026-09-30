@@ -425,7 +425,9 @@ function escenarios(e) {
     h("div", { clase: "kpis" }, kpi("Favorable (p90)", pct(e.favorable_p90), "positivo"), kpi("Central (p50)", pct(e.central_p50), signo(e.central_p50)), kpi("Adverso (p10)", pct(e.adverso_p10), signo(e.adverso_p10))),
     h("div", { clase: "kpis" }, kpi("Peor mes histórico", pct(e.peor_mes_historico), "negativo"), kpi("Peor trimestre", pct(e.peor_trimestre_historico), "negativo"), kpi("Caída máx. histórica", pct(e.max_caida_historica), "negativo")),
     h("p", { clase: "suave" }, `Estrés hipotético (${e.estres_hipotetico.supuesto}): ${pct(e.estres_hipotetico.impacto)}.`),
-    h("p", { clase: "suave", texto: `Horizonte ${e.horizonte_anios.toFixed(2)} años. ${e.nota}` }));
+    h("p", { clase: "suave", texto: `Horizonte ${e.sesiones_horizonte ? e.sesiones_horizonte + " sesiones" : e.horizonte_anios.toFixed(2) + " años"}. ${e.nota}` }),
+    e.saltos_excluidos_de_la_media && e.saltos_excluidos_de_la_media.length ? h("p", { clase: "suave", texto: "Saltos únicos acotados a ±10 % en los percentiles (sí cuentan en peor mes y caída máxima): "
+      + e.saltos_excluidos_de_la_media.map((x) => `${x.fecha} ${pct(x.rend)}`).join(", ") }) : null);
 }
 
 /* ---------- alertas ---------- */
@@ -844,8 +846,10 @@ async function pintarBoletas() {
     const est = { vigente: "vigente", invalidada: "vencido", caducada: "sin_datos", descartada: "sin_datos", marcada_ejecutada: "vigente" };
     limpiar("boletas-lista", h("p", { clase: "suave", texto: d.aviso }), tabla([
       { t: "Emisora", f: (b) => h("strong", { texto: b.emisora_serie || b.instrumento_id }) },
-      { t: "Tipo", f: (b) => b.tipo }, { t: "Lado · títulos", f: (b) => (b.lado ? `${b.lado} · ${num(b.cantidad)}` : "—") },
-      { t: "Límite", f: (b) => (b.precio_limite ? mxn(b.precio_limite, true) : "—"), num: true },
+      { t: "Tipo", f: (b) => b.tipo }, { t: "Lado · títulos", f: (b) => (b.lado ? `${b.lado} · ${num(b.cantidad)}` : b.referencia_condicional
+        ? h("span", { title: b.referencia_condicional.nota }, `${b.referencia_condicional.lado_sugerido} · ≈ ${num(b.referencia_condicional.titulos_aprox)} (condicional)`) : "—") },
+      { t: "Límite", f: (b) => (b.precio_limite ? mxn(b.precio_limite, true) : b.referencia_condicional
+        ? `banda ${mxn(b.referencia_condicional.precio_min, true)}–${mxn(b.referencia_condicional.precio_max, true)}` : "—"), num: true },
       { t: "Costo (com.+IVA)", f: (b) => (b.costos ? mxn(b.costos.total, true) : "—"), num: true },
       { t: "Efectivo después", f: (b) => mxn(b.efecto.efectivo_despues, true), num: true },
       { t: "Peso después", f: (b) => pct(b.efecto.peso_emisora_despues), num: true },

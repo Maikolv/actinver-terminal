@@ -13,6 +13,7 @@
   uv run terminal fondos         # importa la hoja oficial de precios de los fondos Actinver (o --archivo PDF descargado)
   uv run terminal cobertura-twelvedata  # verifica símbolo por símbolo la cobertura BMV de Twelve Data (lista pública)
   uv run terminal claude         # comprueba la credencial de Claude del chatbot de Telegram (una consulta mínima)
+  uv run terminal catalogo-simulador  # limita el universo del Reto a lo que muestra su simulador (transcripción del PDF)
   uv run terminal boletas        # boletas del plan del día (o --propuesta CLAVE; --telegram para enviarlas) para captura manual
 """
 from __future__ import annotations
@@ -234,7 +235,7 @@ def fondos(args) -> None:
         else:
             import httpx
             r = httpx.get(fa.URL, timeout=60, follow_redirects=True,
-                          headers={"User-Agent": "actinver-terminal/uso-personal (lectura de la hoja pública)"})
+                          headers={"User-Agent": "actinver-terminal/uso-personal (lectura de la hoja publica)"})
             if r.status_code != 200:
                 sys.exit(f"No se pudo descargar la hoja (HTTP {r.status_code}); descárguela en actinver.com/fondos y use --archivo.")
             rep = fa.importar(con, r.content, fa.URL)
@@ -245,6 +246,40 @@ def fondos(args) -> None:
         print(f"  {p['id']:<16} {p['precio']:>14,.6f} MXN")
     if rep["sin_serie_en_documento"]:
         print("Sin la serie del universo en el documento (no se asigna por aproximación):", ", ".join(rep["sin_serie_en_documento"]))
+
+
+def catalogo_simulador(args) -> None:
+    """Catálogo operable del simulador a partir de la transcripción de sus capturas (config/pdf_transcripcion.csv).
+
+    Solo secciones «Acciones» y «Fondos» (la sección «ETF's» del PDF repite las acciones: no prueba que haya ETF).
+    Sin --confirmar solo muestra la vista previa; con --confirmar reemplaza universo_simulador (queda en auditoría)."""
+    import csv
+    import io
+    from . import db, importar, mercado
+    origen = Path(args.transcripcion)
+    filas = [r for r in csv.DictReader(origen.open(encoding="utf-8")) if r["seccion_pdf"] in ("Acciones", "Fondos")]
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(["clave", "tipo", "nombre"])
+    vistos: set[str] = set()
+    for r in filas:
+        clave = f"{r['clave_pdf']} {r['serie_pdf']}".strip()
+        if clave not in vistos:
+            vistos.add(clave)
+            w.writerow([clave, "fondo" if r["seccion_pdf"] == "Fondos" else "accion", f"{args.fuente}"])
+    con = db.conectar()
+    db.inicializar(con)
+    ins = mercado.instrumentos(con)
+    rep = importar.importar(con, buf.getvalue().encode("utf-8"), "catalogo_simulador.csv", "universo", ins,
+                            confirmar=args.confirmar)
+    print(f"{rep['filas']} claves del simulador · {rep['aceptables']} coinciden con el universo · {rep['rechazadas']} rechazadas")
+    for d in rep["detalle"]:
+        if d["estado"] == "rechazada":
+            print(f"  línea {d['linea']}:", "; ".join(d["errores"]))
+    fuera = sorted(i for i, v in ins.items() if v["estado"] == "activo" and i not in set(rep.get("ids", [])))
+    if fuera:
+        print("Activos del universo que NO aparecen en el simulador (se excluyen de las propuestas del Reto):", ", ".join(fuera))
+    print("Catálogo aplicado." if args.confirmar else "Vista previa: repita con --confirmar para aplicarlo.")
 
 
 def cobertura_twelvedata(_args) -> None:
@@ -330,6 +365,10 @@ def boletas(args) -> None:
         lado = (b.get("lado") or "—").upper()
         cant = f"{int(b['cantidad']):,}" if b.get("cantidad") else "—"
         lim = f"${b['precio_limite']:,.2f}" if b.get("precio_limite") else "precio del portal"
+        r = b.get("referencia_condicional")
+        if r:  # sin cotización confiable: guía condicional, no orden
+            lado, cant = f"({r['lado_sugerido'][:6]})", f"≈{r['titulos_aprox']:,}"
+            lim = f"solo si el portal está en ${r['precio_min']:,.2f}–${r['precio_max']:,.2f} ({r['fuente']} {r['fecha']})"
         print(f"  #{b['id']:>4}  {b['tipo']:<18} {lado:<7} {cant:>7} {b.get('emisora_serie') or b['instrumento_id']:<12} "
               f"límite {lim}  vence {_hora_mx(b['caduca_en'])}")
     print("Solo informativo: capture cada orden a mano en el simulador del Reto. La terminal no envía órdenes.")
@@ -436,6 +475,11 @@ def main() -> None:
     sub.add_parser("cobertura-twelvedata", help="verifica la cobertura BMV de Twelve Data símbolo por símbolo").set_defaults(
         fn=cobertura_twelvedata)
     sub.add_parser("claude", help="comprueba la credencial de Claude del chatbot (una consulta mínima)").set_defaults(fn=claude)
+    cs = sub.add_parser("catalogo-simulador", help="limita el universo del Reto a lo que muestra su simulador")
+    cs.add_argument("--transcripcion", default="config/pdf_transcripcion.csv")
+    cs.add_argument("--fuente", default="Datos Actinver.pdf (capturas del simulador, 22-sep-2026)")
+    cs.add_argument("--confirmar", action="store_true")
+    cs.set_defaults(fn=catalogo_simulador)
     bo = sub.add_parser("boletas", help="genera las boletas del plan del día (captura manual en el simulador)")
     bo.add_argument("--propuesta", default="plan_del_dia", help="clave de la propuesta (por omisión, la del plan del día)")
     bo.add_argument("--telegram", action="store_true", help="además, enviarlas por Telegram")

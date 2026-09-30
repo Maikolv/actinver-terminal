@@ -5,7 +5,10 @@
 activo: true                      # aplica reglas y costos del Reto a las propuestas
 nombre: "Reto Actinver 2026"
 fuente: "https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica"
-consultado: "2026-09-23"                # re-verificado el 2026-09-23 antes de esta versión (§1, §2, §5, §6, §8, §13, §17)
+consultado: "2026-09-29"                # re-verificado el 2026-09-29 (§1, §2, §5, §6, §8, §13, §17); sin cambios frente al 23-sep
+# Discrepancia registrada: las bases dicen «acciones, ETFs y fondos de inversión» y no mencionan el SIC ni publican un
+# catálogo. La disponibilidad de emisoras extranjeras se toma de las capturas del simulador del participante
+# («Datos Actinver.pdf», 22-sep-2026 → config/pdf_transcripcion.csv → `uv run terminal catalogo-simulador`).
 prohibicion_automatizacion: "§17: prohibido usar robots, scripts, macros o programas en el portal. La terminal no entra al portal, no extrae datos de él ni captura órdenes."
 
 capital: 1000000                  # actipesos (reglamento §1)

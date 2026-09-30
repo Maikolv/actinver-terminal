@@ -148,7 +148,7 @@ def actualizar(con: sqlite3.Connection, ajustes, cliente: httpx.Client | None = 
     if intento and ahora_dt - datetime.fromisoformat(intento) < timedelta(hours=REINTENTO_HORAS):
         return {"estado": "en_espera", "fecha_valuacion": ultima}
     cli = cliente or httpx.Client(timeout=60, follow_redirects=True,
-                                  headers={"User-Agent": "actinver-terminal/uso-personal (lectura de la hoja pública)"})
+                                  headers={"User-Agent": "actinver-terminal/uso-personal (lectura de la hoja publica)"})
     try:
         r = cli.get(URL)
         if r.status_code != 200:

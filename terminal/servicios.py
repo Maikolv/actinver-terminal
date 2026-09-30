@@ -183,6 +183,19 @@ def huella_calculo(ajustes: Ajustes) -> str:
     return hashlib.sha256((_huella_codigo + conf).encode()).hexdigest()[:16]
 
 
+def huella_catalogo(con) -> str:
+    """Huella del catálogo importado del simulador: al cambiar, las propuestas se recalculan con el universo nuevo."""
+    ids = [r[0] for r in con.execute("SELECT id FROM universo_simulador ORDER BY id")]
+    return hashlib.sha256("|".join(ids).encode()).hexdigest()[:16] if ids else "sin_catalogo"
+
+
+def _revisar_catalogo(con, p: dict | None) -> dict | None:
+    if p and p.get("estado") == "calculada" and p.get("catalogo_simulador", "sin_catalogo") != huella_catalogo(con):
+        p["avisos"] = [*p.get("avisos", []), "El catálogo del simulador cambió desde el cálculo: se recalculará en el próximo ciclo."]
+        p["recalcular"] = True
+    return p
+
+
 def revalidar(p: dict, perfil: dict, ajustes: Ajustes) -> dict:
     """Una propuesta guardada nunca se presenta como actual si cambiaron sus datos, el perfil, el código o la
     configuración del cálculo. «recalcular» indica que un nuevo cálculo lo resuelve (el motor lo hace solo)."""
@@ -218,14 +231,14 @@ def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
     for tipo, lente in COMBINACIONES:
         clave = f"{tipo}_{lente}"
         f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()
-        out[clave] = revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None
+        out[clave] = _revisar_catalogo(con, revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None)
         if out[clave] and "advertencias_reto" not in out[clave]:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
     for tipo, m in claves_variantes(perfil):
         clave = f"{tipo}_puntuacion_{m}"
         f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()
-        out[clave] = revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None
+        out[clave] = _revisar_catalogo(con, revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None)
         if out[clave] and "advertencias_reto" not in out[clave]:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
@@ -247,6 +260,7 @@ def calcular_propuestas(con, ajustes: Ajustes) -> dict:
     for tipo, lente in COMBINACIONES:
         p = optimizador.proponer(con, ajustes, perfil, tipo, actual, cot, lente=lente)
         p["huella_calculo"] = huella_calculo(ajustes)
+        p["catalogo_simulador"] = huella_catalogo(con)
         js = json.dumps(p, default=str)
         with db.transaccion(con):
             con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
@@ -257,6 +271,7 @@ def calcular_propuestas(con, ajustes: Ajustes) -> dict:
         p.update({"clave": f"{tipo}_puntuacion_{m}", "nombre": f"{p['nombre']} · {VARIANTES_MERCADO[m]}",
                   "mercado_variante": m, "perfil": perfil})  # el perfil del usuario sigue en «ambos»
         p["huella_calculo"] = huella_calculo(ajustes)
+        p["catalogo_simulador"] = huella_catalogo(con)
         js = json.dumps(p, default=str)
         with db.transaccion(con):
             con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
@@ -399,7 +414,9 @@ def resumen_seguro(ajustes: Ajustes) -> dict | None:
             estado = resumen._estado(con)
             obj = resumen.sesion_objetivo(ahora).isoformat()
             if estado.get("fecha") == obj and (resumen.entregado(estado) or int(estado.get("intentos", 1)) >= resumen.MAX_INTENTOS):
-                return None  # ya enviado para la próxima sesión: comprobación barata cada 15 s
+                if not (resumen.puede_corregir(estado, ahora)
+                        and estado.get("propuestas_max_id") != resumen.ultima_propuesta_id(con)):
+                    return None  # ya enviado y sin recálculo posterior: comprobación barata cada 15 s
             global _ultima_revision_plan
             if _ultima_revision_plan and (ahora - _ultima_revision_plan).total_seconds() < 120:
                 return None  # a lo sumo una evaluación completa cada 2 minutos mientras se espera

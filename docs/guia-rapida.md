@@ -30,7 +30,7 @@ La captura deja de usarse cuando cambia la etapa del Reto (de práctica a compet
 
 ## Alertas que recibes (Telegram y escritorio)
 
-- **Plan del día**, a las 7:00 en días hábiles: órdenes con títulos, cambios frente a ayer y el porqué.
+- **Plan del día**: llega en cuanto la terminal tiene los cierres de la última sesión (normalmente la noche anterior), o a las 7:00 si faltan datos. Trae las órdenes con títulos, los cambios frente al plan anterior y el porqué. Si un recálculo cambia las órdenes antes de la apertura, recibes un **«🔁 PLAN CORREGIDO»** que reemplaza al anterior (como máximo 2 por sesión).
 - **Cambio en tu cuenta del Reto**: después de cada captura que traiga cambios.
 - **Actualiza la captura**: cuando la BMV cerró y no has capturado tu cuenta del día.
 - **Posible movimiento**: cuando la mejor propuesta pide órdenes distintas. De noche no te despierta; va incluida en el plan de la mañana.
@@ -40,6 +40,7 @@ Cada aviso trae la hora, la fuente y el motivo. No se repite, y si un canal fall
 ## Cuándo la terminal bloquea una decisión
 
 - Una **propuesta con avisos** (datos atrasados, perfil cambiado o captura con posiciones sin precio) no genera boletas ni avisos de movimiento.
-- Una **boleta del SIC** sale como «investigar», sin cantidad: toma el precio del portal para calcular los títulos.
+- Una **boleta sin cotización confiable** (todas las del SIC y las BMV con cierre atrasado) sale como «investigar» y no se puede marcar como ejecutada. Trae una **guía condicional**: títulos aproximados y una banda de ±2 % alrededor de la referencia, con su fuente y fecha. Captura solo si el precio del portal cae dentro de la banda, con títulos = monto ÷ precio del portal. Si cae fuera, genera boletas nuevas.
+- **Catálogo del simulador**: durante el Reto, las propuestas solo usan instrumentos que aparecen en tu simulador. La lista sale de tus capturas «Datos Actinver.pdf» (22-sep-2026), aplicadas con `uv run terminal catalogo-simulador --confirmar`. Si el simulador cambia, actualiza `config/pdf_transcripcion.csv` y repite el comando.
 - Una propuesta que **no cumple tu perfil** (por ejemplo, demasiado en dólares) lo dice en «Riesgos» como «NO CUMPLE SU PERFIL».
 - **Validación corta**: si la propuesta se validó con menos de medio año de datos, «Riesgos» lo advierte porque la puntuación es poco confiable.

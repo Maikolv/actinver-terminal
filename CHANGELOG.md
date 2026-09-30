@@ -2,6 +2,19 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.13.0] — 2026-09-30 (auditoría integral)
+
+### Corregido (crítico)
+- **Splits sin ajustar en el Reto.** Para excluir dividendos, que el Reto no paga, se usaba el cierre sin ajustar. Eso también dejaba los splits sin ajustar, aunque las bases dicen que sí se replican. El *reverse split* 1:10 de FUBO (24-mar-2026) aparecía como +994 % y el optimizador le daba 11–20 % en todas las propuestas; la «máxima puntuación» de 95.7 estaba inflada por ese salto. Otros saltos ficticios: WMT, NVDA, AVGO, NFLX, SPCE y LCID. Ahora se usa precio ajustado **solo por splits** (`precios_mxn(..., ajustados="splits")`) en el optimizador, el ranking, las boletas y las alertas. La valuación de la cartera sigue usando el cierre real.
+- **Escenarios irreales.** Antes daban +162 % / −37 % a 0.25 años. Ahora usan el horizonte real al 13-nov (29 sesiones, sin piso de 0.25 años). La media histórica se contrae 50 % por sesgo de selección y los días de salto único se acotan a ±10 %. Se informan la volatilidad con saltos y los saltos acotados.
+- **La hoja de fondos tiraba el ciclo completo.** El User-Agent contenía «pública» (no ASCII) y httpx lo rechazaba, así que no se recalculaban propuestas. Se corrigió la cabecera y un fallo de esa fuente ya no detiene el ciclo.
+
+### Añadido
+- `uv run terminal catalogo-simulador [--confirmar]`: limita el universo del Reto a lo que muestra el simulador del participante (transcripción de «Datos Actinver.pdf», 22-sep-2026: 146 acciones y 23 fondos). Quedan fuera AGG, IAU, IEF, IVV, QQQ, SHV, VEA, VNQ, VOO, VWO y SMARTRC; antes la variante extranjera ponía 47 % en cinco de esos ETF. Si el catálogo cambia, las propuestas se recalculan.
+- **Boletas SIC condicionales.** Sin cotización confiable del SIC, la boleta sigue en «investigar» (no ejecutable), pero trae títulos aproximados y una banda de ±2 % alrededor de la referencia (cierre de origen × tipo de cambio, con fuente y fecha). Solo se captura si el precio del portal cae dentro de la banda.
+- **Plan corregido.** Si un recálculo cambia las órdenes después de enviado el plan del día y antes de la apertura del Reto (07:30; 08:30 desde el 3-nov), se reenvía una vez marcado «🔁 PLAN CORREGIDO», con un máximo de 2 por sesión.
+- `config/reto.yaml`: bases re-verificadas el 29-sep. Queda registrada la discrepancia: las bases no mencionan el SIC ni publican catálogo.
+
 ## [0.12.2] — 2026-09-29 (iniciador remoto)
 
 ### Corregido

@@ -157,8 +157,9 @@ def universo(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         else:
             candidatos.append(i)
     ids = [c["id"] for c in candidatos]
-    # El Reto no paga dividendos (reglamento §13): se estima con precio sin ajustar, que es lo que valúa el simulador.
-    ajustados = not (reto.activo() and not (reto.config().get("reglas") or {}).get("dividendos_reproducidos", True))
+    # El Reto no paga dividendos (reglamento §13) pero sí replica splits: se estima con precio ajustado SOLO por splits
+    # (un split inverso sin ajustar aparecía como un rendimiento ficticio de +900 %).
+    ajustados = "splits" if (reto.activo() and not (reto.config().get("reglas") or {}).get("dividendos_reproducidos", True)) else True
     precios = mercado.precios_mxn(con, ajustes, ids, ajustados=ajustados)
     cotiz = cotiz if cotiz is not None else mercado.cotizaciones(con, ajustes, ids)
     minimo = int(ajustes["optimizacion"]["historia_min_sesiones"])
@@ -415,10 +416,22 @@ def _contribucion_riesgo(X: pd.DataFrame, pesos: pd.Series) -> pd.Series:
     return pd.Series(w * (cov @ w) / var, index=X.columns)
 
 
+ESC_CONTRACCION = 0.5   # declarada antes de evaluar: la media histórica de lo ya seleccionado se reduce a la mitad
+ESC_SALTO = 0.10        # días de la cartera con |r| > 10 % (fusiones, noticias puntuales) se acotan a ±10 %
+
+
 def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: dict) -> dict:
+    """Percentiles al horizonte REAL (en el Reto: hasta el cierre del 13-nov), sin piso artificial.
+
+    La media histórica de activos elegidos por su historia está sesgada al alza (sesgo de selección) y la dominan saltos
+    únicos que no se repiten: se excluyen de la media los días con |r| > ESC_SALTO y se contrae a la mitad. La
+    volatilidad completa, el peor mes y la caída máxima históricos se informan aparte con esos días."""
     rp = _serie_pesos(X, pesos)
-    mu, sig = float(rp.mean() * DIAS), float(rp.std() * math.sqrt(DIAS))
-    h = max(horizonte, 0.25)
+    saltos = rp[rp.abs() > ESC_SALTO]
+    rw = rp.clip(-ESC_SALTO, ESC_SALTO)  # winsorizada: el salto cuenta como un día de ±10 %, no como +200 %
+    mu = float(rw.mean() * DIAS) * ESC_CONTRACCION
+    sig = float(rw.std() * math.sqrt(DIAS))
+    h = max(horizonte, 5 / DIAS)
     z = 1.2816
     g = (mu - sig ** 2 / 2) * h
     peor21 = float((1 + rp).rolling(21).apply(np.prod, raw=True).min() - 1)
@@ -438,7 +451,13 @@ def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: 
             "impacto": _estres(pesos, elegibles),
             "renta_variable": rv, "exposicion_usd": usd,
         },
-        "nota": "Percentiles bajo supuesto log-normal con parámetros históricos; no son pronósticos.",
+        "sesiones_horizonte": round(h * DIAS),
+        "media_anual_usada": mu, "volatilidad_anual": sig, "volatilidad_anual_con_saltos": float(rp.std() * math.sqrt(DIAS)),
+        "saltos_excluidos_de_la_media": [{"fecha": str(pd.Timestamp(k).date()), "rend": round(float(v), 4)}
+                                         for k, v in saltos.items()],
+        "nota": (f"Percentiles log-normales al horizonte de {round(h * DIAS)} sesiones; media histórica contraída "
+                 f"{ESC_CONTRACCION:.0%} (sesgo de selección) y {len(saltos)} día(s) de salto acotados a ±{ESC_SALTO:.0%}; "
+                 "peor mes y caída máxima con la historia completa. No son pronósticos."),
     }
 
 
@@ -820,7 +839,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
             "regularizacion_l2_gamma": float(o.get("l2_regularizacion", 0.0)),
             "lente": lente, "aversion_riesgo_lambda": aversion,
             "horizonte_anios": float(perfil["horizonte_anios"]), "horizonte_origen": perfil.get("horizonte_origen", "perfil"),
-            "precios": "sin ajustar por dividendos (el Reto no los paga)" if reto.activo() else "ajustados por dividendos y splits",
+            "precios": "ajustados solo por splits (el Reto no paga dividendos)" if reto.activo() else "ajustados por dividendos y splits",
             "restricciones": _restricciones(tipo, perfil, ajustes, elegibles_l, lente_calc) + [f"tope por activo {tope:.0%}",
                                                                                           "sin ventas en corto, sin apalancamiento"],
             "ventana_estimacion": {"desde": X.index[0].date().isoformat(), "hasta": X.index[-1].date().isoformat(), "sesiones": len(X)},

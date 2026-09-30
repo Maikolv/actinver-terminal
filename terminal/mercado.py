@@ -1,8 +1,11 @@
 """Acceso normalizado a precios: moneda base MXN, fuente y vigencia por dato."""
 from __future__ import annotations
 
+import math
+
 import sqlite3
 
+import numpy as np
 import pandas as pd
 
 from . import vigencia
@@ -54,21 +57,39 @@ def ultimo_fx(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
             "tipo_dato": f["tipo_dato"], "obtenido_en": f["obtenido_en"], **v}
 
 
-def precios_mxn(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str], ajustados: bool = True) -> pd.DataFrame:
+SALTO_SPLIT = math.log(1.25)  # cambio del factor de ajuste mayor a 25 % en un día = split; menor = dividendo
+
+
+def _solo_splits(df: pd.DataFrame) -> pd.Series:
+    """Precio sin ajustar por dividendos pero SÍ por splits (lo que replica el simulador del Reto).
+
+    El factor cierre_ajustado/cierre cambia un poco con cada dividendo y de golpe con cada split (p. ej. ×10 en un
+    split inverso 1:10). Solo los saltos de split se acumulan hacia atrás, así el último precio es el cierre real."""
+    f = (df["aj"] / df["p"]).where(df["aj"].notna() & (df["p"] > 0), 1.0)
+    lr = np.log(f).groupby(df["id"]).diff().fillna(0.0)
+    lr = lr.where(lr.abs() > SALTO_SPLIT, 0.0)
+    posterior = lr[::-1].groupby(df["id"][::-1]).cumsum()[::-1] - lr  # suma de saltos estrictamente posteriores
+    return df["p"] * np.exp(-posterior)
+
+
+def precios_mxn(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str], ajustados: bool | str = True) -> pd.DataFrame:
     """Matriz fecha x instrumento en MXN. USD se convierte con el FX del mismo día (o el previo disponible).
-    Si falta el tipo de cambio, las columnas en USD quedan vacías: nunca se inventa una conversión."""
+    Si falta el tipo de cambio, las columnas en USD quedan vacías: nunca se inventa una conversión.
+    ajustados: True (dividendos y splits), False (cierre tal cual) o "splits" (solo splits: base del Reto)."""
     if not ids:
         return pd.DataFrame()
     cond, par = _filtro_proveedor(ajustes)
     marcas = ",".join("?" * len(ids))
-    col = "COALESCE(cierre_ajustado, cierre)" if ajustados else "cierre"
-    q = (f"SELECT instrumento_id, fecha, {col} AS p, moneda, proveedor FROM precios "
+    col = "COALESCE(cierre_ajustado, cierre)" if ajustados is True else "cierre"
+    q = (f"SELECT instrumento_id, fecha, {col} AS p, cierre_ajustado AS aj, moneda, proveedor FROM precios "
          f"WHERE instrumento_id IN ({marcas}) AND {cond}")
-    df = pd.DataFrame(con.execute(q, (*ids, *par)).fetchall(), columns=["id", "fecha", "p", "moneda", "proveedor"])
+    df = pd.DataFrame(con.execute(q, (*ids, *par)).fetchall(), columns=["id", "fecha", "p", "aj", "moneda", "proveedor"])
     if df.empty:
         return pd.DataFrame()
     df["prio"] = df["proveedor"].map(prioridad_fuente)
-    df = df.sort_values(["id", "fecha", "prio"]).drop_duplicates(["id", "fecha"], keep="first")
+    df = df.sort_values(["id", "fecha", "prio"]).drop_duplicates(["id", "fecha"], keep="first").reset_index(drop=True)
+    if ajustados == "splits":
+        df["p"] = _solo_splits(df)
     ancho = df.pivot(index="fecha", columns="id", values="p")
     ancho.index = pd.to_datetime(ancho.index)
     monedas = df.drop_duplicates("id").set_index("id")["moneda"]

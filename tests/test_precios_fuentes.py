@@ -120,3 +120,13 @@ def test_twelvedata_solo_con_simbolo_verificado_y_explica_el_plan(con, tmp_path,
     with pytest.raises(ErrorProveedor, match="Pro"):
         td.historico({"id": "BMV:GCC", "clave": "GCC", "serie": "*"}, datetime(2026, 9, 1).date(), datetime(2026, 9, 28).date())
     assert not TwelveData(con, {}, None).configurado()                 # sin clave, nunca se usa
+
+
+def test_la_cabecera_de_la_hoja_de_fondos_es_ascii_y_un_fallo_no_detiene_el_ciclo(con, ajustes, monkeypatch):
+    import inspect
+    from terminal import fondos_actinver as fa, ingesta
+    fuente = inspect.getsource(fa.actualizar)
+    ua = fuente.split('"User-Agent": "')[1].split('"')[0]
+    assert ua.isascii()  # httpx rechaza cabeceras no ASCII (antes: «pública» tiraba el ciclo completo)
+    monkeypatch.setattr(fa, "actualizar", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("caída")))
+    assert ingesta.actualizar_fondos(con, ajustes)["estado"] == "error"

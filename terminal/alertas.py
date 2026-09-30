@@ -580,7 +580,7 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
     cfg = ajustes["alertas"]
     ahora_dt = ahora_dt or datetime.now(UTC)
     ids = {p["instrumento_id"] for p in cartera.get("posiciones", [])}
-    precios = mercado.precios_mxn(con, ajustes, sorted(ids), ajustados=False) if ids else pd.DataFrame()
+    precios = mercado.precios_mxn(con, ajustes, sorted(ids), ajustados="splits") if ids else pd.DataFrame()
     compras = {r[0]: r[1] for r in con.execute(
         "SELECT instrumento_id, MIN(fecha) FROM transacciones WHERE tipo='compra' AND anulada=0 GROUP BY instrumento_id")}
     conds = (reglas_deriva(con, cfg, cartera, propuestas) + reglas_posicion(con, cfg, cartera, precios, compras)
