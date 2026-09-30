@@ -10,7 +10,7 @@ import json
 import logging
 import math
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 import pandas as pd
 
@@ -64,10 +64,13 @@ def cambios_vs_anterior(hoy: list[dict], ayer: list[dict] | None) -> list[str]:
     return out or ["Sin cambios frente al plan anterior."]
 
 
-def construir(p: dict, cartera: dict, anterior: list[dict] | None, ahora_local: pd.Timestamp) -> tuple[str, str, list[dict]]:
+def construir(p: dict, cartera: dict, anterior: list[dict] | None, ahora_local: pd.Timestamp,
+              sesion: date | None = None) -> tuple[str, str, list[dict]]:
     ords = ordenes(p, cartera)
     etapa = reto.etapa_operativa(ahora_local.to_pydatetime()) if reto.activo() else None
-    cab = f"☀️ Plan del día — {DIAS[ahora_local.weekday()]} {ahora_local:%d-%m-%Y}"
+    s = pd.Timestamp(sesion) if sesion else ahora_local
+    cab = (f"☀️ Plan del día — {DIAS[s.weekday()]} {s:%d-%m-%Y}" if s.date() == ahora_local.date()
+           else f"🌙 Plan para la sesión del {DIAS[s.weekday()]} {s:%d-%m-%Y} (enviado al tener los cierres)")
     if etapa:
         cab += f" · Reto: {'práctica' if etapa == 'practica' else etapa}, {reto.sesiones_restantes(ahora_local.to_pydatetime())} sesiones restantes"
     base = (f"tu cuenta del Reto (captura del {pd.Timestamp(cartera['captura']['hora_portal']).tz_convert(ZONA):%d-%m %H:%M})"
@@ -121,21 +124,33 @@ def entregado(estado: dict) -> bool:
     return r.get("telegram") == "enviada" or (r.get("telegram") in (None, "no_configurado") and "enviada" in r.values())
 
 
-def toca(ajustes, ahora: datetime, estado: dict) -> bool:
+def sesion_objetivo(ahora: datetime) -> date:
+    """Sesión para la que se arma el plan: la de hoy si aún no cierra; si ya cerró (o no es día hábil), la siguiente."""
+    cal = vigencia.calendario("XMEX")
+    hoy = pd.Timestamp(pd.Timestamp(ahora).tz_convert(ZONA).date())
+    if cal.is_session(hoy) and pd.Timestamp(ahora) < cal.session_close(hoy):
+        return hoy.date()
+    return cal.date_to_session(hoy, direction="next").date() if not cal.is_session(hoy) else cal.next_session(hoy).date()
+
+
+def toca(ajustes, ahora: datetime, estado: dict, datos_hasta: str | None = None) -> bool:
+    """Lo antes posible: en cuanto la propuesta usa los cierres de la última sesión cerrada (normalmente la noche
+    anterior). Respaldo: a la hora configurada del día de la sesión, aunque falten datos (el plan lo indica)."""
     cfg = ajustes["alertas"]
     if not cfg.get("resumen_matutino", True):
         return False
-    local = pd.Timestamp(ahora).tz_convert(ZONA)
-    h, m = (int(x) for x in str(cfg.get("resumen_matutino_hora", "07:00")).split(":"))
-    if (local.hour, local.minute) < (h, m):
-        return False
-    if estado.get("fecha") == local.date().isoformat():
+    obj = sesion_objetivo(ahora)
+    if estado.get("fecha") == obj.isoformat():
         if entregado(estado) or int(estado.get("intentos", 1)) >= MAX_INTENTOS:
             return False
         ultimo = pd.Timestamp(estado.get("enviado_en") or ahora)
         if pd.Timestamp(ahora) - ultimo < pd.Timedelta(minutes=REINTENTO_MIN):
             return False  # reintento tras un fallo de canal, cada 10 minutos
-    return bool(vigencia.calendario("XMEX").is_session(local.date().isoformat()))
+    if datos_hasta and date.fromisoformat(datos_hasta) >= vigencia.ultima_sesion_cerrada("XMEX", ahora):
+        return True  # envío anticipado: los cierres de la última sesión ya están en la propuesta
+    local = pd.Timestamp(ahora).tz_convert(ZONA)
+    h, m = (int(x) for x in str(cfg.get("resumen_matutino_hora", "07:00")).split(":"))
+    return obj == local.date() and (local.hour, local.minute) >= (h, m)
 
 
 def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict,
@@ -143,25 +158,27 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
     """Envía el plan del día una vez por sesión hábil, a partir de la hora configurada."""
     ahora = ahora or datetime.now(UTC)
     estado = _estado(con)
-    if not toca(ajustes, ahora, estado):
+    ref = propuesta_referencia(propuestas)
+    if not toca(ajustes, ahora, estado, (ref or {}).get("datos_hasta")):
         return None
     local = pd.Timestamp(ahora).tz_convert(ZONA)
+    obj = sesion_objetivo(ahora)
     h, m = (int(x) for x in str(ajustes["alertas"].get("resumen_matutino_hora", "07:00")).split(":"))
-    minutos = (local.hour - h) * 60 + (local.minute - m)
+    minutos = (local.hour - h) * 60 + (local.minute - m) if obj == local.date() else 0
     if any(p and p.get("recalcular") for p in propuestas.values()) and minutos < ESPERA_RECALCULO_MIN:
         return None  # las propuestas se están recalculando: se espera para no enviar un plan viejo
-    p = propuesta_referencia(propuestas)
+    p = ref
     if p is None:
         titulo, texto, ords = (f"☀️ Plan del día — {local:%d-%m-%Y}",
                                "No hay una propuesta vigente (datos no actualizados o propuestas suspendidas). Revise la "
                                "pestaña Datos de la terminal; no se sugieren órdenes hoy.", [])
     else:
-        titulo, texto, ords = construir(p, cartera, estado.get("ordenes"), local)
+        titulo, texto, ords = construir(p, cartera, estado.get("ordenes"), local, obj)
     cfg = {**ajustes["alertas"], "notificar_escritorio": False, "notificar_telegram": True}
     res = notificador.enviar(titulo, texto, cfg, detalle=texto)
     ok = entregado({"resultado": res})
-    nuevo = {"fecha": local.date().isoformat(), "enviado_en": ahora.isoformat(timespec="seconds"), "resultado": res,
-             "intentos": int(estado.get("intentos", 1)) + 1 if estado.get("fecha") == local.date().isoformat() else 1,
+    nuevo = {"fecha": obj.isoformat(), "enviado_en": ahora.isoformat(timespec="seconds"), "resultado": res,
+             "intentos": int(estado.get("intentos", 1)) + 1 if estado.get("fecha") == obj.isoformat() else 1,
              "propuesta": p["clave"] if p else None,
              # base para comparar el próximo plan: el último que SÍ llegó
              "ordenes": [{k: o[k] for k in ("id", "clave", "accion", "titulos")} for o in ords] if (p and ok)

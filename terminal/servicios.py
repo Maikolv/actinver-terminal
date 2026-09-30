@@ -386,14 +386,24 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     return estado
 
 
+_ultima_revision_plan: datetime | None = None
+
+
 def resumen_seguro(ajustes: Ajustes) -> dict | None:
     """Plan del día por Telegram (una vez por sesión hábil, desde la hora configurada). Lo revisa el programador."""
     from . import resumen
     try:
         con = db.conectar()
         try:
-            if not resumen.toca(ajustes, datetime.now(UTC), resumen._estado(con)):
-                return None
+            ahora = datetime.now(UTC)
+            estado = resumen._estado(con)
+            obj = resumen.sesion_objetivo(ahora).isoformat()
+            if estado.get("fecha") == obj and (resumen.entregado(estado) or int(estado.get("intentos", 1)) >= resumen.MAX_INTENTOS):
+                return None  # ya enviado para la próxima sesión: comprobación barata cada 15 s
+            global _ultima_revision_plan
+            if _ultima_revision_plan and (ahora - _ultima_revision_plan).total_seconds() < 120:
+                return None  # a lo sumo una evaluación completa cada 2 minutos mientras se espera
+            _ultima_revision_plan = ahora
             with bloqueo:  # no convive con un cálculo en curso
                 perfil = perfil_actual(con, ajustes)
                 return resumen.enviar_si_toca(con, ajustes, cartera_actual(con, ajustes),

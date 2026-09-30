@@ -113,3 +113,21 @@ def test_texto_de_boletas_para_telegram():
     t = boleta.texto_telegram(bs)
     assert "vencen 29-09 13:10 (CDMX)" in t and "🟢 COMPRA ALPEK A: 5,418 títulos, límite $14.87" in t
     assert "FUBO * (#83)" in t and "CAT" not in t and "no envía órdenes" in t
+
+
+def test_envio_anticipado_al_tener_los_cierres(con, ajustes, monkeypatch):
+    enviados = []
+    monkeypatch.setattr(notificador, "enviar", lambda t, x, c, detalle=None: enviados.append((t, detalle)) or {"telegram": "enviada"})
+    cart = {"fuente": "local", "posiciones": []}
+    noche = datetime(2026, 9, 30, 3, 0, tzinfo=UTC)                       # martes 29-sep 21:00 CDMX, BMV cerrada
+    viejo = {"mixta_puntuacion": {**PROP, "datos_hasta": "2026-09-28"}}
+    assert resumen.enviar_si_toca(con, ajustes, cart, viejo, noche) is None   # aún sin los cierres del 29: espera
+    r = resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": PROP}, noche)   # datos al 29-sep
+    assert r and r["fecha"] == "2026-09-30" and "Plan para la sesión del mié 30-09-2026" in enviados[0][0]
+    assert resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": PROP}, MANANA) is None   # 07:05: ya enviado
+
+
+def test_sesion_objetivo():
+    assert resumen.sesion_objetivo(datetime(2026, 9, 29, 16, 0, tzinfo=UTC)).isoformat() == "2026-09-29"  # sesión abierta
+    assert resumen.sesion_objetivo(datetime(2026, 9, 30, 3, 0, tzinfo=UTC)).isoformat() == "2026-09-30"   # tras el cierre
+    assert resumen.sesion_objetivo(datetime(2026, 10, 3, 18, 0, tzinfo=UTC)).isoformat() == "2026-10-05"  # sábado → lunes
