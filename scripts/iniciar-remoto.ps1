@@ -59,9 +59,16 @@ if (-not (Test-Terminal $true)) {
     foreach ($proc in $running) { Stop-Process -Id $proc.Id -ErrorAction Stop }
     Start-Sleep -Seconds 2
     if (Test-Terminal $false) { throw 'El puerto 8765 lo ocupa otro proceso. No se modifico.' }
-    Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', 'start.bat') -WorkingDirectory $repo -WindowStyle Hidden | Out-Null
+    # Proceso independiente de esta ventana (sigue corriendo al cerrarla); registros en data\terminal_*.log
+    $uv = (Get-Command uv -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source)
+    if (-not $uv) { throw 'No se encontro "uv". Instalelo con: winget install astral-sh.uv' }
+    & $uv sync --quiet --directory $repo
+    New-Item -ItemType Directory -Force -Path (Join-Path $repo 'data') | Out-Null
+    Start-Process -FilePath $uv -ArgumentList @('run', 'terminal', 'iniciar', '--sin-navegador') -WorkingDirectory $repo `
+        -WindowStyle Hidden -RedirectStandardOutput (Join-Path $repo 'data\terminal_salida.log') `
+        -RedirectStandardError (Join-Path $repo 'data\terminal_errores.log') | Out-Null
     $ready = $false
-    for ($i = 0; $i -lt 45; $i++) {
+    for ($i = 0; $i -lt 90; $i++) {
         Start-Sleep -Seconds 1
         if (Test-Terminal $true) { $ready = $true; break }
     }
