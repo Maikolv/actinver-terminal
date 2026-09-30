@@ -356,15 +356,32 @@ def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condi
                              "cartera", "REVISAR el plan y el riesgo; el límite lo definió usted."))
     f = con.execute("SELECT * FROM saldos_portal ORDER BY id DESC LIMIT 1").fetchone()
     if f and total > 0:
-        dif = total / f["valor_portafolio"] - 1
         umbral = float(cfg.get("diferencia_portal_pct", 0.01))
-        out.append(Condicion("diferencia_portal", str(f["id"]), abs(dif) >= umbral, "aviso",
-                             f"Diferencia con el portal {dif:+.2%}",
-                             f"La terminal estima {total:,.2f}; el portal mostraba {f['valor_portafolio']:,.2f} "
-                             f"({f['hora_portal']}).",
-                             {"calculo": f"{total:,.2f} / {f['valor_portafolio']:,.2f} − 1 = {dif:.4f}",
-                              "incertidumbre": "Horas distintas, precios de referencia y comisiones pueden explicar la diferencia."},
-                             "saldo capturado del portal", "REVISAR operaciones registradas y precios; el portal es la valuación oficial."))
+        base = float(f["valor_portafolio"])
+        # Total, efectivo e invertido: un total parecido puede esconder una composición distinta (todo en efectivo en la
+        # terminal y 61 % invertido en el portal). Cada diferencia se mide en puntos del valor del portal.
+        portal = {"total": base, "efectivo": f["efectivo"], "invertido": f["invertido"]}
+        if portal["invertido"] is None and f["efectivo"] is not None and f["por_liquidar"] is not None:
+            portal["invertido"] = base - float(f["efectivo"]) - float(f["por_liquidar"])
+        local = {"total": total, "efectivo": float(cartera.get("efectivo") or 0),
+                 "invertido": float(cartera.get("valor_posiciones") or 0)}
+        difs = {k: (local[k] - float(portal[k])) / base for k in local if portal[k] is not None}
+        fuera = {k: d for k, d in difs.items() if abs(d) >= umbral}
+        detalle = "; ".join(f"{k}: terminal {local[k]:,.2f} vs portal {float(portal[k]):,.2f} ({difs[k]:+.1%} del valor)"
+                            for k in difs)
+        peor = max(fuera or difs, key=lambda k: abs(difs[k]))
+        out.append(Condicion("diferencia_portal", str(f["id"]), bool(fuera), "aviso",
+                             f"Diferencia con el portal en {', '.join(fuera) or 'nada'}: {peor} {difs[peor]:+.1%}",
+                             f"Portal ({f['hora_portal']}): {detalle}."
+                             + (f" Por liquidar en el portal: {float(f['por_liquidar']):,.2f}." if f["por_liquidar"] else ""),
+                             {"calculo": "; ".join(f"{k}: ({local[k]:,.2f} − {float(portal[k]):,.2f}) / {base:,.2f} = "
+                                                   f"{difs[k]:.4f}" for k in difs),
+                              "incertidumbre": "Horas distintas, precios de referencia y comisiones pueden explicar parte "
+                                               "de la diferencia; una diferencia de efectivo o invertido suele ser una "
+                                               "operación del portal no capturada en la terminal."},
+                             "saldo capturado del portal",
+                             "REVISAR: capture sus posiciones del portal en «Mi cartera → Capturar desde el portal»; "
+                             "el portal es la valuación oficial."))
     return out
 
 

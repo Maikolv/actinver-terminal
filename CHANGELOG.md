@@ -2,6 +2,12 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.14.1] — 2026-09-30 (conciliación de efectivo e invertido; horario en el plan del día)
+
+### Añadido
+- **Alerta «Diferencia con el portal»:** ahora compara el efectivo y lo invertido además del total, cada uno en puntos del valor del portal. Con la captura de las 14:45 el total difería 0.49 % y no alertaba, pero el efectivo difería +77.4 % y lo invertido −61.5 %. Nuevas columnas `invertido` y `por_liquidar` en `saldos_portal` (migración 5), con campos en el formulario y un desglose en «Presente».
+- **Plan del día por Telegram:** indica a qué hora consultar el portal (la apertura: 07:30, o 08:30 desde el 3-nov) y a qué hora retirarse (cierre + 15 min: 14:15, o 15:15), además de recordar que las órdenes limitadas vencen al cierre y que hay que copiar la cuenta. El 13-nov avisa que cierra el Reto.
+
 ## [0.14.0] — 2026-09-30 (auditoría: horario BMV, escenarios, alertas, respaldos, lanzador)
 
 ### Corregido

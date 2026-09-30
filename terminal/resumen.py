@@ -64,6 +64,24 @@ def cambios_vs_anterior(hoy: list[dict], ayer: list[dict] | None) -> list[str]:
     return out or ["Sin cambios frente al plan anterior."]
 
 
+RETIRO_MIN_DESPUES_DEL_CIERRE = 15  # margen para ver la última ejecución y copiar la cuenta del portal
+
+
+def horario_del_dia(sesion: date) -> str:
+    """Horas para el participante según el horario de las bases del Reto (07:30–14:00 hasta el 2-nov; 08:30–15:00 después)."""
+    abre = vigencia.apertura_sesion("XMEX", sesion).tz_convert(ZONA)
+    cierra = vigencia.cierre_sesion("XMEX", sesion).tz_convert(ZONA)
+    retiro = cierra + pd.Timedelta(minutes=RETIRO_MIN_DESPUES_DEL_CIERRE)
+    lineas = [f"🕖 Consulta el portal a las {abre:%H:%M} (apertura de la BMV): revisa precios, compáralos con las boletas y "
+              "captura las órdenes limitadas del día.",
+              f"🕑 Puedes retirarte a las {retiro:%H:%M}: la BMV cierra a las {cierra:%H:%M} y las órdenes limitadas que no se "
+              "ejecutaron vencen al cierre. Antes, copia tu cuenta en «Mi cartera → Capturar desde el portal»."]
+    fin = (reto.config().get("fechas") or {}).get("competencia_fin") if reto.activo() else None
+    if fin and str(fin)[:10] == sesion.isoformat():
+        lineas.append(f"🏁 Hoy cierra el Reto a las {str(fin)[11:16]}: después ya no se puede operar.")
+    return "\n".join(lineas)
+
+
 def construir(p: dict, cartera: dict, anterior: list[dict] | None, ahora_local: pd.Timestamp,
               sesion: date | None = None) -> tuple[str, str, list[dict]]:
     ords = ordenes(p, cartera)
@@ -77,7 +95,7 @@ def construir(p: dict, cartera: dict, anterior: list[dict] | None, ahora_local: 
             if cartera.get("fuente") == "portal" else "el registro local de la terminal (sin captura del portal)")
     lineas = [cab, "",
               f"Propuesta: {p['nombre']} — {p['puntuacion']['total']:.1f}/100 (datos al {p.get('datos_hasta')}).",
-              f"Frente a: {base}.", ""]
+              f"Frente a: {base}.", "", horario_del_dia(s.date()), ""]
     if not ords:
         lineas.append("✅ Sin órdenes sugeridas: la cartera ya está dentro de la banda de rebalanceo.")
     else:

@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS eventos_webhook (
 -- Saldo que muestra el portal de Actinver, capturado a mano por el participante (fuente oficial).
 CREATE TABLE IF NOT EXISTS saldos_portal (
     id INTEGER PRIMARY KEY AUTOINCREMENT, capturado_en TEXT NOT NULL, hora_portal TEXT NOT NULL, etapa TEXT,
-    valor_portafolio REAL NOT NULL, efectivo REAL, nota TEXT
+    valor_portafolio REAL NOT NULL, efectivo REAL, nota TEXT, invertido REAL, por_liquidar REAL
 );
 
 -- FUTURO: pronósticos emitidos. Inmutables salvo el resultado observado, que se añade al conocerse.

@@ -533,18 +533,21 @@ def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
     except (TypeError, ValueError):
         errores.append("valor_portafolio: número positivo")
         valor = 0
-    efectivo = cuerpo.get("efectivo")
-    try:
-        efectivo = None if efectivo in (None, "") else float(efectivo)
-    except (TypeError, ValueError):
-        errores.append("efectivo: número")
+    montos = {}
+    for campo in ("efectivo", "invertido", "por_liquidar"):  # opcionales: poder de compra, inversiones, por liquidar
+        v = cuerpo.get(campo)
+        try:
+            montos[campo] = None if v in (None, "") else float(v)
+        except (TypeError, ValueError):
+            errores.append(f"{campo}: número")
     hora = str(cuerpo.get("hora_portal") or db.ahora())[:40]
     if errores:
         raise cartera.ErrorValidacion(errores)
-    cur = con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, nota) "
-                      "VALUES (?,?,?,?,?,?)", (db.ahora(), hora, reto.etapa_operativa(), valor, efectivo,
-                                               str(cuerpo.get("nota") or "")[:200]))
-    db.auditar(con, "saldo_portal", cur.lastrowid, "alta", despues={"valor": valor, "efectivo": efectivo, "hora": hora})
+    cur = con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, invertido, "
+                      "por_liquidar, nota) VALUES (?,?,?,?,?,?,?,?)",
+                      (db.ahora(), hora, reto.etapa_operativa(), valor, montos["efectivo"], montos["invertido"],
+                       montos["por_liquidar"], str(cuerpo.get("nota") or "")[:200]))
+    db.auditar(con, "saldo_portal", cur.lastrowid, "alta", despues={"valor": valor, **montos, "hora": hora})
     con.commit()
     disparar_motor(False)
     return {"id": cur.lastrowid}

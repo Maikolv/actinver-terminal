@@ -97,7 +97,13 @@ def _v4(con):
         pronostico TEXT, previo TEXT, actual TEXT, fuente TEXT NOT NULL, PRIMARY KEY (evento_id, obtenido_en))""")
 
 
-MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4)]
+def _v5(con):
+    # Saldo del portal con desglose: invertido y movimientos por liquidar (conciliación de efectivo e invertido)
+    _agregar(con, "saldos_portal", "invertido", "REAL")
+    _agregar(con, "saldos_portal", "por_liquidar", "REAL")
+
+
+MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5)]
 
 
 def migrar(con: sqlite3.Connection, ajustes=None) -> int:

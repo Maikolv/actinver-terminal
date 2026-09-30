@@ -121,11 +121,13 @@
       </form>
       <div id="ordenes-lista"></div>
       <h3>Saldo que muestra el portal de Actinver</h3>
-      <p class="ayuda">Cópielo a mano desde el portal (la terminal no entra al portal ni extrae datos de él). Sirve para comparar la estimación con la valuación oficial.</p>
+      <p class="ayuda">Cópielo a mano desde el portal (la terminal no entra al portal ni extrae datos de él). Sirve para comparar la estimación con la valuación oficial: el total, el efectivo y lo invertido (la alerta avisa si cualquiera difiere 1 % del valor o más).</p>
       <form id="form-portal" class="formulario" novalidate>
         <div class="campos">
           <label>Valor del portafolio (MXN)<input type="number" name="valor_portafolio" min="0" step="0.01" required></label>
-          <label>Efectivo (MXN)<input type="number" name="efectivo" min="0" step="0.01"></label>
+          <label>Efectivo / poder de compra (MXN)<input type="number" name="efectivo" min="0" step="0.01"></label>
+          <label>Inversiones (MXN)<input type="number" name="invertido" min="0" step="0.01"></label>
+          <label>Movimientos por liquidar (MXN)<input type="number" name="por_liquidar" min="0" step="0.01"></label>
           <label>Fecha y hora en el portal<input type="datetime-local" name="hora_portal" required></label>
           <label>Nota<input type="text" name="nota" maxlength="200"></label>
         </div>
