@@ -57,3 +57,49 @@ def test_precios_solo_splits_quitan_el_salto_del_split_pero_no_suman_dividendos(
     s = mercado._solo_splits(df).tolist()
     assert s[0] == pytest.approx(16.0) and s[1] == pytest.approx(17.0)  # antes del split: ×10, sin el 1 % del dividendo
     assert s[2:] == pytest.approx([17.0, 17.5, 17.2, 17.4])             # el último precio es el cierre real
+
+
+def test_media_robusta_acota_saltos_unicos_sin_tocar_dias_normales():
+    import numpy as np
+    from skfolio.moments import ShrunkMu
+    from terminal import optimizador as op
+    rng = np.random.default_rng(5)
+    X = rng.normal(0.0005, 0.02, (500, 3))
+    X[200, 0] = 1.75                      # salto único, como MRNA el 19-ago-2026
+    X[300, 1] = -0.08                     # día malo pero normal: se conserva
+    A = op.acotar_saltos(X)
+    assert A[200, 0] < 0.2 and A[300, 1] == -0.08 and np.allclose(A[:, 2], X[:, 2])
+    mu_simple, mu_rob = ShrunkMu().fit(X).mu_, op.MuRobusto().fit(X).mu_
+    assert mu_simple[0] - mu_rob[0] > 0.002  # el salto ya no domina la media del activo
+    assert abs(mu_rob[2] - mu_simple[2]) < 1e-3
+
+
+def test_escenarios_no_son_mas_optimistas_que_la_validacion_fuera_de_muestra():
+    """La volatilidad dentro de muestra de pesos optimizados está sesgada a la baja: el escenario usa la mayor entre
+    ella y la observada fuera de muestra, y la menor de las medias."""
+    import numpy as np
+    import pandas as pd
+    from terminal import optimizador as op
+    rng = np.random.default_rng(9)
+    idx = pd.bdate_range("2024-01-01", periods=300)
+    X = pd.DataFrame({"A": rng.normal(0.002, 0.005, 300)}, index=idx)          # calma aparente: 8 % anual
+    oos = pd.Series(rng.normal(-0.0005, 0.025, 84), index=idx[-84:])           # fuera de muestra: 40 % anual
+    el = {"A": {"clase": "accion", "exposicion": "MXN"}}
+    base = op._escenarios(X, pd.Series({"A": 1.0}), 29 / op.DIAS, el)
+    con = op._escenarios(X, pd.Series({"A": 1.0}), 29 / op.DIAS, el, oos=oos)
+    assert con["volatilidad_anual"] > 0.3 > base["volatilidad_anual"]
+    assert con["media_anual_usada"] < base["media_anual_usada"]
+    assert con["adverso_p10"] < base["adverso_p10"] - 0.05
+    assert con["fuente_parametros"]["volatilidad"] == "fuera de muestra"
+
+
+def test_riesgos_advierten_si_la_propuesta_no_supera_a_1_n():
+    import pandas as pd
+    from terminal import optimizador as op
+    el = {k: {"clase": "accion", "exposicion": "MXN", "ventana_venta": "diaria", "vigencia": "vigente"} for k in "AB"}
+    w = pd.Series({"A": 0.6, "B": 0.4})
+    m = {"rend_anual": 0.011, "sesiones": 300, "max_caida": -0.05}
+    esc = {"peor_trimestre_historico": 0.01}
+    r = op._riesgos(w, el, m, esc, [], {"max_exposicion_usd": 1.0}, {"rend_anual": 0.108})
+    assert any("No supera a la referencia simple" in x and "10.8%" in x for x in r)
+    assert not any("No supera" in x for x in op._riesgos(w, el, m, esc, [], {"max_exposicion_usd": 1.0}, {"rend_anual": 0.0}))

@@ -75,10 +75,10 @@ function notificar(texto) {
   n.textContent = texto; n.hidden = false;
   clearTimeout(notificar.t); notificar.t = setTimeout(() => { n.hidden = true; }, 6000);
 }
-function tabla(columnas, filas, { caption, vacio: textoVacio = "Sin registros." } = {}) {
+function tabla(columnas, filas, { caption, vacio: textoVacio = "Sin registros.", claseFila } = {}) {
   if (!filas.length) return h("p", { clase: "vacio", texto: textoVacio });
   const cab = h("tr", {}, columnas.map((c) => h("th", { scope: "col", clase: c.num ? "num" : null, texto: c.t })));
-  const cuerpo = filas.map((f) => h("tr", {}, columnas.map((c) => {
+  const cuerpo = filas.map((f) => h("tr", { clase: claseFila ? claseFila(f) : null }, columnas.map((c) => {
     const v = c.f(f);
     return h("td", { clase: c.num ? "num" : null }, v instanceof Node ? v : (v ?? "—"));
   })));
@@ -207,9 +207,9 @@ async function simular(cambios, titulo) {
       h("div", { clase: "kpis" }, kpi("Valor total", mxn(r.valor_total)), kpi("Efectivo resultante", mxn(r.efectivo_resultante), signo(r.efectivo_resultante)),
         kpi("Costo (comisión + IVA + spread)", mxn(r.costo_total, true)), kpi("Emisoras", String(r.emisoras))),
       tabla([{ t: "Operación", f: (f) => f.operacion }, { t: "Instrumento", f: (f) => f.clave_operable },
-        { t: "Títulos", f: (f) => f.titulos, num: true }, { t: "Precio (fecha)", f: (f) => `${mxn(f.precio_mxn, true)} (${f.fecha_precio || "—"})`, num: true },
+        { t: "Títulos", f: (f) => titulosConMarca(f.id, f.titulos), num: true }, { t: "Precio (fecha)", f: (f) => precioConMarca(f.id, f.precio_mxn, f.fecha_precio || "—"), num: true },
         { t: "Importe", f: (f) => mxn(f.importe), num: true }, { t: "Costo", f: (f) => mxn(f.costo, true), num: true }],
-      r.operaciones, { caption: "Títulos enteros con el último precio disponible" }),
+      r.operaciones, { caption: "Títulos enteros con el último precio disponible. * SIC: precio de referencia (bolsa de origen × tipo de cambio), no la cotización del SIC." }),
       r.cumplimiento_reto.length ? h("ul", {}, r.cumplimiento_reto.map((c) => h("li", {}, h("span", { clase: c.cumple ? "cumple" : "no-cumple", texto: c.cumple ? "Cumple: " : "No cumple: " }), `${c.regla} (${c.detalle})`))) : null,
       h("p", { clase: "suave", texto: r.nota }));
   } catch (e) { limpiar("simulacion-contenido", errorCaja(e)); }
@@ -381,11 +381,11 @@ function pintarDetalle() {
       tabla([
         { t: "Instrumento", f: (f) => h("span", {}, h("strong", { texto: f.clave_operable }), h("br"), h("span", { clase: "suave", texto: `${CLASES[f.clase] || f.clase} · ${f.id}` })) },
         { t: "Peso", f: (f) => pct(f.peso), num: true }, { t: "Monto", f: (f) => mxn(f.monto_objetivo), num: true },
-        { t: "Títulos", f: (f) => (f.titulos === null ? "—" : f.titulos), num: true },
-        { t: "Precio MXN (fecha)", f: (f) => h("span", {}, mxn(f.precio_mxn, true), h("br"), h("span", { clase: "suave", texto: f.fecha_precio || "" })), num: true },
+        { t: "Títulos", f: (f) => titulosConMarca(f.id, f.titulos), num: true },
+        { t: "Precio MXN (fecha)", f: (f) => precioConMarca(f.id, f.precio_mxn, f.fecha_precio || ""), num: true },
         { t: "Datos", f: (f) => chip(f.vigencia) },
         { t: "Razones", f: (f) => h("ul", { clase: "lista-motivos" }, f.motivos.map((m) => h("li", { texto: m }))) }],
-      p.pesos, { caption: `Capital ${mxn(p.capital)} · efectivo residual por redondeo ${mxn(p.efectivo_residual)}. Precios de la última cotización disponible (ver fecha y tipo en «Datos»).` }));
+      p.pesos, { caption: `Capital ${mxn(p.capital)} · efectivo residual por redondeo ${mxn(p.efectivo_residual)}. Precios de la última cotización disponible (ver fecha y tipo en «Datos»). * SIC: precio de referencia (bolsa de origen × tipo de cambio), no la cotización del SIC; títulos aproximados (≈).` }));
     out.push(h("h2", { texto: "Comparación fuera de muestra" }), tabla([
       { t: "Cartera", f: (f) => f.cartera }, { t: "Rend. anual", f: (f) => pct(f.rend_anual), num: true },
       { t: "Volatilidad", f: (f) => pct(f.volatilidad), num: true }, { t: "Sharpe", f: (f) => (vacio(f.sharpe) ? "—" : f.sharpe.toFixed(2)), num: true },
@@ -418,6 +418,18 @@ function pintarDetalle() {
           ["Versiones", Object.entries(r.versiones).map(([k, v]) => `${k} ${v}`).join(", ")]].flatMap(([a, b]) => [h("dt", { texto: a }), h("dd", { texto: String(b) })]))));
   }
   limpiar("propuesta-detalle", ...out);
+}
+// SIC: el precio es la bolsa de origen × tipo de cambio (referencia), nunca la cotización del SIC: se marca con «*» y
+// los títulos con «≈»; la cifra ejecutable sale del portal.
+const esReferenciaSic = (id) => String(id || "").startsWith("SIC:");
+const TXT_REF_SIC = "Referencia: bolsa de origen × tipo de cambio; no es la cotización del SIC. Confirme el precio en el portal.";
+function precioConMarca(id, precio, fecha) {
+  const ref = esReferenciaSic(id);
+  return h("span", { title: ref ? TXT_REF_SIC : "" }, mxn(precio, true), ref ? " *" : "", fecha ? h("br") : null,
+    fecha ? h("span", { clase: "suave", texto: fecha + (ref ? " · referencia" : "") }) : null);
+}
+function titulosConMarca(id, t) {
+  return t === null || t === undefined ? "—" : (esReferenciaSic(id) ? `≈ ${num(t)}` : num(t));
 }
 function escenarios(e) {
   if (!e) return h("p", { clase: "vacio", texto: "—" });
@@ -843,9 +855,20 @@ document.getElementById("btn-hoja-descargar").addEventListener("click", () => im
 async function pintarBoletas() {
   try {
     const d = await api("/api/boletas");
-    const est = { vigente: "vigente", invalidada: "vencido", caducada: "sin_datos", descartada: "sin_datos", marcada_ejecutada: "vigente" };
-    limpiar("boletas-lista", h("p", { clase: "suave", texto: d.aviso }), tabla([
+    // Solo una boleta vigente con lado y títulos se puede capturar; el resto se etiqueta y se atenúa.
+    const capturable = (b) => b.estado === "vigente" && b.lado && Number(b.cantidad) > 0;
+    const estado = (b) => (capturable(b) ? ["vigente", "Capturable"]
+      : b.estado === "vigente" ? ["retrasado", b.referencia_condicional ? "Solo guía (sin cotización confiable)" : "Investigar: sin precio"]
+        : ({ invalidada: ["vencido", "Invalidada"], caducada: ["sin_datos", "Vencida"], descartada: ["sin_datos", "Descartada"],
+          marcada_ejecutada: ["calculada", "Ejecutada"] })[b.estado] || ["sin_datos", b.estado]);
+    const orden = (b) => (capturable(b) ? 0 : b.estado === "vigente" ? 1 : b.estado === "marcada_ejecutada" ? 2 : 3);
+    const filas = [...d.boletas].sort((a, b) => orden(a) - orden(b)).slice(0, 40);
+    const n = filas.filter(capturable).length;
+    limpiar("boletas-lista", h("p", { clase: "suave", texto: d.aviso }),
+      h("p", { clase: n ? "suave" : "aviso-caja", texto: n ? `${n} boleta(s) capturable(s) arriba; las «Solo guía», vencidas, invalidadas y descartadas NO se capturan.`
+        : "Ninguna boleta es capturable ahora: las vigentes son guías sin cotización confiable o ya vencieron." }), tabla([
       { t: "Emisora", f: (b) => h("strong", { texto: b.emisora_serie || b.instrumento_id }) },
+      { t: "Estado", f: (b) => { const [c, txt] = estado(b); return h("span", { title: b.motivo_estado || b.estado }, chip(c, txt)); } },
       { t: "Tipo", f: (b) => b.tipo }, { t: "Lado · títulos", f: (b) => (b.lado ? `${b.lado} · ${num(b.cantidad)}` : b.referencia_condicional
         ? h("span", { title: b.referencia_condicional.nota }, `${b.referencia_condicional.lado_sugerido} · ≈ ${num(b.referencia_condicional.titulos_aprox)} (condicional)`) : "—") },
       { t: "Límite", f: (b) => (b.precio_limite ? mxn(b.precio_limite, true) : b.referencia_condicional
@@ -855,12 +878,11 @@ async function pintarBoletas() {
       { t: "Peso después", f: (b) => pct(b.efecto.peso_emisora_despues), num: true },
       { t: "Rango 10–90 % (estimado)", f: (b) => (b.rango && b.rango.disponible ? `${pct(b.rango.p10)} a ${pct(b.rango.p90)}` : "—") },
       { t: "Precio (fuente · moneda · fecha y hora · tipo)", f: datoPrecio },
-      { t: "Estado", f: (b) => h("span", { title: b.motivo_estado || "" }, chip(est[b.estado] || "sin_datos", b.estado)) },
-      { t: "Falta", f: (b) => (b.datos_faltantes || []).join(" · ") || "—" },
-      { t: "", f: (b) => (b.estado === "vigente" && b.lado ? h("span", {},
-          h("button", { type: "button", clase: "boton boton--secundario", onclick: () => ejecutarBoleta(b) }, "Marcar ejecutada"), " ",
-          h("button", { type: "button", clase: "boton boton--secundario", onclick: async () => { await api(`/api/boletas/${b.id}/descartar`, { method: "POST", json: {} }); pintarBoletas(); } }, "Descartar")) : "") }],
-      d.boletas.slice(0, 40), { vacio: "Sin boletas. Genérelas desde la propuesta vigente." }));
+      { t: "Falta", f: (b) => { const t = (b.datos_faltantes || []).join(" · "); return t ? h("span", { title: t }, t.length > 120 ? t.slice(0, 117) + "…" : t) : "—"; } },
+      { t: "", f: (b) => (b.estado !== "vigente" ? "" : h("span", {},
+          capturable(b) ? h("button", { type: "button", clase: "boton boton--secundario", onclick: () => ejecutarBoleta(b) }, "Marcar ejecutada") : null, " ",
+          h("button", { type: "button", clase: "boton boton--secundario", onclick: async () => { await api(`/api/boletas/${b.id}/descartar`, { method: "POST", json: {} }); pintarBoletas(); } }, "Descartar"))) }],
+      filas, { vacio: "Sin boletas. Genérelas desde la propuesta vigente.", claseFila: (b) => (capturable(b) ? null : "fila-inactiva") }));
   } catch (e) { limpiar("boletas-lista", errorCaja(e)); }
 }
 async function ejecutarBoleta(b) {
@@ -965,7 +987,8 @@ async function cargarRanking() {
       { t: "Caída 60 d", f: (f) => pct(f.caida_60), num: true },
       { t: "Seeking Alpha", f: (f) => (f.calificacion_sa ? h("span", { title: `Autores ${f.calificacion_sa.autores ?? "—"} · Wall Street ${f.calificacion_sa.wall_street ?? "—"} · importada ${f.calificacion_sa.fecha}` }, `Quant ${f.calificacion_sa.quant ?? "—"}`) : "—") },
       { t: "Dato", f: (f) => h("span", {}, chip(f.vigencia), h("br"), h("span", { clase: "suave", texto: `${f.tipo_dato || "—"} · ${f.fecha || "—"} · ${f.proveedor || "—"}` })) }],
-      d.filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC.", vacio: "Sin emisoras con al menos 61 sesiones de precio." }));
+      d.filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC."
+        + (d.fuera_del_catalogo ? ` Se omiten ${d.fuera_del_catalogo} instrumento(s) que no aparecen en el catálogo de su simulador.` : ""), vacio: "Sin emisoras con al menos 61 sesiones de precio." }));
   } catch (e) { limpiar("ranking-contenido", errorCaja(e)); }
 }
 setInterval(() => { if (pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);

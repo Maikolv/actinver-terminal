@@ -4,6 +4,10 @@
 
 En el escritorio, abra **Actinver Terminal**. El acceso directo apunta a `launcher/ActinverTerminal.exe` dentro del repositorio. Si el servidor local ya responde, abre `http://127.0.0.1:8765/`. Si esta apagado, llama a `scripts/iniciar-remoto.ps1`, espera hasta dos minutos y abre la pagina cuando responda. Para reconstruir el ejecutable o el acceso directo: `launcher/compilar.ps1` y `launcher/crear-acceso-directo.ps1`.
 
+Si Tailscale no esta instalado, no ha iniciado sesion o no responde, el iniciador **igual arranca la terminal en esta PC** (`http://127.0.0.1:8765/`) y avisa que el acceso remoto no esta activo; antes se detenia sin arrancarla. Para forzar el modo solo local: variable `ACTINVER_SIN_TAILSCALE=1`.
+
+Pruebas del 30-sep-2026 en esta PC: con el servidor apagado, el `.exe` lo arranco y respondio en 27–51 s; con el servidor encendido abrio la pagina en 0.9 s sin crear un segundo proceso; el acceso directo del escritorio apunta a `launcher\ActinverTerminal.exe`; el servidor escucha solo en `127.0.0.1` y `tailscale serve status` indica **tailnet only**. La URL `.ts.net` respondio 200 desde esta misma PC; **falta probarla desde otro dispositivo**.
+
 Este acceso directo depende de que **esta PC este encendida**. El ejecutable no aloja la aplicacion por si solo. El acceso remoto actual usa Tailscale Serve y sigue siendo privado.
 
 ## Acceso cuando esta PC este apagada

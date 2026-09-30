@@ -111,6 +111,9 @@ main:focus { outline: none; }
 .chip--sin_datos { background: var(--sin-datos-fondo); color: var(--sin-datos); }
 .chip--sintetico, .chip--demostracion { background: var(--sintetico-fondo); color: var(--sintetico); }
 .chip--calculada { background: var(--vigente-fondo); color: var(--vigente); }
+tr.fila-inactiva td { opacity: .62; }
+tr.fila-inactiva td:nth-child(-n+2) { opacity: 1; } /* emisora y estado siempre legibles */
+@media (max-width: 720px) { #boletas-lista td:nth-last-child(2), #boletas-lista td:nth-last-child(3) { min-width: 15rem; } } /* precio y faltantes: menos altura en móvil */
 
 /* Tablas */
 .tabla-contenedor { overflow-x: auto; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); }

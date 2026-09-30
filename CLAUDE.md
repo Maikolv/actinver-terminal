@@ -28,13 +28,16 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-09-29, v0.12.1, rama `main`)
+## Estado comprobado (2026-09-30 14:40 CDMX, v0.14.0, rama `main`)
 
-- 203 pruebas en verde. Hay 148 de 174 instrumentos con precio: 41 vigentes, 107 retrasados (cierre de la sesión anterior) y 26 emisoras BMV sin datos. Son cierres diarios o NAV, no cotizaciones BMV/SIC en tiempo real.
-- La hoja oficial Actinver del 28-sep-2026 aporta NAV a los 23 fondos; JPMRVUS usa exactamente la serie B-1.
-- «Mi cartera» separa la captura del portal y el registro local. Aún no hay captura confirmada del Reto: el millón mostrado es local. La captura exige hora, efectivo, valor total y posiciones coherentes.
-- Las alertas de cambio, captura pendiente y posible movimiento llegan por Telegram y escritorio. Correo espera configuración SMTP en `.env`.
-- Faltan la primera captura real del usuario y un contrato de datos con credenciales para BMV/SIC en tiempo real. EODHD gratuito recupera las emisoras faltantes paulatinamente, con cupo diario.
+- Pruebas: suite completa en verde (ver CHANGELOG 0.14.0 para la cifra de la última corrida).
+- Precios (14:35 CDMX, tras el cierre BMV de las 14:00): 0 vigentes, 147 retrasados (cierre del 29-sep; cupo por hora de Tiingo/EODHD agotado), 5 vencidos y 22 BMV sin datos, de 174. Fondos: 23/23 con NAV del 28-sep (la hoja pública de Actinver aún no publica el 29-sep). FX: Banxico FIX 18.0692 del 30-sep. Son cierres, no tiempo real; el SIC es referencia origen × FX.
+- Catálogo del simulador: 165 instrumentos; propuestas y Ranking excluyen los 11 que no están (10 ETF y SMARTRC).
+- Propuestas: con media robusta ya no aparecen FUBO ni MRNA. Validación fuera de muestra de solo 84 sesiones en las principales. La referencia del plan («Acciones · Máxima puntuación», 73.0) rindió +1.1 % anual fuera de muestra contra +10.8 % del 1/N: decisión pendiente del usuario.
+- Cuenta del Reto: sin captura del portal; el millón es LOCAL.
+- Acceso: lanzador `.exe` probado apagado/encendido; escucha solo en 127.0.0.1; Serve «tailnet only»; `.ts.net` probado solo desde esta PC.
+- Alertas: Telegram y escritorio «enviada» (prueba del 30-sep); correo sin SMTP. Claude sin `ANTHROPIC_API_KEY` (chatbot local).
+- Respaldos: diario verificado en `data/respaldos` (el primero, del 30-sep).
 
 ## Registro histórico (2026-09-23, v0.6.0)
 

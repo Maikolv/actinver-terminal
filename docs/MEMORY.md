@@ -29,7 +29,10 @@ Contexto duradero para cualquier persona o agente que retome el trabajo: hechos 
 7. **Hoja de fondos**: un pie de página pegado («ACTIG+2 -Morningstar») asignaba precios al fondo equivocado. Solo se acepta fondo y serie exactos; si hay ambigüedad, no se asigna.
 8. **Envíos**: un plan solo cuenta como entregado si Telegram confirma. Un fallo se reintenta cada 10 minutos.
 9. **Universo del simulador vacío = sin restricción**: antes de proponer durante el Reto, verificar que `universo_simulador` tenga filas.
-10. **Horario**: el calendario de la BMV de la librería abre a las 08:30, pero el Reto abre a las 07:30 hasta el 2-nov. Usar `resumen.apertura` (lee `horario_bmv`).
+10. **Horario**: `exchange_calendars` fija la BMV en 08:30–15:00; el Reto (y la BMV) operan 07:30–14:00 hasta el 2-nov. Usar siempre `vigencia.apertura_sesion` / `cierre_sesion` / `mercado_abierto`, nunca `session_open/close` directo.
+11. **Optimismo dentro de muestra**: la volatilidad de pesos optimizados en su propia muestra subestima el riesgo (16.6 % frente a 42.5 % fuera de muestra). Los escenarios usan la menos optimista de ambas.
+12. **Selección por puntuación**: «Máxima puntuación» elige con la primera mitad de la validación; su total puede quedar debajo de «Ajuste» y puede rendir menos que 1/N. No es un error de código.
+13. **Respaldos**: no existía ninguno hasta el 30-sep; ahora el motor hace uno verificado al día en `data/respaldos`.
 
 ## Decisiones vigentes (resumen)
 

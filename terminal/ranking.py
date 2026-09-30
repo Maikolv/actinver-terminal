@@ -14,7 +14,7 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
-from . import mercado
+from . import mercado, reto
 from .config import Ajustes
 
 PESOS = {"rend_20": 0.30, "rend_60": 0.30, "estabilidad": 0.20, "tendencia": 0.20}
@@ -25,6 +25,10 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "a
     ins = mercado.instrumentos(con)
     ids = [i for i, v in ins.items() if v["estado"] == "activo" and v["clase"] in CLASES
            and (mercado_filtro == "ambos" or (mercado_filtro == "nacionales") == (v["mercado_operable"] != "BMV-SIC"))]
+    # Durante el Reto solo se ordena lo que el simulador permite operar (mismo criterio que las propuestas)
+    catalogo = {r[0] for r in con.execute("SELECT id FROM universo_simulador")} if reto.activo() else set()
+    fuera = [i for i in ids if catalogo and i not in catalogo]
+    ids = [i for i in ids if i not in set(fuera)]
     precios = mercado.precios_mxn(con, ajustes, ids, ajustados="splits") if ids else pd.DataFrame()
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
     filas = []
@@ -61,6 +65,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "a
         df["posicion"] = df.index + 1
         filas = df.round(6).astype(object).where(df.notna(), None).to_dict("records")
     return {"filas": filas, "n": len(filas), "universo": len(ids), "criterio": PESOS, "filtro": mercado_filtro,
+            "fuera_del_catalogo": len(fuera),
             "aviso": ("Ordena por comportamiento reciente y estabilidad; no es recomendación ni pronóstico. Se actualiza con "
                       "cada precio nuevo: hoy los precios BMV son cierres (EOD) y los del SIC son referencia de su bolsa de "
                       "origen convertida a pesos, no la cotización del SIC.")}

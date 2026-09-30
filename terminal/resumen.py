@@ -139,12 +139,8 @@ def puede_corregir(estado: dict, ahora: datetime) -> bool:
 
 
 def apertura(sesion: date) -> pd.Timestamp:
-    """Apertura según el horario publicado en las bases del Reto (07:30 hasta el 2-nov-2026, 08:30 después); sin él,
-    la del calendario de la BMV."""
-    for h in (reto.config().get("horario_bmv") or []) if reto.activo() else []:
-        if str(h["desde"]) <= sesion.isoformat() <= str(h["hasta"]):
-            return pd.Timestamp(f"{sesion.isoformat()} {h['apertura']}", tz=ZONA)
-    return vigencia.calendario("XMEX").session_open(pd.Timestamp(sesion))
+    """Apertura según el horario publicado en las bases del Reto (07:30 hasta el 2-nov-2026, 08:30 después)."""
+    return vigencia.apertura_sesion("XMEX", sesion)
 
 
 def _guardar(con: sqlite3.Connection, estado: dict) -> None:
@@ -163,7 +159,7 @@ def sesion_objetivo(ahora: datetime) -> date:
     """Sesión para la que se arma el plan: la de hoy si aún no cierra; si ya cerró (o no es día hábil), la siguiente."""
     cal = vigencia.calendario("XMEX")
     hoy = pd.Timestamp(pd.Timestamp(ahora).tz_convert(ZONA).date())
-    if cal.is_session(hoy) and pd.Timestamp(ahora) < cal.session_close(hoy):
+    if cal.is_session(hoy) and pd.Timestamp(ahora) < vigencia.cierre_sesion("XMEX", hoy):
         return hoy.date()
     return cal.date_to_session(hoy, direction="next").date() if not cal.is_session(hoy) else cal.next_session(hoy).date()
 

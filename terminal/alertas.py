@@ -192,6 +192,8 @@ CADUCIDAD_H = {"datos_inciertos": 6, "dato_vencido": 6, "cambio_brusco": 8, "sto
 # Avisos que el participante espera en cuanto ocurren (su propia captura, el recordatorio de cierre y un plan nuevo):
 # no se silencian fuera del horario de la BMV.
 SIEMPRE = {"cambio_portal", "captura_pendiente", "plan_propuesta"}
+# Reglas cuyo aviso nuevo REEMPLAZA al anterior (un plan recalculado deja sin efecto el plan avisado antes).
+REEMPLAZA_ANTERIOR = {"plan_propuesta"}
 
 INCERTIDUMBRE = {
     "deriva": "Media: depende del rendimiento esperado estimado (incierto) y de precios posiblemente no vigentes.",
@@ -242,6 +244,9 @@ def procesar(con: sqlite3.Connection, condiciones: list[Condicion], cfg: dict, a
                      json.dumps(c.simulacion) if c.simulacion else None, PRIORIDAD.get(c.severidad, 3),
                      (ahora_dt + timedelta(hours=CADUCIDAD_H.get(c.regla, 24))).isoformat(timespec="seconds"),
                      (c.datos or {}).get("impacto_mxn")))
+                if c.regla in REEMPLAZA_ANTERIOR:
+                    con.execute("UPDATE alertas SET estado='caducada' WHERE regla=? AND estado='nueva' AND id<>?",
+                                (c.regla, cur.lastrowid))
                 nuevas.append({"id": cur.lastrowid, "regla": c.regla, "clave": c.clave, "titulo": c.titulo,
                                "severidad": c.severidad, "motivo": c.motivo, "accion": c.accion, "fuente": c.fuente,
                                "ts": ahora_dt.isoformat(timespec="seconds")})

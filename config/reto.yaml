@@ -1,11 +1,11 @@
 # Reglas del Reto Actinver 2026. Se editan aquí sin tocar código.
-# Fuente: https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica (consultada 2026-09-23).
+# Fuente: https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica (ver «consultado»).
 # Un valor null = regla no confirmada: la interfaz lo muestra con el aviso «regla sin confirmar».
 
 activo: true                      # aplica reglas y costos del Reto a las propuestas
 nombre: "Reto Actinver 2026"
 fuente: "https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica"
-consultado: "2026-09-29"                # re-verificado el 2026-09-29 (§1, §2, §5, §6, §8, §13, §17); sin cambios frente al 23-sep
+consultado: "2026-09-30"                # re-verificado el 2026-09-30 (§1, §2, §5, §6, §8, §13, §17); sin cambios frente al 23-sep
 # Discrepancia registrada: las bases dicen «acciones, ETFs y fondos de inversión» y no mencionan el SIC ni publican un
 # catálogo. La disponibilidad de emisoras extranjeras se toma de las capturas del simulador del participante
 # («Datos Actinver.pdf», 22-sep-2026 → config/pdf_transcripcion.csv → `uv run terminal catalogo-simulador`).
@@ -43,7 +43,7 @@ reglas:
   max_peso_emisora: 0.50          # §6/§7: «en ningún momento haber realizado compras en una sola acción por más del 50 %»
   ventas_en_corto: false          # §11
   apalancamiento: false
-  dividendos_reproducidos: false  # §13: no se pagan dividendos; sí splits → se usa precio sin ajustar
+  dividendos_reproducidos: false  # §13: no se pagan dividendos; sí splits → precio ajustado SOLO por splits
   splits_reproducidos: true
   tipos_orden: [mercado, limitada]
   vigencia_orden_limitada_dias: 1
@@ -54,7 +54,7 @@ reglas:
   limite_diario_operaciones: null # no publicado
 
 evaluacion:
-  rendimiento: "Mayor rendimiento del portafolio del 5 oct al 13 nov (3 primeros lugares por modalidad)"
+  rendimiento: "Mayor ganancia absoluta (diferencial aritmético del valor del portafolio) del 5 oct al 13 nov; 3 primeros lugares por modalidad"
   avance: "Track del inversionista en Acelera Academy: 6 tracks semanales + quiz diario (≥3 correctos/semana)"
   nota: "La terminal cubre solo la parte de portafolio; el avance educativo se hace en Acelera Academy."
 

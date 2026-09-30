@@ -2,6 +2,23 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.14.0] — 2026-09-30 (auditoría: horario BMV, escenarios, alertas, respaldos, lanzador)
+
+### Corregido
+- **Horario de la BMV.** `exchange_calendars` fija XMEX en 08:30–15:00 todo el año; las bases del Reto dicen 07:30–14:00 hasta el 2-nov-2026. Entre 14:00 y 15:00 la terminal creía abierta la bolsa y no daba por cerrada la sesión; de 07:30 a 08:30 la creía cerrada. `vigencia.apertura_sesion` y `cierre_sesion` usan ahora `horario_bmv` de `config/reto.yaml`, y los festivos siguen saliendo del calendario.
+- **Escenarios demasiado estrechos.** Usaban la volatilidad dentro de muestra de pesos ya optimizados, sesgada a la baja: en «Mixta · Ajuste», 16.6 % frente a 42.5 % fuera de muestra, con un adverso de −2.8 % en vez de −11.7 %. Ahora se toma la mayor volatilidad y la menor media entre dentro y fuera de muestra; el escenario informa qué fuente usó.
+- **Media robusta en el optimizador.** Cada activo acota sus saltos de un solo día a máx(10 %, 5 σ robusta) al estimar la media; la covarianza sigue usando la serie completa. MRNA (+175 % el 19-ago) salió de las propuestas principales, donde tenía 11.9 %.
+- **Alertas «Posible movimiento» acumuladas.** Cada recálculo dejaba otra como «nueva»; ahora la última reemplaza a las anteriores.
+- **El Ranking mostraba instrumentos que el simulador no ofrece** (QQQ era 5.º). Ahora se filtra por el catálogo del simulador, como las propuestas, y avisa cuántos omite.
+- **El iniciador no arrancaba la terminal si fallaba Tailscale.** Ahora arranca en local y avisa que el acceso remoto no está activo.
+- **Precio SIC sin marcar.** En «Propuestas» y en la simulación, las filas del SIC ahora llevan «*» (referencia: bolsa de origen × tipo de cambio) y «≈» en los títulos.
+- **Boletas.** Etiqueta explícita por estado (Capturable, Solo guía, Invalidada, Vencida, Descartada, Ejecutada); las capturables van primero y las demás se atenúan. En móvil, las filas pasan de más de 142 px a 80–99 px.
+
+### Añadido
+- Respaldo diario verificado de la base desde el ciclo del motor (`data/respaldos`, 14 copias). Antes no existía ningún respaldo.
+- Riesgo «No supera a la referencia simple» cuando la propuesta rinde menos que 1/N fuera de muestra.
+- `config/reto.yaml`: bases re-verificadas el 30-sep; el criterio es «mayor ganancia absoluta».
+
 ## [0.13.0] — 2026-09-30 (auditoría integral)
 
 ### Corregido (crítico)

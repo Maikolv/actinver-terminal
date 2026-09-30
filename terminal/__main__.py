@@ -67,24 +67,13 @@ def actualizar(_args) -> None:
 
 def respaldar(args) -> None:
     from . import db
-    origen = db.ruta_db()
-    destino_dir = origen.parent / "respaldos"
-    destino_dir.mkdir(parents=True, exist_ok=True)
-    destino = destino_dir / f"terminal-{datetime.now():%Y%m%d-%H%M%S}.db"
-    src = sqlite3.connect(origen)
-    dst = sqlite3.connect(destino)
-    with dst:
-        src.backup(dst)
-    ok = dst.execute("PRAGMA integrity_check").fetchone()[0]
-    n = dst.execute("SELECT COUNT(*) FROM transacciones").fetchone()[0]
-    src.close()
-    dst.close()
-    if ok != "ok":
-        destino.unlink(missing_ok=True)
-        sys.exit(f"Respaldo inválido ({ok}); no se conservó")
-    copias = sorted(destino_dir.glob("terminal-*.db"))
-    for viejo in copias[: max(len(copias) - args.conservar, 0)]:
-        viejo.unlink()
+    try:
+        destino = db.respaldar(conservar=args.conservar)
+    except RuntimeError as e:
+        sys.exit(str(e))
+    c = sqlite3.connect(destino)
+    n = c.execute("SELECT COUNT(*) FROM transacciones").fetchone()[0]
+    c.close()
     print(f"Respaldo verificado: {destino} (integridad ok, {n} operaciones)")
 
 

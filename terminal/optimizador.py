@@ -3,7 +3,8 @@
 Función objetivo (documentada y reproducible):
     maximizar  μᵀw − λ·wᵀΣw − Σ c_i·|w_i − w_actual_i| − γ·‖w‖²
     sujeto a   Σw = 1, 0 ≤ w_i ≤ tope_i, restricciones de grupo (deuda mínima, exposición USD máxima)
-  μ: media de rendimientos diarios en MXN con contracción James-Stein (ShrunkMu), ajustada por escenario.
+  μ: media ROBUSTA de rendimientos diarios en MXN: cada activo acota sus saltos únicos (|r| > máx(10 %, 5 σ robusta))
+     antes de la contracción James-Stein (ShrunkMu); ajustada por escenario. Σ usa los rendimientos completos.
   Σ: covarianza Ledoit-Wolf.   λ: aversión al riesgo del perfil.   c_i: comisión + IVA + spread estimado
   (amortizado en el horizonte).   γ: regularización L2 que reduce la sensibilidad de los pesos al ruido.
 
@@ -49,6 +50,34 @@ ESCENARIOS = {  # ajuste anual al rendimiento esperado por tipo de activo (supue
 }
 
 
+SALTO_MIN = 0.10      # nunca se acota un día normal de hasta ±10 %
+SALTO_SIGMAS = 5.0    # ni uno dentro de 5 desviaciones robustas (MAD) del propio activo
+
+
+def acotar_saltos(X) -> np.ndarray:
+    """Rendimientos con los saltos únicos acotados, activo por activo (solo para estimar la MEDIA).
+
+    Una fusión o una noticia puntual (FUBO +245 % el 6-ene-2025, MRNA +175 % el 19-ago-2026) no se repite: con la
+    media simple, un solo día así dominaba la selección. Umbral por activo = máx(10 %, 5 × 1.4826 × MAD); el día se
+    conserva con ese tope, no se borra. La covarianza sigue usando la serie completa: el riesgo no se suaviza."""
+    A = np.asarray(X, dtype=float)
+    med = np.nanmedian(A, axis=0)
+    mad = np.nanmedian(np.abs(A - med), axis=0) * 1.4826
+    u = np.maximum(SALTO_MIN, SALTO_SIGMAS * mad)
+    return np.clip(A, med - u, med + u)
+
+
+class MuRobusto(BaseMu):
+    """ShrunkMu (James-Stein) sobre rendimientos con saltos únicos acotados."""
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None, **_):
+        self.mu_ = ShrunkMu().fit(acotar_saltos(X)).mu_
+        return self
+
+
 class PreseleccionAcciones(skf.SelectorMixin, skb.BaseEstimator):
     """Conserva las k acciones con mayor razón rendimiento/volatilidad de la ventana de entrenamiento
     y todos los instrumentos que no son acciones. Se ajusta dentro de cada ventana (sin mirar el futuro)."""
@@ -64,7 +93,7 @@ class PreseleccionAcciones(skf.SelectorMixin, skb.BaseEstimator):
         X = skv.validate_data(self, X)
         nombres = nombres or [str(i) for i in range(X.shape[1])]
         es_acc = np.array([n in set(self.acciones) for n in nombres])
-        razon = X.mean(axis=0) / np.maximum(X.std(axis=0), 1e-12)
+        razon = acotar_saltos(X).mean(axis=0) / np.maximum(X.std(axis=0), 1e-12)  # media robusta, riesgo completo
         keep = ~es_acc
         idx = np.where(es_acc)[0]
         if len(idx):
@@ -243,7 +272,7 @@ def _parametros_lente(lente: str, perfil: dict, ajustes: Ajustes) -> tuple[float
 
 
 class MuFijo(BaseMu):
-    """μ precalculado (contracción James-Stein sobre TODO el universo) para que la propuesta final, su
+    """μ precalculado (media robusta con contracción James-Stein sobre TODO el universo) para que la propuesta final, su
     rendimiento esperado y la comparación con la cartera actual usen exactamente el mismo estimador."""
 
     def __init__(self, mu=None):
@@ -258,7 +287,7 @@ class MuFijo(BaseMu):
 
 
 def mu_global(X: pd.DataFrame) -> pd.Series:
-    return pd.Series(ShrunkMu().fit(X.values).mu_, index=X.columns)
+    return pd.Series(MuRobusto().fit(X.values).mu_, index=X.columns)
 
 
 def _ajuste_final(tipo: str, perfil: dict, ajustes: Ajustes, elegibles_l: list[dict], previos: dict, X: pd.DataFrame,
@@ -309,7 +338,7 @@ def _modelo(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], pr
         objective_function=ObjectiveFunction.MAXIMIZE_UTILITY,
         risk_measure=RiskMeasure.VARIANCE,
         risk_aversion=aversion * aversion_mult,  # misma unidad que μ y Σ diarios
-        prior_estimator=EmpiricalPrior(mu_estimator=MuFijo(mu_fijo) if mu_fijo is not None else ShrunkMu(),
+        prior_estimator=EmpiricalPrior(mu_estimator=MuFijo(mu_fijo) if mu_fijo is not None else MuRobusto(),
                                        covariance_estimator=LedoitWolf()),
         max_weights=topes,
         # costo único amortizado en el horizonte (skfolio lo descuenta por observación diaria)
@@ -420,17 +449,28 @@ ESC_CONTRACCION = 0.5   # declarada antes de evaluar: la media histórica de lo 
 ESC_SALTO = 0.10        # días de la cartera con |r| > 10 % (fusiones, noticias puntuales) se acotan a ±10 %
 
 
-def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: dict) -> dict:
+def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: dict,
+                oos: pd.Series | None = None) -> dict:
     """Percentiles al horizonte REAL (en el Reto: hasta el cierre del 13-nov), sin piso artificial.
 
     La media histórica de activos elegidos por su historia está sesgada al alza (sesgo de selección) y la dominan saltos
     únicos que no se repiten: se excluyen de la media los días con |r| > ESC_SALTO y se contrae a la mitad. La
-    volatilidad completa, el peor mes y la caída máxima históricos se informan aparte con esos días."""
+    volatilidad completa, el peor mes y la caída máxima históricos se informan aparte con esos días.
+    Además, la volatilidad dentro de muestra de pesos OPTIMIZADOS está sesgada a la baja (el optimizador la minimiza en
+    esa misma muestra): con la validación fuera de muestra (`oos`) se usa la MAYOR volatilidad y la MENOR media."""
     rp = _serie_pesos(X, pesos)
     saltos = rp[rp.abs() > ESC_SALTO]
     rw = rp.clip(-ESC_SALTO, ESC_SALTO)  # winsorizada: el salto cuenta como un día de ±10 %, no como +200 %
     mu = float(rw.mean() * DIAS) * ESC_CONTRACCION
     sig = float(rw.std() * math.sqrt(DIAS))
+    fuente = {"media": "dentro de muestra (contraída)", "volatilidad": "dentro de muestra"}
+    if oos is not None and len(oos) >= 20:
+        ow = oos.clip(-ESC_SALTO, ESC_SALTO)
+        mu_o, sig_o = float(ow.mean() * DIAS), float(ow.std() * math.sqrt(DIAS))
+        if mu_o < mu:
+            mu, fuente["media"] = mu_o, "fuera de muestra"
+        if sig_o > sig:
+            sig, fuente["volatilidad"] = sig_o, "fuera de muestra"
     h = max(horizonte, 5 / DIAS)
     z = 1.2816
     g = (mu - sig ** 2 / 2) * h
@@ -452,11 +492,12 @@ def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: 
             "renta_variable": rv, "exposicion_usd": usd,
         },
         "sesiones_horizonte": round(h * DIAS),
-        "media_anual_usada": mu, "volatilidad_anual": sig, "volatilidad_anual_con_saltos": float(rp.std() * math.sqrt(DIAS)),
+        "media_anual_usada": mu, "volatilidad_anual": sig, "fuente_parametros": fuente, "volatilidad_anual_con_saltos": float(rp.std() * math.sqrt(DIAS)),
         "saltos_excluidos_de_la_media": [{"fecha": str(pd.Timestamp(k).date()), "rend": round(float(v), 4)}
                                          for k, v in saltos.items()],
         "nota": (f"Percentiles log-normales al horizonte de {round(h * DIAS)} sesiones; media histórica contraída "
                  f"{ESC_CONTRACCION:.0%} (sesgo de selección) y {len(saltos)} día(s) de salto acotados a ±{ESC_SALTO:.0%}; "
+                 f"media {fuente['media']}, volatilidad {fuente['volatilidad']} (se usa la menos optimista); "
                  "peor mes y caída máxima con la historia completa. No son pronósticos."),
     }
 
@@ -502,7 +543,8 @@ def _puntuar(m: dict, pesos: pd.Series, elegibles: dict, ajustes: Ajustes, perfi
                            "explicacion": v[1]} for k, v in c.items()]}
 
 
-def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: list, perfil: dict) -> list[str]:
+def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: list, perfil: dict,
+             m_ew: dict | None = None) -> list[str]:
     w = pesos[pesos > 0].sort_values(ascending=False)
     out = []
     top3 = float(w.iloc[:3].sum())
@@ -516,6 +558,9 @@ def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: l
     if m.get("sesiones") and m["sesiones"] < 126:
         out.append(f"Validación corta: solo {m['sesiones']} sesiones fuera de muestra (menos de medio año); la puntuación "
                    "no se puede verificar bien con los datos actuales.")
+    if m_ew and m.get("rend_anual") is not None and m_ew.get("rend_anual") is not None and m["rend_anual"] < m_ew["rend_anual"]:
+        out.append(f"No supera a la referencia simple: fuera de muestra rindió {m['rend_anual']:.1%} anual frente a "
+                   f"{m_ew['rend_anual']:.1%} de repartir por igual (1/N) el mismo universo en el mismo periodo.")
     if m.get("max_caida") is not None:
         out.append(f"Caída máxima en la validación fuera de muestra: {m['max_caida']:.0%}; "
                    f"peor trimestre histórico con estos pesos: {esc['peor_trimestre_historico']:.0%}.")
@@ -788,7 +833,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     estabilidad = 1 - float(np.mean([s["cambio_pesos"] for s in sens if "cambio_pesos" in s] or [1]))
 
     contrib = _contribucion_riesgo(X, pesos)
-    esc = _escenarios(X, pesos[pesos > 0], float(perfil["horizonte_anios"]), elegibles)
+    esc = _escenarios(X, pesos[pesos > 0], float(perfil["horizonte_anios"]), elegibles, oos=oos)
     capital = float(perfil.get("capital") or 0)
     asignacion, residuo = _asignacion_discreta(pesos, elegibles, capital)
     for a in asignacion:
@@ -830,7 +875,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "pesos": asignacion, "efectivo_residual": residuo, "capital": capital,
         "metricas_estimacion": _metricas(_serie_pesos(X, pesos)),
         "comparacion": comparacion, "sensibilidad": sens, "estabilidad": round(estabilidad, 3),
-        "escenarios": esc, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil),
+        "escenarios": esc, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil, m_ew),
         "cambios": cmb, "ordenes": plan_ordenes, "puntuacion": punt, "busqueda_puntuacion": busqueda,
         "mercado_acciones": perfil.get("mercado_acciones", "ambos"),
         "n_elegibles": len(elegibles), "n_excluidos": len(excluidos),

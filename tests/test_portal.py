@@ -136,3 +136,19 @@ def test_recordatorio_de_captura_al_cierre(con):
     portal.guardar(con, TEXTO, "2026-09-28T14:05", _ins(con), confirmar=True)
     conds = [c for c in alertas.reglas_portal(con, despues) if c.regla == "captura_pendiente"]
     assert not conds[0].activa
+
+
+def test_nuevo_plan_reemplaza_la_alerta_de_plan_anterior(con, monkeypatch):
+    """Cada recálculo con otras órdenes crea un aviso nuevo; el anterior ya no aplica y no debe seguir como «nueva»."""
+    monkeypatch.setattr(notificador, "enviar", lambda *a, **k: {})
+    def prop(filas):
+        return {"mixta_puntuacion": {"clave": "mixta_puntuacion", "nombre": "Mixta", "estado": "calculada", "avisos": [],
+                                     "puntuacion": {"total": 80.0}, "cambios": {"filas": filas, "costo_total": 1.0}}}
+    compra = {"id": "BMV:AMX", "clave_operable": "AMX B", "accion": "comprar", "monto_mxn": 50000.0, "delta_pp": 5.0}
+    otra = {**compra, "id": "BMV:WALMEX", "clave_operable": "WALMEX *"}
+    hora = datetime(2026, 9, 29, 16, 0, tzinfo=UTC)
+    alertas.procesar(con, alertas.reglas_plan_propuesta({"fuente": "local"}, prop([compra])), _cfg(), hora)
+    alertas.procesar(con, alertas.reglas_plan_propuesta({"fuente": "local"}, prop([otra])), _cfg(), hora)
+    vivas = con.execute("SELECT clave FROM alertas WHERE regla='plan_propuesta' AND estado='nueva'").fetchall()
+    assert len(vivas) == 1 and "mixta_puntuacion:" in vivas[0][0]
+    assert con.execute("SELECT COUNT(*) FROM alertas WHERE regla='plan_propuesta' AND estado='caducada'").fetchone()[0] == 1

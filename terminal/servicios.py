@@ -440,6 +440,11 @@ def ciclo_seguro(ajustes: Ajustes, forzar: bool = False, en_vivo: bool = False) 
         con = db.conectar()
         try:
             db.inicializar(con)
+            if not ajustes.es_demo:
+                try:
+                    db.respaldo_diario()  # un respaldo verificado al día (data/respaldos, 14 copias)
+                except Exception:  # noqa: BLE001 - un respaldo fallido se registra, no detiene el ciclo
+                    log.exception("respaldo diario")
             return ciclo(con, ajustes, forzar=forzar, en_vivo=en_vivo)
         finally:
             con.close()

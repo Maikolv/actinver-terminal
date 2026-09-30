@@ -203,6 +203,40 @@ def ruta_db() -> Path:
     return d / "terminal.db"
 
 
+def respaldar(origen: Path | None = None, conservar: int = 14) -> Path:
+    """Copia consistente (API de respaldo de SQLite) con verificación de integridad; conserva las `conservar` más recientes."""
+    import time
+    origen = Path(origen or ruta_db())
+    destino_dir = origen.parent / "respaldos"
+    destino_dir.mkdir(parents=True, exist_ok=True)
+    destino = destino_dir / f"terminal-{time.strftime('%Y%m%d-%H%M%S')}-{time.perf_counter_ns() % 1000000:06d}.db"
+    src, dst = sqlite3.connect(origen), sqlite3.connect(destino)
+    try:
+        with dst:
+            src.backup(dst)
+        ok = dst.execute("PRAGMA integrity_check").fetchone()[0]
+    finally:
+        src.close()
+        dst.close()
+    if ok != "ok":
+        destino.unlink(missing_ok=True)
+        raise RuntimeError(f"Respaldo inválido ({ok}); no se conservó")
+    copias = sorted(destino_dir.glob("terminal-*.db"))
+    for viejo in copias[: max(len(copias) - conservar, 0)]:
+        viejo.unlink()
+    return destino
+
+
+def respaldo_diario(origen: Path | None = None, conservar: int = 14, horas: float = 20) -> Path | None:
+    """Un respaldo verificado si el último tiene más de `horas`; lo llama el motor en cada ciclo."""
+    import time
+    origen = Path(origen or ruta_db())
+    copias = sorted((origen.parent / "respaldos").glob("terminal-*.db"), key=lambda p: p.stat().st_mtime)
+    if copias and time.time() - copias[-1].stat().st_mtime < horas * 3600:
+        return None
+    return respaldar(origen, conservar)
+
+
 def conectar(ruta: Path | str | None = None) -> sqlite3.Connection:
     con = sqlite3.connect(str(ruta or ruta_db()), check_same_thread=False, timeout=30)
     con.row_factory = sqlite3.Row
