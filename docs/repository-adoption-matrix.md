@@ -93,3 +93,18 @@ Inspección de los clones locales en `C:\Users\MIKE\Desktop\Repos` el 2026-09-23
 - **colibri**: `JustVugg/colibri` (motor de inferencia MoE en C), no un modelo financiero.
 
 Generado por `scripts/matriz_repositorios.py`.
+
+## Nuevos clones revisados el 30-sep-2026
+
+Estos cinco clones aparecieron despues de la inspeccion original. Se evaluaron por finalidad, licencia y utilidad para la Terminal Actinver. Estar en la carpeta Repos o en la barra lateral de Claude no equivale a estar conectado al producto.
+
+| Clon | Commit local | Licencia observada | Decision | Motivo |
+|---|---|---|---|---|
+| [financial-services](https://github.com/anthropics/financial-services) | `574ed36` | Apache-2.0 | Adoptar como guia de auditoria, sin copiar agentes | Contiene plantillas y skills para flujos de investigacion financiera; requieren revision humana y no ejecutan inversiones. Se cita en el prompt de auditoria. |
+| [hindsight](https://github.com/vectorize-io/hindsight) | `eb021da` | MIT | No integrar por ahora | Servicio de memoria para agentes; introduciria almacenamiento y posible transmision de datos financieros privados sin mejorar precios o reglas del Reto. |
+| [repomix](https://github.com/yamadashy/repomix) | `0b3f82b` | Licencia permisiva del archivo LICENSE | Herramienta opcional de desarrollo | Puede empaquetar contexto para una auditoria, pero se debe excluir `.env`, `data/` y archivos privados. El indice de contexto del proyecto ya cubre esta necesidad. |
+| [show-me-the-money](https://github.com/iamzifei/show-me-the-money) | `b1e2f9e` | CC BY-NC 4.0 | No adoptar | Sistema para negocios autonomos, no un proveedor de precios ni analisis del Reto; licencia no comercial. |
+| [WeKnora](https://github.com/Tencent/WeKnora) | `1dbe9d0` | MIT con avisos de terceros | Evaluacion futura, no integrar | Base de conocimiento empresarial con servicios adicionales; podria organizar documentos autorizados, pero no aporta precios vigentes y ampliaria la operacion del sistema. |
+
+La integracion de TradingView que otra sesion prepara en `tradingview/` sigue como trabajo local sin confirmar; esta matriz no la marca como activa hasta tener pruebas y revisar sus condiciones de uso.
+
