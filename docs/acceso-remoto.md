@@ -1,38 +1,21 @@
-# Acceso remoto a la terminal (privado, con Tailscale)
+# Acceso remoto privado a Actinver Terminal
 
-La terminal no tiene usuario ni contraseña, así que **nunca debe quedar abierta a Internet**. El acceso remoto usa **Tailscale Serve**, que crea una red privada entre **sus** dispositivos:
+La terminal sigue escuchando solo en `127.0.0.1:8765`. **Tailscale Serve** ofrece una dirección HTTPS accesible únicamente desde dispositivos de la misma red privada Tailscale. La terminal exige además el nombre DNS de esta PC y la identidad de la cuenta Tailscale. No se usa Tailscale Funnel ni se abre el puerto del router.
 
-- El servidor sigue escuchando solo en `127.0.0.1` de su PC.
-- Tailscale lo publica con HTTPS únicamente dentro de su red.
-- La terminal solo acepta una petición remota si su nombre `*.ts.net` está autorizado en `.env` y si trae la identidad del usuario de la red (cabecera `Tailscale-User-Login`, que Tailscale Serve añade).
-- Un enlace público, como Tailscale **Funnel** o un túnel de Cloudflare o ngrok, se rechaza.
+## Activación
 
-## Configuración (una sola vez)
+1. Instale Tailscale en la PC desde [su página oficial para Windows](https://tailscale.com/download/windows) e inicie sesión. Si `winget` funciona en su equipo, también puede usar `winget install tailscale.tailscale`.
+2. Instale Tailscale en su celular o laptop e inicie sesión con la **misma cuenta**.
+3. Haga doble clic en `iniciar-remoto.bat` dentro del proyecto. El iniciador encuentra Tailscale aunque no esté en `PATH`, toma el nombre y usuario de la cuenta conectada, configura `.env` sin mostrar sus secretos, reutiliza la terminal cuando ya tiene esa configuración y activa Serve. Si Tailscale solicita habilitar HTTPS en la red, complete la página de configuración que abre.
+4. Abra desde el otro dispositivo la dirección `https://...ts.net` que muestra el iniciador. La PC debe permanecer encendida, sin suspenderse, y Tailscale debe seguir conectado.
 
-1. **Instale Tailscale en la PC** donde corre la terminal:
-   ```
-   winget install tailscale.tailscale
-   ```
-   Abra Tailscale e inicie sesión con su cuenta. Si no tiene una, créela usted.
-2. **Instale Tailscale en su celular o laptop** (App Store, Google Play o tailscale.com/download) e inicie sesión con **la misma cuenta**.
-3. En la consola de Tailscale (login.tailscale.com), active **MagicDNS** y **HTTPS Certificates** en DNS.
-4. Ejecute `iniciar-remoto.bat`. Publica el puerto 8765 en su red, muestra la dirección (por ejemplo, `https://mi-pc.tailXXXX.ts.net`) e inicia la terminal.
-5. Agregue a `.env` el nombre sin `https://`. Si quiere limitarlo a su propia cuenta, agregue también su usuario:
-   ```
-   TERMINAL_HOSTS_REMOTOS=mi-pc.tailXXXX.ts.net
-   TERMINAL_USUARIOS_REMOTOS=su-correo@ejemplo.com
-   ```
-   Reinicie con `iniciar-remoto.bat`.
-6. Desde el celular, con Tailscale conectado, abra la dirección que se mostró.
+Para detener la publicación privada, ejecute `tailscale serve --https=443 off` desde una consola con acceso a Tailscale. La terminal local seguirá disponible en `http://127.0.0.1:8765`.
 
-## Qué funciona a distancia
+## Seguridad y alcance
 
-Todo lo de la interfaz: resumen, propuestas, boletas, captura del portal, ranking y alertas. La PC debe estar **encendida y sin suspenderse**, con la terminal corriendo.
+- `TERMINAL_HOSTS_REMOTOS` y `TERMINAL_USUARIOS_REMOTOS` se derivan de la sesión Tailscale de esta PC y se guardan en `.env`. El servidor debe reiniciarse para aplicar un cambio; el iniciador lo hace solo cuando es necesario.
+- Tailscale Serve añade `Tailscale-User-Login`; Tailscale Funnel, que es público, no añade esa cabecera y la terminal lo rechaza. [Documentación oficial de Serve](https://tailscale.com/docs/features/tailscale-serve).
+- El usuario decide y captura cada orden en el portal del Reto. El acceso remoto no activa operaciones automáticas.
+- Telegram continúa disponible sin abrir la interfaz web a distancia.
 
-Sin Tailscale sigue disponible el bot de Telegram (`/plan`, `/boletas`, `/estado`, preguntas).
-
-## Qué no hacer
-
-- No use `tailscale funnel`: publica la terminal en Internet.
-- No abra el puerto 8765 en el router ni use túneles públicos. La terminal los rechaza por diseño.
-- Para dejar de publicarla: `tailscale serve --https=443 off` (o `tailscale serve reset`).
+Si el inicio de sesión de Tailscale no está terminado, el iniciador mostrará un mensaje y no publicará la terminal.

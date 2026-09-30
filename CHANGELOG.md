@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.12.2] — 2026-09-29 (iniciador remoto)
+
+### Corregido
+- `iniciar-remoto.bat` encuentra Tailscale aunque no esté en `PATH`, obtiene el host y usuario de la sesión privada, actualiza solo esas dos claves de `.env` y reutiliza la terminal cuando ya acepta ese acceso. Si necesita aplicar la configuración, reinicia únicamente el proceso de esta terminal.
+- La guía de acceso remoto describe la instalación oficial para Windows cuando `winget` no está disponible.
+- El acceso remoto no se activa si Tailscale no ha iniciado sesión; se comprobó este fallo seguro y el rechazo de un host no autorizado. La conexión real entre dispositivos queda pendiente del inicio de sesión del usuario.
+
 ## [0.12.1] — 2026-09-29 (serie exacta de JPMRVUS)
 
 ### Corregido
