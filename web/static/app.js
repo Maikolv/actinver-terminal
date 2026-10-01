@@ -538,6 +538,48 @@ function pintarPortal(cp, c) {
   k.posiciones, { caption: "Tal como se copió del portal. Abajo, la terminal los valúa con sus propios precios.", vacio: "La captura no incluyó posiciones." }));
   limpiar("portal-resumen", ...out);
 }
+/* Capturas de pantalla → texto (OCR local de Windows en el servidor de esta PC; las imágenes no se guardan) */
+function horaLocalAhora() {
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Mexico_City", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit" }).format(new Date()).replace(" ", "T");
+}
+async function leerCapturas(archivos) {
+  const imgs = [...archivos].filter((a) => /^image\/(png|jpeg)$/.test(a.type)).slice(0, 6);
+  if (!imgs.length) { notificar("Use capturas PNG o JPG."); return; }
+  const fd = new FormData();
+  imgs.forEach((a, i) => fd.append("imagenes", a, a.name || `captura-${i + 1}.png`));
+  limpiar("resultado-capturas", h("p", { clase: "cargando", texto: `Leyendo ${imgs.length} captura(s)… (unos segundos por imagen)` }));
+  try {
+    const r = await fetch("/api/portal/capturas-imagen", { method: "POST", body: fd, headers: { "X-CSRF-Token": CSRF } });
+    const d = await r.json();
+    if (!r.ok) throw new Error((d.errores || []).join(" · ") || d.detail || d.error || "No se pudieron leer las capturas.");
+    const f = document.getElementById("form-captura");
+    f.elements.texto.value = d.texto;
+    const sinHora = !f.elements.hora_portal.value;
+    if (sinHora) f.elements.hora_portal.value = horaLocalAhora();
+    limpiar("resultado-capturas",
+      h("div", { clase: "info-caja", texto: `${d.imagenes} captura(s) leída(s): ${d.n_posiciones} posición(es)` + (Object.keys(d.resumen || {}).length ? ` y ${Object.keys(d.resumen).join(", ")}` : "") +
+        `. Compare el texto con su captura${sinHora ? " y ajuste la hora a la que tomó la captura" : ""}; abajo está la vista previa.` }),
+      ...(d.avisos || []).map((a) => h("div", { clase: "aviso-caja", texto: a })),
+      (d.lectura || []).length ? h("details", {}, h("summary", { texto: "Ver lo que leyó el OCR (filas tal cual)" }),
+        h("pre", { clase: "lectura-ocr", texto: d.lectura.join("\n") })) : null);
+    if (d.texto) f.querySelector('[data-accion="previa"]').click();
+  } catch (e) { limpiar("resultado-capturas", errorCaja(e)); }
+}
+(() => {
+  const zona = document.getElementById("zona-capturas"), entrada = document.getElementById("archivo-capturas");
+  zona.addEventListener("click", () => entrada.click());
+  zona.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); entrada.click(); } });
+  entrada.addEventListener("change", () => { if (entrada.files.length) leerCapturas(entrada.files); entrada.value = ""; });
+  zona.addEventListener("dragover", (ev) => { ev.preventDefault(); zona.classList.add("encima"); });
+  zona.addEventListener("dragleave", () => zona.classList.remove("encima"));
+  zona.addEventListener("drop", (ev) => { ev.preventDefault(); zona.classList.remove("encima"); leerCapturas(ev.dataTransfer.files); });
+  document.addEventListener("paste", (ev) => {  // Ctrl+V de una captura mientras se ve «Mi portafolio Actinver»
+    if (document.getElementById("panel-cartera").hidden) return;
+    const imgs = [...(ev.clipboardData ? ev.clipboardData.files : [])].filter((a) => a.type.startsWith("image/"));
+    if (imgs.length) { ev.preventDefault(); leerCapturas(imgs); }
+  });
+})();
 function datosCaptura(f, confirmar) {
   return { texto: f.elements.texto.value, hora_portal: f.elements.hora_portal.value, efectivo: f.elements.efectivo.value,
     por_liquidar: f.elements.por_liquidar.value, valor_portafolio: f.elements.valor_portafolio.value, confirmar };

@@ -2,6 +2,23 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.16.0] — 2026-09-30 (capturas de pantalla del portafolio)
+
+### Añadido
+- **Capturas de pantalla en «Mi portafolio Actinver».** Se arrastran, se eligen o se pegan con Ctrl+V. El OCR de Windows (español) las lee en esta PC, en un proceso aparte (sus bibliotecas chocan con las de scipy), sin guardar ni enviar las imágenes. El texto resultante pasa por la misma vista previa y confirmación que el texto pegado.
+- **Robustez frente al OCR:**
+  - dos lecturas (tamaño original y ampliada) que se combinan;
+  - montos reconstruidos con sus centavos («$611.62509» → 611,625.09) y confusiones del «$» (3, 5, S, «SI» = «$1») resueltas por coherencia de la fila: costo ÷ costo unitario ≈ títulos y precio ≈ costo;
+  - un título ilegible se deduce del costo;
+  - encabezados por aproximación y filas ancladas en «Ver Detalle»;
+  - «Ver lo que leyó el OCR» muestra la lectura tal cual.
+- Paquetes `winrt-*` (MIT) solo en Windows.
+
+### Seguridad
+- Una captura cuyas posiciones difieren más de 1 % de «Inversiones» del portal ya no se puede guardar.
+- Si no se lee la «Valuación total», se calcula con el resumen del portal y no con las filas leídas, para que el cuadre sí detecte un título o precio mal leído.
+- Límite de 30 MB solo para la ruta de capturas; el resto sigue en 1 MB.
+
 ## [0.15.1] — 2026-09-30 (criterio «mayor plusvalía» y tabla real del portal)
 
 ### Añadido

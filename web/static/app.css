@@ -84,6 +84,9 @@ a { color: var(--acento); }
 /* Secciones técnicas (boletas e historial, ranking, mercado, datos, ayuda) se muestran con «Más» */
 .pestanas:not(.con-secundarias) [role="tab"].secundaria:not([aria-selected="true"]) { display: none; }
 details.tarjeta > summary { cursor: pointer; font-weight: 600; }
+.zona-capturas { display: grid; gap: 4px; border: 2px dashed var(--borde); border-radius: var(--radio); padding: 16px; margin: 10px 0;
+  cursor: pointer; background: var(--superficie); }
+.zona-capturas:hover, .zona-capturas:focus-visible, .zona-capturas.encima { border-color: var(--acento); outline: none; }
 
 main { max-width: 1280px; margin: 0 auto; padding: 20px var(--espacio) 96px; min-height: 100vh; }
 #resumen-contenido { min-height: 60vh; }
@@ -255,3 +258,4 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
 .ficha dt { color: var(--texto-2); }
 .ficha dd { margin: 0; }
 @media (max-width: 720px) { .ficha dl { grid-template-columns: 1fr; } }
+.lectura-ocr { white-space: pre-wrap; font-size: .8rem; max-height: 260px; overflow: auto; }

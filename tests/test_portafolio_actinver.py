@@ -67,3 +67,10 @@ def test_tabla_real_del_portal_valor_al_costo_es_el_costo_unitario(con):
     alpek = next(p for p in r["posiciones"] if p["instrumento_id"] == "BMV:ALPEK")
     assert alpek["titulos"] == 5430 and alpek["costo_promedio"] == 14.72 and alpek["precio"] == 14.88
     assert alpek["valor"] == round(5430 * 14.88, 2)            # valor de mercado = títulos × precio actual
+
+
+def test_posiciones_que_no_suman_las_inversiones_del_portal_no_se_guardan(con):
+    """Un título o precio mal leído (p. ej. por OCR) no debe guardarse aunque el total se haya calculado de las filas."""
+    mal = TEXTO.replace("ALPEK\tA\t20,000\t14.90\t14.78\t295,600.00", "ALPEK\tA\t3\t14.90\t14.78\t44.34")
+    r = portal.guardar(con, mal, "2026-09-30T14:45", mercado.instrumentos(con), confirmar=True)
+    assert not r["confirmado"] and any("«Inversiones»" in e for e in r["errores"])

@@ -233,6 +233,12 @@ def guardar(con: sqlite3.Connection, texto: str, hora_portal: str, instrumentos:
             errores.append("faltan posiciones: el valor total difiere del efectivo"
                            + (" más lo por liquidar" if pl else "") + "; copie también la tabla de posiciones")
     valores = [p["valor"] for p in r["posiciones"]]
+    inv = r.get("invertido")
+    if inv and valores and all(v is not None for v in valores) and abs(sum(valores) / inv - 1) > TOLERANCIA_CUADRE:
+        errores.append(f"las posiciones suman {sum(valores):,.2f} y el portal dice «Inversiones» {inv:,.2f}: revise títulos y "
+                       "precios (o si falta una fila) antes de guardar")
+    if any(p.get("valor") is None for p in r["posiciones"]):
+        r["advertencias"].append("Hay posiciones sin precio ni valor: se valuarán con el precio de la terminal.")
     if valores and all(v is not None for v in valores) and r["efectivo"] is not None and r["valor_portafolio"]:
         diferencia = abs((sum(valores) + r["efectivo"] + pl) / r["valor_portafolio"] - 1)
         if diferencia > TOLERANCIA_CUADRE:

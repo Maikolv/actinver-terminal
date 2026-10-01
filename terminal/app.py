@@ -540,6 +540,29 @@ def post_captura_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
     return r
 
 
+@app.post("/api/portal/capturas-imagen")
+async def post_capturas_imagen(imagenes: list[UploadFile] = File(...), con=Depends(con_db)):
+    """Capturas de pantalla del portafolio → texto para la vista previa. OCR de Windows en esta PC; las imágenes se
+    procesan en memoria y no se guardan. No registra nada: el participante revisa y confirma en la vista previa."""
+    from starlette.concurrency import run_in_threadpool
+    from . import ocr_portal
+    if not 1 <= len(imagenes) <= ocr_portal.MAX_IMAGENES:
+        raise cartera.ErrorValidacion([f"Suba entre 1 y {ocr_portal.MAX_IMAGENES} capturas."])
+    ins = mercado.instrumentos(con)
+    resultados, avisos = [], []
+    for n, im in enumerate(imagenes, 1):
+        data = await im.read(ocr_portal.LIMITE_BYTES + 1)
+        try:
+            resultados.append(await run_in_threadpool(ocr_portal.leer_captura, data, ins))
+        except ocr_portal.ErrorImagen as e:
+            avisos.append(f"Captura {n}: {e}")
+        except ocr_portal.OcrNoDisponible as e:
+            raise HTTPException(status_code=501, detail=str(e)) from None
+    out = ocr_portal.texto_para_captura(resultados)
+    out.update(avisos=avisos + out["avisos"], imagenes=len(resultados))
+    return out
+
+
 @app.post("/api/saldo-portal")
 def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
     """El participante copia a mano el valor y el efectivo que muestra el portal (la terminal no entra al portal)."""

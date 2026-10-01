@@ -170,6 +170,13 @@
       <details id="portal-captura" open>
         <summary>Actualizar desde el portal (copiar y pegar)</summary>
         <p class="ayuda">No existe una integración oficial: el simulador no ofrece API ni exportación y el reglamento (§17) prohíbe robots y programas en el portal, así que la terminal no entra a él. En el portal: 1) en el Dashboard copie el recuadro <strong>«Tu inversión»</strong> (Valuación Total Ahora, Inversiones, Poder de compra y Movimientos por liquidar); 2) abra <strong>«Ver detalle de mi inversión»</strong> y copie la tabla de posiciones <strong>con sus encabezados</strong>. Pegue ambas aquí, escriba la hora que muestra el portal y pulse «Vista previa». Nada se guarda hasta que confirme.</p>
+        <div id="zona-capturas" class="zona-capturas" tabindex="0" role="button" aria-describedby="ayuda-capturas">
+          <strong>📷 Subir o pegar capturas de pantalla del portal</strong>
+          <span>Arrástrelas aquí, pulse para elegirlas o pegue con Ctrl+V una captura hecha con Win+Shift+S: el recuadro «Tu inversión» (o «Portafolio») y la tabla de «Ver detalle de mi inversión» (puede subir varias páginas).</span>
+          <input type="file" id="archivo-capturas" accept="image/png,image/jpeg" multiple hidden>
+        </div>
+        <p class="ayuda" id="ayuda-capturas">Se leen en esta PC con el reconocimiento de texto de Windows y no se guardan ni se envían a ningún servicio. El texto leído aparece abajo para que lo compare con su captura; nada se guarda hasta que confirme.</p>
+        <div id="resultado-capturas" aria-live="polite"></div>
         <form id="form-captura" class="formulario" novalidate>
           <label>Contenido copiado del portal<textarea name="texto" rows="9" maxlength="200000" placeholder="Valuación Total Ahora	$995,116.81&#10;Inversiones	$611,625.09&#10;Poder de compra	$229,883.38&#10;Movimientos por liquidar	$153,608.34&#10;Emisora	Serie	Títulos	Costo promedio	Precio actual	Valor de mercado&#10;ALPEK	A	20,000	14.90	14.78	295,600.00"></textarea></label>
           <div class="campos">

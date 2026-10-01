@@ -23,6 +23,7 @@ from starlette.responses import JSONResponse
 TOKEN_CSRF = secrets.token_urlsafe(32)
 HOSTS_LOCALES = {"127.0.0.1", "localhost", "[::1]"}
 MAX_CUERPO = 1_200_000
+MAX_CUERPO_RUTA = {"/api/portal/capturas-imagen": 30_000_000}  # capturas de pantalla (cada imagen ≤ 8 MB, máx. 6)
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; "
        "connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 CABECERAS = {
@@ -98,8 +99,9 @@ class Seguridad(BaseHTTPMiddleware):
             if not secrets.compare_digest(request.headers.get("x-csrf-token", ""), TOKEN_CSRF):
                 return JSONResponse({"error": "Token CSRF ausente o inválido; recargue la página"}, status_code=403)
             largo = request.headers.get("content-length")
-            if largo is None or not largo.isdigit() or int(largo) > MAX_CUERPO:
-                return JSONResponse({"error": "Cuerpo ausente o demasiado grande (máx. 1 MB)"}, status_code=413)
+            tope = MAX_CUERPO_RUTA.get(request.url.path, MAX_CUERPO)
+            if largo is None or not largo.isdigit() or int(largo) > tope:
+                return JSONResponse({"error": f"Cuerpo ausente o demasiado grande (máx. {tope // 1_000_000} MB)"}, status_code=413)
             ruta = request.url.path
             if self._excede(ruta, LIMITES.get(ruta, LIMITE_MUTACION)):
                 return JSONResponse({"error": "Demasiadas solicitudes; espere un minuto"}, status_code=429)

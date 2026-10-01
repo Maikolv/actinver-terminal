@@ -27,6 +27,8 @@ Para capturar (no existe integración oficial: el reglamento prohíbe programas 
 4. Escribe la fecha y hora que muestra el portal y pulsa **Vista previa**. Revisa las cifras, las emisoras reconocidas y las diferencias frente a la captura anterior y al registro local.
 5. Si no hay errores, pulsa **Confirmar y guardar mi portafolio**. La terminal rechaza las capturas que no cuadran (posiciones + poder de compra + por liquidar frente a la valuación), las que tienen emisoras desconocidas, hora futura o anterior a la última, y las duplicadas.
 
+**Con capturas de pantalla (más rápido):** en el portal toma capturas con Win+Shift+S del recuadro «Tu inversión» (o «Portafolio») y de la tabla de «Ver detalle de mi inversión». Arrástralas o pégalas con Ctrl+V en el recuadro 📷 de «Mi portafolio Actinver». La terminal las lee en esta PC con el OCR de Windows (no se guardan ni se envían), llena el texto y abre la vista previa. Compara el texto con tu captura: si el OCR leyó mal algo, las posiciones no cuadrarán con «Inversiones» y no se podrá guardar hasta corregirlo. «Ver lo que leyó el OCR» muestra la lectura tal cual.
+
 Repite la captura después de operar o al cierre de cada sesión; «Plan de acción» muestra la hora de la última actualización.
 
 La captura deja de usarse cuando cambia la etapa del Reto (de práctica a competencia) o cuando registras una operación a mano después. En ese caso, pega una captura nueva.
