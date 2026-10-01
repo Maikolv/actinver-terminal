@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<ownershipDocument>
+
+    <schemaVersion>X0508</schemaVersion>
+
+    <documentType>4</documentType>
+
+    <periodOfReport>2025-11-26</periodOfReport>
+
+    <issuer>
+        <issuerCik>0001235912</issuerCik>
+        <issuerName>CVRx, Inc.</issuerName>
+        <issuerTradingSymbol>CVRX</issuerTradingSymbol>
+    </issuer>
+
+    <reportingOwner>
+        <reportingOwnerId>
+            <rptOwnerCik>0000200406</rptOwnerCik>
+            <rptOwnerName>JOHNSON &amp; JOHNSON</rptOwnerName>
+        </reportingOwnerId>
+        <reportingOwnerAddress>
+            <rptOwnerStreet1>ONE JOHNSON &amp; JOHNSON PLAZA</rptOwnerStreet1>
+            <rptOwnerStreet2></rptOwnerStreet2>
+            <rptOwnerCity>NEW BRUNSWICK</rptOwnerCity>
+            <rptOwnerState>NJ</rptOwnerState>
+            <rptOwnerZipCode>08933</rptOwnerZipCode>
+            <rptOwnerStateDescription></rptOwnerStateDescription>
+        </reportingOwnerAddress>
+        <reportingOwnerRelationship>
+            <isDirector>false</isDirector>
+            <isOfficer>false</isOfficer>
+            <isTenPercentOwner>true</isTenPercentOwner>
+            <isOther>false</isOther>
+        </reportingOwnerRelationship>
+    </reportingOwner>
+
+    <reportingOwner>
+        <reportingOwnerId>
+            <rptOwnerCik>0000924020</rptOwnerCik>
+            <rptOwnerName>Johnson &amp; Johnson Innovation - JJDC, Inc.</rptOwnerName>
+        </reportingOwnerId>
+        <reportingOwnerAddress>
+            <rptOwnerStreet1>410 GEORGE STREET</rptOwnerStreet1>
+            <rptOwnerStreet2></rptOwnerStreet2>
+            <rptOwnerCity>NEW BRUNSWICK</rptOwnerCity>
+            <rptOwnerState>NJ</rptOwnerState>
+            <rptOwnerZipCode>08901</rptOwnerZipCode>
+            <rptOwnerStateDescription></rptOwnerStateDescription>
+        </reportingOwnerAddress>
+        <reportingOwnerRelationship>
+            <isDirector>false</isDirector>
+            <isOfficer>false</isOfficer>
+            <isTenPercentOwner>true</isTenPercentOwner>
+            <isOther>false</isOther>
+        </reportingOwnerRelationship>
+    </reportingOwner>
+
+    <aff10b5One>false</aff10b5One>
+
+    <nonDerivativeTable>
+        <nonDerivativeTransaction>
+            <securityTitle>
+                <value>Common Stock</value>
+            </securityTitle>
+            <transactionDate>
+                <value>2025-11-26</value>
+            </transactionDate>
+            <transactionCoding>
+                <transactionFormType>4</transactionFormType>
+                <transactionCode>S</transactionCode>
+                <equitySwapInvolved>false</equitySwapInvolved>
+            </transactionCoding>
+            <transactionAmounts>
+                <transactionShares>
+                    <value>6337</value>
+                </transactionShares>
+                <transactionPricePerShare>
+                    <value>10.03</value>
+                    <footnoteId id="F1"/>
+                </transactionPricePerShare>
+                <transactionAcquiredDisposedCode>
+                    <value>D</value>
+                </transactionAcquiredDisposedCode>
+            </transactionAmounts>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>4040861</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>I</value>
+                </directOrIndirectOwnership>
+                <natureOfOwnership>
+                    <value>By Johnson &amp; Johnson Innovation - JJDC, Inc.</value>
+                    <footnoteId id="F2"/>
+                </natureOfOwnership>
+            </ownershipNature>
+        </nonDerivativeTransaction>
+    </nonDerivativeTable>
+
+    <footnotes>
+        <footnote id="F1">The price reported in Column 4 is a weighted average price. The shares were sold in multiple transactions at prices ranging from $10.00 to $10.23. The Reporting Person undertakes to provide to the Issuer, any shareholder of the Issuer, or the staff of the Securities and Exchange Commission, upon request, full information regarding the number of shares sold at each separate price within the range set forth in this footnote.</footnote>
+        <footnote id="F2">The securities reported as being indirectly beneficially owned by Johnson &amp; Johnson, the designated Reporting Person, are directly beneficially owned by Johnson &amp; Johnson Innovation - JJDC, Inc. (&quot;JJDC&quot;).  JJDC is a wholly-owned subsidiary of Johnson &amp; Johnson.</footnote>
+    </footnotes>
+
+    <ownerSignature>
+        <signatureName>Johnson &amp; Johnson By /s/ Marc Larkins, Secretary</signatureName>
+        <signatureDate>2025-12-01</signatureDate>
+    </ownerSignature>
+
+    <ownerSignature>
+        <signatureName>Johnson &amp; Johnson Innovation - JJDC, Inc. By: /s/ Jill McManus, Assistant Treasurer</signatureName>
+        <signatureDate>2025-12-01</signatureDate>
+    </ownerSignature>
+</ownershipDocument>

@@ -469,6 +469,64 @@ def estado_investigacion():
     return INVESTIGACION
 
 
+@app.get("/api/movimientos")
+def get_movimientos(emisora: str | None = None, gestor: str | None = None, tipo: str | None = None, desde: str | None = None,
+                    hasta: str | None = None, con=Depends(con_db)):
+    """Movimientos públicos (SEC EDGAR: Form 4 y 13F) con evidencia original, fechas separadas y su relación con su
+    cartera, propuestas, seguimiento y catálogo del simulador. Contexto de investigación: no crea órdenes."""
+    from .movimientos import servicio
+    for f in (desde, hasta):
+        if f and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", f):
+            raise cartera.ErrorValidacion(["Fecha inválida (use AAAA-MM-DD)."])
+    return servicio.listar(con, AJUSTES, emisora=emisora or None, gestor=gestor or None, tipo=tipo or None,
+                           desde=desde or None, hasta=hasta or None)
+
+
+MOVIMIENTOS = {"estado": "inactivo", "resultado": None}
+
+
+@app.post("/api/movimientos/actualizar")
+def actualizar_movimientos():
+    """Consulta la SEC ahora (incremental, ≤ 5 peticiones/s). En segundo plano."""
+    from .movimientos import servicio
+
+    def correr():
+        c = db.conectar()
+        try:
+            MOVIMIENTOS.update(estado="terminado", resultado=servicio.actualizar(c, AJUSTES, forzar=True))
+        except Exception as e:  # noqa: BLE001
+            log.exception("movimientos públicos")
+            MOVIMIENTOS.update(estado="error", resultado=type(e).__name__)
+        finally:
+            c.close()
+    MOVIMIENTOS.update(estado="actualizando", resultado=None)
+    threading.Thread(target=correr, daemon=True).start()
+    return MOVIMIENTOS
+
+
+@app.get("/api/movimientos/estado")
+def estado_movimientos():
+    return MOVIMIENTOS
+
+
+@app.post("/api/seguimiento")
+def agregar_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
+    iid = str(cuerpo.get("instrumento_id") or "").strip().upper()
+    if not con.execute("SELECT 1 FROM instrumentos WHERE id=?", (iid,)).fetchone():
+        raise cartera.ErrorValidacion([f"Instrumento desconocido: {iid or '—'}"])
+    with db.transaccion(con):
+        con.execute("INSERT OR IGNORE INTO seguimiento (instrumento_id, agregado_en, nota) VALUES (?,?,?)",
+                    (iid, db.ahora(), str(cuerpo.get("nota") or "")[:200]))
+    return {"ok": True}
+
+
+@app.delete("/api/seguimiento/{iid}")
+def quitar_seguimiento(iid: str, con=Depends(con_db)):
+    with db.transaccion(con):
+        con.execute("DELETE FROM seguimiento WHERE instrumento_id=?", (iid.upper(),))
+    return {"ok": True}
+
+
 @app.get("/api/nube/estado")
 def get_nube_estado(con=Depends(con_db)):
     """Monitor de alertas en la nube: activo o inactivo, última sincronización y ejecución, próxima revisión y motivos

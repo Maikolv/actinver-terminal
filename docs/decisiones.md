@@ -163,3 +163,6 @@ Contexto: se pidió un pronóstico hasta el 13-nov en MXN que influya en el plan
 
 ### D-47 Monitor de alertas en la nube
 Contexto: avisos por Telegram con la PC apagada, sin tarjeta ni facturación. Decisión: Cloudflare Workers Free + D1 (1 cron cada 15 min, 12–21 h UTC, lun-vie) en `cloud-alerts/`; al exceder un límite falla, no cobra. La terminal sincroniza cada 10 min una carga mínima firmada (HMAC, nonce, ventana de 5 min, secuencia) que también es latido: mientras llega, la nube no envía (relevo sin duplicados). Fuentes en la nube: Alpaca IEX y FIX de Banxico; la BMV usa el último cierre sincronizado (EODHD da 20 consultas/día y son de la terminal). El optimizador no se duplica: la nube recibe el plan ya calculado.
+
+### D-48 Movimientos públicos con SEC EDGAR (sin puntuación)
+Contexto: se pidió un módulo tipo Dataroma de 13F e insiders. Decisión: fuente oficial SEC EDGAR (gratuita; User-Agent y ≤ 5 peticiones/s); Dataroma, WhaleWisdom, Quiver, GuruFocus y HedgeFollow no se conectan (sin API autorizada o de pago). Los movimientos son contexto: alertas materiales sin duplicados, peso 0 en la puntuación porque no hay evidencia fuera de muestra y el 13F del 3T-2026 vence el 16-nov-2026, después del Reto. Consultas «a una fecha» por hora de aceptación de la SEC.

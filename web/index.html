@@ -44,6 +44,7 @@
     <!-- Secundarias: información técnica y trazabilidad; se muestran con «Más» -->
     <button role="tab" class="secundaria" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
     <button role="tab" class="secundaria" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+    <button role="tab" class="secundaria" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
     <button role="tab" class="secundaria" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
     <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
     <button role="tab" class="secundaria" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
@@ -143,6 +144,33 @@
         <span class="suave" id="investigacion-estado"></span></p>
       <div id="futuro-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     </section>
+  </section>
+
+  <section role="tabpanel" id="panel-movimientos" aria-labelledby="tab-movimientos" hidden>
+    <h1>Movimientos públicos</h1>
+    <p class="ayuda">Compras y ventas declaradas por insiders (Form 4) y cambios de cartera de fondos institucionales (13F), con
+      el documento original de la SEC. Es contexto de investigación: no son cotizaciones ni recomendaciones, y ningún movimiento
+      crea por sí solo una orden o boleta.</p>
+    <div id="mov-fuentes"></div>
+    <form id="form-mov" class="filtros">
+      <label>Emisora <input name="emisora" list="mov-emisoras" placeholder="SIC:KO" autocomplete="off"></label>
+      <datalist id="mov-emisoras"></datalist>
+      <label>Gestor (13F) <select name="gestor" id="mov-gestor"><option value="">Todos</option></select></label>
+      <label>Tipo <select name="tipo">
+        <option value="">Todos (sin «sin cambio»)</option>
+        <optgroup label="Form 4"><option value="compra_mercado">Compra en mercado</option><option value="venta_mercado">Venta en mercado</option>
+          <option value="no_discrecional">No discrecional (adjudicación, ejercicio, impuestos, 10b5-1…)</option></optgroup>
+        <optgroup label="13F"><option value="nueva">Nueva posición</option><option value="aumento">Aumento</option>
+          <option value="reduccion">Reducción</option><option value="salida">Salida</option><option value="no_comparable">No comparable (posible split)</option></optgroup>
+      </select></label>
+      <label>Desde <input type="date" name="desde"></label>
+      <button class="boton boton--secundario" type="submit">Filtrar</button>
+      <button class="boton boton--secundario" type="button" id="btn-mov-actualizar">Consultar la SEC ahora</button>
+    </form>
+    <p class="suave"><span id="mov-seguimiento"></span>
+      <input id="mov-seg-id" list="mov-emisoras" placeholder="SIC:NVDA" aria-label="Emisora para la lista de seguimiento" size="12">
+      <button type="button" class="boton boton--secundario" id="btn-mov-seguir">Añadir a seguimiento</button></p>
+    <div id="mov-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 
   <section role="tabpanel" id="panel-ranking" aria-labelledby="tab-ranking" hidden>

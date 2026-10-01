@@ -2,6 +2,40 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.19.0] — 2026-10-01 (movimientos públicos: 13F e insiders con SEC EDGAR)
+
+### Añadido
+- **Módulo `terminal/movimientos/`, sección «Movimientos públicos»** ([docs/movimientos-publicos.md](docs/movimientos-publicos.md)), con fuente oficial SEC EDGAR:
+  - Form 4 de las emisoras del SIC de su cartera, propuestas y seguimiento;
+  - 13F de 8 gestores con CIK verificado.
+- **Cada fila trae:** documento original, fechas separadas (operación o corte, publicación con hora de aceptación, y cuándo la conoció la terminal) y una explicación de sus límites.
+- **Form 4:** distingue compra o venta discrecional (P/S) de adjudicación, ejercicio, retención de impuestos, donación, plan 10b5-1 y venta tras ejercicio el mismo día; también titularidad directa o indirecta y relación del declarante.
+- **13F:** clasifica nueva posición, aumento, reducción, salida o sin cambio. Advierte que el cambio se infiere de dos fotografías trimestrales.
+- **Casos difíciles con documentos reales:**
+  - 4/A sin duplicar y con el original marcado «corregido por»;
+  - 13F/A NEW HOLDINGS y RESTATEMENT aplicados solo desde su publicación;
+  - split ajustado con `eventos_corporativos`, o «no comparable» si no está registrado;
+  - CUSIP con varias clases sin atribuir;
+  - VALUE declarado en miles reescalado y anotado (Baupost y Duquesne).
+- **Grupos:** cartera, propuesta, seguimiento, operable en el Reto, fuera del catálogo y sin identificar. El precio del Form 4 en pesos se etiqueta «referencia EE. UU. × tipo de cambio; no es cotización del SIC».
+- **Lista de seguimiento** (`seguimiento`), con API `POST/DELETE /api/seguimiento`.
+- **Alertas «movimiento_publico»**, solo nuevas y materiales y sin duplicados:
+  - compra discrecional ≥ 100 000 USD;
+  - venta discrecional ≥ 1 000 000 USD;
+  - nueva posición o salida en 13F.
+
+  Siempre como contexto: no crean órdenes ni boletas.
+- **Reporte diario, Telegram y línea de comandos:** sección fechada en el reporte, `/movimientos` en Telegram y `uv run terminal movimientos actualizar|resumen`.
+- **Peso en la puntuación: 0.** No entra a la puntuación (no hay evidencia fuera de muestra). El 13F del 30-sep-2026 vence el 16-nov-2026, después del cierre del Reto.
+
+### Cambiado
+- **Consulta de Form 4:** la de `fuentes_web.SecEdgar` queda sustituida por el módulo nuevo (incremental, ≤ 5 peticiones/s, reintentos ante 429 o 5xx).
+- **Migraciones 8 y 9:** tablas `mp_*` y `seguimiento`, y corrección de la escala del valor en documentos ya guardados.
+
+### Verificado
+- **Primera carga real:** 614 consultas a la SEC en 2 min 48 s (501 Form 4 y 25 13F). La segunda pasada hace 37 consultas y no repite documentos.
+- **Pruebas:** 14 nuevas (`tests/test_movimientos.py`) con documentos reales de la SEC en `tests/fixtures/sec/`. Suite: 299 de Python y 19 del Worker en verde.
+
 ## [0.18.0] — 2026-10-01 (monitor de alertas en la nube, Cloudflare Workers Free)
 
 ### Añadido

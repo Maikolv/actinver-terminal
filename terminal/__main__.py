@@ -214,6 +214,24 @@ def investigar(args) -> None:
         con.close()
 
 
+def movimientos(args) -> None:
+    import json
+
+    from . import db
+    from .config import cargar_ajustes
+    from .movimientos import servicio
+    a = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con, a)
+    try:
+        if args.accion == "actualizar":
+            print(json.dumps(servicio.actualizar(con, a, forzar=True), ensure_ascii=False, indent=1, default=str))
+        else:
+            print("\n".join(servicio.texto_reporte(con, a)))
+    finally:
+        con.close()
+
+
 def nube(args) -> None:
     import json
 
@@ -507,6 +525,9 @@ def main() -> None:
     inv.add_argument("--sin-reto", dest="reto", action="store_false",
                      help="no emitir el horizonte dinámico hasta el cierre del Reto")
     inv.set_defaults(fn=investigar, reto=True)
+    mv = sub.add_parser("movimientos", help="movimientos públicos SEC EDGAR (Form 4 y 13F): actualizar o resumen")
+    mv.add_argument("accion", choices=["actualizar", "resumen"], nargs="?", default="resumen")
+    mv.set_defaults(fn=movimientos)
     nb = sub.add_parser("nube", help="monitor de alertas en Cloudflare: estado, sincronizar, prueba, carga o secreto")
     nb.add_argument("accion", choices=["estado", "sincronizar", "prueba", "carga", "secreto"], nargs="?", default="estado")
     nb.set_defaults(fn=nube)

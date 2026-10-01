@@ -260,3 +260,11 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
 @media (max-width: 720px) { .ficha dl { grid-template-columns: 1fr; } }
 .lectura-ocr { white-space: pre-wrap; font-size: .8rem; max-height: 260px; overflow: auto; }
 .acciones-boletas { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* Movimientos públicos: quitar de la lista de seguimiento */
+button.enlace { background: none; border: 0; color: inherit; cursor: pointer; padding: 0 2px; font: inherit; }
+button.enlace:hover, button.enlace:focus-visible { text-decoration: underline; }
+/* Movimientos públicos: columnas de texto largo legibles y emisoras compactas */
+td.col-texto, th.col-texto { min-width: 26rem; }
+td.col-fechas, th.col-fechas { min-width: 13rem; }
+td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: anywhere; }

@@ -116,7 +116,20 @@ def _v7(con):
     _agregar(con, "pronosticos", "moneda", "TEXT")
 
 
-MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5), (6, _v6), (7, _v7)]
+def _v8(con):
+    # Movimientos públicos (SEC EDGAR: 13F y Form 4) con procedencia y fechas separadas; lista de seguimiento
+    from .movimientos import almacen
+    almacen.asegurar(con)
+
+
+def _v9(con):
+    # 13F con VALUE declarado en miles después de 2023 (p. ej. Duquesne): se reescalan y se anotan
+    from .movimientos import almacen
+    almacen.asegurar(con)
+    almacen.corregir_escala(con)
+
+
+MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5), (6, _v6), (7, _v7), (8, _v8), (9, _v9)]
 
 
 def migrar(con: sqlite3.Connection, ajustes=None) -> int:

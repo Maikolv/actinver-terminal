@@ -77,10 +77,11 @@ function notificar(texto) {
 }
 function tabla(columnas, filas, { caption, vacio: textoVacio = "Sin registros.", claseFila } = {}) {
   if (!filas.length) return h("p", { clase: "vacio", texto: textoVacio });
-  const cab = h("tr", {}, columnas.map((c) => h("th", { scope: "col", clase: c.num ? "num" : null, texto: c.t })));
+  const clase = (c) => [c.num ? "num" : null, c.clase].filter(Boolean).join(" ") || null;
+  const cab = h("tr", {}, columnas.map((c) => h("th", { scope: "col", clase: clase(c), texto: c.t })));
   const cuerpo = filas.map((f) => h("tr", { clase: claseFila ? claseFila(f) : null }, columnas.map((c) => {
     const v = c.f(f);
-    return h("td", { clase: c.num ? "num" : null }, v instanceof Node ? v : (v ?? "—"));
+    return h("td", { clase: clase(c) }, v instanceof Node ? v : (v ?? "—"));
   })));
   return h("div", { clase: "tabla-contenedor" }, h("table", {}, caption ? h("caption", { texto: caption }) : null,
     h("thead", {}, cab), h("tbody", {}, cuerpo)));
@@ -103,6 +104,7 @@ const CARGAS = {
   "tab-resumen": () => pintarResumen(), "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
   "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
   "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
+  "tab-movimientos": () => cargarMovimientos(),
 };
 const navPestanas = document.querySelector(".pestanas");
 function mostrarSecundarias(si) {
@@ -1154,6 +1156,70 @@ document.getElementById("btn-cobertura").addEventListener("click", async (ev) =>
 
 /* ---------- ranking de todas las acciones ---------- */
 estado.rankingFiltro = "ambos";
+/* ---------- Movimientos públicos (SEC EDGAR: Form 4 y 13F) ---------- */
+const GRUPO_CHIP = { cartera: "vigente", propuesta: "calculada", seguimiento: "retrasado", "operable en el Reto": "sin_datos" };
+const enlaceSec = (url, texto) => h("a", { href: url, target: "_blank", rel: "noopener noreferrer", texto: texto || "documento SEC" });
+const usd = (v) => (vacio(v) ? "—" : `${num(Math.round(v))} USD`);
+async function cargarMovimientos(filtros) {
+  const q = new URLSearchParams(Object.entries(filtros || {}).filter(([, v]) => v)).toString();
+  try {
+    const d = await api(`/api/movimientos${q ? `?${q}` : ""}`);
+    const sel = document.getElementById("mov-gestor");
+    if (sel.options.length <= 1) d.gestores.forEach((g) => sel.append(h("option", { value: g.cik, texto: g.nombre })));
+    const ids = [...new Set([...d.form4, ...d.trece_f].map((r) => r.instrumento_id).filter(Boolean))].sort();
+    limpiar("mov-emisoras", ...ids.map((i) => h("option", { value: i })));
+    limpiar("mov-fuentes", tabla([{ t: "Fuente", f: (f) => f.fuente }, { t: "Estado", f: (f) => chip(f.estado === "vigente" ? "vigente" : f.estado === "antigua" ? "retrasado" : "vencido", f.estado) },
+      { t: "Última consulta correcta", f: (f) => fechaLocal(f.ultimo_ok) }, { t: "Explicación", f: (f) => f.explicacion }], d.fuentes,
+      { caption: d.aviso }));
+    limpiar("mov-seguimiento", "Seguimiento: ", ...(d.seguimiento.length ? d.seguimiento.map((s) => h("span", { clase: "chip chip--retrasado" }, s.instrumento_id, " ",
+      h("button", { type: "button", clase: "enlace", title: `Quitar ${s.instrumento_id}`, onclick: async () => { await api(`/api/seguimiento/${encodeURIComponent(s.instrumento_id)}`, { method: "DELETE" }); cargarMovimientos(filtros); } }, "×"))) : ["(vacía)"]), " ");
+    const grupo = (r) => chip(GRUPO_CHIP[r.grupo] || "sin_datos", r.grupo);
+    const fechas = (r, primera) => h("span", {}, primera, h("br"), h("span", { clase: "suave", texto: `publicado ${r.fecha_presentacion} (${fechaLocal(r.aceptado_en)}) · conocido ${fechaLocal(r.conocido_en)}` }));
+    limpiar("mov-contenido",
+      h("h2", { texto: `Insiders · Form 4 (${d.form4.length})` }),
+      tabla([{ t: "Grupo", f: grupo }, { t: "Emisora", f: (r) => h("strong", { texto: r.clave || r.simbolo || r.emisor }) },
+        { t: "Movimiento", f: (r) => h("span", { title: `${r.codigo}: ${r.descripcion}` }, chip(r.discrecional ? (r.clasificacion === "compra_mercado" ? "vigente" : "vencido") : "sin_datos", r.tipo),
+          r.tipo_documento === "4/A" ? " (4/A)" : "", r.corregido_por ? h("span", { clase: "suave", texto: " · corregido por 4/A" }) : "") },
+        { t: "Declarante", f: (r) => r.declarantes.map((x) => `${x.nombre} (${x.relacion})`).join("; ") },
+        { t: "Títulos · precio", f: (r) => h("span", {}, `${num(r.titulos)} · ${vacio(r.precio_usd) ? "—" : `${num(r.precio_usd)} USD`}`, h("br"),
+          h("span", { clase: "suave", texto: `≈ ${usd(r.valor_usd)} · titularidad ${r.titularidad || "—"}${r.referencia_mxn ? ` · ${mxn(r.referencia_mxn.valor, true)} (${r.referencia_mxn.etiqueta})` : ""}` })), num: true },
+        { t: "Operación · publicación · conocido", clase: "col-fechas", f: (r) => fechas(r, `operación ${r.fecha_operacion || "—"}`) },
+        { t: "Evidencia y límites", clase: "col-texto", f: (r) => h("span", {}, enlaceSec(r.url), " · ", enlaceSec(r.url_indice, "índice"), h("br"), h("span", { clase: "suave", texto: r.limite })) }],
+        d.form4.slice(0, 150), { vacio: "Sin operaciones de insiders con estos filtros (o la fuente aún no se consulta).", claseFila: (r) => (r.discrecional ? null : "fila-inactiva") }),
+      h("h2", { texto: `Institucionales · 13F (${d.trece_f.length})` }),
+      tabla([{ t: "Grupo", f: grupo }, { t: "Emisora", clase: "col-corta", f: (r) => h("span", { title: `CUSIP ${r.cusip} · ${r.clase}` }, h("strong", { texto: r.simbolo || r.emisor }),
+          h("br"), h("span", { clase: "suave", texto: r.simbolo ? `${r.emisor} (${r.clase})` : (r.candidatos ? `clases: ${r.candidatos}` : `CUSIP ${r.cusip}`) })) },
+        { t: "Gestor", f: (r) => r.gestor },
+        { t: "Cambio inferido", f: (r) => h("span", {}, chip(r.clasificacion === "nueva" || r.clasificacion === "aumento" ? "vigente" : r.clasificacion === "salida" || r.clasificacion === "reduccion" ? "vencido" : "sin_datos", r.tipo),
+          r.antiguo ? h("span", { clase: "suave", texto: " · ANTIGUO" }) : "", r.nota ? h("br") : "", r.nota ? h("span", { clase: "suave", texto: r.nota }) : "") },
+        { t: "Títulos (previo → actual)", f: (r) => `${num(Math.round(r.titulos_previo_ajustado))} → ${num(Math.round(r.titulos))}`, num: true },
+        { t: "Valor declarado", f: (r) => usd(r.valor_usd), num: true },
+        { t: "Corte · publicación · conocido", clase: "col-fechas", f: (r) => fechas(r, `corte ${r.periodo_previo || "—"} → ${r.periodo}`) },
+        { t: "Evidencia y límites", clase: "col-texto", f: (r) => h("span", {}, ...r.documentos.flatMap((x, i) => [i ? " · " : "", enlaceSec(x.url, x.tipo + (x.tipo_enmienda ? ` (${x.tipo_enmienda})` : ""))]),
+          h("br"), h("span", { clase: "suave", texto: [r.limite, ...r.documentos.map((x) => x.nota).filter(Boolean)].join(" ") })) }],
+        d.trece_f.slice(0, 200), { vacio: "Sin cambios 13F con estos filtros.", claseFila: (r) => (r.antiguo ? "fila-inactiva" : null) }));
+  } catch (e) { limpiar("mov-contenido", errorCaja(e)); }
+}
+document.getElementById("form-mov").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  cargarMovimientos(Object.fromEntries(new FormData(ev.currentTarget)));
+});
+document.getElementById("btn-mov-actualizar").addEventListener("click", async () => {
+  try {
+    await api("/api/movimientos/actualizar", { method: "POST", json: {} });
+    notificar("Consultando la SEC (incremental, ≤ 5 peticiones por segundo)…");
+    const t = setInterval(async () => {
+      const e = await api("/api/movimientos/estado");
+      if (e.estado !== "actualizando") { clearInterval(t); notificar(e.estado === "terminado" ? "SEC consultada." : `SEC: ${e.estado}`); cargarMovimientos(); }
+    }, 4000);
+  } catch (e) { notificar(e.message); }
+});
+document.getElementById("btn-mov-seguir").addEventListener("click", async () => {
+  const i = document.getElementById("mov-seg-id").value.trim();
+  if (!i) return;
+  try { await api("/api/seguimiento", { method: "POST", json: { instrumento_id: i } }); document.getElementById("mov-seg-id").value = ""; cargarMovimientos(); }
+  catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
 async function cargarRanking() {
   segmentado("selector-ranking", estado.rankingFiltro, (v) => { estado.rankingFiltro = v; cargarRanking(); });
   try {

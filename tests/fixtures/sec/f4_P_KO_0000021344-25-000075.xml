@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<ownershipDocument>
+
+    <schemaVersion>X0508</schemaVersion>
+
+    <documentType>4</documentType>
+
+    <periodOfReport>2025-10-23</periodOfReport>
+
+    <issuer>
+        <issuerCik>0000021344</issuerCik>
+        <issuerName>COCA COLA CO</issuerName>
+        <issuerTradingSymbol>KO</issuerTradingSymbol>
+    </issuer>
+
+    <reportingOwner>
+        <reportingOwnerId>
+            <rptOwnerCik>0001539853</rptOwnerCik>
+            <rptOwnerName>Levchin Max R</rptOwnerName>
+        </reportingOwnerId>
+        <reportingOwnerAddress>
+            <rptOwnerStreet1>C/O AFFIRM HOLDINGS, INC.</rptOwnerStreet1>
+            <rptOwnerStreet2>650 CALIFORNIA STREET</rptOwnerStreet2>
+            <rptOwnerCity>SAN FRANCISCO</rptOwnerCity>
+            <rptOwnerState>CA</rptOwnerState>
+            <rptOwnerZipCode>94108</rptOwnerZipCode>
+            <rptOwnerStateDescription></rptOwnerStateDescription>
+        </reportingOwnerAddress>
+        <reportingOwnerRelationship>
+            <isDirector>1</isDirector>
+        </reportingOwnerRelationship>
+    </reportingOwner>
+
+    <aff10b5One>0</aff10b5One>
+
+    <nonDerivativeTable>
+        <nonDerivativeTransaction>
+            <securityTitle>
+                <value>Common Stock, $.25 Par Value</value>
+            </securityTitle>
+            <transactionDate>
+                <value>2025-10-23</value>
+            </transactionDate>
+            <transactionCoding>
+                <transactionFormType>4</transactionFormType>
+                <transactionCode>P</transactionCode>
+                <equitySwapInvolved>0</equitySwapInvolved>
+            </transactionCoding>
+            <transactionTimeliness></transactionTimeliness>
+            <transactionAmounts>
+                <transactionShares>
+                    <value>2864</value>
+                </transactionShares>
+                <transactionPricePerShare>
+                    <value>69.8721</value>
+                    <footnoteId id="F1"/>
+                </transactionPricePerShare>
+                <transactionAcquiredDisposedCode>
+                    <value>A</value>
+                </transactionAcquiredDisposedCode>
+            </transactionAmounts>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>2864</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>D</value>
+                </directOrIndirectOwnership>
+            </ownershipNature>
+        </nonDerivativeTransaction>
+        <nonDerivativeTransaction>
+            <securityTitle>
+                <value>Common Stock, $.25 Par Value</value>
+            </securityTitle>
+            <transactionDate>
+                <value>2025-10-23</value>
+            </transactionDate>
+            <transactionCoding>
+                <transactionFormType>4</transactionFormType>
+                <transactionCode>P</transactionCode>
+                <equitySwapInvolved>0</equitySwapInvolved>
+            </transactionCoding>
+            <transactionTimeliness></transactionTimeliness>
+            <transactionAmounts>
+                <transactionShares>
+                    <value>4197</value>
+                </transactionShares>
+                <transactionPricePerShare>
+                    <value>70.3062</value>
+                    <footnoteId id="F2"/>
+                </transactionPricePerShare>
+                <transactionAcquiredDisposedCode>
+                    <value>A</value>
+                </transactionAcquiredDisposedCode>
+            </transactionAmounts>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>7061</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>D</value>
+                </directOrIndirectOwnership>
+            </ownershipNature>
+        </nonDerivativeTransaction>
+        <nonDerivativeTransaction>
+            <securityTitle>
+                <value>Common Stock, $.25 Par Value</value>
+            </securityTitle>
+            <transactionDate>
+                <value>2025-10-24</value>
+            </transactionDate>
+            <transactionCoding>
+                <transactionFormType>4</transactionFormType>
+                <transactionCode>P</transactionCode>
+                <equitySwapInvolved>0</equitySwapInvolved>
+            </transactionCoding>
+            <transactionTimeliness></transactionTimeliness>
+            <transactionAmounts>
+                <transactionShares>
+                    <value>7206</value>
+                </transactionShares>
+                <transactionPricePerShare>
+                    <value>69.8706</value>
+                    <footnoteId id="F3"/>
+                </transactionPricePerShare>
+                <transactionAcquiredDisposedCode>
+                    <value>A</value>
+                </transactionAcquiredDisposedCode>
+            </transactionAmounts>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>14267</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>D</value>
+                </directOrIndirectOwnership>
+            </ownershipNature>
+        </nonDerivativeTransaction>
+    </nonDerivativeTable>
+
+    <derivativeTable>
+        <derivativeHolding>
+            <securityTitle>
+                <value>Phantom Share Units</value>
+            </securityTitle>
+            <conversionOrExercisePrice>
+                <value>0</value>
+                <footnoteId id="F4"/>
+            </conversionOrExercisePrice>
+            <exerciseDate>
+                <footnoteId id="F5"/>
+            </exerciseDate>
+            <expirationDate>
+                <footnoteId id="F5"/>
+            </expirationDate>
+            <underlyingSecurity>
+                <underlyingSecurityTitle>
+                    <value>Common Stock, $.25 Par Value</value>
+                </underlyingSecurityTitle>
+                <underlyingSecurityShares>
+                    <value>1118.0992</value>
+                </underlyingSecurityShares>
+            </underlyingSecurity>
+            <postTransactionAmounts>
+                <sharesOwnedFollowingTransaction>
+                    <value>1118.0992</value>
+                </sharesOwnedFollowingTransaction>
+            </postTransactionAmounts>
+            <ownershipNature>
+                <directOrIndirectOwnership>
+                    <value>D</value>
+                </directOrIndirectOwnership>
+            </ownershipNature>
+        </derivativeHolding>
+    </derivativeTable>
+
+    <footnotes>
+        <footnote id="F1">The price is the weighted average purchase price of the aggregate number of shares that were purchased by the reporting person. These shares were purchased in multiple transactions at prices ranging from $69.73 to $69.995. The reporting person undertakes to provide to the issuer, any security holder of the issuer or the staff of the Securities and Exchange Commission, upon request, full information regarding the number of shares purchased at each separate price.</footnote>
+        <footnote id="F2">The price is the weighted average purchase price of the aggregate number of shares that were purchased by the reporting person. These shares were purchased in multiple transactions at prices ranging from $70.00 to $70.86. The reporting person undertakes to provide to the issuer, any security holder of the issuer or the staff of the Securities and Exchange Commission, upon request, full information regarding the number of shares purchased at each separate price.</footnote>
+        <footnote id="F3">The price is the weighted average purchase price of the aggregate number of shares that were purchased by the reporting person. These shares were purchased in multiple transactions at prices ranging from $69.6653 to $70.005. The reporting person undertakes to provide to the issuer, any security holder of the issuer or the staff of the Securities and Exchange Commission, upon request, full information regarding the number of shares purchased at each separate price.</footnote>
+        <footnote id="F4">Each phantom share unit is economically equivalent to one share of Common Stock.</footnote>
+        <footnote id="F5">The phantom share units credited under The Coca-Cola Company Directors' Plan, as amended and restated effective June 1, 2025, are settled in cash the later of (i) January 15 of the year following the year in which the reporting person leaves the Board, or (ii) six months following the date on which the reporting person leaves the Board.</footnote>
+    </footnotes>
+
+    <ownerSignature>
+        <signatureName>Max R. Levchin</signatureName>
+        <signatureDate>2025-10-27</signatureDate>
+    </ownerSignature>
+</ownershipDocument>

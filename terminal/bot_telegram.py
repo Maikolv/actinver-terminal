@@ -38,6 +38,7 @@ AYUDA = ("Comandos:\n"
          "/estado — qué está confirmado, estimado, vencido o falta\n"
          "/alertas — alertas nuevas\n"
          "/cartera — saldo y posiciones (cuenta del Reto o registro local)\n"
+         "/movimientos — compras y ventas públicas de insiders (Form 4) y fondos (13F) en sus emisoras (contexto)\n"
          "/pronostico — pronóstico al cierre del Reto: potencial, riesgos, cambios y calidad del modelo (estimación)\n"
          "/ayuda — esta ayuda\n\n"
          "También puede escribir una pregunta, p. ej. «¿por qué ALPEK?» o «¿qué noticias hay de MRNA?».\n"
@@ -359,7 +360,7 @@ class Chatbot:
 
 # ------------------------------------------------------------------------------------------------------------------
 COMANDOS = {"/plan": "plan", "/boletas": "boletas", "/estado": "estado", "/alertas": "alertas", "/cartera": "cartera",
-            "/detalle": "detalle", "/propuestas": "propuestas", "/pronostico": "pronostico", "/pronóstico": "pronostico",
+            "/detalle": "detalle", "/propuestas": "propuestas", "/pronostico": "pronostico", "/pronóstico": "pronostico", "/movimientos": "movimientos",
             "/ayuda": "ayuda", "/help": "ayuda", "/start": "ayuda"}
 
 
@@ -380,6 +381,9 @@ def atender(con, ajustes, texto: str, chatbot: Chatbot) -> str:
         return texto_detalle(con, ajustes)
     if cmd == "propuestas":
         return texto_propuestas(con, ajustes)
+    if cmd == "movimientos":
+        from .movimientos import servicio
+        return "\n".join(servicio.texto_reporte(con, ajustes)).replace("## ", "").replace("**", "")
     if cmd == "pronostico":
         return texto_pronostico(con, ajustes)
     if cmd == "ayuda" or texto.strip().startswith("/"):

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import sqlite3
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -18,6 +19,8 @@ import pandas as pd
 
 from . import mercado, notificador, reto, vigencia
 from .db import transaccion
+
+log = logging.getLogger("terminal.alertas")
 
 
 @dataclass
@@ -135,6 +138,17 @@ def reglas_insider(con, cfg: dict, ids: set[str], ahora_dt: datetime) -> list[Co
     return out
 
 
+def reglas_movimientos(con, ajustes, ahora_dt: datetime) -> list[Condicion]:
+    """Movimientos públicos nuevos y materiales (Form 4 discrecional, 13F nueva posición o salida) en emisoras de su
+    cartera, propuestas o seguimiento. Solo contexto: no cambia propuestas, boletas ni órdenes."""
+    try:
+        from .movimientos import servicio
+        return servicio.condiciones(con, ajustes, ahora_dt)
+    except Exception:  # noqa: BLE001 - una falla de esta fuente no detiene las demás alertas
+        log.exception("reglas de movimientos públicos")
+        return []
+
+
 def reglas_noticias(con, cfg: dict, ids: set[str], ahora_dt: datetime) -> list[Condicion]:
     out = []
     desde = (ahora_dt - timedelta(hours=48)).isoformat()
@@ -188,7 +202,7 @@ PRIORIDAD = {"critica": 1, "aviso": 2, "info": 3}
 CADUCIDAD_H = {"datos_inciertos": 6, "dato_vencido": 6, "cambio_brusco": 8, "stop_loss": 24, "take_profit": 24,
                "deriva": 24, "concentracion": 24, "ruptura_tesis": 24, "macro": 48, "evento_corporativo": 72, "noticia": 48,
                "insider": 72, "cinco_acciones": 24, "diferencia_portal": 24, "deterioro_modelo": 168,
-               "cambio_portal": 48, "captura_pendiente": 16, "plan_propuesta": 24}
+               "cambio_portal": 48, "captura_pendiente": 16, "plan_propuesta": 24, "movimiento_publico": 72}
 # Avisos que el participante espera en cuanto ocurren (su propia captura, el recordatorio de cierre y un plan nuevo):
 # no se silencian fuera del horario de la BMV.
 SIEMPRE = {"cambio_portal", "captura_pendiente", "plan_propuesta"}
@@ -611,7 +625,8 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
              + reglas_reto(con, cfg, cartera, ahora_dt) + reglas_cambio_brusco(cfg, cartera, precios)
              + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
              + reglas_webhook(con, ahora_dt) + reglas_tesis(con, cartera)
-             + reglas_portal(con, ahora_dt) + reglas_plan_propuesta(cartera, propuestas))
+             + reglas_portal(con, ahora_dt) + reglas_plan_propuesta(cartera, propuestas)
+             + reglas_movimientos(con, ajustes, ahora_dt))
     if cfg.get("exigir_precio_confiable", True):
         from . import cotizaciones
         provs = cotizaciones.construir(con, ajustes.es_demo)

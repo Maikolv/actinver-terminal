@@ -1,0 +1,52 @@
+[
+ {
+  "cik_str": 1045810,
+  "ticker": "NVDA",
+  "title": "NVIDIA CORP"
+ },
+ {
+  "cik_str": 1652044,
+  "ticker": "GOOGL",
+  "title": "Alphabet Inc."
+ },
+ {
+  "cik_str": 1067983,
+  "ticker": "BRK-B",
+  "title": "BERKSHIRE HATHAWAY INC"
+ },
+ {
+  "cik_str": 21344,
+  "ticker": "KO",
+  "title": "COCA COLA CO"
+ },
+ {
+  "cik_str": 882184,
+  "ticker": "DHI",
+  "title": "HORTON D R INC /DE/"
+ },
+ {
+  "cik_str": 920760,
+  "ticker": "LEN",
+  "title": "LENNAR CORP /NEW/"
+ },
+ {
+  "cik_str": 40729,
+  "ticker": "ALLY",
+  "title": "Ally Financial Inc."
+ },
+ {
+  "cik_str": 1652044,
+  "ticker": "GOOG",
+  "title": "Alphabet Inc."
+ },
+ {
+  "cik_str": 1067983,
+  "ticker": "BRK-A",
+  "title": "BERKSHIRE HATHAWAY INC"
+ },
+ {
+  "cik_str": 920760,
+  "ticker": "LEN-B",
+  "title": "LENNAR CORP /NEW/"
+ }
+]

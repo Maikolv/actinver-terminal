@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edgarSubmission xmlns:n1="http://www.sec.gov/edgar/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sec.gov/edgar/thirteenffiler">
+  <schemaVersion>X0202</schemaVersion>
+  <headerData>
+    <submissionType>13F-HR</submissionType>
+    <filerInfo>
+      <liveTestFlag>LIVE</liveTestFlag>
+      <flags>
+        <confirmingCopyFlag>false</confirmingCopyFlag>
+        <returnCopyFlag>false</returnCopyFlag>
+        <overrideInternetFlag>false</overrideInternetFlag>
+      </flags>
+      <filer>
+        <credentials>
+          <cik>0001656456</cik>
+          <ccc>XXXXXXXX</ccc>
+        </credentials>
+      </filer>
+      <periodOfReport>03-31-2024</periodOfReport>
+    </filerInfo>
+  </headerData>
+  <formData>
+    <coverPage>
+      <reportCalendarOrQuarter>03-31-2024</reportCalendarOrQuarter>
+      <filingManager>
+        <name>APPALOOSA LP</name>
+        <address>
+          <n1:street1>51 John F. Kennedy Pkwy</n1:street1>
+          <n1:city>Short Hills</n1:city>
+          <n1:stateOrCountry>NJ</n1:stateOrCountry>
+          <n1:zipCode>07078</n1:zipCode>
+        </address>
+      </filingManager>
+      <reportType>13F HOLDINGS REPORT</reportType>
+      <form13FFileNumber>028-17453</form13FFileNumber>
+      <provideInfoForInstruction5>N</provideInfoForInstruction5>
+    </coverPage>
+    <signatureBlock>
+      <name>Michael L Palmer</name>
+      <title>CFO</title>
+      <phone>973-701-8429</phone>
+      <signature>Michael L Palmer</signature>
+      <city>Short HIlls</city>
+      <stateOrCountry>NJ</stateOrCountry>
+      <signatureDate>5-15-2024</signatureDate>
+    </signatureBlock>
+    <summaryPage>
+      <otherIncludedManagersCount>0</otherIncludedManagersCount>
+      <tableEntryTotal>39</tableEntryTotal>
+      <tableValueTotal>6754832658</tableValueTotal>
+    </summaryPage>
+  </formData>
+</edgarSubmission>

@@ -23,6 +23,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal alpaca` | Comprueba las claves de Alpaca (solo datos) |
 | `uv run terminal telegram` | Detecta su chat de Telegram, lo guarda en `.env` y envía una prueba |
 | `uv run terminal investigar` | Experimento sin fuga de información (walk-forward → validación → prueba) y pronósticos a 1, 5 sesiones y al cierre del Reto (en MXN) |
+| `uv run terminal movimientos resumen` | Movimientos públicos (SEC EDGAR: Form 4 de insiders y 13F de fondos) como contexto; `actualizar` consulta la SEC — ver [docs/movimientos-publicos.md](docs/movimientos-publicos.md) |
 | `uv run terminal nube estado` | Monitor de alertas en la nube (Cloudflare Workers Free): estado, `sincronizar`, `prueba`, `carga` — ver [cloud-alerts/README.md](cloud-alerts/README.md) |
 | `uv run terminal pronostico` | Resumen del pronóstico al cierre del Reto (el mismo texto que `/pronostico` en Telegram) |
 | `uv run terminal cobertura` | Verifica cobertura por símbolo y proveedor; escribe `docs/cobertura.md` |

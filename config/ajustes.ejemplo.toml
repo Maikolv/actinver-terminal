@@ -39,6 +39,17 @@ horizontes = [1, 5]                  # H: próxima sesión y próximos cinco dí
 emitir_diario = true                 # el monitor emite una vez por sesión cerrada, en segundo plano
 # L (ventana retrospectiva máxima) = 60 sesiones (terminal/investigacion/datos.py); proporciones 70/15/15, embargo = H
 
+[movimientos]
+# Movimientos públicos SEC EDGAR (Form 4 de insiders y 13F de gestores). Contexto: no entra a la puntuación ni crea órdenes.
+compra_min_usd = 100000              # alerta: compra discrecional de un insider desde este monto…
+venta_min_usd = 1000000              # …o venta discrecional (no 10b5-1, no tras ejercicio) desde este monto
+dias_alerta_form4 = 3                # solo avisa documentos publicados en los últimos días (nuevos)
+dias_alerta_13f = 10
+cada_horas_form4 = 6                 # ritmo de consulta a la SEC (≤ 5 peticiones/s; exige SEC_USER_AGENT)
+cada_horas_13f = 24
+en_puntuacion = false                # peso 0 en la puntuación de propuestas (ver docs/movimientos-publicos.md)
+alertas = true
+
 [nube]
 # Monitor de alertas en Cloudflare Workers (cloud-alerts/). Solo funciona con CLOUD_ALERTS_URL y CLOUD_ALERTS_SECRET en .env.
 activo = true

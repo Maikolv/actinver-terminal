@@ -206,7 +206,7 @@ def actualizar_contexto(con, ajustes: Ajustes, ids_cartera: list[str], cliente=N
     res = {}
     for nombre, fn in (("forexfactory", lambda: fw.actualizar_macro(con, prov, cliente)),
                        ("seekingalpha_rss", lambda: fw.actualizar_noticias(con, prov, cartera, cliente)),
-                       ("sec_edgar", lambda: fw.actualizar_insiders(con, prov, cartera, cliente))):
+                       ("sec_edgar", lambda: _movimientos(con, ajustes))):
         inicio = ahora()
         try:
             r = fn()
@@ -217,6 +217,18 @@ def actualizar_contexto(con, ajustes: Ajustes, ids_cartera: list[str], cliente=N
                        str(r.get("mensaje") or " | ".join(r.get("errores", [])) or ""))
         res[nombre] = r
     return res
+
+
+def _movimientos(con, ajustes: Ajustes) -> dict:
+    """SEC EDGAR (Form 4 de cartera, propuestas y seguimiento; 13F de gestores seleccionados), incremental y con ritmo
+    propio (6 h y 24 h). Sustituye la consulta anterior de Form 4 para no repetir peticiones a la SEC."""
+    from .movimientos import servicio
+    r = servicio.actualizar(con, ajustes)
+    if r.get("estado") == "ok":
+        n = sum((r.get(k) or {}).get("documentos_nuevos", 0) for k in ("form4", "13f"))
+        errores = [e for k in ("form4", "13f") for e in (r.get(k) or {}).get("errores", [])]
+        return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5]}
+    return {**r, "registros": 0}
 
 
 def actualizar_fondos(con, ajustes: Ajustes, cliente=None) -> dict:

@@ -8,6 +8,12 @@
       "port": 8765
     },
     {
+      "name": "actinver-terminal-verificacion",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set TERMINAL_SIN_MOTOR=1&& uv run uvicorn terminal.app:app --host 127.0.0.1 --port 8766"],
+      "port": 8766
+    },
+    {
       "name": "actinver-terminal-demo",
       "runtimeExecutable": "uv",
       "runtimeArgs": ["run", "terminal", "demo", "--sin-navegador"],

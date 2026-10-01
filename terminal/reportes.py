@@ -123,6 +123,14 @@ def _seccion_motor(con) -> list[str]:
             f"{m.get('nuevos_datos')}) · fuentes de contexto → {ctx}", ""]
 
 
+def _seccion_movimientos(con, ajustes: Ajustes) -> list[str]:
+    from .movimientos import servicio
+    try:
+        return servicio.texto_reporte(con, ajustes)
+    except Exception:  # noqa: BLE001 - el reporte nunca se detiene por esta fuente
+        return ["## Movimientos públicos (SEC EDGAR)", "No se pudo construir esta sección (ver registro de errores).", ""]
+
+
 def _seccion_pronostico(con, ajustes: Ajustes, props: dict, cart: dict) -> list[str]:
     from .investigacion import reto_pronostico
     try:
@@ -150,6 +158,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, tipo: str, ahora: datetim
         out += _seccion_seguimiento(servicios.seguimiento(con, ajustes))
     out += _seccion_propuestas(props, detalle=tipo != "cierre")
     out += _seccion_pronostico(con, ajustes, props, cart)
+    out += _seccion_movimientos(con, ajustes)
     out += _seccion_alertas(con, 24 * 7 if semanal else 24)
     return "\n".join(out).rstrip() + "\n"
 
