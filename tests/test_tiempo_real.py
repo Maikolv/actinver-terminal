@@ -172,3 +172,25 @@ def test_prueba_de_avisos_exige_csrf_y_responde(monkeypatch):
         e = c.get("/api/estado").json()
         assert set(e["notificaciones"]) == {"escritorio", "telegram", "correo"} and "modo" in e["tiempo_real"]
         assert json.dumps(e).count(SECRETO) == 0
+
+
+def test_simbolos_en_vivo_priorizan_la_cuenta_del_portal_y_la_propuesta_del_plan(con):
+    """Con 30 símbolos, las posiciones de la captura del portal y la propuesta del plan no deben quedar fuera."""
+    import json as _json
+    from terminal import tiempo_real
+    con.execute("INSERT INTO capturas_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, fuente, "
+                "n_posiciones, tabla_reconocida, huella) VALUES ('x','2026-09-30T21:43:00-06:00','practica',1,0,'p',1,1,'h')")
+    cid = con.execute("SELECT MAX(id) FROM capturas_portal").fetchone()[0]
+    con.execute("INSERT INTO posiciones_portal (captura_id, instrumento_id, texto, titulos) VALUES (?, 'SIC:MRNA', 'MRNA *', 16)", (cid,))
+    otros = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE moneda_referencia='USD' AND estado='activo' "
+                                        "AND id NOT IN ('SIC:MRNA','SIC:MU') LIMIT 40")]
+    relleno = {"clave": "acciones_ajuste", "estado": "calculada", "puntuacion": {"total": 50},
+               "pesos": [{"id": i, "peso": 0.02} for i in otros]}
+    plan = {"clave": "acciones_puntuacion", "estado": "calculada", "puntuacion": {"total": 90},
+            "pesos": [{"id": "SIC:MU", "peso": 0.2}]}
+    for p in (relleno, plan):
+        con.execute("INSERT INTO propuestas (tipo, creado_en, parametros, resultado) VALUES (?,?,?,?)",
+                    (p["clave"], "2026-09-30", "{}", _json.dumps(p)))
+    con.commit()
+    m = tiempo_real.simbolos(con, 5)
+    assert list(m)[:2] == ["MRNA", "MU"] and len(m) == 5

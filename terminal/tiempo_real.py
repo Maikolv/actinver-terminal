@@ -37,7 +37,7 @@ class ErrorFatal(ErrorFlujo):
     pass
 
 
-def simbolos(con, maximo: int = 30, referencias: list[str] | None = None) -> dict[str, list[str]]:
+def simbolos(con, maximo: int = 30, referencias: list[str] | None = None, ajustes=None) -> dict[str, list[str]]:
     """símbolo → ids de instrumento. Prioridad: posiciones, propuestas vigentes, referencias, resto del universo."""
     ins = {r["id"]: r["listado_referencia"] for r in con.execute(
         "SELECT id, listado_referencia FROM instrumentos WHERE estado='activo' AND moneda_referencia='USD' "
@@ -47,11 +47,25 @@ def simbolos(con, maximo: int = 30, referencias: list[str] | None = None) -> dic
                              "ELSE 0 END) AS n FROM transacciones WHERE anulada=0 AND instrumento_id IS NOT NULL "
                              "GROUP BY instrumento_id HAVING n > 0")
     orden += [r[0] for r in posiciones]
+    # posiciones de la última captura del portal (la cuenta real del Reto), aunque no se hayan registrado a mano
+    orden += [r[0] for r in con.execute(
+        "SELECT instrumento_id FROM posiciones_portal WHERE titulos > 0 AND captura_id = "
+        "(SELECT id FROM capturas_portal ORDER BY hora_portal DESC, id DESC LIMIT 1)")]
+    props = {}
     for (res,) in con.execute("SELECT resultado FROM propuestas WHERE id IN (SELECT MAX(id) FROM propuestas GROUP BY tipo)"):
         try:
-            orden += [p["id"] for p in json.loads(res).get("pesos") or []]
+            p = json.loads(res)
+            props[p.get("clave") or len(props)] = p
         except (ValueError, TypeError):
             continue
+    from .resumen import propuesta_referencia
+    if ajustes is not None:  # con ajustes, exactamente la misma selección (y revalidación) que el plan del día
+        from . import servicios
+        props = {k: v for k, v in servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes)).items()
+                 if v} or props
+    ref = propuesta_referencia(props)  # la que alimenta el plan del día va primero
+    for p in ([ref] if ref else []) + [p for p in props.values() if p is not ref]:
+        orden += [a["id"] for a in p.get("pesos") or [] if a.get("peso", 1) > 0]
     orden += list(referencias or []) + sorted(ins)
     mapa: dict[str, list[str]] = {}
     for iid in orden:
@@ -168,7 +182,7 @@ class FlujoVivo:
         con = db.conectar()
         try:
             ref = (self.ajustes.get("referencias") or {}).get("sp500")
-            mapa = simbolos(con, int(self.cfg.get("max_simbolos", 30)), [ref] if ref else [])
+            mapa = simbolos(con, int(self.cfg.get("max_simbolos", 30)), [ref] if ref else [], self.ajustes)
         finally:
             con.close()
         with self._lock:
