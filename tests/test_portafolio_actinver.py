@@ -54,3 +54,16 @@ def test_errores_claros_si_no_cuadra_o_hay_emisoras_desconocidas(con):
     assert not r["confirmado"] and any("no cuadran" in e for e in r["errores"])
     r2 = portal.guardar(con, TEXTO + "ZZZZ9\tX\t10\t1\t1\t10\n", "2026-09-30T14:45", ins, confirmar=True)
     assert not r2["confirmado"] and any("sin reconocer" in e for e in r2["errores"])
+
+
+TABLA_PORTAL = ("Fav\tInformación\tEmisora\tTítulos\tValor al Costo\tCosto\tPrecio Actual\tPlusvalía / Minusvalía\t% de variación\n"
+                "\tVer Detalle\tALPEK A\t5,430\t$14.72\t$79,938.34\t$14.88\t$860.056\t1.07%\n"
+                "\tVer Detalle\tCAT *\t1\t$14,727.06\t$14,727.06\t$14,660.00\t-$67.064\t-0.45%\n"
+                "Valuación total\t$94,512.40\nInversiones\t$95,458.80\nPoder de compra\t$-946.40\nMovimientos por liquidar\t$0.00\n")
+
+
+def test_tabla_real_del_portal_valor_al_costo_es_el_costo_unitario(con):
+    r = portal.interpretar(TABLA_PORTAL, mercado.instrumentos(con))
+    alpek = next(p for p in r["posiciones"] if p["instrumento_id"] == "BMV:ALPEK")
+    assert alpek["titulos"] == 5430 and alpek["costo_promedio"] == 14.72 and alpek["precio"] == 14.88
+    assert alpek["valor"] == round(5430 * 14.88, 2)            # valor de mercado = títulos × precio actual

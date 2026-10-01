@@ -416,11 +416,10 @@ def reglas_portal(con, ahora_dt: datetime) -> list[Condicion]:
 
 def reglas_plan_propuesta(cartera: dict, propuestas: dict) -> list[Condicion]:
     """Aviso cuando la propuesta mejor puntuada (vigente) pide un conjunto de órdenes distinto al último avisado."""
-    cands = [p for p in propuestas.values() if p and not p.get("mercado_variante") and p.get("estado") == "calculada"
-             and not p.get("avisos") and p.get("puntuacion")]
-    if not cands:
+    from . import resumen
+    p = resumen.propuesta_referencia(propuestas)  # la misma que alimenta el plan del día (según el criterio del perfil)
+    if not p:
         return []
-    p = max(cands, key=lambda x: x["puntuacion"]["total"])
     ops = [f for f in (p.get("cambios") or {}).get("filas", []) if f["accion"] != "mantener"]
     if not ops:
         return []
@@ -430,7 +429,7 @@ def reglas_plan_propuesta(cartera: dict, propuestas: dict) -> list[Condicion]:
               f"≈ {abs(f['monto_mxn']):,.0f} MXN ({f['delta_pp']:+.1f} pp)" for f in ops[:6]]
     return [Condicion("plan_propuesta", f"{p['clave']}:{firma}", True, "aviso",
                       f"Posible movimiento: {len(ops)} {'orden' if len(ops) == 1 else 'órdenes'} según «{p['nombre']}»",
-                      f"Frente a {base}, la propuesta con mayor puntuación ({p['puntuacion']['total']:.1f}/100) sugiere: "
+                      f"Frente a {base}, la propuesta del plan del día ({p['puntuacion']['total']:.1f}/100) sugiere: "
                       + "; ".join(lineas) + (" …" if len(ops) > 6 else "") + ".",
                       {"propuesta": p["clave"], "ordenes": len(ops), "datos_hasta": p.get("datos_hasta"),
                        "costo_estimado": (p.get("cambios") or {}).get("costo_total"),

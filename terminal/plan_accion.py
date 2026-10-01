@@ -133,6 +133,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
                 b = boleta.construir(con, ajustes, {**f, "nota": fila["motivo"]}, cart, ahora=ahora)
                 fila["invalidacion"] = "; ".join(b.get("invalidacion") or [])
                 fila["referencia"] = b.get("referencia_condicional")
+                if fila["referencia"] and accion == "vender" and not fila["peso_objetivo"] and tenencia:
+                    fila["referencia"] = {**fila["referencia"], "titulos_aprox": int(tenencia),
+                                          "nota": fila["referencia"]["nota"] + " Objetivo 0 %: vender todos sus títulos."}
                 adv = [a for a in (b.get("efecto") or {}).get("advertencias_reto") or [] if a.get("nivel") == "critica"]
                 if b.get("lado") and b.get("cantidad") and not adv:
                     fila.update(decision=b["lado"] if b["lado"] in ("comprar", "vender") else
@@ -177,7 +180,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         "generado_en": ahora.isoformat(timespec="seconds"), "reglas": reglas, "cuenta": cuenta, "cuenta_hora_texto": cuenta_txt,
         "propuesta": ({"clave": p["clave"], "nombre": p["nombre"], "puntuacion": p["puntuacion"]["total"],
                        "datos_hasta": p.get("datos_hasta"),
-                       "por_que": "Es la propuesta vigente con mayor puntuación (criterio del plan del día)."} if p else None),
+                       "por_que": ("Mayor plusvalía esperada al cierre del Reto (criterio elegido en su perfil)."
+                                   if (p.get("perfil") or {}).get("criterio_plan") == "plusvalia"
+                                   else "Es la propuesta vigente con mayor puntuación (criterio del plan del día).")} if p else None),
         "acciones": acciones, "faltan": faltan,
         "resumen": {d: sum(1 for a in acciones if a["decision"] == d) for d in ("comprar", "vender", "mantener", "pendiente")}
         | {"monto_compras": round(sum(a["monto"] for a in acciones if a["decision"] == "comprar"), 2),

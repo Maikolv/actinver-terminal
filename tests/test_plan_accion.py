@@ -96,3 +96,17 @@ def test_telegram_y_plan_de_accion_coinciden(con, ajustes):
     amx = plan["acciones"][0]
     assert f"🟢 Comprar AMX B: {amx['cantidad']:,} títulos, límite ${amx['precio_limite']:,.2f}" in texto
     assert f"{plan['resumen']['comprar']} compra(s)" in texto and "✅ confirmada" in texto
+
+
+def test_venta_total_sic_pendiente_indica_todos_los_titulos(con, ajustes):
+    _base(con)
+    hora = (pd.Timestamp.now(tz="America/Mexico_City") - timedelta(minutes=2)).strftime("%Y-%m-%dT%H:%M")
+    precio = float(mercado.cotizaciones(con, ajustes, ["SIC:AAPL"])["SIC:AAPL"]["precio_mxn"])
+    texto = (f"Emisora\tSerie\tTítulos\tPrecio actual\tValor de mercado\nAAPL\t*\t1\t{precio:.2f}\t{precio:.2f}\n"
+             f"Poder de compra\t$500,000.00\nValuación Total Ahora\t${500_000 + precio:,.2f}\n")
+    assert portal.guardar(con, texto, hora, mercado.instrumentos(con), confirmar=True)["confirmado"]
+    p = {**PROP, "pesos": [{"id": "BMV:AMX", "peso": 0.3}], "cambios": {"filas": [
+        {"id": "SIC:AAPL", "clave_operable": "AAPL *", "peso_actual": 0.01, "peso_objetivo": 0.0, "delta_pp": -1.0,
+         "monto_mxn": -precio, "accion": "vender"}]}}
+    a = plan_accion.calcular(con, ajustes, propuesta=p)["acciones"][0]
+    assert a["decision"] == "pendiente" and a["referencia"]["titulos_aprox"] == 1 and "todos sus títulos" in a["referencia"]["nota"]

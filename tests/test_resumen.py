@@ -182,3 +182,16 @@ def test_plan_pedido_despues_del_cierre_muestra_la_proxima_sesion(con, ajustes, 
     monkeypatch.setattr(bot_telegram, "_ahora", lambda: tarde)
     texto = bot_telegram.texto_plan(con, ajustes)
     assert texto.startswith("🌙 Plan para la sesión del jue 01-10-2026") and "mié 30-09-2026" not in texto.splitlines()[0]
+
+
+def test_criterio_del_plan_mayor_plusvalia_esperada():
+    """Con criterio «plusvalia» el plan usa la propuesta con mayor ganancia esperada al cierre, no la mejor puntuada."""
+    esc = lambda c: {"central_p50": c, "adverso_p10": c - 0.1, "favorable_p90": c + 0.1, "volatilidad_anual": 0.3}
+    a = {**PROP, "clave": "a", "puntuacion": {"total": 87.0, "criterios": []}, "escenarios": esc(0.007)}
+    b = {**PROP, "clave": "b", "nombre": "Agresiva", "puntuacion": {"total": 69.9, "criterios": []}, "escenarios": esc(0.043)}
+    assert resumen.propuesta_referencia({"a": a, "b": b})["clave"] == "a"                       # por omisión: puntuación
+    perfil = {"criterio_plan": "plusvalia"}
+    a2, b2 = {**a, "perfil": perfil}, {**b, "perfil": perfil}
+    assert resumen.propuesta_referencia({"a": a2, "b": b2})["clave"] == "b"
+    texto = "\n".join(resumen.bloque_propuestas({"a": a2, "b": b2}, b2))
+    assert "MAYOR PLUSVALÍA ESPERADA" in texto and "«Agresiva»" in texto

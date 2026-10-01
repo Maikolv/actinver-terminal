@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.15.1] — 2026-09-30 (criterio «mayor plusvalía» y tabla real del portal)
+
+### Añadido
+- **Criterio del plan de acción** en «Reto y perfil». «Máxima puntuación» queda por omisión; «Mayor plusvalía esperada al cierre del Reto» elige la propuesta con mayor ganancia esperada (escenario central) y declara su riesgo (escenario adverso). Lo usan por igual el plan de acción, Telegram, las boletas y la alerta «Posible movimiento».
+
+### Corregido
+- **Tabla de posiciones del portal:** la columna «Valor al Costo» es el costo unitario; antes se tomaba como valor de mercado.
+- **`/plan` y la muestra después del cierre** muestran la próxima sesión de la BMV (por ejemplo, jue 01-10) en vez de la de hoy.
+- **Venta total en el SIC** (objetivo 0 %): la referencia indica todos los títulos que se tienen.
+
 ## [0.15.0] — 2026-09-30 (plan de acción, «Mi portafolio Actinver», interfaz simplificada, Telegram)
 
 ### Añadido

@@ -33,7 +33,7 @@ COLUMNAS = {
     "titulos": ("titulos", "no. titulos", "num. titulos", "cantidad", "acciones", "posicion", "titulos disponibles",
                 "tenencia"),
     "costo_promedio": ("costo promedio", "precio promedio", "costo prom", "costo prom.", "precio de compra",
-                       "costo unitario", "precio costo"),
+                       "costo unitario", "precio costo", "valor al costo"),  # portal del Reto: «Valor al Costo» = unitario
     "precio": ("precio actual", "ultimo precio", "precio de mercado", "precio mercado", "ultimo", "precio"),
     "valor": ("valor de mercado", "valor mercado", "valuacion", "importe", "valor actual", "monto", "valor"),
 }

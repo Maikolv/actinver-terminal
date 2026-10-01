@@ -22,11 +22,31 @@ ZONA = "America/Mexico_City"
 DIAS = ("lun", "mar", "mié", "jue", "vie", "sáb", "dom")
 
 
+CRITERIOS_PLAN = {"puntuacion": "mayor puntuación", "plusvalia": "mayor plusvalía esperada al cierre del Reto"}
+
+
+def criterio_plan(propuestas: dict) -> str:
+    """Criterio elegido en el perfil («Reto y perfil»): cada propuesta guarda el perfil con que se calculó."""
+    for p in propuestas.values():
+        if p and p.get("perfil"):
+            c = p["perfil"].get("criterio_plan", "puntuacion")
+            return c if c in CRITERIOS_PLAN else "puntuacion"
+    return "puntuacion"
+
+
 def propuesta_referencia(propuestas: dict) -> dict | None:
-    """La propuesta vigente con mayor puntuación (sin las variantes por mercado, que son informativas)."""
+    """La propuesta vigente que alimenta el plan (sin las variantes por mercado, que son informativas).
+    Criterio «puntuacion» (por omisión): la mejor puntuada. Criterio «plusvalia»: la de mayor ganancia esperada al cierre
+    (escenario central), con su riesgo explícito; desempata la puntuación."""
     cands = [p for p in propuestas.values() if p and not p.get("mercado_variante") and p.get("estado") == "calculada"
              and not p.get("avisos") and p.get("puntuacion")]
-    return max(cands, key=lambda x: x["puntuacion"]["total"]) if cands else None
+    if not cands:
+        return None
+    if criterio_plan(propuestas) == "plusvalia":
+        con_esc = [p for p in cands if (p.get("escenarios") or {}).get("central_p50") is not None]
+        if con_esc:
+            return max(con_esc, key=lambda x: (x["escenarios"]["central_p50"], x["puntuacion"]["total"]))
+    return max(cands, key=lambda x: x["puntuacion"]["total"])
 
 
 def ordenes(p: dict, cartera: dict) -> list[dict]:
@@ -123,11 +143,18 @@ def bloque_propuestas(props: dict | None, ref: dict, detalle: bool = False) -> l
         out.append(f"• {_linea_propuesta(x)}{marca}")
         if detalle or marca:
             out.append(f"   desglose: {_desglose(x)}")
-    out.append(f"Por qué esta: el plan usa la propuesta vigente con MAYOR PUNTUACIÓN («{ref['nombre']}», "
-               f"{ref['puntuacion']['total']:.1f}), que pondera rendimiento ajustado, riesgo, diversificación, liquidez, costos y "
-               "calidad de datos; no maximiza solo la ganancia.")
+    plusvalia = criterio_plan(props or {}) == "plusvalia"
+    if plusvalia:
+        er = ref.get("escenarios") or {}
+        out.append(f"Por qué esta: usted eligió el criterio MAYOR PLUSVALÍA ESPERADA al cierre del Reto; «{ref['nombre']}» espera "
+                   f"{er.get('central_p50', 0):+.1%}, pero su escenario adverso es {er.get('adverso_p10', 0):+.1%}: busca más "
+                   "ganancia a cambio de más riesgo. No es una promesa.")
+    else:
+        out.append(f"Por qué esta: el plan usa la propuesta vigente con MAYOR PUNTUACIÓN («{ref['nombre']}», "
+                   f"{ref['puntuacion']['total']:.1f}), que pondera rendimiento ajustado, riesgo, diversificación, liquidez, "
+                   "costos y calidad de datos; no maximiza solo la ganancia.")
     esp = [x for x in vig if (x.get("escenarios") or {}).get("central_p50") is not None]
-    if esp:
+    if esp and not plusvalia:
         mayor = max(esp, key=lambda x: x["escenarios"]["central_p50"])
         if mayor.get("clave") != ref.get("clave"):
             em, er = mayor["escenarios"], ref.get("escenarios") or {}

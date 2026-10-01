@@ -1121,6 +1121,7 @@ async function cargarPerfil() {
     f.elements.max_exposicion_usd.value = Math.round(d.perfil.max_exposicion_usd * 100);
     f.elements.escenario.value = d.perfil.escenario || "base";
     f.elements.mercado_acciones.value = d.perfil.mercado_acciones || "ambos";
+    f.elements.criterio_plan.value = d.perfil.criterio_plan || "puntuacion";
     f.elements.incluir_etf_por_confirmar.checked = !!d.perfil.incluir_etf_por_confirmar;
     f.elements.excluir.value = (d.perfil.excluir || []).join(", ");
     limpiar("criterios", h("h2", { texto: "Criterios de puntuación, costos y alertas" }),
@@ -1139,7 +1140,7 @@ document.getElementById("form-perfil").addEventListener("submit", async (ev) => 
     horizonte_anios: n(f.elements.horizonte_anios.value), capital: n(f.elements.capital.value),
     max_peso_activo: n(f.elements.max_peso_activo.value) / 100, max_exposicion_usd: n(f.elements.max_exposicion_usd.value) / 100,
     escenario: f.elements.escenario.value, incluir_etf_por_confirmar: f.elements.incluir_etf_por_confirmar.checked,
-    mercado_acciones: f.elements.mercado_acciones.value,
+    mercado_acciones: f.elements.mercado_acciones.value, criterio_plan: f.elements.criterio_plan.value,
     excluir: f.elements.excluir.value.split(/[,;\s]+/).map((x) => x.trim().toUpperCase()).filter(Boolean),
   };
   try {
