@@ -103,7 +103,13 @@ def _v5(con):
     _agregar(con, "saldos_portal", "por_liquidar", "REAL")
 
 
-MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5)]
+def _v6(con):
+    # Captura del portal con «movimientos por liquidar» e «inversiones» (forman parte de la valuación total)
+    _agregar(con, "capturas_portal", "por_liquidar", "REAL")
+    _agregar(con, "capturas_portal", "invertido", "REAL")
+
+
+MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5), (6, _v6)]
 
 
 def migrar(con: sqlite3.Connection, ajustes=None) -> int:

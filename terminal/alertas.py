@@ -380,7 +380,7 @@ def reglas_reto(con, cfg: dict, cartera: dict, ahora_dt: datetime) -> list[Condi
                                                "de la diferencia; una diferencia de efectivo o invertido suele ser una "
                                                "operación del portal no capturada en la terminal."},
                              "saldo capturado del portal",
-                             "REVISAR: capture sus posiciones del portal en «Mi cartera → Capturar desde el portal»; "
+                             "REVISAR: capture sus posiciones del portal en «Mi portafolio Actinver → Actualizar desde el portal»; "
                              "el portal es la valuación oficial."))
     return out
 
@@ -409,7 +409,7 @@ def reglas_portal(con, ahora_dt: datetime) -> list[Condicion]:
                              "La BMV ya cerró y la terminal no tiene el saldo y las posiciones del portal de hoy. "
                              "Las propuestas y alertas pueden basarse en una captura anterior o en el registro local.",
                              {"sesion": hoy.isoformat()}, "calendario BMV y capturas registradas",
-                             "Copia la tabla de tu cuenta en el portal y pégala en «Mi cartera» → «Captura del portal».",
+                             "Copia la tabla de tu cuenta en el portal y pégala en «Mi portafolio Actinver» → «Actualizar desde el portal».",
                              rearme=False))
     return out
 

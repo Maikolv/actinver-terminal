@@ -37,7 +37,11 @@ COLUMNAS = {
     "precio": ("precio actual", "ultimo precio", "precio de mercado", "precio mercado", "ultimo", "precio"),
     "valor": ("valor de mercado", "valor mercado", "valuacion", "importe", "valor actual", "monto", "valor"),
 }
-ETIQUETAS_EFECTIVO = ("efectivo disponible", "saldo en efectivo", "efectivo", "saldo disponible", "disponible")
+ETIQUETAS_EFECTIVO = ("poder de compra", "efectivo disponible", "saldo en efectivo", "efectivo", "saldo disponible",
+                      "disponible")
+# El portal del Reto («Tu inversión»): Valuación total = Inversiones + Poder de compra + Movimientos por liquidar
+ETIQUETAS_POR_LIQUIDAR = ("movimientos por liquidar", "por liquidar", "operaciones por liquidar")
+ETIQUETAS_INVERTIDO = ("inversiones", "valor de inversiones", "total inversiones")
 ETIQUETAS_TOTAL = ("valor del portafolio", "valor total", "total del portafolio", "valuacion total", "saldo total",
                    "valor de la cartera", "total cartera", "portafolio total")
 NUMERO = re.compile(r"-?\$?\s*\(?\d[\d,]*(?:\.\d+)?\)?")
@@ -112,12 +116,16 @@ def interpretar(texto: str, instrumentos: dict[str, dict]) -> dict:
     if len(texto) > 200_000:
         raise ErrorCaptura("El texto pegado es demasiado largo (máx. 200 000 caracteres).")
     filas = _filas(texto)
-    efectivo = total = None
+    efectivo = total = por_liquidar = invertido = None
     for l in texto.replace("\r", "").split("\n"):
         if efectivo is None:
             efectivo = _etiqueta(l, ETIQUETAS_EFECTIVO)
         if total is None:
             total = _etiqueta(l, ETIQUETAS_TOTAL)
+        if por_liquidar is None:
+            por_liquidar = _etiqueta(l, ETIQUETAS_POR_LIQUIDAR)
+        if invertido is None:
+            invertido = _etiqueta(l, ETIQUETAS_INVERTIDO)
     mapa, posiciones, no_reconocidas = None, [], []
     for fila in filas:
         m = _mapa_encabezado(fila)
@@ -165,32 +173,41 @@ def interpretar(texto: str, instrumentos: dict[str, dict]) -> dict:
     if any(p["titulos"] < 0 or p["titulos"] != int(p["titulos"]) for p in posiciones):
         advertencias.append("Hay títulos negativos o fraccionarios; revise lo pegado.")
     suma = sum(p["valor"] or 0 for p in posiciones)
-    if total and efectivo is not None and posiciones and all(p["valor"] is not None for p in posiciones):
-        dif = (suma + efectivo) / total - 1
+    pl = por_liquidar or 0.0
+    completas = bool(posiciones) and all(p["valor"] is not None for p in posiciones)
+    if total and efectivo is not None and completas:
+        dif = (suma + efectivo + pl) / total - 1
         if abs(dif) > TOLERANCIA_CUADRE:
-            advertencias.append(f"Posiciones + efectivo ({suma + efectivo:,.2f}) no cuadran con el valor total "
-                                f"({total:,.2f}): diferencia {dif:+.2%}.")
-    if total is None and efectivo is not None and posiciones and all(p["valor"] is not None for p in posiciones):
-        total = round(suma + efectivo, 2)
-        advertencias.append("El valor total se calculó como posiciones + efectivo (el texto no lo traía).")
+            advertencias.append(f"Posiciones + efectivo{' + por liquidar' if pl else ''} ({suma + efectivo + pl:,.2f}) no "
+                                f"cuadran con el valor total ({total:,.2f}): diferencia {dif:+.2%}.")
+    if invertido and completas and abs(suma / invertido - 1) > TOLERANCIA_CUADRE:
+        advertencias.append(f"La suma de las posiciones ({suma:,.2f}) difiere de «Inversiones» del portal ({invertido:,.2f}): "
+                            "¿faltó copiar alguna fila de la tabla?")
+    if total is None and efectivo is not None and completas:
+        total = round(suma + efectivo + pl, 2)
+        advertencias.append("El valor total se calculó como posiciones + efectivo + por liquidar (el texto no lo traía).")
     if no_reconocidas:
         advertencias.append(f"Emisoras no reconocidas (no se guardan): {', '.join(no_reconocidas[:10])}.")
     if efectivo is None:
         advertencias.append("No se encontró el efectivo; copie también la línea «Efectivo» o captúrelo abajo.")
-    return {"valor_portafolio": total, "efectivo": efectivo, "posiciones": posiciones, "no_reconocidas": no_reconocidas,
-            "advertencias": advertencias, "tabla_reconocida": bool(mapa)}
+    return {"valor_portafolio": total, "efectivo": efectivo, "por_liquidar": por_liquidar, "invertido": invertido,
+            "posiciones": posiciones, "no_reconocidas": no_reconocidas, "advertencias": advertencias,
+            "tabla_reconocida": bool(mapa)}
 
 
 def guardar(con: sqlite3.Connection, texto: str, hora_portal: str, instrumentos: dict, efectivo: float | None = None,
-            valor_portafolio: float | None = None, confirmar: bool = False) -> dict:
+            valor_portafolio: float | None = None, confirmar: bool = False, por_liquidar: float | None = None) -> dict:
     """Vista previa (confirmar=False) o registro de la captura. Nunca adivina: exige hora del portal y valor total."""
     r = interpretar(texto, instrumentos) if texto and texto.strip() else {
-        "valor_portafolio": None, "efectivo": None, "posiciones": [], "no_reconocidas": [], "advertencias": [],
-        "tabla_reconocida": False}
+        "valor_portafolio": None, "efectivo": None, "por_liquidar": None, "invertido": None, "posiciones": [],
+        "no_reconocidas": [], "advertencias": [], "tabla_reconocida": False}
     if efectivo is not None:
         r["efectivo"] = efectivo
     if valor_portafolio is not None:
         r["valor_portafolio"] = valor_portafolio
+    if por_liquidar is not None:
+        r["por_liquidar"] = por_liquidar
+    pl = r.get("por_liquidar") or 0.0
     errores = []
     try:
         t = pd.Timestamp(hora_portal)
@@ -212,34 +229,42 @@ def guardar(con: sqlite3.Connection, texto: str, hora_portal: str, instrumentos:
     if any(p["titulos"] < 0 or not p["titulos"].is_integer() for p in r["posiciones"]):
         errores.append("los títulos deben ser enteros y no negativos")
     if not r["posiciones"] and r["valor_portafolio"] is not None and r["efectivo"] is not None:
-        if abs(r["valor_portafolio"] - r["efectivo"]) > 0.01:
-            errores.append("faltan posiciones: el valor total y el efectivo difieren")
+        if abs(r["valor_portafolio"] - r["efectivo"] - pl) > 0.01:
+            errores.append("faltan posiciones: el valor total difiere del efectivo"
+                           + (" más lo por liquidar" if pl else "") + "; copie también la tabla de posiciones")
     valores = [p["valor"] for p in r["posiciones"]]
     if valores and all(v is not None for v in valores) and r["efectivo"] is not None and r["valor_portafolio"]:
-        diferencia = abs((sum(valores) + r["efectivo"]) / r["valor_portafolio"] - 1)
+        diferencia = abs((sum(valores) + r["efectivo"] + pl) / r["valor_portafolio"] - 1)
         if diferencia > TOLERANCIA_CUADRE:
-            errores.append("posiciones y efectivo no cuadran con el valor total (diferencia mayor al 1 %)")
+            errores.append("posiciones, efectivo y movimientos por liquidar no cuadran con el valor total "
+                           "(diferencia mayor al 1 %); copie también la línea «Movimientos por liquidar» si existe")
     if confirmar and not errores:
         ultima = captura(con)
         if ultima and pd.Timestamp(hora) < pd.Timestamp(ultima["hora_portal"]):
             errores.append("hora_portal: es anterior a la última captura guardada")
+    huella = hashlib.sha256(f"{hora}|{r['valor_portafolio']}|{r['efectivo']}|"
+                            f"{sorted((p['instrumento_id'], p['titulos']) for p in r['posiciones'])}".encode()).hexdigest()[:16]
+    ya = bool(hora) and con.execute("SELECT 1 FROM capturas_portal WHERE huella=?", (huella,)).fetchone() is not None
+    if ya and not confirmar:
+        r["advertencias"].append("Esta captura ya está guardada (misma hora, saldo y posiciones): no hace falta volver a guardarla.")
     r.update(hora_portal=hora, errores=errores, fuente=FUENTE, confirmado=False)
     if not confirmar or errores:
         return r
-    ahora = datetime.now(UTC).isoformat(timespec="seconds")
-    etapa = reto.etapa_operativa() if reto.activo() else None
-    huella = hashlib.sha256(f"{hora}|{r['valor_portafolio']}|{r['efectivo']}|"
-                            f"{sorted((p['instrumento_id'], p['titulos']) for p in r['posiciones'])}".encode()).hexdigest()[:16]
-    if con.execute("SELECT 1 FROM capturas_portal WHERE huella=?", (huella,)).fetchone():
+    if ya:
         r["errores"] = ["Esta captura ya estaba registrada (misma hora, saldo y posiciones)."]
         return r
+    ahora = datetime.now(UTC).isoformat(timespec="seconds")
+    etapa = reto.etapa_operativa() if reto.activo() else None
     with transaccion(con):
-        s = con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, nota) "
-                        "VALUES (?,?,?,?,?,?)", (ahora, hora, etapa, r["valor_portafolio"], r["efectivo"], FUENTE))
+        s = con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, invertido, "
+                        "por_liquidar, nota) VALUES (?,?,?,?,?,?,?,?)",
+                        (ahora, hora, etapa, r["valor_portafolio"], r["efectivo"], r.get("invertido"), r.get("por_liquidar"),
+                         FUENTE))
         c = con.execute("INSERT INTO capturas_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, fuente, "
-                        "n_posiciones, tabla_reconocida, saldo_id, huella) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                        "n_posiciones, tabla_reconocida, saldo_id, huella, por_liquidar, invertido) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                         (ahora, hora, etapa, r["valor_portafolio"], r["efectivo"], FUENTE, len(r["posiciones"]),
-                         int(r["tabla_reconocida"]), s.lastrowid, huella))
+                         int(r["tabla_reconocida"]), s.lastrowid, huella, r.get("por_liquidar"), r.get("invertido")))
         con.executemany("INSERT INTO posiciones_portal (captura_id, instrumento_id, texto, titulos, costo_promedio, precio, "
                         "valor) VALUES (?,?,?,?,?,?,?)",
                         [(c.lastrowid, p["instrumento_id"], p["texto"], p["titulos"], p["costo_promedio"], p["precio"],
@@ -289,6 +314,27 @@ def cambios(prev: dict | None, act: dict) -> list[str]:
     return out
 
 
+def diferencias(con: sqlite3.Connection, ajustes, r: dict) -> dict:
+    """Para la vista previa: qué cambia frente a la última captura guardada y frente al registro LOCAL de la terminal."""
+    from . import servicios
+    act = {"valor_portafolio": r.get("valor_portafolio"), "efectivo": r.get("efectivo"), "n_posiciones": len(r["posiciones"]),
+           "posiciones": r["posiciones"], "tabla_reconocida": r.get("tabla_reconocida")}
+    frente_captura = cambios(captura(con), act) if act["valor_portafolio"] is not None else []
+    loc = servicios.cartera_actual(con, ajustes, solo_local=True)
+    frente_local = []
+    for nombre, a, b in (("Efectivo", loc.get("efectivo"), r.get("efectivo")),
+                         ("Valor total", loc.get("valor_total"), r.get("valor_portafolio"))):
+        if a is not None and b is not None and abs(b - a) >= 0.01:
+            frente_local.append(f"{nombre}: registro local {a:,.2f} → portal {b:,.2f} ({b - a:+,.2f}).")
+    tl = {p["instrumento_id"]: p["cantidad"] for p in loc.get("posiciones", [])}
+    tp = {p["instrumento_id"]: p["titulos"] for p in r["posiciones"]}
+    for i in sorted(set(tl) | set(tp)):
+        if abs(tl.get(i, 0) - tp.get(i, 0)) > 1e-9:
+            frente_local.append(f"{i.split(':', 1)[-1]}: registro local {tl.get(i, 0):,.0f} → portal {tp.get(i, 0):,.0f} títulos.")
+    return {"frente_a_captura_anterior": frente_captura, "frente_al_registro_local": frente_local,
+            "nota": "Al confirmar, el plan y las propuestas usan la cuenta del portal; el registro local se conserva aparte."}
+
+
 def cartera(con: sqlite3.Connection, cot: dict, c: dict) -> dict:
     """Cartera con la forma de `cartera.calcular`, construida con la captura del portal (títulos y efectivo del Reto)
     y valuada con el último precio de la terminal; si no hay precio vigente, con el que mostraba el portal."""
@@ -317,11 +363,13 @@ def cartera(con: sqlite3.Connection, cot: dict, c: dict) -> dict:
                       "no_realizado_pct": None if (nr is None or not costo) else round(nr / costo, 6),
                       "realizado": 0.0, "dividendos": 0.0, "comisiones": 0.0})
     efectivo = float(c["efectivo"] or 0)
-    total = efectivo + valor_pos
+    por_liquidar = float(c.get("por_liquidar") or 0)  # parte de la valuación del portal, aún no disponible para comprar
+    total = efectivo + valor_pos + por_liquidar
     for f in filas:
         f["peso"] = round(f["valor_mxn"] / total, 6) if (f["valor_mxn"] is not None and total > 0) else None
     capital = float(reto.config().get("capital") or 0) if reto.activo() else float(c["valor_portafolio"])
-    return {"efectivo": round(efectivo, 2), "valor_posiciones": round(valor_pos, 2), "valor_total": round(total, 2),
+    return {"efectivo": round(efectivo, 2), "por_liquidar": round(por_liquidar, 2), "valor_posiciones": round(valor_pos, 2),
+            "valor_total": round(total, 2),
             "aportaciones": capital, "retiros": 0.0, "aportacion_neta": capital, "realizado": 0.0,
             "no_realizado": round(sum(f["no_realizado"] or 0 for f in filas), 2), "dividendos": 0.0, "comisiones": 0.0,
             "impuestos": 0.0, "resultado_total": round(total - capital, 2),

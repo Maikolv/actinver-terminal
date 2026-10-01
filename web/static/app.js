@@ -100,11 +100,20 @@ function segmentado(id, valorActual, alCambiar) {
 
 /* ---------- pestañas (teclado: flechas, Inicio, Fin) ---------- */
 const CARGAS = {
-  "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
+  "tab-resumen": () => pintarResumen(), "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
   "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
   "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
 };
+const navPestanas = document.querySelector(".pestanas");
+function mostrarSecundarias(si) {
+  navPestanas.classList.toggle("con-secundarias", si);
+  const b = document.getElementById("btn-mas");
+  b.setAttribute("aria-expanded", String(si)); b.textContent = si ? "Menos ▴" : "Más ▾";
+  try { localStorage.setItem("mas", si ? "1" : "0"); } catch { /* sin almacenamiento */ }
+}
+document.getElementById("btn-mas").addEventListener("click", () => mostrarSecundarias(!navPestanas.classList.contains("con-secundarias")));
 function activarPestana(tab, enfocar) {
+  if (tab.classList.contains("secundaria")) mostrarSecundarias(true);
   document.querySelectorAll('[role="tab"]').forEach((t) => {
     const sel = t === tab;
     t.setAttribute("aria-selected", sel); t.tabIndex = sel ? 0 : -1;
@@ -115,7 +124,7 @@ function activarPestana(tab, enfocar) {
   if (CARGAS[tab.id]) CARGAS[tab.id]();
 }
 document.getElementById("lista-pestanas").addEventListener("keydown", (ev) => {
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  const tabs = [...document.querySelectorAll('[role="tab"]')].filter((t) => getComputedStyle(t).display !== "none");
   const i = tabs.indexOf(document.activeElement);
   if (i < 0) return;
   const mapa = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 };
@@ -263,8 +272,44 @@ function tarjetaReto(r, c) {
         h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-perfil") }, "Ver todas"))),
     h("p", { clase: "suave", texto: "La calificación del Reto también cuenta el avance en Acelera Academy (track semanal y quiz diario); esta terminal solo cubre el portafolio." }));
 }
+const DECISION = { comprar: ["vigente", "Comprar"], vender: ["vencido", "Vender"], mantener: ["calculada", "Mantener"],
+  pendiente: ["retrasado", "Decisión pendiente"] };
+function tarjetaPlan(plan) {
+  const c = plan.cuenta, r = plan.reglas || {}, res = plan.resumen;
+  const cuenta = c.confirmada
+    ? h("p", {}, chip("vigente", "Cuenta confirmada"), ` Portal ${plan.cuenta_hora_texto}: valuación ${mxn(c.valor_total)} · poder de compra ${mxn(c.efectivo)}`
+      + (c.por_liquidar ? ` · por liquidar ${mxn(c.por_liquidar)}` : "") + (c.efectivo_tras_compras !== null ? ` · efectivo tras las compras sugeridas ${mxn(c.efectivo_tras_compras)}` : ""))
+    : h("div", { clase: "aviso-caja" }, h("strong", { texto: "Cuenta NO confirmada. " }),
+      "La terminal no conoce sus títulos ni su efectivo del portal: todas las decisiones quedan pendientes y los montos son orientativos. ",
+      h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-cartera") }, "Capturar mi portafolio"));
+  const reglas = r.activo ? h("p", { clase: "suave", texto: `Reglas verificadas (bases consultadas ${r.consultado}): ≥${r.min_emisoras} emisoras · ≤${pct(r.max_peso_emisora)} por emisora · comisión ${(r.comision * 100).toFixed(3)} % con IVA · catálogo del simulador: ${r.catalogo} instrumentos · competencia ${r.competencia}.` }) : null;
+  const avisos = [...(r.errores || []), ...(r.avisos || [])].map((a) => h("div", { clase: "aviso-caja", texto: a }));
+  const faltan = plan.faltan.length ? h("div", { clase: "aviso-caja" }, h("strong", { texto: "Datos que faltan: " }), plan.faltan.join(" · ")) : null;
+  const filas = plan.acciones;
+  return h("section", { clase: "tarjeta", "aria-labelledby": "t-plan" },
+    h("h2", { id: "t-plan", texto: plan.propuesta ? `Plan de acción — «${plan.propuesta.nombre}» (${plan.propuesta.puntuacion.toFixed(1)}/100, datos al ${plan.propuesta.datos_hasta})` : "Plan de acción" }),
+    cuenta, reglas, ...avisos, faltan,
+    h("div", { clase: "kpis" }, kpi("Compras", `${res.comprar} · ${mxn(res.monto_compras)}`), kpi("Ventas", `${res.vender} · ${mxn(res.monto_ventas)}`),
+      kpi("Mantener", String(res.mantener)), kpi("Decisión pendiente", String(res.pendiente), res.pendiente ? "negativo" : "")),
+    tabla([
+      { t: "#", f: (a) => a.prioridad, num: true },
+      { t: "Decisión", f: (a) => chip(...DECISION[a.decision]) },
+      { t: "Instrumento", f: (a) => h("span", {}, h("strong", { texto: a.clave }), h("br"), h("span", { clase: "suave", texto: `${a.mercado} · propuesta: ${a.accion_propuesta}` })) },
+      { t: "Cantidad", f: (a) => (a.cantidad ? num(a.cantidad) : "—"), num: true },
+      { t: "Precio límite", f: (a) => (a.precio_limite ? mxn(a.precio_limite, true) : "—"), num: true },
+      { t: "Monto", f: (a) => (a.decision === "pendiente" ? `≈ ${mxn(a.monto)}` : mxn(a.monto)), num: true },
+      { t: "Peso actual → objetivo", f: (a) => `${pct(a.peso_actual)} → ${pct(a.peso_objetivo)}` },
+      { t: "Precio (fuente · fecha)", f: (a) => h("span", { title: a.precio.nota || "" }, `${a.precio.fuente || "—"} · ${a.precio.fecha || "—"}${a.precio.es_referencia ? " · referencia *" : ""}`) },
+      { t: "Motivo", f: (a) => a.motivo },
+      { t: "Falta o se invalida si", f: (a) => (a.falta.length ? h("span", { clase: "no-cumple", texto: `Falta: ${a.falta.join(" · ")}` }) : a.invalidacion || "—") }],
+    filas, { caption: "Ordenadas por prioridad: ventas, luego compras por tamaño del ajuste, luego mantener. * SIC: referencia de la bolsa de origen × tipo de cambio, no cotización ejecutable. Nada se envía: usted captura cada orden en el portal.",
+      vacio: "Sin acciones: la cartera está dentro de la banda de rebalanceo o no hay propuesta vigente.",
+      claseFila: (a) => (a.decision === "pendiente" ? "fila-inactiva" : null) }),
+    h("p", { clase: "suave", texto: plan.aviso }),
+    h("p", {}, h("button", { type: "button", clase: "boton boton--secundario", onclick: () => irA("tab-tiempo") }, "Generar o ver boletas")));
+}
 async function pintarResumen() {
-  const p = estado.propuestas, c = estado.cartera, d = estado.datos;
+  const d = estado.datos;
   const cont = [];
   if (d && d.alertas_pendientes) {
     let lista = [];
@@ -274,52 +319,24 @@ async function pintarResumen() {
       h("strong", { texto: `${d.alertas_pendientes} alerta(s) nueva(s). ` }), lista.slice(0, 3).map((a) => a.titulo).join(" · "), " ",
       h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-alertas") }, "Revisar alertas")));
   }
-  const tr = tarjetaReto(estado.reto, c);
-  const tc = h("section", { clase: "tarjeta", "aria-labelledby": "t-cartera" }, h("h2", { id: "t-cartera", texto: "Cartera actual" }),
-    c ? h("p", {}, c.fuente === "portal"
-      ? h("span", {}, chip("vigente", "Confirmado"), ` Cuenta del Reto copiada del portal (${fechaLocal(c.captura.hora_portal)}); valuación estimada con cierres.`)
-      : h("span", {}, chip("sin_datos", "Local"), " Registro de la terminal, NO confirmado por el portal del Reto.")) : null);
-  if (!c) tc.append(h("div", { clase: "esqueleto esqueleto--bloque", "aria-hidden": "true" }));
-  else if (!c.n_operaciones) tc.append(h("p", { clase: "vacio", texto: "Sin operaciones registradas. Regístrelas o impórtelas en «Mi cartera» para comparar las propuestas con su posición real." }));
-  else {
-    const ipc = (c.referencias || [])[0];
-    tc.append(h("div", { clase: "kpis" },
-      kpi("Valor total", mxn(c.valor_total)), kpi("Resultado total", mxn(c.resultado_total), signo(c.resultado_total)),
-      kpi("Rend. ponderado por tiempo", pct(c.twr_acumulado), signo(c.twr_acumulado)), kpi("Caída máxima", pct(c.max_caida), "negativo"),
-      kpi(ipc ? ipc.nombre : "Referencia", pct(ipc && ipc.rend_acumulado), signo(ipc && ipc.rend_acumulado))),
-    h("p", { clase: "suave" }, "Precios: ", chip(c.vigencia), c.sin_precio.length ? ` · ${c.sin_precio.length} posición(es) sin precio: total incompleto` : ""));
+  let plan = null;
+  try { plan = await api("/api/plan-accion"); } catch (e) { cont.push(errorCaja(e)); }
+  if (plan) cont.push(tarjetaPlan(plan));
+  if (plan && plan.propuestas_texto.length) {
+    cont.push(h("section", { clase: "tarjeta", "aria-labelledby": "t-ref" }, h("h2", { id: "t-ref", texto: "Propuesta que alimenta el plan (igual que en Telegram)" }),
+      h("ul", {}, plan.propuestas_texto.map((t) => h("li", { texto: t }))),
+      h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-propuestas") }, "Ver todas las propuestas")));
   }
-  cont.push(h("div", { clase: "rejilla" }, tr, tc));
+  const tr = tarjetaReto(estado.reto, estado.cartera);
+  if (tr) cont.push(tr);
   try {
     const ei = await api("/api/estado-informacion");
     const NIV = { confirmado: ["vigente", "Confirmado"], estimado: ["retrasado", "Estimado"], vencido: ["vencido", "Vencido"], falta: ["sin_datos", "Falta"] };
-    cont.push(h("section", { clase: "tarjeta", "aria-labelledby": "t-estado-info" }, h("h2", { id: "t-estado-info", texto: "¿En qué puedo confiar hoy?" }),
+    cont.push(h("details", { clase: "tarjeta" }, h("summary", { texto: "¿En qué puedo confiar hoy? (fuentes, frescura y lo que falta)" }),
       tabla([{ t: "Tema", f: (f) => f.tema }, { t: "Estado", f: (f) => chip(...NIV[f.nivel]) }, { t: "Qué hay", f: (f) => f.texto },
         { t: "Qué falta hacer", f: (f) => f.accion || "—" }], ei.items,
       { caption: Object.entries(ei.leyenda).map(([k, v]) => `${NIV[k][1]}: ${v}`).join(" · ") })));
-  } catch { /* el resto del resumen se muestra igual */ }
-  if (!p) cont.push(h("div", { clase: "tarjeta esqueleto esqueleto--bloque", "aria-hidden": "true" }));
-  else {
-    const L = estado.lenteResumen;
-    const cands = ["acciones", "mixta"].map((u) => p[`${u}_${L}`]);
-    const puntuadas = cands.filter((x) => x && x.puntuacion && x.estado !== "suspendida");
-    const mejor = puntuadas.sort((a, b) => b.puntuacion.total - a.puntuacion.total)[0];
-    const sel = h("div", { clase: "segmentado", role: "radiogroup", "aria-label": "Lente de comparación" },
-      Object.entries(LENTES).map(([k, t]) => h("button", { type: "button", role: "radio", "aria-checked": String(k === L), onclick: () => { estado.lenteResumen = k; pintarResumen(); } }, t)));
-    cont.push(h("div", { clase: "selectores" }, h("h2", { texto: "Comparación de propuestas" }), sel),
-      h("div", { clase: "rejilla" }, cands.map((x) => tarjetaPropuesta(x, x && mejor && x.clave === mejor.clave))));
-    if (estado.clasificacion.length) {
-      cont.push(tabla([{ t: "#", f: (f) => f.posicion || "—" }, { t: "Alternativa", f: (f) => f.alternativa },
-        { t: "Puntuación", f: (f) => (f.puntuacion === null ? "—" : f.puntuacion.toFixed(1)), num: true },
-        { t: "Estado", f: (f) => chip(f.estado) }, { t: "Motivo", f: (f) => f.motivo || "" }],
-      estado.clasificacion, { caption: "Clasificación según los criterios del perfil: orden relativo, no una certeza ni una promesa de rendimiento." }));
-    }
-    if (mejor) {
-      cont.push(h("div", { clase: "rejilla" },
-        h("section", { clase: "tarjeta" }, h("h2", { texto: "Riesgos principales" }), h("p", { clase: "suave", texto: mejor.nombre }), h("ul", {}, mejor.riesgos.map((r) => h("li", { texto: r })))),
-        h("section", { clase: "tarjeta" }, h("h2", { texto: "Cambios sugeridos frente a su cartera" }), resumenCambios(mejor))));
-    }
-  }
+  } catch { /* el resto se muestra igual */ }
   limpiar("resumen-contenido", ...cont);
 }
 function resumenCambios(p) {
@@ -502,12 +519,16 @@ async function cargarCartera() {
 function pintarPortal(cp, c) {
   const k = cp.captura;
   if (!k) {
-    limpiar("portal-resumen", h("div", { clase: "aviso-caja", texto: "Aún no hay datos de su cuenta del Reto. Lo que aparece abajo es el registro LOCAL de la terminal (por ejemplo, la aportación virtual de 1,000,000 de la semana de práctica): no es un saldo confirmado del portal. Capture su cuenta con «Capturar desde el portal»." }));
+    limpiar("portal-resumen", h("div", { clase: "aviso-caja", texto: "Sin saldo confirmado: aún no ha capturado su cuenta del Reto. El plan de acción deja todo como «decisión pendiente» hasta que pegue su portafolio abajo. El registro local de la terminal (sección avanzada) no es su saldo del portal." }));
     return;
   }
-  const out = [h("div", { clase: "kpis" },
-    kpi("Valor del portafolio (portal)", mxn(k.valor_portafolio)), kpi("Efectivo (portal)", mxn(k.efectivo)),
-    kpi("Posiciones (portal)", String(k.n_posiciones))),
+  const horas = (Date.now() - new Date(k.hora_portal).getTime()) / 3600000;
+  const out = [h("div", { clase: horas > 24 || !cp.vigente ? "aviso-caja" : "info-caja" },
+    h("strong", { texto: `Última actualización del portal: ${fechaLocal(k.hora_portal)}` }),
+    ` (hace ${horas < 1 ? "menos de 1 h" : `${Math.round(horas)} h`}). ` + (horas > 24 ? "Actualícela después de operar o al cierre de cada sesión." : "")),
+  h("div", { clase: "kpis" },
+    kpi("Valuación total (portal)", mxn(k.valor_portafolio)), kpi("Poder de compra (portal)", mxn(k.efectivo)),
+    kpi("Por liquidar (portal)", mxn(k.por_liquidar || 0)), kpi("Posiciones (portal)", String(k.n_posiciones))),
   h("p", { clase: "suave", texto: `Fuente: ${k.fuente}. Hora del portal: ${fechaLocal(k.hora_portal)}; capturado en la terminal: ${fechaLocal(k.capturado_en)}.` })];
   if (!cp.vigente) out.push(h("div", { clase: "aviso-caja", texto: "Esta captura ya no alimenta las propuestas: pudo cambiar la etapa del Reto o registrarse una operación local después. La terminal usa el registro local hasta recibir una captura nueva." }));
   if (cp.cambios.length) out.push(h("p", {}, h("strong", { texto: "Cambios frente a la captura anterior: " }), cp.cambios.join(" ")));
@@ -517,21 +538,38 @@ function pintarPortal(cp, c) {
   k.posiciones, { caption: "Tal como se copió del portal. Abajo, la terminal los valúa con sus propios precios.", vacio: "La captura no incluyó posiciones." }));
   limpiar("portal-resumen", ...out);
 }
+function datosCaptura(f, confirmar) {
+  return { texto: f.elements.texto.value, hora_portal: f.elements.hora_portal.value, efectivo: f.elements.efectivo.value,
+    por_liquidar: f.elements.por_liquidar.value, valor_portafolio: f.elements.valor_portafolio.value, confirmar };
+}
 document.getElementById("form-captura").addEventListener("submit", async (ev) => {
   ev.preventDefault();
-  const f = ev.target, guardar = ev.submitter && ev.submitter.dataset.accion === "guardar";
+  const f = ev.target;
   try {
-    const r = await api("/api/portal/captura", { method: "POST", json: {
-      texto: f.elements.texto.value, hora_portal: f.elements.hora_portal.value, efectivo: f.elements.efectivo.value,
-      valor_portafolio: f.elements.valor_portafolio.value, confirmar: guardar } });
+    const r = await api("/api/portal/captura", { method: "POST", json: datosCaptura(f, false) });
     const out = [];
     (r.errores || []).forEach((e) => out.push(h("div", { clase: "error-caja", texto: e })));
     (r.advertencias || []).forEach((a) => out.push(h("div", { clase: "aviso-caja", texto: a })));
-    out.push(h("p", { texto: `Valor del portafolio: ${mxn(r.valor_portafolio)} · Efectivo: ${mxn(r.efectivo)} · ${r.posiciones.length} posiciones reconocidas.` }),
-      tabla([{ t: "Copiado", f: (x) => x.texto }, { t: "Instrumento", f: (x) => x.instrumento_id }, { t: "Títulos", f: (x) => num(x.titulos), num: true },
-        { t: "Costo prom.", f: (x) => mxn(x.costo_promedio, true), num: true }, { t: "Precio", f: (x) => mxn(x.precio, true), num: true },
-        { t: "Valor", f: (x) => mxn(x.valor), num: true }], r.posiciones, { vacio: "Sin posiciones reconocidas." }));
-    if (r.confirmado) { out.unshift(h("div", { clase: "info-caja", texto: "Captura guardada. Las propuestas se recalculan con su cuenta del Reto y recibirá un aviso con los cambios." })); f.reset(); cargarCartera(); }
+    out.push(h("div", { clase: "kpis" }, kpi("Valuación total", mxn(r.valor_portafolio)), kpi("Poder de compra", mxn(r.efectivo)),
+      kpi("Por liquidar", mxn(r.por_liquidar || 0)), kpi("Inversiones (portal)", mxn(r.invertido)), kpi("Posiciones", String(r.posiciones.length))),
+    tabla([{ t: "Copiado", f: (x) => x.texto }, { t: "Instrumento reconocido", f: (x) => x.instrumento_id }, { t: "Títulos", f: (x) => num(x.titulos), num: true },
+      { t: "Costo prom.", f: (x) => mxn(x.costo_promedio, true), num: true }, { t: "Precio (portal)", f: (x) => mxn(x.precio, true), num: true },
+      { t: "Valor (portal)", f: (x) => mxn(x.valor), num: true }], r.posiciones, { vacio: "Sin posiciones reconocidas." }));
+    const dif = r.diferencias || {};
+    if ((dif.frente_a_captura_anterior || []).length) out.push(h("p", {}, h("strong", { texto: "Frente a la última captura: " }), dif.frente_a_captura_anterior.join(" ")));
+    if ((dif.frente_al_registro_local || []).length) out.push(h("p", {}, h("strong", { texto: "Frente al registro local de la terminal: " }), dif.frente_al_registro_local.join(" ")));
+    if (!(r.errores || []).length) {
+      out.push(h("p", { clase: "suave", texto: dif.nota || "" }),
+        h("button", { type: "button", clase: "boton", onclick: async (e2) => {
+          e2.target.disabled = true;
+          try {
+            const g = await api("/api/portal/captura", { method: "POST", json: datosCaptura(f, true) });
+            if (!g.confirmado) { limpiar("captura-previa", ...(g.errores || ["No se guardó."]).map((x) => h("div", { clase: "error-caja", texto: x }))); return; }
+            limpiar("captura-previa", h("div", { clase: "info-caja", texto: `Portafolio guardado (hora del portal ${fechaLocal(g.hora_portal)}). El plan de acción y las propuestas ya usan su cuenta confirmada.` }));
+            f.reset(); cargarCartera();
+          } catch (e3) { limpiar("captura-previa", errorCaja(e3)); }
+        } }, "Confirmar y guardar mi portafolio"));
+    }
     limpiar("captura-previa", ...out);
   } catch (e) { limpiar("captura-previa", errorCaja(e)); }
 });
@@ -753,7 +791,7 @@ function pintarPresente(p) {
         { c: "Efectivo / poder de compra", p: p.saldo_portal.efectivo, t: p.efectivo },
         { c: "Invertido", p: p.saldo_portal.invertido, t: p.valor_estimado - p.efectivo },
         { c: "Por liquidar (solo portal)", p: p.saldo_portal.por_liquidar, t: 0 }],
-      { caption: "Si el efectivo o lo invertido difieren, capture sus posiciones del portal en «Mi cartera»: las propuestas usan esta cartera." }))
+      { caption: "Si el efectivo o lo invertido difieren, capture sus posiciones del portal en «Mi portafolio Actinver»: las propuestas usan esta cartera." }))
       : h("p", { clase: "suave", texto: "Aún no se captura el saldo del portal." }),
     tabla([
       { t: "Posición confirmada", f: (f) => h("strong", { texto: f.clave_operable || f.instrumento_id }) },
@@ -1170,7 +1208,7 @@ async function iniciar() {
   try { const aviso = sessionStorage.getItem("aviso"); if (aviso) { sessionStorage.removeItem("aviso"); notificar(aviso); } } catch { /* sin almacenamiento */ }
   document.getElementById("form-operacion").elements.fecha.value = new Date().toISOString().slice(0, 10);
   let inicial = null;
-  try { inicial = localStorage.getItem("pestana"); } catch { /* sin almacenamiento */ }
+  try { inicial = localStorage.getItem("pestana"); if (localStorage.getItem("mas") === "1") mostrarSecundarias(true); } catch { /* sin almacenamiento */ }
   // Carga inicial en paralelo y un solo pintado (menos recálculos de estilo y diseño).
   const [e, r, p, c, a] = await Promise.allSettled([api("/api/estado"), api("/api/reto"), api("/api/propuestas"),
     api("/api/cartera"), api("/api/alertas?limite=5")]);
@@ -1181,7 +1219,7 @@ async function iniciar() {
   if (valor(p)) { estado.propuestas = valor(p).propuestas; estado.clasificacion = valor(p).clasificacion; }
   await cargarEstado(valor(e) || undefined);
   ajustarCampos();
-  if (estado.propuestas) pintarResumen(); else if (p.reason) limpiar("resumen-contenido", errorCaja(p.reason));
+  pintarResumen();
   const tab = inicial && document.getElementById(inicial);
   if (tab && tab.id !== "tab-resumen") activarPestana(tab);
   setInterval(cargarEstado, 60000); // detecta ciclos del motor y alertas nuevas

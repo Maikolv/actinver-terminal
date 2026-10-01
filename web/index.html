@@ -36,22 +36,24 @@
 
 <nav class="pestanas" aria-label="Secciones">
   <div role="tablist" id="lista-pestanas">
-    <button role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Resumen</button>
-    <button role="tab" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Pasado · Presente · Futuro</button>
+    <button role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
+    <button role="tab" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio Actinver</button>
     <button role="tab" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
-    <button role="tab" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
     <button role="tab" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
-    <button role="tab" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi cartera</button>
-    <button role="tab" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
-    <button role="tab" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos</button>
     <button role="tab" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
-    <button role="tab" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
+    <!-- Secundarias: información técnica y trazabilidad; se muestran con «Más» -->
+    <button role="tab" class="secundaria" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
+    <button role="tab" class="secundaria" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+    <button role="tab" class="secundaria" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
+    <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
+    <button role="tab" class="secundaria" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
+  <button type="button" class="boton boton--texto" id="btn-mas" aria-expanded="false" aria-controls="lista-pestanas">Más ▾</button>
 </nav>
 
 <main id="principal" tabindex="-1">
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
-    <h1 class="oculto-visual">Resumen</h1>
+    <h1 class="oculto-visual">Plan de acción</h1>
     <div id="resumen-contenido">
       <div class="rejilla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     </div>
@@ -161,26 +163,29 @@
   </section>
 
   <section role="tabpanel" id="panel-cartera" aria-labelledby="tab-cartera" hidden>
-    <h1>Mi cartera</h1>
+    <h1>Mi portafolio Actinver</h1>
     <section class="tarjeta" aria-labelledby="h-portal">
-      <h2 id="h-portal">Cuenta del Reto según el portal</h2>
+      <h2 id="h-portal">Cuenta del Reto confirmada por el portal</h2>
       <div id="portal-resumen"><p class="cargando">Cargando…</p></div>
-      <details id="portal-captura">
-        <summary>Capturar desde el portal (copiar y pegar)</summary>
-        <p class="ayuda">El simulador no ofrece conexión automática y el reglamento (§17) prohíbe robots y programas en el portal, así que la terminal no entra a él. En su cuenta del Reto seleccione con el ratón la tabla de posiciones <strong>con sus encabezados</strong> y las líneas de <strong>efectivo</strong> y <strong>valor del portafolio</strong>, cópiela (Ctrl+C) y péguela aquí (Ctrl+V). Revise la vista previa y guárdela.</p>
+      <details id="portal-captura" open>
+        <summary>Actualizar desde el portal (copiar y pegar)</summary>
+        <p class="ayuda">No existe una integración oficial: el simulador no ofrece API ni exportación y el reglamento (§17) prohíbe robots y programas en el portal, así que la terminal no entra a él. En el portal: 1) en el Dashboard copie el recuadro <strong>«Tu inversión»</strong> (Valuación Total Ahora, Inversiones, Poder de compra y Movimientos por liquidar); 2) abra <strong>«Ver detalle de mi inversión»</strong> y copie la tabla de posiciones <strong>con sus encabezados</strong>. Pegue ambas aquí, escriba la hora que muestra el portal y pulse «Vista previa». Nada se guarda hasta que confirme.</p>
         <form id="form-captura" class="formulario" novalidate>
-          <label>Contenido copiado del portal<textarea name="texto" rows="8" maxlength="200000" placeholder="Emisora	Serie	Títulos	Costo promedio	Precio	Valor de mercado&#10;AMX	B	5,000	17.20	17.55	87,750.00&#10;Efectivo disponible: $912,250.00&#10;Valor del portafolio: $1,000,000.00"></textarea></label>
+          <label>Contenido copiado del portal<textarea name="texto" rows="9" maxlength="200000" placeholder="Valuación Total Ahora	$995,116.81&#10;Inversiones	$611,625.09&#10;Poder de compra	$229,883.38&#10;Movimientos por liquidar	$153,608.34&#10;Emisora	Serie	Títulos	Costo promedio	Precio actual	Valor de mercado&#10;ALPEK	A	20,000	14.90	14.78	295,600.00"></textarea></label>
           <div class="campos">
             <label>Fecha y hora que muestra el portal<input type="datetime-local" name="hora_portal" required></label>
-            <label>Efectivo (si no venía en lo copiado)<input type="number" name="efectivo" min="0" step="0.01"></label>
-            <label>Valor del portafolio (si no venía)<input type="number" name="valor_portafolio" min="0" step="0.01"></label>
+            <label>Poder de compra / efectivo (si no venía)<input type="number" name="efectivo" min="0" step="0.01"></label>
+            <label>Movimientos por liquidar (si no venía)<input type="number" name="por_liquidar" min="0" step="0.01"></label>
+            <label>Valuación total (si no venía)<input type="number" name="valor_portafolio" min="0" step="0.01"></label>
           </div>
-          <button class="boton boton--secundario" type="submit" data-accion="previa">Vista previa</button>
-          <button class="boton" type="submit" data-accion="guardar">Guardar captura</button>
+          <button class="boton" type="submit" data-accion="previa">Vista previa</button>
         </form>
         <div id="captura-previa"></div>
       </details>
     </section>
+    <details class="tarjeta secundaria-detalle">
+    <summary>Registro local de la terminal, operaciones manuales e importación de archivos (avanzado)</summary>
+    <p class="ayuda">Esto NO es su saldo del portal: es lo que se registró a mano en la terminal. Solo se usa si no hay una captura vigente del portal.</p>
     <h2>Registro de la terminal</h2>
     <div id="cartera-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     <h2>Registrar una operación</h2>
@@ -228,6 +233,7 @@
       <div id="resultado-importacion" aria-live="polite"></div>
       <button class="boton boton--secundario" type="submit">Revisar archivo</button>
     </form>
+    </details>
   </section>
 
   <section role="tabpanel" id="panel-mercado" aria-labelledby="tab-mercado" hidden>
@@ -295,6 +301,7 @@
     <h1>Ayuda</h1>
     <div class="texto">
       <h2>Qué hace esta terminal</h2>
+      <p><strong>Cómo usarla cada día:</strong> 1) copie su cuenta del portal en «Mi portafolio Actinver» (sin eso, todo queda como «decisión pendiente»); 2) revise «Plan de acción»: comprar, vender, mantener o pendiente por instrumento, con cantidad, precio, fuente, motivo e invalidación; 3) verifique cada precio en el portal y capture usted las órdenes. Las secciones técnicas están en «Más».</p>
       <p>Calcula en todo momento dos carteras —solo acciones, y acciones con ETF y fondos—, cada una con tres lentes: <strong>máximo rendimiento esperado</strong> (agresiva, con su riesgo explícito), <strong>ajuste a su perfil y cartera</strong> y <strong>máxima puntuación</strong> (elige con la primera mitad de la validación y se reporta con la segunda; por eso puede quedar debajo de «Ajuste»). Además hay variantes solo nacionales y solo extranjeras. Las compara con su cartera registrada y le avisa cuando conviene cambiar algo. <strong>No envía órdenes</strong>: las operaciones se capturan en el simulador del Reto.</p>
       <h2>Estado de los datos</h2>
       <dl class="glosario">

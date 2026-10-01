@@ -94,7 +94,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     plan_inicial = bool(efectivo_supuesto) and not cart.get("n_operaciones")
     if plan_inicial:  # sin operaciones registradas: se planea con el capital del perfil, marcado como supuesto
         efectivo = total = float(efectivo_supuesto)
-        faltan.append("Registrar la aportación inicial en «Mi cartera» (la boleta supone efectivo = capital del perfil)")
+        faltan.append("Registrar la aportación inicial en «Mi portafolio Actinver» (la boleta supone efectivo = capital del perfil)")
     pos_valor = {p["instrumento_id"]: float(p.get("valor_mxn") or 0) for p in cart.get("posiciones", [])}
     pos_tit = {p["instrumento_id"]: float(p.get("cantidad") or 0) for p in cart.get("posiciones", [])}
     monto = float(fila.get("monto_mxn") or 0)

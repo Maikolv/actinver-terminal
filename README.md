@@ -37,9 +37,9 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 3. Ejecute `.\start.bat`. La primera vez, `uv` crea el entorno con las versiones fijadas en `uv.lock`.
 4. Opcional: copie `.env.example` como `.env` y llene las claves que tenga. Vea [docs/proveedores.md](docs/proveedores.md).
 
-**Importar operaciones confirmadas.** Use «Mi cartera → Importar», con el tipo `transacciones` y el ejemplo `ejemplos/operaciones_confirmadas.csv`. También puede capturarlas una por una. Solo las operaciones **confirmadas** cambian posiciones y efectivo. Las órdenes pendientes se anotan como referencia en «Pasado · Presente · Futuro». Importe la lista del simulador con el tipo `universo` (ejemplo: `ejemplos/catalogo_simulador.csv`).
+**Importar operaciones confirmadas.** Use «Mi portafolio Actinver» → sección avanzada → «Importar», con el tipo `transacciones` y el ejemplo `ejemplos/operaciones_confirmadas.csv`. También puede capturarlas una por una. Solo las operaciones **confirmadas** cambian posiciones y efectivo. Las órdenes pendientes se anotan como referencia en «Pasado · Presente · Futuro». Importe la lista del simulador con el tipo `universo` (ejemplo: `ejemplos/catalogo_simulador.csv`).
 
-**Cuenta del Reto.** En «Mi cartera → Capturar desde el portal», copie usted la tabla de posiciones, el efectivo y el valor total desde su sesión del Reto; péguelos, revise la vista previa e indique la hora que muestra el portal. La terminal no accede al portal. Rechaza capturas incompletas, descuadradas o anteriores a la última. Mientras no haya una captura válida de la etapa actual, el saldo local se muestra claramente como registro de la terminal, no como saldo confirmado del Reto. Telegram y escritorio avisan de cambios entre capturas y de posibles movimientos sugeridos; el correo requiere configurar SMTP en `.env`.
+**Cuenta del Reto.** En «Mi portafolio Actinver → Actualizar desde el portal», copie usted la tabla de posiciones, el efectivo y el valor total desde su sesión del Reto; péguelos, revise la vista previa e indique la hora que muestra el portal. La terminal no accede al portal. Rechaza capturas incompletas, descuadradas o anteriores a la última. Mientras no haya una captura válida de la etapa actual, el saldo local se muestra claramente como registro de la terminal, no como saldo confirmado del Reto. Telegram y escritorio avisan de cambios entre capturas y de posibles movimientos sugeridos; el correo requiere configurar SMTP en `.env`.
 
 **Pruebas.** `uv run pytest` ejecuta la suite (171 pruebas al 29-sep-2026). `uv run python scripts/escanear_secretos.py` revisa el historial en busca de secretos. `uv run python scripts/experimento_indices_fred.py` repite el experimento con datos reales de FRED.
 
@@ -68,17 +68,20 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 
 ## Qué muestra
 
-- **Resumen**: estado de datos y del motor, alertas nuevas, Reto (sesiones restantes, reglas, pendientes), cartera (valor, resultado, caída, vs IPC) y las dos propuestas con selector de lente, clasificación, riesgos y cambios sugeridos.
-- **Propuestas**: pesos, montos, títulos enteros, razones, puntuación explicada, rendimiento esperado al cierre del Reto, validación fuera de muestra, escenarios, sensibilidad, cambios frente a su cartera y «Simular estos cambios».
-- **Alertas**: deriva con mejora neta de costos, stop-loss, toma de utilidad, caída desde máximo, evento macro, insider, noticia de alto impacto y alertas técnicas; notificación de escritorio de Windows; «Simular cambio».
-- **Mi cartera**: operaciones (captura o CSV con vista previa), posiciones, costo promedio, realizado/no realizado, dividendos, comisiones con IVA, curva de valor, caída, IPC/S&P 500/60-40, auditoría.
-- **Mercado**: calendario macro, titulares e insiders de sus emisoras; gráfica por activo (widget de TradingView).
-- **Datos**: proveedor, bolsa, moneda, zona horaria, hora, tipo de dato, retraso y vigencia de cada instrumento.
-- **Reto y perfil**: reglas oficiales (con «regla sin confirmar»), tareas pendientes, perfil y criterios.
+Navegación principal (lo necesario para decidir):
+
+- **Plan de acción**: para cada instrumento, comprar, vender, mantener o «decisión pendiente», con cantidad, precio límite, monto, peso actual y objetivo, fuente y fecha del precio, motivo y condición que invalida la sugerencia, ordenado por prioridad. Sin saldo confirmado del portal o sin cotización confiable, la decisión queda pendiente y se dice qué falta. Incluye la propuesta que alimenta el plan (el mismo texto que Telegram).
+- **Mi portafolio Actinver**: se copia el recuadro «Tu inversión» y la tabla «Ver detalle de mi inversión» del portal; la terminal muestra una vista previa, valida símbolos y cifras, detecta diferencias y duplicados, y pide confirmación antes de guardar. Indica la última actualización. El registro local y la importación de archivos quedan en una sección avanzada.
+- **Propuestas**: pesos, montos, títulos enteros, razones, puntuación explicada, rendimiento esperado al cierre del Reto, validación fuera de muestra, escenarios, sensibilidad y cambios frente a su cartera.
+- **Alertas** y **Reto y perfil**: avisos con su fuente y reglas oficiales del Reto, tareas y perfil.
+
+Con «Más»: **Boletas e historial** (pasado, presente, futuro y boletas), **Ranking**, **Mercado** (calendario macro, titulares, insiders), **Datos y fuentes** (proveedor, moneda, zona horaria, hora, retraso y vigencia de cada instrumento) y **Ayuda**.
+
+Telegram: el plan del día resume compras, ventas, mantener y pendientes; `/detalle` da cada instrumento y `/propuestas` la puntuación con su desglose y la comparación con pesos iguales.
 
 ## Reto Actinver 2026
 
-Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-2026): 1 000 000 actipesos; práctica 28 sep–2 oct; competencia 5 oct–13 nov 15:00; comisión 0.10 % + IVA; al menos 5 emisoras; máximo 50 % por emisora; sin dividendos (sí splits); horario BMV 07:30–14:00 hasta el 2 nov y 08:30–15:00 desde el 3 nov. Importe la lista de instrumentos del simulador en «Mi cartera → Importar» para restringir el universo. La calificación por avance (Acelera Academy) no la cubre la terminal.
+Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-2026): 1 000 000 actipesos; práctica 28 sep–2 oct; competencia 5 oct–13 nov 15:00; comisión 0.10 % + IVA; al menos 5 emisoras; máximo 50 % por emisora; sin dividendos (sí splits); horario BMV 07:30–14:00 hasta el 2 nov y 08:30–15:00 desde el 3 nov. Importe la lista de instrumentos del simulador en «Mi portafolio Actinver» → sección avanzada → «Importar» para restringir el universo. La calificación por avance (Acelera Academy) no la cubre la terminal.
 
 ## Fuentes y credenciales
 

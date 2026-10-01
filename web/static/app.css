@@ -78,6 +78,12 @@ a { color: var(--acento); }
 .pestanas [role="tablist"] { display: flex; gap: 2px; max-width: 1280px; margin: 0 auto; padding: 0 var(--espacio); overflow-x: auto; scrollbar-width: none; }
 .pestanas [role="tab"] { font: inherit; background: none; border: none; border-bottom: 3px solid transparent; padding: 11px 12px; color: var(--texto-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
 .pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); font-weight: 600; }
+.pestanas { display: flex; align-items: center; }
+.pestanas [role="tablist"] { flex: 1 1 auto; min-width: 0; }
+#btn-mas { white-space: nowrap; margin-right: var(--espacio); min-height: 44px; flex: none; }
+/* Secciones técnicas (boletas e historial, ranking, mercado, datos, ayuda) se muestran con «Más» */
+.pestanas:not(.con-secundarias) [role="tab"].secundaria:not([aria-selected="true"]) { display: none; }
+details.tarjeta > summary { cursor: pointer; font-weight: 600; }
 
 main { max-width: 1280px; margin: 0 auto; padding: 20px var(--espacio) 96px; min-height: 100vh; }
 #resumen-contenido { min-height: 60vh; }

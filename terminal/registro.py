@@ -145,7 +145,7 @@ def registrar_orden_pendiente(con, instrumento_id: str, lado: str, tipo_orden: s
 
 def cerrar_orden(con, oid: int, estado: str, transaccion_id: int | None = None) -> None:
     """Marca la referencia como ejecutada/cancelada/expirada. La tenencia solo cambia si el usuario registra la
-    operación CONFIRMADA en «Mi cartera»; aquí únicamente se enlaza su id."""
+    operación CONFIRMADA en «Mi portafolio Actinver»; aquí únicamente se enlaza su id."""
     if estado not in ("enviada", "pendiente", "ejecutada", "cancelada", "expirada"):
         raise ValueError("estado inválido")
     if estado == "ejecutada" and not transaccion_id:

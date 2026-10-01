@@ -30,7 +30,9 @@ from . import db, notificador
 log = logging.getLogger("terminal.bot")
 ZONA = "America/Mexico_City"
 AYUDA = ("Comandos:\n"
-         "/plan — plan del día (órdenes, cambios y porqué)\n"
+         "/plan — plan del día (resumen de compras, ventas, mantener y pendientes)\n"
+         "/detalle — cada instrumento: cantidad, precio límite, fuente y hora, motivo e invalidación\n"
+         "/propuestas — máxima puntuación, desglose, rendimiento esperado y comparación con pesos iguales\n"
          "/boletas — genera y envía las boletas del plan del día\n"
          "/estado — qué está confirmado, estimado, vencido o falta\n"
          "/alertas — alertas nuevas\n"
@@ -71,8 +73,53 @@ def texto_plan(con, ajustes) -> str:
     if not p:
         return "No hay una propuesta vigente ahora (se está recalculando o faltan datos). Pruebe /estado."
     local = pd.Timestamp.now(tz=ZONA)
-    _, texto, _ = resumen.construir(p, servicios.cartera_actual(con, ajustes), resumen._estado(con).get("ordenes"), local)
+    cart = servicios.cartera_actual(con, ajustes)
+    _, texto, _ = resumen.construir(p, cart, resumen._estado(con).get("ordenes"), local,
+                                    plan=resumen.plan_de_accion(con, ajustes, p, cart), props=props)
     return texto
+
+
+def texto_detalle(con, ajustes) -> str:
+    """Cada instrumento del plan de acción con lo necesario para verificarlo en el portal."""
+    from . import plan_accion
+    plan = plan_accion.calcular(con, ajustes)
+    if not plan["propuesta"]:
+        return "No hay una propuesta vigente ahora. Pruebe /estado."
+    c = plan["cuenta"]
+    lineas = [f"🧭 Plan de acción — «{plan['propuesta']['nombre']}» {plan['propuesta']['puntuacion']:.1f}/100",
+              (f"Cuenta confirmada (portal {plan['cuenta_hora_texto']}); poder de compra ${c['efectivo']:,.2f}."
+               if c["confirmada"] else "⚠️ Cuenta NO confirmada: todo es «decisión pendiente».")]
+    for a in plan["acciones"]:
+        pr = a["precio"]
+        precio = (f"precio {pr.get('fuente') or '—'} {pr.get('fecha') or ''}"
+                  + (" (referencia origen × tipo de cambio)" if pr.get("es_referencia") else ""))
+        cab = {"comprar": "🟢 COMPRAR", "vender": "🔴 VENDER", "mantener": "⏸ MANTENER", "pendiente": "⏳ PENDIENTE"}[a["decision"]]
+        if a["decision"] in ("comprar", "vender"):
+            orden = f"{a['cantidad']:,} títulos, límite ${a['precio_limite']:,.2f} ≈ ${a['monto']:,.0f}"
+        elif a["decision"] == "pendiente":
+            orden = f"propuesta: {a['accion_propuesta']} ≈ ${a['monto']:,.0f}"
+        else:
+            orden = f"{a['titulos_actuales']:,.0f} títulos"
+        lineas.append(f"\n{a['prioridad']}. {cab} {a['clave']}: {orden}\n   peso {a['peso_actual']:.1%} → "
+                      f"{a['peso_objetivo']:.1%} · {precio}\n   motivo: {a['motivo'][:160]}")
+        if a["falta"]:
+            lineas.append(f"   falta: {'; '.join(a['falta'])[:220]}")
+        if a.get("referencia"):
+            r = a["referencia"]
+            lineas.append(f"   referencia: banda ${r['precio_min']:,.2f}–${r['precio_max']:,.2f} "
+                          f"(≈ {r['titulos_aprox']:,} títulos si el portal está dentro)")
+        if a["invalidacion"]:
+            lineas.append(f"   se invalida si: {a['invalidacion'][:180]}")
+    return "\n".join(lineas)
+
+
+def texto_propuestas(con, ajustes) -> str:
+    from . import resumen, servicios
+    props = servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes))
+    p = resumen.propuesta_referencia(props)
+    if not p:
+        return "No hay una propuesta vigente ahora. Pruebe /estado."
+    return "\n".join(resumen.bloque_propuestas(props, p, detalle=True))
 
 
 def texto_boletas(con, ajustes) -> str:
@@ -107,7 +154,7 @@ def texto_cartera(con, ajustes) -> str:
     if c.get("fuente") == "portal":
         cab = f"✅ Cuenta del Reto (captura del portal {_hora(c['captura']['hora_portal'])}); valuación estimada con cierres."
     else:
-        cab = "⚠️ Registro LOCAL de la terminal: NO es un saldo confirmado del portal. Capture su cuenta en «Mi cartera»."
+        cab = "⚠️ Registro LOCAL de la terminal: NO es un saldo confirmado del portal. Capture su cuenta en «Mi portafolio Actinver»."
     lineas = [cab, f"Valor {c['valor_total']:,.2f} · efectivo {c['efectivo']:,.2f} · {len(c['posiciones'])} posiciones"]
     for p in c["posiciones"][:10]:
         lineas.append(f"• {p['instrumento_id'].split(':')[-1]}: {p['cantidad']:,.0f} títulos"
@@ -300,7 +347,7 @@ class Chatbot:
 
 # ------------------------------------------------------------------------------------------------------------------
 COMANDOS = {"/plan": "plan", "/boletas": "boletas", "/estado": "estado", "/alertas": "alertas", "/cartera": "cartera",
-            "/ayuda": "ayuda", "/help": "ayuda", "/start": "ayuda"}
+            "/detalle": "detalle", "/propuestas": "propuestas", "/ayuda": "ayuda", "/help": "ayuda", "/start": "ayuda"}
 
 
 def atender(con, ajustes, texto: str, chatbot: Chatbot) -> str:
@@ -316,6 +363,10 @@ def atender(con, ajustes, texto: str, chatbot: Chatbot) -> str:
         return texto_alertas(con)
     if cmd == "cartera":
         return texto_cartera(con, ajustes)
+    if cmd == "detalle":
+        return texto_detalle(con, ajustes)
+    if cmd == "propuestas":
+        return texto_propuestas(con, ajustes)
     if cmd == "ayuda" or texto.strip().startswith("/"):
         return AYUDA
     return chatbot.responder(con, texto[:1000])
@@ -339,6 +390,8 @@ class BotTelegram:
             try:  # menú de comandos en la app de Telegram (mejor esfuerzo)
                 httpx.post(f"https://api.telegram.org/bot{self.token}/setMyCommands", timeout=15, json={"commands": [
                     {"command": "plan", "description": "Plan del día: órdenes, cambios y porqué"},
+                    {"command": "detalle", "description": "Plan de acción completo por instrumento"},
+                    {"command": "propuestas", "description": "Puntuación, desglose y comparación con pesos iguales"},
                     {"command": "boletas", "description": "Generar y enviar las boletas del plan"},
                     {"command": "estado", "description": "Qué está confirmado, estimado o falta"},
                     {"command": "alertas", "description": "Alertas nuevas"},

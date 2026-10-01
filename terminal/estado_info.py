@@ -47,12 +47,12 @@ def calcular(con: sqlite3.Connection, ajustes) -> dict:
     elif c:
         item("Cuenta del Reto", "vencido",
              f"La última captura ({_hora(c['hora_portal'])}) ya no se usa: cambió la etapa del Reto o registró operaciones "
-             "a mano después.", "Pegue una captura nueva en «Mi cartera» → «Capturar desde el portal».")
+             "a mano después.", "Pegue una captura nueva en «Mi portafolio Actinver» → «Actualizar desde el portal».")
     else:
         item("Cuenta del Reto", "falta",
              "No hay datos de su cuenta del Reto. El millón que ve la terminal es un registro LOCAL (aportación capturada "
              "a mano), no un saldo confirmado del portal.",
-             "Copie la tabla de su cuenta en el portal y péguela en «Mi cartera» → «Capturar desde el portal».")
+             "Copie la tabla de su cuenta en el portal y péguela en «Mi portafolio Actinver» → «Actualizar desde el portal».")
     # 2. Precios
     ins = mercado.instrumentos(con)
     ids = [i for i, v in ins.items() if v["estado"] == "activo"]

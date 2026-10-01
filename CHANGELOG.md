@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.15.0] — 2026-09-30 (plan de acción, «Mi portafolio Actinver», interfaz simplificada, Telegram)
+
+### Añadido
+- **Plan de acción** (`terminal/plan_accion.py`, `/api/plan-accion`, primera sección de la interfaz). Para cada instrumento indica comprar, vender, mantener o «decisión pendiente», con cantidad, precio límite, monto, peso actual y objetivo, fuente y fecha del precio, motivo e invalidación, ordenado por prioridad. Antes de calcular verifica las reglas: fecha de consulta de las bases, comisión, al menos 5 emisoras, máximo 50 % y catálogo del simulador. Sin saldo confirmado del portal, sin cotización confiable (el SIC es referencia) o sin efectivo, la decisión queda pendiente y dice qué falta; las compras se limitan al poder de compra confirmado, en orden de prioridad.
+- **«Mi portafolio Actinver»** (antes «Mi cartera»). Reconoce el recuadro «Tu inversión» del portal (Valuación Total Ahora, Inversiones, Poder de compra, Movimientos por liquidar) más la tabla de «Ver detalle de mi inversión». El cuadre incluye lo por liquidar (migración 6). La vista previa muestra diferencias frente a la captura anterior y al registro local y avisa de duplicados; se confirma con «Confirmar y guardar mi portafolio». Muestra la hora de la última actualización. No existe integración oficial: el simulador no ofrece API y el reglamento §17 prohíbe programas en el portal.
+- **Telegram:** el plan del día incluye las propuestas con máxima puntuación (desglose, rendimiento esperado, rango, validación fuera de muestra frente a pesos iguales), cuál alimenta el plan y por qué, la de mayor rendimiento esperado cuando es otra (con la diferencia de riesgo) y un resumen de compras, ventas, mantener y pendientes. Nuevos comandos `/detalle` y `/propuestas`, y enlace privado de Tailscale. Sin cuenta confirmada no da órdenes con títulos.
+
+### Cambiado
+- **Navegación:** cinco secciones principales (Plan de acción, Mi portafolio Actinver, Propuestas, Alertas, Reto y perfil). Boletas e historial, Ranking, Mercado, Datos y fuentes y Ayuda pasan a «Más». La comparación de lentes que se repetía en el resumen se quitó de allí; sigue en «Propuestas». El registro local y la importación quedan en una sección avanzada. No se borró ningún dato.
+
 ## [0.14.1] — 2026-09-30 (conciliación de efectivo e invertido; horario en el plan del día)
 
 ### Añadido

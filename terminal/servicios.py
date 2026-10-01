@@ -76,11 +76,12 @@ def cartera_actual(con, ajustes: Ajustes, solo_local: bool = False) -> dict:
     precios = {i: (q["precio_mxn"] if q.get("estado") not in ("sin_datos",) else None) for i, q in cot.items()}
     if c:
         res = portal.cartera(con, cot, c)
-        res.update(fuente="portal", captura={k: c[k] for k in ("id", "hora_portal", "capturado_en", "valor_portafolio",
-                                                                "efectivo", "fuente", "n_posiciones")})
+        res.update(fuente="portal", captura={k: c.get(k) for k in ("id", "hora_portal", "capturado_en", "valor_portafolio",
+                                                                    "efectivo", "por_liquidar", "invertido", "fuente",
+                                                                    "n_posiciones")})
     else:
         res = cartera.calcular(tx, precios)
-        res.update(fuente="local", captura=None)
+        res.update(fuente="local", captura=None, por_liquidar=0.0)
     for p in res["posiciones"] + res["cerradas"]:
         q = cot.get(p["instrumento_id"], {})
         p.update({"clave_operable": q.get("clave_operable"), "clase": q.get("clase"), "vigencia": q.get("estado"),

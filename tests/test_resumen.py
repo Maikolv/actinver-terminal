@@ -26,19 +26,43 @@ def test_toca_solo_en_sesion_habil_desde_la_hora_y_una_vez(ajustes):
     assert not resumen.toca(ajustes, datetime(2026, 10, 3, 14, 0, tzinfo=UTC), {})        # sábado
 
 
-def test_plan_con_titulos_cambios_y_porque():
+def test_plan_sin_cuenta_confirmada_no_da_ordenes_ejecutables():
     import pandas as pd
     local = pd.Timestamp(MANANA).tz_convert("America/Mexico_City")
     anterior = [{"id": "BMV:ALPEK", "clave": "ALPEK A", "accion": "comprar", "titulos": 4000},
                 {"id": "BMV:FUNO", "clave": "FUNO 11", "accion": "comprar", "titulos": 2500}]
     _, texto, ords = resumen.construir(PROP, {"fuente": "local", "posiciones": []}, anterior, local)
-    assert [o["clave"] for o in ords] == ["ALPEK A", "AAPL *"] and ords[0]["titulos"] == 5385
-    assert "🟢 Comprar ALPEK A: 5,385 títulos a ~$14.98" in texto
-    assert "AAPL *: 10 títulos" in texto and "precio de referencia; confirme en el portal" in texto
+    assert [o["clave"] for o in ords] == ["ALPEK A", "AAPL *"] and ords[0]["titulos"] == 5385   # firma interna
+    assert "Cuenta NO confirmada" in texto and "⏳ Decisión pendiente (2): ALPEK A (comprar" in texto
+    assert "5,385" not in texto and "🟢 Comprar" not in texto                     # nada aparentemente ejecutable
     assert "Nueva: comprar AAPL *." in texto and "Ya no se sugiere comprar FUNO 11." in texto
-    assert "ALPEK A: 4,000 → 5,385 títulos." in texto
-    assert "ALPEK A: Relación rendimiento/riesgo histórica 1.85." in texto and "Riesgo principal" in texto
-    assert "AMX" not in texto                                                              # «mantener» no es una orden
+    assert "ALPEK A: 4,000 → 5,385" not in texto                                  # sin cuenta no se citan títulos
+    assert "alimenta el plan" in texto and "desglose: diversificación 100" in texto and "Riesgo principal" in texto
+    assert "/detalle" in texto and "AMX" not in texto                             # «mantener» de la propuesta sin posición
+
+
+def test_plan_con_cuenta_confirmada_bmv_ejecutable_y_sic_pendiente():
+    import pandas as pd
+    local = pd.Timestamp(MANANA).tz_convert("America/Mexico_City")
+    cart = {"fuente": "portal", "posiciones": [], "captura": {"hora_portal": "2026-09-30T14:45:00-06:00",
+                                                                 "valor_portafolio": 995116.81, "efectivo": 229883.38}}
+    _, texto, _ = resumen.construir(PROP, cart, None, local)
+    assert "✅ confirmada (portal 30-09 14:45)" in texto and "poder de compra $229,883" in texto
+    assert "🟢 Comprar ALPEK A: 5,385 títulos, límite $14.98" in texto
+    assert "⏳ Decisión pendiente (1): AAPL *" in texto and "Cotización confiable" in texto
+
+
+def test_propuestas_mayor_puntuacion_y_mayor_rendimiento_esperado():
+    esc = lambda c, a, f: {"central_p50": c, "adverso_p10": a, "favorable_p90": f, "volatilidad_anual": 0.2}
+    cmp_ = lambda r, e: [{"rend_anual": r, "sesiones": 84}, {"rend_anual": e}]
+    ref = {**PROP, "lente": "puntuacion", "escenarios": esc(0.001, -0.05, 0.055), "comparacion": cmp_(0.011, 0.108)}
+    agresiva = {**PROP, "clave": "mixta_rendimiento", "nombre": "Mixta · Máximo rendimiento", "lente": "rendimiento",
+                "puntuacion": {"total": 63.5, "criterios": []}, "escenarios": esc(0.046, -0.161, 0.304),
+                "comparacion": cmp_(1.135, 0.102)}
+    b = "\n".join(resumen.bloque_propuestas({"a": ref, "b": agresiva}, ref))
+    assert "«Mixta · Máxima puntuación» 87.1/100" in b and "alimenta el plan" in b
+    assert "fuera de muestra +1.1%/año vs pesos iguales +10.8% (84 sesiones)" in b
+    assert "🚀 Mayor rendimiento esperado: «Mixta · Máximo rendimiento»" in b and "más riesgo" in b
 
 
 def test_envia_una_sola_vez_por_dia(con, ajustes, monkeypatch):

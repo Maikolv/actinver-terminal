@@ -18,13 +18,16 @@ La terminal **no tiene precios en tiempo real**. Los de la BMV son cierres del d
 ## Tu saldo: cuenta del Reto o registro local
 
 - **Registro local.** Lo que capturas a mano en la terminal, como la aportación virtual de $1,000,000 de la semana de práctica. **No** es un saldo confirmado.
-- **Cuenta del Reto.** Lo que copias del portal y pegas en **Mi cartera → Capturar desde el portal**. En cuanto guardas una captura válida, las propuestas y las alertas usan tu cuenta del Reto.
+- **Cuenta del Reto.** Lo que copias del portal y pegas en **Mi portafolio Actinver → Actualizar desde el portal**. En cuanto guardas una captura válida, las propuestas y las alertas usan tu cuenta del Reto.
 
-Para capturar:
-1. En el portal, selecciona tu tabla de posiciones **con sus encabezados**, además de las líneas de efectivo y valor del portafolio.
-2. Copia con Ctrl+C.
-3. En la terminal, pega con Ctrl+V, escribe la hora que muestra el portal y pulsa **Vista previa**.
-4. Si no hay errores, pulsa **Guardar captura**. La terminal rechaza las capturas que no cuadran, las que tienen emisoras desconocidas, las que tienen hora futura o anterior a la última, y las duplicadas.
+Para capturar (no existe integración oficial: el reglamento prohíbe programas en el portal):
+1. En el portal, en el **Dashboard**, selecciona el recuadro **«Tu inversión»** completo: Valuación Total Ahora, Inversiones, Poder de compra y Movimientos por liquidar. Copia con Ctrl+C.
+2. En la terminal, abre **Mi portafolio Actinver** y pega con Ctrl+V en «Contenido copiado del portal».
+3. Vuelve al portal, pulsa **«Ver detalle de mi inversión»**, selecciona la tabla de posiciones **con sus encabezados** (emisora, serie, títulos, costo promedio, precio, valor) y cópiala. Pégala debajo de lo anterior.
+4. Escribe la fecha y hora que muestra el portal y pulsa **Vista previa**. Revisa las cifras, las emisoras reconocidas y las diferencias frente a la captura anterior y al registro local.
+5. Si no hay errores, pulsa **Confirmar y guardar mi portafolio**. La terminal rechaza las capturas que no cuadran (posiciones + poder de compra + por liquidar frente a la valuación), las que tienen emisoras desconocidas, hora futura o anterior a la última, y las duplicadas.
+
+Repite la captura después de operar o al cierre de cada sesión; «Plan de acción» muestra la hora de la última actualización.
 
 La captura deja de usarse cuando cambia la etapa del Reto (de práctica a competencia) o cuando registras una operación a mano después. En ese caso, pega una captura nueva.
 
