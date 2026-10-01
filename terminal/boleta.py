@@ -98,17 +98,23 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     pos_valor = {p["instrumento_id"]: float(p.get("valor_mxn") or 0) for p in cart.get("posiciones", [])}
     pos_tit = {p["instrumento_id"]: float(p.get("cantidad") or 0) for p in cart.get("posiciones", [])}
     monto = float(fila.get("monto_mxn") or 0)
-    lado = "compra" if monto > 0 else "venta" if monto < 0 else None
+    direccional = fila.get("accion") in ("comprar", "vender")  # «mantener» trae un monto chico dentro de la banda
+    lado = ("compra" if monto > 0 else "venta" if monto < 0 else None) if direccional else None
     tipo = {"comprar": "considerar compra", "vender": "considerar venta"}.get(fila.get("accion"), "mantener")
     if lado is None:
         tipo = "mantener"
-    if not q:
+    if not q and lado:
         tipo = "investigar"  # sin precio confiable se inhibe cualquier propuesta direccional
         faltan.append("Precio BMV confiable de la serie exacta (" + "; ".join(conf.get("motivos", [])[:2]) + ")")
     precio = float(q["precio"]) if q else None
     condicional = None
     if not q and lado:
         condicional = referencia_condicional(con, ajustes, i["id"], monto, lado)
+        if condicional and lado == "venta":  # vender: con el precio de referencia y nunca más de lo que se tiene
+            tiene = int(pos_tit.get(i["id"], 0))
+            condicional["titulos_aprox"] = min(tiene, round(abs(monto) / condicional["precio_ref_mxn"]))
+            if condicional["titulos_aprox"] == tiene:
+                condicional["nota"] += f" Equivale a vender todos sus títulos ({tiene})."
         if condicional:
             faltan.append(f"Confirmar en el portal que el precio esté entre ${condicional['precio_min']:,.2f} y "
                           f"${condicional['precio_max']:,.2f} MXN; con él, títulos = monto ÷ precio del portal")
@@ -116,7 +122,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     cantidad, limite, importe = 0, None, 0.0
     if q and lado:
         limite = _tick(precio * (1 + MARGEN_LIMITE) if lado == "compra" else precio * (1 - MARGEN_LIMITE))
-        cantidad = math.floor(abs(monto) / limite)
+        cantidad = math.floor(abs(monto) / limite + 1e-9)  # sin perder un título por punto flotante
         if lado == "venta":
             cantidad = min(cantidad, int(pos_tit.get(i["id"], 0)))
         if lado == "compra":
@@ -166,6 +172,7 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         "creada_en": ahora.isoformat(timespec="seconds"), "caduca_en": caduca.isoformat(timespec="seconds"),
         "version_reglas": registro.estado_reglas(con).get("version"),
         "referencia_condicional": condicional,
+        "accion_propuesta": fila.get("accion"), "monto_objetivo": round(monto, 2),  # para recalcular sin deriva
         "plan_inicial": plan_inicial, "efectivo_supuesto": efectivo_supuesto if plan_inicial else None,
     }
     b["huella_datos"] = huella(b, cart)
@@ -244,9 +251,13 @@ def recalcular(con: sqlite3.Connection, ajustes: Ajustes, bid: int, ahora: datet
         estado, motivo = "caducada", "Pasó su caducidad"
     else:
         cart = servicios.cartera_actual(con, ajustes)
-        fila = {"id": b["instrumento_id"], "accion": {"considerar compra": "comprar", "considerar venta": "vender"}.get(b["tipo"]),
-                "monto_mxn": (b["importe"] if b["lado"] == "compra" else -b["importe"]) if b["lado"] else 0,
-                "nota": b["razones"][-1] if b["razones"] else ""}
+        if b.get("monto_objetivo") is not None:  # misma acción y monto que al crearla (no títulos × límite)
+            fila = {"id": b["instrumento_id"], "accion": b.get("accion_propuesta"), "monto_mxn": b["monto_objetivo"],
+                    "nota": b["razones"][-1] if b["razones"] else ""}
+        else:  # boletas anteriores a este cambio
+            fila = {"id": b["instrumento_id"], "accion": {"considerar compra": "comprar", "considerar venta": "vender"}.get(b["tipo"]),
+                    "monto_mxn": (b["importe"] if b["lado"] == "compra" else -b["importe"]) if b["lado"] else 0,
+                    "nota": b["razones"][-1] if b["razones"] else ""}
         nueva = construir(con, ajustes, fila, cart, ahora, efectivo_supuesto=b.get("efectivo_supuesto"))
         estado = "vigente"
         if b["precio_referencia"] and not nueva["precio_referencia"]:

@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.16.1] — 2026-09-30 (boletas coherentes con el plan)
+
+### Corregido
+- **Boletas invalidadas al instante por punto flotante:** 7,994 × 14.91 ÷ 14.91 = 7,993.999… hacía «cambiar la cantidad» al recalcular. La boleta guarda ahora la acción y el monto originales, y redondea con tolerancia. En el plan del 1-oct faltaban ALPEK y FIBRAPL 14.
+- **Las boletas «investigar» del SIC perdían su banda de referencia al recalcular.**
+- **«Mantener» ya no se presenta como «investigar»** cuando falta cotización confiable.
+- **Venta total en el SIC:** la guía indica los títulos que se tienen (LLY 1, JNJ 5), no los que resultan de dividir entre el precio máximo de la banda.
+
 ## [0.16.0] — 2026-09-30 (capturas de pantalla del portafolio)
 
 ### Añadido

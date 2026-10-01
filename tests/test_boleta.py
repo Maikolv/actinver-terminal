@@ -259,3 +259,40 @@ def test_sic_sin_cotizacion_confiable_da_referencia_condicional_no_ejecutable(co
     assert "REFERENCIA" in r["nota"]
     txt = boleta.texto_telegram([{**b, "id": 1, "estado": "vigente"}])
     assert "Condicionales (1)" in txt and "banda" in txt and "Listas" not in txt
+
+
+def test_recalcular_no_invalida_por_redondeo_de_la_cantidad(con, ajustes):
+    """títulos × límite ÷ límite no debe perder un título por punto flotante (7,994 × 14.91 ÷ 14.91 = 7,993.999…)."""
+    px = _cartera_con_precio(con)
+    b = boleta.construir(con, ajustes, {"id": "BMV:AMX", "accion": "comprar", "monto_mxn": 119_191.0}, _cart(con, ajustes))
+    assert b["cantidad"] > 0 and b["monto_objetivo"] == 119_191.0
+    bid = _guardar(con, b)
+    r = boleta.recalcular(con, ajustes, bid)
+    assert r["estado"] == "vigente" and r["cantidad"] == b["cantidad"]
+
+
+def test_sic_investigar_conserva_referencia_al_recalcular_y_mantener_no_es_investigar(con, ajustes):
+    sembrar_precios(con, ["SIC:AAPL"], fin=vigencia.ultima_sesion_cerrada("XNYS"), sesiones=300, proveedor="tiingo")
+    migraciones.completar_tiempos(con)
+    t = cartera.validar({"fecha": "2026-09-01", "tipo": "aportacion", "monto": 1_000_000, "moneda": "MXN", "tipo_cambio": 1}, _ins(con))
+    cartera.registrar(con, t, "prueba")
+    con.commit()
+    b = boleta.construir(con, ajustes, {"id": "SIC:AAPL", "accion": "comprar", "monto_mxn": 50_000}, _cart(con, ajustes))
+    bid = _guardar(con, b)
+    r = boleta.recalcular(con, ajustes, bid)
+    assert r["tipo"] == "investigar" and r["referencia_condicional"] and r["referencia_condicional"]["lado_sugerido"] == "compra"
+    m = boleta.construir(con, ajustes, {"id": "SIC:AAPL", "accion": "mantener", "monto_mxn": 900}, _cart(con, ajustes))
+    assert m["tipo"] == "mantener" and m["lado"] is None
+
+
+def test_venta_sic_condicional_usa_la_tenencia(con, ajustes):
+    """Vender toda la posición SIC sin cotización confiable: la guía indica los títulos que se tienen (no 0 por la banda)."""
+    sembrar_precios(con, ["SIC:AAPL"], fin=vigencia.ultima_sesion_cerrada("XNYS"), sesiones=300, proveedor="tiingo")
+    migraciones.completar_tiempos(con)
+    from terminal import mercado
+    px = mercado.cotizaciones(con, ajustes, ["SIC:AAPL"])["SIC:AAPL"]["precio_mxn"]
+    cart = {"fuente": "portal", "efectivo": 100_000.0, "valor_total": 100_000.0 + px, "n_operaciones": 1,
+            "posiciones": [{"instrumento_id": "SIC:AAPL", "cantidad": 1, "valor_mxn": px}]}
+    b = boleta.construir(con, ajustes, {"id": "SIC:AAPL", "accion": "vender", "monto_mxn": -px}, cart)
+    assert b["tipo"] == "investigar" and b["referencia_condicional"]["titulos_aprox"] == 1
+    assert "todos sus títulos (1)" in b["referencia_condicional"]["nota"]
