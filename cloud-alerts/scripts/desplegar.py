@@ -122,6 +122,9 @@ def desactivar() -> None:
 
 
 def main() -> None:
+    # Wrangler puede imprimir emoji; en Windows la consola suele usar cp1252.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
     a = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     a.add_argument("--secretos", action="store_true", help="solo cargar los secretos")
     a.add_argument("--desactivar", action="store_true", help="quitar el disparador programado")

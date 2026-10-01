@@ -16,7 +16,7 @@
       "binding": "DB",
       "database_name": "actinver-alertas",
       // Se llena con el id que imprime «wrangler d1 create actinver-alertas» (no es un secreto)
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "fc78c5b5-963d-44e0-819c-5ff33ff96ba6",
       "migrations_dir": "migrations"
     }
   ],
