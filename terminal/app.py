@@ -429,10 +429,11 @@ _bloqueo_inv = threading.Lock()
 
 
 def _investigar(horizontes: list[int]) -> None:
-    from .investigacion import pronosticos
+    from .investigacion import reto_pronostico
     con = db.conectar()
     try:
-        INVESTIGACION["resultado"] = [pronosticos.emitir(con, AJUSTES.es_demo, h) for h in horizontes]
+        INVESTIGACION["resultado"] = [{k: v for k, v in r.items() if not k.startswith("_")}
+                                      for r in reto_pronostico.emitir_todo(con, AJUSTES.es_demo, horizontes)]
         INVESTIGACION["estado"] = "terminado"
     except Exception as e:  # noqa: BLE001
         log.exception("fallo en investigación")
@@ -445,7 +446,8 @@ def _investigar(horizontes: list[int]) -> None:
 
 @app.post("/api/investigacion/calcular")
 def calcular_investigacion(cuerpo: dict = Body(default={})):
-    """Corre el experimento (walk-forward → validación → prueba) y emite pronósticos. En segundo plano (~1 min)."""
+    """Corre el experimento (walk-forward → validación → prueba) y emite pronósticos a 1 y 5 sesiones y al cierre del
+    Reto. En segundo plano (unos minutos)."""
     horizontes = [int(h) for h in ((cuerpo or {}).get("horizontes") or AJUSTES.get("investigacion", {}).get("horizontes", [1, 5]))
                   if 1 <= int(h) <= 20][:3]
     if not _bloqueo_inv.acquire(blocking=False):
@@ -458,6 +460,25 @@ def calcular_investigacion(cuerpo: dict = Body(default={})):
 @app.get("/api/investigacion/estado")
 def estado_investigacion():
     return INVESTIGACION
+
+
+@app.get("/api/pronostico")
+def get_pronostico(con=Depends(con_db)):
+    from .investigacion import reto_pronostico
+    r = reto_pronostico.construir(con, AJUSTES)
+    return {**r, "texto": reto_pronostico.texto(r)}
+
+
+@app.post("/api/pronostico/telegram")
+def pronostico_telegram(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    """Envía el resumen del pronóstico por Telegram (o solo lo devuelve con enviar=false). No envía órdenes."""
+    from . import notificador
+    from .investigacion import reto_pronostico
+    texto = reto_pronostico.texto(reto_pronostico.construir(con, AJUSTES))
+    if cuerpo.get("enviar", True) is False:
+        return {"resultado": None, "texto": texto}
+    cfg = {**AJUSTES["alertas"], "notificar_escritorio": False, "notificar_telegram": True, "notificar_correo": False}
+    return {"resultado": notificador.enviar("🔮 Pronóstico (estimación)", texto, cfg, detalle=texto), "texto": texto}
 
 
 # ------------------------------------------------------------------------------------------------------------

@@ -35,7 +35,8 @@ umbral_movimiento = 0.01             # …o antes, si algún símbolo se mueve �
 recalculo_minimo_seg = 120           # nunca dos cálculos en vivo con menos de 2 min de diferencia
 
 [investigacion]
-horizontes = [1, 5]                  # H: próxima sesión y próximos cinco días hábiles
+horizontes = [1, 5]                  # H: próxima sesión y próximos cinco días hábiles (más el cierre del Reto, automático)
+emitir_diario = true                 # el monitor emite una vez por sesión cerrada, en segundo plano
 # L (ventana retrospectiva máxima) = 60 sesiones (terminal/investigacion/datos.py); proporciones 70/15/15, embargo = H
 
 [disponibilidad]

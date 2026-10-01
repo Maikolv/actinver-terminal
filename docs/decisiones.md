@@ -158,3 +158,5 @@ Decisión: Kronos (torch + pesos de Hugging Face) y whisper (torch) quedan con i
 ### D-45 Repositorio `reto-actinver`
 Contexto: la instrucción nombra `reto-actinver`, que no existe localmente. Decisión: se trabaja sobre `actinver-terminal`, que es el repositorio del Reto, en la rama `ampliacion-integral`, sin renombrarlo.
 
+### D-46 Pronóstico al cierre del Reto y barrera de decisión
+Contexto: se pidió un pronóstico hasta el 13-nov en MXN que influya en el plan solo con ventaja demostrada. Decisión: horizonte dinámico de sesiones BMV y precios del SIC × tipo de cambio ya publicado. El pronóstico solo influye si, en la prueba final intacta y después de costos, supera a «sin cambio», a pesos iguales y a la estrategia actual (media histórica, como el optimizador), con DM p < 0.05 frente a cada referencia de error. Con los datos al 30-sep no la supera: se muestra «señal experimental: sin ventaja demostrada» y el plan sigue el método actual. Kronos no se añade sin una prueba medida que quepa en memoria y mejore fuera de muestra. Ver `docs/pronostico-reto.md`.

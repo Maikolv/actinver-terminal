@@ -109,7 +109,14 @@ def _v6(con):
     _agregar(con, "capturas_portal", "invertido", "REAL")
 
 
-MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5), (6, _v6)]
+def _v7(con):
+    # Pronóstico al cierre del Reto: etiqueta del horizonte («1s», «5s», «reto»), precio base y moneda (MXN)
+    _agregar(con, "pronosticos", "etiqueta", "TEXT")
+    _agregar(con, "pronosticos", "precio_base", "REAL")
+    _agregar(con, "pronosticos", "moneda", "TEXT")
+
+
+MIGRACIONES = [(1, _v1), (2, _v2), (3, _v3), (4, _v4), (5, _v5), (6, _v6), (7, _v7)]
 
 
 def migrar(con: sqlite3.Connection, ajustes=None) -> int:

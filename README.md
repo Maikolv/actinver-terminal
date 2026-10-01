@@ -22,7 +22,8 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 | `uv run terminal respaldar` | Respaldo verificado en `data/respaldos/` |
 | `uv run terminal alpaca` | Comprueba las claves de Alpaca (solo datos) |
 | `uv run terminal telegram` | Detecta su chat de Telegram, lo guarda en `.env` y envía una prueba |
-| `uv run terminal investigar` | Experimento sin fuga de información (walk-forward → validación → prueba) y pronósticos |
+| `uv run terminal investigar` | Experimento sin fuga de información (walk-forward → validación → prueba) y pronósticos a 1, 5 sesiones y al cierre del Reto (en MXN) |
+| `uv run terminal pronostico` | Resumen del pronóstico al cierre del Reto (el mismo texto que `/pronostico` en Telegram) |
 | `uv run terminal cobertura` | Verifica cobertura por símbolo y proveedor; escribe `docs/cobertura.md` |
 | `uv run terminal webhook-secreto` | Genera el secreto del webhook de TradingView en `.env` |
 | `uv run terminal reporte cierre` | Reporte en Markdown en `data/reportes/` (`preapertura`, `cierre`, `semanal`) |
@@ -61,7 +62,7 @@ Para datos reales copie `.env.example` como `.env` y complete las claves que ten
 - **Pasado · Presente · Futuro**: pestaña con tres espacios separados.
   - **PASADO:** hechos con su hora de disponibilidad.
   - **PRESENTE:** última cotización BMV confiable o «SIN PRECIO CONFIABLE», referencia externa aparte, efectivo, posiciones confirmadas, exposición, alertas y saldo del portal que usted captura.
-  - **FUTURO:** pronósticos a 1 y 5 sesiones con rangos, siempre etiquetados como estimaciones.
+  - **FUTURO:** pronósticos a 1 y 5 sesiones y al cierre del Reto (en MXN), por emisora y para la cartera del portal, comparados con las propuestas; con barrera: sin ventaja demostrada no cambian el plan ([docs/pronostico-reto.md](docs/pronostico-reto.md)).
 - **Proveedores**: vea [docs/proveedores.md](docs/proveedores.md) y la tabla [docs/cobertura.md](docs/cobertura.md). Hoy no hay ninguna fuente BMV con licencia conectada; los conectores BMV, LSEG e ICE esperan su contrato y su documentación.
 - **Investigación**: vea [docs/investigacion.md](docs/investigacion.md). Si el modelo no supera a las referencias simples fuera de muestra, no se emite recomendación.
 - **Límites del Reto**: la terminal no inicia sesión en el portal, no extrae datos de él y no registra órdenes (reglamento §17).
@@ -77,7 +78,7 @@ Navegación principal (lo necesario para decidir):
 
 Con «Más»: **Boletas e historial** (pasado, presente, futuro y boletas), **Ranking**, **Mercado** (calendario macro, titulares, insiders), **Datos y fuentes** (proveedor, moneda, zona horaria, hora, retraso y vigencia de cada instrumento) y **Ayuda**.
 
-Telegram: el plan del día resume compras, ventas, mantener y pendientes; `/detalle` da cada instrumento y `/propuestas` la puntuación con su desglose y la comparación con pesos iguales.
+Telegram: el plan del día resume compras, ventas, mantener y pendientes; `/detalle` da cada instrumento y `/propuestas` la puntuación con su desglose y la comparación con pesos iguales; `/pronostico` el pronóstico al cierre del Reto (estimación).
 
 ## Reto Actinver 2026
 

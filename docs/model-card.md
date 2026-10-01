@@ -7,11 +7,15 @@
 | Semilla | 20261113 |
 | Uso previsto | Investigación. Da rangos y probabilidades como **estimaciones** para revisión humana |
 | Fuera de alcance | Ejecutar operaciones o decidirlas; sustituir el precio observado; emitir recomendaciones cuando no hay ventaja demostrada |
-| Datos | Cierres diarios con `available_at`. Hoy no hay datos BMV reales (sin licencia ni claves) |
+| Datos | Cierres diarios con `available_at`, en MXN (SIC × USD/MXN ya publicado). 130 instrumentos con historia suficiente (23 BMV por EODHD, 107 SIC por Tiingo/Alpaca); son cierres diarios, no cotizaciones BMV en tiempo real |
 | Variables | 14 variables con ventanas hacia atrás (ver quant-methodology §3) |
 | Validación | 70/15/15 cronológica, embargo ≥ H, purga, walk-forward purgado, prueba intacta, Diebold-Mariano con Newey-West |
 
 ## Resultados fuera de muestra
+
+### Universo del Reto en pesos (1-oct-2026): 1, 5 y 31 sesiones (hasta el cierre del Reto)
+
+Detalle, barrera y uso: [pronostico-reto.md](pronostico-reto.md). En los tres horizontes el error es igual o mayor que el de «sin cambio» (DM p = 0.45, 0.63 y 0.72) y el resultado neto queda por debajo de mantener y de pesos iguales: **SIN VENTAJA DEMOSTRADA**. La probabilidad de subida está mal calibrada (cuando estimaba ≥ 70 %, subió el 49 %).
 
 ### Índices reales de FRED (S&P 500, Nasdaq Composite, Dow Jones), 2016–2026
 
@@ -35,10 +39,11 @@ No tienen valor para el mercado real. El modelo no supera a las referencias en H
 
 ## Limitaciones y riesgos
 
-- Sin datos BMV licenciados no hay evaluación en el universo real del Reto.
+- La evaluación en el universo del Reto usa cierres diarios (23 BMV y 107 SIC); 23 fondos y 21 emisoras no tienen historia suficiente.
+- La probabilidad de subida no está calibrada en el universo del Reto: no debe leerse como probabilidad real.
 - El embargo y la purga evitan fugas de información; **no** garantizan que el modelo acierte.
 - La probabilidad de subida está calibrada con residuos de validación; su cobertura observada fue de 0.75 a 0.80 contra el 0.80 nominal.
-- Kronos está pendiente de autorización para descargar torch y sus pesos.
+- Kronos no se usa: la prueba medida se quedó sin memoria y no hay evidencia de mejora fuera de muestra. El modelo ligero (Ridge) emite los tres horizontes con 0.36 GB de memoria pico.
 
 ## Banco de estrategias simples frente a referencias (índices reales de FRED)
 

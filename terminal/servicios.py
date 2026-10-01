@@ -390,6 +390,9 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     try:
         from .investigacion import pronosticos
         pronosticos.resolver(con, ajustes.es_demo)  # añade resultados observados a pronósticos vencidos
+        if not en_vivo and (ajustes.get("investigacion") or {}).get("emitir_diario", True):
+            from .investigacion import reto_pronostico
+            reto_pronostico.emitir_si_toca(ajustes, (ajustes.get("investigacion") or {}).get("horizontes", [1, 5]))
     except Exception:  # noqa: BLE001 - la investigación nunca detiene el monitor
         log.exception("no se pudieron resolver pronósticos")
     nuevas = alertas.evaluar(con, ajustes, cart, props, notificar=notificar)

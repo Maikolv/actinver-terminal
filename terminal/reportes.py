@@ -123,6 +123,15 @@ def _seccion_motor(con) -> list[str]:
             f"{m.get('nuevos_datos')}) · fuentes de contexto → {ctx}", ""]
 
 
+def _seccion_pronostico(con, ajustes: Ajustes, props: dict, cart: dict) -> list[str]:
+    from .investigacion import reto_pronostico
+    try:
+        r = reto_pronostico.construir(con, ajustes, props=props, cart=cart)
+    except Exception:  # noqa: BLE001 - el reporte nunca se detiene por la investigación
+        return ["## Pronóstico", "No se pudo construir el pronóstico (ver registro de errores).", ""]
+    return ["## Pronóstico (ESTIMACIÓN, no cotización)", "", "```", reto_pronostico.texto(r), "```", ""]
+
+
 def generar(con: sqlite3.Connection, ajustes: Ajustes, tipo: str, ahora: datetime | None = None) -> str:
     """Devuelve el reporte en Markdown. No escribe nada ni envía nada."""
     if tipo not in TIPOS:
@@ -140,6 +149,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, tipo: str, ahora: datetim
     if semanal:
         out += _seccion_seguimiento(servicios.seguimiento(con, ajustes))
     out += _seccion_propuestas(props, detalle=tipo != "cierre")
+    out += _seccion_pronostico(con, ajustes, props, cart)
     out += _seccion_alertas(con, 24 * 7 if semanal else 24)
     return "\n".join(out).rstrip() + "\n"
 

@@ -27,11 +27,52 @@ def _utc(s: pd.Series) -> pd.Series:
     return pd.to_datetime(s, utc=True, format="ISO8601")
 
 
+FX_MAX_DIAS = 5  # tipo de cambio de la misma fecha o, si falta (festivo en México), de hasta 5 días antes
+
+
+def fx_hasta(con: sqlite3.Connection, T: pd.Timestamp | None = None) -> pd.DataFrame:
+    """USD/MXN conocido a la hora T (available_at <= T); por fecha, la primera publicación conocida."""
+    q = "SELECT fecha, valor, available_at FROM fx WHERE par IN ('USDMXN','USD/MXN') AND available_at IS NOT NULL"
+    par: list = []
+    if T is not None:
+        q += " AND available_at <= ?"
+        par.append(pd.Timestamp(T).tz_convert("UTC").isoformat())
+    df = pd.read_sql_query(q, con, params=par)
+    if df.empty:
+        return df
+    df["available_at"] = _utc(df["available_at"])
+    return df.sort_values(["fecha", "available_at"]).drop_duplicates("fecha").reset_index(drop=True)
+
+
+def a_mxn(precios: pd.DataFrame, fx: pd.DataFrame) -> pd.DataFrame:
+    """Convierte a pesos las filas en USD con el tipo de cambio de su fecha (o el previo hasta FX_MAX_DIAS).
+    La fila convertida se conoce cuando se conocen AMBOS datos: available_at = máx(precio, tipo de cambio).
+    Sin tipo de cambio válido la fila se descarta (nunca se inventa una conversión)."""
+    if precios.empty or "moneda" not in precios.columns:
+        return precios
+    usd = precios["moneda"] == "USD"
+    if not usd.any():
+        return precios
+    if fx.empty:
+        return precios[~usd].reset_index(drop=True)
+    f = fx.assign(_f=pd.to_datetime(fx["fecha"])).sort_values("_f")
+    u = precios[usd].assign(_f=pd.to_datetime(precios.loc[usd, "fecha"])).sort_values("_f")
+    m = pd.merge_asof(u, f[["_f", "valor", "available_at"]].rename(columns={"available_at": "fx_disponible"}), on="_f",
+                      direction="backward", tolerance=pd.Timedelta(days=FX_MAX_DIAS))
+    m = m.dropna(subset=["valor"])
+    m["cierre"] = m["cierre"] * m["valor"]
+    m["available_at"] = m[["available_at", "fx_disponible"]].max(axis=1)
+    m["moneda"] = "MXN"
+    out = pd.concat([precios[~usd], m[precios.columns]], ignore_index=True)
+    return out.sort_values(["instrumento_id", "fecha"]).reset_index(drop=True)
+
+
 def precios_hasta(con: sqlite3.Connection, demo: bool, T: pd.Timestamp | None = None,
-                  ids: list[str] | None = None) -> pd.DataFrame:
-    """Cierres diarios conocidos a la hora T (available_at <= T). Demo y real nunca se mezclan."""
+                  ids: list[str] | None = None, mxn: bool = False) -> pd.DataFrame:
+    """Cierres diarios conocidos a la hora T (available_at <= T). Demo y real nunca se mezclan.
+    mxn=True: en pesos (el Reto se mide en MXN); el riesgo cambiario queda dentro del rendimiento."""
     cond = "proveedor = 'demo_sintetico'" if demo else "proveedor <> 'demo_sintetico'"
-    q = (f"SELECT instrumento_id, fecha, cierre, volumen, proveedor, available_at FROM precios WHERE {cond} "
+    q = (f"SELECT instrumento_id, fecha, cierre, volumen, moneda, proveedor, available_at FROM precios WHERE {cond} "
          f"AND tipo_dato IN ({','.join('?' * len(TIPOS_DIARIOS))}) AND available_at IS NOT NULL")
     par: list = list(TIPOS_DIARIOS)
     if T is not None:
@@ -55,7 +96,20 @@ def precios_hasta(con: sqlite3.Connection, demo: bool, T: pd.Timestamp | None = 
         for r in splits.itertuples():
             m = (df["instrumento_id"] == r.instrumento_id) & (df["fecha"] < r.fecha)
             df.loc[m, "cierre"] = df.loc[m, "cierre"] / float(r.valor)  # precios previos en unidades posteriores al split
+    if mxn:
+        df = a_mxn(df, fx_hasta(con, T))
+        if T is not None:  # la fila convertida puede conocerse después (cuando se publica el tipo de cambio)
+            df = df[df["available_at"] <= pd.Timestamp(T).tz_convert("UTC")]
     return df.reset_index(drop=True)
+
+
+def historia_insuficiente(precios: pd.DataFrame, H: int) -> list[dict]:
+    """Instrumentos que quedan fuera del panel por historia corta (se informan, no se ocultan)."""
+    if precios.empty:
+        return []
+    n = precios.groupby("instrumento_id")["fecha"].count()
+    minimo = L_MAX + H + 5
+    return [{"instrumento_id": i, "sesiones": int(k), "minimo": minimo} for i, k in n.items() if k < minimo]
 
 
 def noticias_hasta(con: sqlite3.Connection, T: pd.Timestamp | None = None) -> pd.DataFrame:

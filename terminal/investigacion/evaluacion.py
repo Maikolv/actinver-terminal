@@ -103,23 +103,62 @@ def estrategia(df: pd.DataFrame, pred: np.ndarray, H: int, k: int, costo: float,
             "sensibilidad_costos": sensibilidad}
 
 
+def escala(df: pd.DataFrame, H: int) -> np.ndarray:
+    """Escala del error por emisora: volatilidad diaria de 60 sesiones (conocida en la fecha base) × √H. Así un bono y
+    una acción volátil no reciben el mismo rango."""
+    v = pd.to_numeric(df["vol60"], errors="coerce").to_numpy(dtype=float)
+    med = np.nanmedian(v) if np.isfinite(v).any() else 0.01
+    v = np.where(np.isfinite(v), v, med)
+    return np.maximum(v, 1e-4) * np.sqrt(H)
+
+
 def metricas(df: pd.DataFrame, pred: np.ndarray, residuos_val: np.ndarray, H: int, k: int, costo: float,
              nombre: str) -> dict:
+    """`residuos_val`: residuos de validación ESTANDARIZADOS por `escala` (rango y probabilidad por emisora)."""
     y = df["y"].to_numpy()
+    s = escala(df, H)
     q10, q90 = np.quantile(residuos_val, [0.10, 0.90]) if len(residuos_val) else (np.nan, np.nan)
-    cob = float(np.mean((y >= pred + q10) & (y <= pred + q90))) if len(y) else None
+    cob = float(np.mean((y >= pred + q10 * s) & (y <= pred + q90 * s))) if len(y) else None
     res_ord = np.sort(residuos_val)
-    prob = 1 - np.searchsorted(res_ord, -pred, side="right") / max(len(res_ord), 1)  # P(y > 0) con residuos empíricos
+    prob = 1 - np.searchsorted(res_ord, -pred / s, side="right") / max(len(res_ord), 1)  # P(y > 0) con residuos empíricos
     brier = float(np.mean((prob - (y > 0)) ** 2))
     no_cero = pred != 0
     meses = pd.Series(pd.to_datetime(df["fecha"]).dt.to_period("M").astype(str).to_numpy())
     err = pd.DataFrame({"m": meses, "e": (y - pred) ** 2, "e0": y ** 2}).groupby("m").mean()
     return {"modelo": nombre, "n": int(len(y)), "mse": _mse(y, pred), "mae": float(np.mean(np.abs(y - pred))),
+            "calibracion": calibracion(prob, y),
             "acierto_direccion": float(np.mean(np.sign(pred[no_cero]) == np.sign(y[no_cero]))) if no_cero.any() else None,
             "r2_vs_sin_cambio": float(1 - _mse(y, pred) / _mse(y, 0 * y)) if _mse(y, 0 * y) > 0 else None,
             "cobertura_intervalo_80": cob, "brier_prob_subida": brier,
             "meses_mejor_que_sin_cambio": f"{int((err['e'] < err['e0']).sum())}/{len(err)}",
             **estrategia(df, pred, H, k, costo, mantener=(nombre == "sin_cambio"))}
+
+
+def por_mercado(df: pd.DataFrame, pred: np.ndarray, H: int) -> list[dict]:
+    """Error y dirección del modelo frente a «sin cambio», separados por mercado (BMV y SIC)."""
+    out = []
+    mercado = df["instrumento_id"].str.split(":").str[0]
+    for m in sorted(mercado.unique()):
+        sel = (mercado == m).to_numpy()
+        y, p = df["y"].to_numpy()[sel], np.asarray(pred)[sel]
+        if not len(y):
+            continue
+        nz = p != 0
+        out.append({"mercado": m, "n": int(len(y)), "instrumentos": int(df.loc[sel, "instrumento_id"].nunique()),
+                    "mse": _mse(y, p), "mse_sin_cambio": _mse(y, 0 * y),
+                    "acierto_direccion": float(np.mean(np.sign(p[nz]) == np.sign(y[nz]))) if nz.any() else None})
+    return out
+
+
+def calibracion(prob: np.ndarray, y: np.ndarray, cortes=(0.0, 0.3, 0.45, 0.55, 0.7, 1.0)) -> list[dict]:
+    """Probabilidad de subida estimada frente a la frecuencia observada, por tramos (calibración)."""
+    out = []
+    for a, b in zip(cortes[:-1], cortes[1:], strict=True):
+        sel = (prob >= a) & ((prob < b) if b < 1 else (prob <= b))
+        if sel.any():
+            out.append({"tramo": f"{a:.2f}–{b:.2f}", "n": int(sel.sum()), "prob_media": float(prob[sel].mean()),
+                        "frecuencia_subida": float((y[sel] > 0).mean())})
+    return out
 
 
 def diebold_mariano(df: pd.DataFrame, pred_a: np.ndarray, pred_b: np.ndarray, H: int) -> dict:
@@ -151,7 +190,7 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
     cfg = {**CONFIG_BASE, **(config or {}), "H": H}
     T = pd.Timestamp(T if T is not None else datetime.now(UTC))
     T = T.tz_localize("UTC") if T.tzinfo is None else T.tz_convert("UTC")
-    precios = datos.precios_hasta(con, demo, T)
+    precios = datos.precios_hasta(con, demo, T, mxn=bool(cfg.get("mxn")))
     panel = datos.etiquetados_hasta(datos.construir_panel(precios, H, datos.noticias_hasta(con, T)), T)
     if panel.empty:
         return {"estado": "sin_datos", "H": H, "mensaje": "No hay historia suficiente con available_at <= T para investigar."}
@@ -188,9 +227,10 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
         ajustados[v] = mdl
         val_mse[v] = _mse(val["y"], mdl.predict(_X(val)))
     elegido = min(VARIANTES, key=lambda v: val_mse[v])
-    residuos = {"modelo": val["y"].to_numpy() - ajustados[elegido].predict(_X(val))}
+    s_val = escala(val, H)
+    residuos = {"modelo": (val["y"].to_numpy() - ajustados[elegido].predict(_X(val))) / s_val}
     for nombre, pr in referencias(val, H).items():
-        residuos[nombre] = val["y"].to_numpy() - pr
+        residuos[nombre] = (val["y"].to_numpy() - pr) / s_val
 
     # 3) prueba final: modelo fijado, reentrenado con entrenamiento + validación purgados contra la prueba
     m_ev = (panel["fecha"] <= cortes.fechas[cortes.validacion[1] - 1]) & panel["fecha_fin_etiqueta"].notna() & (
@@ -202,7 +242,9 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
     for nombre, pr in referencias(pru, H).items():
         tabla.append(metricas(pru, pr, residuos[nombre], H, k, costo, nombre))
     cero = np.zeros(len(pru))
-    estrategias_ref = [{"modelo": "pesos_iguales (todas las emisoras)", **estrategia(pru, cero, H, k, costo, iguales=True)}]
+    estrategias_ref = [{"modelo": "pesos_iguales (todas las emisoras)", **estrategia(pru, cero, H, k, costo, iguales=True)},
+                       {"modelo": "estrategia_actual (media histórica de 60 sesiones, como el optimizador)",
+                        **estrategia(pru, referencias(pru, H)["historico_reciente"], H, k, costo)}]
     mod, refs = tabla[0], tabla[1:]
     pred_mod = final.predict(_X(pru))
     dm = {n: diebold_mariano(pru, pred_mod, pr, H) for n, pr in referencias(pru, H).items()}
@@ -239,6 +281,9 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
         "prueba_ya_vista": prueba_ya_vista,
         "aviso": ("El embargo y la purga evitan fugas de información; no garantizan que los pronósticos acierten. "
                   "Los intervalos son estimaciones con error histórico."),
+        "historia_insuficiente": datos.historia_insuficiente(precios, H), "moneda": "MXN" if cfg.get("mxn") else "original",
+        "por_mercado": por_mercado(pru, pred_mod, H),
+        "dias_prueba": int(pru["fecha"].nunique()),
         "version_codigo": __version__, "semilla": semilla, "huella_config": _huella(config_reg)[:16],
         "huella_datos": huella_datos[:16],
     }

@@ -192,11 +192,13 @@ def investigar(args) -> None:
     con = db.conectar()
     db.inicializar(con, a)
     try:
-        for H in args.horizontes:
-            r = pronosticos.emitir(con, a.es_demo, H)
+        from .investigacion import reto_pronostico
+        res = (reto_pronostico.emitir_todo(con, a.es_demo, args.horizontes) if args.reto
+               else [pronosticos.emitir(con, a.es_demo, H) for H in args.horizontes])
+        for r in res:
             print(json.dumps({k: v for k, v in r.items() if not k.startswith("_")}, ensure_ascii=False, indent=1, default=str))
         from .investigacion import evaluacion
-        for H in args.horizontes:
+        for H in [*args.horizontes, *[r["H"] for r in res if r.get("etiqueta") == "reto" and r.get("H")]]:
             e = evaluacion.ultimo(con, H, a.es_demo)
             if not e or e.get("estado") != "ok":
                 continue
@@ -208,6 +210,19 @@ def investigar(args) -> None:
                 print(f"{m['modelo']:32} {m['mse']:10.6f} {(f'{d:.3f}' if d is not None else '—'):>6} "
                       f"{m['cobertura_intervalo_80']:6.3f} {m['resultado_neto']:8.4f} {m['rotacion_media']:6.3f}")
             print(e["conclusion"] + (" (prueba ya vista: no válida para elegir)" if e.get("prueba_ya_vista") else ""))
+    finally:
+        con.close()
+
+
+def pronostico(args) -> None:
+    from . import db
+    from .config import cargar_ajustes
+    from .investigacion import reto_pronostico
+    a = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con, a)
+    try:
+        print(reto_pronostico.texto(reto_pronostico.construir(con, a)))
     finally:
         con.close()
 
@@ -434,6 +449,11 @@ def webhook_secreto(_args) -> None:
 
 
 def main() -> None:
+    for flujo in (sys.stdout, sys.stderr):  # la consola de Windows (cp1252) no imprime acentos raros ni emojis
+        try:
+            flujo.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     p = argparse.ArgumentParser(prog="terminal", description="Terminal local de análisis de portafolios")
     sub = p.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("iniciar", help="inicia el servidor local y abre el navegador")
@@ -455,7 +475,11 @@ def main() -> None:
     c.set_defaults(fn=comparar_modelos)
     inv = sub.add_parser("investigar", help="experimento sin fuga de información y pronósticos (FUTURO)")
     inv.add_argument("--horizontes", type=int, nargs="+", default=[1, 5])
-    inv.set_defaults(fn=investigar)
+    inv.add_argument("--sin-reto", dest="reto", action="store_false",
+                     help="no emitir el horizonte dinámico hasta el cierre del Reto")
+    inv.set_defaults(fn=investigar, reto=True)
+    pr = sub.add_parser("pronostico", help="muestra el pronóstico al cierre del Reto (texto de Telegram)")
+    pr.set_defaults(fn=pronostico)
     sub.add_parser("cobertura", help="verifica cobertura por símbolo y proveedor (docs/cobertura.md)").set_defaults(fn=cobertura)
     sub.add_parser("webhook-secreto", help="genera el secreto del webhook de TradingView en .env").set_defaults(fn=webhook_secreto)
     fo = sub.add_parser("fondos", help="importa la hoja oficial de precios de los fondos Actinver (PDF)")

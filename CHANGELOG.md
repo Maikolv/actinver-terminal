@@ -2,6 +2,44 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.17.0] — 2026-10-01 (pronóstico al cierre del Reto, con barrera)
+
+### Añadido
+- **Pronóstico al cierre del Reto** (`terminal/investigacion/reto_pronostico.py`, [docs/pronostico-reto.md](docs/pronostico-reto.md)). Además de 1 y 5 sesiones, emite un horizonte dinámico: sesiones de la BMV desde la última sesión cerrada hasta el 13-nov (31 el 30-sep). Todo va en pesos: el SIC se multiplica por el USD/MXN de su fecha, y solo si ya estaba publicado a la hora de emisión. Cada pronóstico guarda el precio base, la estimación, el rango 10–90 %, la probabilidad de subida, la fecha de emisión, el último cierre usado, la fecha objetivo y la versión del modelo (migración 7).
+- **FUTURO en «Boletas e historial»** separa tres cosas:
+  - cierre OBSERVADO;
+  - ESTIMACIÓN al objetivo;
+  - ESCENARIOS 10/90 %.
+
+  Muestra cada emisora y la cartera de la captura del portal; si no hay captura, avisa «Cartera NO conciliada». También muestra:
+  - la comparación de cada propuesta con el pronóstico: neto de comisión + IVA, exposición al SIC con tipo de cambio, reglas del Reto y catálogo del simulador;
+  - los cambios frente a la emisión anterior;
+  - la calidad por mercado (BMV y SIC) y la calibración;
+  - las emisoras sin historia suficiente o sin precios, que no se ocultan.
+- **Barrera verificable.** El pronóstico solo puede influir en compras, ventas o boletas si cumple todo esto:
+  - la prueba final está intacta y es suficiente;
+  - su error es menor que el de cada referencia, con Diebold-Mariano p < 0.05;
+  - su resultado neto de costos es mejor que mantener, que pesos iguales y que la **estrategia actual** (nueva referencia: media histórica, como el optimizador);
+  - no hay deterioro.
+
+  Si no, aparece «señal experimental: sin ventaja demostrada» y el plan sigue el método actual. Una prueba comprueba que el plan, las boletas y el optimizador no leen los pronósticos.
+- **Telegram y reporte.** Nuevo comando `/pronostico`, botón «Enviar pronóstico por Telegram», sección en el reporte diario, `uv run terminal pronostico`, `GET /api/pronostico` y `POST /api/pronostico/telegram`.
+- **Emisión automática.** Una vez por sesión cerrada, en segundo plano: unos 140 s y 0.36 GB de memoria pico. Se desactiva con `[investigacion] emitir_diario = false`.
+- **Métricas nuevas.** Calibración por tramos, error y dirección por mercado, días de prueba y lista de historia insuficiente.
+
+### Cambiado
+- **Rango por emisora.** Los residuos se estandarizan con la volatilidad de 60 sesiones × √H. Antes, un bono (AGG) y una acción volátil recibían el mismo rango.
+- La línea de comandos escribe en UTF-8: la consola de Windows fallaba con emojis.
+
+### Resultados reales (datos al 30-sep, 130 instrumentos)
+- **SIN VENTAJA DEMOSTRADA** en 1, 5 y 31 sesiones:
+  - el error relativo a «sin cambio» es de 1.000, 1.001 y 1.009;
+  - Diebold-Mariano da p = 0.45, 0.63 y 0.72;
+  - el neto del modelo es −35.4 %, −4.4 % y −0.0 %, frente a +8.8 %, +12.6 % y +4.5 % de mantener.
+- **La probabilidad de subida está mal calibrada.** Cuando estimaba ≥ 70 %, la emisora subió el 49 % de las veces. La terminal y Telegram lo advierten.
+- **Kronos no se añadió**: no hay una prueba medida que quepa en memoria y mejore fuera de muestra.
+- **Pruebas:** 11 nuevas (`tests/test_pronostico_reto.py`).
+
 ## [0.16.1] — 2026-09-30 (boletas coherentes con el plan)
 
 ### Corregido

@@ -38,6 +38,7 @@ AYUDA = ("Comandos:\n"
          "/estado — qué está confirmado, estimado, vencido o falta\n"
          "/alertas — alertas nuevas\n"
          "/cartera — saldo y posiciones (cuenta del Reto o registro local)\n"
+         "/pronostico — pronóstico al cierre del Reto: potencial, riesgos, cambios y calidad del modelo (estimación)\n"
          "/ayuda — esta ayuda\n\n"
          "También puede escribir una pregunta, p. ej. «¿por qué ALPEK?» o «¿qué noticias hay de MRNA?».\n"
          "Nada de esto envía órdenes: cada orden se captura a mano en el simulador del Reto.")
@@ -126,6 +127,11 @@ def texto_propuestas(con, ajustes) -> str:
     if not p:
         return "No hay una propuesta vigente ahora. Pruebe /estado."
     return "\n".join(resumen.bloque_propuestas(props, p, detalle=True))
+
+
+def texto_pronostico(con, ajustes) -> str:
+    from .investigacion import reto_pronostico
+    return reto_pronostico.texto(reto_pronostico.construir(con, ajustes))
 
 
 def texto_boletas(con, ajustes) -> str:
@@ -353,7 +359,8 @@ class Chatbot:
 
 # ------------------------------------------------------------------------------------------------------------------
 COMANDOS = {"/plan": "plan", "/boletas": "boletas", "/estado": "estado", "/alertas": "alertas", "/cartera": "cartera",
-            "/detalle": "detalle", "/propuestas": "propuestas", "/ayuda": "ayuda", "/help": "ayuda", "/start": "ayuda"}
+            "/detalle": "detalle", "/propuestas": "propuestas", "/pronostico": "pronostico", "/pronóstico": "pronostico",
+            "/ayuda": "ayuda", "/help": "ayuda", "/start": "ayuda"}
 
 
 def atender(con, ajustes, texto: str, chatbot: Chatbot) -> str:
@@ -373,6 +380,8 @@ def atender(con, ajustes, texto: str, chatbot: Chatbot) -> str:
         return texto_detalle(con, ajustes)
     if cmd == "propuestas":
         return texto_propuestas(con, ajustes)
+    if cmd == "pronostico":
+        return texto_pronostico(con, ajustes)
     if cmd == "ayuda" or texto.strip().startswith("/"):
         return AYUDA
     return chatbot.responder(con, texto[:1000])

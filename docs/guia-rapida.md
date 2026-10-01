@@ -42,6 +42,16 @@ La captura deja de usarse cuando cambia la etapa del Reto (de práctica a compet
 
 Cada aviso trae la hora, la fuente y el motivo. No se repite, y si un canal falla se reintenta cada 10 minutos. El correo se activa cuando agregues sus datos en `.env` (ver README).
 
+## Pronóstico al cierre del Reto (estimación)
+
+- En la terminal: «Boletas e historial» → FUTURO. Ahí están:
+  - el cierre observado, la estimación al 13-nov y los escenarios 10/90 % de cada emisora, en pesos;
+  - su cartera del portal;
+  - la comparación con las propuestas;
+  - la calidad del modelo.
+- En Telegram: `/pronostico`, o el botón «Enviar pronóstico por Telegram».
+- Mientras diga **«señal experimental: sin ventaja demostrada»**, el pronóstico no cambia el plan ni las boletas. Hoy (1-oct) no supera a «sin cambio» y su probabilidad de subida está mal calibrada. Detalle en [pronostico-reto.md](pronostico-reto.md).
+
 ## Cuándo la terminal bloquea una decisión
 
 - Una **propuesta con avisos** (datos atrasados, perfil cambiado o captura con posiciones sin precio) no genera boletas ni avisos de movimiento.

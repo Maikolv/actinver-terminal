@@ -3,12 +3,15 @@
 como el precio o saldo de Actinver."""
 from __future__ import annotations
 
+import logging
 import sqlite3
 from datetime import UTC, datetime
 
 from . import alertas, cotizaciones as cz, mercado, reto, servicios, vigencia
 from .config import Ajustes
 from .investigacion import evaluacion, pronosticos
+
+log = logging.getLogger("terminal.espacios")
 
 
 def pasado(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
@@ -100,11 +103,17 @@ def futuro(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
             exps.append({k: e.get(k) for k in ("H", "hora_corte", "prueba", "supera_referencias", "recomendacion_permitida",
                                                "conclusion", "prueba_ya_vista", "aviso", "datos", "variante_elegida", "veredicto",
                                                "estrategias_referencia", "nombres_referencias")})
-    permitido = bool(exps) and all(e["recomendacion_permitida"] for e in exps)
+    from .investigacion import reto_pronostico
+    try:
+        reto_f = reto_pronostico.construir(con, ajustes)
+    except Exception:  # noqa: BLE001 - la vista nunca falla por la investigación
+        log.exception("no se pudo construir el pronóstico al cierre del Reto")
+        reto_f = None
+    permitido = bool(reto_f and reto_f["barrera"]["permitida"])
     return {"espacio": "FUTURO", "etiqueta": "ESTIMACIONES — no son cotizaciones ni hechos",
             "pronosticos": lista, "n_instrumentos": len(ids), "experimentos": exps, "recomendacion_permitida": permitido,
-            "deterioro": pronosticos.deterioro(con),
+            "deterioro": pronosticos.deterioro(con), "reto": reto_f,
             "aviso": ("Probabilidades y rangos estimados con datos disponibles a la hora de emisión. Un embargo evita fugas "
                       "de información, pero no hace acertado un pronóstico. "
-                      + ("" if permitido else "El modelo no superó a las referencias simples: no se emite recomendación de cambio."))}
+                      + ("" if permitido else f"{reto_pronostico.LEYENDA_SIN_VENTAJA.capitalize()}: el plan sigue el método actual."))}
 

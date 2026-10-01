@@ -895,10 +895,61 @@ function pintarPasado(p) {
     tabla([{ t: "Publicado", f: (f) => fechaLocal(f.publicado) }, { t: "Conocido (available_at)", f: (f) => fechaLocal(f.available_at) },
       { t: "Emisora", f: (f) => f.instrumento_id }, { t: "Titular", f: (f) => f.titulo }], p.noticias, { caption: "Noticias", vacio: "Sin noticias." }));
 }
+const signoPct = (x) => (vacio(x) ? "—" : `${x > 0 ? "+" : ""}${pct(x)}`);
+function pintarReto(r) {
+  if (!r || !r.emision) return h("p", { clase: "suave", texto: "Aún no hay pronóstico al cierre del Reto: pulse «Calcular investigación y pronósticos» (2–3 min)." });
+  const e = r.emision, b = r.barrera, c = r.cartera, q = r.calidad, hz = r.horizonte, pr = r.propuestas;
+  const tit = r.etiqueta === "reto" ? `Al cierre del Reto (${hz.hasta}, ${hz.H} sesiones de la BMV)` : `A ${hz.H} sesiones`;
+  return h("div", {},
+    h("h3", {}, `${tit} `, chip(b.permitida ? "vigente" : "vencido", b.leyenda)),
+    h("p", { clase: "suave", texto: `Emitido ${fechaLocal(e.emitido_en)} · último cierre usado ${e.ultimo_cierre} · disponible desde ${fechaLocal(e.datos_hasta)} · modelo ${e.version} (${e.modelo}) · en ${e.moneda}. ${r.uso_en_decisiones}` }),
+    tabla([{ t: "Criterio de la barrera", f: (x) => x.criterio }, { t: "", f: (x) => chip(x.cumple ? "vigente" : "vencido", x.cumple ? "Cumple" : "No cumple") },
+      { t: "Detalle", f: (x) => x.detalle }], b.criterios,
+      { caption: "Para influir en compras, ventas o boletas, el pronóstico debe superar fuera de muestra y después de costos a «sin cambio», a pesos iguales y a la estrategia actual." }),
+    h("div", { clase: "kpis" }, kpi(c.conciliada ? "Cartera del portal (hoy)" : "Cartera local NO conciliada (hoy)", mxn(c.valor_actual, true)),
+      kpi("Estimado al objetivo (escenario central)", mxn(c.central, true), signo(c.central - c.valor_actual)),
+      kpi("Rango conservador 10–90 %", `${mxn(c.p10, true)} a ${mxn(c.p90, true)}`)),
+    c.aviso ? h("div", { clase: "aviso-caja", role: "note", texto: c.aviso }) : h("p", { clase: "suave", texto: `Posiciones y efectivo de la captura del portal (${fechaLocal(c.hora_portal)}).` }),
+    h("p", { clase: "suave", texto: c.nota + (c.sin_pronostico.length ? ` Sin pronóstico (se mantienen a su valor): ${c.sin_pronostico.map((x) => x.instrumento_id).join(", ")}.` : "") }),
+    tabla([{ t: "Emisora", f: (x) => h("strong", { texto: x.clave }) }, { t: "Mercado", f: (x) => x.mercado },
+      { t: "OBSERVADO: cierre base (MXN)", f: (x) => h("span", { title: x.fuente_precio_base }, `${num(x.precio_base)} · ${x.fecha_base}`), num: true },
+      { t: "ESTIMADO al objetivo (MXN)", f: (x) => num(x.precio_central), num: true },
+      { t: "ESCENARIOS 10 % / 90 % (MXN)", f: (x) => `${num(x.precio_p10)} / ${num(x.precio_p90)}` },
+      { t: "Rendimiento estimado", f: (x) => signoPct(x.rend_central), num: true },
+      { t: "Rango 10–90 %", f: (x) => `${signoPct(x.rend_p10)} a ${signoPct(x.rend_p90)}` },
+      { t: "Prob. subida", f: (x) => pct(x.prob_subida), num: true },
+      { t: "Estado", f: (x) => chip(x.vencido ? "vencido" : "calculada", x.vencido ? `Vencido (${x.atraso_sesiones} ses.)` : "Estimación") }],
+      r.emisoras.slice(0, 80), { caption: r.aviso, claseFila: (x) => (x.vencido ? "fila-inactiva" : null) }),
+    tabla([{ t: "Propuesta frente al pronóstico", f: (x) => x.nombre }, { t: "Puntuación", f: (x) => (vacio(x.puntuacion) ? "—" : x.puntuacion.toFixed(1)), num: true },
+      { t: "Estimado neto", f: (x) => signoPct(x.rend_estimado_neto), num: true }, { t: "Costo rebalanceo", f: (x) => pct(x.costo_rebalanceo), num: true },
+      { t: "Rango 10–90 %", f: (x) => `${signoPct(x.rango_p10)} a ${signoPct(x.rango_p90)}` },
+      { t: "Peso con pronóstico", f: (x) => pct(x.peso_con_pronostico), num: true }, { t: "SIC (incluye tipo de cambio)", f: (x) => pct(x.peso_sic), num: true },
+      { t: "Reglas del Reto", f: (x) => (x.cumple_reto == null ? "—" : chip(x.cumple_reto ? "vigente" : "vencido", x.cumple_reto ? "Cumple" : "No cumple")) },
+      { t: "Simulador", f: (x) => x.simulador }, { t: "Escenario del optimizador", f: (x) => signoPct(x.escenario_optimizador), num: true }],
+      pr.filas, { caption: `${pr.explicacion} ${pr.nota}` }),
+    r.cambios.hay_anterior ? tabla([{ t: "Mayor cambio vs. emisión anterior", f: (x) => x.instrumento_id },
+      { t: "Antes", f: (x) => signoPct(x.antes), num: true }, { t: "Ahora", f: (x) => signoPct(x.ahora), num: true },
+      { t: "Prob. subida", f: (x) => `${pct(x.prob_antes)} → ${pct(x.prob_ahora)}` }], r.cambios.filas,
+      { caption: `Frente a la emisión del ${fechaLocal(r.cambios.emitido_anterior)}${r.cambios.version_cambio ? " (cambió la versión del modelo)" : ""}.` })
+      : h("p", { clase: "suave", texto: r.cambios.texto }),
+    q ? h("div", {},
+      q.calibracion_aviso ? h("div", { clase: "aviso-caja", role: "note", texto: q.calibracion_aviso }) : null,
+      h("h4", { texto: `Calidad histórica fuera de muestra (H = ${q.H}, prueba ${(q.cortes && q.cortes.prueba || []).join(" → ")}): ${q.veredicto}` }),
+      tabla([{ t: "Mercado", f: (m) => m.mercado }, { t: "Emisoras", f: (m) => m.instrumentos, num: true }, { t: "Ejemplos", f: (m) => num(m.n), num: true },
+        { t: "Error / «sin cambio»", f: (m) => num(m.mse / m.mse_sin_cambio), num: true }, { t: "Acierto dirección", f: (m) => pct(m.acierto_direccion), num: true }],
+        q.por_mercado, { caption: "Por mercado (BMV y SIC): un cociente ≥ 1 significa que el modelo no mejora a «sin cambio»." }),
+      tabla([{ t: "Probabilidad estimada", f: (m) => m.tramo }, { t: "n", f: (m) => num(m.n), num: true },
+        { t: "Media estimada", f: (m) => pct(m.prob_media), num: true }, { t: "Frecuencia observada de subida", f: (m) => pct(m.frecuencia_subida), num: true }],
+        q.calibracion || [], { caption: `Calibración de la probabilidad de subida. Cobertura del rango 80 %: ${pct(q.cobertura_80)} · Brier ${num(q.brier)} · rotación ${num(q.rotacion_media)} · caída máxima ${pct(q.caida_maxima)} · neto de costos ${signoPct(q.resultado_neto)}.` }),
+      q.historia_insuficiente.length ? h("p", { clase: "suave", texto: `Sin historia suficiente (no se ocultan): ${q.historia_insuficiente.map((x) => `${x.instrumento_id} (${x.sesiones}/${x.minimo})`).join(", ")}.` }) : null)
+      : null,
+    (r.sin_datos || []).length ? h("p", { clase: "suave", texto: `Sin precios en la terminal (sin pronóstico): ${r.sin_datos.join(", ")}.` }) : null);
+}
 function pintarFuturo(f) {
   const exps = f.experimentos || [];
   limpiar("futuro-contenido",
     h("div", { clase: f.recomendacion_permitida ? "aviso-caja" : "error-caja", role: "note", texto: `${f.etiqueta}. ${f.aviso}` }),
+    pintarReto(f.reto),
     ...exps.map((e) => h("div", {},
       h("h3", {}, `Fuera de muestra, H = ${e.H} sesión(es) · ${e.datos} `, chip(e.recomendacion_permitida ? "vigente" : "vencido", e.veredicto || (e.recomendacion_permitida ? "VENTAJA" : "SIN VENTAJA DEMOSTRADA"))),
       tabla([{ t: "Modelo / referencia", f: (m) => m.modelo }, { t: "MSE", f: (m) => (m.mse * 1e4).toFixed(3) + "e-4", num: true },
@@ -1013,6 +1064,12 @@ async function boletasPlanDelDia() {
   } catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 }
 document.getElementById("btn-boletas-plan").addEventListener("click", boletasPlanDelDia);
+document.getElementById("btn-pronostico-telegram").addEventListener("click", async () => {
+  try {
+    const r = await api("/api/pronostico/telegram", { method: "POST", json: {} });
+    notificar(r.resultado.telegram === "enviada" ? "Pronóstico enviado por Telegram." : `Telegram: ${r.resultado.telegram || "no configurado"}.`);
+  } catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
+});
 document.getElementById("btn-boletas-telegram").addEventListener("click", async () => {
   try {
     const r = await api("/api/boletas/telegram", { method: "POST", json: {} });

@@ -28,9 +28,12 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-09-30 14:40 CDMX, v0.14.0, rama `main`)
+## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
-- Pruebas: suite completa en verde (ver CHANGELOG 0.14.0 para la cifra de la última corrida).
+- Pruebas: 276 en verde (`uv run pytest -q`, sin contar las de TradingView de otra sesión).
+- Pronóstico al cierre del Reto (D-46, `docs/pronostico-reto.md`): 1, 5 y 31 sesiones, en MXN y con barrera. Con datos al 30-sep: SIN VENTAJA DEMOSTRADA en los tres horizontes y probabilidad de subida mal calibrada → «señal experimental», no cambia el plan. Se emite solo una vez por sesión (≈140 s, 0.36 GB). `/pronostico` en Telegram.
+- Cuenta del Reto (1-oct): hay una captura del portal confirmada (30-sep 21:43); el pronóstico de cartera la usa.
+- Lo que sigue es del 30-sep:
 - Precios (14:35 CDMX, tras el cierre BMV de las 14:00): 0 vigentes, 147 retrasados (cierre del 29-sep; cupo por hora de Tiingo/EODHD agotado), 5 vencidos y 22 BMV sin datos, de 174. Fondos: 23/23 con NAV del 28-sep (la hoja pública de Actinver aún no publica el 29-sep). FX: Banxico FIX 18.0692 del 30-sep. Son cierres, no tiempo real; el SIC es referencia origen × FX.
 - Catálogo del simulador: 165 instrumentos; propuestas y Ranking excluyen los 11 que no están (10 ETF y SMARTRC).
 - Propuestas: con media robusta ya no aparecen FUBO ni MRNA. Validación fuera de muestra de solo 84 sesiones en las principales. La referencia del plan («Acciones · Máxima puntuación», 73.0) rindió +1.1 % anual fuera de muestra contra +10.8 % del 1/N: decisión pendiente del usuario.
@@ -47,7 +50,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
   - Pestaña PASADO / PRESENTE / FUTURO; operaciones confirmadas (práctica ≠ competencia); órdenes pendientes solo como referencia.
   - Bitácora de decisiones y alertas con ficha de revisión e inhibición por datos.
   - Receptor de webhooks de TradingView e investigación sin fuga (`terminal/investigacion/`).
-- **Precios:** `MarketDataProvider` (`terminal/cotizaciones.py`). Hoy **0/176 instrumentos con precio BMV verificado** (sin licencia ni claves): todo aparece como «SIN PRECIO CONFIABLE» a propósito.
+- **Precios (dato del 23-sep, OBSOLETO):** entonces había 0/176 instrumentos con precio BMV verificado. Hoy hay cierres diarios de EODHD para la BMV y NAV oficiales para los fondos (ver «Estado comprobado»); siguen sin ser cotizaciones BMV en tiempo real.
 - **Resultados con datos reales (índices de FRED):** SIN VENTAJA DEMOSTRADA en H=1 y H=5 (`docs/model-card.md`). backtrader coincide exactamente con el cálculo independiente.
 - **Kronos:** dependencias en el grupo opcional `uv sync --group kronos --inexact`; pesos Kronos-mini en la caché de Hugging Face. El experimento completo (`scripts/experimento_kronos.py`) **no terminó**: el equipo se quedó sin memoria (5.9 GB, 0.3 GB libres). Reintentarlo con `--muestras 1 --contexto 256` y otras apps cerradas.
 - **FRED (24-sep):** el CSV público deja colgadas las peticiones con el User-Agent de la terminal. No se falsifica el User-Agent: la vía es `FRED_API_KEY` (API oficial, gratis) o `BANXICO_TOKEN`.
@@ -62,7 +65,7 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
-uv run pytest -q             # 146 pruebas
+uv run pytest -q             # 276 pruebas
 uv run terminal comparar-modelos   # walk-forward de modelos (TERMINAL_MODO=demo solo como prueba funcional)
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq
