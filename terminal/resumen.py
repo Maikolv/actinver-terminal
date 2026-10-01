@@ -205,7 +205,7 @@ def construir(p: dict, cartera: dict, anterior: list[dict] | None, ahora_local: 
     etapa = reto.etapa_operativa(ahora_local.to_pydatetime()) if reto.activo() else None
     s = pd.Timestamp(sesion) if sesion else ahora_local
     cab = (f"☀️ Plan del día — {DIAS[s.weekday()]} {s:%d-%m-%Y}" if s.date() == ahora_local.date()
-           else f"🌙 Plan para la sesión del {DIAS[s.weekday()]} {s:%d-%m-%Y} (enviado al tener los cierres)")
+           else f"🌙 Plan para la sesión del {DIAS[s.weekday()]} {s:%d-%m-%Y} (próxima sesión de la BMV)")
     if etapa:
         cab += f" · Reto: {'práctica' if etapa == 'practica' else etapa}, {reto.sesiones_restantes(ahora_local.to_pydatetime())} sesiones restantes"
     if confirmada and cartera.get("captura"):
@@ -371,11 +371,12 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
 
 def enviar_muestra(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict) -> dict:
     """Envía ahora el plan con los datos actuales, marcado como MUESTRA; no cuenta como el envío del día."""
-    local = pd.Timestamp(datetime.now(UTC)).tz_convert(ZONA)
+    ahora = datetime.now(UTC)
+    local = pd.Timestamp(ahora).tz_convert(ZONA)
     p = propuesta_referencia(propuestas)
     if p is None:
         return {"resultado": None, "texto": "No hay propuesta vigente para armar el plan."}
-    titulo, texto, _ = construir(p, cartera, _estado(con).get("ordenes"), local,
+    titulo, texto, _ = construir(p, cartera, _estado(con).get("ordenes"), local, sesion_objetivo(ahora),
                                  plan=plan_de_accion(con, ajustes, p, cartera), props=propuestas)
     titulo, texto = "MUESTRA — " + titulo, "MUESTRA (envío de prueba)\n" + texto
     cfg = {**ajustes["alertas"], "notificar_escritorio": False, "notificar_telegram": True}

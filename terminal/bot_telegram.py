@@ -21,6 +21,7 @@ import re
 import threading
 import time
 from collections import deque
+from datetime import UTC, datetime
 
 import httpx
 import pandas as pd
@@ -65,6 +66,10 @@ def _con_ajustes():
     return con, cargar_ajustes()
 
 
+def _ahora() -> datetime:
+    return datetime.now(UTC)
+
+
 def texto_plan(con, ajustes) -> str:
     from . import resumen, servicios
     perfil = servicios.perfil_actual(con, ajustes)
@@ -72,9 +77,10 @@ def texto_plan(con, ajustes) -> str:
     p = resumen.propuesta_referencia(props)
     if not p:
         return "No hay una propuesta vigente ahora (se está recalculando o faltan datos). Pruebe /estado."
-    local = pd.Timestamp.now(tz=ZONA)
+    ahora = _ahora()
+    local = pd.Timestamp(ahora).tz_convert(ZONA)
     cart = servicios.cartera_actual(con, ajustes)
-    _, texto, _ = resumen.construir(p, cart, resumen._estado(con).get("ordenes"), local,
+    _, texto, _ = resumen.construir(p, cart, resumen._estado(con).get("ordenes"), local, resumen.sesion_objetivo(ahora),
                                     plan=resumen.plan_de_accion(con, ajustes, p, cart), props=props)
     return texto
 

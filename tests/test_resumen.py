@@ -171,3 +171,14 @@ def test_plan_corregido_si_el_recalculo_cambia_las_ordenes_antes_de_la_apertura(
     assert resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": otra}, datetime(2026, 9, 30, 7, 0, tzinfo=UTC)) is None
     assert resumen.enviar_si_toca(con, ajustes, cart, {"mixta_puntuacion": PROP}, datetime(2026, 9, 30, 14, 0, tzinfo=UTC)) is None
     assert len(enviados) == 2
+
+
+def test_plan_pedido_despues_del_cierre_muestra_la_proxima_sesion(con, ajustes, monkeypatch):
+    """/plan después de las 14:00 (o en fin de semana) es para la PRÓXIMA sesión, no para la de hoy."""
+    from terminal import bot_telegram, servicios
+    tarde = datetime(2026, 9, 30, 21, 30, tzinfo=UTC)                       # mié 30-sep 15:30 CDMX, BMV cerrada
+    assert resumen.sesion_objetivo(tarde).isoformat() == "2026-10-01"
+    monkeypatch.setattr(servicios, "propuestas_guardadas", lambda *a, **k: {"mixta_puntuacion": PROP})
+    monkeypatch.setattr(bot_telegram, "_ahora", lambda: tarde)
+    texto = bot_telegram.texto_plan(con, ajustes)
+    assert texto.startswith("🌙 Plan para la sesión del jue 01-10-2026") and "mié 30-09-2026" not in texto.splitlines()[0]
