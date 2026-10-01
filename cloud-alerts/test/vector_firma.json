@@ -1,0 +1,11 @@
+{
+ "secreto": "prueba-kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+ "cuerpo": "{\"version\":1,\"secuencia\":7,\"nota\":\"ñandú €\"}",
+ "ts": "1790000000",
+ "nonce": "0123456789abcdef0123456789abcdef",
+ "metodo": "POST",
+ "ruta": "/sync",
+ "hash_cuerpo": "f2927fe4048ea2c99cc83dd312654e9b3dd7dbf37fb568b47368c2027b42849e",
+ "canonico": "v1:1790000000:0123456789abcdef0123456789abcdef:POST:/sync:f2927fe4048ea2c99cc83dd312654e9b3dd7dbf37fb568b47368c2027b42849e",
+ "firma": "1aa707d48a9263402486438ce59179d4ff51bb3780908661903ea30fa31f00f9"
+}

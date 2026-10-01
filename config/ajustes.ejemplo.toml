@@ -39,6 +39,16 @@ horizontes = [1, 5]                  # H: próxima sesión y próximos cinco dí
 emitir_diario = true                 # el monitor emite una vez por sesión cerrada, en segundo plano
 # L (ventana retrospectiva máxima) = 60 sesiones (terminal/investigacion/datos.py); proporciones 70/15/15, embargo = H
 
+[nube]
+# Monitor de alertas en Cloudflare Workers (cloud-alerts/). Solo funciona con CLOUD_ALERTS_URL y CLOUD_ALERTS_SECRET en .env.
+activo = true
+cada_min = 10                        # sincronización (y latido) mientras la terminal esté encendida
+movimiento_pct = 0.03                # aviso por movimiento de una posición SIC (y luego cada 3 % más)
+cartera_pct = 0.02                   # aviso por variación estimada de la cartera frente a la copia sincronizada
+sync_max_horas = 26                  # sin sincronizar más tiempo ⇒ aviso y se suspenden compra/venta basadas en el saldo
+conciliacion_max_horas = 30          # copia del portal más antigua ⇒ se suspenden las condiciones del plan
+local_inactivo_min = 20              # sin latido en ese tiempo ⇒ la nube toma el relevo de las alertas
+
 [disponibilidad]
 # Horas tras el cierre en que cada proveedor publica su dato (available_at = cierre + retraso). Conservador.
 tiingo = 3

@@ -1,0 +1,24 @@
+// Monitor de alertas del Reto Actinver — Cloudflare Workers, plan Free (sin tarjeta).
+// Secretos (nunca aquí): wrangler secret put SYNC_SECRET | TELEGRAM_BOT_TOKEN | TELEGRAM_CHAT_ID |
+//   ALPACA_API_KEY_ID | ALPACA_API_SECRET_KEY | BANXICO_TOKEN   (o: uv run python scripts/cargar_secretos.py)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "actinver-alertas",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  // Cron Triggers corren en UTC. Cada 15 min, 12–21 h UTC, lunes a viernes: cubre 06:00–15:45 CDMX, el horario de
+  // la BMV y de NYSE antes y después del cambio de horario de EE. UU. (1-nov-2026). El código decide si hay sesión.
+  "triggers": { "crons": ["*/15 12-21 * * 1-5"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "actinver-alertas",
+      // Se llena con el id que imprime «wrangler d1 create actinver-alertas» (no es un secreto)
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": true, "head_sampling_rate": 1 }
+}

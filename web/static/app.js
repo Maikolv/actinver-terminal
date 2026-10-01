@@ -497,7 +497,27 @@ document.getElementById("btn-probar-avisos").addEventListener("click", async (ev
   } catch (e) { notificar(e.message); }
   finally { ocupado([b], false); }
 });
+async function pintarNube() {
+  try {
+    const n = await api("/api/nube/estado");
+    const tit = h("h2", {}, "Monitor en la nube ", chip(n.activo ? "vigente" : (n.configurado ? "vencido" : "sin_datos"),
+      n.activo ? "Activo" : (n.configurado ? "Inactivo" : "No configurado")));
+    if (!n.configurado) return limpiar("nube-estado", tit, h("p", { clase: "suave", texto: n.mensaje }));
+    const filas = [["Última sincronización", n.ultima_sincronizacion || "—"], ["Última ejecución en la nube", n.ultima_ejecucion || "—"],
+      ["Próxima revisión", n.proxima_revision || "—"], ["Quién envía las alertas ahora", n.relevo_texto || "—"],
+      ["Telegram en la nube", n.telegram_configurado ? "configurado" : "sin configurar"],
+      ["Tipo de cambio que usa", n.fx ? `FIX ${n.fx.valor} del ${n.fx.fecha}` : "—"]];
+    limpiar("nube-estado", tit, h("p", { clase: "suave", texto: n.mensaje + (n.error ? ` (${n.error})` : "") }),
+      tabla([{ t: "Concepto", f: (f) => f[0] }, { t: "Valor", f: (f) => f[1] }], filas),
+      (n.suspendidas || []).length ? tabla([{ t: "Alerta suspendida en la nube", f: (s) => s.alerta }, { t: "Motivo", f: (s) => s.motivo }], n.suspendidas)
+        : h("p", { clase: "suave", texto: "Ninguna alerta suspendida en la nube." }),
+      h("p", {}, h("button", { type: "button", clase: "boton boton--secundario", onclick: async () => {
+        try { const r = await api("/api/nube/sincronizar", { method: "POST", json: {} }); notificar(r.ok ? "Sincronizado con la nube." : `No se sincronizó: ${r.error || r.motivo}`); pintarNube(); }
+        catch (e) { notificar(e.message); } } }, "Sincronizar ahora")));
+  } catch (e) { limpiar("nube-estado", h("h2", { texto: "Monitor en la nube" }), errorCaja(e)); }
+}
 async function cargarAlertas() {
+  pintarNube();
   try {
     const d = await api("/api/alertas?limite=200");
     const c = d.configuracion;

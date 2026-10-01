@@ -214,6 +214,35 @@ def investigar(args) -> None:
         con.close()
 
 
+def nube(args) -> None:
+    import json
+
+    from . import db
+    from . import nube as nb
+    from .config import cargar_ajustes
+    a = cargar_ajustes()
+    if args.accion == "secreto":
+        import secrets as _s
+        valor = _s.token_urlsafe(32)
+        _fijar_env("CLOUD_ALERTS_SECRET", valor)
+        print(f"Secreto de sincronización guardado en .env (termina en …{valor[-4:]}). Cárguelo en Cloudflare con "
+              "«uv run python cloud-alerts/scripts/cargar_secretos.py» (no lo copie al chat).")
+        return
+    con = db.conectar()
+    db.inicializar(con, a)
+    try:
+        if args.accion == "carga":  # vista previa de lo que viajaría (sin enviarlo)
+            c = nb.construir_carga(con, a)
+            print(json.dumps(c, ensure_ascii=False, indent=1))
+            print(f"\n{len(json.dumps(c, ensure_ascii=False, separators=(',', ':')).encode())} bytes", file=sys.stderr)
+        elif args.accion in ("sincronizar", "prueba"):
+            print(json.dumps(nb.sincronizar(con, a, prueba=args.accion == "prueba"), ensure_ascii=False, indent=1))
+        else:
+            print(json.dumps(nb.estado(con, a), ensure_ascii=False, indent=1))
+    finally:
+        con.close()
+
+
 def pronostico(args) -> None:
     from . import db
     from .config import cargar_ajustes
@@ -478,6 +507,9 @@ def main() -> None:
     inv.add_argument("--sin-reto", dest="reto", action="store_false",
                      help="no emitir el horizonte dinámico hasta el cierre del Reto")
     inv.set_defaults(fn=investigar, reto=True)
+    nb = sub.add_parser("nube", help="monitor de alertas en Cloudflare: estado, sincronizar, prueba, carga o secreto")
+    nb.add_argument("accion", choices=["estado", "sincronizar", "prueba", "carga", "secreto"], nargs="?", default="estado")
+    nb.set_defaults(fn=nube)
     pr = sub.add_parser("pronostico", help="muestra el pronóstico al cierre del Reto (texto de Telegram)")
     pr.set_defaults(fn=pronostico)
     sub.add_parser("cobertura", help="verifica cobertura por símbolo y proveedor (docs/cobertura.md)").set_defaults(fn=cobertura)

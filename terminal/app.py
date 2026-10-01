@@ -84,8 +84,15 @@ async def vida(app: FastAPI):
         from .bot_telegram import BotTelegram
         bot = BotTelegram(AJUSTES)
         bot.iniciar()  # solo si TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID están en .env
+    nube_sync = None
+    if not os.environ.get("TERMINAL_SIN_MOTOR"):
+        from .nube import Sincronizador
+        nube_sync = Sincronizador(AJUSTES)
+        nube_sync.iniciar()  # solo si CLOUD_ALERTS_URL y CLOUD_ALERTS_SECRET están en .env
     yield
     stop.set()
+    if nube_sync:
+        nube_sync.detener()
     if bot:
         bot.detener()
     if FLUJO:
@@ -460,6 +467,22 @@ def calcular_investigacion(cuerpo: dict = Body(default={})):
 @app.get("/api/investigacion/estado")
 def estado_investigacion():
     return INVESTIGACION
+
+
+@app.get("/api/nube/estado")
+def get_nube_estado(con=Depends(con_db)):
+    """Monitor de alertas en la nube: activo o inactivo, última sincronización y ejecución, próxima revisión y motivos
+    de las alertas suspendidas. No devuelve secretos."""
+    from . import nube
+    return nube.estado(con, AJUSTES)
+
+
+@app.post("/api/nube/sincronizar")
+def nube_sincronizar(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    """Envía ahora la carga mínima firmada. prueba=true pide a la nube un aviso de prueba, que solo sale cuando la
+    terminal deja de sincronizar (así se comprueba que el aviso viene de la nube)."""
+    from . import nube
+    return nube.sincronizar(con, AJUSTES, prueba=bool(cuerpo.get("prueba")))
 
 
 @app.get("/api/pronostico")

@@ -30,8 +30,9 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
-- Pruebas: 276 en verde (`uv run pytest -q`, sin contar las de TradingView de otra sesión).
+- Pruebas: 283 de Python en verde (`uv run pytest -q`, sin contar las de TradingView de otra sesión) y 19 del Worker (`npm --prefix cloud-alerts test`).
 - Pronóstico al cierre del Reto (D-46, `docs/pronostico-reto.md`): 1, 5 y 31 sesiones, en MXN y con barrera. Con datos al 30-sep: SIN VENTAJA DEMOSTRADA en los tres horizontes y probabilidad de subida mal calibrada → «señal experimental», no cambia el plan. Se emite solo una vez por sesión (≈140 s, 0.36 GB). `/pronostico` en Telegram.
+- Monitor en la nube (`cloud-alerts/`, D-47): Worker + D1 en Cloudflare Free, probado en local (19 pruebas JS + 7 Python). **No desplegado**: falta `npx wrangler login` del usuario; luego `uv run python cloud-alerts/scripts/desplegar.py` y comprobar un aviso real con la terminal cerrada.
 - Cuenta del Reto (1-oct): hay una captura del portal confirmada (30-sep 21:43); el pronóstico de cartera la usa.
 - Lo que sigue es del 30-sep:
 - Precios (14:35 CDMX, tras el cierre BMV de las 14:00): 0 vigentes, 147 retrasados (cierre del 29-sep; cupo por hora de Tiingo/EODHD agotado), 5 vencidos y 22 BMV sin datos, de 174. Fondos: 23/23 con NAV del 28-sep (la hoja pública de Actinver aún no publica el 29-sep). FX: Banxico FIX 18.0692 del 30-sep. Son cierres, no tiempo real; el SIC es referencia origen × FX.
@@ -65,7 +66,7 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
-uv run pytest -q             # 276 pruebas
+uv run pytest -q             # 283 pruebas (más npm --prefix cloud-alerts test: 19)
 uv run terminal comparar-modelos   # walk-forward de modelos (TERMINAL_MODO=demo solo como prueba funcional)
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq

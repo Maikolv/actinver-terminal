@@ -2,6 +2,31 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.18.0] — 2026-10-01 (monitor de alertas en la nube, Cloudflare Workers Free)
+
+### Añadido
+- **`cloud-alerts/`: monitor independiente en Cloudflare Workers con D1**, en el plan gratuito y sin tarjeta. Envía avisos por Telegram aunque la PC esté apagada:
+  - movimientos de posiciones SIC (Alpaca IEX × FIX, etiquetado como referencia y no como precio del SIC);
+  - variación estimada de la cartera;
+  - condiciones del plan validado;
+  - cartera sin sincronizar, que además suspende compra y venta;
+  - fallas persistentes de datos y posibles splits no registrados;
+  - un resumen diario antes de la apertura de la BMV.
+- **Relevo sin duplicados.** La terminal sincroniza cada 10 min, y esa sincronización funciona como latido. Mientras llegue, la nube no envía nada; tras 20 min sin latido toma el relevo. Cada aviso tiene una clave única en D1. La nube solo usa `sendMessage` y no lee el chat, así que no compite con el bot local.
+- **Sincronización segura (`terminal/nube.py`).** Viaja la carga mínima (~11 KB), firmada con HMAC-SHA256 y con:
+  - ventana de 5 min;
+  - nonce de un solo uso;
+  - secuencia creciente;
+  - límite de 64 KB y validación estricta (cualquier campo desconocido se rechaza).
+
+  Nunca suben la base, `.env`, claves, costos ni documentos del portal.
+- **Estado en la terminal.** En «Alertas» → «Monitor en la nube»: activo o inactivo, última sincronización y ejecución, próxima revisión, quién envía las alertas y por qué se suspende cada una. También están `uv run terminal nube estado|sincronizar|prueba|carga|secreto`, `GET /api/nube/estado` y `POST /api/nube/sincronizar`.
+- **Despliegue.** `cloud-alerts/scripts/desplegar.py` crea la D1, migra, despliega y carga los secretos desde `.env` sin imprimirlos; `--desactivar` quita el cron.
+- **Pruebas.** 19 del Worker (`npm test`, con D1 simulada sobre `node:sqlite`) y 7 de Python (`tests/test_nube.py`). La firma usa un vector compartido entre Python y JS, y la carga real pasa el validador del Worker.
+
+### Pendiente
+- Desplegar requiere iniciar sesión en Cloudflare: `npx wrangler login`, lo hace el usuario. Hasta comprobar un aviso real enviado desde la nube, el acceso permanente no se da por completado.
+
 ## [0.17.0] — 2026-10-01 (pronóstico al cierre del Reto, con barrera)
 
 ### Añadido

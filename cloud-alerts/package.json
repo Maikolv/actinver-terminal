@@ -1,0 +1,24 @@
+{
+  "name": "actinver-alertas-nube",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monitor ligero en Cloudflare Workers (plan Free) que avisa por Telegram aunque la PC esté apagada",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "dev": "wrangler dev --test-scheduled",
+    "migrar:local": "wrangler d1 migrations apply actinver-alertas --local",
+    "migrar:remoto": "wrangler d1 migrations apply actinver-alertas --remote",
+    "desplegar": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260930.2": true
+  }
+}

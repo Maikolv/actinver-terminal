@@ -1,0 +1,7 @@
+# Copie a .dev.vars SOLO para «npm run dev» local (ignorado por Git). En la nube use «wrangler secret put».
+SYNC_SECRET=genere-uno-con-uv-run-terminal-nube-secreto
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+ALPACA_API_KEY_ID=
+ALPACA_API_SECRET_KEY=
+BANXICO_TOKEN=
