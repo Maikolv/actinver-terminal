@@ -259,3 +259,4 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
 .ficha dd { margin: 0; }
 @media (max-width: 720px) { .ficha dl { grid-template-columns: 1fr; } }
 .lectura-ocr { white-space: pre-wrap; font-size: .8rem; max-height: 260px; overflow: auto; }
+.acciones-boletas { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

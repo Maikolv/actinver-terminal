@@ -296,3 +296,33 @@ def test_venta_sic_condicional_usa_la_tenencia(con, ajustes):
     b = boleta.construir(con, ajustes, {"id": "SIC:AAPL", "accion": "vender", "monto_mxn": -px}, cart)
     assert b["tipo"] == "investigar" and b["referencia_condicional"]["titulos_aprox"] == 1
     assert "todos sus títulos (1)" in b["referencia_condicional"]["nota"]
+
+
+def test_api_boletas_telegram_genera_vista_previa_y_envia(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from terminal import notificador
+    from terminal.app import app
+    from terminal.seguridad import TOKEN_CSRF
+    llamadas, enviados = [], []
+    lista = [{"id": 1, "estado": "vigente", "tipo": "considerar compra", "cantidad": 10, "lado": "compra",
+              "emisora_serie": "AMX B", "instrumento_id": "BMV:AMX", "precio_limite": 17.5, "importe": 175.0,
+              "caduca_en": "2026-10-01T14:45:00+00:00", "fuente_precio": {"proveedor": "eodhd_bmv", "moneda": "MXN",
+                                                                         "estado_latencia": "EOD", "hora_evento": None}},
+             {"id": 2, "estado": "vigente", "tipo": "investigar", "cantidad": 0, "lado": None, "emisora_serie": "MU *",
+              "instrumento_id": "SIC:MU", "caduca_en": "2026-10-01T14:45:00+00:00",
+              "referencia_condicional": {"lado_sugerido": "compra", "titulos_aprox": 10, "monto_mxn": 200000,
+                                         "precio_min": 1, "precio_max": 2, "fuente": "tiingo", "moneda_origen": "USD",
+                                         "precio_origen": 1065.1, "fecha": "2026-09-30", "estado": "vigente",
+                                         "tipo_cambio": 18.07, "tipo_cambio_fuente": "banxico", "tipo_cambio_fecha": "2026-09-30"}}]
+    monkeypatch.setattr(boleta, "generar", lambda *a, **k: llamadas.append("generar") or [{}])
+    monkeypatch.setattr(boleta, "listar", lambda *a, **k: lista)
+    monkeypatch.setattr(notificador, "enviar", lambda t, x, c, detalle=None: enviados.append(x) or {"telegram": "enviada"})
+    h = {"X-CSRF-Token": TOKEN_CSRF}
+    with TestClient(app, base_url="http://127.0.0.1:8765") as c:
+        assert c.post("/api/boletas/telegram", json={"generar": True}).status_code == 403          # sin CSRF
+        previa = c.post("/api/boletas/telegram", json={"generar": True, "enviar": False}, headers=h).json()
+        assert previa["resultado"] is None and previa["conteo"] == {"listas": 1, "condicionales": 1, "por_investigar": 0}
+        assert not enviados and "COMPRA AMX B" in previa["texto"]
+        r = c.post("/api/boletas/telegram", json={"generar": True}, headers=h).json()
+        assert r["resultado"]["telegram"] == "enviada" and len(enviados) == 1 and llamadas == ["generar", "generar"]

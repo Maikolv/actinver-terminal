@@ -32,6 +32,7 @@ Contexto duradero para cualquier persona o agente que retome el trabajo: hechos 
 10. **Horario**: `exchange_calendars` fija la BMV en 08:30–15:00; el Reto (y la BMV) operan 07:30–14:00 hasta el 2-nov. Usar siempre `vigencia.apertura_sesion` / `cierre_sesion` / `mercado_abierto`, nunca `session_open/close` directo.
 11. **Optimismo dentro de muestra**: la volatilidad de pesos optimizados en su propia muestra subestima el riesgo (16.6 % frente a 42.5 % fuera de muestra). Los escenarios usan la menos optimista de ambas.
 12. **Selección por puntuación**: «Máxima puntuación» elige con la primera mitad de la validación; su total puede quedar debajo de «Ajuste» y puede rendir menos que 1/N. No es un error de código.
+14. **Reiniciar el servidor por el puerto, no por el nombre**: `uv run terminal iniciar` deja un `python.exe -m terminal iniciar` escuchando en 8765; detener solo `terminal.exe` lo deja vivo con el código viejo (y el lanzador cree que ya está encendido). Detener el proceso dueño del puerto 8765 y verificar la hora de inicio.
 13. **Respaldos**: no existía ninguno hasta el 30-sep; ahora el motor hace uno verificado al día en `data/respaldos`.
 
 ## Decisiones vigentes (resumen)

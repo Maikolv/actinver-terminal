@@ -306,7 +306,28 @@ function tarjetaPlan(plan) {
       vacio: "Sin acciones: la cartera está dentro de la banda de rebalanceo o no hay propuesta vigente.",
       claseFila: (a) => (a.decision === "pendiente" ? "fila-inactiva" : null) }),
     h("p", { clase: "suave", texto: plan.aviso }),
-    h("p", {}, h("button", { type: "button", clase: "boton boton--secundario", onclick: () => irA("tab-tiempo") }, "Generar o ver boletas")));
+    h("div", { clase: "acciones-boletas" },
+      h("button", { type: "button", clase: "boton", onclick: (ev) => boletasTelegram(ev.currentTarget, true) }, "Generar boletas y enviarlas por Telegram"),
+      " ", h("button", { type: "button", clase: "boton boton--secundario", onclick: (ev) => boletasTelegram(ev.currentTarget, false) }, "Ver el texto sin enviar"),
+      " ", h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-tiempo") }, "Boletas en detalle")),
+    h("div", { id: "resultado-boletas-telegram", "aria-live": "polite" }));
+}
+async function boletasTelegram(boton, enviar) {
+  ocupado([boton], true);
+  limpiar("resultado-boletas-telegram", h("p", { clase: "cargando", texto: enviar ? "Generando y enviando boletas…" : "Generando boletas…" }));
+  try {
+    const r = await api("/api/boletas/telegram", { method: "POST", json: { generar: true, enviar } });
+    const c = r.conteo || {};
+    const estadoTg = r.resultado ? r.resultado.telegram : null;
+    const cab = enviar
+      ? (estadoTg === "enviada" ? ["info-caja", `Enviadas por Telegram: ${c.listas} lista(s), ${c.condicionales} condicional(es) del SIC y ${c.por_investigar} por investigar.`]
+        : ["error-caja", `Telegram: ${estadoTg || "no configurado"}. Revise TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID en .env.`])
+      : ["info-caja", `Vista previa (no se envió): ${c.listas} lista(s), ${c.condicionales} condicional(es) y ${c.por_investigar} por investigar.`];
+    limpiar("resultado-boletas-telegram", h("div", { clase: cab[0], texto: cab[1] }),
+      h("details", { open: !enviar }, h("summary", { texto: "Texto de las boletas" }), h("pre", { clase: "lectura-ocr", texto: r.texto })));
+    if (enviar) notificar(estadoTg === "enviada" ? "Boletas enviadas por Telegram." : `Telegram: ${estadoTg || "no configurado"}.`);
+  } catch (e) { limpiar("resultado-boletas-telegram", errorCaja(e)); }
+  finally { ocupado([boton], false); }
 }
 async function pintarResumen() {
   const d = estado.datos;

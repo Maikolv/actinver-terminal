@@ -667,10 +667,27 @@ def generar_boletas(cuerpo: dict = Body(default={}), con=Depends(con_db)):
 
 
 @app.post("/api/boletas/telegram")
-def boletas_telegram(con=Depends(con_db)):
-    """Envía por Telegram las boletas vigentes (recalculadas justo antes de enviar)."""
+def boletas_telegram(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    """Boletas por Telegram desde la terminal. generar=true crea antes las del plan del día (reemplaza las vigentes);
+    enviar=false solo devuelve el texto (vista previa). Nada de esto envía órdenes al portal."""
     from . import boleta
-    return boleta.enviar_telegram(con, AJUSTES)
+    if cuerpo.get("generar"):
+        try:
+            boleta.generar(con, AJUSTES, boleta.PLAN_DEL_DIA)
+        except ValueError as e:
+            raise cartera.ErrorValidacion([f"No se generaron boletas: {e}"]) from None
+    lista = boleta.listar(con, AJUSTES, recalcular_vigentes=True)
+    vig = [b for b in lista if b.get("estado") == "vigente"]
+    conteo = {"listas": sum(1 for b in vig if b["tipo"] in ("considerar compra", "considerar venta") and b.get("cantidad")),
+              "condicionales": sum(1 for b in vig if b.get("referencia_condicional")),
+              "por_investigar": sum(1 for b in vig if b["tipo"] == "investigar" and not b.get("referencia_condicional"))}
+    texto = boleta.texto_telegram(lista)
+    if cuerpo.get("enviar", True) is False:
+        return {"resultado": None, "texto": texto, "conteo": conteo}
+    from . import notificador
+    cfg = {**AJUSTES["alertas"], "notificar_escritorio": False, "notificar_telegram": True, "notificar_correo": False}
+    return {"resultado": notificador.enviar("🧾 Boletas para capturar", texto, cfg, detalle=texto), "texto": texto,
+            "conteo": conteo}
 
 
 @app.post("/api/boletas/{bid}/recalcular")
