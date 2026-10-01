@@ -32,7 +32,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 - Pruebas: 283 de Python en verde (`uv run pytest -q`, sin contar las de TradingView de otra sesión) y 19 del Worker (`npm --prefix cloud-alerts test`).
 - Pronóstico al cierre del Reto (D-46, `docs/pronostico-reto.md`): 1, 5 y 31 sesiones, en MXN y con barrera. Con datos al 30-sep: SIN VENTAJA DEMOSTRADA en los tres horizontes y probabilidad de subida mal calibrada → «señal experimental», no cambia el plan. Se emite solo una vez por sesión (≈140 s, 0.36 GB). `/pronostico` en Telegram.
-- Monitor en la nube (`cloud-alerts/`, D-47): Worker + D1 en Cloudflare Free, probado en local (19 pruebas JS + 7 Python). **No desplegado**: falta `npx wrangler login` del usuario; luego `uv run python cloud-alerts/scripts/desplegar.py` y comprobar un aviso real con la terminal cerrada.
+- Monitor en la nube (`cloud-alerts/`, D-47): Worker + D1 desplegados el 1-oct en Cloudflare Workers Free. URL pública responde y `/estado` rechaza solicitudes sin firma (401). La terminal sincroniza automáticamente; sigue pendiente comprobar un aviso real de relevo tras el primer cron, a partir de las 06:00 CDMX.
 - Cuenta del Reto (1-oct): hay una captura del portal confirmada (30-sep 21:43); el pronóstico de cartera la usa.
 - Lo que sigue es del 30-sep:
 - Precios (14:35 CDMX, tras el cierre BMV de las 14:00): 0 vigentes, 147 retrasados (cierre del 29-sep; cupo por hora de Tiingo/EODHD agotado), 5 vencidos y 22 BMV sin datos, de 174. Fondos: 23/23 con NAV del 28-sep (la hoja pública de Actinver aún no publica el 29-sep). FX: Banxico FIX 18.0692 del 30-sep. Son cierres, no tiempo real; el SIC es referencia origen × FX.
