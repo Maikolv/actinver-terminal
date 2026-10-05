@@ -36,3 +36,14 @@ def test_fibras_y_fondos_clasificados():
     assert all(cl[f"BMV:{k}"] == "fibra" for k in ("FUNO", "FIBRAMQ", "FIBRAPL", "TERRA"))
     assert cl["FONDO:ACTIGOB"] == "fondo_deuda" and cl["FONDO:ACTI500"] == "fondo_renta_variable"
     assert cl["SIC:IVV"] == "etf" and cl["SIC:AAPL"] == "accion"
+
+
+def test_etf_del_portal_del_simulador():
+    """56 ETF vistos en la pestaña «ETF's» del simulador (5-oct-2026); los apalancados e inversos quedan excluidos."""
+    portal = [f for f in filas() if f["secciones_pdf"] == "ETF (portal 2026-10-05)"]
+    assert len(portal) == 56 and all(f["clase"] == "etf" for f in portal)
+    excluidos = {f["clave"] for f in portal if f["estado"] == "excluido"}
+    assert excluidos == {"FAS", "FAZ", "PSQ", "QLD", "SOXL", "SOXS", "SPXL", "SPXS", "SQQQ", "TECL", "TECS", "TNA", "TQQQ", "TZA",
+                         "ANGELD", "DIABLOI"}
+    lista = list(csv.DictReader((CFG / "simulador_etf.csv").open(encoding="utf-8")))
+    assert len(lista) == 56 and {"QQQ *", "NAFTRAC ISHRS", "SPY *", "SOXX *"} <= {x["clave"] for x in lista}

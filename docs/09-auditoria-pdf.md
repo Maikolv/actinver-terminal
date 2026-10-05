@@ -52,3 +52,17 @@ Transcripción reproducible: `scripts/transcribir_pdf.py` → `config/pdf_transc
   - QQQ se agregó al catálogo.
   - `uv run terminal catalogo-simulador --confirmar` ahora conserva siempre las claves vistas en las capturas del portal.
   - Para completar la lista hacen falta capturas actuales de la pestaña «ETF's» del simulador.
+
+## ETF reales del simulador (capturas del 5-oct-2026)
+
+- **Origen:** tres capturas de la pestaña «ETF's» del simulador con **56 ETF**:
+  - AAXJ, ACWI, ANGELD 10, BIL, BOTZ, DIA, DIABLOI 10, EEM, EWZ, FAS, FAZ, GDX, GLD, IAU, ICLN, INDA, IVV, KWEB, LIT, MCHI;
+  - NAFTRAC ISHRS, PSQ, QCLN, QLD, QQQ, SHV, SHY, SLV, SOXL, SOXS, SOXX, SPXL, SPXS, SPY, SPYM, SQQQ, TAN, TECL, TECS, TLT;
+  - TNA, TQQQ, TZA, USO, VEA, VGT, VNQ, VOO, VT, VTI, VWO, VYM, XLE, XLF, XLK, XLV.
+- **Alta en la terminal:** `scripts/incorporar_etf_simulador.py` toma nombres y bolsa del Nasdaq Trader Symbol Directory, con rótulo «ETF (portal 2026-10-05)».
+  - `config/universo.csv`: 46 altas y 10 actualizaciones.
+  - `config/simulador_etf.csv`: lista que `catalogo-simulador` suma a la transcripción del PDF.
+- **Apalancados e inversos** registrados con estado «excluido» por la regla de la terminal (sin apalancamiento): FAS, FAZ, PSQ, QLD, SOXL, SOXS, SPXL, SPXS, SQQQ, TECL, TECS, TNA, TQQQ, TZA, ANGELD y DIABLOI.
+- **Catálogo resultante:** 225 instrumentos (146 acciones y FIBRAs, 23 fondos y 56 ETF, de ellos 40 elegibles).
+- **Precios:** Alpaca entregó la historia diaria de 38 de los 40 ETF elegibles. AAXJ y NAFTRAC quedan para los ciclos del motor (NAFTRAC usa EODHD, con cupo diario).
+- **Pruebas:** `tests/test_universo.py::test_etf_del_portal_del_simulador`.

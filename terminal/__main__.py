@@ -318,6 +318,13 @@ def catalogo_simulador(args) -> None:
         if clave not in vistos:
             vistos.add(clave)
             w.writerow([clave, "fondo" if r["seccion_pdf"] == "Fondos" else "accion", f"{args.fuente}"])
+    # ETF vistos en la pestaña «ETF's» del simulador (capturas del 5-oct-2026; el PDF no los traía)
+    lista_etf = origen.parent / "simulador_etf.csv"
+    if lista_etf.exists():
+        for r in csv.DictReader(lista_etf.open(encoding="utf-8")):
+            if r["clave"] not in vistos:
+                vistos.add(r["clave"])
+                w.writerow([r["clave"], "etf", r.get("fuente") or args.fuente])
     con = db.conectar()
     db.inicializar(con)
     ins = mercado.instrumentos(con)
