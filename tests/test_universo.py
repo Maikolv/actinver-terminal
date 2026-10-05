@@ -45,5 +45,17 @@ def test_etf_del_portal_del_simulador():
     excluidos = {f["clave"] for f in portal if f["estado"] == "excluido"}
     assert excluidos == {"FAS", "FAZ", "PSQ", "QLD", "SOXL", "SOXS", "SPXL", "SPXS", "SQQQ", "TECL", "TECS", "TNA", "TQQQ", "TZA",
                          "ANGELD", "DIABLOI"}
-    lista = list(csv.DictReader((CFG / "simulador_etf.csv").open(encoding="utf-8")))
-    assert len(lista) == 56 and {"QQQ *", "NAFTRAC ISHRS", "SPY *", "SOXX *"} <= {x["clave"] for x in lista}
+    lista = list(csv.DictReader((CFG / "simulador_portal.csv").open(encoding="utf-8")))
+    etf = {x["clave"] for x in lista if x["tipo"] == "etf"}
+    assert len(etf) == 56 and {"QQQ *", "NAFTRAC ISHRS", "SPY *", "SOXX *"} <= etf
+
+
+def test_fondos_del_portal_del_simulador():
+    """25 fondos en la pestaña «Fondos» del simulador (5-oct-2026): los 23 del PDF + ACTIRVT y PROTEGE."""
+    pdf = {x["clave_pdf"] for x in csv.DictReader((CFG / "pdf_transcripcion.csv").open(encoding="utf-8")) if x["seccion_pdf"] == "Fondos"}
+    portal = {x["clave"].split()[0] for x in csv.DictReader((CFG / "simulador_portal.csv").open(encoding="utf-8")) if x["tipo"] == "fondo"}
+    assert len(pdf | portal) == 25 and portal == {"ACTIRVT", "PROTEGE"}
+    meta = {x["clave"]: x for x in csv.DictReader((CFG / "fondos_actinver.csv").open(encoding="utf-8"))}
+    assert meta["ACTIRVT"]["ventana_venta"] == "anual" and meta["PROTEGE"]["ventana_venta"] == "diaria"
+    ids = {f["id"] for f in filas()}
+    assert {"FONDO:ACTIRVT", "FONDO:PROTEGE"} <= ids

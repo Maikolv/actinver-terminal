@@ -345,6 +345,44 @@ def referencia_condicional(con, ajustes: Ajustes, iid: str, monto: float, lado: 
                     + "Verifique el precio en el portal; si está fuera de la banda, no capture y regenere las boletas."}
 
 
+def texto_telegram_simple(boletas: list[dict]) -> str:
+    """Boletas en lenguaje sencillo: qué capturar, en qué orden (ventas primero) y con qué tope de precio."""
+    import pandas as pd
+    vig = [b for b in boletas if b.get("estado", "vigente") == "vigente" and b["tipo"] != "mantener"]
+    if not vig:
+        return "No hay órdenes para capturar ahora. Escribe /plan para ver si hoy hay que hacer algo."
+    vence = pd.Timestamp(min(b["caduca_en"] for b in vig)).tz_convert("America/Mexico_City")
+    listas = sorted([b for b in vig if b["tipo"] in ("considerar compra", "considerar venta") and b.get("cantidad")],
+                    key=lambda b: b.get("lado") != "venta")
+    cond = sorted([b for b in vig if b not in listas and b.get("referencia_condicional")],
+                  key=lambda b: b["referencia_condicional"]["lado_sugerido"] != "venta")
+    resto = [b for b in vig if b not in listas and b not in cond]
+    nombre = lambda b: (b.get("emisora_serie") or b["instrumento_id"].split(":")[-1]).replace(" *", "")  # noqa: E731
+    L = [f"🧾 Órdenes para capturar a mano (válidas hasta {vence:%d-%m %H:%M})"] + ([""] if listas else [])
+    for i, b in enumerate(listas, 1):
+        if b.get("lado") == "venta":
+            L.append(f"{i}. 🔴 VENDE {nombre(b)}: {int(b['cantidad']):,} acciones, precio límite ${b['precio_limite']:,.2f} "
+                     f"(no vendas más barato) · boleta #{b['id']}")
+        else:
+            L.append(f"{i}. 🟢 COMPRA {nombre(b)}: {int(b['cantidad']):,} acciones, precio límite ${b['precio_limite']:,.2f} "
+                     f"(no pagues más) · boleta #{b['id']}")
+    if listas and any(b.get("lado") == "venta" for b in listas) and any(b.get("lado") != "venta" for b in listas):
+        L.append("Primero las ventas, luego las compras.")
+    if cond:
+        L += ["", "🟡 Solo si el precio del portal está en el rango (si no, no la toques hoy). Ventas primero:"]
+        for b in cond:
+            r = b["referencia_condicional"]
+            compra = r["lado_sugerido"] == "compra"
+            L.append(f"• {'COMPRA' if compra else 'VENDE'} {nombre(b)}: unas {r['titulos_aprox']:,} acciones si cuesta entre "
+                     f"${r['precio_min']:,.2f} y ${r['precio_max']:,.2f}; precio límite "
+                     f"${r['precio_max'] if compra else r['precio_min']:,.2f} · #{b['id']}")
+    if resto:
+        L += ["", "⏸ No toques hoy (falta un dato): " + ", ".join(nombre(b) for b in resto) + "."]
+    L += ["", "Elige «orden limitada» y escribe el precio límite. Si el precio del portal se movió más de 1 %, escribe "
+              "/boletas para recalcular. La terminal no compra ni vende nada. Detalle técnico: /boletas detalle"]
+    return "\n".join(L)
+
+
 def texto_telegram(boletas: list[dict]) -> str:
     """Boletas vigentes en texto para Telegram: lo necesario para capturar cada orden a mano en el simulador."""
     import pandas as pd

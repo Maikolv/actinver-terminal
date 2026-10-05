@@ -91,3 +91,33 @@ def test_mientras_la_fijada_se_recalcula_no_se_salta_a_otra(con, ajustes, monkey
     out["acciones_rendimiento"] = servicios.revalidar({**pendiente, "huella_calculo": "vieja"}, perfil, ajustes)  # …«rendimiento» aún no
     assert servicios._fijar_referencia(con, ajustes, perfil, out) is None
     assert json.loads(con.execute("SELECT valor FROM ajustes_usuario WHERE clave='referencia_plan'").fetchone()[0])["clave"] == "acciones_rendimiento"
+
+
+def test_se_cambia_si_otra_propuesta_la_domina(con, ajustes, monkeypatch):
+    """6-oct-2026: «rendimiento» +0.9 % con −19.7 % adverso frente a otra con +1.6 % y −5.9 %: la mejora central es menor
+    que el margen, pero la otra gana en ambas cosas ⇒ se cambia."""
+    perfil = {"criterio_plan": "plusvalia"}
+    sesion = {"d": date(2026, 10, 5)}
+    monkeypatch.setattr(resumen, "sesion_objetivo", lambda ahora: sesion["d"])
+
+    def out_con_p10(filas):
+        out = _out(con, ajustes, perfil, [(k, c, pt) for k, c, pt, _ in filas])
+        for k, _, _, p10 in filas:
+            out[k]["escenarios"]["adverso_p10"] = p10
+        return out
+    assert servicios._fijar_referencia(con, ajustes, perfil, out_con_p10(
+        [("acciones_rendimiento", 0.036, 66, -0.15), ("acciones_puntuacion", 0.013, 89, -0.05)])) == "acciones_rendimiento"
+    sesion["d"] = date(2026, 10, 6)
+    out = out_con_p10([("acciones_rendimiento", 0.009, 66, -0.197), ("acciones_puntuacion", 0.016, 89, -0.059)])
+    assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_puntuacion"
+
+
+def test_antes_de_la_apertura_aun_puede_cambiar(con, ajustes, monkeypatch):
+    """Fijada la noche anterior para la sesión de mañana: antes de abrir aplica la regla de margen, no la de sesión fija."""
+    perfil = {"criterio_plan": "plusvalia"}
+    monkeypatch.setattr(resumen, "sesion_objetivo", lambda ahora: date(2099, 1, 5))  # sesión futura: aún no abre
+    monkeypatch.setattr(resumen, "apertura", lambda s: vigencia.apertura_sesion("XMEX", date(2026, 10, 6)).replace(year=2099))
+    out = _out(con, ajustes, perfil, [("acciones_rendimiento", 0.036, 66), ("acciones_puntuacion", 0.013, 89)])
+    assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_rendimiento"
+    out = _out(con, ajustes, perfil, [("acciones_rendimiento", 0.010, 66), ("acciones_puntuacion", 0.035, 89)])
+    assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_puntuacion"

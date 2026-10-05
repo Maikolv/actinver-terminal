@@ -30,6 +30,13 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
+- **5-oct (v0.20.0, competencia):**
+  - 314 pruebas en verde, sin contar las de TradingView.
+  - Telegram en lenguaje sencillo: `/plan` y `/boletas`; el formato técnico sigue en `/completo`, `/detalle` y `/boletas detalle` (D-49).
+  - El plan cambia si otra propuesta domina a la fijada.
+  - Universo de 230, con 56 ETF y 25 fondos del portal.
+  - Auditoría en `docs/auditoria-2026-10-05.md`. Lo más urgente: 19 BMV del catálogo sin ningún precio (cupo de EODHD), fondos con solo 5 sesiones de historia, y la decisión pendiente frente a 1/N.
+
 - Pruebas: 283 de Python en verde (`uv run pytest -q`, sin contar las de TradingView de otra sesión) y 19 del Worker (`npm --prefix cloud-alerts test`).
 - Pronóstico al cierre del Reto (D-46, `docs/pronostico-reto.md`): 1, 5 y 31 sesiones, en MXN y con barrera. Con datos al 30-sep: SIN VENTAJA DEMOSTRADA en los tres horizontes y probabilidad de subida mal calibrada → «señal experimental», no cambia el plan. Se emite solo una vez por sesión (≈140 s, 0.36 GB). `/pronostico` en Telegram.
 - Monitor en la nube (`cloud-alerts/`, D-47): Worker + D1 desplegados el 1-oct en Cloudflare Workers Free. URL pública responde y `/estado` rechaza solicitudes sin firma (401). La terminal sincroniza automáticamente; sigue pendiente comprobar un aviso real de relevo tras el primer cron, a partir de las 06:00 CDMX.

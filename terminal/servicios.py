@@ -240,8 +240,10 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
     plan entre carteras distintas por diferencias de ruido (5-oct-2026: +0.9 % vs +1.3 % de escenario central).
     - Misma sesión: se conserva la propuesta (la misma versión guardada) elegida al inicio, mientras siga siendo válida
       y no cambie el criterio del perfil.
-    - Sesión nueva: se cambia de propuesta solo si la mejor supera a la anterior por un margen claro (2 puntos de
-      escenario central o 5 de puntuación); si no, se conserva la anterior con su versión más reciente."""
+    - Sesión nueva (o la misma antes de la apertura, cuando aún no se pudo operar): se cambia de propuesta solo si la
+      mejor supera a la anterior por un margen claro (2 puntos de escenario central o 5 de puntuación) o si la domina
+      (más escenario central y al menos 2 puntos menos de pérdida en el escenario adverso; 6-oct-2026: +0.9 %/−19.7 %
+      frente a +1.6 %/−5.9 %); si no, se conserva la anterior con su versión más reciente."""
     from . import resumen
     nueva = resumen.propuesta_referencia(out)
     f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='referencia_plan'").fetchone()
@@ -250,7 +252,11 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
     criterio = resumen.criterio_plan(out)
     elegido, motivo = None, None
     if previa and previa.get("criterio") == criterio and previa.get("clave") in out:
-        if previa.get("sesion") == sesion:
+        abierta = datetime.now(UTC) >= resumen.apertura(date.fromisoformat(sesion))
+        if previa.get("sesion") == sesion and not abierta:
+            if not _valida(out.get(previa["clave"])) and (out.get(previa["clave"]) or {}).get("recalcular"):
+                return None
+        if previa.get("sesion") == sesion and abierta:
             fila = con.execute("SELECT resultado FROM propuestas WHERE id=?", (previa.get("id"),)).fetchone()
             p = _revisar_catalogo(con, revalidar({**json.loads(fila[0]), "id_registro": previa["id"]}, perfil, ajustes)) if fila else None
             if _valida(p):
@@ -264,8 +270,11 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
         elif _valida(out.get(previa["clave"])) and nueva:
             ant, nva = out[previa["clave"]], nueva
             if criterio == "plusvalia":
-                mejora = (nva.get("escenarios") or {}).get("central_p50", 0) - (ant.get("escenarios") or {}).get("central_p50", 0)
-                cambia = mejora >= MARGEN_CAMBIO_CENTRAL
+                ea, en = ant.get("escenarios") or {}, nva.get("escenarios") or {}
+                mejora = en.get("central_p50", 0) - ea.get("central_p50", 0)
+                domina = (mejora > 0 and en.get("adverso_p10") is not None and ea.get("adverso_p10") is not None
+                          and en["adverso_p10"] - ea["adverso_p10"] >= MARGEN_CAMBIO_CENTRAL)
+                cambia = mejora >= MARGEN_CAMBIO_CENTRAL or domina
             else:
                 cambia = nva["puntuacion"]["total"] - ant["puntuacion"]["total"] >= MARGEN_CAMBIO_PUNTUACION
             if not cambia:

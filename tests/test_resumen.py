@@ -181,7 +181,9 @@ def test_plan_pedido_despues_del_cierre_muestra_la_proxima_sesion(con, ajustes, 
     monkeypatch.setattr(servicios, "propuestas_guardadas", lambda *a, **k: {"mixta_puntuacion": PROP})
     monkeypatch.setattr(bot_telegram, "_ahora", lambda: tarde)
     texto = bot_telegram.texto_plan(con, ajustes)
-    assert texto.startswith("🌙 Plan para la sesión del jue 01-10-2026") and "mié 30-09-2026" not in texto.splitlines()[0]
+    assert texto.startswith("📋 Qué hacer en la próxima sesión, jueves 01-10")
+    completo = bot_telegram.texto_plan_completo(con, ajustes)
+    assert completo.startswith("🌙 Plan para la sesión del jue 01-10-2026") and "mié 30-09-2026" not in completo.splitlines()[0]
 
 
 def test_criterio_del_plan_mayor_plusvalia_esperada():

@@ -375,12 +375,18 @@ def enviar_si_toca(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: 
                                "No hay una propuesta vigente (datos no actualizados o propuestas suspendidas). Revise la "
                                "pestaña Datos de la terminal; no se sugieren órdenes hoy.", [])
     else:
-        titulo, texto, ords = construir(p, cartera, estado.get("ordenes"), local, obj,
-                                        plan=plan_de_accion(con, ajustes, p, cartera), props=propuestas)
+        plan = plan_de_accion(con, ajustes, p, cartera)
+        titulo, texto, ords = construir(p, cartera, estado.get("ordenes"), local, obj, plan=plan, props=propuestas)
+        if str(ajustes["alertas"].get("formato_plan", "sencillo")) == "sencillo" and plan:
+            from . import mensaje_simple
+            texto = mensaje_simple.texto(con, ajustes, propuesta=p, cartera=cartera, plan=plan, ahora=ahora, sesion=obj)
+            if estado.get("ordenes") is not None:  # qué cambió frente al último plan que sí llegó
+                texto += "\n\nQué cambió frente al mensaje anterior:\n" + "\n".join(
+                    f"• {c}" for c in cambios_vs_anterior(ords, estado.get("ordenes"), con_titulos=plan["cuenta"]["confirmada"]))
     if correccion:
         titulo = "🔁 PLAN CORREGIDO — " + titulo
         texto = ("🔁 PLAN CORREGIDO: la terminal recalculó la propuesta después del envío anterior y las órdenes cambiaron. "
-                 "Este mensaje REEMPLAZA al anterior; «Cambios frente al plan anterior» compara contra él.\n\n" + texto)
+                 "Este mensaje REEMPLAZA al anterior.\n\n" + texto)
     cfg = {**ajustes["alertas"], "notificar_escritorio": False, "notificar_telegram": True}
     res = notificador.enviar(titulo, texto, cfg, detalle=texto)
     ok = entregado({"resultado": res})

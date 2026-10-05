@@ -31,10 +31,11 @@ from . import db, notificador
 log = logging.getLogger("terminal.bot")
 ZONA = "America/Mexico_City"
 AYUDA = ("Comandos:\n"
-         "/plan — plan del día (resumen de compras, ventas, mantener y pendientes)\n"
+         "/plan — qué hacer hoy, en palabras sencillas\n"
+         "/completo — plan del día completo (propuestas, reglas y cambios frente al anterior)\n"
          "/detalle — cada instrumento: cantidad, precio límite, fuente y hora, motivo e invalidación\n"
          "/propuestas — máxima puntuación, desglose, rendimiento esperado y comparación con pesos iguales\n"
-         "/boletas — genera y envía las boletas del plan del día\n"
+         "/boletas — órdenes para capturar hoy (/boletas detalle: fuente y hora de cada precio)\n"
          "/estado — qué está confirmado, estimado, vencido o falta\n"
          "/alertas — alertas nuevas\n"
          "/cartera — saldo y posiciones (cuenta del Reto o registro local)\n"
@@ -73,6 +74,12 @@ def _ahora() -> datetime:
 
 
 def texto_plan(con, ajustes) -> str:
+    """Plan del día en lenguaje sencillo (solo qué hacer). El completo: /completo."""
+    from . import mensaje_simple
+    return mensaje_simple.texto(con, ajustes, ahora=_ahora())
+
+
+def texto_plan_completo(con, ajustes) -> str:
     from . import resumen, servicios
     perfil = servicios.perfil_actual(con, ajustes)
     props = servicios.propuestas_guardadas(con, ajustes, perfil)
@@ -135,13 +142,14 @@ def texto_pronostico(con, ajustes) -> str:
     return reto_pronostico.texto(reto_pronostico.construir(con, ajustes))
 
 
-def texto_boletas(con, ajustes) -> str:
+def texto_boletas(con, ajustes, detalle: bool = False) -> str:
     from . import boleta
     try:
         boleta.generar(con, ajustes, boleta.PLAN_DEL_DIA)
     except ValueError as e:
         return f"No se generaron boletas: {e}"
-    return boleta.texto_telegram(boleta.listar(con, ajustes, recalcular_vigentes=True))
+    lista = boleta.listar(con, ajustes, recalcular_vigentes=True)
+    return boleta.texto_telegram(lista) if detalle else boleta.texto_telegram_simple(lista)
 
 
 def texto_estado(con, ajustes) -> str:
@@ -359,7 +367,7 @@ class Chatbot:
 
 
 # ------------------------------------------------------------------------------------------------------------------
-COMANDOS = {"/plan": "plan", "/boletas": "boletas", "/estado": "estado", "/alertas": "alertas", "/cartera": "cartera",
+COMANDOS = {"/plan": "plan", "/completo": "completo", "/boletas": "boletas", "/estado": "estado", "/alertas": "alertas", "/cartera": "cartera",
             "/detalle": "detalle", "/propuestas": "propuestas", "/pronostico": "pronostico", "/pronóstico": "pronostico", "/movimientos": "movimientos",
             "/ayuda": "ayuda", "/help": "ayuda", "/start": "ayuda"}
 
@@ -369,8 +377,10 @@ def atender(con, ajustes, texto: str, chatbot: Chatbot) -> str:
     cmd = COMANDOS.get(texto.strip().split()[0].split("@")[0].lower()) if texto.strip().startswith("/") else None
     if cmd == "plan":
         return texto_plan(con, ajustes)
+    if cmd == "completo":
+        return texto_plan_completo(con, ajustes)
     if cmd == "boletas":
-        return texto_boletas(con, ajustes)
+        return texto_boletas(con, ajustes, detalle="detalle" in texto.lower())
     if cmd == "estado":
         return texto_estado(con, ajustes)
     if cmd == "alertas":
@@ -408,10 +418,11 @@ class BotTelegram:
         if self.configurado():
             try:  # menú de comandos en la app de Telegram (mejor esfuerzo)
                 httpx.post(f"https://api.telegram.org/bot{self.token}/setMyCommands", timeout=15, json={"commands": [
-                    {"command": "plan", "description": "Plan del día: órdenes, cambios y porqué"},
+                    {"command": "plan", "description": "Qué hacer hoy, en palabras sencillas"},
+                    {"command": "completo", "description": "Plan del día completo (propuestas y reglas)"},
                     {"command": "detalle", "description": "Plan de acción completo por instrumento"},
                     {"command": "propuestas", "description": "Puntuación, desglose y comparación con pesos iguales"},
-                    {"command": "boletas", "description": "Generar y enviar las boletas del plan"},
+                    {"command": "boletas", "description": "Órdenes para capturar hoy"},
                     {"command": "estado", "description": "Qué está confirmado, estimado o falta"},
                     {"command": "alertas", "description": "Alertas nuevas"},
                     {"command": "cartera", "description": "Saldo y posiciones"},

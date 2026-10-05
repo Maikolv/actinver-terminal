@@ -15,7 +15,7 @@ import httpx
 
 RAIZ = Path(__file__).resolve().parents[1]
 UNIVERSO = RAIZ / "config" / "universo.csv"
-LISTA = RAIZ / "config" / "simulador_etf.csv"
+LISTA = RAIZ / "config" / "simulador_portal.csv"
 FECHA = "2026-10-05"
 ORIGEN = "Pestaña «ETF's» del simulador del Reto (capturas del participante, 5-oct-2026)"
 
@@ -101,9 +101,12 @@ def main() -> None:
         w = csv.DictWriter(fh, fieldnames=cols)
         w.writeheader()
         w.writerows(filas)
+    otros = [r for r in csv.DictReader(LISTA.open(encoding="utf-8")) if r["tipo"] != "etf"] if LISTA.exists() else []
     with LISTA.open("w", encoding="utf-8", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["clave", "tipo", "fuente"])
+        for r in otros:  # fondos u otros tipos vistos en el portal: se conservan
+            w.writerow([r["clave"], r["tipo"], r["fuente"]])
         for t in ETF:
             if t not in faltan:
                 w.writerow([f"{t} *", "etf", ORIGEN])

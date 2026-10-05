@@ -2,6 +2,28 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.20.0] — 2026-10-05 (fondos del portal, mensajes sencillos, auditoría)
+
+### Añadido
+- **Fondos del simulador (capturas del 5-oct):** ACTIRVT (B, renta variable, venta anual) y PROTEGE (B-1, deuda, diaria) en el universo, en `config/fondos_actinver.csv` y en el catálogo. Se reimportaron las hojas oficiales ya guardadas para asignarles NAV del 28-sep al 2-oct. Ahora hay 25/25 fondos con precio y un universo de 230. `config/simulador_etf.csv` pasa a `config/simulador_portal.csv` (ETF y fondos vistos en el portal).
+- **Mensajes de Telegram en lenguaje sencillo** (`terminal/mensaje_simple.py`, D-49):
+  - `/plan` y el envío diario dicen solo qué hacer: vender primero, luego comprar, con precio límite;
+  - si el precio es aproximado, dan el rango para revisarlo en el portal;
+  - avisan si el efectivo no alcanza sin las ventas, si la captura está vieja o si se rompe una regla del Reto;
+  - incluyen el próximo evento macro de alto impacto (48 h) y el rango esperado al cierre del Reto.
+- **Boletas sencillas:** `/boletas` en el mismo formato, con las ventas primero. El formato técnico sigue en `/completo`, `/detalle` y `/boletas detalle`; `alertas.formato_plan = "completo"` restaura el envío anterior.
+- **Auditoría** `docs/auditoria-2026-10-05.md`:
+  - noticias y macro: qué entra al portafolio (nada) y qué entra como aviso;
+  - 19 emisoras BMV sin ningún precio por el cupo de EODHD;
+  - fondos con 5 sesiones de historia;
+  - decisiones pendientes.
+
+### Corregido
+- **El plan del día ya no conserva una propuesta dominada:** cambia si otra tiene más escenario central y al menos 2 puntos menos de pérdida adversa. El 6-oct era +0.9 %/−19.7 % frente a +1.6 %/−5.9 %. Antes de la apertura aplica la regla entre sesiones.
+
+### Pruebas
+- 11 nuevas: `tests/test_mensaje_simple.py` (8), 2 en `tests/test_referencia_plan.py` y `test_fondos_del_portal_del_simulador` (25 fondos).
+
 ## [0.19.1] — 2026-10-05 (plan del día estable)
 
 ### Corregido
