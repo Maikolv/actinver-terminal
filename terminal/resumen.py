@@ -42,6 +42,9 @@ def propuesta_referencia(propuestas: dict) -> dict | None:
              and not p.get("avisos") and p.get("puntuacion")]
     if not cands:
         return None
+    fijada = [p for p in cands if p.get("referencia_fijada")]  # plan del día fijo (servicios._fijar_referencia)
+    if fijada:
+        return fijada[0]
     if criterio_plan(propuestas) == "plusvalia":
         con_esc = [p for p in cands if (p.get("escenarios") or {}).get("central_p50") is not None]
         if con_esc:

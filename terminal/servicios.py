@@ -226,16 +226,82 @@ def bloqueo_cartera(actual: dict) -> str | None:
     return None
 
 
+MARGEN_CAMBIO_CENTRAL = 0.02    # criterio «plusvalía»: la nueva debe mejorar el escenario central ≥ 2 puntos
+MARGEN_CAMBIO_PUNTUACION = 5.0  # criterio «puntuación»: ≥ 5 puntos de puntuación
+
+
+def _valida(p: dict | None) -> bool:
+    return bool(p and not p.get("mercado_variante") and p.get("estado") == "calculada" and not p.get("avisos")
+                and p.get("puntuacion"))
+
+
+def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | None:
+    """Plan del día estable. Las estimaciones cambian con cada precio en vivo; elegir siempre el máximo hacía saltar el
+    plan entre carteras distintas por diferencias de ruido (5-oct-2026: +0.9 % vs +1.3 % de escenario central).
+    - Misma sesión: se conserva la propuesta (la misma versión guardada) elegida al inicio, mientras siga siendo válida
+      y no cambie el criterio del perfil.
+    - Sesión nueva: se cambia de propuesta solo si la mejor supera a la anterior por un margen claro (2 puntos de
+      escenario central o 5 de puntuación); si no, se conserva la anterior con su versión más reciente."""
+    from . import resumen
+    nueva = resumen.propuesta_referencia(out)
+    f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='referencia_plan'").fetchone()
+    previa = json.loads(f[0]) if f else None
+    sesion = resumen.sesion_objetivo(datetime.now(UTC)).isoformat()
+    criterio = resumen.criterio_plan(out)
+    elegido, motivo = None, None
+    if previa and previa.get("criterio") == criterio and previa.get("clave") in out:
+        if previa.get("sesion") == sesion:
+            fila = con.execute("SELECT resultado FROM propuestas WHERE id=?", (previa.get("id"),)).fetchone()
+            p = _revisar_catalogo(con, revalidar({**json.loads(fila[0]), "id_registro": previa["id"]}, perfil, ajustes)) if fila else None
+            if _valida(p):
+                out[previa["clave"]] = p
+                elegido, motivo = previa["clave"], "Plan del día fijado al inicio de la sesión (no cambia con cada precio en vivo)."
+            elif _valida(out.get(previa["clave"])):  # la versión fijada caducó (p. ej. recálculo): misma propuesta, versión nueva
+                elegido, motivo = previa["clave"], ("Plan del día: misma propuesta de la sesión, recalculada (la versión anterior "
+                                                    "dejó de ser válida).")
+            elif (out.get(previa["clave"]) or {}).get("recalcular"):
+                return None  # se está recalculando: el plan espera a esa misma propuesta en vez de saltar a otra
+        elif _valida(out.get(previa["clave"])) and nueva:
+            ant, nva = out[previa["clave"]], nueva
+            if criterio == "plusvalia":
+                mejora = (nva.get("escenarios") or {}).get("central_p50", 0) - (ant.get("escenarios") or {}).get("central_p50", 0)
+                cambia = mejora >= MARGEN_CAMBIO_CENTRAL
+            else:
+                cambia = nva["puntuacion"]["total"] - ant["puntuacion"]["total"] >= MARGEN_CAMBIO_PUNTUACION
+            if not cambia:
+                elegido, motivo = previa["clave"], ("Se conserva la propuesta anterior: ninguna otra la supera por un margen "
+                                                    "claro (diferencias menores son ruido de estimación).")
+    if elegido is None and nueva:
+        elegido = next(k for k, v in out.items() if v is nueva)
+        motivo = "Propuesta elegida por el criterio del perfil al inicio de la sesión."
+    if elegido is None:
+        return None
+    p = out[elegido]
+    p["referencia_fijada"], p["motivo_referencia"] = True, motivo
+    estado = {"sesion": sesion, "clave": elegido, "id": p.get("id_registro"), "criterio": criterio,
+              "central": (p.get("escenarios") or {}).get("central_p50"), "puntuacion": p["puntuacion"]["total"]}
+    if not previa or any(previa.get(k) != estado[k] for k in ("sesion", "clave", "id", "criterio")):
+        with db.transaccion(con):
+            con.execute("INSERT INTO ajustes_usuario VALUES ('referencia_plan', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
+                        "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(estado), db.ahora()))
+    return elegido
+
+
 def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
     out = {}
     actual = None
     for tipo, lente in COMBINACIONES:
         clave = f"{tipo}_{lente}"
-        f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()
-        out[clave] = _revisar_catalogo(con, revalidar(json.loads(f["resultado"]), perfil, ajustes) if f else None)
+        f = con.execute("SELECT id, resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()
+        out[clave] = _revisar_catalogo(con, revalidar({**json.loads(f["resultado"]), "id_registro": f["id"]}, perfil, ajustes)
+                                       if f else None)
         if out[clave] and "advertencias_reto" not in out[clave]:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
+    fija = _fijar_referencia(con, ajustes, perfil, out)
+    if fija and "advertencias_reto" not in out[fija]:
+        actual = actual or cartera_actual(con, ajustes)
+        advertir_compras(out[fija], actual)
     for tipo, m in claves_variantes(perfil):
         clave = f"{tipo}_puntuacion_{m}"
         f = con.execute("SELECT resultado FROM propuestas WHERE tipo=? ORDER BY id DESC LIMIT 1", (clave,)).fetchone()

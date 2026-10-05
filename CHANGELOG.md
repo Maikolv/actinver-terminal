@@ -2,6 +2,17 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.19.1] — 2026-10-05 (plan del día estable)
+
+### Corregido
+- **El plan del día saltaba de propuesta con los precios en vivo.** Con el criterio «plusvalía», el plan elegía la propuesta con mayor escenario central, y esa estimación cambia con cada precio. El 5-oct, a la apertura, una diferencia de ruido (+0.9 % frente a +1.3 %) cambiaba toda la cartera del plan.
+- **Regla nueva (`servicios._fijar_referencia`):**
+  - la propuesta elegida al inicio de la sesión queda fija toda la sesión, con su misma versión;
+  - si esa versión caduca por un recálculo, se usa la versión nueva de la misma propuesta, y mientras se recalcula el plan espera en vez de saltar a otra;
+  - entre sesiones, solo cambia si otra la supera por 2 puntos de escenario central (o 5 de puntuación);
+  - cambiar el criterio del perfil vuelve a elegir.
+- **Pruebas:** 5 nuevas (`tests/test_referencia_plan.py`).
+
 ## [0.19.0] — 2026-10-01 (movimientos públicos: 13F e insiders con SEC EDGAR)
 
 ### Añadido
