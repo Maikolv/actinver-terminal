@@ -327,6 +327,17 @@ def catalogo_simulador(args) -> None:
     for d in rep["detalle"]:
         if d["estado"] == "rechazada":
             print(f"  línea {d['linea']}:", "; ".join(d["errores"]))
+    # Lo que el participante tiene en el portal se opera en el simulador aunque el PDF no lo muestre (p. ej. QQQ: la
+    # pestaña «ETF's» del PDF repite las acciones). Esas claves se conservan siempre en el catálogo.
+    vistos_portal = [r[0] for r in con.execute("SELECT DISTINCT instrumento_id FROM posiciones_portal")]
+    if args.confirmar and vistos_portal:
+        with db.transaccion(con):
+            con.executemany("INSERT OR IGNORE INTO universo_simulador (id, clave_operable, importado_en) VALUES (?, ?, ?)",
+                            [(i, (ins.get(i) or {}).get("clave_operable"), db.ahora()) for i in vistos_portal if i in ins])
+    extra = sorted(set(vistos_portal) - set(rep.get("ids", [])))
+    if extra:
+        print("Se conservan por aparecer en sus capturas del portal:", ", ".join(extra))
+    rep["ids"] = list(rep.get("ids", [])) + extra
     fuera = sorted(i for i, v in ins.items() if v["estado"] == "activo" and i not in set(rep.get("ids", [])))
     if fuera:
         print("Activos del universo que NO aparecen en el simulador (se excluyen de las propuestas del Reto):", ", ".join(fuera))

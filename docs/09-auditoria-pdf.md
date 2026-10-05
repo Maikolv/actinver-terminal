@@ -40,3 +40,15 @@ Transcripción reproducible: `scripts/transcribir_pdf.py` → `config/pdf_transc
 | Claves y series como lista de descubrimiento | Precios, volúmenes, variaciones (históricos) |
 | Nombres de fondos | Rendimientos 1/3/5 años (incompletos y sin fecha) |
 | Estructura de columnas para entender el origen (plataforma de Actinver) | Favoritos del usuario |
+
+## «ETfs actinver.pdf» (recibido el 5-oct-2026)
+
+- **Archivo:** 6 páginas y 18 capturas. Copia en el repositorio privado: `docs/evidencia/simulador/etfs-actinver.pdf`.
+- **Contenido:** las 18 imágenes son **idénticas píxel por píxel** a las páginas 6–11 de «Datos Actinver.pdf» (comparación sha256 de los píxeles). No aporta claves nuevas.
+  - **«ETF's»:** repite las 146 acciones (AA1 * … ZM *).
+  - **«Fondos»:** los mismos 23 fondos.
+- **Verificación de la transcripción** (5-oct): OCR de Windows sobre las 31 capturas de «Datos Actinver.pdf». No apareció ninguna clave ausente de `config/pdf_transcripcion.csv`; las diferencias eran errores de lectura (AAI = AA1, CCLI = CCL1, OXYI = OXY1, INJ = JNJ, GOITERA = GENTERA).
+- **ETF reales del simulador:** el portal del participante (5-oct, 15:08) muestra una posición en **QQQ *** dentro de la sección «ETFs», así que el simulador sí opera ETF aunque ningún PDF los liste.
+  - QQQ se agregó al catálogo.
+  - `uv run terminal catalogo-simulador --confirmar` ahora conserva siempre las claves vistas en las capturas del portal.
+  - Para completar la lista hacen falta capturas actuales de la pestaña «ETF's» del simulador.
