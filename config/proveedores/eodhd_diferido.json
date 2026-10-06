@@ -1,0 +1,19 @@
+{
+  "_comentario": "EODHD Live OHLCV (precio diferido). Verificado en la documentación pública el 6-oct-2026: https://eodhd.com/financial-apis/live-realtime-stocks-api — GET /api/real-time/{TICKER}.MX?api_token=…&fmt=json; respuesta {code, timestamp (epoch s), close, …}; retraso declarado 15–20 min para acciones; incluido en el plan gratuito.",
+  "proveedor": "EODHD Live OHLCV (diferido)",
+  "documentacion": "https://eodhd.com/financial-apis/live-realtime-stocks-api",
+  "url_base": "https://eodhd.com",
+  "variables_requeridas": [],
+  "autenticacion": {"tipo": "parametro", "nombre": "api_token"},
+  "cotizacion": {
+    "metodo": "GET",
+    "ruta": "/api/real-time/{simbolo}",
+    "parametros": {"fmt": "json"},
+    "campos": {"precio": "close", "hora_evento": "timestamp", "unidad_hora": "s", "simbolo": "code"}
+  },
+  "plantilla_simbolo": "{clave}{serie}.MX",
+  "mapa_simbolos": {},
+  "bolsa": "BMV",
+  "moneda_fija": "MXN",
+  "latencia_declarada_s": 900
+}
