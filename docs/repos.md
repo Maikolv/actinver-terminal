@@ -242,7 +242,8 @@ Mantenimiento: **activo** = commit en los últimos 30 días; **moderado** = últ
 ### CloudflareSpeedTest_duplicates_backup
 - **Lectura fácil:** Es una copia repetida de la carpeta anterior. No tiene nada nuevo.
 - **Técnico:** sin Git · GPL-3.0.
-- **Uso:** descartado — **duplicado verificado**: sus 28 archivos son idénticos byte a byte a los de CloudflareSpeedTest (solo cambia el sufijo « (2)» en el nombre). Se puede borrar sin pérdida (decisión del usuario).
+- **Uso:** descartado — **duplicado verificado**: sus 28 archivos son idénticos byte a byte a los de CloudflareSpeedTest (solo cambia el sufijo « (2)» en el nombre).
+- **Eliminado el 6-oct-2026 por orden del usuario** («Elíminalo»). Antes se volvió a verificar: 28/28 archivos idénticos. Respaldo: `Desktop/Repos/_respaldos/CloudflareSpeedTest_duplicates_backup_2026-10-06.zip` (28 entradas). La carpeta se envió a la Papelera de reciclaje de Windows, así que se puede restaurar.
 
 ### agentic-inbox
 - **Lectura fácil:** Un buzón de correo atendido por IA.

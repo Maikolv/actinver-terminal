@@ -128,10 +128,10 @@ importados por el usuario — es intencional (D-12), no un bug.
 4. **Ranking de modelos** (D-33): el comparador ya existe; falta evaluarlo con las
    series reales disponibles y una prueba fuera de muestra suficiente. La cobertura
    parcial y la historia corta impiden declarar una ventaja predictiva.
-5. **CloudflareSpeedTest_duplicates_backup** (duplicado verificado: 28/28 archivos idénticos)
-   y otros repos mal ubicados detectados en `docs/repos.md`: pendiente de limpieza fuera
-   de este repo (afecta a `Desktop/Repos`, no a `actinver-terminal`); dejar
-   constancia en ese doc antes de borrar cualquier cosa, con respaldo o rama.
+5. **CloudflareSpeedTest_duplicates_backup:** eliminado el 6-oct-2026 por orden del usuario.
+   Respaldo en `Desktop/Repos/_respaldos/` y carpeta en la Papelera de reciclaje.
+   Otros repos mal ubicados de `docs/repos.md` siguen pendientes; borrarlos requiere
+   confirmación expresa del usuario (mandato v2).
 
 ## Al cerrar cada sesión
 
