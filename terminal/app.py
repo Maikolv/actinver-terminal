@@ -426,6 +426,15 @@ def get_presente(con=Depends(con_db)):
     return espacios.presente(con, AJUSTES)
 
 
+@app.get("/api/robustez")
+def get_robustez(tipo: str = "acciones"):
+    from .robustez import informe
+    if tipo not in ("acciones", "mixta"):
+        raise HTTPException(400, "tipo: acciones o mixta")
+    r = informe.ultimo(tipo)
+    return r or {"estado": "sin_corrida", "mensaje": "Aún no hay corrida del protocolo. Ejecute: uv run terminal robustez"}
+
+
 @app.get("/api/futuro")
 def get_futuro(con=Depends(con_db)):
     return espacios.futuro(con, AJUSTES)

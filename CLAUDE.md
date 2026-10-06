@@ -32,6 +32,13 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
+- **6-oct (v0.24.0, protocolo de robustez):**
+  - `uv run terminal robustez` (reanudable, ≈ 15–20 min por universo, ≤ 0.36 GB).
+  - Cuadrícula de 150 combinaciones × 500 simulaciones Monte Carlo.
+  - Mesetas amplias: 66 % de la cuadrícula aprueba en acciones y 79 % en mixta.
+  - La selección anidada NO supera a la configuración vigente, así que no se cambian parámetros.
+  - Máximo rendimiento vigente: «no aprobada» por caída p5 −23/−24 %; decisión del usuario.
+  - Vista «Robustez» en «Más».
 - **6-oct (v0.23.0, auditoría de 7 mejoras):**
   - 329 pruebas en verde.
   - Validación V1 (1,099 sesiones fuera de muestra): sin ventaja frente a 1/N, propuestas sin cambios.

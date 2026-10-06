@@ -2,6 +2,37 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.24.0] — 2026-10-06 (protocolo de robustez)
+
+### Añadido
+- **Protocolo de robustez** (`terminal/robustez/`, `docs/robustez.md`, preregistrado antes de ejecutar):
+  - cuadrícula λ × tope × historia de 150 combinaciones por universo, todas evaluadas;
+  - **estabilidad** con fórmula e índice publicados;
+  - **detección de picos aislados**;
+  - **Monte Carlo de 500 simulaciones en cada combinación**, con bloques de 10 sesiones, costos, deslizamiento y diferencial del SIC perturbados, y horizonte al cierre del Reto;
+  - **SPP con mapas de calor por pares** y **regiones contiguas** (búsqueda en anchura, vecindad de von Neumann; meseta de 5 o más combinaciones);
+  - **walk-forward anidado** con selección solo en la ventana previa y un tramo final intacto de 63 sesiones;
+  - etiqueta «evidencia insuficiente» cuando no alcanza la historia.
+- **Ejecución por lotes y reanudable** (`uv run terminal robustez`). Cada combinación se guarda con su semilla y huella de preregistro.
+- **Vista «Robustez»** (en «Más») y `/api/robustez`: fechas, cobertura, combinaciones, simulaciones, mapas con filtro de la tercera dimensión, walk-forward y motivos de aprobación o rechazo.
+- **Propuestas, reporte y Telegram** separan ESTIMACIÓN (modelo), HISTÓRICO (fuera de muestra) y SIMULACIÓN (Monte Carlo). Cada propuesta lleva su estado de robustez: robusta, no aprobada o frágil. Una propuesta frágil (pico aislado o inestable) no puede ser la referencia del plan si hay alternativa.
+
+### Resultados (datos al 5-oct-2026)
+- **Mesetas amplias:** 66 % de la cuadrícula aprueba en acciones y 79 % en mixta, con una dispersión de unos 6 puntos.
+- **Configuración vigente de máximo rendimiento:** estable, pero no aprobada por riesgo de cola (caída p5 de −23 % y −24 % en simulación).
+- **Walk-forward anidado:** la selección del protocolo no supera a la configuración vigente (+33 % frente a +39/+47 % anual encadenado), así que los parámetros no se cambian (ver `docs/robustez.md`).
+
+### Pruebas
+- 9 nuevas (`tests/test_robustez.py`):
+  - reproducibilidad;
+  - sin filtración futura;
+  - Monte Carlo en las 150 combinaciones;
+  - picos aislados frente a meseta;
+  - separación de ventanas del walk-forward y tramo intacto;
+  - reanudación;
+  - referencia sin propuestas frágiles;
+  - estado por combinación más cercana.
+
 ## [0.23.0] — 2026-10-06 (auditoría de siete mejoras)
 
 ### Añadido

@@ -44,6 +44,7 @@
     <!-- Secundarias: información técnica y trazabilidad; se muestran con «Más» -->
     <button role="tab" class="secundaria" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
     <button role="tab" class="secundaria" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+    <button role="tab" class="secundaria" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
     <button role="tab" class="secundaria" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
     <button role="tab" class="secundaria" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
     <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
@@ -183,6 +184,19 @@
     </div>
     <p class="suave" id="ranking-hora"></p>
     <div id="ranking-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-robustez" aria-labelledby="tab-robustez" hidden>
+    <h1>Robustez de las propuestas</h1>
+    <p class="ayuda">¿Los parámetros del optimizador funcionan en una región amplia o solo en un punto con suerte? Estabilidad
+      ante cambios pequeños, Monte Carlo en cada combinación, mapas por pares (SPP) y walk-forward anidado. Es
+      <strong>histórico fuera de muestra</strong> y <strong>simulación</strong> (remuestreo del pasado), no pronóstico ni garantía.
+      Diseño y umbrales: <code>docs/robustez.md</code>. Se recalcula con <code>uv run terminal robustez</code>.</p>
+    <div class="segmentado" role="radiogroup" aria-label="Universo" id="selector-robustez">
+      <button type="button" role="radio" aria-checked="true" data-valor="acciones">Solo acciones</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="mixta">Acciones + ETF + fondos</button>
+    </div>
+    <div id="robustez-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 
   <section role="tabpanel" id="panel-alertas" aria-labelledby="tab-alertas" hidden>

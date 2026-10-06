@@ -77,6 +77,8 @@ def propuesta_referencia(propuestas: dict) -> dict | None:
              and not p.get("avisos") and p.get("puntuacion")]
     if not cands:
         return None
+    no_fragiles = [p for p in cands if (p.get("robustez") or {}).get("estado") != "frágil"]
+    cands = no_fragiles or cands  # una estrategia frágil no es la referencia solo por un buen backtest (docs/robustez.md)
     fijada = [p for p in cands if p.get("referencia_fijada")]  # plan del día fijo (servicios._fijar_referencia)
     if fijada:
         return fijada[0]
@@ -156,15 +158,19 @@ def _linea_propuesta(x: dict) -> str:
     c = x.get("comparacion") or []
     partes = [f"«{x['nombre']}» {x['puntuacion']['total']:.1f}/100"]
     if e.get("central_p50") is not None:
-        partes.append(f"esperado al cierre {e['central_p50']:+.1%} (rango {e['adverso_p10']:+.1%} a {e['favorable_p90']:+.1%}; "
+        partes.append(f"ESTIMACIÓN del modelo al cierre {e['central_p50']:+.1%} (rango {e['adverso_p10']:+.1%} a {e['favorable_p90']:+.1%}; "
                       f"volatilidad {e.get('volatilidad_anual', 0):.0%})")
     if c and c[0].get("rend_anual") is not None:
         ew = c[1].get("rend_anual") if len(c) > 1 else None
-        partes.append(f"fuera de muestra {c[0]['rend_anual']:+.1%}/año" + (f" vs pesos iguales {ew:+.1%}" if ew is not None else "")
+        partes.append(f"HISTÓRICO fuera de muestra {c[0]['rend_anual']:+.1%}/año" + (f" vs pesos iguales {ew:+.1%}" if ew is not None else "")
                       + f" ({c[0].get('sesiones')} sesiones)")
+    rb = x.get("robustez") or {}
+    if rb.get("estado") in ("robusta", "no aprobada", "frágil"):
+        partes.append(f"robustez: {rb['estado'].upper()}" + (f" ({', '.join(rb['motivos'])})" if rb.get("motivos") else "")
+                      + f" · SIMULACIÓN al cierre: prob. de pérdida {rb['simulacion_prob_perdida']:.0%}")
     v = x.get("validacion_extendida") or {}
     if v.get("estrategia"):  # historia larga (V1): la evidencia que cuenta para decir «ventaja»
-        partes.append(f"validación extendida {v['estrategia']['rend_anual']:+.1%}/año vs pesos iguales "
+        partes.append(f"HISTÓRICO, validación extendida {v['estrategia']['rend_anual']:+.1%}/año vs pesos iguales "
                       f"{v['iguales']['rend_anual']:+.1%} ({v['estrategia']['sesiones']} sesiones desde "
                       f"{v['estrategia']['desde'][:7]}; exceso IC 90 % {v['exceso_ic90'][0]:+.0%} a {v['exceso_ic90'][1]:+.0%}): "
                       f"{v['veredicto'].lower()}")

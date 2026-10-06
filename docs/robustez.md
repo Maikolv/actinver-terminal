@@ -140,3 +140,53 @@ cuadrícula. Se penaliza usando el **rendimiento robusto** R̃(c) = mediana de R
   Ninguna es garantía.
 - **Ejecución por lotes y reanudable:** cada combinación se guarda al terminar y una corrida interrumpida retoma
   donde quedó.
+
+## Resultados (corrida del 6-oct-2026, datos al 5-oct-2026)
+
+Comando: `uv run terminal robustez --tipo ambos` (reanudable). Tiempo: acciones 893 s, mixta 1,214 s; pico de memoria
+337–355 MB. Resultados en `data/robustez/<tipo>_<huella>/` (locales, fuera de Git):
+`preregistro.json`, `combos/*.npz` con semilla por combinación y `resumen.json`.
+
+**Fechas:** historia 28-sep-2021 a 5-oct-2026 (1,267 sesiones). Fuera de muestra: 29-sep-2023 a 8-jul-2026 (700
+sesiones). Tramo intacto: 9-jul a 5-oct-2026 (63 sesiones). Horizonte de la simulación: 28 sesiones, al cierre del
+Reto. **Cobertura:** 150 combinaciones × 500 simulaciones en cada universo, ninguna omitida.
+
+| | Acciones | Mixta (acciones + ETF + fondos) |
+|---|---|---|
+| Mediana SPP (rend. anual de todas las combinaciones) | +35.3 % | +36.8 % |
+| Combinaciones que superan a 1/N / que aprueban los 5 umbrales | 71 % / 66 % | 96 % / 79 % |
+| Región | 1 meseta de 99 (R medio +37.8 %, desv. 6.4 pts) | 1 meseta de 118 (+36.7 %, desv. 5.4 pts) |
+| Picos aislados | 0 | 1 |
+| Elegida por la regla | λ 0.25 · tope 20 % · historia 504 (S 0.81) | λ 0.5 · tope 20 % · historia 504 (S 0.78) |
+| Elegida: histórico (R, exceso vs 1/N, caída máx.) | +49.9 %, +21.6 pts, −35.8 % | +45.5 %, +19.0 pts, −34.7 % |
+| Elegida: simulación al cierre (p5 / p50 / p95, prob. pérdida, caída p5) | −12.4 % / +4.7 % / +22.9 %, 34 %, −19.4 % | −12.6 % / +4.9 % / +21.2 %, 32 %, −18.9 % |
+| **Actual «máximo rendimiento»** (λ 0.5 · 20 % · 168) | +36.1 %, +12.8 pts; S 0.63; caída p5 **−23.1 %** ⇒ no aprobada (riesgo) | +48.4 %, +24.9 pts; S 0.68; caída p5 **−24.2 %** ⇒ no aprobada (riesgo) |
+| Actual «ajuste» (λ 4 · 12 % · 168) | no aprobada: exceso vs 1/N −2.7 pts | **aprobada** (+36.0 %, +10.9 pts, caída p5 −14.9 %) |
+| **Walk-forward anidado, encadenado** (448 sesiones, 8 fronteras): anidado / actual / 1/N / mediana diaria de combinaciones | +33.5 % / **+39.2 %** / +16.0 % / +17.6 % anual | +33.0 % / **+47.2 %** / +14.6 % / +25.2 % anual |
+| **Tramo intacto** (63 sesiones, acumulado) | +35.7 % / **+45.6 %** / +6.7 % / +1.2 % | +3.8 % / **+46.6 %** / +6.4 % / +2.6 % |
+
+**Lectura:**
+1. Los parámetros del optimizador están en una **meseta amplia**: 66–79 % de la cuadrícula aprueba y la dispersión es
+   de unos 6 puntos. No dependen de un punto con suerte.
+2. La selección anidada **no supera** a la configuración actual de máximo rendimiento, ni encadenada ni en el tramo
+   intacto. Elegir parámetros con el protocolo reduce el riesgo de cola, pero no mejora el rendimiento fuera de muestra.
+3. La configuración actual de máximo rendimiento falla **solo** el umbral de riesgo de cola: en 1 de cada 20
+   simulaciones cae más del 20 % antes del cierre. Su estabilidad es aceptable (S ≥ 0.6) y no es pico aislado.
+4. Todo esto ocurre en un periodo muy alcista para semiconductores (2023–2026), y el tramo intacto (jul–oct-2026)
+   también lo es. Nada de esto es un pronóstico.
+
+**Parámetros:** no se cambian automáticamente. La evidencia fuera de muestra no muestra que la regla elegida rinda
+más que la configuración actual; solo que arriesga menos. Hacerlo es decisión del usuario (ver abajo).
+
+## Enmiendas
+
+**Enmienda 1 (6-oct-2026, después de ver resultados; exploratoria).** El § 6 decía que toda combinación no aprobada
+se marcaría «frágil» y no podría ser la referencia. Las propuestas vigentes (λ 0.5 · 20 % · ≈ 252 sesiones) no son
+inestables: S ≈ 0.6–0.7 y sin pico. Fallan solo el umbral de caída p5, por poco: −20.1 % en acciones y −21.8 % en
+mixta. Aplicar la regla tal cual cambiaba el plan del usuario y contradecía su decisión D-50 («prioridad: mayor
+ganancia»). Se separan dos estados:
+- **frágil** (pico aislado o S < 0.60): no puede ser la referencia del plan si hay alternativa;
+- **no aprobada** (estable, pero falla rendimiento o riesgo): se informa con sus motivos en lenguaje sencillo y la
+  decisión queda en el usuario.
+
+Los umbrales y la regla de elección **no** cambiaron.

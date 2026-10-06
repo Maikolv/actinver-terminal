@@ -193,3 +193,6 @@ Contexto: experimento completo con el protocolo previo (índices de FRED, mismas
 
 ### D-57 Titulares: se conserva el léxico; búsqueda con BM25
 Contexto: 161 titulares etiquetados, los mismos para todos los métodos. Decisión: el LLM local (Qwen 1.5B) no se integra: invierte 9 direcciones, tiene 37 % de precisión en «negativo» y cuesta 1 GB y 3.5 s por titular. No se agrega memoria conversacional: no se midió necesidad. La búsqueda de documentación pasa a BM25 (13/15 frente a 4/15); la semántica e5-small (12/15) no se adopta.
+
+### D-58 Protocolo de robustez de parámetros
+Contexto: se pidió estabilidad de parámetros, Monte Carlo por combinación, SPP y clústeres, y walk-forward anidado. Decisión: `terminal/robustez/` con preregistro (`docs/robustez.md`, commit previo a la ejecución). La cuadrícula de 150 combinaciones por universo y las 500 simulaciones por combinación no tienen omisiones. Resultado al 5-oct: mesetas amplias, del 66 % y 79 % de la cuadrícula. La selección anidada no supera a la configuración vigente fuera de muestra, así que no se cambian parámetros. La configuración vigente de máximo rendimiento es estable, pero no pasa el umbral de caída p5 (−20 %). Enmienda 1: «frágil» queda solo para pico aislado o inestable; lo «no aprobado» por riesgo se informa y la decisión es del usuario, por D-50.

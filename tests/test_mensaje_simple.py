@@ -101,5 +101,5 @@ def test_si_mantener_es_mejor_dice_que_no_cambie_nada():
     plan = {**_plan([_accion("MU *", "mantener", tenencia=25)]), "mantener_mejor": mm}
     t = ms.construir(plan, PROP, [], AHORA)
     assert "Hoy no cambies nada" in t and "+7.6%" in t and "+7.0%" in t and "-16.7%" in t
-    assert "VENDE" not in t and "COMPRA" not in t and "Qué esperar" not in t
+    assert "VENDE" not in t and "COMPRA" not in t and "Pronóstico del modelo" not in t
     assert "Antes de capturar" not in t and "Para tener en cuenta" in t

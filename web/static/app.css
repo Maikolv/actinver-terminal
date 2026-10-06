@@ -268,3 +268,10 @@ button.enlace:hover, button.enlace:focus-visible { text-decoration: underline; }
 td.col-texto, th.col-texto { min-width: 26rem; }
 td.col-fechas, th.col-fechas { min-width: 13rem; }
 td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: anywhere; }
+
+/* Robustez: controles del mapa de calor y celdas coloreadas (verde = mejor según la métrica) */
+.fila-controles { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; align-items: center; margin: 1rem 0 .5rem; }
+.fila-controles select { margin-left: .25rem; }
+.mapa-calor { border-collapse: collapse; min-width: 22rem; }
+.mapa-calor th, .mapa-calor td { padding: .35rem .6rem; border: 1px solid var(--borde); text-align: right; }
+.mapa-calor caption { text-align: left; padding: .4rem .6rem; color: var(--texto-2); }

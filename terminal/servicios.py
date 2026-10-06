@@ -230,6 +230,21 @@ MARGEN_CAMBIO_CENTRAL = 0.02    # criterio «plusvalía»: la nueva debe mejorar
 MARGEN_CAMBIO_PUNTUACION = 5.0  # criterio «puntuación»: ≥ 5 puntos de puntuación
 
 
+def _marcar_robustez(out: dict) -> None:
+    """Estado del protocolo de robustez (docs/robustez.md) en cada propuesta: robusta, frágil o sin evaluar."""
+    try:
+        from .robustez import informe
+        for p in out.values():
+            if p is not None:
+                p["robustez"] = informe.estado_propuesta(p)
+    except Exception:  # noqa: BLE001 - la evidencia adicional nunca detiene las propuestas
+        log.exception("robustez de propuestas")
+
+
+def _fragil(p: dict | None) -> bool:
+    return bool(p and (p.get("robustez") or {}).get("estado") == "frágil")
+
+
 def _valida(p: dict | None) -> bool:
     return bool(p and not p.get("mercado_variante") and p.get("estado") == "calculada" and not p.get("avisos")
                 and p.get("puntuacion"))
@@ -251,6 +266,8 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
     sesion = resumen.sesion_objetivo(datetime.now(UTC)).isoformat()
     criterio = resumen.criterio_plan(out)
     elegido, motivo = None, None
+    if previa and _fragil(out.get(previa.get("clave"))) and any(_valida(v) and not _fragil(v) for v in out.values()):
+        previa = None  # una propuesta frágil no se conserva como referencia si hay una alternativa robusta o sin evaluar
     if previa and previa.get("criterio") == criterio and previa.get("clave") in out:
         abierta = datetime.now(UTC) >= resumen.apertura(date.fromisoformat(sesion))
         if previa.get("sesion") == sesion and not abierta:
@@ -307,6 +324,7 @@ def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
         if out[clave] and "advertencias_reto" not in out[clave]:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
+    _marcar_robustez(out)
     fija = _fijar_referencia(con, ajustes, perfil, out)
     if fija and "advertencias_reto" not in out[fija]:
         actual = actual or cartera_actual(con, ajustes)
@@ -319,6 +337,7 @@ def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
             actual = actual or cartera_actual(con, ajustes)
             advertir_compras(out[clave], actual)
     actual = actual or cartera_actual(con, ajustes)
+    _marcar_robustez({k: v for k, v in out.items() if v and "robustez" not in v})  # variantes por mercado: «sin evaluar»
     motivo = bloqueo_cartera(actual)
     if motivo:
         for p in out.values():

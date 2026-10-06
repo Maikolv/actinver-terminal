@@ -299,6 +299,33 @@ def fondos(args) -> None:
         print("Sin la serie del universo en el documento (no se asigna por aproximación):", ", ".join(rep["sin_serie_en_documento"]))
 
 
+def robustez(args) -> None:
+    """Protocolo de robustez (docs/robustez.md): estabilidad, Monte Carlo, SPP/clústeres y walk-forward anidado.
+    Por lotes y reanudable: lo ya calculado con el mismo preregistro no se repite."""
+    from . import db
+    from .config import cargar_ajustes
+    from .robustez import informe
+    ajustes = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con, ajustes)
+    for tipo in (["acciones", "mixta"] if args.tipo == "ambos" else [args.tipo]):
+        r = informe.ejecutar(con, ajustes, tipo, max_combos=args.max_combos, progreso=lambda m: print(m, flush=True))
+        if r.get("estado") != "ok":
+            print(f"{tipo}: {r.get('estado')} — {r.get('motivo')}")
+            continue
+        e, w = r.get("elegida"), r["walk_forward"]
+        print(f"\n{tipo}: {r['combinaciones']} combinaciones × {r['simulaciones_por_combinacion']} simulaciones · "
+              f"fuera de muestra {r['fechas']['oos_desde']}→{r['fechas']['oos_hasta']} · intacto {r['fechas']['intacto_desde']}"
+              f"→{r['fechas']['intacto_hasta']} · {r['recursos']}")
+        print(f"  SPP: mediana {r['spp']['mediana_R']:+.1%}/año · supera a 1/N {r['spp']['pct_supera_1N']:.0%} · aprobadas "
+              f"{r['pct_aprobadas']:.0%} · {r['veredicto']}" + (f" · elegida {e['params']} (R robusto {e['R_robusto']:+.1%}, "
+                                                                 f"distancia al borde {r['distancia_borde']})" if e else ""))
+        print(f"  Walk-forward anidado ({w['evidencia']}, {w['fronteras']} fronteras): " + " · ".join(
+            f"{k} {v.get('anual', 0):+.1%}" for k, v in w["encadenado"].items()))
+        print("  Tramo intacto: " + " · ".join(f"{k} {v.get('acum', 0):+.1%}" for k, v in w["intacto"].items()
+                                              if isinstance(v, dict) and "acum" in v))
+
+
 def precios_portal(args) -> None:
     """Precios de la pestaña «Acciones» del simulador desde el PDF que arma el participante (vista previa o --confirmar)."""
     from pathlib import Path
@@ -581,6 +608,10 @@ def main() -> None:
     sub.add_parser("cobertura-twelvedata", help="verifica la cobertura BMV de Twelve Data símbolo por símbolo").set_defaults(
         fn=cobertura_twelvedata)
     sub.add_parser("claude", help="comprueba la credencial de Claude del chatbot (una consulta mínima)").set_defaults(fn=claude)
+    rb = sub.add_parser("robustez", help="protocolo de robustez: estabilidad, Monte Carlo, SPP/clústeres y walk-forward anidado")
+    rb.add_argument("--tipo", choices=["acciones", "mixta", "ambos"], default="ambos")
+    rb.add_argument("--max-combos", type=int, default=None, help="solo las primeras N combinaciones (prueba rápida)")
+    rb.set_defaults(fn=robustez)
     pp_ = sub.add_parser("precios-portal", help="precios de la pestaña Acciones del simulador desde el PDF del participante")
     pp_.add_argument("archivo")
     pp_.add_argument("--confirmar", action="store_true")

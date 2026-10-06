@@ -104,7 +104,7 @@ const CARGAS = {
   "tab-resumen": () => pintarResumen(), "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
   "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
   "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
-  "tab-movimientos": () => cargarMovimientos(),
+  "tab-movimientos": () => cargarMovimientos(), "tab-robustez": () => cargarRobustez(),
 };
 const navPestanas = document.querySelector(".pestanas");
 function mostrarSecundarias(si) {
@@ -1221,6 +1221,78 @@ document.getElementById("btn-mov-seguir").addEventListener("click", async () => 
   try { await api("/api/seguimiento", { method: "POST", json: { instrumento_id: i } }); document.getElementById("mov-seg-id").value = ""; cargarMovimientos(); }
   catch (e) { notificar(e.errores ? e.errores.join(" · ") : e.message); }
 });
+/* ---------- Robustez (histórico fuera de muestra + simulación; no es pronóstico) ---------- */
+const robustezSel = { tipo: "acciones", par: 0, filtro: "mediana", metrica: "R" };
+const METRICAS_ROB = { R: "Rend. anual fuera de muestra", exceso_1N: "Exceso vs 1/N", S: "Estabilidad S",
+  prob_perdida: "MC: prob. de pérdida", ret_p5: "MC: rend. p5", caida_p5: "MC: caída p5", aprobada: "Aprobada (1 = sí)" };
+const NOMBRE_PARAM = { aversion: "λ aversión", tope: "Tope por activo", historia: "Historia (sesiones)" };
+const PARES_ROB = ["aversion|tope", "aversion|historia", "tope|historia"];
+const MOTIVOS_ROB = { exceso_vs_1N: "no supera a 1/N", prob_perdida: "prob. de pérdida > 45 %",
+  caida_p5: "caída p5 < −20 %", estabilidad: "inestable (S < 0.6)", no_pico_aislado: "pico aislado" };
+function celdaColor(v, lo, hi, invertir, texto) {
+  // el color se asigna por la propiedad style (la política CSP bloquea el atributo style en línea)
+  const td = h("td", { clase: "num" }, texto);
+  if (!vacio(v) && hi !== lo) {
+    let t = (v - lo) / (hi - lo);
+    if (invertir) t = 1 - t;
+    td.style.backgroundColor = `hsl(${Math.round(10 + 110 * t)} 55% 42% / 0.55)`;
+  }
+  return td;
+}
+async function cargarRobustez() {
+  segmentado("selector-robustez", robustezSel.tipo, (v) => { robustezSel.tipo = v; cargarRobustez(); });
+  try { pintarRobustez(await api(`/api/robustez?tipo=${robustezSel.tipo}`)); }
+  catch (e) { limpiar("robustez-contenido", errorCaja(e)); }
+}
+function pintarRobustez(r) {
+  if (r.estado !== "ok") return limpiar("robustez-contenido", h("p", { clase: "aviso-caja", texto: r.mensaje || r.motivo || r.estado }));
+  const f = r.fechas, w = r.walk_forward, e = r.elegida;
+  const mapasPar = r.mapas.filter((m) => `${m.y}|${m.x}` === PARES_ROB[robustezSel.par]);
+  const mapa = mapasPar.find((m) => String(m.filtro_valor) === String(robustezSel.filtro)) || mapasPar[mapasPar.length - 1];
+  const celdas = mapa.celdas[robustezSel.metrica];
+  const vals = celdas.flat().filter((v) => !vacio(v));
+  const lo = Math.min(...vals), hi = Math.max(...vals), invertir = robustezSel.metrica === "prob_perdida";
+  const fmt = (v) => (robustezSel.metrica === "S" || robustezSel.metrica === "aprobada" ? num(v) : pct(v));
+  const sel = (id, opciones, valor, alCambiar) => h("select", { id, onchange: (ev) => alCambiar(ev.target.value) },
+    ...opciones.map(([v, t]) => h("option", { value: v, selected: String(v) === String(valor) }, t)));
+  const params = (x) => (x ? `λ ${x.aversion} · tope ${pct(x.tope)} · historia ${x.historia}` : "—");
+  const fichas = [...(e ? [{ nombre: "Elegida (meseta)", ...e }] : []),
+    ...Object.entries(r.actuales).map(([k, v]) => ({ nombre: `Actual: ${k.replaceAll("_", " ")}`, ...v }))];
+  const wf = [["Encadenado: selección anidada", w.encadenado.anidado], ["Encadenado: estrategia actual", w.encadenado.actual],
+    ["Encadenado: 1/N", w.encadenado.iguales_1N], ["Encadenado: mediana SPP", w.encadenado.mediana_SPP],
+    ["Tramo intacto: selección anidada", w.intacto.anidado], ["Tramo intacto: estrategia actual", w.intacto.actual],
+    ["Tramo intacto: 1/N", w.intacto.iguales_1N], ["Tramo intacto: mediana SPP", w.intacto.mediana_SPP]].map(([nombre, x]) => ({ nombre, ...x }));
+  limpiar("robustez-contenido",
+    h("div", { clase: r.veredicto === "MESETA" ? "aviso-caja" : "error-caja", role: "note" },
+      h("strong", {}, r.veredicto === "MESETA" ? "Hay una región estable de parámetros. " : "No hay región robusta. "),
+      `Walk-forward anidado: ${w.evidencia}. ${r.aviso}`),
+    h("p", { clase: "suave", texto: `Datos ${f.datos.desde} → ${f.datos.hasta} · fuera de muestra ${f.oos_desde} → ${f.oos_hasta} (${r.cobertura.sesiones_oos} sesiones) · tramo intacto ${f.intacto_desde} → ${f.intacto_hasta} (${r.cobertura.sesiones_intacto}) · universo ${r.cobertura.universo} instrumentos (${r.cobertura.excluidos} excluidos) · ${r.combinaciones} combinaciones × ${r.simulaciones_por_combinacion.join("/")} simulaciones · horizonte ${r.horizonte_sesiones} sesiones (cierre del Reto) · calculado en ${r.recursos.segundos} s.` }),
+    tabla([{ t: "", f: (x) => h("strong", {}, x.nombre) }, { t: "Parámetros", f: (x) => params(x.params) },
+      { t: "HISTÓRICO: rend. anual", f: (x) => pct(x.oos?.R), num: true }, { t: "Exceso vs 1/N", f: (x) => pct(x.oos?.exceso_1N), num: true },
+      { t: "Caída máx.", f: (x) => pct(x.oos?.D), num: true }, { t: "Estabilidad S", f: (x) => num(x.S), num: true },
+      { t: "SIMULACIÓN al cierre: p5 / p50 / p95", f: (x) => (x.montecarlo ? `${pct(x.montecarlo.ret_p5)} / ${pct(x.montecarlo.ret_p50)} / ${pct(x.montecarlo.ret_p95)}` : "—") },
+      { t: "Prob. pérdida", f: (x) => pct(x.montecarlo?.prob_perdida), num: true }, { t: "Caída p5", f: (x) => pct(x.montecarlo?.caida_p5), num: true },
+      { t: "Veredicto", f: (x) => chip(x.aprobada ? "vigente" : "vencido", x.aprobada ? "Aprobada" : (x.pico_aislado ? "Pico aislado" : "Rechazada")) },
+      { t: "Motivos de rechazo", f: (x) => (x.motivos_rechazo || []).map((m) => MOTIVOS_ROB[m] || m).join(", ") || "—" }], fichas,
+      { caption: `SPP (todas las combinaciones): mediana ${pct(r.spp.mediana_R)}/año; ${pct(r.spp.pct_supera_1N)} superan a 1/N; aprobadas ${pct(r.pct_aprobadas)}.` + (e ? ` Distancia de la elegida al borde de su región: ${r.distancia_borde} paso(s).` : "") }),
+    tabla([{ t: "Walk-forward anidado (histórico)", f: (x) => x.nombre }, { t: "Sesiones", f: (x) => num(x.sesiones), num: true },
+      { t: "Rend. anual", f: (x) => pct(x.anual), num: true }, { t: "Acumulado", f: (x) => pct(x.acum), num: true },
+      { t: "Caída máx.", f: (x) => pct(x.caida_max), num: true }], wf,
+      { caption: `${w.fronteras} fronteras; en cada una se elige solo con las 252 sesiones anteriores. Tramo intacto evaluado una vez (elegida: ${params(w.intacto.elegida)}).` }),
+    tabla([{ t: "Región", f: (x) => x.tipo }, { t: "Tamaño", f: (x) => num(x.tamano), num: true },
+      { t: "Rend. medio", f: (x) => pct(x.R_media), num: true }, { t: "Dispersión (desv.)", f: (x) => pct(x.R_desv), num: true },
+      { t: "Rango", f: (x) => `${pct(x.R_rango[0])} a ${pct(x.R_rango[1])}` }], r.regiones.slice(0, 6),
+      { caption: "Regiones contiguas de combinaciones aprobadas (vecindad: un paso en un solo parámetro). Meseta: ≥ 5 combinaciones.", vacio: "Ninguna combinación aprueba los cinco umbrales." }),
+    h("div", { clase: "fila-controles" },
+      h("label", {}, "Par ", sel("rob-par", [[0, "λ × tope"], [1, "λ × historia"], [2, "tope × historia"]], robustezSel.par, (v) => { robustezSel.par = Number(v); robustezSel.filtro = "mediana"; pintarRobustez(r); })),
+      h("label", {}, `${NOMBRE_PARAM[mapa.filtro_dim]} `, sel("rob-filtro", mapasPar.map((m) => [m.filtro_valor, m.filtro_valor === "mediana" ? "mediana (SPP)" : m.filtro_valor]), robustezSel.filtro, (v) => { robustezSel.filtro = v; pintarRobustez(r); })),
+      h("label", {}, "Métrica ", sel("rob-metrica", Object.entries(METRICAS_ROB), robustezSel.metrica, (v) => { robustezSel.metrica = v; pintarRobustez(r); }))),
+    h("div", { clase: "tabla-contenedor" }, h("table", { clase: "mapa-calor" },
+      h("caption", {}, `${METRICAS_ROB[robustezSel.metrica]}: filas ${NOMBRE_PARAM[mapa.y]}, columnas ${NOMBRE_PARAM[mapa.x]}${invertir ? " (verde = menor)" : " (verde = mayor)"}.`),
+      h("thead", {}, h("tr", {}, h("th", {}, ""), ...mapa.eje_x.map((x) => h("th", { scope: "col" }, String(x))))),
+      h("tbody", {}, ...celdas.map((fila, i) => h("tr", {}, h("th", { scope: "row" }, String(mapa.eje_y[i])),
+        ...fila.map((v) => celdaColor(v, lo, hi, invertir, vacio(v) ? "—" : fmt(v)))))))));
+}
 async function cargarRanking() {
   segmentado("selector-ranking", estado.rankingFiltro, (v) => { estado.rankingFiltro = v; cargarRanking(); });
   try {

@@ -80,7 +80,15 @@ def _seccion_propuestas(props: dict, detalle: bool) -> list[str]:
             continue
         m = p.get("mejora_esperada") or {}
         out.append(f"- **{p['nombre']}** (puntuación {p['puntuacion']['total']:.0f}, datos al {p.get('datos_hasta')}): "
-                   f"mejora esperada neta {_pct(m.get('neta'))} — estimación incierta, no es una promesa.")
+                   f"ESTIMACIÓN: mejora esperada neta {_pct(m.get('neta'))} — incierta, no es una promesa.")
+        v, rb = p.get("validacion_extendida") or {}, p.get("robustez") or {}
+        if v.get("estrategia"):
+            out.append(f"  - HISTÓRICO fuera de muestra ({v['estrategia']['sesiones']} sesiones): {_pct(v['estrategia']['rend_anual'])}/año "
+                       f"vs 1/N {_pct(v['iguales']['rend_anual'])} — {v['veredicto'].lower()}.")
+        if rb.get("estado") in ("robusta", "no aprobada", "frágil"):
+            out.append(f"  - SIMULACIÓN (Monte Carlo, remuestreo del pasado): prob. de pérdida al cierre "
+                       f"{rb['simulacion_prob_perdida']:.0%}; robustez {rb['estado'].upper()}"
+                       + (f" ({', '.join(rb['motivos'])})" if rb.get("motivos") else "") + ".")
         for a in p.get("avisos", []):
             out.append(f"  - ⚠ {a}")
         if detalle:

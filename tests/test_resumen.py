@@ -61,7 +61,7 @@ def test_propuestas_mayor_puntuacion_y_mayor_rendimiento_esperado():
                 "comparacion": cmp_(1.135, 0.102)}
     b = "\n".join(resumen.bloque_propuestas({"a": ref, "b": agresiva}, ref))
     assert "«Mixta · Máxima puntuación» 87.1/100" in b and "alimenta el plan" in b
-    assert "fuera de muestra +1.1%/año vs pesos iguales +10.8% (84 sesiones)" in b
+    assert "HISTÓRICO fuera de muestra +1.1%/año vs pesos iguales +10.8% (84 sesiones)" in b
     assert "🚀 Mayor rendimiento esperado: «Mixta · Máximo rendimiento»" in b and "más riesgo" in b
 
 
