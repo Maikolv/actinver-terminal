@@ -9,6 +9,11 @@ que el experimento de índices reales de FRED (scripts/experimento_indices_fred.
   referencias Y mejor resultado neto que referencias y estrategias; si no: SIN VENTAJA DEMOSTRADA.
 
 Uso: uv run --group kronos python scripts/experimento_kronos.py [--muestras 5] [--contexto 400] [--validacion 100]
+     [--lote 8] [--max-fechas N]
+
+Memoria (6-oct-2026): con todas las series en un solo lote, 5 muestras y contexto 400, el equipo de 5.9 GB se quedó sin
+memoria. `--lote` parte cada fecha en lotes pequeños; `--max-fechas` corre solo las primeras N fechas para medir
+memoria y tiempo antes del experimento completo. Se reporta el pico de memoria del proceso.
 """
 from __future__ import annotations
 
@@ -29,11 +34,38 @@ from terminal import db  # noqa: E402
 from terminal.investigacion import datos, division, evaluacion, kronos_candidato  # noqa: E402
 
 
+def pico_mb() -> float:
+    """Pico de memoria del proceso (Windows: PeakWorkingSetSize; otros: ru_maxrss)."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class PMC(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD), ("PeakWorkingSetSize", ctypes.c_size_t),
+                        ("WorkingSetSize", ctypes.c_size_t), ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                        ("QuotaPagedPoolUsage", ctypes.c_size_t), ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                        ("QuotaNonPagedPoolUsage", ctypes.c_size_t), ("PagefileUsage", ctypes.c_size_t),
+                        ("PeakPagefileUsage", ctypes.c_size_t)]
+        c = PMC()
+        c.cb = ctypes.sizeof(PMC)
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.GetCurrentProcess.restype = wintypes.HANDLE  # en 64 bits el seudo-handle no cabe en un int de 32
+        k32.K32GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(PMC), wintypes.DWORD]
+        if not k32.K32GetProcessMemoryInfo(k32.GetCurrentProcess(), ctypes.byref(c), c.cb):
+            return float("nan")
+        return c.PeakWorkingSetSize / 2**20
+    except Exception:  # noqa: BLE001
+        import resource
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+
+
 def main() -> None:
     a = argparse.ArgumentParser()
     a.add_argument("--muestras", type=int, default=5)
     a.add_argument("--contexto", type=int, default=400)
     a.add_argument("--validacion", type=int, default=100)
+    a.add_argument("--lote", type=int, default=8, help="series por llamada a Kronos (memoria acotada)")
+    a.add_argument("--max-fechas", type=int, default=0, help="solo las primeras N fechas (medición de recursos)")
     args = a.parse_args()
     ruta = RAIZ / "_renders" / "experimento_fred.db"
     if not ruta.exists():
@@ -55,6 +87,9 @@ def main() -> None:
         conjuntos[H] = (pru, val, cortes)
         fechas_necesarias |= set(pru["fecha"]) | set(val["fecha"])
     fechas = sorted(fechas_necesarias)
+    total_fechas = len(fechas)
+    if args.max_fechas:
+        fechas = fechas[:args.max_fechas]
     pred: dict[tuple[str, str], np.ndarray] = {}
     t0 = time.time()
     for k, f in enumerate(fechas):
@@ -71,12 +106,20 @@ def main() -> None:
             ult.append(v[-1])
         if not ids:
             continue
-        out = predictor.predict_batch(dfs, xs, ys, pred_len=5, T=1.0, top_p=0.9, sample_count=args.muestras, verbose=False)
+        out = []
+        for j in range(0, len(dfs), max(args.lote, 1)):  # lotes pequeños: memoria acotada
+            out += predictor.predict_batch(dfs[j:j + args.lote], xs[j:j + args.lote], ys[j:j + args.lote], pred_len=5,
+                                           T=1.0, top_p=0.9, sample_count=args.muestras, verbose=False)
         for iid, o, u in zip(ids, out, ult, strict=True):
             pred[(iid, f)] = np.log(o["close"].to_numpy(dtype=float) / u)
-        if k % 25 == 0:
-            print(f"{k + 1}/{len(fechas)} fechas · {time.time() - t0:.0f} s", flush=True)
-    res = {"modelo": kronos_candidato.MODELO, "tokenizador": kronos_candidato.TOKENIZADOR, "muestras": args.muestras,
+        if k % 25 == 0 or args.max_fechas:
+            print(f"{k + 1}/{len(fechas)} fechas · {time.time() - t0:.0f} s · pico {pico_mb():.0f} MB", flush=True)
+    if args.max_fechas:
+        seg = time.time() - t0
+        print(f"MEDICIÓN: {len(fechas)} fechas en {seg:.0f} s ({seg / max(len(fechas), 1):.1f} s/fecha) · pico {pico_mb():.0f} MB · "
+              f"estimado para {total_fechas} fechas: {seg / max(len(fechas), 1) * total_fechas / 60:.0f} min", flush=True)
+        return
+    res = {"lote": args.lote, "pico_memoria_mb": round(pico_mb()), "modelo": kronos_candidato.MODELO, "tokenizador": kronos_candidato.TOKENIZADOR, "muestras": args.muestras,
            "contexto": args.contexto, "insumo": "solo cierre (open=high=low=close)", "ejecutado": datetime.now(UTC).isoformat(),
            "segundos": round(time.time() - t0), "horizontes": {}}
     costo = 0.00116

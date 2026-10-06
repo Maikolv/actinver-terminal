@@ -178,3 +178,18 @@ Contexto: 19 emisoras BMV del catálogo nunca tuvieron precio (cupo de EODHD). D
 
 ### D-52 El plan no sugiere operar si no supera a mantener la cartera (mismo método)
 Contexto: con criterio «ganancia», el plan sugería rotar la cartera porque la propuesta tenía la mayor ganancia esperada entre las propuestas, pero sus escenarios usaban su validación walk-forward (+2.2 %) y la cartera actual otra medida. Medidas igual (pesos fijos, misma regla de media y volatilidad), la cartera actual esperaba +7.6 % y la propuesta +7.0 % al cierre. Decisión: cada propuesta guarda `frente_a_mantener` (ambas con el mismo método; sin comparación si menos del 90 % de lo invertido tiene historia). Se mide en dos ventanas de validación, la del walk-forward (3-jun a 28-sep: propuesta +5.8 % frente a +4.2 %) y las sesiones más recientes del mismo largo (8-jun a 1-oct: +7.0 % frente a +7.6 %), y cuenta la menos favorable para la propuesta, porque desplazar la ventana unos días cambiaba al ganador. Con criterio de ganancia, si la propuesta no supera a mantener por `margen_mejora_mantener` (1 punto) después de comisiones, el plan marca «mantener» en todo, no genera boletas y el mensaje lo explica con las dos cifras y sus escenarios adversos.
+
+### D-53 Mandato de autonomía versionado
+Contexto: el mandato solo existía en el chat. Decisión: `docs/mandato-autonomia.txt` guarda su texto exacto, extraído del mensaje que el usuario pegó el 23-sep-2026 (sha256 e3957ec1…). `docs/mandato-autonomia.md` registra su procedencia y su precedencia: ganan las restricciones posteriores, más estrictas. La confirmación del usuario de que es la versión vigente está pendiente.
+
+### D-54 Validación con historia larga (V1) y horizonte del Reto
+Contexto: la historia común era de 255 sesiones (EODHD gratis: 1 año de la BMV) y dejaba 87 sesiones fuera de muestra. Decisión (preregistro en `docs/historia-y-horizonte.md`, escrito antes de los resultados): se adopta el panel dinámico 168/21, con 1,099 sesiones fuera de muestra. Ninguna lente supera a 1/N con IC 90 %, así que propuestas y ranking no cambian. El horizonte de decisión sigue siendo el cierre del 13-nov.
+
+### D-55 Probabilidad de subida experimental
+Contexto: auditoría con Brier frente a la frecuencia base, recalibración isotónica y Platt, e IC por fechas. Resultado: en H = 1, 5 y 28 es peor que la frecuencia base; recalibrada solo la iguala. Decisión: queda marcada experimental y con menos prominencia (Telegram ya no la muestra por emisora). No es señal.
+
+### D-56 Kronos sigue como candidato sin uso
+Contexto: experimento completo con el protocolo previo (índices de FRED, mismas fechas y referencias, 5 muestras, contexto 400, lotes de 8; pico de 494 MB, 95 min). Resultado: MSE 40 % mayor que «sin cambio» a H = 1 y 2.3 veces mayor a H = 5; dirección 48 % y 43 %; Diebold-Mariano p = 1.0. Decisión: SIN VENTAJA DEMOSTRADA; no entra a pronósticos ni propuestas.
+
+### D-57 Titulares: se conserva el léxico; búsqueda con BM25
+Contexto: 161 titulares etiquetados, los mismos para todos los métodos. Decisión: el LLM local (Qwen 1.5B) no se integra: invierte 9 direcciones, tiene 37 % de precisión en «negativo» y cuesta 1 GB y 3.5 s por titular. No se agrega memoria conversacional: no se midió necesidad. La búsqueda de documentación pasa a BM25 (13/15 frente a 4/15); la semántica e5-small (12/15) no se adopta.

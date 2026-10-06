@@ -1,0 +1,816 @@
+{
+ "metodo": "qwen2.5-1.5b-instruct-q4_k_m",
+ "segundos_total": 571.18,
+ "pico_memoria_mb": 976,
+ "carga_s": 1.5,
+ "latencia_media_s": 3.548,
+ "latencia_p95_s": 7.246,
+ "tamano_modelo_mb": 1066,
+ "predicciones": [
+  {
+   "n": "1",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "2",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "3",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "4",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "5",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "6",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "7",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "8",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "9",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "10",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "11",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "12",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "13",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "14",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "15",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "16",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "17",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "18",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "19",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "20",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "21",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "22",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "23",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "24",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "25",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "26",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "27",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "28",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "29",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "30",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "31",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "32",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "33",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "34",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "35",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "36",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "37",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "38",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "39",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "40",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "41",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "42",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "43",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "44",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "45",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "46",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "47",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "48",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "49",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "50",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "51",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "52",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "53",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "54",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "55",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "56",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "57",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "58",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "59",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "60",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "61",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "62",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "63",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "64",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "65",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "66",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "67",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "68",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "69",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "70",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "71",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "72",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "73",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "74",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "75",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "76",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "77",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "78",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "79",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "80",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "81",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "82",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "83",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "84",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "85",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "86",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "87",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "88",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "89",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "90",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "91",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "92",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "93",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "94",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "95",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "96",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "97",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "98",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "99",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "100",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "101",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "102",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "103",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "104",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "105",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "106",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "107",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "108",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "109",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "110",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "111",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "112",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "113",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "114",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "115",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "116",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "117",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "118",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "119",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "120",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "121",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "122",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "123",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "124",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "125",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "126",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "127",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "128",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "129",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "130",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "131",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "132",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "133",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "134",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "135",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "136",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "137",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "138",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "139",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "140",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "141",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "142",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "143",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "144",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "145",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "146",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "147",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "148",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "149",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "150",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "151",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "152",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "153",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "154",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "155",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "156",
+   "pred": "neg",
+   "crudo": "negativo"
+  },
+  {
+   "n": "157",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "158",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "159",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "160",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "161",
+   "pred": "neu",
+   "crudo": "neutral"
+  }
+ ]
+}

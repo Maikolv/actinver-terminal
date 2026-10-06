@@ -32,6 +32,15 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
+- **6-oct (v0.23.0, auditoría de 7 mejoras):**
+  - 329 pruebas en verde.
+  - Validación V1 (1,099 sesiones fuera de muestra): sin ventaja frente a 1/N, propuestas sin cambios.
+  - Probabilidad de subida EXPERIMENTAL (peor que la frecuencia base).
+  - Kronos sin ventaja (494 MB, 95 min).
+  - Se conserva el léxico de titulares (el LLM 1.5B invierte 9 direcciones).
+  - Búsqueda de documentación con BM25 (13/15).
+  - Mandato en `docs/mandato-autonomia.txt`.
+  - Recomendación BMV en `docs/bmv-licencia.md` (EODHD Historian, USD 19.99/mes; decisión del usuario).
 - **5-oct noche (v0.22.0):**
   - 321 pruebas en verde.
   - Con criterio de ganancia, el plan no opera si la propuesta no supera a mantener la cartera por 1 punto tras comisiones (mismo método, dos ventanas; D-52).

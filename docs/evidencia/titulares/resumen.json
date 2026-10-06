@@ -1,0 +1,170 @@
+{
+ "n": 161,
+ "clases": {
+  "neg": 29,
+  "pos": 66,
+  "amb": 29,
+  "neu": 37
+ },
+ "metodos": [
+  {
+   "metodo": "lexico",
+   "acierto": 0.466,
+   "acierto_sin_ambiguos": 0.568,
+   "por_clase": {
+    "pos": {
+     "precision": 0.857,
+     "recall": 0.455,
+     "n": 66
+    },
+    "neg": {
+     "precision": 0.593,
+     "recall": 0.552,
+     "n": 29
+    },
+    "neu": {
+     "precision": 0.293,
+     "recall": 0.784,
+     "n": 37
+    },
+    "amb": {
+     "precision": null,
+     "recall": 0.0,
+     "n": 29
+    }
+   },
+   "direccion_invertida": 2,
+   "negativos_relevantes_no_detectados": "13/29",
+   "ejemplos_invertidos": [
+    "130",
+    "147"
+   ],
+   "confusion": {
+    "neg→neu": 13,
+    "pos→pos": 30,
+    "amb→neu": 23,
+    "neu→neu": 29,
+    "neg→neg": 16,
+    "neu→neg": 4,
+    "neu→pos": 4,
+    "pos→neu": 34,
+    "amb→neg": 5,
+    "pos→neg": 2,
+    "amb→pos": 1
+   },
+   "segundos_total": 0.02,
+   "pico_memoria_mb": 33,
+   "carga_s": null,
+   "latencia_media_s": null,
+   "latencia_p95_s": null,
+   "tamano_modelo_mb": null
+  },
+  {
+   "metodo": "qwen2.5-0.5b-instruct-q4_k_m",
+   "acierto": 0.292,
+   "acierto_sin_ambiguos": 0.356,
+   "por_clase": {
+    "pos": {
+     "precision": 0.636,
+     "recall": 0.212,
+     "n": 66
+    },
+    "neg": {
+     "precision": null,
+     "recall": 0.0,
+     "n": 29
+    },
+    "neu": {
+     "precision": 0.237,
+     "recall": 0.892,
+     "n": 37
+    },
+    "amb": {
+     "precision": null,
+     "recall": 0.0,
+     "n": 29
+    }
+   },
+   "direccion_invertida": 1,
+   "negativos_relevantes_no_detectados": "29/29",
+   "ejemplos_invertidos": [
+    "104"
+   ],
+   "confusion": {
+    "neg→neu": 28,
+    "pos→neu": 52,
+    "amb→neu": 26,
+    "neu→neu": 33,
+    "neu→pos": 4,
+    "pos→pos": 14,
+    "amb→pos": 3,
+    "neg→pos": 1
+   },
+   "segundos_total": 233.38,
+   "pico_memoria_mb": 411,
+   "carga_s": 1.0,
+   "latencia_media_s": 1.45,
+   "latencia_p95_s": 2.81,
+   "tamano_modelo_mb": 469
+  },
+  {
+   "metodo": "qwen2.5-1.5b-instruct-q4_k_m",
+   "acierto": 0.578,
+   "acierto_sin_ambiguos": 0.705,
+   "por_clase": {
+    "pos": {
+     "precision": 0.821,
+     "recall": 0.833,
+     "n": 66
+    },
+    "neg": {
+     "precision": 0.368,
+     "recall": 0.966,
+     "n": 29
+    },
+    "neu": {
+     "precision": 0.556,
+     "recall": 0.27,
+     "n": 37
+    },
+    "amb": {
+     "precision": null,
+     "recall": 0.0,
+     "n": 29
+    }
+   },
+   "direccion_invertida": 9,
+   "negativos_relevantes_no_detectados": "1/29",
+   "ejemplos_invertidos": [
+    "20",
+    "67",
+    "73",
+    "76",
+    "102",
+    "115",
+    "144",
+    "151",
+    "153"
+   ],
+   "confusion": {
+    "neg→neg": 28,
+    "pos→pos": 55,
+    "amb→neg": 21,
+    "neu→neu": 10,
+    "neu→neg": 19,
+    "amb→neu": 5,
+    "neu→pos": 8,
+    "pos→neg": 8,
+    "pos→neu": 3,
+    "amb→pos": 3,
+    "neg→pos": 1
+   },
+   "segundos_total": 571.18,
+   "pico_memoria_mb": 976,
+   "carga_s": 1.5,
+   "latencia_media_s": 3.548,
+   "latencia_p95_s": 7.246,
+   "tamano_modelo_mb": 1066
+  }
+ ]
+}

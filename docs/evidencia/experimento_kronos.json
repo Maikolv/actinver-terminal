@@ -1,0 +1,501 @@
+{
+ "lote": 8,
+ "pico_memoria_mb": 494,
+ "modelo": "NeoQuasar/Kronos-mini",
+ "tokenizador": "NeoQuasar/Kronos-Tokenizer-2k",
+ "muestras": 5,
+ "contexto": 400,
+ "insumo": "solo cierre (open=high=low=close)",
+ "ejecutado": "2026-10-06T08:26:40.354503+00:00",
+ "segundos": 5721,
+ "horizontes": {
+  "1": {
+   "cortes": {
+    "H": 1,
+    "embargo_sesiones": 1,
+    "n_fechas": 2636,
+    "entrenamiento": [
+     "2016-03-31",
+     "2023-07-27"
+    ],
+    "validacion": [
+     "2023-07-31",
+     "2025-02-24"
+    ],
+    "prueba": [
+     "2025-02-26",
+     "2026-09-22"
+    ],
+    "fechas_embargadas": 2
+   },
+   "n_prueba": 1184,
+   "n_validacion": 300,
+   "prueba": [
+    {
+     "modelo": "Kronos-mini",
+     "n": 1184,
+     "mse": 0.00019128613750253452,
+     "mae": 0.009807588061674156,
+     "calibracion": [
+      {
+       "tramo": "0.00–0.30",
+       "n": 797,
+       "prob_media": 0.0014721873693015475,
+       "frecuencia_subida": 0.5457967377666249
+      },
+      {
+       "tramo": "0.30–0.45",
+       "n": 1,
+       "prob_media": 0.41000000000000003,
+       "frecuencia_subida": 1.0
+      },
+      {
+       "tramo": "0.55–0.70",
+       "n": 3,
+       "prob_media": 0.6088888888888889,
+       "frecuencia_subida": 0.6666666666666666
+      },
+      {
+       "tramo": "0.70–1.00",
+       "n": 383,
+       "prob_media": 0.9960400348128808,
+       "frecuencia_subida": 0.5456919060052219
+      }
+     ],
+     "acierto_direccion": 0.4839527027027027,
+     "r2_vs_sin_cambio": -0.3989043517249893,
+     "cobertura_intervalo_80": 0.011824324324324325,
+     "brier_prob_subida": 0.5128863738738739,
+     "meses_mejor_que_sin_cambio": "0/20",
+     "resultado_neto": -0.366707,
+     "rotacion_media": 0.9797,
+     "rebalanceos": 395,
+     "caida_maxima": -0.366707,
+     "exposicion_media": 0.6633,
+     "sensibilidad_costos": {
+      "x0": -0.00775,
+      "x1": -0.366707,
+      "x2": -0.596143,
+      "x5": -0.895787
+     }
+    },
+    {
+     "modelo": "sin_cambio",
+     "n": 1184,
+     "mse": 0.00013673996886682033,
+     "mae": 0.007846504739015011,
+     "calibracion": [
+      {
+       "tramo": "0.45–0.55",
+       "n": 1184,
+       "prob_media": 0.5333333333333333,
+       "frecuencia_subida": 0.5464527027027027
+      }
+     ],
+     "acierto_direccion": null,
+     "r2_vs_sin_cambio": 0.0,
+     "cobertura_intervalo_80": 0.01266891891891892,
+     "brier_prob_subida": 0.2480142642642643,
+     "meses_mejor_que_sin_cambio": "0/20",
+     "resultado_neto": 0.184616,
+     "rotacion_media": 0.0025,
+     "rebalanceos": 395,
+     "caida_maxima": -0.141314,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.185998,
+      "x1": 0.184616,
+      "x2": 0.183234,
+      "x5": 0.179088
+     }
+    },
+    {
+     "modelo": "historico_reciente",
+     "n": 1184,
+     "mse": 0.0001391288956178213,
+     "mae": 0.007896608842451172,
+     "calibracion": [
+      {
+       "tramo": "0.00–0.30",
+       "n": 315,
+       "prob_media": 0.015851851851851853,
+       "frecuencia_subida": 0.5492063492063493
+      },
+      {
+       "tramo": "0.30–0.45",
+       "n": 3,
+       "prob_media": 0.3644444444444444,
+       "frecuencia_subida": 0.0
+      },
+      {
+       "tramo": "0.45–0.55",
+       "n": 6,
+       "prob_media": 0.46888888888888886,
+       "frecuencia_subida": 0.16666666666666666
+      },
+      {
+       "tramo": "0.55–0.70",
+       "n": 12,
+       "prob_media": 0.6127777777777778,
+       "frecuencia_subida": 0.6666666666666666
+      },
+      {
+       "tramo": "0.70–1.00",
+       "n": 848,
+       "prob_media": 0.9918749999999998,
+       "frecuencia_subida": 0.5483490566037735
+      }
+     ],
+     "acierto_direccion": 0.5261824324324325,
+     "r2_vs_sin_cambio": -0.017470581358166815,
+     "cobertura_intervalo_80": 0.008445945945945946,
+     "brier_prob_subida": 0.46494347785285295,
+     "meses_mejor_que_sin_cambio": "7/20",
+     "resultado_neto": 0.318475,
+     "rotacion_media": 0.0582,
+     "rebalanceos": 395,
+     "caida_maxima": -0.078512,
+     "exposicion_media": 0.7797,
+     "sensibilidad_costos": {
+      "x0": 0.354066,
+      "x1": 0.318475,
+      "x2": 0.283748,
+      "x5": 0.184565
+     }
+    },
+    {
+     "modelo": "regla_simple",
+     "n": 1184,
+     "mse": 0.00013833712764803907,
+     "mae": 0.007917218054984456,
+     "calibracion": [
+      {
+       "tramo": "0.00–0.30",
+       "n": 93,
+       "prob_media": 0.017204301075268814,
+       "frecuencia_subida": 0.5591397849462365
+      },
+      {
+       "tramo": "0.30–0.45",
+       "n": 3,
+       "prob_media": 0.3477777777777778,
+       "frecuencia_subida": 0.6666666666666666
+      },
+      {
+       "tramo": "0.45–0.55",
+       "n": 328,
+       "prob_media": 0.4673272357723578,
+       "frecuencia_subida": 0.5396341463414634
+      },
+      {
+       "tramo": "0.55–0.70",
+       "n": 2,
+       "prob_media": 0.6483333333333334,
+       "frecuencia_subida": 1.0
+      },
+      {
+       "tramo": "0.70–1.00",
+       "n": 758,
+       "prob_media": 0.9943755496921723,
+       "frecuencia_subida": 0.5461741424802111
+      }
+     ],
+     "acierto_direccion": 0.5354239256678281,
+     "r2_vs_sin_cambio": -0.01168026287013646,
+     "cobertura_intervalo_80": 0.005067567567567568,
+     "brier_prob_subida": 0.40270187687687686,
+     "meses_mejor_que_sin_cambio": "6/20",
+     "resultado_neto": 0.228417,
+     "rotacion_media": 0.2253,
+     "rebalanceos": 395,
+     "caida_maxima": -0.137683,
+     "exposicion_media": 0.7544,
+     "sensibilidad_costos": {
+      "x0": 0.362106,
+      "x1": 0.228417,
+      "x2": 0.107611,
+      "x5": -0.189136
+     }
+    }
+   ],
+   "estrategias_referencia": [
+    {
+     "modelo": "pesos_iguales",
+     "resultado_neto": 0.296498,
+     "rotacion_media": 0.0042,
+     "rebalanceos": 395,
+     "caida_maxima": -0.164826,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.29904,
+      "x1": 0.296498,
+      "x2": 0.293958,
+      "x5": 0.286353
+     }
+    }
+   ],
+   "diebold_mariano": {
+    "sin_cambio": {
+     "n": 395,
+     "estadistico": -8.0078,
+     "p_valor": 1.0
+    },
+    "historico_reciente": {
+     "n": 395,
+     "estadistico": -7.6886,
+     "p_valor": 1.0
+    },
+    "regla_simple": {
+     "n": 395,
+     "estadistico": -7.3442,
+     "p_valor": 1.0
+    }
+   },
+   "veredicto": "SIN VENTAJA DEMOSTRADA"
+  },
+  "5": {
+   "cortes": {
+    "H": 5,
+    "embargo_sesiones": 5,
+    "n_fechas": 2632,
+    "entrenamiento": [
+     "2016-03-31",
+     "2023-07-24"
+    ],
+    "validacion": [
+     "2023-08-01",
+     "2025-02-18"
+    ],
+    "prueba": [
+     "2025-02-26",
+     "2026-09-16"
+    ],
+    "fechas_embargadas": 10
+   },
+   "n_prueba": 1172,
+   "n_validacion": 300,
+   "prueba": [
+    {
+     "modelo": "Kronos-mini",
+     "n": 1172,
+     "mse": 0.0013039931341215349,
+     "mae": 0.02988395879329452,
+     "calibracion": [
+      {
+       "tramo": "0.00–0.30",
+       "n": 1085,
+       "prob_media": 0.0008294930875576036,
+       "frecuencia_subida": 0.5834101382488479
+      },
+      {
+       "tramo": "0.30–0.45",
+       "n": 3,
+       "prob_media": 0.36000000000000004,
+       "frecuencia_subida": 0.6666666666666666
+      },
+      {
+       "tramo": "0.55–0.70",
+       "n": 3,
+       "prob_media": 0.6377777777777778,
+       "frecuencia_subida": 1.0
+      },
+      {
+       "tramo": "0.70–1.00",
+       "n": 81,
+       "prob_media": 0.9869958847736626,
+       "frecuencia_subida": 0.6049382716049383
+      }
+     ],
+     "acierto_direccion": 0.4257679180887372,
+     "r2_vs_sin_cambio": -1.2963083299238636,
+     "cobertura_intervalo_80": 0.013651877133105802,
+     "brier_prob_subida": 0.5682056503602579,
+     "meses_mejor_que_sin_cambio": "2/20",
+     "resultado_neto": 0.104927,
+     "rotacion_media": 0.2532,
+     "rebalanceos": 79,
+     "caida_maxima": -0.080067,
+     "exposicion_media": 0.1392,
+     "sensibilidad_costos": {
+      "x0": 0.130681,
+      "x1": 0.104927,
+      "x2": 0.079716,
+      "x5": 0.00724
+     }
+    },
+    {
+     "modelo": "sin_cambio",
+     "n": 1172,
+     "mse": 0.0005678650018940488,
+     "mae": 0.017340614164421203,
+     "calibracion": [
+      {
+       "tramo": "0.45–0.55",
+       "n": 1172,
+       "prob_media": 0.54,
+       "frecuencia_subida": 0.5861774744027304
+      }
+     ],
+     "acierto_direccion": null,
+     "r2_vs_sin_cambio": 0.0,
+     "cobertura_intervalo_80": 0.016211604095563138,
+     "brier_prob_subida": 0.24470580204778158,
+     "meses_mejor_que_sin_cambio": "0/20",
+     "resultado_neto": 0.184609,
+     "rotacion_media": 0.0127,
+     "rebalanceos": 79,
+     "caida_maxima": -0.078963,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.185998,
+      "x1": 0.184609,
+      "x2": 0.183219,
+      "x5": 0.179051
+     }
+    },
+    {
+     "modelo": "historico_reciente",
+     "n": 1172,
+     "mse": 0.0006267197784316529,
+     "mae": 0.01780325760336277,
+     "calibracion": [
+      {
+       "tramo": "0.00–0.30",
+       "n": 313,
+       "prob_media": 0.016730564430244944,
+       "frecuencia_subida": 0.536741214057508
+      },
+      {
+       "tramo": "0.30–0.45",
+       "n": 8,
+       "prob_media": 0.38416666666666666,
+       "frecuencia_subida": 0.375
+      },
+      {
+       "tramo": "0.45–0.55",
+       "n": 5,
+       "prob_media": 0.52,
+       "frecuencia_subida": 0.6
+      },
+      {
+       "tramo": "0.55–0.70",
+       "n": 9,
+       "prob_media": 0.6025925925925927,
+       "frecuencia_subida": 0.6666666666666666
+      },
+      {
+       "tramo": "0.70–1.00",
+       "n": 837,
+       "prob_media": 0.9930306650736759,
+       "frecuencia_subida": 0.6057347670250897
+      }
+     ],
+     "acierto_direccion": 0.568259385665529,
+     "r2_vs_sin_cambio": -0.10364219724987578,
+     "cobertura_intervalo_80": 0.021331058020477817,
+     "brier_prob_subida": 0.42474690936670456,
+     "meses_mejor_que_sin_cambio": "6/20",
+     "resultado_neto": 0.278045,
+     "rotacion_media": 0.1139,
+     "rebalanceos": 79,
+     "caida_maxima": -0.058194,
+     "exposicion_media": 0.7722,
+     "sensibilidad_costos": {
+      "x0": 0.291375,
+      "x1": 0.278045,
+      "x2": 0.264827,
+      "x5": 0.22584
+     }
+    },
+    {
+     "modelo": "regla_simple",
+     "n": 1172,
+     "mse": 0.0006002621453248157,
+     "mae": 0.018002008925636363,
+     "calibracion": [
+      {
+       "tramo": "0.00–0.30",
+       "n": 94,
+       "prob_media": 0.02539007092198582,
+       "frecuencia_subida": 0.6702127659574468
+      },
+      {
+       "tramo": "0.30–0.45",
+       "n": 320,
+       "prob_media": 0.393,
+       "frecuencia_subida": 0.534375
+      },
+      {
+       "tramo": "0.45–0.55",
+       "n": 4,
+       "prob_media": 0.4583333333333333,
+       "frecuencia_subida": 0.75
+      },
+      {
+       "tramo": "0.55–0.70",
+       "n": 6,
+       "prob_media": 0.625,
+       "frecuencia_subida": 0.8333333333333334
+      },
+      {
+       "tramo": "0.70–1.00",
+       "n": 748,
+       "prob_media": 0.9958600713012478,
+       "frecuencia_subida": 0.5949197860962567
+      }
+     ],
+     "acierto_direccion": 0.5679156908665105,
+     "r2_vs_sin_cambio": -0.05705078376499695,
+     "cobertura_intervalo_80": 0.020477815699658702,
+     "brier_prob_subida": 0.3831118126659082,
+     "meses_mejor_que_sin_cambio": "5/20",
+     "resultado_neto": 0.369871,
+     "rotacion_media": 0.3038,
+     "rebalanceos": 79,
+     "caida_maxima": -0.085169,
+     "exposicion_media": 0.7595,
+     "sensibilidad_costos": {
+      "x0": 0.408561,
+      "x1": 0.369871,
+      "x2": 0.332168,
+      "x5": 0.22475
+     }
+    }
+   ],
+   "estrategias_referencia": [
+    {
+     "modelo": "pesos_iguales",
+     "resultado_neto": 0.283435,
+     "rotacion_media": 0.0211,
+     "rebalanceos": 79,
+     "caida_maxima": -0.09864,
+     "exposicion_media": 1.0,
+     "sensibilidad_costos": {
+      "x0": 0.285938,
+      "x1": 0.283435,
+      "x2": 0.280935,
+      "x5": 0.273447
+     }
+    }
+   ],
+   "diebold_mariano": {
+    "sin_cambio": {
+     "n": 391,
+     "estadistico": -9.6461,
+     "p_valor": 1.0
+    },
+    "historico_reciente": {
+     "n": 391,
+     "estadistico": -7.685,
+     "p_valor": 1.0
+    },
+    "regla_simple": {
+     "n": 391,
+     "estadistico": -7.7233,
+     "p_valor": 1.0
+    }
+   },
+   "veredicto": "SIN VENTAJA DEMOSTRADA"
+  }
+ }
+}

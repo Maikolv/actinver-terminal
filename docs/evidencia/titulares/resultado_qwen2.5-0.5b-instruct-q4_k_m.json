@@ -1,0 +1,816 @@
+{
+ "metodo": "qwen2.5-0.5b-instruct-q4_k_m",
+ "segundos_total": 233.38,
+ "pico_memoria_mb": 411,
+ "carga_s": 1.0,
+ "latencia_media_s": 1.45,
+ "latencia_p95_s": 2.81,
+ "tamano_modelo_mb": 469,
+ "predicciones": [
+  {
+   "n": "1",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "2",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "3",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "4",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "5",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "6",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "7",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "8",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "9",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "10",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "11",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "12",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "13",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "14",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "15",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "16",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "17",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "18",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "19",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "20",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "21",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "22",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "23",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "24",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "25",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "26",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "27",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "28",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "29",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "30",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "31",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "32",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "33",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "34",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "35",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "36",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "37",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "38",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "39",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "40",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "41",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "42",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "43",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "44",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "45",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "46",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "47",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "48",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "49",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "50",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "51",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "52",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "53",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "54",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "55",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "56",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "57",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "58",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "59",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "60",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "61",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "62",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "63",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "64",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "65",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "66",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "67",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "68",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "69",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "70",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "71",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "72",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "73",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "74",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "75",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "76",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "77",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "78",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "79",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "80",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "81",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "82",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "83",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "84",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "85",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "86",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "87",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "88",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "89",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "90",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "91",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "92",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "93",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "94",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "95",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "96",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "97",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "98",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "99",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "100",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "101",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "102",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "103",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "104",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "105",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "106",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "107",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "108",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "109",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "110",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "111",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "112",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "113",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "114",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "115",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "116",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "117",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "118",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "119",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "120",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "121",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "122",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "123",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "124",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "125",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "126",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "127",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "128",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "129",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "130",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "131",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "132",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "133",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "134",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "135",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "136",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "137",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "138",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "139",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "140",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "141",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "142",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "143",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "144",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "145",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "146",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "147",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "148",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "149",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "150",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "151",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "152",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "153",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "154",
+   "pred": "pos",
+   "crudo": "positivo"
+  },
+  {
+   "n": "155",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "156",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "157",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "158",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "159",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "160",
+   "pred": "neu",
+   "crudo": "neutral"
+  },
+  {
+   "n": "161",
+   "pred": "pos",
+   "crudo": "positivo"
+  }
+ ]
+}

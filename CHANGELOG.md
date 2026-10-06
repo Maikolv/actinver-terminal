@@ -2,6 +2,24 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.23.0] — 2026-10-06 (auditoría de siete mejoras)
+
+### Añadido
+- **Mandato de autonomía versionado.** `docs/mandato-autonomia.txt` contiene el texto exacto que el usuario pegó el 23-sep-2026, con sha256. `docs/mandato-autonomia.md` explica su procedencia y precedencia. Enlazado desde `CLAUDE.md`, README y `docs/seguridad.md`. La confirmación del usuario está pendiente (D-53).
+- **Validación extendida V1.** Panel dinámico 168/21 con 1,099 sesiones fuera de muestra, frente a 87 antes. Se eligió con un preregistro escrito antes de calcular (`docs/historia-y-horizonte.md`, `scripts/comparar_historia.py`). Cada propuesta la incluye en `validacion_extendida`, con exceso frente a 1/N e IC 90 %. Ninguna lente muestra ventaja demostrada, así que propuestas y ranking no cambian (D-54).
+- **Auditoría de series** (`scripts/calidad_series.py`):
+  - 0 mezclas de divisas, 0 huecos y ningún split sin ajustar;
+  - 44 saltos de más de 30 %, revisados;
+  - 6 claves con problemas, ya marcadas.
+- **Calibración de la probabilidad de subida** (`terminal/investigacion/calibracion.py`): Brier frente a la frecuencia base, isotónica y Platt ajustadas en validación, e IC por fechas. En H = 1, 5 y 28 queda peor que la frecuencia base, así que se marca EXPERIMENTAL con menos prominencia en Telegram y en la web (D-55).
+- **Fuentes BMV con licencia** (`docs/bmv-licencia.md`): comparación con costos confirmados en los sitios de cada proveedor y una recomendación. Conector `EodhdDiferidoProvider` (apagado) con retraso medido por la hora del evento y pruebas simuladas. No se contrató nada.
+- **Kronos con memoria acotada.** `--lote`, `--max-fechas` y pico de memoria en el experimento. Corrida completa: 494 MB, 95 min; SIN VENTAJA DEMOSTRADA (D-56).
+- **Titulares** (`scripts/evaluar_titulares.py`, `docs/titulares-llm.md`): 161 titulares etiquetados para comparar el léxico con Qwen 0.5B y 1.5B locales. Se conserva el léxico (D-57).
+- **Búsqueda de documentación con BM25** (`scripts/indice_contexto.py`): 13/15 frente a 4/15, citando archivo, línea y fecha. La semántica e5-small (12/15) no se adopta. Memoria conversacional: no se agrega (`docs/memoria-y-busqueda.md`).
+
+### Pruebas
+- 8 nuevas: calibración (3), validación extendida (2) y EODHD diferido (3). Suite completa: 329 en verde.
+
 ## [0.22.0] — 2026-10-05 (no operar si no mejora a mantener)
 
 ### Corregido

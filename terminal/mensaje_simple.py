@@ -189,7 +189,7 @@ def texto(con: sqlite3.Connection, ajustes, propuesta: dict | None = None, carte
     """Arma el mensaje sencillo con la propuesta de referencia y la cuenta actuales."""
     from datetime import UTC
 
-    from . import plan_accion, reto, resumen, servicios
+    from . import plan_accion, resumen, reto, servicios
     ahora = ahora or datetime.now(UTC)
     if propuesta is None:
         propuesta = resumen.propuesta_referencia(servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes)))

@@ -1,0 +1,162 @@
+n,noticia_id,fecha,instrumento,tipo,marcado_alto_por_lexico,titulo,etiqueta,relevante_inversion,nota
+1,e6458745ee7f42be,2026-03-26,SIC:TX,hecho (noticia),1,"Gerdau upgraded, Ternium downgraded at Scotiabank in steelmaker rating swap",neg,1,rebaja de calificación de Ternium
+2,b71575d0032ea6fe,2026-04-23,SIC:TX,opinión / análisis,1,Ternium: Retest Of $45+ Likely As We Approach Q1 Earnings Release (Rating Upgrade) (Technical Analysis),pos,1,mejora de calificación
+3,5e871f8946e2ec71,2026-05-05,SIC:TX,hecho (noticia),0,"Ternium GAAP EPADS of $1.09 beats by $0.29, revenue of $3.93B misses by $30M",amb,1,"utilidad supera, ingresos fallan"
+4,d7adf3db9016fddf,2026-05-06,SIC:FUBO,hecho (noticia),0,FuboTV reports mixed Q2 results; reaffirms FY26 and beyond outlook,amb,1,"resultados mixtos, guía reafirmada"
+5,dca835bb6fa14c52,2026-05-18,SIC:TMO,hecho (noticia),0,Top Quant-rated stocks from Jefferies’ Franchise picks list,neu,0,lista genérica
+6,f4bb8eefcc639e61,2026-05-21,SIC:TMO,hecho (noticia),0,Thermo Fisher Scientific declares $0.47 dividend,neu,0,dividendo ordinario
+7,b3e6ec93ba546e6a,2026-05-27,SIC:FANG,opinión / análisis,1,Diamondback Energy: The Iran Oil Rally Changes Things (Rating Downgrade),neg,1,rebaja de calificación
+8,bb79505c1732109c,2026-07-09,SIC:TX,hecho (noticia),0,Kaiser Aluminum cut to Sell equivalent at Wells Fargo as valuation looks stretched,neu,0,trata de otra empresa (Kaiser)
+9,be57ba9e49d3754b,2026-07-09,SIC:FUBO,hecho (noticia),1,FuboTV appoints former Disney streaming executive Alisa Bowen as CEO,amb,1,cambio de director general
+10,65428c76ea672601,2026-07-11,SIC:DAL,hecho (noticia),0,Earnings Scoreboard: Early S&P 500 reports post perfect revenue growth record despite mixed EPS,neu,0,resumen general del mercado
+11,31d061ed9c6edca9,2026-07-23,SIC:FCX,hecho (noticia),1,Earnings Snapshot: Freeport Q2 top and bottom line beat estimates; reaffirms FY26 outlook,pos,1,supera estimados y reafirma guía
+12,b81b7b5d5c63f7c3,2026-07-23,SIC:TMO,hecho (noticia),0,Thermo Fisher extends post-Q2 gains after raising outlook,pos,1,sube guía
+13,3eeedf1c0303a776,2026-07-26,SIC:DAL,hecho (noticia),1,United Airlines explored merger with Delta before talks ended: WSJ,amb,1,fusión explorada y descartada
+14,5ff4fbd71c398e72,2026-07-29,SIC:CAT,hecho (noticia),1,Caterpillar shares slip on Baird downgrade amid data center risks,neg,1,cae por rebaja
+15,787d5ac0366f205d,2026-08-03,SIC:CAT,hecho (noticia),0,Caterpillar Q2 2026 earnings preview: Wall Street expects strong growth,neu,0,avance previo a resultados
+16,1020da566976820b,2026-08-03,SIC:TX,hecho (noticia),0,Ternium Q2 2026 Earnings Preview,neu,0,avance previo a resultados
+17,ca5b608179c58048,2026-08-03,SIC:DVN,hecho (noticia),0,Devon Energy Q2 2026 Earnings Preview,neu,0,avance previo a resultados
+18,0e0d09b74facee1f,2026-08-04,SIC:CAT,hecho (noticia),0,Caterpillar in charts: Q2 regional revenue gains led by 37% jump in North America,pos,1,crecimiento de ingresos
+19,24c29aa7e461370f,2026-08-05,SIC:BMY,hecho (noticia),0,Erica Schwartz confirmed as CDC director,neu,0,sin relación directa
+20,964e92179b79f4fa,2026-08-06,SIC:DVN,opinión / análisis,0,Devon Energy: The Market Still Underestimates The New Devon,pos,1,opinión alcista
+21,0a6199c2d8e099dc,2026-08-06,SIC:ABNB,hecho (noticia),0,Airbnb in charts: Gross booking value jumps 16% Y/Y,pos,1,crecimiento de reservas
+22,4bf7591b6f294406,2026-08-10,SIC:BMY,hecho (noticia),0,"Bristol Myers Squibb to invest $2.3B for manufacturing campus in Houston, Texas",neu,0,inversión de capital sin efecto claro
+23,c74dee83c5defdcf,2026-08-10,SIC:ABNB,hecho (noticia),0,Airbnb rises 4% to fresh 52-week high after earnings surge,pos,1,sube tras resultados
+24,1aaffe072aaff00e,2026-08-11,SIC:FCX,opinión / análisis,0,"Freeport-McMoRan: Growth On The Horizon, With A Positive Q2 As Significant Growth Operations Continue",pos,1,opinión alcista
+25,40bc0f1e0a955441,2026-08-13,SIC:CSCO,hecho (noticia),1,Cisco falls amid high expectations on guidance; analysts remain bullish,amb,1,"cae, analistas alcistas"
+26,6b5e5fd2663c8bae,2026-08-13,SIC:CSCO,hecho (noticia),0,Cisco declares $0.42 dividend,neu,0,dividendo ordinario
+27,4431b3d49a585206,2026-08-14,SIC:CSCO,hecho (noticia),1,Cisco downgraded at HSBC as firm worries about slowing growth,neg,1,rebaja de calificación
+28,036700f69896a7e1,2026-08-14,SIC:KO,hecho (noticia),1,What's next for Coca-Cola after its Q2 earnings beat?,pos,1,superó estimados
+29,2a8234690d1fd14f,2026-08-15,SIC:CSCO,hecho (noticia),0,"Notable tech headlines for the week: Super Micro, Intel, Workday in focus",neu,0,resumen genérico
+30,116b5bb09b14c87d,2026-08-15,SIC:KO,hecho (noticia),0,"Insider trades: Netflix, Coca-Cola, Pfizer among notable names",neu,0,lista genérica
+31,c9232ec4034e1afc,2026-08-18,SIC:CSCO,opinión / análisis,0,"Cisco: Buy The AI Pullback, But Watch The Margin Pressure",amb,1,compra con presión en márgenes
+32,e733305e2699d978,2026-08-19,SIC:TGT,hecho (noticia),1,"Target delivers as Q2 results, FY outlook beats expectations",pos,1,resultados y guía superan
+33,77802031049732e5,2026-08-19,SIC:FANG,hecho (noticia),1,"Suncor Energy raised on recent weakness, Diamondback downgraded at Morgan Stanley",neg,1,rebaja de calificación (Diamondback)
+34,dc2c694ac5b42eda,2026-08-21,SIC:BMY,hecho (noticia),1,Lawmakers ask FDA to scrutinize Chinese trials amid deaths - report,amb,0,sin relación directa clara
+35,01a027dc9a6df699,2026-08-25,SIC:CSCO,hecho (noticia),0,Cisco partners with Supermicro to expand Secure AI Factory with NVIDIA,pos,0,alianza menor
+36,584a62bc456ec57e,2026-08-26,SIC:TGT,hecho (noticia),1,Target stock drops after controversial Halloween costume recall sparks boycott calls,neg,1,cae por boicot
+37,4c54c3443cd67f5d,2026-08-27,SIC:TSM,hecho (noticia),1,Trump administration mulls new round of tariffs on chips: report,neg,1,aranceles a chips
+38,23e5571b3115fb29,2026-08-27,SIC:MRNA,hecho (noticia),0,Moderna gains approval for updated COVID-19 vaccines,pos,1,aprobación regulatoria
+39,3f7eaa9d56446bf6,2026-08-29,SIC:BMY,hecho (noticia),0,"Insider trades: Alibaba, IBM, Coca-Cola among major names",neu,0,lista genérica
+40,58d51328e1996c8d,2026-08-31,SIC:KO,opinión / análisis,0,The Coca-Cola Company: Not At This Price,neg,1,opinión: cara
+41,ee981fbb3b4fb379,2026-09-01,SIC:C,hecho (noticia),0,Wall Street banks demand lower legal fees as AI boosts efficiency: FT,neu,0,sectorial sin efecto claro
+42,e72a3d055561d08a,2026-09-01,SIC:KO,hecho (noticia),0,"India finds relabeled PepsiCo, Coca-Cola, and Nestle products at a third-party facility",amb,0,incidente de terceros
+43,44657a6946d2e229,2026-09-01,SIC:C,hecho (noticia),0,"BofA, Citi, Goldman Sachs, 18 others to create new stablecoin company",neu,0,sectorial sin efecto claro
+44,e3d9265e6b02e234,2026-09-02,SIC:JNJ,opinión / análisis,0,Johnson & Johnson Replaced $913 Million In Lost Sales With $2.4 Billion In New Ones - But Kept Less Than Half,amb,1,ventas nuevas con margen menor
+45,04613d5d5af652cf,2026-09-02,SIC:C,hecho (noticia),1,Citi's London branch fined over Russia sanctions violation,neg,1,multa por sanciones
+46,a65f8d90efc4adb8,2026-09-03,SIC:CVX,opinión / análisis,0,Chevron: Hess And Production Growth Strengthen The Long-Term Outlook,pos,1,opinión alcista
+47,84a36fca6f53c057,2026-09-03,SIC:CVX,hecho (noticia),1,Chevron CEO says patience pays off in landmark Venezuela oil deal: report,pos,1,acuerdo favorable
+48,e2c8d0ba14524971,2026-09-04,SIC:MRNA,hecho (noticia),0,RFK Jr. is probing if U.S. troops died of COVID shots: report,neg,1,investigación regulatoria
+49,3eac3fb8bbbca8c1,2026-09-04,SIC:CVX,opinión / análisis,0,Chevron: Don't Let The Venezuela Deal Distract You From The Bigger Risk,neg,1,opinión: riesgo mayor
+50,c28ef6f882240964,2026-09-07,SIC:FANG,opinión / análisis,0,Diamondback Energy: The Next Catalyst May Have Nothing To Do With Oil,amb,0,opinión sin dirección clara
+51,25c6213dca8c4f32,2026-09-08,SIC:TSM,hecho (noticia),0,"ASML wins commitments from Samsung, TSMC for new chipmaking gear",neu,0,trata de ASML
+52,b7b7d3762e00af14,2026-09-08,SIC:CVX,opinión / análisis,0,"Chevron's Project Kilby, Venezuela, And Why The Stock Is So Appealing Here",pos,1,opinión alcista
+53,d2c6fca942f1623d,2026-09-08,SIC:DVN,opinión / análisis,1,Devon Energy: Operations Back In Focus After The Coterra Acquisition,neu,0,descriptivo
+54,ad6ba9a6492b6a91,2026-09-08,SIC:KO,hecho (noticia),1,"SA analyst upgrades/downgrades: DELL, BA, KO, HSY",amb,0,lista de cambios de calificación
+55,4ed9e04c3fa34716,2026-09-08,SIC:TGT,opinión / análisis,1,"Target's Turnaround Is Shaping Up Nicely, But The Rising Valuation Forces A Downgrade",neg,1,rebaja de calificación
+56,ccc830954fe97dc0,2026-09-09,SIC:BMY,hecho (noticia),1,FDA names acting heads of drug and vaccine units to permanent roles,neu,0,sin relación directa
+57,04849faeb5c3e06e,2026-09-09,SIC:TSM,opinión / análisis,0,TSMC's Arizona Bet Was My Biggest Worry In July - Now It's My Best Argument,pos,1,opinión alcista
+58,6c76125b1bd295fc,2026-09-09,SIC:TGT,opinión / análisis,1,Target: Weighing The Consolidation Scenario (Rating Downgrade),neg,1,rebaja de calificación
+59,be035ce8abe45626,2026-09-10,SIC:FCX,hecho (noticia),1,Copper stocks slump as White House tariff plan reportedly stalls,neg,1,caída del sector
+60,c2673151a8da309d,2026-09-10,SIC:FCX,hecho (noticia),1,"Freeport-McMoRan attractively valued after White House copper tariff uncertainty, Goldman says",pos,1,valuación atractiva
+61,4db72a7ec7ef4f26,2026-09-10,SIC:DVN,hecho (noticia),0,"Devon, Williams and Targa lead new top picks at Stifel on higher commodity prices, tighter supply",pos,1,entre las preferidas
+62,7a23feffc11cc590,2026-09-11,SIC:C,hecho (noticia),1,Bessent: U.S. to sanction 'large bank' next week to pressure Iran,amb,1,sanción a un banco no identificado
+63,99246dc6eaeadf73,2026-09-12,SIC:JNJ,hecho (noticia),1,Apollo in talks to acquire J&J’s orthopedics unit - Bloomberg,amb,1,venta de una división
+64,c03620ef537913c3,2026-09-12,SIC:FCX,opinión / análisis,0,Freeport-McMoRan: The Copper-AI Supercycle And Big Risks,amb,1,alcista con riesgos grandes
+65,c7749890c2b0d692,2026-09-13,SIC:XOM,hecho (noticia),1,Trump urges Ukraine to halt strikes on Russian diesel facilities,neu,0,geopolítica sin efecto directo
+66,68cc4349b79d64e4,2026-09-14,SIC:DVN,opinión / análisis,1,Devon Energy: The Coterra Merger Meets A Powerful Oil Price Tailwind,pos,1,viento a favor
+67,443b488c8e20b56a,2026-09-14,SIC:DAL,opinión / análisis,0,Delta Air Lines' Refinery Is Becoming A Powerful Competitive Weapon,pos,1,ventaja competitiva
+68,3d426946ac3a5003,2026-09-14,SIC:CVX,hecho (noticia),1,"Chevron CEO Wirth, other U.S. oil executives warn global fuel crisis has arrived",amb,0,advertencia sectorial
+69,c8021bd88ba36cc4,2026-09-15,SIC:DAL,hecho (noticia),1,Portfolio check: The biggest SA Quant downgrades over the past week,amb,0,lista de rebajas sin detalle
+70,63f342edecf74ccf,2026-09-15,SIC:LLY,hecho (noticia),1,Eli Lilly boosted to Buy at Berenberg as upside to 2026 guidance seen,pos,1,mejora a compra
+71,74046a8ae333478b,2026-09-15,SIC:LLY,hecho (noticia),1,FDA launches pilot program that aims to speed the time to first-in-human drug trials,neu,0,regulatorio general
+72,469acf12381bdec5,2026-09-15,SIC:DVN,opinión / análisis,1,Devon Energy: Stronger Permian Focus And Valuation Support (Rating Upgrade),pos,1,mejora de calificación
+73,6e12461f155e73b3,2026-09-15,SIC:XOM,hecho (noticia),0,Texas regulator approves Exxon's $5B carbon capture project after lengthy battle,pos,1,aprobación de proyecto
+74,a4304d1b3eed24a8,2026-09-17,SIC:AMAT,hecho (noticia),0,Applied Materials to invest $5B in India over the next decade,neu,0,inversión de capital sin efecto claro
+75,ff5c129d3a0bb2bc,2026-09-17,SIC:CSCO,opinión / análisis,1,Cisco Systems: The Flight To Quality In Tech Will Run Through Cybersecurity (Upgrade),pos,1,mejora de calificación
+76,1c1a22093479f8cb,2026-09-17,SIC:INTC,opinión / análisis,1,"Intel: I Was Wrong, Buckle Up For What Is Coming (Rating Upgrade)",pos,1,mejora de calificación
+77,c45b1afce850b92a,2026-09-17,SIC:INTC,opinión / análisis,1,SK hynix Could Be The Catalyst Intel Foundry Needs (Rating Upgrade),pos,1,mejora de calificación
+78,6fc55892b257154a,2026-09-18,SIC:AAPL,hecho (noticia),1,Over half of Apple users plan to upgrade to iPhone 18: survey,pos,1,demanda de producto
+79,af936a2ff25682a3,2026-09-18,SIC:LLY,hecho (noticia),1,Lilly wins full FDA approval for Inluriyo combo in breast cancer,pos,1,aprobación regulatoria
+80,1381b010ac4d2884,2026-09-18,SIC:MRNA,hecho (noticia),0,Trump to 'demand' vaccine makers make smaller doses for kids to address autism,neg,1,presión regulatoria
+81,9c76cb3241938718,2026-09-21,SIC:CVX,opinión / análisis,0,Chevron: The Bull Case Goes Beyond $100 Oil,pos,1,opinión alcista
+82,2c07c7e11cb0e500,2026-09-21,SIC:LLY,opinión / análisis,0,Eli Lilly Vs. Novo Nordisk: Temporarily Cheap Or Correctly Cheap?,amb,0,pregunta sin dirección
+83,c882920b8ef76edf,2026-09-21,SIC:MRK,opinión / análisis,1,"Merck: Time To Trim, Overvalued, And Overbought (Rating Downgrade)",neg,1,rebaja de calificación
+84,b162d079b95fe49e,2026-09-21,SIC:LLY,hecho (noticia),1,Eli Lilly CEO Ricks sees more Foundayo growth with foreign markets,pos,1,crecimiento esperado
+85,8b9b5fe67d6637b5,2026-09-22,SIC:MRK,hecho (noticia),1,Merck says FDA approved label update for PAH therapy Winrevair,pos,1,aprobación regulatoria
+86,554b4a7ea7ed25a7,2026-09-22,SIC:AMAT,opinión / análisis,1,Applied Materials: Opportunity Is Brewing Again (Rating Upgrade),pos,1,mejora de calificación
+87,16ae01bec83e6450,2026-09-22,SIC:AMD,opinión / análisis,1,AMD: Likely Dead Money From Here (Rating Downgrade),neg,1,rebaja de calificación
+88,5f43f5d3e4423b84,2026-09-23,SIC:MRK,opinión / análisis,1,Merck's Melt-Up Triggers Profit-Taking Risks - Multi-Year Portfolio Renewal (Rating Downgrade),neg,1,rebaja de calificación
+89,d9a41e284050e81f,2026-09-23,SIC:FCX,hecho (noticia),0,Freeport-McMoRan declares $0.15 dividend,neu,0,dividendo ordinario
+90,05401259c0dfec85,2026-09-23,SIC:AMD,opinión / análisis,0,AMD: This Uptrend Is Far From Over,pos,1,opinión alcista
+91,9fdecf080793b4af,2026-09-23,SIC:MU,hecho (noticia),0,Micron in focus as Citi ups estimates on better-than-expected DRAM pricing,pos,1,suben estimados
+92,271a2a53dbbd748d,2026-09-23,SIC:AMD,hecho (noticia),0,Bipartisan chip export bills face delay in reaching US Senate floor for vote: report,amb,1,retraso de regulación de exportaciones
+93,4df23af9538f1cc3,2026-09-24,SIC:LLY,hecho (noticia),1,"Lilly wins FDA nod for once-weekly insulin product, Onswik",pos,1,aprobación regulatoria
+94,a1be383f3304cc16,2026-09-24,SIC:MRK,hecho (noticia),0,Merck’s diabetic macular edema therapy succeeds in Phase 2b/3 trial,pos,1,estudio exitoso
+95,fc30a8164b9dd3d5,2026-09-24,SIC:AMD,hecho (noticia),1,"SA analyst upgrades/downgrades: TSLA, AMD, AMAT, SPCX",amb,0,lista de cambios de calificación
+96,bd6b06972989bd7a,2026-09-24,SIC:INTC,opinión / análisis,0,"Meta's AI Agents Are Putting CPUs In Data Centers, But That's Not Bullish For Intel",neg,1,opinión bajista
+97,2e093839e02ea512,2026-09-24,SIC:MU,opinión / análisis,0,Micron: Exit Before It's Too Late,neg,1,opinión bajista
+98,96d6b0dd8e7ab9c4,2026-09-24,SIC:LLY,hecho (noticia),1,FDA commissioner nominee Overton rebuffs questions about Trump medical claims,neu,0,sin relación directa
+99,bdc13f866e147aa1,2026-09-24,SIC:MRK,hecho (noticia),0,"Merck Welireg, Eisai Lenvima combo approved for kidney cancer",pos,1,aprobación regulatoria
+100,65a5ee16f082353d,2026-09-24,SIC:DVN,hecho (noticia),1,BP weighing potential acquisition ​of Devon Energy's South Texas shale assets - Reuters,amb,1,posible venta de activos
+101,7260fe21bb3178f2,2026-09-24,SIC:DAL,hecho (noticia),0,Delta Air Lines declares $0.215 dividend,neu,0,dividendo ordinario
+102,b5c391a5127ddd9b,2026-09-25,SIC:TSM,opinión / análisis,0,"Taiwan Semiconductor: AI Hiccups Lately, But Strong Growth Persists",pos,1,crecimiento fuerte
+103,83d8fe698fa6011c,2026-09-25,SIC:TWLO,hecho (noticia),1,Twilio downgraded at HSBC despite Muse-induced hype,neg,1,rebaja de calificación
+104,3f6a2dab110063e1,2026-09-25,SIC:AMD,opinión / análisis,0,AMD: Potentially Zero Margin Of Safety Right Now,neg,1,opinión: sin margen de seguridad
+105,63041a0af9c04c74,2026-09-25,SIC:AAPL,opinión / análisis,1,Apple: Why I'm Betting Against This Valuable Company (Rating Downgrade),neg,1,rebaja de calificación
+106,b8c84cd60b8777a9,2026-09-25,SIC:TSM,opinión / análisis,0,TSMC Offers AI Upside No Matter Who Wins The Race,pos,1,opinión alcista
+107,745fb8f12bfcd1e1,2026-09-25,SIC:AMD,hecho (noticia),0,Nasdaq gains 2% for the week driven by mid-week tech rally,neu,0,resumen general del mercado
+108,130717ed1f0db087,2026-09-25,SIC:MRK,hecho (noticia),0,Merck pulls BLA for antibody-drug conjugate I-DXd for small cell lung cancer,neg,1,retira solicitud regulatoria
+109,1b3a863e3ee5aca4,2026-09-28,SIC:GOOGL,hecho (noticia),0,Michael Burry: Trump 'cannot afford' to let AI boom fail,neu,0,opinión macro
+110,9600af6594fd603a,2026-09-28,SIC:MU,opinión / análisis,0,Micron: Remains A Strong Buy Ahead Of Q4 Earnings,pos,1,compra fuerte
+111,0d7b189ec1650d87,2026-09-28,SIC:NVDA,opinión / análisis,0,"Nvidia: Spot The Real Asset And Trade From A Position Of Knowledge, Not Enthusiasm",amb,0,opinión sin dirección clara
+112,bb96ca15b7e9b38c,2026-09-28,SIC:MU,opinión / análisis,0,Micron's Stock Faces Another Post-Earnings Plunge,neg,1,caída tras resultados
+113,07d8f302e713e8b8,2026-09-28,SIC:NVDA,opinión / análisis,1,Nvidia: The Valuation Has Gotten Too Cheap; I'm Upgrading To A Buy,pos,1,mejora a compra
+114,ce18ccec140cdd17,2026-09-28,SIC:AAPL,opinión / análisis,1,"Apple: I Was Wrong, Margin Math Is Now In Its Favor (Rating Upgrade)",pos,1,mejora de calificación
+115,3fb4bc9bdd22e1ce,2026-09-28,SIC:MU,opinión / análisis,1,"Micron's Earnings: Don't Be Misled By The Guidance, Don't Worry, Q4 Should Be Stellar",pos,1,opinión alcista
+116,aeed8781a45584fd,2026-09-28,SIC:AMD,opinión / análisis,1,"AMD: The AI Momentum Train Looks Unstoppable, But I'm Pausing Accumulation (Downgrade)",neg,1,rebaja de calificación
+117,62871c1241d90e76,2026-09-28,SIC:AAPL,hecho (noticia),1,"SA analyst upgrades/downgrades: AAPL, IBM, UBER, HOG",amb,0,lista de cambios de calificación
+118,9212515c509085aa,2026-09-28,SIC:AAPL,hecho (noticia),0,"Apple likely seeing 'healthy' iPhone 18 Pro demand, JPMorgan says",pos,1,demanda sana
+119,7f82eabb9b557731,2026-09-28,SIC:LLY,hecho (noticia),1,Eli Lilly CEO Ricks says drugmaker on hunt for bigger deals: Bloomberg,neu,0,intención de adquisiciones
+120,cada8fe6d5b11934,2026-09-28,SIC:AMD,hecho (noticia),1,AMD to acquire World Labs in $8.2B all-stock deal,amb,1,adquisición pagada con acciones
+121,26d529f45a10d93b,2026-09-29,SIC:TSM,hecho (noticia),0,TSMC boosting 2nm production could be boon for chip equipment: Wells Fargo,pos,1,aumento de producción
+122,68e7eafeaea5ff31,2026-09-29,SIC:GOOGL,hecho (noticia),0,House Democrats seek AI cyberattack records from tech CEOs: report,amb,0,requerimiento político
+123,2cef61859068a8d5,2026-09-29,SIC:CSCO,hecho (noticia),0,"Bell Canada, Cisco to collaborate on sovereign AI infrastructure",pos,0,alianza menor
+124,7e3964a3ee0420d9,2026-09-29,SIC:JNJ,opinión / análisis,0,"Johnson & Johnson: Strong Catalysts, But I'm Staying At Hold",neu,1,se mantiene neutral
+125,9fa8d5faae5a38d7,2026-09-29,SIC:NVDA,hecho (noticia),0,Nvidia looks to insurers to spread the risk of AI buildout - report,neu,0,descriptivo
+126,fd5cd0043c8d229d,2026-09-29,SIC:TSM,opinión / análisis,0,TSMC: 2nm Is Moving Into High Gear,pos,1,avance de producción
+127,eb5d98d5f8226602,2026-09-29,SIC:AMD,opinión / análisis,1,"AMD: Path To $1,000 (Rating Upgrade)",pos,1,mejora de calificación
+128,b7633b71038fd409,2026-09-29,SIC:AAPL,hecho (noticia),1,"Apple CEO Ternus may look to unveil products faster, become more experimental: report",neu,0,descriptivo
+129,1f61ba0124da3c2f,2026-09-29,SIC:MRNA,opinión / análisis,0,Moderna And Merck: The Intismeran Readout That Was Worth $86 Billion,pos,1,resultado clínico favorable
+130,b2914e22f96cc7f0,2026-09-29,SIC:TGT,hecho (noticia),0,Target's price cuts are seen as the latest winning move by management,pos,1,estrategia favorable
+131,6d2cef54a6f9612d,2026-09-29,SIC:MRK,hecho (noticia),0,CDC data now show two measles deaths for 2026; Pennsylvania records four,neu,0,salud pública sin efecto directo
+132,493b78f7203618b7,2026-09-30,SIC:AMD,opinión / análisis,0,"AMD: Expensive, But Growth Is Still Fast Enough To Keep The Bull Case Alive",amb,1,cara pero con crecimiento
+133,751ef00fe4f03999,2026-09-30,SIC:LLY,hecho (noticia),0,Lilly posts late-stage trial win for Ebglyss in hand-and-foot atopic dermatitis,pos,1,estudio exitoso
+134,a787e2daf90d621f,2026-09-30,SIC:TGT,hecho (noticia),1,"HSBC upgrades Target to Buy, raises PT to $190",pos,1,mejora a compra
+135,6782e2cdfeb59a29,2026-09-30,SIC:AMD,hecho (noticia),1,"SA analyst upgrades/downgrades: AMD, QCOM, NWL, PLTR",amb,0,lista de cambios de calificación
+136,3dc51bab83467fc5,2026-09-30,SIC:LLY,hecho (noticia),1,"Pharmaceutical industry lobbying group names new CEO, Eric Cantor",neu,0,sin relación directa
+137,f81cc839f00c26e9,2026-09-30,SIC:AAPL,hecho (noticia),0,"Apple rises amid iPhone Duo excitement, though UBS sees 'flattish' wait times for Pro",pos,1,sube por expectativa
+138,fd13baf9e055ba1b,2026-09-30,SIC:GOOGL,hecho (noticia),1,Google seeks EU court halt to search-data sharing order,amb,1,disputa legal
+139,b2c2005a05563fe2,2026-09-30,SIC:MU,hecho (noticia),0,"Micron Non-GAAP EPS of $33.42 beats by $1.60, revenue of $54.23B beats by $2.76B",pos,1,utilidad e ingresos superan
+140,8546b0ed9e0737e1,2026-09-30,SIC:MU,hecho (noticia),1,"Micron rises as Q4 results, guidance top estimates",pos,1,sube por resultados
+141,8e25253942c0e63b,2026-09-30,SIC:MU,opinión / análisis,0,Simply Outstanding: Micron's Absolutely Enormous Day,pos,1,jornada muy favorable
+142,de30a359513b3727,2026-09-30,SIC:LLY,hecho (noticia),1,FDA launches recruitment drive to add members to advisory panels,neu,0,regulatorio general
+143,69e9533be19565bb,2026-09-30,SIC:AMD,opinión / análisis,1,AMD: Lisa Su Proved Me Wrong (Rating Upgrade),pos,1,mejora de calificación
+144,3baf560c81435a5c,2026-10-01,SIC:MU,hecho (noticia),0,Sandisk remains solid as Micron's Q4 results reveal tight NAND supply through 2028: Citi,pos,1,oferta ajustada favorable
+145,4967cc7d0b511ffb,2026-10-01,SIC:XOM,hecho (noticia),1,"BP upgraded, Exxon downgraded at Wells Fargo as relative valuation favors BP",neg,1,rebaja de calificación (Exxon)
+146,955d7667544cdfa2,2026-10-01,SIC:C,opinión / análisis,1,Citigroup Q3 Preview: Earnings Should Be Alright Despite Macro Risks (Upgrade),pos,1,mejora de calificación
+147,32abba94d9607825,2026-10-02,SIC:MRNA,hecho (noticia),0,"Moderna to join Nasdaq-100, replacing Warner Bros. Discovery",pos,1,entra al Nasdaq-100
+148,6634e6056c1d80ad,2026-10-02,SIC:ABNB,hecho (noticia),1,"KeyBanc upgrades Airbnb to overweight, sets $191 price target",pos,1,mejora de calificación
+149,9b46b7cf753ec72b,2026-10-02,SIC:MU,opinión / análisis,0,Micron: The Memory Cycle Won't Last Forever,neg,1,opinión: ciclo terminará
+150,e310dacdb4f4ed54,2026-10-02,SIC:NVDA,opinión / análisis,0,"Nvidia Stock Has Become Deeply Undervalued, But Watch Out For Accounts Receivable",amb,1,barata pero con alerta contable
+151,22a004afeabaa701,2026-10-03,SIC:MU,opinión / análisis,0,Micron: The Memory Equity Cycle Is At Its Zenith,neg,1,opinión: ciclo en su punto máximo
+152,524673ab3b2cf356,2026-10-03,SIC:MU,hecho (noticia),0,"Earnings Scoreboard: all 8 S&P 500 firms beat EPS estimates, 6 saw profits rise Y/Y",neu,0,resumen general
+153,906865edf9589333,2026-10-04,SIC:MU,opinión / análisis,0,Micron: The Market Is In Disbelief. Ignore Them,pos,1,opinión alcista
+154,e99b6d8480b98149,2026-10-04,SIC:NVDA,hecho (noticia),0,Trump names intelligence chief Jay Clayton to lead new AI task force,neu,0,sin relación directa
+155,d459c276db9d05d7,2026-10-04,SIC:MU,opinión / análisis,0,Micron: The Trade Of The Decade Has Arrived,pos,1,opinión alcista
+156,88fe63c47aec38c4,2026-10-04,SIC:ABNB,hecho (noticia),0,Ulta Beauty tops consumer discretionary gainers in Q3; MGM Resorts declines,neu,0,trata de otras empresas
+157,e68e0fd9365a37e7,2026-10-05,SIC:MU,opinión / análisis,0,Micron: Memory Boom Still Has Legs,pos,1,opinión alcista
+158,3fecdbebc4286b90,2026-10-05,SIC:GOOGL,opinión / análisis,0,Alphabet Appears To Be The Easiest AI Trade Of The Year Before Its Q3 Print,pos,1,opinión alcista
+159,f014230779206056,2026-10-05,SIC:NVDA,opinión / análisis,0,Nvidia: Reaching The Point Of An Explosive Upside Breakout,pos,1,opinión alcista
+160,45ceddec849829aa,2026-10-05,SIC:CVX,hecho (noticia),1,Chevron promotes CFO to head oil and gas operations ahead of potential CEO succession,neu,0,sucesión de directivos
+161,5ee428db322f7534,2026-10-05,SIC:MU,hecho (noticia),1,"SA analyst upgrades/downgrades: MU, NOW, SNDK, ACN",amb,0,lista de cambios de calificación

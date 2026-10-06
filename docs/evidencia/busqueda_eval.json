@@ -1,6 +1,6 @@
 {
  "n": 15,
- "secciones": 606,
+ "secciones": 612,
  "metodos": [
   {
    "metodo": "conteo de términos (anterior)",
@@ -13,12 +13,12 @@
       "config/reto.yaml"
      ],
      "top3": [
+      "docs/memoria-y-busqueda.md",
       "CHANGELOG.md",
-      "CLAUDE.md",
       "CLAUDE.md"
      ],
      "acierto": false,
-     "segundos": 0.6
+     "segundos": 0.3
     },
     {
      "pregunta": "¿Cuál es la comisión por operación en el Reto?",
@@ -32,7 +32,7 @@
       "README.md"
      ],
      "acierto": true,
-     "segundos": 0.53
+     "segundos": 0.29
     },
     {
      "pregunta": "¿Cuántas emisoras mínimo debo tener en el portafolio?",
@@ -46,7 +46,7 @@
       "README.md"
      ],
      "acierto": false,
-     "segundos": 0.44
+     "segundos": 0.32
     },
     {
      "pregunta": "¿Qué decidí sobre el criterio del plan: mayor ganancia o puntuación?",
@@ -59,7 +59,7 @@
       "web/index.html"
      ],
      "acierto": false,
-     "segundos": 0.46
+     "segundos": 0.31
     },
     {
      "pregunta": "¿Por qué el plan dice que no cambie nada frente a mantener la cartera?",
@@ -72,7 +72,7 @@
       "README.md"
      ],
      "acierto": false,
-     "segundos": 0.52
+     "segundos": 0.41
     },
     {
      "pregunta": "¿Qué fuente de precios BMV con licencia me recomiendas contratar?",
@@ -85,7 +85,7 @@
       "README.md"
      ],
      "acierto": false,
-     "segundos": 0.44
+     "segundos": 0.42
     },
     {
      "pregunta": "¿La probabilidad de subida está calibrada?",
@@ -99,7 +99,7 @@
       "docs/model-card.md"
      ],
      "acierto": true,
-     "segundos": 0.36
+     "segundos": 0.41
     },
     {
      "pregunta": "¿Qué es la alternativa C con NVIDIA?",
@@ -112,7 +112,7 @@
       "CHANGELOG.md"
      ],
      "acierto": true,
-     "segundos": 0.37
+     "segundos": 0.34
     },
     {
      "pregunta": "¿A qué hora abre y cierra la bolsa durante el Reto?",
@@ -121,12 +121,12 @@
       "config/reto.yaml"
      ],
      "top3": [
+      "docs/memoria-y-busqueda.md",
       "CHANGELOG.md",
-      "CHANGELOG.md",
-      "docs/02-prd.md"
+      "CHANGELOG.md"
      ],
      "acierto": false,
-     "segundos": 0.44
+     "segundos": 0.43
     },
     {
      "pregunta": "¿El precio del SIC es en tiempo real?",
@@ -140,7 +140,7 @@
       "CLAUDE.md"
      ],
      "acierto": false,
-     "segundos": 0.44
+     "segundos": 0.46
     },
     {
      "pregunta": "¿Cómo copio mi portafolio del portal a la terminal?",
@@ -153,7 +153,7 @@
       "docs/guia-rapida.md"
      ],
      "acierto": true,
-     "segundos": 0.41
+     "segundos": 0.44
     },
     {
      "pregunta": "¿Cuándo termina la competencia del Reto?",
@@ -180,7 +180,7 @@
       "docs/guia-rapida.md"
      ],
      "acierto": false,
-     "segundos": 0.46
+     "segundos": 0.38
     },
     {
      "pregunta": "¿Por qué la validación fuera de muestra tenía tan pocas sesiones?",
@@ -193,7 +193,7 @@
       "docs/decisiones.md"
      ],
      "acierto": false,
-     "segundos": 0.47
+     "segundos": 0.33
     },
     {
      "pregunta": "¿Qué límites tiene el mandato de autonomía?",
@@ -207,14 +207,14 @@
       "docs/decisiones.md"
      ],
      "acierto": false,
-     "segundos": 0.49
+     "segundos": 0.34
     }
    ]
   },
   {
    "metodo": "BM25 por sección (vigente)",
    "acierto_a_3": 0.8666666666666667,
-   "segundos_por_consulta": 0.097,
+   "segundos_por_consulta": 0.079,
    "filas": [
     {
      "pregunta": "¿Me penalizan por comprar ETF o fondos?",
@@ -223,9 +223,9 @@
       "config/reto.yaml"
      ],
      "top3": [
+      "docs/memoria-y-busqueda.md",
       "CHANGELOG.md",
-      "docs/09-auditoria-pdf.md",
-      "docs/decisiones.md"
+      "docs/09-auditoria-pdf.md"
      ],
      "acierto": false
     },
@@ -323,9 +323,9 @@
       "config/reto.yaml"
      ],
      "top3": [
+      "docs/memoria-y-busqueda.md",
       "docs/ARCHITECTURE.md",
-      "CHANGELOG.md",
-      "docs/fuentes.md"
+      "CHANGELOG.md"
      ],
      "acierto": false
     },
@@ -405,6 +405,202 @@
      "acierto": true
     }
    ]
+  },
+  {
+   "metodo": "semántica e5-small",
+   "acierto_a_3": 0.8,
+   "segundos_por_consulta": 0.059,
+   "filas": [
+    {
+     "pregunta": "¿Me penalizan por comprar ETF o fondos?",
+     "esperado": [
+      "docs/actinver-rules.md",
+      "config/reto.yaml"
+     ],
+     "top3": [
+      "docs/actinver-rules.md",
+      "config/reto.yaml",
+      "docs/RULES.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Cuál es la comisión por operación en el Reto?",
+     "esperado": [
+      "docs/actinver-rules.md",
+      "config/reto.yaml"
+     ],
+     "top3": [
+      "docs/resumen-ejecutivo.md",
+      "docs/04-adopcion.md",
+      "docs/fuentes.md"
+     ],
+     "acierto": false
+    },
+    {
+     "pregunta": "¿Cuántas emisoras mínimo debo tener en el portafolio?",
+     "esperado": [
+      "docs/actinver-rules.md",
+      "config/reto.yaml"
+     ],
+     "top3": [
+      "config/reto.yaml",
+      "docs/quant-methodology.md",
+      "docs/model-card.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Qué decidí sobre el criterio del plan: mayor ganancia o puntuación?",
+     "esperado": [
+      "docs/decisiones.md"
+     ],
+     "top3": [
+      "CHANGELOG.md",
+      "docs/decisiones.md",
+      "docs/auditoria-2026-10-05.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Por qué el plan dice que no cambie nada frente a mantener la cartera?",
+     "esperado": [
+      "docs/decisiones.md"
+     ],
+     "top3": [
+      "CHANGELOG.md",
+      "docs/decisiones.md",
+      "docs/pronostico-reto.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Qué fuente de precios BMV con licencia me recomiendas contratar?",
+     "esperado": [
+      "docs/bmv-licencia.md"
+     ],
+     "top3": [
+      "docs/bmv-licencia.md",
+      "docs/sources/bmv.md",
+      "docs/data-providers.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿La probabilidad de subida está calibrada?",
+     "esperado": [
+      "docs/pronostico-reto.md",
+      "docs/model-card.md"
+     ],
+     "top3": [
+      "docs/pronostico-reto.md",
+      "docs/model-card.md",
+      "CHANGELOG.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Qué es la alternativa C con NVIDIA?",
+     "esperado": [
+      "docs/alternativa-nvda-2026-10-05.md"
+     ],
+     "top3": [
+      "docs/alternativa-nvda-2026-10-05.md",
+      "docs/repository-adoption-matrix.md",
+      "docs/movimientos-publicos.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿A qué hora abre y cierra la bolsa durante el Reto?",
+     "esperado": [
+      "docs/actinver-rules.md",
+      "config/reto.yaml"
+     ],
+     "top3": [
+      "docs/ARCHITECTURE.md",
+      "docs/pronostico-reto.md",
+      "README.md"
+     ],
+     "acierto": false
+    },
+    {
+     "pregunta": "¿El precio del SIC es en tiempo real?",
+     "esperado": [
+      "docs/fuentes.md",
+      "docs/guia-rapida.md"
+     ],
+     "top3": [
+      "docs/decisiones.md",
+      "docs/RULES.md",
+      "docs/fuentes.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Cómo copio mi portafolio del portal a la terminal?",
+     "esperado": [
+      "docs/guia-rapida.md"
+     ],
+     "top3": [
+      "docs/guia-rapida.md",
+      "README.md",
+      "docs/decision-workflow.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Cuándo termina la competencia del Reto?",
+     "esperado": [
+      "docs/actinver-rules.md",
+      "config/reto.yaml"
+     ],
+     "top3": [
+      "README.md",
+      "docs/quant-methodology.md",
+      "docs/decisiones.md"
+     ],
+     "acierto": false
+    },
+    {
+     "pregunta": "¿Qué hace la terminal con las compras de insiders y los 13F?",
+     "esperado": [
+      "docs/movimientos-publicos.md"
+     ],
+     "top3": [
+      "docs/guia-rapida.md",
+      "docs/movimientos-publicos.md",
+      "docs/sources/insiderfinance.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Por qué la validación fuera de muestra tenía tan pocas sesiones?",
+     "esperado": [
+      "docs/historia-y-horizonte.md"
+     ],
+     "top3": [
+      "docs/historia-y-horizonte.md",
+      "docs/decisiones.md",
+      "docs/investigacion.md"
+     ],
+     "acierto": true
+    },
+    {
+     "pregunta": "¿Qué límites tiene el mandato de autonomía?",
+     "esperado": [
+      "docs/mandato-autonomia.md",
+      "docs/mandato-autonomia.txt"
+     ],
+     "top3": [
+      "docs/seguridad.md",
+      "docs/mandato-autonomia.md",
+      "CLAUDE.md"
+     ],
+     "acierto": true
+    }
+   ],
+   "segundos_indexar": 298.2
   }
  ]
 }
