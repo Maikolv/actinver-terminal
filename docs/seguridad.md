@@ -87,3 +87,7 @@ Rotación de una clave de proveedor (Tiingo, EODHD, Banxico, Barchart, SEC User-
 - Operaciones, perfil, importaciones y alertas permanecen en `data/` del equipo; no hay telemetría ni analítica.
 - Salen del equipo solo: peticiones de precios/tipo de cambio (símbolo y fechas), consultas a los feeds de contexto (símbolo), el User-Agent de contacto que usted configure para la SEC, el símbolo al abrir una gráfica de TradingView, y las notificaciones por correo/Telegram si usted las activa.
 - El PDF de origen no está en el repositorio; sus renders están en `_renders/` (ignorado).
+
+## Mandato de autonomía
+
+El texto exacto del mandato y su procedencia están en [mandato-autonomia.md](mandato-autonomia.md). Sus límites (sección 6) y las restricciones posteriores del usuario, más estrictas, aplican a todo lo descrito en este documento.

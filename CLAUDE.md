@@ -1,9 +1,11 @@
 # CLAUDE.md — actinver-terminal
 
 Este repo opera bajo el **prompt de autonomía total** («Terminal local de análisis
-de portafolios») guardado por el usuario en el proyecto de chat correspondiente
-(no está en este repo como archivo; si no lo tienes a la vista, pide al usuario
-que lo pegue de nuevo). Resumen de sus límites duros (sección 6, no negociables):
+de portafolios»). Su texto exacto está en `docs/mandato-autonomia.txt`, y su procedencia
+(pegado por el usuario el 23-sep-2026), sha256 y orden de precedencia en
+`docs/mandato-autonomia.md`. La confirmación del usuario de que es la versión vigente
+está pendiente. Las restricciones posteriores del usuario, más estrictas, prevalecen.
+Resumen de sus límites duros (sección 6, no negociables):
 sin dinero real ni órdenes en vivo, secretos solo en `.env`, datos solo por vía
 legal (sin saltar anti-bot/paywalls), sin automatizar la cuenta personal de
 Actinver, nada destructivo fuera de este repo y de los adjuntos, nunca simular un

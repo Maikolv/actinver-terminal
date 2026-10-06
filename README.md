@@ -138,8 +138,9 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 | [13 Evidencia](docs/13-evidencia.md) | Criterios de aceptación con pruebas, Lighthouse y capturas |
 | [Repositorios](docs/repos.md) | 64 fichas (lectura fácil, técnico, uso, cambios) |
 | [Fuentes](docs/fuentes.md) | Tipo, retraso medido, límites, credenciales, condiciones |
-| [Decisiones](docs/decisiones.md) | Registro D-01 a D-30 |
+| [Decisiones](docs/decisiones.md) | Registro D-01 a D-52 |
 | [Seguridad](docs/seguridad.md) | Checklist aplicado / previsto / no aplica con evidencia |
+| [Mandato de autonomía](docs/mandato-autonomia.md) | Texto exacto, procedencia (23-sep-2026), sha256 y precedencia frente a restricciones posteriores |
 | [Matriz](docs/matriz.md) | Sitio, legal, SEO, indexación, medición |
 | [Diseño](docs/diseno.md) | Decisiones de interfaz |
 | [CHANGELOG](CHANGELOG.md) | Historial de cambios |
