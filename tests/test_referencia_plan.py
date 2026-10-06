@@ -137,3 +137,18 @@ def test_criterio_ganancia_usa_la_media_no_la_mediana():
     for x in props.values():
         x["perfil"]["criterio_plan"] = "plusvalia"
     assert resumen.propuesta_referencia(props)["clave"] == "acciones_puntuacion"
+
+
+def test_mantener_es_mejor_con_el_mismo_metodo():
+    """5-oct: misma medida ⇒ cartera actual +7.6 %, propuesta +7.0 %: el plan no sugiere operar."""
+    f = {"comparable": True, "propuesta": {"media": 0.070, "central_p50": 0.060, "adverso_p10": -0.127},
+         "mantener": {"media": 0.076, "central_p50": 0.060, "adverso_p10": -0.167}}
+    p = {"frente_a_mantener": f, "mejora_esperada": {"costo_cambio": 0.001}}
+    mm = resumen.mantener_es_mejor(p, "ganancia")
+    assert mm and mm["mantener"] == 0.076 and mm["metrica"] == "ganancia promedio"
+    assert resumen.mantener_es_mejor(p, "puntuacion") is None                    # solo con criterio de ganancia
+    f["propuesta"]["media"] = 0.10                                              # supera por 2.3 pp netos ⇒ se opera
+    assert resumen.mantener_es_mejor(p, "ganancia") is None
+    f["propuesta"]["media"] = 0.085                                             # +0.8 pp netos: menos que el margen
+    assert resumen.mantener_es_mejor(p, "ganancia")
+    assert resumen.mantener_es_mejor({"frente_a_mantener": {"comparable": False}}, "ganancia") is None

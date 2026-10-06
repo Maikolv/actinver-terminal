@@ -35,6 +35,25 @@ def ganancia_esperada(p: dict) -> float | None:
     return float(e["media_anual_usada"]) * float(e["horizonte_anios"])
 
 
+MARGEN_MANTENER = 0.01  # 1 punto de ganancia al cierre del Reto, además de las comisiones
+
+
+def mantener_es_mejor(p: dict | None, criterio: str, margen: float = MARGEN_MANTENER) -> dict | None:
+    """Con criterio de ganancia: si la propuesta NO supera a mantener la cartera actual (mismo método, después de
+    comisiones y por más que el margen de ruido), el plan no sugiere operar. Devuelve las cifras para explicarlo."""
+    f = (p or {}).get("frente_a_mantener") or {}
+    if criterio not in ("ganancia", "plusvalia") or not f.get("comparable"):
+        return None
+    k = "media" if criterio == "ganancia" else "central_p50"
+    costo = float(((p.get("mejora_esperada") or {}).get("costo_cambio")) or 0)
+    neta = f["propuesta"][k] - f["mantener"][k] - costo
+    if neta >= margen:
+        return None
+    return {"propuesta": f["propuesta"][k], "mantener": f["mantener"][k], "costo": costo, "neta": neta, "margen": margen,
+            "metrica": "ganancia promedio" if k == "media" else "resultado más común",
+            "adverso_propuesta": f["propuesta"]["adverso_p10"], "adverso_mantener": f["mantener"]["adverso_p10"]}
+
+
 def metrica_plan(p: dict, criterio: str) -> float | None:
     if criterio == "ganancia":
         return ganancia_esperada(p)

@@ -93,3 +93,13 @@ def test_boletas_sencillas_ventas_primero():
     assert t.index("VENDE ALPEK A") < t.index("COMPRA MU") and "Primero las ventas" in t
     assert "(no pagues más)" in t and "(no vendas más barato)" in t and "válidas hasta 06-10 14:00" in t
     assert boleta.texto_telegram_simple([]).startswith("No hay órdenes")
+
+
+def test_si_mantener_es_mejor_dice_que_no_cambie_nada():
+    mm = {"propuesta": 0.070, "mantener": 0.076, "costo": 0.001, "neta": -0.007, "margen": 0.01, "metrica": "ganancia promedio",
+          "adverso_propuesta": -0.127, "adverso_mantener": -0.167}
+    plan = {**_plan([_accion("MU *", "mantener", tenencia=25)]), "mantener_mejor": mm}
+    t = ms.construir(plan, PROP, [], AHORA)
+    assert "Hoy no cambies nada" in t and "+7.6%" in t and "+7.0%" in t and "-16.7%" in t
+    assert "VENDE" not in t and "COMPRA" not in t and "Qué esperar" not in t
+    assert "Antes de capturar" not in t and "Para tener en cuenta" in t

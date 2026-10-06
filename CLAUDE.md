@@ -30,6 +30,10 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
+- **5-oct noche (v0.22.0):**
+  - 321 pruebas en verde.
+  - Con criterio de ganancia, el plan no opera si la propuesta no supera a mantener la cartera por 1 punto tras comisiones (mismo método, dos ventanas; D-52).
+  - Para el 6-oct: «hoy no cambies nada» (mantener +7.6 % frente a propuesta +7.0 %).
 - **5-oct noche (v0.21.0):**
   - Criterio del plan = `ganancia` (media esperada), decisión del usuario (D-50).
   - `terminal precios-portal <pdf>` importa los precios BMV del PDF de la pestaña Acciones que arma el usuario (D-51); las BMV sin precio bajan de 19 a 6.

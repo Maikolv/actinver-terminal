@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.22.0] — 2026-10-05 (no operar si no mejora a mantener)
+
+### Corregido
+- **El plan sugería rotar la cartera sin mejora demostrada** (D-52). Los escenarios de la propuesta (+2.2 %) y los de la cartera actual se medían con métodos distintos. Medidas igual: cartera actual +7.6 %, propuesta +7.0 % al cierre del Reto.
+  - Ahora cada propuesta guarda `frente_a_mantener`, con ambas medidas con el mismo método en dos ventanas: la de validación y la más reciente. Cuenta la menos favorable para la propuesta, porque desplazar la ventana unos días cambiaba al ganador.
+  - Con criterio de ganancia, si la propuesta no supera a mantener por 1 punto después de comisiones (`optimizacion.margen_mejora_mantener`), el plan dice «hoy no cambies nada» y muestra las dos cifras y los escenarios malos, y `/boletas` no genera órdenes.
+
+### Pruebas
+- 3 nuevas (`tests/test_mensaje_simple.py`, `tests/test_referencia_plan.py`, `tests/test_optimizador.py`); 321 en verde.
+
 ## [0.21.0] — 2026-10-05 (criterio «mayor ganancia» y precios del portal)
 
 ### Añadido

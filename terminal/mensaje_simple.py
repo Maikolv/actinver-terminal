@@ -109,7 +109,13 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
                   key=lambda a: a["referencia"].get("lado_sugerido", "compra") != "venta")  # ventas primero
     espera = [a for a in acc if a["decision"] == "pendiente" and not a.get("referencia")]
     L.append("")
-    if not (ventas or compras or cond):
+    mm = plan.get("mantener_mejor")
+    if mm:
+        L.append(f"✅ Hoy no cambies nada. Medidas igual, tu cartera actual espera {mm['mantener']:+.1%} al cierre del Reto "
+                 f"y la propuesta {mm['propuesta']:+.1%}: cambiar no mejora la ganancia esperada y cuesta comisiones.")
+        L.append(f"   Riesgo en un mal escenario (1 de cada 10): tu cartera {mm['adverso_mantener']:+.1%}, "
+                 f"la propuesta {mm['adverso_propuesta']:+.1%}.")
+    elif not (ventas or compras or cond):
         L.append("✅ Hoy no tienes que hacer nada: tu cartera ya está como el plan. No pagues comisiones sin necesidad.")
     n = 0
     if ventas:
@@ -148,7 +154,7 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
                  + (" …" if len(espera) > 8 else "") + ".")
     if ventas and not compras and any(a["decision"] == "pendiente" and a["accion_propuesta"] == "comprar" for a in acc):
         L.append("ℹ️ Las compras esperan al dinero de las ventas: cuando aparezca en «Poder de compra», escribe /plan.")
-    L += ["", "📌 Antes de capturar:", "• " + _horario(s)]
+    L += (["", "📌 Antes de capturar:", "• " + _horario(s)] if (ventas or compras or cond) else ["", "📌 Para tener en cuenta:"])
     if ventas or compras or cond:
         retrasado = [a for a in ventas + compras + cond if (a.get("precio") or {}).get("estado") != "vigente"
                      or (a.get("precio") or {}).get("es_referencia")]
@@ -168,7 +174,7 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
         L.append(f"• 📰 {_cuando(e['fecha'], ahora_local.date()).capitalize()}: "
                  f"{traducir_evento(e['titulo'], e['pais']).rstrip('.')}{extra}. Puede mover mucho los precios; el plan no cambia por eso, pero no subas tu precio máximo.")
     esc = propuesta.get("escenarios") or {}
-    if esc.get("central_p50") is not None and esc.get("adverso_p10") is not None:
+    if not mm and esc.get("central_p50") is not None and esc.get("adverso_p10") is not None:
         media = (esc["media_anual_usada"] * esc["horizonte_anios"] if esc.get("media_anual_usada") is not None
                  and esc.get("horizonte_anios") is not None else None)
         L += ["", "📈 Qué esperar al cierre del Reto (estimación, no promesa): "

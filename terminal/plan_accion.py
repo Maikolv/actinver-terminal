@@ -99,6 +99,14 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
             filas.append({"id": iid, "clave_operable": x.get("clave_operable"), "peso_actual": x.get("peso") or 0,
                           "peso_objetivo": objetivo.get(iid, 0.0), "delta_pp": 0.0, "monto_mxn": 0.0, "accion": "mantener",
                           "nota": "Posición de su cuenta que la propuesta no evalúa: revise antes de operar."})
+    mantener_mejor = resumen.mantener_es_mejor(p, (p.get("perfil") or {}).get("criterio_plan", "puntuacion"),
+                                                float(ajustes["optimizacion"].get("margen_mejora_mantener", resumen.MARGEN_MANTENER))) if p else None
+    if mantener_mejor and confirmada:  # cambiar no mejora la ganancia esperada: se conserva lo que hay, sin operar
+        nota = (f"La propuesta no supera a mantener su cartera ({mantener_mejor['metrica']} {mantener_mejor['propuesta']:+.1%} "
+                f"frente a {mantener_mejor['mantener']:+.1%}, mismo método, después de comisiones): no se sugiere operar.")
+        filas = [{**f, "accion": "mantener", "monto_mxn": 0.0, "delta_pp": 0.0, "nota": nota}
+                 for f in filas if f["id"] in actuales]
+        objetivo = {}
     ids = sorted({f["id"] for f in filas})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
     acciones = []
@@ -185,7 +193,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
                                    else "Mayor plusvalía esperada al cierre del Reto (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "plusvalia"
                                    else "Es la propuesta vigente con mayor puntuación (criterio del plan del día).")} if p else None),
-        "acciones": acciones, "faltan": faltan,
+        "acciones": acciones, "faltan": faltan, "mantener_mejor": mantener_mejor if confirmada else None,
         "resumen": {d: sum(1 for a in acciones if a["decision"] == d) for d in ("comprar", "vender", "mantener", "pendiente")}
         | {"monto_compras": round(sum(a["monto"] for a in acciones if a["decision"] == "comprar"), 2),
            "monto_ventas": round(sum(a["monto"] for a in acciones if a["decision"] == "vender"), 2)},

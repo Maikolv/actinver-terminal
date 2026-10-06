@@ -502,6 +502,37 @@ def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: 
     }
 
 
+def _frente_a_mantener(X: pd.DataFrame, ventanas: list[pd.DataFrame], pesos: pd.Series, previos: dict, cartera_actual: dict,
+                       horizonte: float, elegibles: dict) -> dict | None:
+    """Propuesta y cartera actual medidas con el MISMO método (mismos datos, misma regla de media y volatilidad, pesos
+    fijos en el periodo de validación). Los escenarios de la propuesta usan su validación walk-forward y no son
+    comparables con «mantener» (5-oct-2026: +2.2 % frente a +7.6 % con métodos distintos; +7.0 % frente a +7.6 % con el
+    mismo). Se mide con dos ventanas de validación (la del walk-forward y las sesiones más recientes del mismo largo) y
+    cuenta la menos favorable para la propuesta: desplazar la ventana unos días cambiaba al ganador (+1.5 pp frente a
+    −0.6 pp). Sin cartera, o si menos del 90 % de lo invertido tiene historia en este universo, no hay comparación."""
+    invertido = sum((p.get("valor_mxn") or 0) for p in cartera_actual.get("posiciones", []))
+    total = float(cartera_actual.get("valor_total") or 0)
+    if invertido <= 0 or total <= 0:
+        return None
+    w_act = pd.Series(previos, dtype=float).reindex(X.columns).fillna(0.0)
+    cobertura = float(w_act.sum() * total / invertido)
+    if cobertura < 0.9:
+        return {"comparable": False, "cobertura": round(cobertura, 3)}
+    w_prop = pesos.reindex(X.columns).fillna(0.0)
+
+    def medir(w, X_val):
+        e = _escenarios(X, w[w > 0], horizonte, elegibles, oos=_serie_pesos(X_val, w[w > 0]) if len(X_val) else None)
+        return {"media": e["media_anual_usada"] * e["horizonte_anios"], "central_p50": e["central_p50"],
+                "adverso_p10": e["adverso_p10"], "favorable_p90": e["favorable_p90"], "volatilidad_anual": e["volatilidad_anual"]}
+    por_ventana = [{"desde": str(v.index[0].date()) if len(v) else None, "hasta": str(v.index[-1].date()) if len(v) else None,
+                    "propuesta": medir(w_prop, v), "mantener": medir(w_act, v)} for v in ventanas]
+    peor = min(por_ventana, key=lambda x: x["propuesta"]["media"] - x["mantener"]["media"])
+    return {"comparable": True, "cobertura": round(cobertura, 3), "propuesta": peor["propuesta"], "mantener": peor["mantener"],
+            "ventana": {"desde": peor["desde"], "hasta": peor["hasta"]}, "por_ventana": por_ventana,
+            "nota": "Mismo método para ambas: pesos fijos, media contraída o la de validación si es menor, la volatilidad mayor; "
+                    "cuenta la ventana menos favorable para la propuesta."}
+
+
 def _estres(pesos: pd.Series, elegibles: dict, choque_rv: float = -0.30, choque_fx: float = 0.15) -> float:
     """Σ w_i·[(1 + choque del activo)·(1 + choque cambiario si está expuesto al dólar) − 1]."""
     total = 0.0
@@ -834,6 +865,8 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
 
     contrib = _contribucion_riesgo(X, pesos)
     esc = _escenarios(X, pesos[pesos > 0], float(perfil["horizonte_anios"]), elegibles, oos=oos)
+    frente = _frente_a_mantener(X, [X_todo.loc[oos.index], X_todo.iloc[-len(oos):]], pesos, previos, cartera_actual,
+                                float(perfil["horizonte_anios"]), elegibles)
     capital = float(perfil.get("capital") or 0)
     asignacion, residuo = _asignacion_discreta(pesos, elegibles, capital)
     for a in asignacion:
@@ -875,7 +908,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "pesos": asignacion, "efectivo_residual": residuo, "capital": capital,
         "metricas_estimacion": _metricas(_serie_pesos(X, pesos)),
         "comparacion": comparacion, "sensibilidad": sens, "estabilidad": round(estabilidad, 3),
-        "escenarios": esc, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil, m_ew),
+        "escenarios": esc, "frente_a_mantener": frente, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil, m_ew),
         "cambios": cmb, "ordenes": plan_ordenes, "puntuacion": punt, "busqueda_puntuacion": busqueda,
         "mercado_acciones": perfil.get("mercado_acciones", "ambos"),
         "n_elegibles": len(elegibles), "n_excluidos": len(excluidos),

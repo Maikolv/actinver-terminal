@@ -193,6 +193,7 @@ ventana_estimacion = 756             # ~3 años para estimar
 walk_forward_entrenamiento = 504
 walk_forward_prueba = 63
 banda_rebalanceo_pp = 2.0            # no sugerir cambios menores a 2 puntos de peso
+margen_mejora_mantener = 0.01      # con criterio de ganancia: operar solo si la propuesta supera a mantener la cartera por 1 punto (mismo método, tras comisiones)
 monto_minimo_operacion = 2000        # MXN
 max_activos = 15
 l2_regularizacion = 0.001           # γ: penaliza concentración y estabiliza pesos

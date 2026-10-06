@@ -103,3 +103,16 @@ def test_clasificacion_no_puntua_suspendidas():
     filas = optimizador.clasificar([{"nombre": "A", "tipo": "acciones", "estado": "suspendida", "motivos": ["x"]},
                                     {"nombre": "B", "tipo": "mixta", "estado": "calculada", "puntuacion": {"total": 50}}], {})
     assert filas[0]["alternativa"] == "B" and filas[0]["posicion"] == 1 and filas[1]["posicion"] is None
+
+
+def test_frente_a_mantener_con_el_mismo_metodo_y_dos_ventanas(con_datos, ajustes, perfil):
+    """La propuesta y la cartera actual se miden igual, en la ventana de validación y en la más reciente; cuenta la peor."""
+    actual = {"valor_total": 100000, "posiciones": [
+        {"instrumento_id": i, "valor_mxn": 20000, "cantidad": 1, "costo_promedio": 1, "precio_mxn": 1}
+        for i in ("SIC:AAPL", "SIC:MSFT", "SIC:KO", "SIC:JNJ", "SIC:XOM")]}
+    p = optimizador.proponer(con_datos, ajustes, perfil, "acciones", actual)
+    f = p["frente_a_mantener"]
+    assert f["comparable"] and f["cobertura"] == 1.0 and len(f["por_ventana"]) == 2
+    dif = [v["propuesta"]["media"] - v["mantener"]["media"] for v in f["por_ventana"]]
+    assert f["propuesta"]["media"] - f["mantener"]["media"] == pytest.approx(min(dif))
+    assert optimizador.proponer(con_datos, ajustes, perfil, "acciones", VACIA)["frente_a_mantener"] is None
