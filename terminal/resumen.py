@@ -22,7 +22,23 @@ ZONA = "America/Mexico_City"
 DIAS = ("lun", "mar", "mié", "jue", "vie", "sáb", "dom")
 
 
-CRITERIOS_PLAN = {"puntuacion": "mayor puntuación", "plusvalia": "mayor plusvalía esperada al cierre del Reto"}
+CRITERIOS_PLAN = {"puntuacion": "mayor puntuación", "plusvalia": "mayor plusvalía esperada al cierre del Reto",
+                  "ganancia": "mayor ganancia media esperada al cierre del Reto"}
+
+
+def ganancia_esperada(p: dict) -> float | None:
+    """Ganancia media esperada al cierre del Reto: media anual usada × años que faltan (sin el castigo por volatilidad
+    de la mediana «central_p50»). Decisión del usuario del 5-oct-2026: prioridad, la mayor ganancia."""
+    e = (p or {}).get("escenarios") or {}
+    if e.get("media_anual_usada") is None or e.get("horizonte_anios") is None:
+        return None
+    return float(e["media_anual_usada"]) * float(e["horizonte_anios"])
+
+
+def metrica_plan(p: dict, criterio: str) -> float | None:
+    if criterio == "ganancia":
+        return ganancia_esperada(p)
+    return ((p or {}).get("escenarios") or {}).get("central_p50")
 
 
 def criterio_plan(propuestas: dict) -> str:
@@ -45,10 +61,11 @@ def propuesta_referencia(propuestas: dict) -> dict | None:
     fijada = [p for p in cands if p.get("referencia_fijada")]  # plan del día fijo (servicios._fijar_referencia)
     if fijada:
         return fijada[0]
-    if criterio_plan(propuestas) == "plusvalia":
-        con_esc = [p for p in cands if (p.get("escenarios") or {}).get("central_p50") is not None]
+    crit = criterio_plan(propuestas)
+    if crit in ("plusvalia", "ganancia"):
+        con_esc = [p for p in cands if metrica_plan(p, crit) is not None]
         if con_esc:
-            return max(con_esc, key=lambda x: (x["escenarios"]["central_p50"], x["puntuacion"]["total"]))
+            return max(con_esc, key=lambda x: (metrica_plan(x, crit), x["puntuacion"]["total"]))
     return max(cands, key=lambda x: x["puntuacion"]["total"])
 
 
@@ -146,8 +163,14 @@ def bloque_propuestas(props: dict | None, ref: dict, detalle: bool = False) -> l
         out.append(f"• {_linea_propuesta(x)}{marca}")
         if detalle or marca:
             out.append(f"   desglose: {_desglose(x)}")
-    plusvalia = criterio_plan(props or {}) == "plusvalia"
-    if plusvalia:
+    crit = criterio_plan(props or {})
+    plusvalia = crit in ("plusvalia", "ganancia")
+    if crit == "ganancia":
+        er = ref.get("escenarios") or {}
+        out.append(f"Por qué esta: usted eligió el criterio MAYOR GANANCIA; «{ref['nombre']}» tiene la mayor ganancia media "
+                   f"esperada al cierre del Reto ({ganancia_esperada(ref) or 0:+.1%}), con escenario adverso "
+                   f"{er.get('adverso_p10', 0):+.1%}: más ganancia posible a cambio de más riesgo. No es una promesa.")
+    elif plusvalia:
         er = ref.get("escenarios") or {}
         out.append(f"Por qué esta: usted eligió el criterio MAYOR PLUSVALÍA ESPERADA al cierre del Reto; «{ref['nombre']}» espera "
                    f"{er.get('central_p50', 0):+.1%}, pero su escenario adverso es {er.get('adverso_p10', 0):+.1%}: busca más "

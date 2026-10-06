@@ -121,3 +121,19 @@ def test_antes_de_la_apertura_aun_puede_cambiar(con, ajustes, monkeypatch):
     assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_rendimiento"
     out = _out(con, ajustes, perfil, [("acciones_rendimiento", 0.010, 66), ("acciones_puntuacion", 0.035, 89)])
     assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_puntuacion"
+
+
+def test_criterio_ganancia_usa_la_media_no_la_mediana():
+    """Decisión del 5-oct: prioridad, la mayor ganancia. La mediana castiga la volatilidad (+0.9 % vs +1.3 %), la media no
+    (21.5 % vs 12.4 % anual): con «ganancia» gana la de máximo rendimiento."""
+    def p(clave, central, media, punt):
+        return {"clave": clave, "nombre": clave, "estado": "calculada", "puntuacion": {"total": punt},
+                "perfil": {"criterio_plan": "ganancia"},
+                "escenarios": {"central_p50": central, "media_anual_usada": media, "horizonte_anios": 0.115}}
+    props = {"acciones_rendimiento": p("acciones_rendimiento", 0.009, 0.215, 65),
+             "acciones_puntuacion": p("acciones_puntuacion", 0.013, 0.124, 85)}
+    assert resumen.propuesta_referencia(props)["clave"] == "acciones_rendimiento"
+    assert abs(resumen.ganancia_esperada(props["acciones_rendimiento"]) - 0.215 * 0.115) < 1e-12
+    for x in props.values():
+        x["perfil"]["criterio_plan"] = "plusvalia"
+    assert resumen.propuesta_referencia(props)["clave"] == "acciones_puntuacion"

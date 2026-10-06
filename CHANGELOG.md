@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.21.0] — 2026-10-05 (criterio «mayor ganancia» y precios del portal)
+
+### Añadido
+- **Criterio del plan `ganancia`** (D-50, decisión del usuario): elige la propuesta con mayor ganancia media esperada al cierre del Reto (media anual × años que faltan), no la mediana, que castigaba la volatilidad. Activado en el perfil y disponible en «Reto y perfil». El plan de Telegram muestra el promedio, lo más común y el mal escenario.
+- **`terminal precios-portal <pdf>`** (`terminal/precios_portal.py`, D-51): lee el PDF de la pestaña «Acciones» que arma el participante. Las BMV se guardan como cierre del día (proveedor «archivo»). El SIC solo se compara con la referencia origen × tipo de cambio, sin mezclar MXN con la serie en USD. El 5-oct: 43 BMV importadas, diferencia mediana del SIC 0.32 %. Las BMV del catálogo sin precio pasan de 19 a 6.
+- **6 emisoras del portal que faltaban** (`scripts/incorporar_acciones_portal.py`): B (Barrick), BYND, ROKU, TWLO, WYNN y SIGMAF A. Universo 236, catálogo 233.
+
+### Pruebas
+- 4 nuevas: `tests/test_precios_portal.py` (3) y el criterio `ganancia` en `tests/test_referencia_plan.py`.
+
 ## [0.20.0] — 2026-10-05 (fondos del portal, mensajes sencillos, auditoría)
 
 ### Añadido

@@ -159,8 +159,8 @@ def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
         e.append("mercado_acciones: ambos, nacionales o extranjeras")
     out["mercado_acciones"] = mercado_acc
     criterio = str(p.get("criterio_plan", "puntuacion")).lower()
-    if criterio not in ("puntuacion", "plusvalia"):
-        e.append("criterio_plan: puntuacion o plusvalia")
+    if criterio not in ("puntuacion", "plusvalia", "ganancia"):
+        e.append("criterio_plan: puntuacion, plusvalia o ganancia")
     out["criterio_plan"] = criterio
     excl = p.get("excluir") or []
     if not isinstance(excl, list) or len(excl) > 300 or any(str(x) not in ids_validos for x in excl):

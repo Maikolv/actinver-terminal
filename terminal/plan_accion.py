@@ -180,7 +180,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         "generado_en": ahora.isoformat(timespec="seconds"), "reglas": reglas, "cuenta": cuenta, "cuenta_hora_texto": cuenta_txt,
         "propuesta": ({"clave": p["clave"], "nombre": p["nombre"], "puntuacion": p["puntuacion"]["total"],
                        "datos_hasta": p.get("datos_hasta"),
-                       "por_que": ("Mayor plusvalía esperada al cierre del Reto (criterio elegido en su perfil)."
+                       "por_que": ("Mayor ganancia media esperada al cierre del Reto (criterio elegido en su perfil)."
+                                   if (p.get("perfil") or {}).get("criterio_plan") == "ganancia"
+                                   else "Mayor plusvalía esperada al cierre del Reto (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "plusvalia"
                                    else "Es la propuesta vigente con mayor puntuación (criterio del plan del día).")} if p else None),
         "acciones": acciones, "faltan": faltan,

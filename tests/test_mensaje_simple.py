@@ -31,7 +31,7 @@ def test_ventas_antes_que_compras_con_tope_de_precio_y_sin_jerga():
     assert "ALPEK A: vende 3,394 acciones (todas las que tienes), a no menos de $14.60" in t
     assert "MU: compra 2 acciones, pagando como máximo $19,400.00" in t
     assert "ALPEK A" in t.split("Ojo:")[1]          # precio retrasado señalado
-    assert "lo normal +3.1%" in t and "-6.2%" in t   # rango al cierre del Reto, como estimación
+    assert "lo más común +3.1%" in t and "-6.2%" in t   # rango al cierre del Reto, como estimación
     for jerga in ("p10", "p50", "banda", "pp", "SIC", "peso objetivo", "rebalanceo"):
         assert jerga not in t, jerga
 
@@ -63,7 +63,7 @@ def test_condicional_y_pendientes_sin_dato():
     t = ms.construir(_plan([_accion("INTC *", "pendiente", referencia=compra, propuesta="comprar"),
                             _accion("MU *", "pendiente", referencia=venta, propuesta="vender")]), PROP, [], AHORA)
     assert t.index("MU: vende") < t.index("INTC: compra") and "precio límite $18,900.00" in t
-    assert "Haz primero las ventas: tus $37,129 disponibles no alcanzan" in t
+    assert "Haz primero las ventas: lo que te queda ($37,129) no alcanza" in t
 
 
 def test_regla_del_reto_incumplida_se_avisa():

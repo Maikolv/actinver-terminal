@@ -36,6 +36,12 @@ la semana siguiente si la fuente la publica (verificar términos antes).
    - b) Ampliar `reserva_nuevos` para cargar la historia de esas 19 en 1–2 días, a costa de dejar
      otras sin refrescar ese día.
    - c) Proveedor de pago (**Decisión**).
+
+   **Actualización (5-oct, noche):** el usuario entregó el PDF de la pestaña Acciones (145 emisoras). Con
+   `terminal precios-portal` las BMV sin precio bajan de 19 a 6: NAFTRAC, ANGELD y DIABLOI son ETF, ALFA aparece
+   como SIGMAF, y ELEKTRA y TERRA no están en el portal. Un solo día de precio no basta para entrar a las
+   propuestas (falta historia), pero sí para valuar y para las boletas. SIC: el portal y la referencia origen × tipo
+   de cambio difieren 0.32 % en la mediana.
 2. **El plan conservaba una propuesta dominada.** **Hecho.** La regla «estable» (no cambiar sin 2 puntos de
    mejora) mantenía «Acciones · Máximo rendimiento» (+0.9 % central, −19.7 % en el escenario adverso). Otra
    propuesta tenía +1.6 % y −5.9 %: más ganancia esperada y mucho menos riesgo. Ahora se cambia si otra la domina
@@ -47,7 +53,8 @@ la semana siguiente si la fuente la publica (verificar términos antes).
    completo sigue en `/completo`, `/detalle` y `/boletas detalle`. `alertas.formato_plan = "completo"` restaura el
    envío anterior.
 4. **La referencia del plan rinde menos que 1/N fuera de muestra** (+1.1 % contra +10.8 % anual, 84 sesiones).
-   **Decisión** pendiente desde el 30-sep: seguir con «plusvalía» o usar pesos iguales como referencia.
+   **Resuelta (D-50):** el usuario decidió priorizar la mayor ganancia; nuevo criterio `ganancia` (media esperada).
+   Con los datos del 5-oct, «Máximo rendimiento» rindió +92.9 % anual fuera de muestra contra +10.8 % de 1/N.
 
 ### Impacto medio
 

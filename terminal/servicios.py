@@ -269,9 +269,9 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
                 return None  # se está recalculando: el plan espera a esa misma propuesta en vez de saltar a otra
         elif _valida(out.get(previa["clave"])) and nueva:
             ant, nva = out[previa["clave"]], nueva
-            if criterio == "plusvalia":
+            if criterio in ("plusvalia", "ganancia"):
                 ea, en = ant.get("escenarios") or {}, nva.get("escenarios") or {}
-                mejora = en.get("central_p50", 0) - ea.get("central_p50", 0)
+                mejora = (resumen.metrica_plan(nva, criterio) or 0) - (resumen.metrica_plan(ant, criterio) or 0)
                 domina = (mejora > 0 and en.get("adverso_p10") is not None and ea.get("adverso_p10") is not None
                           and en["adverso_p10"] - ea["adverso_p10"] >= MARGEN_CAMBIO_CENTRAL)
                 cambia = mejora >= MARGEN_CAMBIO_CENTRAL or domina

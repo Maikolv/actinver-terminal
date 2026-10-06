@@ -299,6 +299,28 @@ def fondos(args) -> None:
         print("Sin la serie del universo en el documento (no se asigna por aproximación):", ", ".join(rep["sin_serie_en_documento"]))
 
 
+def precios_portal(args) -> None:
+    """Precios de la pestaña «Acciones» del simulador desde el PDF que arma el participante (vista previa o --confirmar)."""
+    from pathlib import Path
+    from . import db, precios_portal as pp
+    from .config import cargar_ajustes
+    ajustes = cargar_ajustes()
+    con = db.conectar()
+    db.inicializar(con, ajustes)
+    try:
+        rep = pp.importar(con, ajustes, Path(args.archivo).read_bytes(), Path(args.archivo).name, confirmar=args.confirmar)
+    except pp.ErrorDocumento as e:
+        sys.exit(f"Documento rechazado: {e}")
+    print(f"Precios del portal del {rep['fecha']}: {rep['filas']} emisoras · BMV {rep['bmv']} "
+          f"({'importadas' if rep['confirmado'] else 'vista previa; use --confirmar'}) · SIC {rep['sic']} (solo comparación)")
+    if rep["sic_dif_mediana"] is not None:
+        print(f"SIC: diferencia mediana portal vs. referencia origen × tipo de cambio {rep['sic_dif_mediana']:.2%}; mayores:")
+        for c in rep["sic_comparacion"][:8]:
+            print(f"  {c['emisora']:<12} portal {c['portal']:>12,.2f} · referencia {c['referencia']:>12,.2f} ({c['fecha_referencia']}) · {c['dif']:+.2%}")
+    if rep["fuera_del_universo"]:
+        print("Fuera del universo de la terminal:", ", ".join(rep["fuera_del_universo"]))
+
+
 def catalogo_simulador(args) -> None:
     """Catálogo operable del simulador a partir de la transcripción de sus capturas (config/pdf_transcripcion.csv).
 
@@ -559,6 +581,10 @@ def main() -> None:
     sub.add_parser("cobertura-twelvedata", help="verifica la cobertura BMV de Twelve Data símbolo por símbolo").set_defaults(
         fn=cobertura_twelvedata)
     sub.add_parser("claude", help="comprueba la credencial de Claude del chatbot (una consulta mínima)").set_defaults(fn=claude)
+    pp_ = sub.add_parser("precios-portal", help="precios de la pestaña Acciones del simulador desde el PDF del participante")
+    pp_.add_argument("archivo")
+    pp_.add_argument("--confirmar", action="store_true")
+    pp_.set_defaults(fn=precios_portal)
     cs = sub.add_parser("catalogo-simulador", help="limita el universo del Reto a lo que muestra su simulador")
     cs.add_argument("--transcripcion", default="config/pdf_transcripcion.csv")
     cs.add_argument("--fuente", default="Datos Actinver.pdf (capturas del simulador, 22-sep-2026)")

@@ -120,7 +120,7 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
             L.append(f"  {n}. {_nombre(a['clave'])}: vende {a['cantidad']:,} acciones{todo}, a no menos de "
                      f"${a['precio_limite']:,.2f} cada una (≈ {_dinero(a['monto'])}).")
     if compras:
-        L.append(f"{'2️⃣ Después' if ventas else '1️⃣'} COMPRA (orden limitada):")
+        L.append(f"{'2️⃣ Después' if ventas else '1️⃣'} COMPRA con el dinero que ya tienes (orden limitada):")
         for a in compras:
             n += 1
             L.append(f"  {n}. {_nombre(a['clave'])}: compra {a['cantidad']:,} acciones, pagando como máximo "
@@ -141,7 +141,7 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
         compra_cond = sum(a["referencia"].get("monto_mxn") or a["referencia"]["titulos_aprox"] * a["referencia"]["precio_max"]
                           for a in cond if a["referencia"].get("lado_sugerido", "compra") == "compra")
         if any(a["referencia"].get("lado_sugerido") == "venta" for a in cond) and compra_cond > efectivo:
-            L.append(f"  ➜ Haz primero las ventas: tus {_dinero(efectivo)} disponibles no alcanzan para las compras "
+            L.append(f"  ➜ Haz primero las ventas: lo que te queda ({_dinero(efectivo)}) no alcanza para estas compras "
                      "sin ese dinero. Si el portal no te deja comprar todo, compra menos acciones.")
     if espera:
         L.append("⏸ No toques hoy (falta un dato para decidir): " + ", ".join(_nombre(a["clave"]) for a in espera[:8])
@@ -169,8 +169,11 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
                  f"{traducir_evento(e['titulo'], e['pais']).rstrip('.')}{extra}. Puede mover mucho los precios; el plan no cambia por eso, pero no subas tu precio máximo.")
     esc = propuesta.get("escenarios") or {}
     if esc.get("central_p50") is not None and esc.get("adverso_p10") is not None:
-        L += ["", f"📈 Qué esperar al cierre del Reto (estimación, no promesa): lo normal {esc['central_p50']:+.1%}; "
-                  f"en un mal escenario (1 de cada 10) {esc['adverso_p10']:+.1%}."]
+        media = (esc["media_anual_usada"] * esc["horizonte_anios"] if esc.get("media_anual_usada") is not None
+                 and esc.get("horizonte_anios") is not None else None)
+        L += ["", "📈 Qué esperar al cierre del Reto (estimación, no promesa): "
+                  + (f"en promedio {media:+.1%}; " if media is not None else "")
+                  + f"lo más común {esc['central_p50']:+.1%}; en un mal escenario (1 de cada 10) {esc['adverso_p10']:+.1%}."]
     L += ["", "Tú capturas cada orden a mano; la terminal no compra ni vende nada. Más detalle: /detalle"]
     return "\n".join(L)
 
