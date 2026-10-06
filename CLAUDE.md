@@ -32,6 +32,11 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
+- **Cuenta del Reto (6-oct, 14:25, captura confirmada):**
+  - El usuario hizo la alternativa C: vendió 6 QQQ y compró 26 NVDA a $4,344.02.
+  - Valuación $987,988.71 (−1.2 %); poder de compra $6,318.77.
+  - Posiciones: MU 47.5 %, GMEXICO 15.4 %, AMD 15.3 %, NVDA 11.3 %, ALPEK 5.0 %, AMAT 4.8 %.
+  - Boletas vigentes #289/#290 (vender AMAT y comprar ≈ 12 NVDA, hasta el 7-oct 08:45): las pidió el usuario. Medidas igual, no mejoran la ganancia esperada (−0.15 pts).
 - **6-oct (v0.25.0):**
   - El usuario mantiene máximo rendimiento aceptando el riesgo de cola (D-59).
   - Alternativa gratuita a EODHD: proxy ADR para 8 emisoras (`scripts/historia_adr.py`; `terminal robustez --proxy-adr`) y el PDF del portal para el precio del día.
