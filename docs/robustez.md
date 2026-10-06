@@ -190,3 +190,20 @@ ganancia»). Se separan dos estados:
   decisión queda en el usuario.
 
 Los umbrales y la regla de elección **no** cambiaron.
+
+**Enmienda 2 (6-oct-2026, escrita ANTES de correr la variante; exploratoria).** Variante «proxy ADR» como
+alternativa gratuita a la historia de pago de EODHD (`terminal/proxy_adr.py`, `scripts/historia_adr.py`).
+- **Qué cambia:** solo los datos. Las emisoras BMV cuyo ADR (Tiingo, clave gratuita) tiene correlación diaria ≥ 0.80
+  con la serie local, en ≥ 120 sesiones comunes, se extienden hacia atrás con el rendimiento del ADR en MXN (FIX de
+  cada fecha, solo splits).
+- **Qué no cambia:** cuadrícula, umbrales, Monte Carlo, regla de elección y walk-forward.
+- **Uso:** corrida aparte (`uv run terminal robustez --proxy-adr`). Se compara con la principal y **no cambia
+  parámetros ni propuestas**; sirve para saber si la conclusión se sostiene cuando las emisoras nacionales entran
+  con historia larga.
+- **Validación del 6-oct:**
+
+  | | Emisoras | Correlación |
+  |---|---|---|
+  | Aceptadas | AMX, FEMSA, CEMEX, ASUR, GAP, KOF, GFNORTE, KIMBER | 0.89–0.96 |
+  | Rechazadas | BIMBO, GMEXICO (ADR OTC poco operados) | 0.52 y 0.75 |
+  | Sin datos para validar | OMA, TLEVISA, VESTA, VOLAR, WALMEX, GCARSO, ORBIA, PE&OLES (sin historia local) | — |
