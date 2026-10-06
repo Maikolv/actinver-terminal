@@ -162,6 +162,12 @@ def _linea_propuesta(x: dict) -> str:
         ew = c[1].get("rend_anual") if len(c) > 1 else None
         partes.append(f"fuera de muestra {c[0]['rend_anual']:+.1%}/año" + (f" vs pesos iguales {ew:+.1%}" if ew is not None else "")
                       + f" ({c[0].get('sesiones')} sesiones)")
+    v = x.get("validacion_extendida") or {}
+    if v.get("estrategia"):  # historia larga (V1): la evidencia que cuenta para decir «ventaja»
+        partes.append(f"validación extendida {v['estrategia']['rend_anual']:+.1%}/año vs pesos iguales "
+                      f"{v['iguales']['rend_anual']:+.1%} ({v['estrategia']['sesiones']} sesiones desde "
+                      f"{v['estrategia']['desde'][:7]}; exceso IC 90 % {v['exceso_ic90'][0]:+.0%} a {v['exceso_ic90'][1]:+.0%}): "
+                      f"{v['veredicto'].lower()}")
     return " · ".join(partes)
 
 

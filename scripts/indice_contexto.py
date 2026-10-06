@@ -25,6 +25,7 @@ INDICE = RAIZ / "_renders" / "contexto_indice.json"
 CACHE = RAIZ / "_renders" / "contexto_cache.json"
 INCLUIR = ("terminal/**/*.py", "tests/*.py", "scripts/*.py", "docs/**/*.md", "config/*.toml", "config/*.yaml", "web/**/*.js",
            "web/*.html", "README.md", "CLAUDE.md", "CHANGELOG.md")
+EXCLUIR = {"evaluar_busqueda.py"}  # contiene las preguntas de evaluación: indexarlo contaminaría la medición
 MARCAS = re.compile(r"^\s*(#{1,4} .+|def \w+|class \w+|async function \w+|function \w+|\[[\w.]+\])")
 
 
@@ -36,7 +37,7 @@ def construir() -> dict:
     archivos = {}
     for patron in INCLUIR:
         for p in RAIZ.glob(patron):
-            if not p.is_file() or "_renders" in p.parts:
+            if not p.is_file() or "_renders" in p.parts or p.name in EXCLUIR:
                 continue
             texto = p.read_text(encoding="utf-8", errors="ignore")
             lineas = texto.splitlines()
@@ -58,10 +59,11 @@ def _cargar() -> dict:
     return construir() if cambiados else idx
 
 
-def buscar(consulta: str, maximo: int = 5, contexto: int = 3) -> dict:
+def buscar_conteo(consulta: str, maximo: int = 5, contexto: int = 3) -> dict:
+    """Búsqueda anterior (conteo de términos por línea): 4/15 en scripts/evaluar_busqueda.py. Se conserva para comparar."""
     idx = _cargar()
     cache = json.loads(CACHE.read_text(encoding="utf-8")) if CACHE.exists() else {}
-    clave = f"{consulta}|{maximo}"
+    clave = f"conteo|{consulta}|{maximo}"
     c = cache.get(clave)
     if c and all((RAIZ / r).exists() and _sha(RAIZ / r) == h for r, h in c["hashes"].items()):
         return {**c["respuesta"], "cache": True}
@@ -93,6 +95,63 @@ def buscar(consulta: str, maximo: int = 5, contexto: int = 3) -> dict:
     return resp
 
 
+VACIAS = set("""a al algo ante como con cual cuál cuando cuándo de del desde donde el ella en entre es esta este esto
+fue ha hay la las le lo los me mi mis más no o para pero por qué que se si sí sin sobre su sus te tiene tu un una uno y ya
+""".split())  # palabras vacías genéricas del español
+DOCUMENTOS = ("docs/**/*.md", "config/*.yaml", "README.md", "CLAUDE.md", "CHANGELOG.md")
+
+
+def _tokens(t: str) -> list[str]:
+    import unicodedata
+    t = unicodedata.normalize("NFKD", t.lower()).encode("ascii", "ignore").decode()
+    return [w for w in re.findall(r"[a-z0-9&+]+", t) if len(w) > 1 and w not in VACIAS]
+
+
+def secciones() -> list[dict]:
+    """Fragmentos de la documentación por encabezado (≤ 1,500 caracteres), con archivo, línea y fecha del archivo."""
+    out = []
+    for patron in DOCUMENTOS:
+        for p in sorted(RAIZ.glob(patron)):
+            if not p.is_file():
+                continue
+            lineas = p.read_text(encoding="utf-8", errors="ignore").splitlines()
+            fecha = datetime.fromtimestamp(p.stat().st_mtime, UTC).date().isoformat()
+            ini, buf = 0, []
+            for i, l in enumerate(lineas + ["# fin"]):
+                if (re.match(r"^#{1,4} ", l) or sum(map(len, buf)) > 1500) and buf:
+                    out.append({"ruta": p.relative_to(RAIZ).as_posix(), "linea": ini + 1, "fecha": fecha, "texto": "\n".join(buf)})
+                    ini, buf = i, []
+                buf.append(l)
+    return out
+
+
+def bm25(consulta: str, docs: list[dict], k1: float = 1.5, b: float = 0.75) -> list[tuple[float, dict]]:
+    import math
+    from collections import Counter
+    toks = [Counter(_tokens(d["texto"])) for d in docs]
+    largo = [sum(t.values()) for t in toks]
+    prom = sum(largo) / max(len(largo), 1)
+    df = Counter(w for t in toks for w in t)
+    q = _tokens(consulta)
+    puntos = [sum(math.log(1 + (len(docs) - df[w] + 0.5) / (df[w] + 0.5)) * t[w] * (k1 + 1) / (t[w] + k1 * (1 - b + b * n / prom))
+                  for w in q if w in t) for t, n in zip(toks, largo, strict=True)]
+    return sorted(((s, d) for s, d in zip(puntos, docs, strict=True) if s > 0), key=lambda x: -x[0])
+
+
+def buscar(consulta: str, maximo: int = 5, contexto: int = 3) -> dict:
+    """BM25 por sección de la documentación (13/15 frente a 4/15 del conteo en scripts/evaluar_busqueda.py).
+    Cita archivo:línea y fecha; el texto se cita tal cual (máx. 8 líneas por fragmento)."""
+    fragmentos = []
+    for s, d in bm25(consulta, secciones())[:maximo]:
+        lineas = d["texto"].splitlines()
+        fragmentos.append({"ruta": f"{d['ruta']}:{d['linea']}", "fecha": d["fecha"], "coincidencias": round(s, 2),
+                           "texto": "\n".join(lineas[:8])})
+    citados = {f["ruta"].rsplit(":", 1)[0] for f in fragmentos}
+    return {"consulta": consulta, "fragmentos": fragmentos, "tokens_estimados": sum(len(f["texto"]) for f in fragmentos) // 4,
+            "tokens_si_se_leyeran_completos": sum(len((RAIZ / r).read_text(encoding="utf-8", errors="ignore")) for r in citados) // 4,
+            "cache": False}
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -108,7 +167,7 @@ def main() -> None:
         r = buscar(a.consulta, a.max)
         sys.stdout.reconfigure(encoding="utf-8")
         for f in r["fragmentos"]:
-            print(f"--- {f['ruta']} ({f['coincidencias']})\n{f['texto']}")
+            print(f"--- {f['ruta']} ({f.get('fecha', 'sin fecha')}, puntaje {f['coincidencias']})\n{f['texto']}")
         print(f"\n≈{r['tokens_estimados']} tokens (vs ≈{r['tokens_si_se_leyeran_completos']} leyendo los archivos completos)"
               f"{' · desde caché' if r['cache'] else ''}")
 

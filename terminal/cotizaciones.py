@@ -375,7 +375,7 @@ class ConectorContratado(MarketDataProvider):
         d = r.json()
         campos = c["campos"]
         recepcion = ahora_iso()
-        moneda = str(_ruta(d, campos["moneda"]) or "") if campos.get("moneda") else ""
+        moneda = str(_ruta(d, campos["moneda"]) or "") if campos.get("moneda") else str(e.get("moneda_fija") or "")
         simbolo_resp = str(_ruta(d, campos["simbolo"]) or sim) if campos.get("simbolo") else sim
         hora = _ruta(d, campos["hora_evento"])
         if hora is None:
@@ -398,6 +398,31 @@ class BmvLicensedProvider(ConectorContratado):
     entrega_mercado = ("local", "SIC")
     requisito_contrato = ("Contrato de datos de mercado con Grupo BMV o un distribuidor autorizado que permita acceso "
                           "programático a cotizaciones del mercado local y del SIC (uso no profesional) y su documentación técnica")
+
+
+class EodhdDiferidoProvider(ConectorContratado):
+    """Precio diferido de la BMV (EODHD «Live OHLCV», 15–20 min de retraso según su documentación) con la especificación
+    config/proveedores/eodhd_diferido.json. APAGADO por omisión: se activa con EODHD_DIFERIDO_ESPECIFICACION. Cada
+    consulta gasta una de las 20 peticiones diarias del plan gratuito (las mismas de los cierres), así que sin plan de pago
+    solo sirve para MEDIR el retraso real en unas pocas emisoras. EODHD declara sus precios «indicativos»; no es un
+    contrato con Grupo BMV. El retraso se clasifica con la hora del evento que devuelve, nunca se supone."""
+    nombre = "eodhd_diferido"
+    descripcion = "Precio diferido BMV de EODHD (15–20 min declarados; se mide con la hora del evento)"
+    prefijo = "EODHD_DIFERIDO"
+    entrega_mercado = ("local",)
+    requisito_contrato = "Clave EODHD (plan gratuito: 20 peticiones/día compartidas con los cierres; planes de pago: 100,000)"
+
+    def pendientes(self) -> list[str]:  # usa la misma clave EODHD_API_KEY de los cierres
+        return [p for p in super().pendientes() if "EODHD_DIFERIDO_API_KEY" not in p] + (
+            [] if self.env.get("EODHD_API_KEY") else ["credencial EODHD_API_KEY"])
+
+    def simbolo_proveedor(self, instrumento: dict) -> str:  # mismo símbolo que los cierres EODHD (GMEXICOB.MX, AC.MX)
+        mapa = (self.especificacion() or {}).get("mapa_simbolos") or {}
+        return mapa.get(instrumento["id"]) or EodhdBmvProvider.simbolo(None, instrumento)
+
+    def _consultar(self, instrumento: dict) -> Cotizacion:
+        self.env = {**self.env, "EODHD_DIFERIDO_API_KEY": self.env.get("EODHD_API_KEY", "")}
+        return super()._consultar(instrumento)
 
 
 class InfoselProvider(ConectorContratado):
@@ -662,14 +687,15 @@ class ActinverPdfProvider(CierreAlmacenadoProvider):
 # ----------------------------------------------------------------------------------------------------------------
 def construir(con: sqlite3.Connection, modo_demo: bool, entorno: dict | None = None) -> dict[str, MarketDataProvider]:
     env = entorno if entorno is not None else os.environ
-    ps = [BmvLicensedProvider(con, env), InfoselProvider(con, env), LsegProvider(con, env), EdimexProvider(con, env), IceProvider(con, env), EodhdBmvProvider(con, env),
+    ps = [BmvLicensedProvider(con, env), InfoselProvider(con, env), LsegProvider(con, env), EdimexProvider(con, env), IceProvider(con, env), EodhdDiferidoProvider(con, env),
+          EodhdBmvProvider(con, env),
           TwelveDataBmvProvider(con, env), ActinverPdfProvider(con, env),
           ManualOrCsvProvider(con, env), DemoProvider(con, env, modo_demo=modo_demo), ReferenciaOrigenProvider(con, env),
           ForeignMarketLicensedProvider(con, env)]
     return {p.nombre: p for p in ps}
 
 
-PRIORIDAD = ["bmv_licenciado", "infosel", "lseg", "ice", "edimex", "eodhd_bmv", "twelvedata_bmv", "actinver_pdf",
+PRIORIDAD = ["bmv_licenciado", "infosel", "lseg", "ice", "edimex", "eodhd_diferido", "eodhd_bmv", "twelvedata_bmv", "actinver_pdf",
              "manual_csv"]
 VIGENCIA_S = {"REAL_TIME": 120, "DELAYED": 30 * 60}
 

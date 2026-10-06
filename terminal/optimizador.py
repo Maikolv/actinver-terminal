@@ -845,6 +845,23 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         comparacion.append({"cartera": "Mantener cartera actual (parte con historia en este universo)", **m_act,
                             "cobertura": round(float(pesos_act.sum()), 3)})
 
+    # 2b) validación extendida (V1 del preregistro): panel dinámico con toda la historia disponible; solo evidencia
+    validacion_ext = None
+    try:
+        from . import validacion_extendida as ve
+        R_todo = precios[ids].ffill(limit=3).pct_change(fill_method=None)
+        R_todo = R_todo.loc[R_todo.notna().sum(axis=1) >= ve.MIN_ACTIVOS_PLIEGUE]
+
+        def _ajustar(cols, Xtr):
+            m = _modelo(tipo, perfil, ajustes, [elegibles[c] for c in cols], {}, aversion_mult=mult_base, lente=lente_calc)
+            o_ = m.fit(Xtr).named_steps["optimizacion"]
+            return pd.Series(o_.weights_, index=list(o_.feature_names_in_))
+        validacion_ext = ve.resumen(ve.walk_forward(_ajustar, R_todo, pd.Series({c: costo_unitario(elegibles[c], ajustes)
+                                                                                for c in ids}),
+                                                    float(o["banda_rebalanceo_pp"]) / 100))
+    except Exception as e:  # noqa: BLE001 - la propuesta no se detiene por la evidencia adicional; se informa
+        validacion_ext = {"error": str(e)[:200]}
+
     # 3) sensibilidad: ventana y aversión al riesgo
     sens = []
     for etiqueta, ventana, mult in (("Ventana 2 años", 504, 1.0), ("Ventana 4 años", 1008, 1.0),
@@ -907,7 +924,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "datos_desde_mas_antiguo": min(fechas_dato) if fechas_dato else None,
         "pesos": asignacion, "efectivo_residual": residuo, "capital": capital,
         "metricas_estimacion": _metricas(_serie_pesos(X, pesos)),
-        "comparacion": comparacion, "sensibilidad": sens, "estabilidad": round(estabilidad, 3),
+        "comparacion": comparacion, "validacion_extendida": validacion_ext, "sensibilidad": sens, "estabilidad": round(estabilidad, 3),
         "escenarios": esc, "frente_a_mantener": frente, "riesgos": _riesgos(pesos, elegibles, m_modelo, esc, excluidos, perfil, m_ew),
         "cambios": cmb, "ordenes": plan_ordenes, "puntuacion": punt, "busqueda_puntuacion": busqueda,
         "mercado_acciones": perfil.get("mercado_acciones", "ambos"),

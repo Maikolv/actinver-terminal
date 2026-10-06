@@ -1,0 +1,284 @@
+{
+ "instrumentos": 233,
+ "saltos_mayores_30pct": [
+  {
+   "id": "SIC:AFRM",
+   "fecha": "2022-05-13",
+   "rend": 0.3029
+  },
+  {
+   "id": "SIC:AFRM",
+   "fecha": "2024-08-29",
+   "rend": 0.3335
+  },
+  {
+   "id": "SIC:BABA",
+   "fecha": "2022-03-16",
+   "rend": 0.3564
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2024-02-28",
+   "rend": 0.3099
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2025-09-29",
+   "rend": -0.3625
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2025-10-13",
+   "rend": -0.4883
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2025-10-20",
+   "rend": 1.2765
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2025-10-21",
+   "rend": 1.4655
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2025-12-01",
+   "rend": 0.3625
+  },
+  {
+   "id": "SIC:BYND",
+   "fecha": "2026-04-20",
+   "rend": 0.4163
+  },
+  {
+   "id": "SIC:FUBO",
+   "fecha": "2022-08-16",
+   "rend": 0.4548
+  },
+  {
+   "id": "SIC:FUBO",
+   "fecha": "2025-01-06",
+   "rend": 2.4542
+  },
+  {
+   "id": "SIC:GME",
+   "fecha": "2022-03-22",
+   "rend": 0.3067
+  },
+  {
+   "id": "SIC:GME",
+   "fecha": "2023-03-22",
+   "rend": 0.3429
+  },
+  {
+   "id": "SIC:GME",
+   "fecha": "2024-05-13",
+   "rend": 0.748
+  },
+  {
+   "id": "SIC:GME",
+   "fecha": "2024-05-14",
+   "rend": 0.6047
+  },
+  {
+   "id": "SIC:GME",
+   "fecha": "2024-06-06",
+   "rend": 0.4723
+  },
+  {
+   "id": "SIC:GME",
+   "fecha": "2024-06-07",
+   "rend": -0.3686
+  },
+  {
+   "id": "SIC:KWEB",
+   "fecha": "2022-03-16",
+   "rend": 0.3858
+  },
+  {
+   "id": "SIC:LCID",
+   "fecha": "2021-10-28",
+   "rend": 0.3217
+  },
+  {
+   "id": "SIC:LCID",
+   "fecha": "2023-01-27",
+   "rend": 0.4263
+  },
+  {
+   "id": "SIC:LCID",
+   "fecha": "2025-07-17",
+   "rend": 0.3661
+  },
+  {
+   "id": "SIC:MARA",
+   "fecha": "2022-07-19",
+   "rend": 0.3246
+  },
+  {
+   "id": "SIC:MARA",
+   "fecha": "2024-11-11",
+   "rend": 0.3197
+  },
+  {
+   "id": "SIC:MRNA",
+   "fecha": "2026-08-19",
+   "rend": 1.7527
+  },
+  {
+   "id": "SIC:NFLX",
+   "fecha": "2022-04-20",
+   "rend": -0.3514
+  },
+  {
+   "id": "SIC:NVAX",
+   "fecha": "2022-12-15",
+   "rend": -0.3396
+  },
+  {
+   "id": "SIC:NVAX",
+   "fecha": "2024-05-10",
+   "rend": 0.9752
+  },
+  {
+   "id": "SIC:NVAX",
+   "fecha": "2024-05-13",
+   "rend": 0.4797
+  },
+  {
+   "id": "SIC:ORCL",
+   "fecha": "2025-09-10",
+   "rend": 0.3563
+  },
+  {
+   "id": "SIC:ROKU",
+   "fecha": "2023-07-28",
+   "rend": 0.3106
+  },
+  {
+   "id": "SIC:SPCE",
+   "fecha": "2022-02-15",
+   "rend": 0.3186
+  },
+  {
+   "id": "SIC:SPCE",
+   "fecha": "2025-05-16",
+   "rend": 0.4355
+  },
+  {
+   "id": "SIC:SPCE",
+   "fecha": "2026-05-29",
+   "rend": 0.3665
+  },
+  {
+   "id": "SIC:SPCE",
+   "fecha": "2026-06-02",
+   "rend": -0.3926
+  },
+  {
+   "id": "SIC:SPCE",
+   "fecha": "2026-06-12",
+   "rend": -0.3246
+  },
+  {
+   "id": "SIC:TWLO",
+   "fecha": "2022-11-04",
+   "rend": -0.351
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2022-02-16",
+   "rend": 0.3522
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2022-05-10",
+   "rend": -0.5631
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2023-05-10",
+   "rend": 0.333
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2023-08-09",
+   "rend": -0.3438
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2024-08-07",
+   "rend": 0.3849
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2024-11-08",
+   "rend": 0.4827
+  },
+  {
+   "id": "SIC:UPST",
+   "fecha": "2025-02-12",
+   "rend": 0.3133
+  }
+ ],
+ "huecos_mayores_5_sesiones": [],
+ "mezcla_de_divisas": [],
+ "claves_por_revisar": [
+  {
+   "id": "BMV:ALFA",
+   "estado": "por_confirmar",
+   "detalle": "El XLS vigente de la BMV no contiene ALFA y sí SIGMAF (Sigma Foods): probable cambio de clave tras la reorganización de Alfa. Confirmar antes de usar."
+  },
+  {
+   "id": "BMV:ELEKTRA",
+   "estado": "por_confirmar",
+   "detalle": "No figura en el XLS vigente de emisoras de la BMV: revisar suspensión o desliste."
+  },
+  {
+   "id": "SIC:CPE",
+   "estado": "deslistado_o_cambio",
+   "detalle": "Símbolo ausente del directorio de EE. UU. vigente. Callon Petroleum fue adquirida por APA Corp. (2024)."
+  },
+  {
+   "id": "SIC:GOLD",
+   "estado": "clave_reasignada",
+   "detalle": "La clave GOLD hoy corresponde a «Gold.com, Inc. Common Stock», no al emisor esperado (barrick). Barrick cambió su clave en NYSE de GOLD a B (2025)."
+  },
+  {
+   "id": "SIC:MRO",
+   "estado": "deslistado_o_cambio",
+   "detalle": "Símbolo ausente del directorio de EE. UU. vigente. Marathon Oil fue adquirida por ConocoPhillips (2024)."
+  },
+  {
+   "id": "SIC:PARA",
+   "estado": "clave_reasignada",
+   "detalle": "La clave PARA hoy corresponde a «Banzai International, Inc. - Class A Common Stock», no al emisor esperado (paramount). Paramount Global se fusionó con Skydance"
+  }
+ ],
+ "sin_precio": [
+  "BMV:ALFA",
+  "BMV:ANGELD",
+  "BMV:DIABLOI",
+  "BMV:ELEKTRA",
+  "BMV:TERRA",
+  "SIC:CPE",
+  "SIC:FAS",
+  "SIC:FAZ",
+  "SIC:GOLD",
+  "SIC:MRO",
+  "SIC:PARA",
+  "SIC:PSQ",
+  "SIC:QLD",
+  "SIC:SOXL",
+  "SIC:SOXS",
+  "SIC:SPXL",
+  "SIC:SPXS",
+  "SIC:SQQQ",
+  "SIC:TECL",
+  "SIC:TECS",
+  "SIC:TNA",
+  "SIC:TQQQ",
+  "SIC:TZA"
+ ]
+}
