@@ -196,3 +196,6 @@ Contexto: 161 titulares etiquetados, los mismos para todos los métodos. Decisi�
 
 ### D-58 Protocolo de robustez de parámetros
 Contexto: se pidió estabilidad de parámetros, Monte Carlo por combinación, SPP y clústeres, y walk-forward anidado. Decisión: `terminal/robustez/` con preregistro (`docs/robustez.md`, commit previo a la ejecución). La cuadrícula de 150 combinaciones por universo y las 500 simulaciones por combinación no tienen omisiones. Resultado al 5-oct: mesetas amplias, del 66 % y 79 % de la cuadrícula. La selección anidada no supera a la configuración vigente fuera de muestra, así que no se cambian parámetros. La configuración vigente de máximo rendimiento es estable, pero no pasa el umbral de caída p5 (−20 %). Enmienda 1: «frágil» queda solo para pico aislado o inestable; lo «no aprobado» por riesgo se informa y la decisión es del usuario, por D-50.
+
+### D-59 Se mantiene máximo rendimiento aceptando el riesgo de cola
+Contexto: el protocolo de robustez marca la configuración de máximo rendimiento como «no aprobada» (caída p5 de −23/−24 % en simulación). Decisión del usuario (6-oct-2026): mantenerla. Se guarda en `ajustes_usuario.decisiones_usuario.acepta_riesgo_cola`, fuera del perfil para no forzar el recálculo. El plan por Telegram lo dice junto al aviso de riesgo.

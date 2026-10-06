@@ -207,3 +207,23 @@ alternativa gratuita a la historia de pago de EODHD (`terminal/proxy_adr.py`, `s
   | Aceptadas | AMX, FEMSA, CEMEX, ASUR, GAP, KOF, GFNORTE, KIMBER | 0.89–0.96 |
   | Rechazadas | BIMBO, GMEXICO (ADR OTC poco operados) | 0.52 y 0.75 |
   | Sin datos para validar | OMA, TLEVISA, VESTA, VOLAR, WALMEX, GCARSO, ORBIA, PE&OLES (sin historia local) | — |
+
+**Resultados de la variante proxy ADR (6-oct-2026; exploratoria).** `uv run terminal robustez --tipo ambos --proxy-adr`
+(acciones 823 s, mixta 1,475 s, pico ≤ 353 MB). Mismas fechas, cuadrícula, umbrales y 500 simulaciones por
+combinación.
+
+| | Acciones: principal → proxy ADR | Mixta: principal → proxy ADR |
+|---|---|---|
+| Mediana SPP (anual) | +35.3 % → +25.8 % | +36.8 % → +29.9 % |
+| Aprobadas / meseta | 66 % (99) → 59 % (89) | 79 % (118) → 86 % (129) |
+| Máximo rendimiento vigente: R, exceso vs 1/N, S, caída p5 | +36.1 %, +12.8, 0.63, −23.1 % → +31.9 %, +9.1, 0.67, **−20.2 %** | +48.4 %, +24.9, 0.68, −24.2 % → +43.6 %, +20.1, 0.74, **−21.2 %** |
+| Walk-forward anidado frente a vigente (encadenado, anual) | +33.5 % vs +39.2 % → +20.6 % vs **+37.8 %** | +33.0 % vs +47.2 % → +40.9 % vs **+50.2 %** |
+| Tramo intacto: anidado frente a vigente (acumulado) | +35.7 % vs +45.6 % → +45.4 % vs +45.7 % | +3.8 % vs +46.6 % → +5.0 % vs +45.2 % |
+
+**Lectura:** con 8 emisoras mexicanas extendidas a 4.4 años, la conclusión se sostiene:
+- hay una meseta amplia;
+- la selección anidada no supera a la configuración vigente;
+- el máximo rendimiento vigente queda justo en el límite de riesgo de cola (−20 % a −21 %).
+
+La mediana baja porque las emisoras mexicanas subieron menos que los semiconductores de EE. UU. en 2023–2026. La
+decisión del usuario de mantener el máximo rendimiento (D-59) es consistente con esta evidencia; no es una garantía.

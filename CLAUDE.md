@@ -32,6 +32,10 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
 
+- **6-oct (v0.25.0):**
+  - El usuario mantiene máximo rendimiento aceptando el riesgo de cola (D-59).
+  - Alternativa gratuita a EODHD: proxy ADR para 8 emisoras (`scripts/historia_adr.py`; `terminal robustez --proxy-adr`) y el PDF del portal para el precio del día.
+  - Revisión del mandato con 9 propuestas, pendientes de decisión del usuario (`docs/mandato-autonomia.md`).
 - **6-oct (v0.24.0, protocolo de robustez):**
   - `uv run terminal robustez` (reanudable, ≈ 15–20 min por universo, ≤ 0.36 GB).
   - Cuadrícula de 150 combinaciones × 500 simulaciones Monte Carlo.

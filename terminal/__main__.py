@@ -309,7 +309,8 @@ def robustez(args) -> None:
     con = db.conectar()
     db.inicializar(con, ajustes)
     for tipo in (["acciones", "mixta"] if args.tipo == "ambos" else [args.tipo]):
-        r = informe.ejecutar(con, ajustes, tipo, max_combos=args.max_combos, progreso=lambda m: print(m, flush=True))
+        r = informe.ejecutar(con, ajustes, tipo, max_combos=args.max_combos, progreso=lambda m: print(m, flush=True),
+                             proxy_adr=args.proxy_adr)
         if r.get("estado") != "ok":
             print(f"{tipo}: {r.get('estado')} — {r.get('motivo')}")
             continue
@@ -611,6 +612,8 @@ def main() -> None:
     rb = sub.add_parser("robustez", help="protocolo de robustez: estabilidad, Monte Carlo, SPP/clústeres y walk-forward anidado")
     rb.add_argument("--tipo", choices=["acciones", "mixta", "ambos"], default="ambos")
     rb.add_argument("--max-combos", type=int, default=None, help="solo las primeras N combinaciones (prueba rápida)")
+    rb.add_argument("--proxy-adr", action="store_true",
+                    help="extiende hacia atrás emisoras BMV con su ADR en MXN (solo si correlación ≥ 0.80); corrida aparte")
     rb.set_defaults(fn=robustez)
     pp_ = sub.add_parser("precios-portal", help="precios de la pestaña Acciones del simulador desde el PDF del participante")
     pp_.add_argument("archivo")

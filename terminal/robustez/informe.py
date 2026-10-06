@@ -48,12 +48,16 @@ def _pico_mb() -> float | None:
         return None
 
 
-def preparar(con, ajustes, tipo: str) -> dict:
+def preparar(con, ajustes, tipo: str, proxy_adr: bool = False) -> dict:
     perfil = op.perfil_efectivo(servicios.perfil_actual(con, ajustes))
     el_l, excluidos, precios = op.universo(con, ajustes, perfil, tipo, None)
     el = {e["id"]: e for e in el_l}
     ids = list(el)
     R = precios[ids].ffill(limit=3).pct_change(fill_method=None)
+    proxys = None
+    if proxy_adr:  # historia sustituta de emisoras BMV con su ADR en MXN (solo las que pasan la validación)
+        from .. import proxy_adr as pa
+        R, proxys = pa.extender(con, ajustes, R)
     R = R.loc[R.notna().sum(axis=1) >= dz.MIN_ACTIVOS]
     costos = pd.Series({c: op.costo_unitario(el[c], ajustes) for c in ids})
     sic = {c for c in ids if el[c].get("mercado_operable") == "BMV-SIC"}
@@ -69,15 +73,19 @@ def preparar(con, ajustes, tipo: str) -> dict:
                          {"comision_con_iva": reto.costo_operacion(), "por_clase": sorted({round(float(x), 6) for x in costos})},
                          {"reglas": rc.get("reglas"), "fechas": rc.get("fechas")})
     pre["excluidos"] = len(excluidos)
+    if proxys is not None:
+        pre["proxy_adr"] = proxys
+        pre["huella"] = dz.huella([pre["huella"], [p for p in proxys if p.get("aceptado")]])
     return {"perfil": perfil, "el": el, "R": R, "costos": costos, "sic": sic, "pre": pre}
 
 
 def ejecutar(con, ajustes, tipo: str = "acciones", max_combos: int | None = None, progreso=print,
-             base: Path | None = None) -> dict:
+             base: Path | None = None, proxy_adr: bool = False) -> dict:
     t0 = time.time()
-    d = preparar(con, ajustes, tipo)
+    d = preparar(con, ajustes, tipo, proxy_adr) if proxy_adr else preparar(con, ajustes, tipo)
     pre, R = d["pre"], d["R"]
-    carpeta = (base or directorio_base()) / f"{tipo}_{pre['huella']}"
+    sufijo = "_adr" if proxy_adr else ""
+    carpeta = (base or directorio_base()) / f"{tipo}{sufijo}_{pre['huella']}"
     carpeta.mkdir(parents=True, exist_ok=True)
     if not (carpeta / "preregistro.json").exists():  # se fija antes de calcular cualquier resultado
         (carpeta / "preregistro.json").write_text(json.dumps(pre, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
@@ -136,11 +144,12 @@ def ejecutar(con, ajustes, tipo: str = "acciones", max_combos: int | None = None
         "combos": [ficha(tuple(c["pos"])) for c in combos],
         "mapas": es.mapas(met, ana, sims),
         "recursos": {"segundos": round(time.time() - t0, 1), "pico_memoria_mb": _pico_mb()},
+        "proxy_adr": pre.get("proxy_adr"),
         "aviso": ("Histórico fuera de muestra y simulación Monte Carlo (remuestreo del pasado con costos perturbados); no son "
                   "pronósticos ni garantías. SIC = referencia de origen × tipo de cambio, no cotización ejecutable."),
     }
     (carpeta / "resumen.json").write_text(json.dumps(res, ensure_ascii=False, default=str), encoding="utf-8")
-    (directorio_base() if base is None else base).joinpath(f"ultimo_{tipo}.json").write_text(
+    (directorio_base() if base is None else base).joinpath(f"ultimo_{tipo}{sufijo}.json").write_text(
         json.dumps({"carpeta": str(carpeta)}), encoding="utf-8")
     return res
 

@@ -81,7 +81,7 @@ def _horario(sesion: date) -> str:
 
 
 def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ahora_local: pd.Timestamp,
-              sesion: date | None = None, sesiones_restantes: int | None = None) -> str:
+              sesion: date | None = None, sesiones_restantes: int | None = None, riesgo_aceptado: dict | None = None) -> str:
     """Texto del plan del día. `plan` es la salida de plan_accion.calcular; `propuesta`, la de referencia."""
     s = sesion or ahora_local.date()
     cab = f"📋 Qué hacer {'hoy' if s == ahora_local.date() else 'en la próxima sesión'}, {DIAS[s.weekday()]} {s:%d-%m}"
@@ -188,6 +188,8 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
                     "frágil": " — ⚠️ FRÁGIL: solo funciona con parámetros muy específicos.",
                     "no aprobada": " — ⚠️ no pasa el filtro de riesgo: " + "; ".join(motivos_sencillos(rb.get("motivos") or [])) + "."
                     }[rb["estado"]])
+        if rb["estado"] == "no aprobada" and riesgo_aceptado:
+            L.append(f"   Tú decidiste mantener máximo rendimiento aceptando ese riesgo ({riesgo_aceptado.get('fecha')}).")
     L += ["", "Tú capturas cada orden a mano; la terminal no compra ni vende nada. Más detalle: /detalle"]
     return "\n".join(L)
 
@@ -208,4 +210,12 @@ def texto(con: sqlite3.Connection, ajustes, propuesta: dict | None = None, carte
         quedan = reto.sesiones_restantes(local.to_pydatetime()) if reto.activo() else None
     except Exception:  # noqa: BLE001
         quedan = None
-    return construir(plan, propuesta, eventos_macro(con, ahora), local, sesion or resumen.sesion_objetivo(ahora), quedan)
+    return construir(plan, propuesta, eventos_macro(con, ahora), local, sesion or resumen.sesion_objetivo(ahora), quedan,
+                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"))
+
+
+def decision(con: sqlite3.Connection, clave: str) -> dict | None:
+    """Decisiones explícitas del usuario guardadas fuera del perfil (no obligan a recalcular las propuestas)."""
+    import json
+    f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='decisiones_usuario'").fetchone()
+    return (json.loads(f[0]) if f else {}).get(clave)

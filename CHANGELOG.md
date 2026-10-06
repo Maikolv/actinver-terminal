@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.25.0] — 2026-10-06 (alternativa gratuita a EODHD y revisión del mandato)
+
+### Añadido
+- **Proxy ADR**, la alternativa gratuita para la historia BMV (`terminal/proxy_adr.py`, `scripts/historia_adr.py`): los rendimientos del ADR en MXN (FIX de cada fecha, solo splits) extienden hacia atrás 8 emisoras validadas (correlación diaria ≥ 0.80: AMX, FEMSA, CEMEX, ASUR, GAP, KOF, GFNORTE y KIMBER). BIMBO y GMEXICO se rechazan. Nunca se guarda como precio. Se usa en `terminal robustez --proxy-adr`, una corrida aparte y exploratoria (enmienda 2).
+- **Fuentes gratuitas revisadas** (`docs/bmv-licencia.md`): Marketstack, Alpha Vantage, FMP, Stooq, publicaciones de BMV, DataBursatil y Yahoo. Ninguna da varios años de la BMV gratis con términos compatibles.
+- **Revisión del mandato** (`docs/mandato-autonomia.md`): 9 choques o desactualizaciones con propuestas. El texto original no se modifica.
+- **Decisión D-59:** se mantiene el máximo rendimiento aceptando su riesgo de cola. Se guarda fuera del perfil y el plan por Telegram lo menciona.
+
+### Resultados
+- Con el proxy ADR, la conclusión se sostiene: meseta amplia (59 % y 86 %); la selección anidada no supera a la configuración vigente; el máximo rendimiento queda en el límite de riesgo de cola (caída p5 de −20.2 % y −21.2 %).
+
+### Pruebas
+- 3 nuevas: `tests/test_proxy_adr.py` (2) y el riesgo aceptado en `tests/test_mensaje_simple.py`.
+
 ## [0.24.0] — 2026-10-06 (protocolo de robustez)
 
 ### Añadido

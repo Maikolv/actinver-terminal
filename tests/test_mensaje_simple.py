@@ -95,6 +95,15 @@ def test_boletas_sencillas_ventas_primero():
     assert boleta.texto_telegram_simple([]).startswith("No hay órdenes")
 
 
+def test_riesgo_de_cola_aceptado_por_el_usuario_se_dice_en_el_mensaje():
+    prop = {**PROP, "robustez": {"estado": "no aprobada", "motivos": ["caida_p5"], "simulacion_prob_perdida": 0.37}}
+    plan = _plan([_accion("MU *", "comprar", 1, 19400.0, 19400.0)])
+    t = ms.construir(plan, prop, [], AHORA, riesgo_aceptado={"fecha": "2026-10-06"})
+    assert "no pasa el filtro de riesgo: en la simulación, 1 de cada 20 casos cae más del 20 %" in t
+    assert "Tú decidiste mantener máximo rendimiento aceptando ese riesgo (2026-10-06)" in t
+    assert "decidiste" not in ms.construir(plan, prop, [], AHORA)
+
+
 def test_si_mantener_es_mejor_dice_que_no_cambie_nada():
     mm = {"propuesta": 0.070, "mantener": 0.076, "costo": 0.001, "neta": -0.007, "margen": 0.01, "metrica": "ganancia promedio",
           "adverso_propuesta": -0.127, "adverso_mantener": -0.167}

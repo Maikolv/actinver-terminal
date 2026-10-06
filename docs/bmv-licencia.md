@@ -72,3 +72,40 @@ Alternativas:
 El retraso real de EODHD Live en la BMV no se ha medido: el mercado estaba cerrado y el cupo gratuito es mínimo. Con
 el conector activado, 2 o 3 consultas a las 10:00 CDMX registran la latencia en `cotizaciones_registro`, y
 `docs/fuentes.md` debe actualizarse con esa cifra medida.
+
+## Alternativa gratuita a EODHD (6-oct-2026, pedida por el usuario)
+
+Revisadas en los sitios de cada proveedor:
+
+| Fuente gratuita | BMV | Historia | Límite | Términos | ¿Sirve? |
+|---|---|---|---|---|---|
+| Marketstack Free | Sí (2,700+ bolsas) | 1 año | 100 peticiones/mes | No comercial | No: misma historia que EODHD gratis y menos cupo |
+| Alpha Vantage Free | No confirmada | Últimos 100 días (`full` es de pago) | — | — | No |
+| Financial Modeling Prep Basic | **No**: solo EE. UU. | 5 años | 250/día | — | No |
+| Stooq | **No** cubre México | 20+ años | — | — | No |
+| Grupo BMV, publicaciones en línea | Sí | Sí | — | **Todas de pago** | No |
+| DataBursatil | Sí, con SIC | Varios años | 200,000 créditos/mes | «Solo educacional», «no… para toma de decisiones de inversión» | No, por sus términos |
+| Yahoo Finance | Sí | Sí | — | API no oficial; descarga solo para suscriptores | No |
+| **ADR en EE. UU. (Tiingo y Alpaca, claves que ya existen)** | 8 emisoras validadas | **2021→hoy** | Ya incluido | Uso personal (Tiingo) | **Sí, para historia** |
+| **PDF del portal del Reto** (lo arma el usuario) | Las 145 del simulador | Desde que se capture | Manual | Copia propia del participante | **Sí, para el precio del día** |
+
+**Alternativa adoptada (gratuita):**
+1. **Historia:** proxy ADR (`terminal/proxy_adr.py`, `scripts/historia_adr.py`). El rendimiento del ADR en MXN, con
+   el FIX de cada fecha y solo splits, extiende hacia atrás la emisora local. Se acepta solo si la correlación diaria
+   es ≥ 0.80 en el año común.
+   - **Aceptadas** (6-oct): AMX 0.96, CEMEX 0.96, FEMSA 0.95, ASUR 0.94, GAP 0.94, KOF 0.93, GFNORTE 0.92 y
+     KIMBER 0.89.
+   - **Rechazadas:** BIMBO 0.52 y GMEXICO 0.75.
+   - **Sin validar todavía:** OMA, TLEVISA, VESTA, VOLAR, WALMEX, GCARSO, ORBIA y PE&OLES. Tienen ADR, pero solo un
+     día local; se validarán cuando se acumulen 120 sesiones locales.
+2. **Precio del día:**
+   - el PDF de la pestaña Acciones del portal (`terminal precios-portal`), que es el precio del simulador;
+   - los cierres de EODHD gratis para las emisoras que alcance su cupo.
+
+**Límites:**
+- El ADR no es la acción local: hay diferencias de horario, de liquidez y de costo del ADR. El error de seguimiento
+  medido va de 7 % a 11 % anual.
+- Solo cubre 8 de las 48 claves BMV del catálogo.
+- No da precio en tiempo real. El retraso real de EODHD Live sigue sin medirse.
+
+Solo se usa para validar con historia larga; nunca como precio ni como cotización.
