@@ -939,7 +939,8 @@ function pintarReto(r) {
       { t: "ESCENARIOS 10 % / 90 % (MXN)", f: (x) => `${num(x.precio_p10)} / ${num(x.precio_p90)}` },
       { t: "Rendimiento estimado", f: (x) => signoPct(x.rend_central), num: true },
       { t: "Rango 10–90 %", f: (x) => `${signoPct(x.rend_p10)} a ${signoPct(x.rend_p90)}` },
-      { t: "Prob. subida", f: (x) => pct(x.prob_subida), num: true },
+      { t: q && q.prob_experimental === false ? "Prob. subida" : "Prob. subida (experimental)",
+        f: (x) => (q && q.prob_experimental === false ? pct(x.prob_subida) : h("span", { clase: "suave" }, pct(x.prob_subida))), num: true },
       { t: "Estado", f: (x) => chip(x.vencido ? "vencido" : "calculada", x.vencido ? `Vencido (${x.atraso_sesiones} ses.)` : "Estimación") }],
       r.emisoras.slice(0, 80), { caption: r.aviso, claseFila: (x) => (x.vencido ? "fila-inactiva" : null) }),
     tabla([{ t: "Propuesta frente al pronóstico", f: (x) => x.nombre }, { t: "Puntuación", f: (x) => (vacio(x.puntuacion) ? "—" : x.puntuacion.toFixed(1)), num: true },
@@ -962,7 +963,7 @@ function pintarReto(r) {
         q.por_mercado, { caption: "Por mercado (BMV y SIC): un cociente ≥ 1 significa que el modelo no mejora a «sin cambio»." }),
       tabla([{ t: "Probabilidad estimada", f: (m) => m.tramo }, { t: "n", f: (m) => num(m.n), num: true },
         { t: "Media estimada", f: (m) => pct(m.prob_media), num: true }, { t: "Frecuencia observada de subida", f: (m) => pct(m.frecuencia_subida), num: true }],
-        q.calibracion || [], { caption: `Calibración de la probabilidad de subida. Cobertura del rango 80 %: ${pct(q.cobertura_80)} · Brier ${num(q.brier)} · rotación ${num(q.rotacion_media)} · caída máxima ${pct(q.caida_maxima)} · neto de costos ${signoPct(q.resultado_neto)}.` }),
+        q.calibracion || [], { caption: `Calibración de la probabilidad de subida: ${q.prob_experimental === false ? "calibrada" : "EXPERIMENTAL, no es señal de compra"} (${q.prob_resumen}). Cobertura del rango 80 %: ${pct(q.cobertura_80)} · Brier ${num(q.brier)} · rotación ${num(q.rotacion_media)} · caída máxima ${pct(q.caida_maxima)} · neto de costos ${signoPct(q.resultado_neto)}.` }),
       q.historia_insuficiente.length ? h("p", { clase: "suave", texto: `Sin historia suficiente (no se ocultan): ${q.historia_insuficiente.map((x) => `${x.instrumento_id} (${x.sesiones}/${x.minimo})`).join(", ")}.` }) : null)
       : null,
     (r.sin_datos || []).length ? h("p", { clase: "suave", texto: `Sin precios en la terminal (sin pronóstico): ${r.sin_datos.join(", ")}.` }) : null);

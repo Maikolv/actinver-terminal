@@ -66,6 +66,39 @@ El error relativo a «sin cambio» por mercado, a 31 sesiones, es de 1.05 en la 
 
 **Conclusión.** No hay ventaja demostrada en ningún horizonte. El pronóstico **no** maximiza la ganancia: es una señal experimental que no cambia el plan.
 
+## Auditoría de la probabilidad de subida (6-oct-2026)
+
+Módulo `terminal/investigacion/calibracion.py`, integrado en cada experimento (`calibracion_auditoria`). Todo se
+mide en la **prueba intacta** (fechas posteriores a la validación):
+- Brier del modelo frente a la **frecuencia base** de subidas conocida antes de la prueba y frente a 0.5;
+- curva de confiabilidad en 10 tramos;
+- recalibración **isotónica** y **Platt**, ajustadas solo con la validación;
+- IC 90 % por bootstrap de fechas completas, porque las emisoras de un mismo día están correlacionadas y las
+  etiquetas a H sesiones se solapan.
+
+Criterio, fijado antes de medir: se considera «calibrada» solo si el Brier es menor que el de la frecuencia base con
+un IC 90 % entero bajo cero y el desvío máximo de la curva es ≤ 10 puntos en tramos con n ≥ 30.
+
+| H | Prueba (n · fechas) | Frecuencia base | Brier base | Brier modelo [dif. IC 90 %] | Isotónica | Platt | Desvío máx. | Veredicto |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 30,403 · 181 (ene–oct-2026) | 49.8 % | 0.2500 | 0.2515 [+0.0002, +0.0027] | 0.2504 | 0.2502 | 17 pts | experimental |
+| 5 | 29,538 · 176 | 50.2 % | 0.2500 | 0.2523 [+0.0002, +0.0044] | 0.2507 | 0.2506 | 20 pts | experimental |
+| 28 (al cierre del Reto) | 25,214 · 150 | 51.2 % | 0.2502 | 0.2613 [+0.0085, +0.0139] | 0.2597 | 0.2598 | 41 pts | experimental |
+
+**Lectura:**
+- En los tres horizontes la probabilidad es **peor** que decir siempre «≈ 50 %», y la diferencia es significativa.
+- Recalibrada (isotónica o Platt), queda al nivel de la frecuencia base, sin superarla: el modelo no tiene
+  información direccional demostrable.
+- A 28 sesiones, la curva llega a desviarse 41 puntos: cuando decía 83 %, subió el 42 % de las veces.
+
+**Qué cambió:**
+- La probabilidad queda marcada como **EXPERIMENTAL**.
+- En Telegram (`/pronostico`) ya no aparece junto a cada emisora: hay una sola línea con el Brier frente a la
+  frecuencia base.
+- En la pestaña Futuro, su columna se llama «Prob. subida (experimental)» y va en gris.
+- No es, ni se convierte en, señal de compra.
+- Tamaño de muestra e incertidumbre: los de la tabla. Datos al 2-oct-2026, cortes 70/15/15.
+
 ## Recursos
 
 - **Memoria y tiempo.** La emisión de los tres horizontes con 130 instrumentos tarda unos 140 s y su memoria pico es de 0.36 GB, medida en un equipo de 5.9 GB.

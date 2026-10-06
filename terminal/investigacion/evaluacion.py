@@ -252,6 +252,16 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
     supera_error = mod["mse"] < min(r["mse"] for r in refs) and significativo
     supera_neto = mod["resultado_neto"] > max([r["resultado_neto"] for r in refs] + [e["resultado_neto"] for e in estrategias_ref])
 
+    # Auditoría de la probabilidad de subida: recalibración ajustada en validación, medida en la prueba intacta
+    from . import calibracion as cal
+    res_ord = np.sort(residuos["modelo"])
+
+    def _prob(pred, s):
+        return 1 - np.searchsorted(res_ord, -np.asarray(pred) / s, side="right") / max(len(res_ord), 1)
+    auditoria = cal.auditar(_prob(ajustados[elegido].predict(_X(val)), s_val), (val["y"].to_numpy() > 0).astype(float),
+                            _prob(pred_mod, escala(pru, H)), (pru["y"].to_numpy() > 0).astype(float), pru["fecha"],
+                            float((panel.loc[m_ev, "y"] > 0).mean()), semilla)
+
     huella_datos = _huella([demo, len(panel), cortes.a_dict(), round(float(panel["y"].sum()), 8)])
     config_reg = {k2: v2 for k2, v2 in cfg.items()}
     previos = con.execute("SELECT huella_config FROM experimentos WHERE huella_datos=?", (huella_datos,)).fetchall()
@@ -282,7 +292,7 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
         "aviso": ("El embargo y la purga evitan fugas de información; no garantizan que los pronósticos acierten. "
                   "Los intervalos son estimaciones con error histórico."),
         "historia_insuficiente": datos.historia_insuficiente(precios, H), "moneda": "MXN" if cfg.get("mxn") else "original",
-        "por_mercado": por_mercado(pru, pred_mod, H),
+        "por_mercado": por_mercado(pru, pred_mod, H), "calibracion_auditoria": auditoria,
         "dias_prueba": int(pru["fecha"].nunique()),
         "version_codigo": __version__, "semilla": semilla, "huella_config": _huella(config_reg)[:16],
         "huella_datos": huella_datos[:16],

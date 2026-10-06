@@ -294,7 +294,14 @@ def calidad(exp: dict | None, det: dict | None) -> dict | None:
     cal = [c for c in (mod.get("calibracion") or []) if c["n"] >= 30]
     peor = max(cal, key=lambda c: abs(c["prob_media"] - c["frecuencia_subida"]), default=None)
     desvio = abs(peor["prob_media"] - peor["frecuencia_subida"]) if peor else None
+    aud = exp.get("calibracion_auditoria") or {}
+    m0 = (aud.get("metodos") or [{}])[0]
     return {"H": exp.get("H"), "hora_corte": exp.get("hora_corte"), "veredicto": exp.get("veredicto"),
+            # sin auditoría (experimento anterior) o sin calibración demostrada: experimental y con menos prominencia
+            "prob_experimental": aud.get("veredicto") != "calibrada", "calibracion_auditoria": aud or None,
+            "prob_resumen": (f"Brier {m0['brier']:.3f} frente a {aud['brier_frecuencia_base']:.3f} de la frecuencia base "
+                             f"({aud['frecuencia_base']:.0%} de subidas); {aud['n_prueba']} casos en {aud['fechas_prueba']} fechas"
+                             if aud and m0 else "sin auditoría de calibración en este experimento"),
             "calibracion_desvio": desvio, "calibracion_aviso": (
                 f"Probabilidad de subida mal calibrada: en la prueba, cuando estimaba {peor['prob_media']:.0%} subió el "
                 f"{peor['frecuencia_subida']:.0%} de las veces ({peor['n']} casos). No la lea como probabilidad real."
@@ -371,8 +378,11 @@ def texto(r: dict) -> str:
            f"Emitido {e['emitido_en'][:16].replace('T', ' ')} UTC · último cierre usado {e['ultimo_cierre']} · modelo {e['version']}",
            f"{'✅' if b['permitida'] else '⚠️'} {b['leyenda']}" + ("" if b["permitida"] else " — el plan sigue el método actual."),
            "", "Mayor potencial estimado:"]
-    out += [f"• {x['clave']} {_p(x['rend_central'])} (rango {_p(x['rend_p10'])} a {_p(x['rend_p90'])}; "
-            f"prob. subida {x['prob_subida']:.0%})" for x in r["mayor_potencial"]] or ["• sin estimaciones utilizables"]
+    q0 = r.get("calidad") or {}
+    exp_p = q0.get("prob_experimental", True)
+    out += [f"• {x['clave']} {_p(x['rend_central'])} (rango {_p(x['rend_p10'])} a {_p(x['rend_p90'])}"
+            + ("" if exp_p else f"; prob. subida {x['prob_subida']:.0%}") + ")"
+            for x in r["mayor_potencial"]] or ["• sin estimaciones utilizables"]
     out += ["", "Riesgos principales (peor escenario 10 %):"]
     out += [f"• {x['clave']} {_p(x['rend_p10'])}" for x in r["riesgos"]] or ["• —"]
     falta = len((r.get("calidad") or {}).get("historia_insuficiente") or []) + len(r.get("sin_datos") or [])
@@ -396,6 +406,8 @@ def texto(r: dict) -> str:
         out.append(f"Calidad histórica (prueba fuera de muestra): error/«sin cambio» {q['razon_error_vs_sin_cambio']:.2f}, "
                    f"dirección {q['acierto_direccion'] or 0:.0%}, cobertura 80 % {q['cobertura_80'] or 0:.0%}, "
                    f"neto de costos {_p(q['resultado_neto'])}. {q['veredicto']}.")
+        if q.get("prob_experimental", True):
+            out.append(f"Probabilidad de subida: EXPERIMENTAL, no se muestra como señal ({q.get('prob_resumen')}).")
         if q.get("calibracion_aviso"):
             out.append("⚠️ " + q["calibracion_aviso"])
     out += ["", r["propuestas"]["explicacion"]]
