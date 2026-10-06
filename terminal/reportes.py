@@ -1,4 +1,4 @@
-"""Reportes automáticos en Markdown: pre-apertura (08:00), cierre (15:15) y semanal del Reto.
+"""Reportes automáticos en Markdown: pre-apertura (07:00 hasta el 2-nov; 08:00 desde el 3-nov), cierre (15:15) y semanal.
 
 Solo leen lo que ya calcula la terminal; nunca inventan un dato. Cada cifra lleva su fecha y su vigencia, y si una
 propuesta está suspendida o desactualizada el reporte lo dice en lugar de mostrarla como actual.

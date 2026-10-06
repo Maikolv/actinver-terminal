@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.25.1] — 2026-10-06 (mandato de autonomía, versión 2)
+
+### Cambiado
+- **Mandato vigente:** `docs/mandato-autonomia-v2.txt`, aprobado por el usuario (D-60). La v1 se conserva intacta. Cambios:
+  - objetivo sin promesa de tiempo real ni de rendimiento;
+  - precedencia de las restricciones posteriores;
+  - el portal del Reto nunca se automatiza;
+  - pre-apertura a las 07:00 hasta el 2-nov;
+  - borrar fuera del repositorio requiere confirmación;
+  - sin la referencia al archivo inexistente;
+  - acceso remoto autorizado solo por Tailscale Serve en la red privada;
+  - otras sesiones en paralelo;
+  - boletas solo informativas.
+
 ## [0.25.0] — 2026-10-06 (alternativa gratuita a EODHD y revisión del mandato)
 
 ### Añadido

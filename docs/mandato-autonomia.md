@@ -1,8 +1,41 @@
 # Mandato de autonomía — procedencia y vigencia
 
-El texto exacto está en [mandato-autonomia.txt](mandato-autonomia.txt). Se guarda como texto plano para no reformatearlo
-ni reinterpretarlo; ese archivo no se edita a mano. Una versión nueva se agrega como archivo aparte, con su propia
-procedencia.
+**Versión vigente: 2** → [mandato-autonomia-v2.txt](mandato-autonomia-v2.txt), aprobada por el usuario el 6-oct-2026.
+Su mensaje fue: «Utiliza la versión más vigente el texto, autorizo realizar cualquier cambio necesario para la
+versión final».
+
+La versión 1 ([mandato-autonomia.txt](mandato-autonomia.txt)) se conserva intacta como historial. Los textos se
+guardan en texto plano y no se editan a mano: cada versión nueva es un archivo aparte, con su procedencia.
+
+## Versión 2 (vigente)
+
+| Campo | Valor |
+|---|---|
+| Base | Versión 1 (texto del 23-sep-2026), confirmada por el usuario como la más vigente |
+| Cambios | Los 9 puntos de la revisión de abajo, aplicados como reemplazos exactos (10 líneas agregadas y 9 quitadas); el resto es idéntico |
+| Aprobación | Usuario, 6-oct-2026, en la sesión de Claude Code |
+| sha256 del texto | `04d79d8bc077d830a4932cf78300a069e624add2f6f942c4d678a6c2f73e5301` (sin el salto de línea final, el mismo criterio que la versión 1) |
+
+Qué cambió respecto de la versión 1:
+1. **Objetivo:** «la mejor estimación disponible… con la frescura que permitan las fuentes legales» y «ninguna
+   ventaja ni rendimiento se afirma sin evidencia fuera de muestra», en lugar de «siempre, en tiempo real, el mejor
+   portafolio».
+2. **Precedencia:** gana la instrucción posterior más restrictiva. La autonomía técnica también respeta lo que el
+   usuario restrinja después.
+3. **Portal del Reto:** nunca se automatiza, ni con autorización (reglamento).
+4. **Pre-apertura:** 07:00 hasta el 2-nov; 08:00 desde el 3-nov.
+5. **Las 6 URL:** sin cambio en el texto; su estado está en `docs/fuentes.md`.
+6. **Borrar fuera de `actinver-terminal/`:** solo con respaldo y confirmación del usuario.
+7. **Lighthouse y rendimiento:** sin cambio en el texto (es una tarea técnica).
+8. **Referencia a `prompt_terminal_actinver.md`:** se quita, porque no existe. El primer paso lee `CLAUDE.md` y
+   `docs/resumen-ejecutivo.md`.
+9. **Acceso remoto:** queda autorizado solo Tailscale Serve dentro de la red privada; cualquier exposición pública
+   requiere autorización.
+
+Además, se incorporaron dos restricciones posteriores del usuario: no sobrescribir el trabajo de otras sesiones, y
+que las boletas son informativas (la terminal no registra órdenes ni marca boletas como ejecutadas).
+
+## Versión 1 (histórica)
 
 | Campo | Valor |
 |---|---|
@@ -11,7 +44,7 @@ procedencia.
 | Fecha | 2026-09-23 06:27:19 UTC (00:27 CDMX) |
 | Extracción | 2026-10-06, del registro local de esa sesión (`~/.claude/projects/…/b2ee0729….jsonl`, línea 85), sin cambios |
 | sha256 del texto | `e3957ec10a0079d4e0d9b7d66a133c940e75d725c7384694b9dd7f11c4435975` (9,088 caracteres, UTF-8, saltos LF) |
-| Confirmación del usuario | **Pendiente**: el usuario debe confirmar que esta es la versión autorizada vigente |
+| Confirmación del usuario | Confirmada como base el 6-oct-2026; sustituida por la versión 2 |
 
 ## Documento mencionado que no está en este equipo
 

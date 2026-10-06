@@ -1,10 +1,10 @@
 # CLAUDE.md — actinver-terminal
 
 Este repo opera bajo el **prompt de autonomía total** («Terminal local de análisis
-de portafolios»). Su texto exacto está en `docs/mandato-autonomia.txt`, y su procedencia
-(pegado por el usuario el 23-sep-2026), sha256 y orden de precedencia en
-`docs/mandato-autonomia.md`. La confirmación del usuario de que es la versión vigente
-está pendiente. Las restricciones posteriores del usuario, más estrictas, prevalecen.
+de portafolios»). **Versión vigente: `docs/mandato-autonomia-v2.txt`**, aprobada por el
+usuario el 6-oct-2026. La v1, del 23-sep, se conserva como historial. Procedencia, sha256 y
+cambios en `docs/mandato-autonomia.md`. Si un texto choca con una instrucción posterior del
+usuario, gana la más restrictiva.
 Resumen de sus límites duros (sección 6, no negociables):
 sin dinero real ni órdenes en vivo, secretos solo en `.env`, datos solo por vía
 legal (sin saltar anti-bot/paywalls), sin automatizar la cuenta personal de

@@ -199,3 +199,6 @@ Contexto: se pidió estabilidad de parámetros, Monte Carlo por combinación, SP
 
 ### D-59 Se mantiene máximo rendimiento aceptando el riesgo de cola
 Contexto: el protocolo de robustez marca la configuración de máximo rendimiento como «no aprobada» (caída p5 de −23/−24 % en simulación). Decisión del usuario (6-oct-2026): mantenerla. Se guarda en `ajustes_usuario.decisiones_usuario.acepta_riesgo_cola`, fuera del perfil para no forzar el recálculo. El plan por Telegram lo dice junto al aviso de riesgo.
+
+### D-60 Mandato de autonomía, versión 2
+Contexto: el usuario confirmó la versión 1 como base vigente y autorizó los cambios necesarios para la versión final (6-oct-2026). Decisión: `docs/mandato-autonomia-v2.txt` aplica los 9 puntos de la revisión como reemplazos exactos e incorpora dos restricciones posteriores (otras sesiones; boletas informativas). Queda autorizado el acceso por Tailscale Serve solo dentro de la red privada. La v1 se conserva intacta. El borrado de `CloudflareSpeedTest_duplicates_backup` sigue requiriendo confirmación expresa: la v2 lo exige y no se ejecutó.

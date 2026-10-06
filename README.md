@@ -141,7 +141,7 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 | [Decisiones](docs/decisiones.md) | Registro D-01 a D-58 |
 | [Seguridad](docs/seguridad.md) | Checklist aplicado / previsto / no aplica con evidencia |
 | [Robustez](docs/robustez.md) | Preregistro, fórmulas, umbrales y resultados del protocolo de robustez (estabilidad, Monte Carlo, SPP, walk-forward anidado) |
-| [Mandato de autonomía](docs/mandato-autonomia.md) | Texto exacto, procedencia (23-sep-2026), sha256 y precedencia frente a restricciones posteriores |
+| [Mandato de autonomía](docs/mandato-autonomia.md) | Versión vigente 2 (6-oct-2026, aprobada por el usuario), versión 1 histórica, procedencia y sha256 |
 | [Matriz](docs/matriz.md) | Sitio, legal, SEO, indexación, medición |
 | [Diseño](docs/diseno.md) | Decisiones de interfaz |
 | [CHANGELOG](CHANGELOG.md) | Historial de cambios |
