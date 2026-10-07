@@ -36,7 +36,12 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
   - El usuario hizo la alternativa C: vendió 6 QQQ y compró 26 NVDA a $4,344.02.
   - Valuación $987,988.71 (−1.2 %); poder de compra $6,318.77.
   - Posiciones: MU 47.5 %, GMEXICO 15.4 %, AMD 15.3 %, NVDA 11.3 %, ALPEK 5.0 %, AMAT 4.8 %.
-  - Boletas vigentes #289/#290 (vender AMAT y comprar ≈ 12 NVDA, hasta el 7-oct 08:45): las pidió el usuario. Medidas igual, no mejoran la ganancia esperada (−0.15 pts).
+  - Las boletas #289/#290 (AMAT → NVDA) se cancelaron el 7-oct: el usuario eligió petróleo.
+- **Cuenta del Reto (7-oct, 08:00, captura confirmada):**
+  - Mismas 6 posiciones; valuación $979,561.91 (−2.04 %); poder de compra $6,318.77.
+  - Boletas #291/#292 (vender AMAT y comprar ≈ 17 XOM): las pidió el usuario y vencían a las 08:19, porque usan el precio en vivo.
+  - Medidas igual, bajan el escenario malo de −16.3 % a −15.1 %, sin mejorar la ganancia esperada.
+  - Entre las acciones petroleras del catálogo (XOM, CVX, DVN, OXY, FANG), XOM tuvo la mayor estimación (+2.1 % al cierre). Todas tienen correlación negativa con la cartera.
 - **6-oct (v0.25.0):**
   - El usuario mantiene máximo rendimiento aceptando el riesgo de cola (D-59).
   - Alternativa gratuita a EODHD: proxy ADR para 8 emisoras (`scripts/historia_adr.py`; `terminal robustez --proxy-adr`) y el PDF del portal para el precio del día.
