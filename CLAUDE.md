@@ -30,8 +30,14 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-10-01, v0.17.0, rama `main`)
+## Estado comprobado (2026-10-07, v0.26.0, rama `main`)
 
+- **7-oct (v0.26.0, D-61):**
+  - Historia externa del usuario (Excel, 1962 → 9-oct-2025): 148 columnas verificadas extienden rendimientos
+    hacia atrás (`docs/historia-externa.md`). Validación desde 2004: máximo rendimiento supera a 1/N
+    (IC [+3.6 %, +23.8 %]), con sesgo de supervivencia y caída máx. −70 %; no se declara ventaja.
+  - Finviz Elite conectado pero apagado: requiere `FINVIZ_AUTH_TOKEN` (de pago; decisión del usuario).
+  - 348 pruebas en verde.
 - **Cuenta del Reto (6-oct, 14:25, captura confirmada):**
   - El usuario hizo la alternativa C: vendió 6 QQQ y compró 26 NVDA a $4,344.02.
   - Valuación $987,988.71 (−1.2 %); poder de compra $6,318.77.

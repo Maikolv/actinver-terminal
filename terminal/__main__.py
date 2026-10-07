@@ -155,6 +155,20 @@ def telegram(_args) -> None:
         print("Reinicie la terminal (Ctrl+C y start.bat) para que el servidor use la configuración nueva.")
 
 
+def finviz(_args) -> None:
+    from . import db, finviz as fv
+    from .config import cargar_ajustes
+    a = cargar_ajustes()
+    falta = fv.pendientes()
+    if falta:
+        sys.exit("Finviz Elite apagado: falta " + "; ".join(falta) + ".
+El plan gratuito no permite exportar y su "
+                 "robots.txt lo prohíbe a programas; la terminal no extrae la versión gratuita.")
+    con = db.conectar()
+    db.inicializar(con)
+    print(fv.actualizar(con, a))
+
+
 def alpaca(_args) -> None:
     from datetime import date, timedelta
 
@@ -584,6 +598,7 @@ def main() -> None:
     g.set_defaults(fn=reporte)
     sub.add_parser("telegram", help="configura y prueba los avisos por Telegram").set_defaults(fn=telegram)
     sub.add_parser("alpaca", help="comprueba las claves de Alpaca (solo datos de mercado)").set_defaults(fn=alpaca)
+    sub.add_parser("finviz", help="consulta Finviz Elite una vez (requiere FINVIZ_AUTH_TOKEN, de pago)").set_defaults(fn=finviz)
     c = sub.add_parser("comparar-modelos", help="walk-forward de HRP, CVaR, paridad de riesgo y el modelo vigente")
     c.add_argument("--tipo", choices=["acciones", "mixta"], default="acciones")
     c.add_argument("--lente", choices=["ajuste", "rendimiento"], default="ajuste")

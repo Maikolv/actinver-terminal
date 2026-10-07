@@ -1,0 +1,10 @@
+{
+  "_comentario": "Exportación CSV de Finviz Elite (de pago). Dirección y parámetros según la documentación pública y el botón «Export» de Elite; CONFIRMAR con la URL que muestra la cuenta del usuario antes del primer uso. El token NUNCA va aquí: solo en .env como FINVIZ_AUTH_TOKEN. Revisado el 7-oct-2026: https://finviz.com/api-and-exports (exportación «Not Included» en el plan gratuito).",
+  "proveedor": "Finviz Elite",
+  "documentacion": "https://finviz.com/api-and-exports",
+  "url": "https://elite.finviz.com/export.ashx",
+  "parametros": {"v": "111"},
+  "parametro_simbolos": "t",
+  "parametro_token": "auth",
+  "campos": {"simbolo": "Ticker", "precio": "Price"}
+}

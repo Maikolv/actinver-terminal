@@ -1,0 +1,6588 @@
+{
+ "procedencia": {
+  "archivo": "bench.xlsx",
+  "sha256": "5ee9220da7966cb4bc4e32d34208d67146969ccafda6c22c0cbf9b7b31c2f8c3",
+  "filas": 16247,
+  "columnas": 229,
+  "desde": "1962-01-02",
+  "hasta": "2025-10-09"
+ },
+ "filas": [
+  {
+   "columna": "AAAU",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2018-08-15",
+   "hasta": "2025-10-09",
+   "sesiones": 1850,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "AAL",
+   "id": "SIC:AAL",
+   "motivo": "",
+   "desde": "2005-09-27",
+   "hasta": "2025-10-09",
+   "sesiones": 5181,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2025-04-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2025-04-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AAPL",
+   "id": "SIC:AAPL",
+   "motivo": "",
+   "desde": "1980-12-12",
+   "hasta": "2025-10-09",
+   "sesiones": 11493,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-05-12",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0017,
+     "fecha_dif_max": "2022-11-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AAXJ",
+   "id": "SIC:AAXJ",
+   "motivo": "",
+   "desde": "2008-08-15",
+   "hasta": "2025-10-09",
+   "sesiones": 4433,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0031,
+     "fecha_dif_max": "2023-06-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9966,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0178,
+     "fecha_dif_max": "2021-12-13",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ABBV",
+   "id": "SIC:ABBV",
+   "motivo": "",
+   "desde": "2013-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 3301,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2022-04-13",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9966,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0122,
+     "fecha_dif_max": "2021-10-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ABNB",
+   "id": "SIC:ABNB",
+   "motivo": "",
+   "desde": "2020-12-10",
+   "hasta": "2025-10-09",
+   "sesiones": 1250,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AC",
+   "id": null,
+   "motivo": "«AC» sin .MX es Associated Capital Group (NYSE), no Arca Continental (AC.MX): no se usa",
+   "desde": "2015-11-09",
+   "hasta": "2025-10-09",
+   "sesiones": 2565,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "ACTDUALB.MX",
+   "id": "FONDO:ACTDUAL",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2020-06-25",
+   "hasta": "2025-10-09",
+   "sesiones": 1370,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTI500B.MX",
+   "id": "FONDO:ACTI500",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTICOBB.MX",
+   "id": "FONDO:ACTICOB",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTICREB.MX",
+   "id": "FONDO:ACTICRE",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2018-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 2010,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTIG+2B.MX",
+   "id": "FONDO:ACTIG+2",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-11-28",
+   "hasta": "2025-10-09",
+   "sesiones": 1517,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTIG+B.MX",
+   "id": "FONDO:ACTIG+",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTIGOBB.MX",
+   "id": "FONDO:ACTIGOB",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTIMEDB.MX",
+   "id": "FONDO:ACTIMED",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2020-02-24",
+   "hasta": "2025-10-09",
+   "sesiones": 1457,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTINMOB.MX",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2018-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 2010,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "estado": "no usada"
+  },
+  {
+   "columna": "ACTIPLUB.MX",
+   "id": "FONDO:ACTIPLU",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTIRENB.MX",
+   "id": "FONDO:ACTIREN",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTIVARB.MX",
+   "id": "FONDO:ACTIVAR",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2018-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 2010,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ACTOTALB.MX",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2018-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 2010,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 787,
+   "estado": "no usada"
+  },
+  {
+   "columna": "ACWI",
+   "id": "SIC:ACWI",
+   "motivo": "",
+   "desde": "2008-03-28",
+   "hasta": "2025-10-09",
+   "sesiones": 4533,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2022-06-09",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9973,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0101,
+     "fecha_dif_max": "2023-06-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AFRM",
+   "id": "SIC:AFRM",
+   "motivo": "",
+   "desde": "2021-01-13",
+   "hasta": "2025-10-09",
+   "sesiones": 1228,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AGNC",
+   "id": "SIC:AGNC",
+   "motivo": "",
+   "desde": "2008-05-15",
+   "hasta": "2025-10-09",
+   "sesiones": 4499,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0008,
+     "fecha_dif_max": "2022-10-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9889,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0173,
+     "fecha_dif_max": "2023-10-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ALFAA.MX",
+   "id": "BMV:ALFA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ALPEKA.MX",
+   "id": "BMV:ALPEK",
+   "motivo": "",
+   "desde": "2012-04-26",
+   "hasta": "2025-10-09",
+   "sesiones": 3478,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ALSEA.MX",
+   "id": "BMV:ALSEA",
+   "motivo": "no coincide con la serie local (correlación 0.99, dif. mediana 0.31%)",
+   "desde": "2000-01-18",
+   "hasta": "2025-10-09",
+   "sesiones": 6666,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.9855,
+     "dif_mediana": 0.00313,
+     "dif_max": 0.007,
+     "fecha_dif_max": "2025-10-02",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9855,
+     "dif_mediana": 0.00313,
+     "dif_max": 0.007,
+     "fecha_dif_max": "2025-10-02",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "rechazada"
+  },
+  {
+   "columna": "AMAT",
+   "id": "SIC:AMAT",
+   "motivo": "",
+   "desde": "1980-03-17",
+   "hasta": "2025-10-09",
+   "sesiones": 11681,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2024-08-22",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0028,
+     "fecha_dif_max": "2025-08-21",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AMD",
+   "id": "SIC:AMD",
+   "motivo": "",
+   "desde": "1980-03-17",
+   "hasta": "2025-10-09",
+   "sesiones": 11681,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-04-25",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-04-25",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AMXB.MX",
+   "id": "BMV:AMX",
+   "motivo": "",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-10-08",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada",
+   "vs_adr": {
+    "adr": "AMX",
+    "aceptado": false,
+    "n": 1197,
+    "correlacion": 0.422,
+    "error_seguimiento_anual": 0.249,
+    "motivo": "correlación 0.42 < 0.8"
+   }
+  },
+  {
+   "columna": "AMZN",
+   "id": "SIC:AMZN",
+   "motivo": "",
+   "desde": "1997-05-15",
+   "hasta": "2025-10-09",
+   "sesiones": 7341,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2023-05-05",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.5932,
+     "dif_mediana": 0.0,
+     "dif_max": 0.9689,
+     "fecha_dif_max": "2022-06-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "APA",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "1979-05-15",
+   "hasta": "2025-10-09",
+   "sesiones": 11893,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "ASURB.MX",
+   "id": "BMV:ASUR",
+   "motivo": "",
+   "desde": "2000-10-04",
+   "hasta": "2025-10-09",
+   "sesiones": 6480,
+   "saltos_50pct": 6,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9341,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0236,
+     "fecha_dif_max": "2025-09-29",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada",
+   "vs_adr": {
+    "adr": "ASR",
+    "aceptado": true,
+    "n": 1197,
+    "correlacion": 0.91,
+    "error_seguimiento_anual": 0.13,
+    "motivo": ""
+   }
+  },
+  {
+   "columna": "ATER",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2019-06-12",
+   "hasta": "2025-10-09",
+   "sesiones": 1638,
+   "saltos_50pct": 2,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "ATOS",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2012-11-08",
+   "hasta": "2025-10-09",
+   "sesiones": 3338,
+   "saltos_50pct": 6,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "AVGO",
+   "id": "SIC:AVGO",
+   "motivo": "",
+   "desde": "2009-08-06",
+   "hasta": "2025-10-09",
+   "sesiones": 4182,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2024-03-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.6921,
+     "dif_mediana": 0.0,
+     "dif_max": 0.9072,
+     "fecha_dif_max": "2024-07-15",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "AXP",
+   "id": "SIC:AXP",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2025-04-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9998,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0041,
+     "fecha_dif_max": "2023-10-05",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BA",
+   "id": "SIC:BA",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BABA",
+   "id": "SIC:BABA",
+   "motivo": "",
+   "desde": "2014-09-19",
+   "hasta": "2025-10-09",
+   "sesiones": 2858,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2025-06-12",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9996,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0211,
+     "fecha_dif_max": "2024-06-13",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BAC",
+   "id": "SIC:BAC",
+   "motivo": "",
+   "desde": "1973-02-21",
+   "hasta": "2025-10-09",
+   "sesiones": 13467,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2024-09-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9989,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0082,
+     "fecha_dif_max": "2023-08-31",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BBAJIOO.MX",
+   "id": "BMV:BBAJIO",
+   "motivo": "",
+   "desde": "2017-06-08",
+   "hasta": "2025-10-09",
+   "sesiones": 2156,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-26",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BBBY",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2002-05-30",
+   "hasta": "2025-10-09",
+   "sesiones": 6049,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "BIL",
+   "id": "SIC:BIL",
+   "motivo": "",
+   "desde": "2007-05-30",
+   "hasta": "2025-10-09",
+   "sesiones": 4747,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 1,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2023-06-01",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.1299,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0046,
+     "fecha_dif_max": "2023-12-18",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BIMBOA.MX",
+   "id": "BMV:BIMBO",
+   "motivo": "no coincide con la serie local (correlación 0.98, dif. mediana 0.35%)",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.976,
+     "dif_mediana": 0.00352,
+     "dif_max": 0.0066,
+     "fecha_dif_max": "2025-09-29",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.976,
+     "dif_mediana": 0.00352,
+     "dif_max": 0.0066,
+     "fecha_dif_max": "2025-09-29",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "rechazada",
+   "vs_adr": {
+    "adr": "BMBOY",
+    "aceptado": false,
+    "n": 1197,
+    "correlacion": 0.195,
+    "error_seguimiento_anual": 0.549,
+    "motivo": "correlación 0.20 < 0.8"
+   }
+  },
+  {
+   "columna": "BMY",
+   "id": "SIC:BMY",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2025-04-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9962,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0151,
+     "fecha_dif_max": "2024-07-05",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BNGO",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2018-08-21",
+   "hasta": "2025-10-09",
+   "sesiones": 1846,
+   "saltos_50pct": 5,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "BOLSAA.MX",
+   "id": "BMV:BOLSA",
+   "motivo": "",
+   "desde": "2008-06-13",
+   "hasta": "2025-10-09",
+   "sesiones": 4478,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.9942,
+     "dif_mediana": 0.00106,
+     "dif_max": 0.0047,
+     "fecha_dif_max": "2025-09-26",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9943,
+     "dif_mediana": 0.00106,
+     "dif_max": 0.0047,
+     "fecha_dif_max": "2025-09-26",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BOTZ",
+   "id": "SIC:BOTZ",
+   "motivo": "",
+   "desde": "2016-09-13",
+   "hasta": "2025-10-09",
+   "sesiones": 2347,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-06-29",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0025,
+     "fecha_dif_max": "2025-06-27",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BRK-B",
+   "id": "SIC:BRKB",
+   "motivo": "",
+   "desde": "1996-05-09",
+   "hasta": "2025-10-09",
+   "sesiones": 7598,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "BYND",
+   "id": "SIC:BYND",
+   "motivo": "",
+   "desde": "2019-05-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1667,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2023-01-04",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "C",
+   "id": "SIC:C",
+   "motivo": "",
+   "desde": "1977-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 12490,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2023-11-03",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9979,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0133,
+     "fecha_dif_max": "2023-11-03",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CAT",
+   "id": "SIC:CAT",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2022-10-21",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9994,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0072,
+     "fecha_dif_max": "2022-07-19",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CCL",
+   "id": "SIC:CCL1",
+   "motivo": "",
+   "desde": "1987-07-24",
+   "hasta": "2025-10-09",
+   "sesiones": 9822,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-10-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CEMEXCPO.MX",
+   "id": "BMV:CEMEX",
+   "motivo": "",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.9805,
+     "dif_mediana": 0.00063,
+     "dif_max": 0.0048,
+     "fecha_dif_max": "2025-09-29",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9805,
+     "dif_mediana": 0.00063,
+     "dif_max": 0.0048,
+     "fecha_dif_max": "2025-09-29",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada",
+   "vs_adr": {
+    "adr": "CX",
+    "aceptado": true,
+    "n": 1197,
+    "correlacion": 0.939,
+    "error_seguimiento_anual": 0.132,
+    "motivo": ""
+   }
+  },
+  {
+   "columna": "CHDRAUIB.MX",
+   "id": "BMV:CHDRAUI",
+   "motivo": "no coincide con la serie local (correlación 0.98, dif. mediana 0.12%)",
+   "desde": "2010-05-04",
+   "hasta": "2025-10-09",
+   "sesiones": 3992,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.9783,
+     "dif_mediana": 0.00125,
+     "dif_max": 0.0052,
+     "fecha_dif_max": "2025-10-09",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9783,
+     "dif_mediana": 0.00125,
+     "dif_max": 0.0052,
+     "fecha_dif_max": "2025-10-09",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "rechazada"
+  },
+  {
+   "columna": "CLF",
+   "id": "SIC:CLF",
+   "motivo": "",
+   "desde": "1973-02-21",
+   "hasta": "2025-10-09",
+   "sesiones": 13467,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "COST",
+   "id": "SIC:COST",
+   "motivo": "",
+   "desde": "1986-07-09",
+   "hasta": "2025-10-09",
+   "sesiones": 10086,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2023-12-27",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9988,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0225,
+     "fecha_dif_max": "2023-12-27",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CRM",
+   "id": "SIC:CRM",
+   "motivo": "",
+   "desde": "2004-06-23",
+   "hasta": "2025-10-09",
+   "sesiones": 5510,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-04-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0018,
+     "fecha_dif_max": "2025-09-17",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CSCO",
+   "id": "SIC:CSCO",
+   "motivo": "",
+   "desde": "1990-02-16",
+   "hasta": "2025-10-09",
+   "sesiones": 9172,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2025-04-03",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9979,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0094,
+     "fecha_dif_max": "2022-10-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CUERVO.MX",
+   "id": "BMV:CUERVO",
+   "motivo": "",
+   "desde": "2017-02-09",
+   "hasta": "2025-10-09",
+   "sesiones": 2240,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-10-09",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CVS",
+   "id": "SIC:CVS",
+   "motivo": "",
+   "desde": "1973-02-21",
+   "hasta": "2025-10-09",
+   "sesiones": 13467,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2025-01-23",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9984,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0129,
+     "fecha_dif_max": "2025-01-23",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "CVX",
+   "id": "SIC:CVX",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2024-02-15",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9969,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0119,
+     "fecha_dif_max": "2025-05-19",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "DAL",
+   "id": "SIC:DAL",
+   "motivo": "",
+   "desde": "2007-05-03",
+   "hasta": "2025-10-09",
+   "sesiones": 4766,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-05-13",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0035,
+     "fecha_dif_max": "2025-07-31",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "DIA",
+   "id": "SIC:DIA",
+   "motivo": "",
+   "desde": "1998-01-20",
+   "hasta": "2025-10-09",
+   "sesiones": 7170,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2024-12-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9993,
+     "dif_mediana": 0.0,
+     "dif_max": 0.003,
+     "fecha_dif_max": "2024-09-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "DIGITALB.MX",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2021-06-07",
+   "hasta": "2025-10-09",
+   "sesiones": 1126,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "estado": "no usada"
+  },
+  {
+   "columna": "DINAMOB.MX",
+   "id": "FONDO:DINAMO",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2018-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 2010,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "DIS",
+   "id": "SIC:DIS",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-06-24",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0046,
+     "fecha_dif_max": "2024-07-08",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "DVN",
+   "id": "SIC:DVN",
+   "motivo": "",
+   "desde": "1985-07-22",
+   "hasta": "2025-10-09",
+   "sesiones": 10329,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0101,
+     "fecha_dif_max": "2023-06-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9977,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0229,
+     "fecha_dif_max": "2022-09-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "EEM",
+   "id": "SIC:EEM",
+   "motivo": "",
+   "desde": "2003-04-14",
+   "hasta": "2025-10-09",
+   "sesiones": 5822,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2023-12-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9953,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0182,
+     "fecha_dif_max": "2023-12-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ELEKTRA.MX",
+   "id": "BMV:ELEKTRA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 8,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ESCALAB.MX",
+   "id": "FONDO:ESCALA",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-06-24",
+   "hasta": "2025-10-09",
+   "sesiones": 1630,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ESFERAB.MX",
+   "id": "FONDO:ESFERA",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ETSY",
+   "id": "SIC:ETSY",
+   "motivo": "",
+   "desde": "2015-04-16",
+   "hasta": "2025-10-09",
+   "sesiones": 2712,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "EWZ",
+   "id": "SIC:EWZ",
+   "motivo": "",
+   "desde": "2000-07-14",
+   "hasta": "2025-10-09",
+   "sesiones": 6538,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0015,
+     "fecha_dif_max": "2022-12-13",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9753,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0679,
+     "fecha_dif_max": "2022-12-13",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "F",
+   "id": "SIC:F",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 0.9981,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0484,
+     "fecha_dif_max": "2023-02-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9944,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0595,
+     "fecha_dif_max": "2023-02-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FANG",
+   "id": "SIC:FANG",
+   "motivo": "",
+   "desde": "2012-10-12",
+   "hasta": "2025-10-09",
+   "sesiones": 3357,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2022-11-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9975,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0232,
+     "fecha_dif_max": "2022-05-11",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FAS",
+   "id": "SIC:FAS",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2008-11-19",
+   "hasta": "2025-10-09",
+   "sesiones": 4365,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "FCX",
+   "id": "SIC:FCX",
+   "motivo": "",
+   "desde": "1995-07-10",
+   "hasta": "2025-10-09",
+   "sesiones": 7810,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0026,
+     "fecha_dif_max": "2022-07-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0054,
+     "fecha_dif_max": "2022-07-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FDX",
+   "id": "SIC:FDX",
+   "motivo": "",
+   "desde": "1978-04-12",
+   "hasta": "2025-10-09",
+   "sesiones": 12169,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2022-06-24",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9995,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0068,
+     "fecha_dif_max": "2022-12-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FEMSAUBD.MX",
+   "id": "BMV:FEMSA",
+   "motivo": "",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.9801,
+     "dif_mediana": 0.00169,
+     "dif_max": 0.0045,
+     "fecha_dif_max": "2025-10-07",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9801,
+     "dif_mediana": 0.00169,
+     "dif_max": 0.0045,
+     "fecha_dif_max": "2025-10-07",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada",
+   "vs_adr": {
+    "adr": "FMX",
+    "aceptado": true,
+    "n": 1197,
+    "correlacion": 0.893,
+    "error_seguimiento_anual": 0.107,
+    "motivo": ""
+   }
+  },
+  {
+   "columna": "FIBRAMQ12.MX",
+   "id": "BMV:FIBRAMQ",
+   "motivo": "no coincide con la serie local (correlación 0.74, dif. mediana 0.54%)",
+   "desde": "2013-10-21",
+   "hasta": "2025-10-09",
+   "sesiones": 3094,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.745,
+     "dif_mediana": 0.00544,
+     "dif_max": 0.0102,
+     "fecha_dif_max": "2025-10-01",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.6135,
+     "dif_mediana": 0.00628,
+     "dif_max": 0.0181,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "rechazada"
+  },
+  {
+   "columna": "FIBRAPL14.MX",
+   "id": "BMV:FIBRAPL",
+   "motivo": "",
+   "desde": "2014-06-04",
+   "hasta": "2025-10-09",
+   "sesiones": 2935,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-10-07",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-10-01",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FSLR",
+   "id": "SIC:FSLR",
+   "motivo": "",
+   "desde": "2006-11-17",
+   "hasta": "2025-10-09",
+   "sesiones": 4883,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-07-19",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-07-19",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FUBO",
+   "id": "SIC:FUBO",
+   "motivo": "",
+   "desde": "2019-03-27",
+   "hasta": "2025-10-09",
+   "sesiones": 1692,
+   "saltos_50pct": 2,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-01-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "FUNO11.MX",
+   "id": "BMV:FUNO",
+   "motivo": "",
+   "desde": "2011-03-18",
+   "hasta": "2025-10-09",
+   "sesiones": 3765,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-10-06",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GAPB.MX",
+   "id": "BMV:GAP",
+   "motivo": "",
+   "desde": "2006-02-27",
+   "hasta": "2025-10-09",
+   "sesiones": 5072,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-09-25",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada",
+   "vs_adr": {
+    "adr": "PAC",
+    "aceptado": true,
+    "n": 1197,
+    "correlacion": 0.925,
+    "error_seguimiento_anual": 0.129,
+    "motivo": ""
+   }
+  },
+  {
+   "columna": "GCARSOA1.MX",
+   "id": "BMV:GCARSO",
+   "motivo": "no coincide con la serie local (correlación 0.91, dif. mediana 0.84%)",
+   "desde": "2000-03-13",
+   "hasta": "2025-10-09",
+   "sesiones": 6627,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 11,
+     "correlacion": 0.9105,
+     "dif_mediana": 0.00843,
+     "dif_max": 0.0162,
+     "fecha_dif_max": "2025-10-01",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 11,
+     "correlacion": 0.9105,
+     "dif_mediana": 0.00843,
+     "dif_max": 0.0162,
+     "fecha_dif_max": "2025-10-01",
+     "desde": "2025-09-24",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "rechazada",
+   "vs_adr": {
+    "adr": "GPOVY",
+    "aceptado": false,
+    "n": 720,
+    "correlacion": 0.02,
+    "error_seguimiento_anual": 0.664,
+    "motivo": "correlación 0.02 < 0.8"
+   }
+  },
+  {
+   "columna": "GCC.MX",
+   "id": "BMV:GCC",
+   "motivo": "solo 7 sesiones en común con la serie local",
+   "desde": "2002-07-08",
+   "hasta": "2025-10-09",
+   "sesiones": 6022,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 7
+    },
+    "cierre": {
+     "n": 7
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "GDX",
+   "id": "SIC:GDX",
+   "motivo": "",
+   "desde": "2006-05-22",
+   "hasta": "2025-10-09",
+   "sesiones": 5012,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2022-12-19",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0172,
+     "fecha_dif_max": "2021-12-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GE",
+   "id": "SIC:GE",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2024-09-26",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.8908,
+     "dif_mediana": 0.0,
+     "dif_max": 0.2321,
+     "fecha_dif_max": "2023-01-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GENTERA.MX",
+   "id": "BMV:GENTERA",
+   "motivo": "solo 7 sesiones en común con la serie local",
+   "desde": "2010-12-30",
+   "hasta": "2025-10-09",
+   "sesiones": 3821,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 7
+    },
+    "cierre": {
+     "n": 7
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "GFINBURO.MX",
+   "id": "BMV:GFINBUR",
+   "motivo": "solo 7 sesiones en común con la serie local",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 7
+    },
+    "cierre": {
+     "n": 7
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "GFNORTEO.MX",
+   "id": "BMV:GFNORTE",
+   "motivo": "solo 7 sesiones en común con la serie local",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 7
+    },
+    "cierre": {
+     "n": 7
+    }
+   },
+   "estado": "sin verificar",
+   "vs_adr": {
+    "adr": "GBOOY",
+    "aceptado": true,
+    "n": 1197,
+    "correlacion": 0.905,
+    "error_seguimiento_anual": 0.152,
+    "motivo": ""
+   }
+  },
+  {
+   "columna": "GILD",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "1992-01-22",
+   "hasta": "2025-10-09",
+   "sesiones": 8685,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "GLD",
+   "id": "SIC:GLD",
+   "motivo": "",
+   "desde": "2004-11-18",
+   "hasta": "2025-10-09",
+   "sesiones": 5404,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GM",
+   "id": "SIC:GM",
+   "motivo": "",
+   "desde": "2010-11-18",
+   "hasta": "2025-10-09",
+   "sesiones": 3850,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2023-06-01",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0032,
+     "fecha_dif_max": "2025-06-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GME",
+   "id": "SIC:GME",
+   "motivo": "",
+   "desde": "2002-02-13",
+   "hasta": "2025-10-09",
+   "sesiones": 6125,
+   "saltos_50pct": 10,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.948,
+     "dif_mediana": 0.0,
+     "dif_max": 0.6994,
+     "fecha_dif_max": "2022-07-22",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GMEXICOB.MX",
+   "id": "BMV:GMEXICO",
+   "motivo": "solo 6 sesiones en común con la serie local",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 6
+    },
+    "cierre": {
+     "n": 6
+    }
+   },
+   "estado": "sin verificar",
+   "vs_adr": {
+    "adr": "GMBXF",
+    "aceptado": false,
+    "n": 1197,
+    "correlacion": 0.762,
+    "error_seguimiento_anual": 0.281,
+    "motivo": "correlación 0.76 < 0.8"
+   }
+  },
+  {
+   "columna": "GOOGL",
+   "id": "SIC:GOOGL",
+   "motivo": "",
+   "desde": "2004-08-19",
+   "hasta": "2025-10-09",
+   "sesiones": 5469,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-03-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.5936,
+     "dif_mediana": 0.0,
+     "dif_max": 0.9266,
+     "fecha_dif_max": "2022-07-18",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "GRUMAB.MX",
+   "id": "BMV:GRUMA",
+   "motivo": "solo 5 sesiones en común con la serie local",
+   "desde": "2000-01-28",
+   "hasta": "2025-10-09",
+   "sesiones": 6658,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 5
+    },
+    "cierre": {
+     "n": 5
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "HD",
+   "id": "SIC:HD",
+   "motivo": "",
+   "desde": "1981-09-22",
+   "hasta": "2025-10-09",
+   "sesiones": 11298,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2025-03-13",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9987,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0073,
+     "fecha_dif_max": "2023-03-08",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "IAU",
+   "id": "SIC:IAU",
+   "motivo": "",
+   "desde": "2005-01-28",
+   "hasta": "2025-10-09",
+   "sesiones": 5353,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ICLN",
+   "id": "SIC:ICLN",
+   "motivo": "",
+   "desde": "2008-06-25",
+   "hasta": "2025-10-09",
+   "sesiones": 4470,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2025-09-10",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9993,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0106,
+     "fecha_dif_max": "2025-06-16",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "INDA",
+   "id": "SIC:INDA",
+   "motivo": "",
+   "desde": "2012-02-03",
+   "hasta": "2025-10-09",
+   "sesiones": 3536,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0011,
+     "fecha_dif_max": "2021-12-13",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9829,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0582,
+     "fecha_dif_max": "2021-12-13",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "INTC",
+   "id": "SIC:INTC",
+   "motivo": "",
+   "desde": "1980-03-17",
+   "hasta": "2025-10-09",
+   "sesiones": 11681,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0006,
+     "fecha_dif_max": "2022-11-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9996,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0139,
+     "fecha_dif_max": "2022-11-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "IVV",
+   "id": "SIC:IVV",
+   "motivo": "",
+   "desde": "2000-05-19",
+   "hasta": "2025-10-09",
+   "sesiones": 6578,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-06-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9992,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0051,
+     "fecha_dif_max": "2022-09-26",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "JNJ",
+   "id": "SIC:JNJ",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2023-02-17",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9964,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0086,
+     "fecha_dif_max": "2025-05-27",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "JPM",
+   "id": "SIC:JPM",
+   "motivo": "",
+   "desde": "1980-03-17",
+   "hasta": "2025-10-09",
+   "sesiones": 11681,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2025-04-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9985,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0088,
+     "fecha_dif_max": "2022-10-05",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "KIMBERA.MX",
+   "id": "BMV:KIMBER",
+   "motivo": "solo 5 sesiones en común con la serie local",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 5
+    },
+    "cierre": {
+     "n": 5
+    }
+   },
+   "estado": "sin verificar",
+   "vs_adr": {
+    "adr": "KCDMY",
+    "aceptado": false,
+    "n": 1197,
+    "correlacion": 0.779,
+    "error_seguimiento_anual": 0.191,
+    "motivo": "correlación 0.78 < 0.8"
+   }
+  },
+  {
+   "columna": "KO",
+   "id": "SIC:KO",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2021-11-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9958,
+     "dif_mediana": 0.0,
+     "dif_max": 0.008,
+     "fecha_dif_max": "2023-11-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "KOFUBL.MX",
+   "id": "BMV:KOF",
+   "motivo": "solo 5 sesiones en común con la serie local",
+   "desde": "2019-04-11",
+   "hasta": "2025-10-09",
+   "sesiones": 1681,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 5
+    },
+    "cierre": {
+     "n": 5
+    }
+   },
+   "estado": "sin verificar",
+   "vs_adr": {
+    "adr": "KOF",
+    "aceptado": true,
+    "n": 1197,
+    "correlacion": 0.875,
+    "error_seguimiento_anual": 0.113,
+    "motivo": ""
+   }
+  },
+  {
+   "columna": "KWEB",
+   "id": "SIC:KWEB",
+   "motivo": "",
+   "desde": "2013-08-01",
+   "hasta": "2025-10-09",
+   "sesiones": 3151,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0025,
+     "fecha_dif_max": "2021-12-29",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9972,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0656,
+     "fecha_dif_max": "2021-12-29",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "LABB.MX",
+   "id": "BMV:LAB",
+   "motivo": "solo 3 sesiones en común con la serie local",
+   "desde": "2008-06-18",
+   "hasta": "2025-10-09",
+   "sesiones": 4475,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 3
+    },
+    "cierre": {
+     "n": 3
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "LCID",
+   "id": "SIC:LCID",
+   "motivo": "",
+   "desde": "2020-09-18",
+   "hasta": "2025-10-09",
+   "sesiones": 1309,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.1445,
+     "dif_mediana": 0.0,
+     "dif_max": 8.0273,
+     "fecha_dif_max": "2025-09-02",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "LIT",
+   "id": "SIC:LIT",
+   "motivo": "",
+   "desde": "2010-07-23",
+   "hasta": "2025-10-09",
+   "sesiones": 3934,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2023-12-28",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9997,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0091,
+     "fecha_dif_max": "2022-12-29",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "LIVEPOLC-1.MX",
+   "id": "BMV:LIVEPOL",
+   "motivo": "solo 3 sesiones en común con la serie local",
+   "desde": "2000-01-06",
+   "hasta": "2025-10-09",
+   "sesiones": 6674,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 3
+    },
+    "cierre": {
+     "n": 3
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "LLY",
+   "id": "SIC:LLY",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-08-12",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0042,
+     "fecha_dif_max": "2022-02-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "LUV",
+   "id": "SIC:LUV",
+   "motivo": "",
+   "desde": "1980-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 11733,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2023-01-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9997,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0062,
+     "fecha_dif_max": "2024-06-18",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "LVS",
+   "id": "SIC:LVS",
+   "motivo": "",
+   "desde": "2004-12-15",
+   "hasta": "2025-10-09",
+   "sesiones": 5385,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-02-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9998,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0067,
+     "fecha_dif_max": "2025-05-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "LYFT",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2019-03-29",
+   "hasta": "2025-10-09",
+   "sesiones": 1690,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "MA",
+   "id": "SIC:MA",
+   "motivo": "",
+   "desde": "2006-05-25",
+   "hasta": "2025-10-09",
+   "sesiones": 5009,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-04-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0017,
+     "fecha_dif_max": "2025-04-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MARA",
+   "id": "SIC:MARA",
+   "motivo": "",
+   "desde": "2012-05-04",
+   "hasta": "2025-10-09",
+   "sesiones": 3472,
+   "saltos_50pct": 13,
+   "final_sin_cambio": 1,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0017,
+     "fecha_dif_max": "2022-12-29",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0017,
+     "fecha_dif_max": "2022-12-29",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MAXIMOB.MX",
+   "id": "FONDO:MAXIMO",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-05-20",
+   "hasta": "2025-10-09",
+   "sesiones": 1655,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "MAYAB.MX",
+   "id": "FONDO:MAYA",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "MCD",
+   "id": "SIC:MCD",
+   "motivo": "",
+   "desde": "1966-07-05",
+   "hasta": "2025-10-09",
+   "sesiones": 15111,
+   "saltos_50pct": 2,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2021-11-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9979,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0065,
+     "fecha_dif_max": "2024-06-03",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MCHI",
+   "id": "SIC:MCHI",
+   "motivo": "",
+   "desde": "2011-03-31",
+   "hasta": "2025-10-09",
+   "sesiones": 3756,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0072,
+     "fecha_dif_max": "2023-06-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9983,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0234,
+     "fecha_dif_max": "2023-12-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MEGACPO.MX",
+   "id": "BMV:MEGA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2007-11-08",
+   "hasta": "2025-10-09",
+   "sesiones": 4631,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "MELI",
+   "id": "SIC:MELI",
+   "motivo": "",
+   "desde": "2007-08-10",
+   "hasta": "2025-10-09",
+   "sesiones": 4695,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-06-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-06-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "META",
+   "id": "SIC:META",
+   "motivo": "",
+   "desde": "2012-05-18",
+   "hasta": "2025-10-09",
+   "sesiones": 3462,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-03-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0011,
+     "fecha_dif_max": "2024-02-21",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MGM",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "1988-05-02",
+   "hasta": "2025-10-09",
+   "sesiones": 9627,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "MRK",
+   "id": "SIC:MRK",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2024-09-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9979,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0099,
+     "fecha_dif_max": "2025-06-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MRNA",
+   "id": "SIC:MRNA",
+   "motivo": "",
+   "desde": "2018-12-07",
+   "hasta": "2025-10-09",
+   "sesiones": 1768,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MSFT",
+   "id": "SIC:MSFT",
+   "motivo": "",
+   "desde": "1986-03-13",
+   "hasta": "2025-10-09",
+   "sesiones": 10167,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-05-18",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0028,
+     "fecha_dif_max": "2022-11-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "MU",
+   "id": "SIC:MU",
+   "motivo": "",
+   "desde": "1984-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 10616,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-10-07",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0022,
+     "fecha_dif_max": "2022-12-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "NAFTRACISHRS.MX",
+   "id": "BMV:NAFTRAC",
+   "motivo": "solo 3 sesiones en común con la serie local",
+   "desde": "2003-04-29",
+   "hasta": "2025-10-09",
+   "sesiones": 5811,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 1,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 3
+    },
+    "cierre": {
+     "n": 3
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "NCLH",
+   "id": "SIC:NCLH",
+   "motivo": "",
+   "desde": "2013-01-18",
+   "hasta": "2025-10-09",
+   "sesiones": 3289,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "NFLX",
+   "id": "SIC:NFLX",
+   "motivo": "",
+   "desde": "2002-05-23",
+   "hasta": "2025-10-09",
+   "sesiones": 6054,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-07-08",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-07-08",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "NKE",
+   "id": "SIC:NKE",
+   "motivo": "",
+   "desde": "1980-12-02",
+   "hasta": "2025-10-09",
+   "sesiones": 11501,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2025-09-02",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9998,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0068,
+     "fecha_dif_max": "2025-06-02",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "NU",
+   "id": "SIC:NU",
+   "motivo": "",
+   "desde": "2021-12-09",
+   "hasta": "2025-10-09",
+   "sesiones": 993,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 961,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-12-10",
+     "desde": "2021-12-09",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 961,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-12-10",
+     "desde": "2021-12-09",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "NVAX",
+   "id": "SIC:NVAX",
+   "motivo": "",
+   "desde": "1995-12-05",
+   "hasta": "2025-10-09",
+   "sesiones": 7706,
+   "saltos_50pct": 11,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0012,
+     "fecha_dif_max": "2024-01-18",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0012,
+     "fecha_dif_max": "2024-01-18",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "NVDA",
+   "id": "SIC:NVDA",
+   "motivo": "",
+   "desde": "1999-01-22",
+   "hasta": "2025-10-09",
+   "sesiones": 6916,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2024-10-31",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.77,
+     "dif_mediana": 0.0,
+     "dif_max": 0.9067,
+     "fecha_dif_max": "2024-06-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "OMAB.MX",
+   "id": "BMV:OMA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2006-11-30",
+   "hasta": "2025-10-09",
+   "sesiones": 4874,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "OPORT1B.MX",
+   "id": "FONDO:OPORT1",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2019-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 1752,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ORBIA.MX",
+   "id": "BMV:ORBIA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ORCL",
+   "id": "SIC:ORCL",
+   "motivo": "",
+   "desde": "1986-03-12",
+   "hasta": "2025-10-09",
+   "sesiones": 10168,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-04-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9998,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0051,
+     "fecha_dif_max": "2022-10-11",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "OXY",
+   "id": "SIC:OXY1",
+   "motivo": "",
+   "desde": "1981-12-31",
+   "hasta": "2025-10-09",
+   "sesiones": 11228,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2025-09-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9998,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0057,
+     "fecha_dif_max": "2025-06-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "PBR",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2000-08-10",
+   "hasta": "2025-10-09",
+   "sesiones": 6519,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "PE&OLES.MX",
+   "id": "BMV:PE&OLES",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2000-01-05",
+   "hasta": "2025-10-09",
+   "sesiones": 6675,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "PEP",
+   "id": "SIC:PEP",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2023-03-02",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9965,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0109,
+     "fecha_dif_max": "2025-06-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "PFE",
+   "id": "SIC:PFE",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2024-07-26",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9955,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0185,
+     "fecha_dif_max": "2025-05-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "PG",
+   "id": "SIC:PG",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-04-21",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9976,
+     "dif_mediana": 0.0,
+     "dif_max": 0.007,
+     "fecha_dif_max": "2022-10-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "PINFRA.MX",
+   "id": "BMV:PINFRA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2000-01-03",
+   "hasta": "2025-10-09",
+   "sesiones": 6677,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "PINS",
+   "id": "SIC:PINS",
+   "motivo": "",
+   "desde": "2019-04-18",
+   "hasta": "2025-10-09",
+   "sesiones": 1676,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "PLTR",
+   "id": "SIC:PLTR",
+   "motivo": "",
+   "desde": "2020-09-30",
+   "hasta": "2025-10-09",
+   "sesiones": 1301,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "PSQ",
+   "id": "SIC:PSQ",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2006-06-21",
+   "hasta": "2025-10-09",
+   "sesiones": 4990,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "PYPL",
+   "id": "SIC:PYPL",
+   "motivo": "",
+   "desde": "2015-07-06",
+   "hasta": "2025-10-09",
+   "sesiones": 2655,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2024-05-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "Q.MX",
+   "id": "BMV:Q",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2015-07-17",
+   "hasta": "2025-10-09",
+   "sesiones": 2646,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "QCLN",
+   "id": "SIC:QCLN",
+   "motivo": "",
+   "desde": "2007-02-14",
+   "hasta": "2025-10-09",
+   "sesiones": 4821,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2025-07-30",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0051,
+     "fecha_dif_max": "2024-06-27",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "QCOM",
+   "id": "SIC:QCOM",
+   "motivo": "",
+   "desde": "1991-12-13",
+   "hasta": "2025-10-09",
+   "sesiones": 8711,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0005,
+     "fecha_dif_max": "2022-11-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9996,
+     "dif_mediana": 0.0,
+     "dif_max": 0.007,
+     "fecha_dif_max": "2023-08-30",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "QLD",
+   "id": "SIC:QLD",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2006-06-21",
+   "hasta": "2025-10-09",
+   "sesiones": 4990,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "QQQ",
+   "id": "SIC:QQQ",
+   "motivo": "",
+   "desde": "1999-03-10",
+   "hasta": "2025-10-09",
+   "sesiones": 6884,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0024,
+     "fecha_dif_max": "2022-12-19",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "RA.MX",
+   "id": "BMV:R",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2011-07-15",
+   "hasta": "2025-10-09",
+   "sesiones": 3681,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "RCL",
+   "id": "SIC:RCL",
+   "motivo": "",
+   "desde": "1993-04-28",
+   "hasta": "2025-10-09",
+   "sesiones": 8365,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2024-12-27",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0035,
+     "fecha_dif_max": "2025-03-07",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "RIOT",
+   "id": "SIC:RIOT",
+   "motivo": "",
+   "desde": "2016-03-31",
+   "hasta": "2025-10-09",
+   "sesiones": 2465,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "RIVN",
+   "id": "SIC:RIVN",
+   "motivo": "",
+   "desde": "2021-11-10",
+   "hasta": "2025-10-09",
+   "sesiones": 1014,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 981,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-11-11",
+     "desde": "2021-11-10",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 981,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-11-11",
+     "desde": "2021-11-10",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ROBOTIKB.MX",
+   "id": "FONDO:ROBOTIK",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2021-02-22",
+   "hasta": "2025-10-09",
+   "sesiones": 1200,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "ROKU",
+   "id": "SIC:ROKU",
+   "motivo": "",
+   "desde": "2017-09-28",
+   "hasta": "2025-10-09",
+   "sesiones": 2076,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SALUDB.MX",
+   "id": "FONDO:SALUD",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2018-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 2010,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "SBUX",
+   "id": "SIC:SBUX",
+   "motivo": "",
+   "desde": "1992-06-26",
+   "hasta": "2025-10-09",
+   "sesiones": 8576,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-08-15",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9994,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0075,
+     "fecha_dif_max": "2024-05-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SHOP",
+   "id": "SIC:SHOP",
+   "motivo": "",
+   "desde": "2015-05-20",
+   "hasta": "2025-10-09",
+   "sesiones": 2688,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.8565,
+     "dif_mediana": 0.0,
+     "dif_max": 0.8492,
+     "fecha_dif_max": "2022-06-29",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SHV",
+   "id": "SIC:SHV",
+   "motivo": "",
+   "desde": "2007-01-11",
+   "hasta": "2025-10-09",
+   "sesiones": 4845,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 0.9976,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2024-03-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.1512,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0046,
+     "fecha_dif_max": "2023-12-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SHY",
+   "id": "SIC:SHY",
+   "motivo": "",
+   "desde": "2002-07-30",
+   "hasta": "2025-10-09",
+   "sesiones": 6006,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-07-16",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9242,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0035,
+     "fecha_dif_max": "2024-09-03",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SITES1A-1.MX",
+   "id": "BMV:SITES1",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2022-03-15",
+   "hasta": "2025-10-09",
+   "sesiones": 925,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "SKLZ",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2020-04-27",
+   "hasta": "2025-10-09",
+   "sesiones": 1413,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "SLV",
+   "id": "SIC:SLV",
+   "motivo": "",
+   "desde": "2006-04-28",
+   "hasta": "2025-10-09",
+   "sesiones": 5028,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SOFI",
+   "id": "SIC:SOFI",
+   "motivo": "",
+   "desde": "2021-01-04",
+   "hasta": "2025-10-09",
+   "sesiones": 1235,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SOXL",
+   "id": "SIC:SOXL",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2010-03-11",
+   "hasta": "2025-10-09",
+   "sesiones": 4029,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "SOXX",
+   "id": "SIC:SOXX",
+   "motivo": "",
+   "desde": "2001-07-13",
+   "hasta": "2025-10-09",
+   "sesiones": 6278,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-03-24",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.7124,
+     "dif_mediana": 0.0,
+     "dif_max": 0.6895,
+     "fecha_dif_max": "2024-03-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SPCE",
+   "id": "SIC:SPCE",
+   "motivo": "",
+   "desde": "2017-09-29",
+   "hasta": "2025-10-09",
+   "sesiones": 2075,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0011,
+     "fecha_dif_max": "2024-04-26",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.0344,
+     "dif_mediana": 0.0,
+     "dif_max": 16.2288,
+     "fecha_dif_max": "2024-06-17",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SPLG",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2005-11-15",
+   "hasta": "2025-10-09",
+   "sesiones": 5146,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "SPXL",
+   "id": "SIC:SPXL",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2008-11-05",
+   "hasta": "2025-10-09",
+   "sesiones": 4375,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "SPXS",
+   "id": "SIC:SPXS",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2008-11-19",
+   "hasta": "2025-10-09",
+   "sesiones": 4365,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "SPY",
+   "id": "SIC:SPY",
+   "motivo": "",
+   "desde": "1993-01-29",
+   "hasta": "2025-10-09",
+   "sesiones": 8426,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-12-16",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9992,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0045,
+     "fecha_dif_max": "2022-12-16",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "SQQQ",
+   "id": "SIC:SQQQ",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2010-02-11",
+   "hasta": "2025-10-09",
+   "sesiones": 4049,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "T",
+   "id": "SIC:T",
+   "motivo": "",
+   "desde": "1983-11-21",
+   "hasta": "2025-10-09",
+   "sesiones": 10749,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 0.9998,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0074,
+     "fecha_dif_max": "2022-01-07",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.8615,
+     "dif_mediana": 0.0,
+     "dif_max": 0.2635,
+     "fecha_dif_max": "2022-04-11",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TAL",
+   "id": null,
+   "motivo": "no está en el catálogo del simulador",
+   "desde": "2010-10-20",
+   "hasta": "2025-10-09",
+   "sesiones": 3871,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "TAN",
+   "id": "SIC:TAN",
+   "motivo": "",
+   "desde": "2008-04-15",
+   "hasta": "2025-10-09",
+   "sesiones": 4521,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2024-12-23",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.005,
+     "fecha_dif_max": "2024-12-23",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TECL",
+   "id": "SIC:TECL",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2008-12-30",
+   "hasta": "2025-10-09",
+   "sesiones": 4337,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "TEMATIKB.MX",
+   "id": "FONDO:TEMATIK",
+   "motivo": "solo 0 sesiones en común con la serie local",
+   "desde": "2020-12-07",
+   "hasta": "2025-10-09",
+   "sesiones": 1253,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 4,
+   "vs_local": {
+    "proveedores": [
+     "actinver_pdf"
+    ],
+    "ajustado": {
+     "n": 0
+    },
+    "cierre": {
+     "n": 0
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "TERRA13.MX",
+   "id": "BMV:TERRA",
+   "motivo": "solo 2 sesiones en común con la serie local",
+   "desde": "2013-03-21",
+   "hasta": "2025-10-09",
+   "sesiones": 3245,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 2,
+   "vs_local": {
+    "proveedores": [
+     "eodhd"
+    ],
+    "ajustado": {
+     "n": 2
+    },
+    "cierre": {
+     "n": 2
+    }
+   },
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "TGT",
+   "id": "SIC:TGT",
+   "motivo": "",
+   "desde": "1973-02-21",
+   "hasta": "2025-10-09",
+   "sesiones": 13467,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0015,
+     "fecha_dif_max": "2024-11-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9992,
+     "dif_mediana": 0.0,
+     "dif_max": 0.011,
+     "fecha_dif_max": "2025-05-14",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TLEVISACPO.MX",
+   "id": "BMV:TLEVISA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2000-03-21",
+   "hasta": "2025-10-09",
+   "sesiones": 6621,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 1,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "TLT",
+   "id": "SIC:TLT",
+   "motivo": "",
+   "desde": "2002-07-30",
+   "hasta": "2025-10-09",
+   "sesiones": 6006,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2023-12-14",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9983,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0039,
+     "fecha_dif_max": "2025-08-01",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TMO",
+   "id": "SIC:TMO",
+   "motivo": "",
+   "desde": "1980-03-17",
+   "hasta": "2025-10-09",
+   "sesiones": 11681,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2025-06-13",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.001,
+     "fecha_dif_max": "2025-06-13",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TNA",
+   "id": "SIC:TNA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2008-11-19",
+   "hasta": "2025-10-09",
+   "sesiones": 4365,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "TQQQ",
+   "id": "SIC:TQQQ",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2010-02-11",
+   "hasta": "2025-10-09",
+   "sesiones": 4049,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "TSLA",
+   "id": "SIC:TSLA",
+   "motivo": "",
+   "desde": "2010-06-29",
+   "hasta": "2025-10-09",
+   "sesiones": 3952,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2022-10-25",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.8847,
+     "dif_mediana": 0.0,
+     "dif_max": 0.6644,
+     "fecha_dif_max": "2022-08-25",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TSM",
+   "id": "SIC:TSM",
+   "motivo": "",
+   "desde": "1997-10-09",
+   "hasta": "2025-10-09",
+   "sesiones": 7239,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0031,
+     "fecha_dif_max": "2025-09-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9997,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0055,
+     "fecha_dif_max": "2022-09-15",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TWLO",
+   "id": "SIC:TWLO",
+   "motivo": "",
+   "desde": "2016-06-23",
+   "hasta": "2025-10-09",
+   "sesiones": 2405,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "TX",
+   "id": "SIC:TX",
+   "motivo": "",
+   "desde": "2006-02-01",
+   "hasta": "2025-10-09",
+   "sesiones": 5090,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0028,
+     "fecha_dif_max": "2025-05-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9874,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0648,
+     "fecha_dif_max": "2025-05-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "UAL",
+   "id": "SIC:UAL",
+   "motivo": "",
+   "desde": "2006-02-06",
+   "hasta": "2025-10-09",
+   "sesiones": 5087,
+   "saltos_50pct": 1,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2022-03-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2022-03-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "UBER",
+   "id": "SIC:UBER",
+   "motivo": "",
+   "desde": "2019-05-10",
+   "hasta": "2025-10-09",
+   "sesiones": 1661,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "UNH",
+   "id": "SIC:UNH",
+   "motivo": "",
+   "desde": "1984-10-17",
+   "hasta": "2025-10-09",
+   "sesiones": 10520,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2025-03-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9997,
+     "dif_mediana": 0.0,
+     "dif_max": 0.007,
+     "fecha_dif_max": "2025-06-16",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "UPST",
+   "id": "SIC:UPST",
+   "motivo": "",
+   "desde": "2020-12-16",
+   "hasta": "2025-10-09",
+   "sesiones": 1246,
+   "saltos_50pct": 2,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "USO",
+   "id": "SIC:USO",
+   "motivo": "",
+   "desde": "2006-04-10",
+   "hasta": "2025-10-09",
+   "sesiones": 5042,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-10-07",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "V",
+   "id": "SIC:V",
+   "motivo": "",
+   "desde": "2008-03-19",
+   "hasta": "2025-10-09",
+   "sesiones": 4539,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-11-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0021,
+     "fecha_dif_max": "2022-11-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VEA",
+   "id": "SIC:VEA",
+   "motivo": "",
+   "desde": "2007-07-26",
+   "hasta": "2025-10-09",
+   "sesiones": 4706,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9943,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0152,
+     "fecha_dif_max": "2021-12-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VESTA.MX",
+   "id": "BMV:VESTA",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2012-07-20",
+   "hasta": "2025-10-09",
+   "sesiones": 3417,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "VGT",
+   "id": "SIC:VGT",
+   "motivo": "",
+   "desde": "2004-01-30",
+   "hasta": "2025-10-09",
+   "sesiones": 5613,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-12-15",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0024,
+     "fecha_dif_max": "2022-12-15",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VNQ",
+   "id": "SIC:VNQ",
+   "motivo": "",
+   "desde": "2004-09-29",
+   "hasta": "2025-10-09",
+   "sesiones": 5440,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2023-03-24",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.995,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0139,
+     "fecha_dif_max": "2022-12-22",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VOLARA.MX",
+   "id": "BMV:VOLAR",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2013-09-18",
+   "hasta": "2025-10-09",
+   "sesiones": 3117,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "VOO",
+   "id": "SIC:VOO",
+   "motivo": "",
+   "desde": "2010-09-09",
+   "hasta": "2025-10-09",
+   "sesiones": 3900,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9991,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0048,
+     "fecha_dif_max": "2022-12-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VT",
+   "id": "SIC:VT",
+   "motivo": "",
+   "desde": "2008-06-26",
+   "hasta": "2025-10-09",
+   "sesiones": 4469,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9979,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0079,
+     "fecha_dif_max": "2023-12-18",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VTI",
+   "id": "SIC:VTI",
+   "motivo": "",
+   "desde": "2001-06-15",
+   "hasta": "2025-10-09",
+   "sesiones": 6298,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-09-23",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9992,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0047,
+     "fecha_dif_max": "2022-12-22",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VWO",
+   "id": "SIC:VWO",
+   "motivo": "",
+   "desde": "2005-03-10",
+   "hasta": "2025-10-09",
+   "sesiones": 5324,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2024-12-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9929,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0237,
+     "fecha_dif_max": "2024-12-20",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VYM",
+   "id": "SIC:VYM",
+   "motivo": "",
+   "desde": "2006-11-16",
+   "hasta": "2025-10-09",
+   "sesiones": 4884,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0002,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9946,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0099,
+     "fecha_dif_max": "2023-12-18",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "VZ",
+   "id": "SIC:VZ",
+   "motivo": "",
+   "desde": "1983-11-21",
+   "hasta": "2025-10-09",
+   "sesiones": 10749,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0004,
+     "fecha_dif_max": "2022-10-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9902,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0207,
+     "fecha_dif_max": "2023-10-06",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "WALMEX.MX",
+   "id": "BMV:WALMEX",
+   "motivo": "la terminal no tiene serie local para comparar",
+   "desde": "2003-01-01",
+   "hasta": "2025-10-09",
+   "sesiones": 5895,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "sin verificar"
+  },
+  {
+   "columna": "WFC",
+   "id": "SIC:WFC",
+   "motivo": "",
+   "desde": "1972-06-01",
+   "hasta": "2025-10-09",
+   "sesiones": 13647,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2023-05-04",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9991,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0091,
+     "fecha_dif_max": "2023-11-02",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "WMT",
+   "id": "SIC:WMT",
+   "motivo": "",
+   "desde": "1972-08-25",
+   "hasta": "2025-10-09",
+   "sesiones": 13587,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2021-12-09",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.509,
+     "dif_mediana": 0.0,
+     "dif_max": 0.679,
+     "fecha_dif_max": "2024-02-26",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "WYNN",
+   "id": "SIC:WYNN",
+   "motivo": "",
+   "desde": "2002-10-25",
+   "hasta": "2025-10-09",
+   "sesiones": 5943,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2024-09-24",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0033,
+     "fecha_dif_max": "2024-08-19",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "XLE",
+   "id": "SIC:XLE",
+   "motivo": "",
+   "desde": "1998-12-22",
+   "hasta": "2025-10-09",
+   "sesiones": 6936,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0006,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9975,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0126,
+     "fecha_dif_max": "2021-12-20",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "XLF",
+   "id": "SIC:XLF",
+   "motivo": "",
+   "desde": "1998-12-22",
+   "hasta": "2025-10-09",
+   "sesiones": 6936,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9989,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0062,
+     "fecha_dif_max": "2022-12-19",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "XLK",
+   "id": "SIC:XLK",
+   "motivo": "",
+   "desde": "1998-12-22",
+   "hasta": "2025-10-09",
+   "sesiones": 6936,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9999,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0028,
+     "fecha_dif_max": "2022-12-19",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "XLV",
+   "id": "SIC:XLV",
+   "motivo": "",
+   "desde": "1998-12-22",
+   "hasta": "2025-10-09",
+   "sesiones": 6936,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1006,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0001,
+     "fecha_dif_max": "2022-06-21",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1006,
+     "correlacion": 0.9985,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0048,
+     "fecha_dif_max": "2025-06-23",
+     "desde": "2021-10-06",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "XOM",
+   "id": "SIC:XOM",
+   "motivo": "",
+   "desde": "1962-01-02",
+   "hasta": "2025-10-09",
+   "sesiones": 16246,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0003,
+     "fecha_dif_max": "2022-08-11",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 0.9977,
+     "dif_mediana": 0.0,
+     "dif_max": 0.013,
+     "fecha_dif_max": "2021-11-10",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "ZM",
+   "id": "SIC:ZM",
+   "motivo": "",
+   "desde": "2019-04-18",
+   "hasta": "2025-10-09",
+   "sesiones": 1676,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "vs_local": {
+    "proveedores": [
+     "tiingo"
+    ],
+    "ajustado": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    },
+    "cierre": {
+     "n": 1013,
+     "correlacion": 1.0,
+     "dif_mediana": 0.0,
+     "dif_max": 0.0,
+     "fecha_dif_max": "2021-09-28",
+     "desde": "2021-09-27",
+     "hasta": "2025-10-09"
+    }
+   },
+   "estado": "verificada"
+  },
+  {
+   "columna": "Conservador",
+   "id": null,
+   "motivo": "perfil índice (construcción no documentada)",
+   "desde": "2004-01-05",
+   "hasta": "2025-10-09",
+   "sesiones": 5483,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "Moderado",
+   "id": null,
+   "motivo": "perfil índice (construcción no documentada)",
+   "desde": "2004-01-05",
+   "hasta": "2025-10-09",
+   "sesiones": 5483,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  },
+  {
+   "columna": "Agresivo",
+   "id": null,
+   "motivo": "perfil índice (construcción no documentada)",
+   "desde": "2004-01-05",
+   "hasta": "2025-10-09",
+   "sesiones": 5483,
+   "saltos_50pct": 0,
+   "final_sin_cambio": 0,
+   "estado": "no usada"
+  }
+ ],
+ "resumen": {
+  "no usada": 20,
+  "verificada": 148,
+  "sin verificar": 56,
+  "rechazada": 5
+ },
+ "perfiles": {
+  "Conservador": {
+   "desde": "2004-01-05",
+   "hasta": "2025-10-09",
+   "rend_anual": 0.0833,
+   "vol_anual": 0.0473,
+   "max_caida": -0.0868,
+   "anios": {
+    "2005": 0.1007,
+    "2006": 0.1325,
+    "2007": 0.0776,
+    "2008": -0.0059,
+    "2009": 0.1273,
+    "2010": 0.0682,
+    "2011": 0.0595,
+    "2012": 0.0626,
+    "2013": 0.0869,
+    "2014": 0.0744,
+    "2015": 0.0562,
+    "2016": 0.0932,
+    "2017": 0.0846,
+    "2018": 0.0273,
+    "2019": 0.1121,
+    "2020": 0.0989,
+    "2021": 0.1104,
+    "2022": -0.0072,
+    "2023": 0.1187,
+    "2024": 0.1606,
+    "2025": 0.082
+   }
+  },
+  "Moderado": {
+   "desde": "2004-01-05",
+   "hasta": "2025-10-09",
+   "rend_anual": 0.0975,
+   "vol_anual": 0.1002,
+   "max_caida": -0.2271,
+   "anios": {
+    "2005": 0.0651,
+    "2006": 0.1563,
+    "2007": 0.0685,
+    "2008": -0.0952,
+    "2009": 0.1595,
+    "2010": 0.0741,
+    "2011": 0.085,
+    "2012": 0.0652,
+    "2013": 0.1639,
+    "2014": 0.1387,
+    "2015": 0.0951,
+    "2016": 0.1734,
+    "2017": 0.1064,
+    "2018": -0.0139,
+    "2019": 0.1573,
+    "2020": 0.1496,
+    "2021": 0.1881,
+    "2022": -0.1012,
+    "2023": 0.1081,
+    "2024": 0.2731,
+    "2025": 0.0635
+   }
+  },
+  "Agresivo": {
+   "desde": "2004-01-05",
+   "hasta": "2025-10-09",
+   "rend_anual": 0.1087,
+   "vol_anual": 0.1543,
+   "max_caida": -0.358,
+   "anios": {
+    "2005": 0.0294,
+    "2006": 0.1794,
+    "2007": 0.0575,
+    "2008": -0.1877,
+    "2009": 0.1859,
+    "2010": 0.0779,
+    "2011": 0.107,
+    "2012": 0.0667,
+    "2013": 0.2448,
+    "2014": 0.2054,
+    "2015": 0.1329,
+    "2016": 0.2566,
+    "2017": 0.1272,
+    "2018": -0.0561,
+    "2019": 0.2027,
+    "2020": 0.1942,
+    "2021": 0.2689,
+    "2022": -0.1903,
+    "2023": 0.0957,
+    "2024": 0.3934,
+    "2025": 0.0421
+   }
+  }
+ }
+}

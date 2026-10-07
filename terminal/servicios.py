@@ -474,6 +474,14 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     ids_prop = ids_propuestas(props)
     act = {"nuevos": 0} if en_vivo else ingesta.actualizar_todo(con, ajustes, prio, forzar_demo=False, contexto=True,
                                                                 ids_propuesta=ids_prop)
+    if not en_vivo and not ajustes.es_demo:
+        try:
+            from . import finviz  # apagado sin FINVIZ_AUTH_TOKEN (Finviz Elite, de pago)
+            fv = finviz.actualizar(con, ajustes)
+            if fv.get("guardados"):
+                act["nuevos"] = act.get("nuevos", 0) + fv["guardados"]
+        except Exception:  # noqa: BLE001 - una fuente opcional nunca detiene el monitor
+            log.exception("Finviz")
     motivo = ("precios en vivo" if en_vivo else "forzado" if forzar else "datos nuevos" if act.get("nuevos") else
               "sin propuestas" if any(v is None for v in props.values()) else
               "código, configuración, perfil o datos cambiaron" if any(v and v.get("recalcular") for v in props.values())

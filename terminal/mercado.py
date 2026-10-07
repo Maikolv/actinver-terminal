@@ -22,7 +22,8 @@ def _filtro_proveedor(ajustes: Ajustes) -> tuple[str, tuple]:
 # así que un precio antiguo nunca sustituye a uno nuevo. Contratos BMV > cierres BMV > NAV oficial de fondos >
 # referencias de la bolsa de origen > precio capturado a mano > cotización en vivo del día (la sustituye el cierre).
 PRIORIDAD_FUENTE = {"bmv_licenciado": 0, "infosel": 1, "lseg": 2, "ice": 3, "edimex": 4, "eodhd": 10, "twelvedata": 11,
-                    "actinver_pdf": 12, "tiingo": 20, "alpaca": 21, "barchart": 22, "archivo": 30, "alpaca_vivo": 40}
+                    "actinver_pdf": 12, "tiingo": 20, "alpaca": 21, "barchart": 22, "archivo": 30, "alpaca_vivo": 40,
+                    "finviz_vivo": 41}
 
 
 def prioridad_fuente(proveedor: str | None) -> int:

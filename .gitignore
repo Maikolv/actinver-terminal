@@ -31,11 +31,13 @@ docs/evidencia/*.json
 !docs/evidencia/calidad_series.json
 !docs/evidencia/busqueda_eval.json
 !docs/evidencia/experimento_kronos.json
+!docs/evidencia/historia_externa.json
 
 # Especificaciones de contratos de datos (pueden contener detalles del contrato): solo locales
 config/proveedores/*.json
 !config/proveedores/ejemplo_especificacion.json
 !config/proveedores/eodhd_diferido.json
+!config/proveedores/finviz_elite.json
 
 # Datos locales (base de datos, respaldos, reportes y documentos descargados): nunca al repositorio
 data/

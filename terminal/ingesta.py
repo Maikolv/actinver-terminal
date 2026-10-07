@@ -180,7 +180,7 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                                         f"serie exacta descargada de {n} ({len(barras)} cierres)")
                 # El cierre oficial sustituye a las cotizaciones en vivo del mismo día o anteriores.
                 if barras:
-                    con.execute("DELETE FROM precios WHERE instrumento_id=? AND proveedor=? AND fecha<=?",
+                    con.execute("DELETE FROM precios WHERE instrumento_id=? AND proveedor IN (?, 'finviz_vivo') AND fecha<=?",
                                 (ins["id"], PROVEEDOR_VIVO, max(b.fecha for b in barras)))
                 eventos = [(ins["id"], b.fecha, "dividendo", b.dividendo, n) for b in barras if b.dividendo]
                 eventos += [(ins["id"], b.fecha, "split", b.factor_split, n) for b in barras if b.factor_split != 1]

@@ -34,6 +34,13 @@ recalcular_cada_min = 5              # recalcula propuestas y alertas con precio
 umbral_movimiento = 0.01             # …o antes, si algún símbolo se mueve ≥ 1 % desde el último cálculo
 recalculo_minimo_seg = 120           # nunca dos cálculos en vivo con menos de 2 min de diferencia
 
+[finviz]
+# Finviz Elite (DE PAGO; contratarlo es decisión del usuario). Sin FINVIZ_AUTH_TOKEN en .env no hace ninguna petición.
+# Una consulta en lote de todas las emisoras SIC con la bolsa de Nueva York abierta. Sin hora del último hecho: se
+# guarda como «retrasado» (latencia no medible) y el cierre oficial lo sustituye. Ver terminal/finviz.py.
+activo = true
+intervalo_min = 5
+
 [investigacion]
 horizontes = [1, 5]                  # H: próxima sesión y próximos cinco días hábiles (más el cierre del Reto, automático)
 emitir_diario = true                 # el monitor emite una vez por sesión cerrada, en segundo plano

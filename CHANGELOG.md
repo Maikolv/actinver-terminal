@@ -2,6 +2,19 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.26.0] — 2026-10-07 (historia externa del usuario y Finviz Elite)
+
+### Agregado
+- **Historia externa** (`terminal/historia_externa.py`, `scripts/historia_externa.py`, `docs/historia-externa.md`, D-61):
+  importa el Excel «Benchmarks_time_series» del usuario (1962 → 9-oct-2025, 226 instrumentos y 3 perfiles índice).
+  - Se verifica columna por columna contra Tiingo/EODHD: 148 verificadas (137 SIC idénticas en ~1,000 sesiones y 11 BMV en 11 sesiones), 5 rechazadas y 56 sin verificar (fondos sin solape). «AC» sin .MX es Associated Capital, no Arca Continental.
+  - Solo las verificadas extienden rendimientos hacia atrás; nunca entra a la tabla de precios.
+  - Validación V1 desde 2004 (5,690 sesiones fuera de muestra, antes 1,099): «acciones · máximo rendimiento» +30.5 % anual frente a 1/N +18.7 %, IC 90 % del exceso [+3.6 %, +23.8 %], caída máxima −70 %. Con fuerte sesgo de supervivencia: no se declara ventaja ni cambian las propuestas.
+- **Finviz Elite** (`terminal/finviz.py`, `terminal finviz`, `[finviz]` en ajustes): conector en lote de precios de EE. UU., **apagado** sin `FINVIZ_AUTH_TOKEN`.
+  - Elite es de pago; el plan gratuito no exporta y su robots.txt lo prohíbe a programas.
+  - Sin hora del último hecho, sus precios quedan como «retrasado» / UNKNOWN y el cierre oficial los reemplaza.
+- 9 pruebas nuevas; 348 en verde.
+
 ## [0.25.1] — 2026-10-06 (mandato de autonomía, versión 2)
 
 ### Cambiado
