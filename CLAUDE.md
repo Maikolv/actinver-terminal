@@ -32,6 +32,10 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-07, v0.26.0, rama `main`)
 
+- **Cuenta del Reto (7-oct, 14:30, captura confirmada):**
+  - Compras de XOM y NVAX ejecutadas por el usuario: 8 XOM a $2,947.54 y 126 NVAX a $203.23.
+  - Valuación $1,001,256.90 (+0.13 %); poder de compra $4,077.53.
+  - Posiciones: MU 48.3 %, AMD 15.1 %, GMEXICO 15.1 %, NVDA 11.1 %, ALPEK 5.0 %, NVAX 2.6 %, XOM 2.4 %.
 - **7-oct (v0.26.0, D-61):**
   - Historia externa del usuario (Excel, 1962 → 9-oct-2025): 148 columnas verificadas extienden rendimientos
     hacia atrás (`docs/historia-externa.md`). Validación desde 2004: máximo rendimiento supera a 1/N
