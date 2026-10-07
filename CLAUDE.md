@@ -37,6 +37,12 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
   - Valuación $987,988.71 (−1.2 %); poder de compra $6,318.77.
   - Posiciones: MU 47.5 %, GMEXICO 15.4 %, AMD 15.3 %, NVDA 11.3 %, ALPEK 5.0 %, AMAT 4.8 %.
   - Las boletas #289/#290 (AMAT → NVDA) se cancelaron el 7-oct: el usuario eligió petróleo.
+- **7-oct ≈ 08:38 (captura solo del resumen, no guardada):**
+  - AMAT vendida (5 a $9,400.00, según el cambio en el poder de compra).
+  - Poder de compra $53,264.25; valuación $993,855.25 (−0.61 %).
+  - Boletas vigentes #298/#299: comprar ≈ 8 XOM y ≈ 126 NVAX, 50/50 por decisión del usuario.
+  - NVAX: −0.2 % estimado al cierre y −23 % en un mal escenario.
+  - Falta la captura con la tabla de posiciones para registrar la cartera nueva.
 - **Cuenta del Reto (7-oct, 08:00, captura confirmada):**
   - Mismas 6 posiciones; valuación $979,561.91 (−2.04 %); poder de compra $6,318.77.
   - Boletas #291/#292 (vender AMAT y comprar ≈ 17 XOM): las pidió el usuario y vencían a las 08:19, porque usan el precio en vivo.
