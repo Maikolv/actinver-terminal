@@ -32,6 +32,9 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-07, v0.26.0, rama `main`)
 
+- **Cuenta del Reto (8-oct, 17:26, captura confirmada):**
+  - Mismas 7 posiciones; valuación $980,186.87 (−1.98 %); poder de compra $4,077.53.
+  - Día: MU −3.3 %, NVDA −1.5 %, AMD −2.5 %; XOM +2.6 %.
 - **Cuenta del Reto (7-oct, 14:30, captura confirmada):**
   - Compras de XOM y NVAX ejecutadas por el usuario: 8 XOM a $2,947.54 y 126 NVAX a $203.23.
   - Valuación $1,001,256.90 (+0.13 %); poder de compra $4,077.53.
