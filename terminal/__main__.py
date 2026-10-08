@@ -161,8 +161,7 @@ def finviz(_args) -> None:
     a = cargar_ajustes()
     falta = fv.pendientes()
     if falta:
-        sys.exit("Finviz Elite apagado: falta " + "; ".join(falta) + ".
-El plan gratuito no permite exportar y su "
+        sys.exit("Finviz Elite apagado: falta " + "; ".join(falta) + ".\nEl plan gratuito no permite exportar y su "
                  "robots.txt lo prohíbe a programas; la terminal no extrae la versión gratuita.")
     con = db.conectar()
     db.inicializar(con)
