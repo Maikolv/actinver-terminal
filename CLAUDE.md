@@ -32,6 +32,10 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-07, v0.26.0, rama `main`)
 
+- **Cuenta del Reto (viernes 9-oct, 14:30, captura confirmada):**
+  - Mismas 7 posiciones; valuación $996,608.12 (−0.34 %); poder de compra $4,077.53.
+  - Pesos: MU 47.5 %, GMEXICO 15.8 %, AMD 14.6 %, NVDA 11.0 %, ALPEK 5.2 %, NVAX 3.0 %, XOM 2.5 %.
+  - Desde el 8-oct: NVAX +17.2 %, GMEXICO +5.3 %, ALPEK +3.7 %, XOM +2.8 %; AMD −1.0 %.
 - **Cuenta del Reto (8-oct, 17:26, captura confirmada):**
   - Mismas 7 posiciones; valuación $980,186.87 (−1.98 %); poder de compra $4,077.53.
   - Día: MU −3.3 %, NVDA −1.5 %, AMD −2.5 %; XOM +2.6 %.
