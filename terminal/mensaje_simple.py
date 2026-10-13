@@ -15,6 +15,7 @@ from datetime import date, datetime, timedelta
 import pandas as pd
 
 ZONA = "America/Mexico_City"
+CONCENTRACION = 0.35  # peso de una sola emisora a partir del cual el plan lo señala (dato de riesgo)
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 # Títulos del calendario (ForexFactory) traducidos a palabras de uso diario; el resto sale como «dato económico».
 MACRO = [("FOMC Meeting Minutes", "minutas de la Reserva Federal de EE. UU."),
@@ -81,8 +82,11 @@ def _horario(sesion: date) -> str:
 
 
 def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ahora_local: pd.Timestamp,
-              sesion: date | None = None, sesiones_restantes: int | None = None, riesgo_aceptado: dict | None = None) -> str:
-    """Texto del plan del día. `plan` es la salida de plan_accion.calcular; `propuesta`, la de referencia."""
+              sesion: date | None = None, sesiones_restantes: int | None = None, riesgo_aceptado: dict | None = None,
+              concentracion: dict | None = None, precios_al: date | None = None) -> str:
+    """Texto del plan del día. `plan` es la salida de plan_accion.calcular; `propuesta`, la de referencia.
+    `concentracion`: {"clave", "peso"} de la emisora con más peso; `precios_al`: fecha del precio más viejo de las
+    posiciones cuando es anterior a la última sesión cerrada (la valuación todavía no trae el cierre del día)."""
     s = sesion or ahora_local.date()
     cab = f"📋 Qué hacer {'hoy' if s == ahora_local.date() else 'en la próxima sesión'}, {DIAS[s.weekday()]} {s:%d-%m}"
     if sesiones_restantes:
@@ -102,6 +106,9 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
              + (f" (según tu captura del {hora:%d-%m %H:%M})." if hora is not None else "."))
     if hora is not None and (ahora_local - hora) > pd.Timedelta(days=3):
         L.append("⚠️ Esa captura es vieja: si compraste o vendiste después, mándame una nueva antes de seguir.")
+    if precios_al is not None:
+        L.append(f"⏳ Ojo: la valuación usa precios del {precios_al:%d-%m}; los del último cierre aún no se descargan. "
+                 "Escribe /plan en unos minutos.")
     acc = plan["acciones"]
     ventas = [a for a in acc if a["decision"] == "vender"]
     compras = [a for a in acc if a["decision"] == "comprar"]
@@ -168,6 +175,10 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     elif r.get("activo"):
         L.append(f"• Reglas del Reto cumplidas: al menos {r.get('min_emisoras')} empresas distintas y ninguna con más de "
                  f"{float(r.get('max_peso_emisora') or 0.5):.0%} del dinero.")
+    if concentracion and concentracion.get("peso", 0) >= CONCENTRACION:
+        k, w = _nombre(concentracion["clave"]), concentracion["peso"]
+        L.append(f"• ⚖️ {k} es el {w:.0%} de tu cartera: si {k} baja 10 %, tu cartera baja ≈ {w * 0.10:.1%} solo por ella. "
+                 "Es un dato de riesgo, no una orden.")
     if eventos:
         e = eventos[0]
         extra = f" (y {len(eventos) - 1} más)" if len(eventos) > 1 else ""
@@ -210,8 +221,27 @@ def texto(con: sqlite3.Connection, ajustes, propuesta: dict | None = None, carte
         quedan = reto.sesiones_restantes(local.to_pydatetime()) if reto.activo() else None
     except Exception:  # noqa: BLE001
         quedan = None
+    conc, precios_al = _cartera_riesgo(con, ajustes, cartera, ahora)
     return construir(plan, propuesta, eventos_macro(con, ahora), local, sesion or resumen.sesion_objetivo(ahora), quedan,
-                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"))
+                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"), concentracion=conc, precios_al=precios_al)
+
+
+def _cartera_riesgo(con, ajustes, cartera: dict | None, ahora: datetime) -> tuple[dict | None, date | None]:
+    """(emisora con más peso, fecha de precio atrasada o None) de la cartera actual."""
+    from . import servicios, vigencia
+    try:
+        cart = cartera or servicios.cartera_actual(con, ajustes)
+        pos = [p for p in cart.get("posiciones") or [] if p.get("peso")]
+        if not pos:
+            return None, None
+        top = max(pos, key=lambda p: p["peso"])
+        conc = {"clave": (top.get("clave_operable") or top["instrumento_id"]).split(":")[-1], "peso": float(top["peso"])}
+        fechas = [date.fromisoformat(p["fecha_precio"][:10]) for p in pos if p.get("fecha_precio")]
+        ultima = vigencia.ultima_sesion_cerrada("XMEX", ahora)
+        viejo = min(fechas) if fechas else None
+        return conc, (viejo if viejo is not None and viejo < ultima else None)
+    except Exception:  # noqa: BLE001 - el plan sale aunque falte este dato
+        return None, None
 
 
 def decision(con: sqlite3.Connection, clave: str) -> dict | None:

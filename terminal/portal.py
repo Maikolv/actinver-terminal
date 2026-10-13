@@ -282,6 +282,19 @@ def guardar(con: sqlite3.Connection, texto: str, hora_portal: str, instrumentos:
     return r
 
 
+def ultima_captura_id() -> int | None:
+    """Id de la última captura confirmada (para que el motor descargue los cierres en cuanto llega una nueva)."""
+    from . import db
+    try:
+        con = db.conectar()
+        try:
+            return con.execute("SELECT MAX(id) FROM capturas_portal").fetchone()[0]
+        finally:
+            con.close()
+    except Exception:  # noqa: BLE001 - nunca detiene el motor
+        return None
+
+
 def captura(con: sqlite3.Connection, cid: int | None = None) -> dict | None:
     f = con.execute("SELECT * FROM capturas_portal WHERE id=?" if cid else
                     "SELECT * FROM capturas_portal ORDER BY hora_portal DESC, id DESC LIMIT 1", (cid,) if cid else ()).fetchone()

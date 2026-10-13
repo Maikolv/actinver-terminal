@@ -112,3 +112,12 @@ def test_si_mantener_es_mejor_dice_que_no_cambie_nada():
     assert "Hoy no cambies nada" in t and "+7.6%" in t and "+7.0%" in t and "-16.7%" in t
     assert "VENDE" not in t and "COMPRA" not in t and "Pronóstico del modelo" not in t
     assert "Antes de capturar" not in t and "Para tener en cuenta" in t
+
+
+def test_concentracion_y_precios_atrasados_se_dicen_en_palabras_sencillas():
+    plan = _plan([_accion("MU *", "mantener")])
+    t = ms.construir(plan, PROP, [], AHORA, concentracion={"clave": "MU *", "peso": 0.475}, precios_al=date(2026, 10, 9))
+    assert "MU es el 48% de tu cartera" in t and "baja ≈ 4.8%" in t and "no una orden" in t
+    assert "precios del 09-10" in t
+    t2 = ms.construir(plan, PROP, [], AHORA, concentracion={"clave": "AMD *", "peso": 0.15})
+    assert "de tu cartera" not in t2 and "Ojo: la valuación" not in t2   # bajo el umbral y precios al día: no se dice

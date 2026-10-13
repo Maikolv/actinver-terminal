@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.26.1] — 2026-10-12 (concentración y precios del día en el plan)
+
+### Agregado
+- **Plan del día:** si una emisora pesa 35 % o más de la cartera, lo dice en palabras sencillas (p. ej. «MU es el 47 % de tu cartera: si MU baja 10 %, tu cartera baja ≈ 4.7 % solo por ella»). Es un dato de riesgo, no una orden.
+- **Plan del día:** avisa cuando la valuación todavía usa precios de una sesión anterior al último cierre.
+- **Motor:** al confirmar una captura nueva del portal, adelanta el ciclo para descargar los cierres del día en lugar de esperar hasta 60 min fuera de horario.
+
 ## [0.26.0] — 2026-10-07 (historia externa del usuario y Finviz Elite)
 
 ### Agregado

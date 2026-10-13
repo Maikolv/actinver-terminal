@@ -51,11 +51,17 @@ def _programador(stop: threading.Event) -> None:
     """Motor automático: adquiere datos (respetando límites), recalcula si hay datos nuevos y evalúa alertas.
     Entre ciclos completos, si el flujo en vivo trae precios que se movieron, recalcula sin consultar proveedores."""
     import time
+
+    from . import portal
     prog = AJUSTES["programacion"]
     siguiente = time.monotonic() + 5  # primer ciclo pocos segundos después de arrancar
+    captura = portal.ultima_captura_id()
     while not stop.wait(15):
         servicios.resumen_seguro(AJUSTES)  # plan del día por Telegram a primera hora (una vez por sesión)
         ahora = time.monotonic()
+        nueva = portal.ultima_captura_id()
+        if nueva != captura:  # captura nueva del portal: descargar ya los cierres del día, sin esperar al ciclo horario
+            captura, siguiente = nueva, ahora
         if ahora >= siguiente:
             if servicios.ciclo_seguro(AJUSTES) is not None and FLUJO:
                 FLUJO.marcar_recalculo()
