@@ -32,6 +32,10 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-07, v0.26.0, rama `main`)
 
+- **Cuenta del Reto (lunes 12-oct, 18:02, captura confirmada):**
+  - Mismas 7 posiciones; valuación $970,442.17 (−2.96 %); poder de compra $4,077.53. La terminal valúa $969,921 (−0.05 %).
+  - Desde el 9-oct: MU −4.6 %, AMD −2.9 %, NVDA −2.0 %, NVAX −2.6 %; ALPEK +4.9 %, XOM +0.8 %.
+  - Plan para el 13-oct: no cambiar nada (mantener +5.1 % frente a propuesta +5.4 %, diferencia menor al margen de 1 punto).
 - **Cuenta del Reto (viernes 9-oct, 14:30, captura confirmada):**
   - Mismas 7 posiciones; valuación $996,608.12 (−0.34 %); poder de compra $4,077.53.
   - Pesos: MU 47.5 %, GMEXICO 15.8 %, AMD 14.6 %, NVDA 11.0 %, ALPEK 5.2 %, NVAX 3.0 %, XOM 2.5 %.
