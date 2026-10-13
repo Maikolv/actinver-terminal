@@ -79,6 +79,10 @@ no encontró secretos.
    de comandos están sin confirmar en Git (otra sesión trabajando). Un error de disco o una limpieza los borraría.
 
 ### Media
+2b. **Las pruebas leen el `.env` real.** `config._cargar_env_local` (l. 49–59) copia `.env` a `os.environ` en cuanto una
+   prueba llama a `cargar_ajustes()`. Con `FRED_API_KEY` ya configurada, `tests/test_adaptadores.py::test_fred_csv_ignora_festivos`
+   falla en la suite completa y pasa sola: el adaptador FRED (`adaptadores/proveedores.py` ≈ l. 29) toma la ruta de la
+   API. Hoy no hubo llamadas reales (cliente simulado), pero una prueba podría usar credenciales reales.
 3. **Mapa de calor y SMA/RSI con cierre sin ajustar por splits** (`visualizaciones.py` l. 17 y 52). El día de un split
    la celda muestra un −50 % o −90 % falso, y la SMA/RSI se distorsionan. La terminal ya tiene `mercado._solo_splits` y
    `eventos_corporativos` para corregirlo.
@@ -175,6 +179,7 @@ no encontró secretos.
 | 1.2 | Alpha Vantage: pausa ≥ 1.2 s entre símbolos y guardado parcial por símbolo | P0 | Que la clave válida entregue datos | Bajo | `centro_conectores.py` | Cupo AV | Respuesta simulada con aviso en el 2.º símbolo → se guardan 1.º, 3.º y 4.º | Consulta real con ≥ 1 símbolo guardado y estado «ok/parcial» |
 | 1.3 | Errores clasificados sin filtrar secretos (credencial, cupo, red, formato) | P1 | Diagnóstico desde la interfaz | Filtrar la URL si se hace mal | `centro_investigacion.py` | — | Error 401/aviso/timeout → mensaje distinto, sin la clave | Cada tipo muestra su causa |
 | 1.4 | `/grafica` en iframe `sandbox`, `form-action 'none'` en su CSP | P1 | Aísla el script de terceros | Que el widget no cargue | `app.py`, `web/` | TradingView | CSP con `form-action`; carga del widget | El widget carga y la CSP lo restringe |
+| 1.6 | Pruebas aisladas del `.env` real (variable `TERMINAL_SIN_ENV` en `conftest.py` o `monkeypatch` de claves) | P0 | Pruebas deterministas y sin credenciales reales | Bajo | `tests/conftest.py`, `terminal/config.py` | — | Suite completa verde con y sin `.env`; ninguna variable de `.env` visible en pruebas | `test_fred_csv_ignora_festivos` verde en la suite completa |
 | 1.5 | Escáner de secretos incremental y del árbol | P2 | Que se pueda correr en cada commit | — | `scripts/escanear_secretos.py` | — | Árbol con un secreto falso → lo detecta | < 30 s |
 
 ### Etapa 2 — Calidad de datos y trazabilidad
@@ -208,7 +213,7 @@ Toda ejecución sigue simulada. No se propone trading automático.
 | Verificación | Resultado |
 |---|---|
 | Pruebas focalizadas: visualizaciones, centro de investigación, opciones, Finviz, historia externa, compilación, plan, seguridad/webhook | **162 aprobadas** |
-| Suite completa (`uv run pytest`, sin las de TradingView de la otra sesión) | 473 aprobadas el 12-oct (tras `e79ec3b`); repetida durante esta auditoría (ver respuesta) |
+| Suite completa (`uv run pytest`, sin las de TradingView de la otra sesión) | **476 aprobadas, 1 fallida**: `test_fred_csv_ignora_festivos`, por depender del `.env` real (hallazgo 2b); sola pasa |
 | `node --check web/static/app.js` | Sintaxis válida |
 | `git diff --check` | Sin errores de espacios |
 | Secretos en el árbol de trabajo (301 archivos) | 0 hallazgos |
