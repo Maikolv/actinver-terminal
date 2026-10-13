@@ -127,7 +127,7 @@ no encontró secretos.
 |---|---|
 | `.env` y `data/` fuera de Git | Sí (`.gitignore` l. 8 y 43) |
 | Secretos en el árbol (301 archivos, con y sin seguimiento) | 0 hallazgos con los patrones de `escanear_secretos.py` |
-| Secretos en la historia de Git | Escáner completo lanzado; ver «Pruebas» |
+| Secretos en la historia de Git | 97 commits, 0 hallazgos |
 | URL con claves en registros | `httpx` en WARNING; los adaptadores informan solo el tipo de error; el centro nunca devuelve cuerpo ni URL |
 | CSRF / CSP | CSRF por cabecera en POST; CSP estricta en la app (`script-src 'self'`); CSP propia en `/grafica` |
 | Límite de peticiones | `/api/centro-investigacion/actualizar` 4/min e `importar` 10/min (`seguridad.py`) |
@@ -217,7 +217,7 @@ Toda ejecución sigue simulada. No se propone trading automático.
 | `node --check web/static/app.js` | Sintaxis válida |
 | `git diff --check` | Sin errores de espacios |
 | Secretos en el árbol de trabajo (301 archivos) | 0 hallazgos |
-| `scripts/escanear_secretos.py` (toda la historia) | Lanzado; lento por diseño (hallazgo 8) |
+| `scripts/escanear_secretos.py` (toda la historia) | **97 commits revisados, 0 hallazgos** (tardó ≈ 45 min; hallazgo 8) |
 | Claves (consulta mínima, sin imprimir valores) | Alpha Vantage: OK (`INCOME_STATEMENT`); EIA: OK (1 observación WTI); FRED: OK en el último ciclo (94 observaciones) |
 
 ## 8. Pendientes y requisitos externos
