@@ -1036,6 +1036,90 @@ async def flujo_importar_externo(archivo: UploadFile = File(...), simbolo: str =
         raise HTTPException(422, str(e)) from None
 
 
+# Etapa 3: riesgo, seguimiento, comparación y backtesting (solo análisis y simulación).
+@app.get("/api/riesgo")
+def get_riesgo(ventana: int = 252, horizonte: int | None = None, con=Depends(con_db)):
+    from . import riesgo
+    return riesgo.calcular(con, AJUSTES, max(60, min(ventana, 1260)), horizonte if horizonte and 1 <= horizonte <= 252 else None)
+
+
+@app.get("/api/lista-seguimiento")
+def get_lista_seguimiento(con=Depends(con_db)):
+    from . import seguimiento
+    return seguimiento.lista(con, AJUSTES)
+
+
+@app.post("/api/lista-seguimiento")
+def post_lista_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import seguimiento
+    try:
+        if cuerpo.get("quitar"):
+            seguimiento.quitar(con, str(cuerpo.get("id", "")))
+        else:
+            seguimiento.agregar(con, str(cuerpo.get("id", "")), str(cuerpo.get("nota") or ""))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    return seguimiento.lista(con, AJUSTES)
+
+
+@app.get("/api/comparar")
+def get_comparar(ids: str, ventana: int = 252, referencia: str = "BMV:NAFTRAC", con=Depends(con_db)):
+    from . import seguimiento
+    try:
+        return seguimiento.comparar(con, AJUSTES, [x.strip() for x in ids.split(",")], max(30, min(ventana, 1260)), referencia)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/ficha/{iid}")
+def get_ficha(iid: str, con=Depends(con_db)):
+    from . import seguimiento
+    try:
+        return seguimiento.ficha(con, AJUSTES, iid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+
+
+@app.get("/api/backtests")
+def get_backtests(con=Depends(con_db)):
+    from . import backtest
+    return {"estrategias": backtest.ESTRATEGIAS, "limites": backtest.LIMITES, "historial": backtest.historial(con)}
+
+
+@app.post("/api/backtests")
+def post_backtest(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import backtest
+    try:
+        ids = cuerpo.get("ids") or []
+        if not isinstance(ids, list):
+            raise ValueError("ids debe ser una lista")
+        return backtest.ejecutar(con, AJUSTES, [str(x) for x in ids], str(cuerpo.get("estrategia", "")),
+                                 cuerpo.get("parametros") or {}, cuerpo.get("desde") or None, cuerpo.get("hasta") or None,
+                                 float(cuerpo.get("deslizamiento_pb", 5)))
+    except (ValueError, TypeError) as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/backtests/{bid}")
+def get_backtest(bid: int, con=Depends(con_db)):
+    from . import backtest
+    try:
+        return backtest.obtener(con, bid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+
+
+@app.get("/api/backtests/{bid}/exportar")
+def exportar_backtest(bid: int, con=Depends(con_db)):
+    from . import backtest
+    try:
+        contenido = backtest.exportar_csv(con, bid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+    return PlainTextResponse(contenido, media_type="text/csv",
+                             headers={"Content-Disposition": f'attachment; filename="backtest-{bid}.csv"'})
+
+
 @app.get("/api/flujo/plantilla/{tipo}")
 def flujo_plantilla(tipo: str):
     from .flujo import importar_csv

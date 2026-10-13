@@ -2175,3 +2175,199 @@ function formImportarExterno(simboloActual, alTerminar) {
     h("p", { clase: "ayuda", texto: "Se reconocen columnas time/date/datetime y open, high, low, close (volume opcional). TradingView: «Exportar datos del gráfico» (tiempo Unix). OpenBB: obb.equity.price.historical(...).to_csv(). Solo datos que tenga derecho a usar; se guardan como «importado» con la fuente y licencia que declare." }),
     form, salida);
 }
+
+/* ---------- Etapa 3: riesgo, seguimiento y comparación, backtesting ---------- */
+const PALETA = ["var(--serie-1)", "var(--serie-2)", "var(--retrasado)", "var(--sintetico)", "var(--positivo)", "var(--negativo)", "var(--acento)", "var(--sin-datos)"];
+const etapa3 = { riesgo: { ventana: 252, horizonte: "" }, comparar: { ids: [], referencia: "BMV:NAFTRAC", ventana: 252 },
+  bt: { ids: [], estrategia: "pesos_iguales", parametros: {}, desde: "", hasta: "", deslizamiento_pb: 5 }, ficha: null };
+async function universo() {
+  if (!estado.universo) estado.universo = (await api("/api/universo")).instrumentos;
+  return estado.universo.filter((i) => i.estado === "activo" || i.estado === undefined);
+}
+function selectorUniverso(lista, valor, alCambiar, etiqueta, multiple = false) {
+  const sel = h("select", { "aria-label": etiqueta, multiple: multiple || null, size: multiple ? 8 : null },
+    multiple ? null : h("option", { value: "" }, "Elija…"), lista.map((i) => h("option", { value: i.id }, `${i.clave_operable || i.id} · ${i.id}`)));
+  if (multiple) [...sel.options].forEach((o) => { o.selected = valor.includes(o.value); }); else sel.value = valor;
+  sel.addEventListener("change", () => alCambiar(multiple ? [...sel.selectedOptions].map((o) => o.value) : sel.value));
+  return h("label", {}, `${etiqueta} `, sel);
+}
+const barraPeso = (w) => h("span", { clase: "fila-peso" }, barraPct(Math.abs(w), 1), h("span", { clase: "num", texto: pct(w) }));
+
+async function cargarRiesgo() {
+  try {
+    const R = etapa3.riesgo;
+    const d = await api(`/api/riesgo?ventana=${R.ventana}${R.horizonte ? `&horizonte=${R.horizonte}` : ""}`);
+    const horiz = h("input", { type: "number", min: 1, max: 252, size: 5 }); horiz.value = R.horizonte || "";
+    horiz.addEventListener("change", () => { R.horizonte = horiz.value; cargarRiesgo(); });
+    const controles = h("div", { clase: "fila-controles" },
+      selectorSimple(R.ventana, [[126, "126 sesiones (6 meses)"], [252, "252 sesiones (1 año)"], [504, "504 sesiones (2 años)"]], (x) => { R.ventana = Number(x); cargarRiesgo(); }, "Ventana"),
+      h("label", {}, "Horizonte (sesiones; vacío = fin del Reto) ", horiz));
+    if (!d.suficiente) { limpiar("riesgo-contenido", controles, h("div", { clase: "aviso-caja", texto: d.motivo || "Historia insuficiente para medir el riesgo." })); return; }
+    const m = d.metricas, v95 = m.var["95"], v99 = m.var["99"];
+    limpiar("riesgo-contenido", controles,
+      h("p", { clase: "ayuda", texto: `Cartera valuada en ${mxn(d.valor_mxn)} (fuente: ${d.fuente_cartera === "portal" ? "captura del portal" : "registro local"}). ${d.nota}` }),
+      h("div", { clase: "kpis" }, kpi("Volatilidad anual", pct(m.vol_anual)), kpi("Caída máxima", pct(m.max_drawdown), "negativo"),
+        kpi("Caída desde el máximo", pct(m.drawdown_actual), m.drawdown_actual < 0 ? "negativo" : ""),
+        kpi("VaR 95 % 1 día (histórico)", `${pct(v95.historico_1d)} · ${mxn(v95.historico_1d_mxn)}`),
+        kpi("CVaR 95 % 1 día", `${pct(v95.cvar_1d)} · ${mxn(v95.cvar_1d_mxn)}`),
+        kpi(`VaR 95 % a ${d.horizonte_sesiones} sesiones`, `${pct(v95.historico_h)} · ${mxn(v95.historico_h_mxn)}`),
+        kpi("VaR 99 % 1 día", pct(v99.historico_1d)), kpi("VaR 95 % paramétrico (normal)", pct(v95.parametrico_1d))),
+      h("p", { clase: "ayuda", texto: `Peor día: ${pct(m.peor_dia)} (${m.fecha_peor_dia}); caída máxima tocó fondo el ${m.fecha_max_drawdown}. VaR = pérdida que solo se superó en el 5 % (o 1 %) de los días de la ventana; CVaR = pérdida promedio de esos días.` }),
+      h("h2", { texto: "Exposición y concentración" }),
+      h("div", { clase: "kpis" }, kpi("Mayor posición", `${d.concentracion.mayor} · ${pct(d.concentracion.peso_mayor)}`),
+        kpi("Índice HHI", num(d.concentracion.hhi)), kpi("Emisoras efectivas", num(d.concentracion.emisoras_efectivas)), kpi("Efectivo", pct(d.exposicion.efectivo))),
+      tabla([{ t: "Emisora", f: (r) => r[0] }, { t: "Peso", f: (r) => barraPeso(r[1]) },
+        { t: "Contribución al riesgo", f: (r) => (d.contribucion_riesgo[r[0]] == null ? "—" : barraPeso(d.contribucion_riesgo[r[0]])) }],
+      Object.entries(d.exposicion.emisora), { caption: "Peso en la cartera y parte de la varianza que aporta cada emisora (suma 100 %)" }),
+      tabla([{ t: "Mercado", f: (r) => r[0] }, { t: "Peso", f: (r) => barraPeso(r[1]) }], Object.entries(d.exposicion.mercado), { caption: "Por mercado del simulador" }),
+      tabla([{ t: "Moneda del subyacente", f: (r) => r[0] }, { t: "Peso", f: (r) => barraPeso(r[1]) }], Object.entries(d.exposicion.moneda_subyacente), { caption: "Exposición al tipo de cambio: el SIC sigue al dólar" }),
+      h("h2", { texto: "Escenarios" }),
+      tabla([{ t: "Escenario", f: (e) => e.escenario }, { t: "Tipo", f: (e) => e.tipo },
+        { t: "Cambio de la cartera", f: (e) => h("span", { clase: signo(e.cambio), texto: pct(e.cambio) }), num: true },
+        { t: "En pesos", f: (e) => mxn(e.cambio_mxn), num: true }], d.escenarios, { caption: "Hipotéticos (choques instantáneos), históricos (peores tramos con los pesos actuales) y de estrés" }),
+      d.sin_historia.length ? h("div", { clase: "aviso-caja", texto: `Sin historia suficiente (no entran al cálculo): ${d.sin_historia.join(", ")}.` }) : null,
+      h("h2", { texto: "Supuestos" }), h("ul", { clase: "ayuda" }, d.supuestos.map((x) => h("li", { texto: x }))));
+  } catch (e) { limpiar("riesgo-contenido", errorCaja(e)); }
+}
+
+function pintarFicha(f) {
+  return h("section", { clase: "tarjeta", "aria-label": `Ficha de ${f.clave}` }, h("h3", { texto: `${f.clave} · ${f.nombre || ""}` }),
+    h("p", { clase: "ayuda", texto: f.nota }),
+    h("h4", { texto: "Noticias" }),
+    tabla([{ t: "Publicado", f: (n) => fechaLocal(n.publicado) }, { t: "Titular", f: (n) => externo(n.enlace, n.titulo) }, { t: "Fuente", f: (n) => n.fuente },
+      { t: "Sentimiento", f: (n) => h("span", { clase: signo(n.sentimiento), texto: n.sentimiento > 0 ? "Positivo" : n.sentimiento < 0 ? "Negativo" : "Neutro" }) }],
+    f.noticias.slice(0, 15), { vacio: "Sin titulares guardados para este instrumento." }),
+    h("h4", { texto: "Estados financieros e investigación" }),
+    tabla([{ t: "Periodo", f: (o) => o.periodo }, { t: "Dato", f: (o) => o.titulo }, { t: "Valor", f: (o) => (o.unidad === "fracción" ? pct(o.valor) : num(o.valor)), num: true },
+      { t: "Unidad", f: (o) => o.unidad }, { t: "Fuente", f: (o) => `${o.fuente} (${o.origen})` }], f.financieros,
+    { vacio: "Sin estados financieros: Alpha Vantage cubre MU, AMD, NVDA y XOM; el resto se importa en «Investigación»." }));
+}
+
+async function cargarSeguimiento() {
+  try {
+    const lista = await universo();
+    const d = await api("/api/lista-seguimiento");
+    const C = etapa3.comparar;
+    let nuevo = "";
+    const nota = h("input", { type: "text", maxlength: 300, size: 24, placeholder: "Nota (opcional)", "aria-label": "Nota" });
+    const agregar = botonAccion("Agregar a la lista", "boton--primario", async (b) => {
+      if (!nuevo) { notificar("Elija un instrumento."); return; }
+      ocupado([b], true);
+      try { await api("/api/lista-seguimiento", { method: "POST", json: { id: nuevo, nota: nota.value } }); cargarSeguimiento(); }
+      catch (e) { notificar(e.message); } finally { ocupado([b], false); }
+    });
+    const quitar = (iid) => botonAccion("Quitar", "boton--secundario", async () => { await api("/api/lista-seguimiento", { method: "POST", json: { id: iid, quitar: true } }); cargarSeguimiento(); });
+    const fichaBtn = (iid) => botonAccion("Ficha", "boton--secundario", async () => {
+      try { etapa3.ficha = iid; document.getElementById("seguimiento-ficha").replaceChildren(pintarFicha(await api(`/api/ficha/${encodeURIComponent(iid)}`))); }
+      catch (e) { notificar(e.message); }
+    });
+    const marcar = (iid) => { const c = h("input", { type: "checkbox", "aria-label": `Comparar ${iid}` }); c.checked = C.ids.includes(iid);
+      c.addEventListener("change", () => { C.ids = c.checked ? [...C.ids, iid] : C.ids.filter((x) => x !== iid); }); return c; };
+    const v = (x) => (x == null ? "—" : h("span", { clase: signo(x), texto: `${x > 0 ? "+" : ""}${pct(x)}` }));
+    limpiar("seguimiento-contenido",
+      h("h2", { texto: "Lista de seguimiento" }),
+      h("div", { clase: "fila-controles" }, selectorUniverso(lista, "", (x) => { nuevo = x; }, "Instrumento"), nota, agregar),
+      tabla([{ t: "Comparar", f: (f) => marcar(f.instrumento_id) }, { t: "Clave", f: (f) => f.clave }, { t: "Último (MXN)", f: (f) => num(f.ultimo_mxn), num: true },
+        { t: "Fecha", f: (f) => f.fecha }, { t: "1 sesión", f: (f) => v(f.variacion["1"]), num: true }, { t: "5 sesiones", f: (f) => v(f.variacion["5"]), num: true },
+        { t: "20 sesiones", f: (f) => v(f.variacion["20"]), num: true }, { t: "RSI 14", f: (f) => num(f.rsi14), num: true },
+        { t: "Noticias 7 d", f: (f) => f.noticias_7d, num: true }, { t: "Nota", f: (f) => f.nota || "—" },
+        { t: "", f: (f) => h("span", { clase: "fila-controles" }, fichaBtn(f.instrumento_id), quitar(f.instrumento_id)) }],
+      d.instrumentos, { caption: d.nota, vacio: "Lista vacía: agregue instrumentos para seguirlos y compararlos." }),
+      h("div", { id: "seguimiento-ficha", "aria-live": "polite" }),
+      h("h2", { texto: "Comparación de instrumentos" }),
+      h("p", { clase: "ayuda", texto: "Marque de 2 a 8 instrumentos en la lista (o elíjalos abajo) y pulse «Comparar»." }),
+      h("div", { clase: "fila-controles" }, selectorUniverso(lista, C.ids, (x) => { C.ids = x; }, "Instrumentos", true),
+        selectorSimple(C.referencia, [["BMV:NAFTRAC", "NAFTRAC (IPC)"], ["SIC:SPY", "SPY (S&P 500)"]], (x) => { C.referencia = x; }, "Referencia"),
+        selectorSimple(C.ventana, [[63, "3 meses"], [126, "6 meses"], [252, "1 año"], [504, "2 años"]], (x) => { C.ventana = Number(x); }, "Ventana"),
+        botonAccion("Comparar", "boton--primario", async (b) => {
+          ocupado([b], true);
+          try { pintarComparacion(await api(`/api/comparar?ids=${encodeURIComponent(C.ids.join(","))}&ventana=${C.ventana}&referencia=${encodeURIComponent(C.referencia)}`)); }
+          catch (e) { document.getElementById("comparacion").replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+        })),
+      h("div", { id: "comparacion", "aria-live": "polite" }));
+    if (etapa3.ficha) { try { document.getElementById("seguimiento-ficha").replaceChildren(pintarFicha(await api(`/api/ficha/${encodeURIComponent(etapa3.ficha)}`))); } catch { /* sin ficha */ } }
+  } catch (e) { limpiar("seguimiento-contenido", errorCaja(e)); }
+}
+
+function pintarComparacion(d) {
+  const ids = d.correlacion.ids;
+  const clave = (i) => (d.metricas.find((m) => m.id === i) || {}).clave || i;
+  const corr = (v) => { const s = h("span", { clase: "celda-iv", texto: num(v) }); s.style.backgroundColor = `color-mix(in srgb, var(--serie-1) ${Math.round(Math.abs(v) * 60)}%, transparent)`; return s; };
+  document.getElementById("comparacion").replaceChildren(
+    h("p", { clase: "ayuda", texto: `${d.desde} a ${d.hasta} · ${d.sesiones} sesiones comunes. ${d.nota}` }),
+    grafica(ids.map((i, k) => ({ nombre: clave(i), color: PALETA[k % PALETA.length], datos: d.serie.fechas.map((f, j) => ({ x: f, y: d.serie[i][j] })) })),
+      { formato: num, etiqueta: "Valor de 100 invertidos al inicio" }),
+    tabla([{ t: "Instrumento", f: (m) => `${m.clave}${m.es_referencia ? " (referencia)" : ""}` }, { t: "Rend. total", f: (m) => pct(m.rend_total), num: true },
+      { t: "Rend. anual", f: (m) => pct(m.rend_anual), num: true }, { t: "Volatilidad", f: (m) => pct(m.vol_anual), num: true },
+      { t: "Caída máx.", f: (m) => pct(m.max_drawdown), num: true }, { t: "Beta", f: (m) => num(m.beta), num: true },
+      { t: "Sharpe (sin tasa)", f: (m) => num(m.sharpe_sin_tasa), num: true }], d.metricas, { caption: "Métricas en el periodo común" }),
+    tabla([{ t: "", f: (r) => clave(r.i) }, ...ids.map((j, k) => ({ t: clave(j), num: true, f: (r) => corr(d.correlacion.matriz[ids.indexOf(r.i)][k]) }))],
+      ids.map((i) => ({ i })), { caption: "Correlación de rendimientos diarios" }));
+}
+
+async function cargarBacktesting() {
+  try {
+    const lista = await universo();
+    const meta = await api("/api/backtests");
+    const B = etapa3.bt;
+    if (!B.ids.length) {
+      try { B.ids = (await api("/api/lista-seguimiento")).instrumentos.map((i) => i.instrumento_id).slice(0, 10); } catch { /* lista vacía */ }
+    }
+    const est = meta.estrategias[B.estrategia];
+    const params = Object.entries(est.parametros).map(([k, def]) => {
+      const i = h("input", { type: "number", min: meta.limites[k][0], max: meta.limites[k][1], step: 1, size: 5 });
+      i.value = B.parametros[k] ?? def; i.addEventListener("change", () => { B.parametros[k] = Number(i.value); });
+      return h("label", {}, `${{ rebalanceo: "Rebalanceo cada (sesiones)", rapida: "SMA rápida", lenta: "SMA lenta", lookback: "Ventana de momento", k: "Cuántos (k)" }[k] || k} `, i);
+    });
+    const fecha = (k, t) => { const i = h("input", { type: "date" }); i.value = B[k]; i.addEventListener("change", () => { B[k] = i.value; }); return h("label", {}, `${t} `, i); };
+    const desl = h("input", { type: "number", min: 0, max: 200, step: 1, size: 5 }); desl.value = B.deslizamiento_pb;
+    desl.addEventListener("change", () => { B.deslizamiento_pb = Number(desl.value); });
+    limpiar("backtesting-contenido",
+      h("div", { clase: "fila-controles" }, selectorUniverso(lista, B.ids, (x) => { B.ids = x; }, "Instrumentos (Ctrl+clic)", true),
+        h("div", { clase: "formulario" },
+          selectorSimple(B.estrategia, Object.entries(meta.estrategias).map(([k, e]) => [k, `${e.nombre} · v${e.version}`]), (x) => { B.estrategia = x; B.parametros = {}; cargarBacktesting(); }, "Estrategia"),
+          ...params, fecha("desde", "Desde"), fecha("hasta", "Hasta"), h("label", {}, "Deslizamiento (pb) ", desl),
+          botonAccion("Correr backtest", "boton--primario", async (b) => {
+            ocupado([b], true);
+            try { pintarBacktest(await api("/api/backtests", { method: "POST", json: B })); cargarHistorialBt(); }
+            catch (e) { document.getElementById("backtest-resultado").replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+          }))),
+      h("p", { clase: "ayuda", texto: "Simulación con cierres diarios: la señal usa datos hasta el cierre de un día y se opera al cierre del siguiente; comisión del Reto + deslizamiento; banda de 1 punto. Sin fecha inicial se usan 2 años. Nunca envía órdenes." }),
+      h("div", { id: "backtest-resultado", "aria-live": "polite" }),
+      h("h2", { texto: "Historial de corridas" }), h("div", { id: "backtest-historial" }));
+    pintarHistorialBt(meta.historial);
+  } catch (e) { limpiar("backtesting-contenido", errorCaja(e)); }
+}
+
+async function cargarHistorialBt() { try { pintarHistorialBt((await api("/api/backtests")).historial); } catch { /* sin historial */ } }
+function pintarHistorialBt(hist) {
+  const ver = (id) => botonAccion("Ver", "boton--secundario", async () => pintarBacktest(await api(`/api/backtests/${id}`)));
+  document.getElementById("backtest-historial").replaceChildren(tabla([{ t: "#", f: (r) => r.id, num: true }, { t: "Fecha", f: (r) => fechaLocal(r.ts) },
+    { t: "Estrategia", f: (r) => `${r.estrategia} v${r.version}` }, { t: "Instrumentos", f: (r) => r.parametros.ids.length, num: true },
+    { t: "Periodo", f: (r) => `${r.resumen.desde} a ${r.resumen.hasta}` }, { t: "Rend. total", f: (r) => pct(r.resumen.rend_total), num: true },
+    { t: "Caída máx.", f: (r) => pct(r.resumen.max_drawdown), num: true }, { t: "Datos", f: (r) => r.huella_datos }, { t: "", f: (r) => ver(r.id) }], hist,
+  { vacio: "Aún no hay corridas." }));
+}
+
+function pintarBacktest(d) {
+  const s = d.resumen, ref = s.referencia_comprar_y_mantener || {};
+  const rep = d.reproducibilidad || {};
+  document.getElementById("backtest-resultado").replaceChildren(h("section", { clase: "tarjeta" },
+    h("h2", { texto: `Corrida #${d.id} · ${s.estrategia} v${s.version} · ${s.desde} a ${s.hasta}` }),
+    h("div", { clase: "kpis" }, kpi("Rend. total", pct(s.rend_total), signo(s.rend_total)), kpi("Rend. anual", pct(s.rend_anual)),
+      kpi("Volatilidad", pct(s.vol_anual)), kpi("Caída máx.", pct(s.max_drawdown), "negativo"), kpi("Sharpe (sin tasa)", num(s.sharpe_sin_tasa)),
+      kpi("Operaciones", num(s.operaciones)), kpi("Costos", mxn(s.costo_total)), kpi("Giro anual", `${num(s.giro_anual)}×`)),
+    ref.rend_total != null ? h("p", { clase: "ayuda", texto: `Referencia (comprar y mantener los mismos instrumentos, mismos costos): rendimiento ${pct(ref.rend_total)}, volatilidad ${pct(ref.vol_anual)}, caída máxima ${pct(ref.max_drawdown)}. Una diferencia en un solo periodo no demuestra ventaja.` }) : null,
+    grafica([{ nombre: "Valor de la cartera simulada (MXN)", color: "var(--acento)", datos: d.curva.map((c) => ({ x: c.fecha, y: c.valor })) }], { formato: (x) => mxn(x), etiqueta: "Curva de valor del backtest" }),
+    h("p", { clase: "ayuda", texto: `Reproducibilidad: huella de datos ${String(rep.huella_datos || "").slice(0, 16)}…, configuración ${String(rep.huella_config || "").slice(0, 16)}…, código v${rep.version_codigo}.${rep.igual_a_corrida ? ` Idéntica a la corrida #${rep.igual_a_corrida}.` : ""}` }),
+    h("a", { href: `/api/backtests/${d.id}/exportar`, clase: "boton boton--secundario", texto: "Exportar CSV (curva y operaciones)" }),
+    h("h3", { texto: "Supuestos" }), h("ul", { clase: "ayuda" }, (d.supuestos || []).map((x) => h("li", { texto: x }))),
+    tabla([{ t: "Fecha", f: (o) => o.fecha }, { t: "Instrumento", f: (o) => o.id }, { t: "Títulos", f: (o) => num(o.titulos), num: true },
+      { t: "Precio (MXN)", f: (o) => num(o.precio), num: true }, { t: "Importe", f: (o) => mxn(o.importe), num: true }, { t: "Costo", f: (o) => mxn(o.costo, true), num: true }],
+    d.operaciones.slice(-30).reverse(), { caption: "Últimas 30 operaciones simuladas" })));
+}
+
+CARGAS["tab-riesgo"] = () => cargarRiesgo();
+CARGAS["tab-seguimiento"] = () => cargarSeguimiento();
+CARGAS["tab-backtesting"] = () => cargarBacktesting();
+Object.assign(ATAJOS, { RIE: "tab-riesgo", SEG: "tab-seguimiento", BT: "tab-backtesting" });

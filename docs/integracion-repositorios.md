@@ -1,6 +1,6 @@
 # Integración de repositorios conservados — Etapa 0 (propuesta)
 
-Fecha: 12-oct-2026. Estado: **aprobada por el usuario el 12-oct**. Las etapas 1 y 2 están implementadas (`docs/flujo-ordenes-opciones.md`): `ccxt`, exportación a `hftbacktest`, importación de exportaciones de OpenBB y TradingView, y Heston propio. La etapa 3 está pendiente. Cripto: Bitso con BTC, ETH, SOL y XRP en MXN.
+Fecha: 12-oct-2026. Estado: **aprobada por el usuario el 12-oct**. Las etapas 1 y 2 están implementadas (`docs/flujo-ordenes-opciones.md`): `ccxt`, exportación a `hftbacktest`, importación de exportaciones de OpenBB y TradingView, y Heston propio. La etapa 3 (riesgo, seguimiento y backtesting reproducible) está implementada: `docs/riesgo-seguimiento-backtesting.md`. Las tres etapas están completas. Cripto: Bitso con BTC, ETH, SOL y XRP en MXN.
 
 Método:
 - Se inventariaron las 103 carpetas de `C:\Users\MIKE\Desktop\Repos`.

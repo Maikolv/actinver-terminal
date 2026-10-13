@@ -2,6 +2,24 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.30.0] — 2026-10-12 (etapa 3: riesgo, seguimiento y backtesting reproducible)
+
+### Agregado
+- **Riesgo** (`terminal/riesgo.py`, Más → Riesgo), con los pesos actuales y los supuestos visibles:
+  - volatilidad, caída máxima, VaR y CVaR históricos al 95 y 99 % (1 día y horizonte), y VaR paramétrico;
+  - exposición por emisora, mercado, clase y moneda, contribución al riesgo y concentración (HHI);
+  - escenarios hipotéticos, históricos y de estrés.
+- **Seguimiento** (`terminal/seguimiento.py`, Más → Seguimiento):
+  - lista unificada con la de «Movimientos públicos»;
+  - ficha con noticias y estados financieros;
+  - comparación de 2 a 8 instrumentos con una referencia (curva base 100, beta y correlación).
+- **Backtesting reproducible** (`terminal/backtest.py`, Más → Backtesting):
+  - 4 estrategias versionadas;
+  - señal en t y ejecución en t+1, comisión del Reto + deslizamiento y banda de 1 punto;
+  - referencia de comprar y mantener;
+  - registro con huellas sha256 de configuración y datos, historial y exportación CSV.
+- `docs/riesgo-seguimiento-backtesting.md`; 7 pruebas nuevas (`tests/test_etapa3.py`).
+
 ## [0.29.0] — 2026-10-12 (etapa 2: adaptadores de repositorios)
 
 ### Agregado

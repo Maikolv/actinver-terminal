@@ -30,8 +30,11 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-10-12, v0.29.0, rama `main`)
+## Estado comprobado (2026-10-12, v0.30.0, rama `main`)
 
+- **12-oct noche (v0.30.0, etapa 3):** Riesgo (VaR/CVaR, exposición, contribución al riesgo; MU aporta 74 % del
+  riesgo con 47 % del peso), Seguimiento (lista unificada con Movimientos, ficha, comparación) y Backtesting
+  reproducible (t → t+1, costos del Reto, huellas). Las tres etapas de `docs/integracion-repositorios.md` están completas.
 - **12-oct noche (v0.29.0, etapa 2):**
   - Heston propio en Option Flow, exportación a hftbacktest (.npz) en Order Flow e importación de velas de
     TradingView, OpenBB y Yahoo.

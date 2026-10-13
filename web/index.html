@@ -58,6 +58,9 @@
     <button role="tab" class="secundaria" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
     <button role="tab" class="secundaria" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
     <button role="tab" class="secundaria" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
+    <button role="tab" class="secundaria" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
+    <button role="tab" class="secundaria" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
+    <button role="tab" class="secundaria" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
     <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
     <button role="tab" class="secundaria" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
@@ -345,6 +348,24 @@
     <h1>Option Flow</h1>
     <p class="ayuda">Cadena de opciones por vencimiento y strike, curva y superficie de volatilidad y una regla descriptiva de volumen inusual. Solo informa: la terminal no opera opciones.</p>
     <div id="optionflow-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-riesgo" aria-labelledby="tab-riesgo" hidden>
+    <h1>Riesgo de la cartera</h1>
+    <p class="ayuda">Exposición, concentración, volatilidad, caídas, VaR, CVaR y escenarios con los pesos actuales. Los supuestos se listan al final. Describe el riesgo con datos pasados; no es una recomendación.</p>
+    <div id="riesgo-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-seguimiento" aria-labelledby="tab-seguimiento" hidden>
+    <h1>Seguimiento y comparación</h1>
+    <p class="ayuda">Lista de seguimiento con variaciones, RSI y noticias; ficha con noticias y estados financieros; comparación de instrumentos con correlación y beta.</p>
+    <div id="seguimiento-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-backtesting" aria-labelledby="tab-backtesting" hidden>
+    <h1>Backtesting</h1>
+    <p class="ayuda">Pruebas históricas reproducibles con comisiones, deslizamiento y datos disponibles a cada fecha. Cada corrida queda registrada con sus parámetros, la huella de los datos y el resultado.</p>
+    <div id="backtesting-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-modelos" aria-labelledby="tab-modelos" hidden>

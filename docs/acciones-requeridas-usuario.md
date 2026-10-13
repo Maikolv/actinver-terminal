@@ -71,7 +71,7 @@ uv run python scripts/historia_externa.py verificar
 - `uv run terminal robustez` corre el protocolo de robustez (15–20 min).
 - `scripts/historia_externa.py verificar` revisa la historia externa (Excel).
 
-En la interfaz: **Más → Velas / Order Flow / Option Flow / Mercado / Investigación / Modelos**.
+En la interfaz: **Más → Velas / Order Flow / Option Flow / Riesgo / Seguimiento / Backtesting / Mercado / Investigación / Modelos**.
 
 Para apagar un adaptador, edita `config/local.toml`:
 - `[flujo.alpaca] activo = false`

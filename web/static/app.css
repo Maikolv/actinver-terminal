@@ -331,3 +331,5 @@ td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: a
 .ficha-celda dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 6px 0; font-size: .86rem; }
 .ficha-celda dt { color: var(--texto-suave, inherit); opacity: .85; }
 @media (max-width: 640px) { .perfil-fila { grid-template-columns: 1fr 1fr; } .perfil-fila .barra { grid-column: 1 / -1; } }
+.fila-peso { display: grid; grid-template-columns: minmax(80px, 160px) 60px; gap: 6px; align-items: center; }
+select[multiple] { min-width: 230px; }
