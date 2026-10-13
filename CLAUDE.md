@@ -32,6 +32,9 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-12, v0.30.0, rama `main`)
 
+- **Cuenta del Reto (martes 13-oct, 14:30, captura confirmada):**
+  - Mismas 7 posiciones; valuación $962,453.35 (−3.75 %); poder de compra $4,077.32.
+  - Desde el 12-oct: MU −3.1 %, ALPEK −3.0 %; NVAX +3.2 %, AMD +2.2 %, XOM +1.8 %, NVDA +1.5 %, GMEXICO +1.0 %.
 - **12-oct noche (v0.30.0, etapa 3):** Riesgo (VaR/CVaR, exposición, contribución al riesgo; MU aporta 74 % del
   riesgo con 47 % del peso), Seguimiento (lista unificada con Movimientos, ficha, comparación) y Backtesting
   reproducible (t → t+1, costos del Reto, huellas). Las tres etapas de `docs/integracion-repositorios.md` están completas.
