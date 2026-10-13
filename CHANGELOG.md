@@ -2,6 +2,23 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.29.0] — 2026-10-12 (etapa 2: adaptadores de repositorios)
+
+### Agregado
+- **Heston** (`terminal/flujo/heston.py`): pricer con la función característica de Albrecher y calibración por mínimos
+  cuadrados ponderados por vega. Código propio desde los artículos publicados: el repositorio `Heston-Calibration`
+  no tiene licencia y solo se leyó.
+  - Reproduce Black-Scholes (< 1e-5) y recupera parámetros sintéticos.
+  - Avisa cuando no cumple Feller o un parámetro queda en su límite.
+  - Botón en Option Flow.
+- **Exportación a `hftbacktest`** (MIT): libro y operaciones guardados → `.npz` con su `event_dtype`, sin importar su
+  código. Botón en Order Flow y `GET /api/flujo/hftbacktest`.
+- **Importación de velas de TradingView, OpenBB y Yahoo/Excel** (`terminal/flujo/externos.py`): detecta las columnas
+  y pasa por la misma validación todo o nada que la plantilla propia.
+- Interruptores `[flujo.heston]`, `[flujo.hftbacktest]` y `[flujo.externos]`; límites de tasa en las rutas nuevas.
+- `scipy` como dependencia explícita (antes llegaba por `skfolio`).
+- 6 pruebas nuevas (`tests/test_flujo_etapa2.py`).
+
 ## [0.28.0] — 2026-10-12 (etapa 1: velas OHLCV, Order Flow, Option Flow y mapa de calor mejorado)
 
 ### Agregado

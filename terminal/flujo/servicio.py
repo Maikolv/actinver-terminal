@@ -219,3 +219,40 @@ def optionflow(con, ajustes, subyacente: str, filtros: dict | None = None) -> di
             "nota": "IV «proveedor» viene de la fuente; «calculado» es Black-Scholes-Merton europeo sobre el punto medio "
                     "bid/ask (las opciones de EE. UU. son americanas); «importado», de su CSV. El volumen inusual es una "
                     "regla descriptiva configurable, no una recomendación."}
+
+
+# --- Etapa 2: adaptadores de repositorios (interruptores en [flujo.<nombre>] activo) ------------------------------
+def activo(ajustes, nombre: str) -> bool:
+    return bool((((ajustes.get("flujo") or {}) if ajustes else {}).get(nombre) or {}).get("activo", True))
+
+
+def heston(con, ajustes, subyacente: str) -> dict:
+    """Calibra Heston a la última cadena guardada del subyacente (código propio; ver flujo/heston.py)."""
+    from . import heston as hs
+    if not activo(ajustes, "heston"):
+        raise ValueError("calibración de Heston desactivada en [flujo.heston]")
+    ahora = datetime.now(UTC)
+    clave = f"heston:{subyacente}:"
+    u = almacen.ultima_consulta(con, clave)
+    if u and (ahora - datetime.fromisoformat(u["intento_en"])).total_seconds() < 30:
+        raise ValueError("calibrado hace menos de 30 s; espere un momento")
+    cadena = almacen.cadena(con, subyacente, demo=ajustes.es_demo)
+    if not cadena:
+        raise ValueError("sin cadena guardada: pulse «Actualizar cadena desde proveedor» o importe un CSV")
+    origen = origen_eeuu(con, subyacente) or subyacente
+    spot = _spot(con, subyacente, origen)
+    if not spot:
+        raise ValueError("sin precio del subyacente para calibrar")
+    tasa, origen_tasa = tasa_libre_riesgo(con)
+    try:
+        r = hs.calibrar(cadena, spot, (tasa if tasa is not None else 4.0) / 100)
+        estado_c, msg = "ok", f"RMSE {r['rmse_iv']:.4f}"
+    except ValueError as e:
+        with db.transaccion(con):
+            almacen.registrar_consulta(con, clave, "error", 0, str(e))
+        raise
+    with db.transaccion(con):
+        almacen.registrar_consulta(con, clave, estado_c, r["contratos"], msg)
+    f = con.execute("SELECT inicio FROM flujo_barras WHERE simbolo=? ORDER BY inicio DESC LIMIT 1", (subyacente,)).fetchone()
+    return {**r, "subyacente": subyacente, "origen_tasa": origen_tasa,
+            "origen_spot": f"último cierre guardado ({f[0][:10] if f else 'tabla de precios'}), USD de origen"}

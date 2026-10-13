@@ -85,8 +85,8 @@ Para apagar un adaptador, edita `config/local.toml`:
 | Cripto (ccxt) | **Tomada (12-oct)**: activo con Bitso y BTC, ETH, SOL y XRP en MXN. Puedes cambiar de exchange o pares en `[flujo.cripto]` |
 | Finviz Elite | Contratarlo o no (USD 39.50/mes) |
 | Profundidad, cinta u opciones en tiempo real | Elegir proveedor y aceptar su costo y licencia |
-| Etapa 2: `hftbacktest`, `OpenBB`, `qlib` | Aprobar cada adaptador; `OpenBB` y `qlib` se usarían como herramientas externas (licencias AGPL o tamaño) |
-| Calibración de Heston | Aprobar código propio desde el artículo (el repositorio local no tiene licencia) |
+| Etapa 2 | **Aprobada e implementada (12-oct)**: exportación a `hftbacktest`, importación de velas de OpenBB y TradingView, Heston propio. Para usar `hftbacktest` u `OpenBB`, instálalos tú, fuera de la terminal |
+| `qlib`, `FinRL`, `backtrader` | Siguen como herramientas externas: si las corres, importa sus resultados como investigación manual |
 
 ## 7. Datos sin licencia confirmada o no disponibles gratuitamente
 

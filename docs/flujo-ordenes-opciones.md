@@ -94,3 +94,42 @@ con cada fila.
   - estados vacíos;
   - API protegida con CSRF.
 - `tests/test_visualizaciones_mercado.py`: mapa con prioridad única y ventanas.
+
+# Etapa 2: adaptadores de repositorios (12-oct-2026)
+
+Cada adaptador tiene su contrato de entrada y salida, un interruptor en `config/local.toml` (`[flujo.<nombre>] activo`),
+manejo de errores sin secretos y pruebas en `tests/test_flujo_etapa2.py`.
+
+| Adaptador | Repositorio de referencia | Método | Entrada → salida | Interruptor | Límite |
+|---|---|---|---|---|---|
+| Libro y cinta de cripto | `ccxt` (MIT) | Dependencia opcional (grupo `cripto`) | Par → libro, operaciones y velas con procedencia | `[flujo.cripto]` | El del exchange + 5–60 s por símbolo |
+| Exportación a `hftbacktest` | `hftbacktest` (MIT) | Formato documentado de eventos (`event_dtype`), sin importar su código | Libro y operaciones guardados → `.npz` con la llave `data` | `[flujo.hftbacktest]` | Bajo demanda |
+| Velas de TradingView, OpenBB o Yahoo | `OpenBB` (AGPL: solo sus archivos exportados) y TradingView | Detección de columnas y paso por la validación de la plantilla | CSV exportado → velas «importado» | `[flujo.externos]` | 10 importaciones/min |
+| Modelo de Heston | `Heston-Calibration` (sin licencia: solo lectura) | Código propio desde los artículos publicados | Cadena guardada → parámetros, error y avisos | `[flujo.heston]` | 1 calibración cada 30 s por subyacente |
+
+## Heston
+
+- **Pricer:** función característica en la forma de Albrecher et al. (2007), probabilidades P1/P2 de Heston (1993) e
+  integración de Gauss-Legendre (256 nodos en [0, 250]); las puts salen por paridad.
+- **Verificación:** con σ → 0 y v0 = θ = σ²_BS reproduce Black-Scholes (error < 1e-5). Con una cadena sintética
+  recupera los 5 parámetros exactos.
+- **Calibración:**
+  - mínimos cuadrados con límites sobre ≤ 60 contratos fuera del dinero, de 7 a 180 días, con bid/ask e IV;
+  - residuo = (precio modelo − precio medio) / vega BS, que aproxima el error en puntos de volatilidad;
+  - tasa FRED DGS2 y sin dividendos.
+- **Avisos visibles:**
+  - Feller incumplido;
+  - parámetros en su límite (posible falta de identificación);
+  - error medio mayor a 5 puntos.
+- **Resultado real con MU (12-oct):** convergió con 60 contratos y un error medio de 3.7 puntos, pero σ quedó en su
+  límite (5) y no cumple Feller. La terminal lo muestra como advertencia: la superficie de MU, con el subyacente de
+  cierre y las cotizaciones diferidas, no queda bien descrita por un solo Heston.
+
+## Exportación a `hftbacktest`
+
+Descarga: el botón **Exportar a hftbacktest (.npz)** en Order Flow, o `GET /api/flujo/hftbacktest?simbolo=…`.
+- El libro se exporta como `DEPTH_CLEAR` + `DEPTH_SNAPSHOT` por nivel; las operaciones, como `TRADE_EVENT`, con
+  `BUY`/`SELL` solo si la fuente informó el lado.
+- Marcas en nanosegundos: `exch_ts` es la hora del evento y `local_ts` la hora de captura (≥ `exch_ts`).
+- **Limitación:** las instantáneas se capturan al pulsar «Actualizar», así que no forman un libro continuo. Sirven para
+  validar el formato o estrategias lentas, no para colas de alta frecuencia. La terminal no ejecuta `hftbacktest`.

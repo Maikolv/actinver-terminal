@@ -46,6 +46,18 @@ exchange = "bitso"                   # bitso (MXN), kraken, coinbase… cualquie
 pares = ["BTC/MXN", "ETH/MXN", "SOL/MXN", "XRP/MXN"]
 niveles = 50
 
+[flujo.heston]
+# Calibración de Heston (código propio desde el artículo publicado) en Option Flow. false = apagado.
+activo = true
+
+[flujo.hftbacktest]
+# Exportación del libro y las operaciones guardados al formato de eventos de hftbacktest (.npz). false = apagado.
+activo = true
+
+[flujo.externos]
+# Importación de velas exportadas por TradingView, OpenBB u hojas tipo Yahoo/Excel. false = apagado.
+activo = true
+
 [finviz]
 # Finviz Elite (DE PAGO; contratarlo es decisión del usuario). Sin FINVIZ_AUTH_TOKEN en .env no hace ninguna petición.
 # Una consulta en lote de todas las emisoras SIC con la bolsa de Nueva York abierta. Sin hora del último hecho: se

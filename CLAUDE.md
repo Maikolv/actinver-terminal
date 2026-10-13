@@ -30,8 +30,13 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-10-12, v0.28.0, rama `main`)
+## Estado comprobado (2026-10-12, v0.29.0, rama `main`)
 
+- **12-oct noche (v0.29.0, etapa 2):**
+  - Heston propio en Option Flow, exportación a hftbacktest (.npz) en Order Flow e importación de velas de
+    TradingView, OpenBB y Yahoo.
+  - Con MU, Heston converge (60 contratos, error de 3.7 puntos de volatilidad), pero σ queda en su límite y no cumple
+    Feller: se muestra como advertencia.
 - **12-oct noche (v0.28.0, etapa 1 aprobada por el usuario):**
   - Velas OHLCV, Order Flow y Option Flow en `terminal/flujo/` (`docs/flujo-ordenes-opciones.md`). Solo datos
     reales (Alpaca SIP/IEX/opciones indicativas; Bitso vía ccxt) o CSV importado; sin fuente, los paneles no simulan.

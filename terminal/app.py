@@ -12,7 +12,7 @@ from datetime import date
 
 from fastapi import Body, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, notificador, reto,
@@ -987,6 +987,51 @@ async def flujo_importar(tipo: str, archivo: UploadFile = File(...), con=Depends
     contenido = await archivo.read(importar_csv.MAX_BYTES + 1)
     try:
         return importar_csv.importar(con, tipo, contenido)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/flujo/heston")
+def flujo_heston(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.heston(con, AJUSTES, str(cuerpo.get("subyacente", "")))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/hftbacktest")
+def flujo_hftbacktest(simbolo: str, con=Depends(con_db)):
+    """Descarga libro y operaciones guardados en el formato de eventos de hftbacktest (.npz, llave «data»)."""
+    import io
+
+    import numpy as np
+
+    from .flujo import externos, servicio
+    if not servicio.activo(AJUSTES, "hftbacktest"):
+        raise HTTPException(409, "exportación a hftbacktest desactivada en [flujo.hftbacktest]")
+    arr, info = externos.eventos_hftbacktest(con, simbolo, demo=AJUSTES.es_demo)
+    if not len(arr):
+        raise HTTPException(404, "sin libro ni operaciones guardados para este símbolo")
+    buf = io.BytesIO()
+    np.savez_compressed(buf, data=arr)
+    nombre = "".join(ch if ch.isalnum() else "_" for ch in simbolo)
+    return Response(buf.getvalue(), media_type="application/octet-stream",
+                    headers={"Content-Disposition": f'attachment; filename="{nombre}_hftbacktest.npz"',
+                             "X-Eventos": str(info["eventos"])})
+
+
+@app.post("/api/flujo/importar-externo")
+async def flujo_importar_externo(archivo: UploadFile = File(...), simbolo: str = Form(...), mercado: str = Form(...),
+                                 intervalo: str = Form("1Day"), fuente: str = Form(...), licencia: str = Form(...),
+                                 zona: str = Form("America/Mexico_City"), con=Depends(con_db)):
+    from .flujo import externos, importar_csv, servicio
+    if not servicio.activo(AJUSTES, "externos"):
+        raise HTTPException(409, "importación de formatos externos desactivada en [flujo.externos]")
+    contenido = await archivo.read(importar_csv.MAX_BYTES + 1)
+    try:
+        return externos.importar_velas_externas(con, contenido, simbolo.strip().upper(), mercado.strip(), intervalo,
+                                                fuente.strip(), licencia.strip(), zona.strip())
     except ValueError as e:
         raise HTTPException(422, str(e)) from None
 

@@ -1893,7 +1893,7 @@ async function cargarVelas() {
       selectorSimple(v.dias, [5, 30, 90, 180, 365].map((d) => [d, `${d} días`]), (x) => { v.dias = Number(x); cargarVelas(); }, "Rango"),
       ...casillas, botonAct);
     if (!v.simbolo) {
-      limpiar("velas-contenido", controles, h("p", { clase: "vacio", texto: "Elija un instrumento. Proveedores: Alpaca (SIC: OHLCV del consolidado SIP con ≥ 15 min de retraso) y cripto (exchange público). Para la BMV importe un CSV." }), formImportar("velas", cargarVelas));
+      limpiar("velas-contenido", controles, h("p", { clase: "vacio", texto: "Elija un instrumento. Proveedores: Alpaca (SIC: OHLCV del consolidado SIP con ≥ 15 min de retraso) y cripto (exchange público). Para la BMV importe un CSV." }), formImportar("velas", cargarVelas), formImportarExterno("", cargarVelas));
       return;
     }
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
@@ -1908,7 +1908,7 @@ async function cargarVelas() {
           { t: "RSI 14", f: (b) => num(b.rsi14), num: true }, { t: "Calidad", f: (b) => chipCalidad(b.calidad) }], ult,
         { caption: "Últimas 12 barras (alternativa accesible a la gráfica)" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio }),
-      formImportar("velas", cargarVelas));
+      formImportar("velas", cargarVelas), formImportarExterno(v.simbolo, cargarVelas));
   } catch (e) { limpiar("velas-contenido", errorCaja(e)); }
 }
 
@@ -1990,6 +1990,7 @@ async function cargarOrderFlow() {
         d.operaciones.slice(-50).reverse(), { caption: "Últimas 50 operaciones" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio_operaciones }),
       h("p", { clase: "ayuda", texto: d.nota }),
+      L || d.operaciones.length ? enlaceHftbacktest(o.simbolo) : null,
       formImportar("libro", cargarOrderFlow), formImportar("operaciones", cargarOrderFlow));
   } catch (e) { limpiar("orderflow-contenido", errorCaja(e)); }
 }
@@ -2085,6 +2086,7 @@ async function cargarOptionFlow() {
         { etiquetaX: "Strike", formatoY: pct, etiqueta: "Volatilidad implícita por strike" }),
         d.iv.superficie ? h("div", {}, h("h2", { texto: "Superficie de volatilidad" }), superficieTabla(curvas))
           : h("p", { clase: "ayuda", texto: "Superficie no disponible: hacen falta al menos 2 vencimientos con 3 strikes con IV." }),
+        botonHeston(o.subyacente),
         h("h2", { texto: "Volumen inusual (regla descriptiva)" }),
         h("div", { clase: "fila-controles" }, campo("vol_inusual_min", "Volumen mínimo"), campo("percentil", "Percentil (0–1)"), campo("ratio_oi", "Volumen / interés abierto ≥")),
         h("p", { clase: "ayuda", texto: `Regla: volumen ≥ ${num(d.regla.minimo)} y, con interés abierto, volumen/interés abierto ≥ ${num(d.regla.ratio_oi)}; sin interés abierto, volumen ≥ percentil ${pct(d.regla.percentil)} de la cadena filtrada. Describe el volumen negociado; no es una recomendación ni una lectura de intención.` }),
@@ -2110,3 +2112,66 @@ CARGAS["tab-velas"] = () => cargarVelas();
 CARGAS["tab-orderflow"] = () => cargarOrderFlow();
 CARGAS["tab-optionflow"] = () => cargarOptionFlow();
 Object.assign(ATAJOS, { VEL: "tab-velas", OF: "tab-orderflow", OPC: "tab-optionflow" });
+
+/* ---------- Etapa 2: Heston, exportación a hftbacktest e importación de formatos externos ---------- */
+function pintarHeston(r) {
+  const p = r.parametros;
+  return h("section", { clase: "tarjeta", "aria-label": "Calibración de Heston" },
+    h("h3", { texto: `Heston calibrado · ${r.contratos} contratos · ${r.convergio ? "convergió" : "NO convergió"}` }),
+    h("div", { clase: "kpis" }, kpi("v0 (varianza inicial)", `${num(p.v0)} (vol ${pct(Math.sqrt(p.v0))})`),
+      kpi("θ (varianza de largo plazo)", `${num(p.theta)} (vol ${pct(Math.sqrt(p.theta))})`), kpi("κ (reversión)", num(p.kappa)),
+      kpi("σ (vol de la vol)", num(p.sigma)), kpi("ρ (correlación)", num(p.rho)),
+      kpi("Error medio", `${num(r.rmse_iv * 100)} p. de vol.`), kpi("Feller 2κθ − σ²", num(r.feller), r.feller > 0 ? "positivo" : "negativo")),
+    r.avisos.length ? h("div", { clase: "aviso-caja", role: "status" }, r.avisos.join(" ")) : null,
+    h("p", { clase: "ayuda", texto: `${r.nota} Subyacente: ${num(r.spot)} (${r.origen_spot}); tasa ${pct(r.tasa)} (${r.origen_tasa}); sin dividendos.` }),
+    tabla([{ t: "Contrato", f: (c) => c.contrato }, { t: "Venc.", f: (c) => c.vencimiento }, { t: "Strike", f: (c) => num(c.strike), num: true },
+      { t: "Tipo", f: (c) => c.tipo }, { t: "IV mercado", f: (c) => pct(c.iv_mercado), num: true },
+      { t: "Error (p. de vol.)", f: (c) => num(c.error_iv * 100), num: true }],
+    [...r.ajuste].sort((a, b) => Math.abs(b.error_iv) - Math.abs(a.error_iv)).slice(0, 10), { caption: "Los 10 contratos peor ajustados" }));
+}
+
+function botonHeston(subyacente) {
+  const destino = h("div", { "aria-live": "polite" });
+  const b = botonAccion("Calibrar modelo de Heston", "boton--secundario", async (btn) => {
+    ocupado([btn], true);
+    destino.replaceChildren(h("p", { clase: "suave", texto: "Calibrando (unos segundos)…" }));
+    try { destino.replaceChildren(pintarHeston(await api("/api/flujo/heston", { method: "POST", json: { subyacente } }))); }
+    catch (e) { destino.replaceChildren(errorCaja(e)); }
+    finally { ocupado([btn], false); }
+  });
+  return h("div", {}, h("h2", { texto: "Modelo de volatilidad estocástica (Heston)" }),
+    h("p", { clase: "ayuda", texto: "Ajusta los 5 parámetros de Heston a los precios medios de contratos fuera del dinero (7–180 días). Describe la superficie; no predice. Código propio desde los artículos publicados (Heston 1993; Albrecher et al. 2007; Cui et al. 2017)." }),
+    b, destino);
+}
+
+function enlaceHftbacktest(simbolo) {
+  return h("p", { clase: "ayuda" }, h("a", { href: `/api/flujo/hftbacktest?simbolo=${encodeURIComponent(simbolo)}`, clase: "boton boton--secundario", texto: "Exportar a hftbacktest (.npz)" }),
+    " Libro y operaciones guardados en el formato de eventos de hftbacktest (MIT), para backtests fuera de la terminal. Las instantáneas son espaciadas: no equivalen a un libro continuo.");
+}
+
+function formImportarExterno(simboloActual, alTerminar) {
+  const campo = (nombre, etiqueta, valor, extra = {}) => { const i = h("input", { name: nombre, required: true, ...extra }); i.value = valor; return h("label", {}, `${etiqueta} `, i); };
+  const sel = (nombre, etiqueta, opciones) => h("label", {}, `${etiqueta} `, h("select", { name: nombre }, opciones.map(([v, t]) => h("option", { value: v }, t))));
+  const archivo = h("input", { type: "file", name: "archivo", accept: ".csv,text/csv", required: true, "aria-label": "CSV exportado" });
+  const boton = h("button", { type: "submit", clase: "boton boton--secundario", texto: "Importar exportación" });
+  const salida = h("p", { clase: "ayuda", role: "status" });
+  const form = h("form", { clase: "formulario" }, archivo,
+    campo("simbolo", "Símbolo", simboloActual || "", { size: 18 }), campo("mercado", "Mercado", "BMV", { size: 10 }),
+    sel("intervalo", "Intervalo", Object.entries(NOMBRE_INTERVALO).reverse()),
+    campo("fuente", "Fuente", "tradingview", { size: 14 }), campo("licencia", "Licencia o permiso", "", { size: 28, placeholder: "p. ej. suscripción personal" }),
+    sel("zona", "Zona de fechas sin zona", [["America/Mexico_City", "Ciudad de México"], ["America/New_York", "Nueva York"], ["UTC", "UTC"]]), boton);
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const fd = new FormData(form);
+    ocupado([boton], true);
+    try {
+      const r = await api("/api/flujo/importar-externo", { method: "POST", body: fd });
+      salida.textContent = `Formato detectado: ${r.formato_detectado}. ${r.guardados} velas guardadas de ${r.filas} filas. ${r.nota}`;
+      await estadoFlujo(true); if (alTerminar) alTerminar();
+    } catch (e) { salida.textContent = e.message; }
+    finally { ocupado([boton], false); }
+  });
+  return h("details", { clase: "importar-flujo" }, h("summary", { texto: "Importar velas exportadas de TradingView, OpenBB o una hoja (Yahoo/Excel)" }),
+    h("p", { clase: "ayuda", texto: "Se reconocen columnas time/date/datetime y open, high, low, close (volume opcional). TradingView: «Exportar datos del gráfico» (tiempo Unix). OpenBB: obb.equity.price.historical(...).to_csv(). Solo datos que tenga derecho a usar; se guardan como «importado» con la fuente y licencia que declare." }),
+    form, salida);
+}
