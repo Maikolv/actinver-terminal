@@ -21,11 +21,17 @@
       <span>Actinver Terminal</span>
     </div>
     <div class="acciones-cabecera">
+      <form id="form-comandos" class="comandos-cabecera" role="search" autocomplete="off">
+        <label class="oculto-visual" for="barra-comandos">Ir a una sección o abrir la gráfica de un símbolo</label>
+        <input id="barra-comandos" type="search" placeholder="Símbolo o /INV · Ctrl+K" maxlength="40" aria-describedby="ayuda-comandos">
+        <button type="submit" class="boton boton--secundario">Ir</button>
+      </form>
       <button type="button" class="boton boton--secundario __CLASE_MODO__" id="btn-modo" data-destino="__DESTINO__">__TEXTO_MODO__</button>
       <button type="button" class="boton boton--secundario" id="btn-actualizar" title="Consulta fuentes (respetando límites), recalcula si hay datos nuevos y evalúa alertas">Actualizar datos</button>
       <button type="button" class="boton boton--primario" id="btn-calcular">Recalcular propuestas</button>
     </div>
   </div>
+  <p id="ayuda-comandos" class="ayuda-comandos">Accesos: /INV investigación · /MOD modelos · /MER mercado · /ROB robustez · /CAR cartera · /DAT fuentes. Un símbolo abre su gráfica local.</p>
   <div class="estado-datos" id="estado-datos" role="status" aria-live="polite">
     <span class="esqueleto esqueleto--linea" aria-hidden="true"></span><span class="oculto-visual">Cargando estado de datos</span>
   </div>
@@ -47,6 +53,8 @@
     <button role="tab" class="secundaria" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
     <button role="tab" class="secundaria" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
     <button role="tab" class="secundaria" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
+    <button role="tab" class="secundaria" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
+    <button role="tab" class="secundaria" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
     <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
     <button role="tab" class="secundaria" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
@@ -290,7 +298,50 @@
 
   <section role="tabpanel" id="panel-mercado" aria-labelledby="tab-mercado" hidden>
     <h1>Mercado</h1>
+    <div id="mercado-visualizaciones" aria-live="polite"></div>
     <div id="mercado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-investigacion" aria-labelledby="tab-investigacion" hidden>
+    <h1>Investigación</h1>
+    <p class="ayuda">Fundamentales, economía, energía y contexto para revisar su portafolio. Cada registro conserva su fuente y fecha. Las notas manuales reflejan lo que usted importó.</p>
+    <form id="form-investigacion-filtro" class="formulario">
+      <label>Símbolo de referencia (opcional)<input name="simbolo" maxlength="24" placeholder="MU, AMD, NVDA, XOM…" autocomplete="off"></label>
+      <label><input type="checkbox" name="historial">Mostrar historial de registros</label>
+      <button type="submit" class="boton boton--secundario">Filtrar</button>
+      <button type="button" id="btn-investigacion-actualizar" class="boton boton--primario">Actualizar investigación</button>
+      <a id="investigacion-exportar" href="/api/centro-investigacion/exportar" class="boton boton--secundario">Descargar registros</a>
+    </form>
+    <div id="investigacion-estado" role="status" aria-live="polite"></div>
+    <div id="investigacion-contenido"></div>
+    <details>
+      <summary>Importar hallazgos de una herramienta</summary>
+      <p class="ayuda">Descargue la plantilla y copie únicamente los datos que puede exportar o consultar con su acceso. Una fila por indicador o nota: fuente (identificador de la lista), símbolo, serie (ej. ROIC), título, período, valor con punto decimal, unidad, nota y enlace HTTPS de la herramienta. Para una nota puede dejar valor y unidad vacíos. Máximo 1000 filas, CSV UTF-8, 1 MB. No incluya claves de API.</p>
+      <p class="ayuda">La importación guarda los registros desde el momento actual; no acredita que se conocieran en una fecha anterior. No sustituye cotizaciones ni cambia las propuestas.</p>
+      <a href="/api/centro-investigacion/plantilla">Descargar plantilla vacía</a>
+      <form id="form-investigacion-importar" class="formulario">
+        <label>Archivo CSV<input type="file" name="archivo" accept=".csv,text/csv" required></label>
+        <button type="submit" class="boton boton--secundario">Importar registros</button>
+      </form>
+    </details>
+  </section>
+
+  <section role="tabpanel" id="panel-modelos" aria-labelledby="tab-modelos" hidden>
+    <h1>Modelo de opciones</h1>
+    <p class="ayuda">Precio y sensibilidades teóricas Black-Scholes-Merton para una opción europea. Ingrese sus propias hipótesis; este cálculo no incorpora cotizaciones, Option Flow ni órdenes.</p>
+    <form id="form-opciones" class="formulario formulario-modelos">
+      <label>Tipo<select name="tipo"><option value="call">Call</option><option value="put">Put</option></select></label>
+      <label>Precio subyacente<input name="spot" type="number" min="0.0001" step="any" value="100" required></label>
+      <label>Precio de ejercicio<input name="strike" type="number" min="0.0001" step="any" value="100" required></label>
+      <label>Días al vencimiento<input name="dias" type="number" min="1" max="3650" step="any" value="30" required></label>
+      <label>Volatilidad anual %<input name="volatilidad_pct" type="number" min="0.01" max="500" step="any" value="20" required></label>
+      <label>Tasa anual %<input name="tasa_pct" type="number" min="-20" max="100" step="any" value="5" required></label>
+      <label>Dividendo anual %<input name="dividendo_pct" type="number" min="0" max="100" step="any" value="0" required></label>
+      <label>Prima de mercado (opcional)<input name="prima_mercado" type="number" min="0" step="any" placeholder="Para inferir volatilidad"></label>
+      <button type="submit" class="boton boton--primario">Calcular opción</button>
+    </form>
+    <p class="ayuda">Si introduce una prima, se estima la volatilidad implícita y se usa para todas las griegas; en otro caso se usa la volatilidad anual ingresada. Vega y rho son por 1 punto porcentual; theta es por día. Las cifras son por unidad del subyacente, sin multiplicador de contrato.</p>
+    <div id="modelo-opciones-resultado" role="status" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>

@@ -280,6 +280,17 @@ def actualizar(con=Depends(con_db)):
         servicios.bloqueo.release()
 
 
+@app.post("/api/modelos/opciones")
+def calcular_opcion(cuerpo: dict = Body(...)):
+    """Calcula una opción hipotética con entradas manuales; no consulta el mercado."""
+    from . import modelos_opciones
+
+    try:
+        return modelos_opciones.calcular(cuerpo)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.post("/api/modo")
 def cambiar_modo(cuerpo: dict = Body(...)):
     """Cambia entre datos reales y demostración sin reiniciar. Cada modo usa su propia base de datos.
@@ -926,6 +937,25 @@ def get_mercado(con=Depends(con_db)):
                         "insiders": "SEC EDGAR Formulario 4"}}
 
 
+@app.get("/api/visualizaciones/mercado")
+def mapa_mercado(con=Depends(con_db)):
+    from . import visualizaciones
+    datos = visualizaciones.mapa(con, AJUSTES)
+    ins = mercado.instrumentos(con)
+    for celda in datos["celdas"]:
+        celda["grafica"] = bool(simbolo_tradingview(ins.get(celda["id"])))
+    return datos
+
+
+@app.get("/api/visualizaciones/serie/{iid}")
+def serie_mercado(iid: str, con=Depends(con_db)):
+    from . import visualizaciones
+    try:
+        return visualizaciones.serie(con, AJUSTES, iid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+
+
 # ------------------------------------------------------------------------------------------------------------
 # Gráfica: widget oficial de TradingView en una página aislada con su propia CSP
 BOLSA_TV = {"NASDAQ": "NASDAQ", "NYSE": "NYSE", "NYSE Arca": "AMEX", "NYSE American": "AMEX", "Cboe BZX": "CBOE",
@@ -999,3 +1029,59 @@ async def no_encontrado(request: Request, _):
     if request.url.path.startswith("/api/"):
         return JSONResponse({"error": "Ruta no encontrada"}, status_code=404)
     return HTMLResponse((WEB / "404.html").read_text(encoding="utf-8"), status_code=404)
+
+# Centro de investigación: APIs oficiales y registros manuales, aislados del motor de propuestas.
+@app.get("/api/centro-investigacion")
+def get_centro_investigacion(simbolo: str = "", con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    try:
+        return centro.resumen(con, AJUSTES, simbolo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/centro-investigacion/actualizar")
+def actualizar_centro_investigacion(con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        return centro.actualizar(con, AJUSTES)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    finally:
+        servicios.bloqueo.release()
+
+
+@app.post("/api/centro-investigacion/importar")
+async def importar_centro_investigacion(archivo: UploadFile = File(...), con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    if AJUSTES.es_demo:
+        raise HTTPException(409, "Cambie a modo real para importar investigación")
+    contenido = await archivo.read(centro.MAX_CSV + 1)
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        return centro.importar_csv(con, contenido)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    finally:
+        servicios.bloqueo.release()
+
+
+@app.get("/api/centro-investigacion/plantilla")
+def plantilla_centro_investigacion():
+    from . import centro_investigacion as centro
+    return PlainTextResponse(centro.plantilla(), media_type="text/csv",
+                             headers={"Content-Disposition": 'attachment; filename="investigacion-plantilla.csv"'})
+
+
+@app.get("/api/centro-investigacion/exportar")
+def exportar_centro_investigacion(simbolo: str = "", con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    try:
+        contenido = centro.exportar(con, simbolo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    return PlainTextResponse(contenido, media_type="text/csv",
+                             headers={"Content-Disposition": 'attachment; filename="investigacion.csv"'})

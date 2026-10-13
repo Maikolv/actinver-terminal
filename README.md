@@ -80,6 +80,8 @@ Navegación principal (lo necesario para decidir):
 
 Con «Más»: **Boletas e historial** (pasado, presente, futuro y boletas), **Ranking**, **Mercado** (calendario macro, titulares, insiders), **Datos y fuentes** (proveedor, moneda, zona horaria, hora, retraso y vigencia de cada instrumento) y **Ayuda**.
 
+En **Mercado**, el mapa de calor compara los dos últimos cierres disponibles por instrumento y permite filtrar por mercado. Al seleccionar una celda se muestran el histórico local, media móvil de 20 sesiones y RSI de 14; cada dato conserva fuente, fecha, hora de captura y rezago. El botón de velas abre la gráfica gratuita externa de TradingView cuando existe un símbolo confirmado. El mapa local usa cierres históricos, no cotizaciones en tiempo real ni velas fabricadas. Consulte [docs/fluere-referencia.md](docs/fluere-referencia.md) y [docs/centro-investigacion.md](docs/centro-investigacion.md).
+
 Telegram: el plan del día resume compras, ventas, mantener y pendientes; `/detalle` da cada instrumento y `/propuestas` la puntuación con su desglose y la comparación con pesos iguales; `/pronostico` el pronóstico al cierre del Reto (estimación).
 
 ## Reto Actinver 2026

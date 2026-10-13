@@ -12,6 +12,7 @@ _TMP = tempfile.mkdtemp(prefix="terminal-pruebas-")
 os.environ["TERMINAL_DATA_DIR"] = _TMP
 os.environ["TERMINAL_MODO"] = "real"
 os.environ["TERMINAL_SIN_MOTOR"] = "1"  # sin hilo automático ni notificaciones durante las pruebas
+os.environ["TERMINAL_SIN_ENV"] = "1"  # nunca se carga el .env real: sin credenciales reales en pruebas
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from terminal import db, vigencia  # noqa: E402

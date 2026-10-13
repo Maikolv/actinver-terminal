@@ -482,6 +482,13 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
                 act["nuevos"] = act.get("nuevos", 0) + fv["guardados"]
         except Exception:  # noqa: BLE001 - una fuente opcional nunca detiene el monitor
             log.exception("Finviz")
+        if ajustes.get("centro_investigacion", {}).get("auto_actualizar", True):
+            try:
+                from . import centro_investigacion
+                act.setdefault("contexto", {})["centro_investigacion"] = centro_investigacion.actualizar(con, ajustes)
+            except Exception:
+                # La investigación opcional no detiene precios, propuestas ni alertas.
+                log.warning("Centro de investigación no disponible")
     motivo = ("precios en vivo" if en_vivo else "forzado" if forzar else "datos nuevos" if act.get("nuevos") else
               "sin propuestas" if any(v is None for v in props.values()) else
               "código, configuración, perfil o datos cambiaron" if any(v and v.get("recalcular") for v in props.values())

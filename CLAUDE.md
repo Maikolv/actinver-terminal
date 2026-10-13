@@ -178,3 +178,14 @@ necesita decisión del usuario (sección 7 del mandato: gastar dinero, cuentas o
 tokens a su nombre, su sesión personal de Actinver, exponer la terminal fuera de
 este PC, borrar trabajo no recuperable, o reglas del Reto que no se puedan
 confirmar y cambien la estrategia).
+
+
+## Actualización 11-oct-2026 — centro de investigación
+
+- Nueva sección **Más → Investigación**, con las 15 fuentes/herramientas solicitadas.
+- Conectores de contexto: Alpha Vantage INCOME_STATEMENT (OVERVIEW es premium), FRED macro, CoinGecko Demo, EIA v2 y BLS público.
+- Finviz Elite conserva su conector existente. Las otras nueve herramientas se aplican por consulta y CSV/notas manuales; sus APIs de pago no se activan ni contratan.
+- Tablas `investigacion_observaciones` y `investigacion_consultas`: revisiones y disponibilidad desde la ingestión, separadas de precios/universo/propuestas.
+- Refresco en ciclos completos con caché y cupos; falla de una fuente no detiene las demás. Demo no consulta APIs.
+- Configuración, plantillas y proyectos cuantitativos: `docs/centro-investigacion.md`.
+- Verificación de esta entrega: 150 pruebas relevantes en verde; consulta real BLS con 115 observaciones; interfaz comprobada en escritorio/móvil sin errores JavaScript. Alpha Vantage/FRED/CoinGecko/EIA pendientes de claves; otras APIs no activadas.

@@ -2,6 +2,22 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.27.0] — 2026-10-12 (centro de investigación, mapa, opciones y correcciones P0 de la auditoría)
+
+### Agregado (trabajo de otra sesión del 11–12 oct, confirmado ahora)
+- **Más → Investigación:** FRED macro, BLS, EIA, Alpha Vantage (`INCOME_STATEMENT`) y CoinGecko, con disponibilidad conservadora y revisiones; importación CSV de hallazgos de otras herramientas (`docs/centro-investigacion.md`).
+- **Mercado:** mapa de calor de los dos últimos cierres con filtro por mercado; serie local de 120 cierres con SMA20 y RSI14; enlace al widget oficial de TradingView.
+- **Modelos:** opciones europeas Black-Scholes-Merton con griegas y volatilidad implícita (entradas manuales).
+- **Barra de comandos** (`Ctrl+K`).
+
+### Corregido (P0 de `docs/auditoria-2026-10-12.md`)
+- **Pruebas aisladas del `.env` real** (`TERMINAL_SIN_ENV`): `test_fred_csv_ignora_festivos` fallaba en la suite completa porque las pruebas cargaban `FRED_API_KEY`.
+- **Alpha Vantage:** pausa de 1.2 s entre símbolos; guarda los que respondan y se detiene ante un aviso de límite, en vez de anular los cuatro.
+
+### Documentación
+- `docs/integracion-repositorios.md`: etapa 0 (matriz de repositorios, licencias, arquitectura propuesta). Pendiente de aprobación.
+- 479 pruebas en verde.
+
 ## [0.26.1] — 2026-10-12 (concentración y precios del día en el plan)
 
 ### Agregado

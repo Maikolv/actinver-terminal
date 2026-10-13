@@ -37,7 +37,8 @@ CABECERAS = {
     "Cache-Control": "no-store",
 }
 LIMITES = {"/api/propuestas/calcular": 6, "/api/datos/actualizar": 4, "/api/importar": 20, "/api/investigacion/calcular": 4,
-           "/api/cobertura/verificar": 4}
+           "/api/cobertura/verificar": 4, "/api/centro-investigacion/actualizar": 4,
+           "/api/centro-investigacion/importar": 10}
 RUTA_WEBHOOK = "/webhook/tradingview"
 MAX_WEBHOOK = 10_000
 LIMITE_WEBHOOK = 30

@@ -261,6 +261,8 @@ def inicializar(con: sqlite3.Connection, ajustes=None) -> None:
     from . import migraciones, registro
     migraciones.migrar(con, ajustes)
     registro.inicializar(con)
+    from . import centro_investigacion
+    centro_investigacion.inicializar(con)
 
 
 def cargar_universo(con: sqlite3.Connection, ruta: Path | None = None) -> int:

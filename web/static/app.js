@@ -103,6 +103,7 @@ function segmentado(id, valorActual, alCambiar) {
 const CARGAS = {
   "tab-resumen": () => pintarResumen(), "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
   "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
+  "tab-investigacion": () => cargarCentroInvestigacion(),
   "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
   "tab-movimientos": () => cargarMovimientos(), "tab-robustez": () => cargarRobustez(),
 };
@@ -135,6 +136,40 @@ document.getElementById("lista-pestanas").addEventListener("keydown", (ev) => {
 document.querySelectorAll('[role="tab"]').forEach((t) => t.addEventListener("click", () => activarPestana(t)));
 const irA = (id) => activarPestana(document.getElementById(id));
 const pestanaVisible = (id) => !document.getElementById(id).hidden;
+
+/* Barra de comandos: navega por secciones o abre una gráfica del universo local. */
+const ATAJOS = { INV: "tab-investigacion", MOD: "tab-modelos", MER: "tab-mercado", ROB: "tab-robustez",
+  CAR: "tab-cartera", DAT: "tab-universo", AL: "tab-alertas", PRO: "tab-propuestas" };
+const barraComandos = document.getElementById("barra-comandos");
+document.addEventListener("keydown", (ev) => {
+  if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "k") {
+    ev.preventDefault(); barraComandos.focus(); barraComandos.select();
+  }
+});
+barraComandos.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") { barraComandos.value = ""; barraComandos.blur(); }
+});
+document.getElementById("form-comandos").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const entrada = barraComandos.value.trim().toUpperCase();
+  if (!entrada) return;
+  if (entrada.startsWith("/")) {
+    const tab = ATAJOS[entrada.slice(1)];
+    if (!tab) { notificar("Comando desconocido. Use /INV, /MOD, /MER, /ROB, /CAR, /DAT, /AL o /PRO."); return; }
+    irA(tab); barraComandos.value = ""; return;
+  }
+  if (!/^[A-Z0-9._-]{1,24}$/.test(entrada)) { notificar("Escriba una clave de instrumento válida."); return; }
+  try {
+    if (!estado.universo) estado.universo = (await api("/api/universo")).instrumentos;
+    const encontrados = estado.universo.filter((i) => String(i.id).toUpperCase() === entrada || String(i.clave_operable || "").toUpperCase() === entrada);
+    if (encontrados.length !== 1) {
+      notificar(encontrados.length ? "La clave coincide con varios instrumentos. Escriba su identificador exacto." : "Ese símbolo no está en el universo local.");
+      return;
+    }
+    if (!encontrados[0].grafica) { notificar("Ese instrumento no tiene gráfica disponible."); return; }
+    window.location.assign(`/grafica/${encodeURIComponent(encontrados[0].id)}`);
+  } catch (e) { notificar(e.message); }
+});
 
 /* ---------- estado de datos y motor ---------- */
 const MODOS_VIVO = { websocket: "en vivo (IEX)", consulta: "cada minuto (respaldo)", mercado_cerrado: "mercado de EE. UU. cerrado",
@@ -818,8 +853,73 @@ document.getElementById("form-importar").addEventListener("submit", async (ev) =
 });
 
 /* ---------- mercado ---------- */
+let visuales = null;
+let visualMercado = "todos";
+let visualSeleccion = null;
+
+function intensidadMapa(v) {
+  if (v === null || v === undefined) return "sin-dato";
+  const nivel = Math.abs(v) >= .04 ? 3 : Math.abs(v) >= .015 ? 2 : 1;
+  return `${v >= 0 ? "sube" : "baja"}-${nivel}`;
+}
+
+function pintarMapaMercado() {
+  const raiz = document.getElementById("mercado-visualizaciones");
+  if (!visuales) return;
+  const mercados = [...new Set(visuales.celdas.map((c) => c.mercado || "Sin mercado"))].sort();
+  const visibles = visualMercado === "todos" ? visuales.celdas : visuales.celdas.filter((c) => (c.mercado || "Sin mercado") === visualMercado);
+  const selector = h("select", { "aria-label": "Filtrar mapa por mercado", onchange: (e) => { visualMercado = e.target.value; pintarMapaMercado(); } },
+    h("option", { value: "todos" }, "Todos los mercados"), ...mercados.map((m) => h("option", { value: m }, m)));
+  selector.value = visualMercado;
+  const tarjetas = visibles.map((c) => h("button", {
+    type: "button", clase: `mercado-tile mercado-tile--${intensidadMapa(c.variacion)}`,
+    title: `${c.nombre || c.clave}. Fuente ${c.proveedor}; cierre ${c.fecha}; rezago ${c.dias_calendario} día(s) calendario; captura ${c.obtenido_en || "hora no disponible"}. Calidad: cierre histórico local, sin verificación intradía.`,
+    "aria-label": `${c.clave}: ${c.variacion == null ? "variación no disponible" : pct(c.variacion)} entre cierres; ${c.fecha}`,
+    onclick: () => cargarSerieMercado(c.id),
+  }, h("strong", { texto: c.clave || c.id }),
+  h("span", { texto: c.variacion == null ? "—" : pct(c.variacion) }),
+  h("small", { texto: c.fecha })));
+  raiz.replaceChildren(h("h2", { texto: "Mapa de calor de cierres" }),
+    h("p", { clase: "ayuda", texto: visuales.nota }),
+    h("div", { clase: "fila-controles" }, h("label", {}, "Mercado ", selector),
+      h("span", { clase: "suave", texto: `${visibles.length} de ${visuales.total} instrumentos con cierre. Seleccione uno para sus indicadores.` })),
+    visibles.length ? h("div", { clase: "mercado-mapa" }, ...tarjetas) : h("p", { clase: "vacio", texto: "No hay cierres disponibles para este mercado." }),
+    h("div", { id: "mercado-indicadores" }));
+  if (visualSeleccion) cargarSerieMercado(visualSeleccion);
+}
+
+async function cargarSerieMercado(iid) {
+  visualSeleccion = iid;
+  const destino = document.getElementById("mercado-indicadores");
+  if (!destino) return;
+  destino.replaceChildren(h("p", { clase: "suave", texto: "Cargando cierres e indicadores…" }));
+  try {
+    const d = await api(`/api/visualizaciones/serie/${encodeURIComponent(iid)}`);
+    if (visualSeleccion !== iid || !destino.isConnected) return;
+    const ultimo = d.puntos[d.puntos.length - 1];
+    const celda = visuales.celdas.find((c) => c.id === iid);
+    destino.replaceChildren(h("h3", { texto: `${d.clave} · cierres e indicadores` }),
+      h("p", { clase: "ayuda", texto: d.nota }),
+      d.puntos.length ? grafica([
+        { nombre: `Cierre (${d.moneda})`, color: "var(--acento)", datos: d.puntos.map((p) => ({ x: p.fecha, y: p.cierre })) },
+        { nombre: "Media móvil 20 sesiones", color: "var(--retrasado)", datos: d.puntos.map((p) => ({ x: p.fecha, y: p.media_20 })) },
+      ], { formato: num, etiqueta: `Cierres y media móvil de ${d.clave}` }) : h("p", { clase: "vacio", texto: "Sin cierres históricos disponibles." }),
+      ultimo ? h("p", { clase: "ayuda", texto: `RSI de 14 sesiones: ${ultimo.rsi_14 == null ? "sin historia suficiente" : num(ultimo.rsi_14)} · Fuente: ${d.proveedor} · fecha del cierre: ${d.fecha} · captura: ${fechaLocal(d.obtenido_en)} (America/Mexico_City) · rezago: ${celda?.dias_calendario ?? "sin dato"} día(s) calendario · calidad: cierre histórico local, sin verificación intradía. ${d.modo === "sintetico" ? "DATOS SINTÉTICOS." : "No es precio en tiempo real."}` }) : null,
+      celda && celda.grafica ? h("a", { href: `/grafica/${encodeURIComponent(iid)}`, target: "_blank", rel: "noopener", clase: "boton boton--secundario", texto: "Abrir velas e indicadores gratuitos de TradingView" }) :
+        h("p", { clase: "ayuda", texto: "No hay un símbolo confirmado para la gráfica externa de velas." }));
+  } catch (e) { if (destino.isConnected) destino.replaceChildren(errorCaja(e)); }
+}
+
+async function cargarVisualizacionesMercado() {
+  try {
+    visuales = await api("/api/visualizaciones/mercado");
+    pintarMapaMercado();
+  } catch (e) { limpiar("mercado-visualizaciones", errorCaja(e)); }
+}
+
 async function cargarMercado() {
   try {
+    cargarVisualizacionesMercado();
     const d = await api("/api/mercado");
     const insiderEstado = (estado.datos && estado.datos.proveedores || []).find((p) => p.proveedor === "sec_edgar");
     limpiar("mercado-contenido",
@@ -1514,3 +1614,95 @@ document.querySelector('#form-operacion input[name="instrumento_id"]').addEventL
   } catch { /* el campo sigue aceptando la clave escrita */ }
 });
 iniciar();
+
+/* ---------- centro de investigación ---------- */
+async function cargarCentroInvestigacion() {
+  const simbolo = document.getElementById("form-investigacion-filtro").elements.simbolo.value.trim().toUpperCase();
+  document.getElementById("investigacion-exportar").href = "/api/centro-investigacion/exportar?simbolo=" + encodeURIComponent(simbolo);
+  try {
+    const d = await api("/api/centro-investigacion?simbolo=" + encodeURIComponent(simbolo));
+    const estados = { lista: "Lista para consultar", requiere_clave: "Falta clave", desactivada: "Desactivada", consulta_manual: "Consulta e importación", conector_existente: "Conector de precios existente" };
+    const porId = new Map(d.fuentes.map((f) => [f.id, f]));
+    const historial = document.getElementById("form-investigacion-filtro").elements.historial.checked;
+    const vistos = new Set();
+    const visibles = historial ? d.observaciones : d.observaciones.filter((x) => {
+      const clave = `${x.fuente}:${x.simbolo}:${x.serie}:${x.origen}`;
+      if (vistos.has(clave)) return false;
+      vistos.add(clave); return true;
+    });
+    limpiar("investigacion-contenido",
+      h("p", { clase: "ayuda", texto: d.nota }),
+      d.modo === "demo" ? h("p", { clase: "aviso", texto: "Modo demostración: no se consultan APIs ni se importan registros reales." }) : document.createDocumentFragment(),
+      h("h2", { texto: "Indicadores y notas" }),
+      tabla([
+        { t: "Fuente / método", f: (x) => `${(porId.get(x.fuente) || {}).nombre || x.fuente} · ${x.origen === "manual" ? "importación manual" : "API oficial"}` },
+        { t: "Símbolo", f: (x) => x.simbolo || "Economía / energía" },
+        { t: "Indicador", f: (x) => x.titulo },
+        { t: "Período", f: (x) => x.periodo },
+        { t: "Valor", num: true, f: (x) => x.valor === null ? "—" : `${num(x.valor)} ${x.unidad}` },
+        { t: "Conocido aquí desde", f: (x) => fechaLocal(x.disponible_desde) },
+        { t: "Última comprobación", f: (x) => `${fechaLocal(x.confirmado_en)}${x.requiere_actualizacion ? " · requiere actualización" : ""}${x.referencia_atrasada ? " · referencia atrasada" : ""}` },
+        { t: "Notas / fuente", f: (x) => h("div", {}, h("p", { texto: x.texto }), x.hora_fuente ? h("p", { clase: "suave", texto: "Hora de la referencia: " + fechaLocal(x.hora_fuente) }) : null, externo(x.url, "Consultar fuente")) },
+    ], visibles, { vacio: "Aún no hay registros. Actualice las fuentes disponibles o importe hallazgos con la plantilla." }),
+      h("h2", { texto: "Herramientas y acceso" }),
+      tabla([
+        { t: "Herramienta", f: (x) => h("div", {}, externo(x.url, x.nombre), h("p", { clase: "suave", texto: `Identificador: ${x.id}` })) },
+        { t: "Uso en su cartera", f: (x) => x.aplicacion },
+        { t: "Vía / estado", f: (x) => h("div", {}, h("p", { texto: x.via }), chip("sin_datos", estados[x.estado]), x.ultima_consulta ? h("p", { texto: `${x.ultima_consulta.estado} · ${fechaLocal(x.ultima_consulta.intento_en)} · ${x.ultima_consulta.mensaje}` }) : null) },
+        { t: "Acceso", f: (x) => h("div", {}, h("p", { texto: x.acceso }), externo(x.registro, "Acceso a la herramienta"), document.createTextNode(" · "), externo(x.documentacion, "Documentación")) },
+      ], d.fuentes)
+    );
+  } catch (e) { limpiar("investigacion-contenido", errorCaja(e)); }
+}
+document.getElementById("form-investigacion-filtro").addEventListener("submit", (ev) => {
+  ev.preventDefault(); cargarCentroInvestigacion();
+});
+document.getElementById("btn-investigacion-actualizar").addEventListener("click", async (ev) => {
+  const b = ev.currentTarget;
+  ocupado([b], true);
+  limpiar("investigacion-estado", h("p", { texto: "Consultando fuentes disponibles…" }));
+  try {
+    const d = await api("/api/centro-investigacion/actualizar", { method: "POST", json: {} });
+    const detalle = Object.entries(d.fuentes).map(([k, v]) => `${k}: ${v.estado}`).join(" · ");
+    limpiar("investigacion-estado", h("p", { texto: d.estado === "demo_sin_consultas" ? "Modo demostración: no se consultaron fuentes reales." : `${d.nuevos} registros nuevos. ${detalle}` }));
+    await cargarCentroInvestigacion();
+  } catch (e) { limpiar("investigacion-estado", errorCaja(e)); }
+  finally { ocupado([b], false); }
+});
+document.getElementById("form-investigacion-importar").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = ev.target, b = f.querySelector("button");
+  ocupado([b], true);
+  try {
+    const d = await api("/api/centro-investigacion/importar", { method: "POST", body: new FormData(f) });
+    limpiar("investigacion-estado", h("p", { texto: `${d.nuevos} registros nuevos. ${d.nota}` }));
+    await cargarCentroInvestigacion(); f.reset();
+  } catch (e) { limpiar("investigacion-estado", errorCaja(e)); }
+  finally { ocupado([b], false); }
+});
+
+/* ---------- modelo cuantitativo de opciones ---------- */
+document.getElementById("form-opciones").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = ev.currentTarget, boton = f.querySelector('button[type="submit"]');
+  const cuerpo = { tipo: f.elements.tipo.value };
+  for (const clave of ["spot", "strike", "dias", "volatilidad_pct", "tasa_pct", "dividendo_pct"]) {
+    cuerpo[clave] = Number(f.elements[clave].value);
+  }
+  if (f.elements.prima_mercado.value.trim()) cuerpo.prima_mercado = Number(f.elements.prima_mercado.value);
+  ocupado([boton], true);
+  try {
+    const r = await api("/api/modelos/opciones", { method: "POST", json: cuerpo });
+    limpiar("modelo-opciones-resultado", h("section", { clase: "tarjeta" },
+      h("h2", { texto: `${r.modelo} · ${r.tipo.toUpperCase()}` }),
+      h("div", { clase: "kpis" },
+        kpi("Precio teórico", num(r.precio_teorico)),
+        kpi(r.volatilidad_implicita ? "Volatilidad implícita" : "Volatilidad ingresada", `${num(r.volatilidad_pct)} %`),
+        kpi("Delta", num(r.delta)), kpi("Gamma", num(r.gamma)),
+        kpi("Vega / +1 p. p.", num(r.vega_por_1pct)),
+        kpi("Theta / día", num(r.theta_por_dia)),
+        kpi("Rho / +1 p. p.", num(r.rho_por_1pct))),
+      h("p", { clase: "ayuda", texto: r.nota })));
+  } catch (e) { limpiar("modelo-opciones-resultado", errorCaja(e)); }
+  finally { ocupado([boton], false); }
+});

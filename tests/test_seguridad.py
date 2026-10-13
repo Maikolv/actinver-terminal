@@ -1,4 +1,5 @@
 """Controles HTTP locales, ausencia de rutas de órdenes y de secretos en el repositorio."""
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -141,3 +142,16 @@ def test_un_nombre_publico_nunca_se_acepta_aunque_se_configure(monkeypatch):
     monkeypatch.setenv("TERMINAL_HOSTS_REMOTOS", "algo.trycloudflare.com")
     with TestClient(app, base_url="https://algo.trycloudflare.com") as c:
         assert c.get("/", headers={"Tailscale-User-Login": "yo@ejemplo.com"}).status_code == 400
+
+
+def test_pruebas_no_cargan_el_env_real(tmp_path, monkeypatch):
+    """Con TERMINAL_SIN_ENV (lo fija conftest) el .env no entra a os.environ; sin la marca, sí."""
+    from terminal import config
+    (tmp_path / ".env").write_text("CLAVE_DE_PRUEBA_ENV=valor\n", encoding="utf-8")
+    monkeypatch.setattr(config, "RAIZ", tmp_path)
+    monkeypatch.delenv("CLAVE_DE_PRUEBA_ENV", raising=False)
+    config._cargar_env_local()
+    assert "CLAVE_DE_PRUEBA_ENV" not in os.environ
+    monkeypatch.delenv("TERMINAL_SIN_ENV")
+    config._cargar_env_local()
+    assert os.environ.pop("CLAVE_DE_PRUEBA_ENV") == "valor"

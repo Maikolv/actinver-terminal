@@ -47,7 +47,10 @@ VARIABLES_SECRETOS = {"alpaca": "ALPACA_API_SECRET_KEY"}
 
 
 def _cargar_env_local() -> None:
-    """Carga .env (KEY=VALUE) sin sobrescribir variables ya definidas. Sin dependencias."""
+    """Carga .env (KEY=VALUE) sin sobrescribir variables ya definidas. Sin dependencias.
+    TERMINAL_SIN_ENV=1 lo omite: las pruebas nunca ven credenciales reales (resultados deterministas)."""
+    if os.environ.get("TERMINAL_SIN_ENV"):
+        return
     ruta = RAIZ / ".env"
     if not ruta.exists():
         return

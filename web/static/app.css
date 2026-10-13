@@ -61,6 +61,9 @@ a { color: var(--acento); }
 .cabecera__fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
 .marca { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 1.05rem; }
 .acciones-cabecera { display: flex; gap: 8px; }
+.comandos-cabecera { display: flex; gap: 4px; }
+.comandos-cabecera input { width: min(24vw, 240px); min-width: 165px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); font: inherit; }
+.ayuda-comandos { max-width: 1280px; margin: 6px auto 0; color: var(--texto-2); font-size: .8rem; }
 .estado-datos { min-height: 3.4em; max-width: 1280px; margin: 8px auto 0; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: .85rem; color: var(--texto-2); }
 .estado-datos .grupo { display: inline-flex; gap: 6px; align-items: center; }
 .aviso-demo { max-width: 1280px; margin: 8px auto 0; padding: 8px 12px; border-radius: var(--radio); background: var(--sintetico-fondo); color: var(--sintetico); font-size: .9rem; }
@@ -230,6 +233,9 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
 @media (max-width: 720px) {
   .acciones-cabecera .boton--primario { display: none; }
   .acciones-cabecera { width: 100%; flex-wrap: wrap; }
+  .comandos-cabecera { width: 100%; }
+  .comandos-cabecera input { flex: 1 1 auto; width: auto; min-width: 0; }
+  .comandos-cabecera .boton { flex: none; }
   .acciones-cabecera .boton { flex: 1 1 140px; white-space: normal; }
   .estado-datos { min-height: 7.5em; }
   .estado-datos .grupo { flex-wrap: wrap; min-width: 0; }
@@ -275,3 +281,27 @@ td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: a
 .mapa-calor { border-collapse: collapse; min-width: 22rem; }
 .mapa-calor th, .mapa-calor td { padding: .35rem .6rem; border: 1px solid var(--borde); text-align: right; }
 .mapa-calor caption { text-align: left; padding: .4rem .6rem; color: var(--texto-2); }
+
+/* Mercado: variación entre cierres locales, sin representar precios intradía. */
+.mercado-mapa { display: grid; grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)); gap: 7px; margin: 12px 0 18px; }
+.mercado-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 76px;
+  padding: 9px 10px; border: 1px solid var(--borde); border-radius: var(--radio); color: var(--texto);
+  font: inherit; text-align: left; cursor: pointer; }
+.mercado-tile strong { font-size: .88rem; overflow-wrap: anywhere; }
+.mercado-tile span { font-family: var(--mono); font-size: 1.08rem; font-weight: 700; }
+.mercado-tile small { font-size: .72rem; opacity: .85; }
+.mercado-tile:hover, .mercado-tile:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+.mercado-tile--sube-1 { background: color-mix(in srgb, var(--vigente) 12%, var(--superficie)); }
+.mercado-tile--sube-2 { background: color-mix(in srgb, var(--vigente) 25%, var(--superficie)); }
+.mercado-tile--sube-3 { background: color-mix(in srgb, var(--vigente) 40%, var(--superficie)); }
+.mercado-tile--baja-1 { background: color-mix(in srgb, var(--vencido) 12%, var(--superficie)); }
+.mercado-tile--baja-2 { background: color-mix(in srgb, var(--vencido) 25%, var(--superficie)); }
+.mercado-tile--baja-3 { background: color-mix(in srgb, var(--vencido) 40%, var(--superficie)); }
+.mercado-tile--sin-dato { background: var(--superficie-2); }
+#mercado-indicadores { margin: 18px 0 26px; }
+#mercado-indicadores .grafica { width: 100%; height: auto; }
+
+/* Centro de investigación: controles que se adaptan al ancho disponible. */
+#panel-investigacion .formulario { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+#panel-investigacion .formulario > label:first-child { flex-basis: 100%; }
+#panel-investigacion .boton { display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
