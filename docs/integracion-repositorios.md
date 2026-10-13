@@ -1,6 +1,6 @@
 # Integración de repositorios conservados — Etapa 0 (propuesta)
 
-Fecha: 12-oct-2026. Estado: **propuesta para aprobación del usuario; no se ha implementado nada de las etapas 1–3**.
+Fecha: 12-oct-2026. Estado: **aprobada por el usuario el 12-oct**. La etapa 1 está implementada (`docs/flujo-ordenes-opciones.md`). Las etapas 2 y 3 están pendientes. Cripto: Bitso con BTC, ETH, SOL y XRP en MXN.
 
 Método:
 - Se inventariaron las 103 carpetas de `C:\Users\MIKE\Desktop\Repos`.

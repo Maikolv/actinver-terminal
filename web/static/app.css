@@ -305,3 +305,29 @@ td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: a
 #panel-investigacion .formulario { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 #panel-investigacion .formulario > label:first-child { flex-basis: 100%; }
 #panel-investigacion .boton { display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
+
+/* Velas, Order Flow y Option Flow. Paleta azul/naranja: distinguible con daltonismo rojo-verde. */
+:root { --vela-sube: #1f5f8b; --vela-baja: #b0600f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --vela-sube: #6fb0dd; --vela-baja: #e5a15a; } }
+:root[data-theme="dark"] { --vela-sube: #6fb0dd; --vela-baja: #e5a15a; }
+.grafica--velas .vela:hover line, .grafica--velas .vela:hover rect { stroke-width: 2; }
+.procedencia { margin: 6px 0 10px; }
+.procedencia .ayuda { margin: 4px 0; }
+.importar-flujo { margin: 14px 0; }
+.importar-flujo summary { cursor: pointer; font-weight: 600; }
+.perfil-volumen { display: grid; gap: 3px; margin: 8px 0 14px; max-width: 720px; }
+.perfil-fila { display: grid; grid-template-columns: 190px 1fr 110px; gap: 8px; align-items: center; font-size: .82rem; }
+.celda-iv { display: inline-block; min-width: 4.5em; padding: 1px 4px; border-radius: 3px; }
+.mercado-tile--sube-1 { background: color-mix(in srgb, var(--vela-sube) 14%, var(--superficie)); }
+.mercado-tile--sube-2 { background: color-mix(in srgb, var(--vela-sube) 28%, var(--superficie)); }
+.mercado-tile--sube-3 { background: color-mix(in srgb, var(--vela-sube) 45%, var(--superficie)); }
+.mercado-tile--baja-1 { background: color-mix(in srgb, var(--vela-baja) 14%, var(--superficie)); }
+.mercado-tile--baja-2 { background: color-mix(in srgb, var(--vela-baja) 28%, var(--superficie)); }
+.mercado-tile--baja-3 { background: color-mix(in srgb, var(--vela-baja) 45%, var(--superficie)); }
+.mercado-tile[aria-pressed="true"] { outline: 3px solid var(--foco); outline-offset: 1px; }
+.escala-mapa { display: flex; gap: 4px; align-items: center; font-size: .78rem; flex-wrap: wrap; }
+.escala-mapa span { padding: 2px 6px; border-radius: 3px; }
+.ficha-celda { border: 1px solid var(--borde); border-radius: 6px; padding: 10px 12px; margin: 8px 0 14px; background: var(--superficie); }
+.ficha-celda dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 6px 0; font-size: .86rem; }
+.ficha-celda dt { color: var(--texto-suave, inherit); opacity: .85; }
+@media (max-width: 640px) { .perfil-fila { grid-template-columns: 1fr 1fr; } .perfil-fila .barra { grid-column: 1 / -1; } }

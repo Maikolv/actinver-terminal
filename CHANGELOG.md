@@ -2,6 +2,37 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.28.0] — 2026-10-12 (etapa 1: velas OHLCV, Order Flow, Option Flow y mapa de calor mejorado)
+
+### Agregado
+- **`terminal/flujo/`** (`docs/flujo-ordenes-opciones.md`):
+  - contratos normalizados (barras, libro, operaciones y opciones) con procedencia completa;
+  - tablas propias con `disponible_desde` (sin fuga temporal);
+  - importación CSV todo o nada.
+- **Adaptadores** bajo demanda, con interruptor y límite por símbolo:
+  - Alpaca: OHLCV y cinta SIP con ≥ 15 min de retraso, bid/ask IEX y opciones con el feed indicativo;
+  - cripto vía `ccxt` (MIT): Bitso, con BTC, ETH, SOL y XRP en MXN.
+- **Vistas nuevas** (Más → Velas / Order Flow / Option Flow; atajos `/VEL`, `/OF`, `/OPC`):
+  - velas con volumen, SMA20, Bollinger, VWAP y RSI de Wilder;
+  - libro, profundidad, desequilibrio, cinta, delta (solo con lado informado) y perfil de volumen;
+  - cadena de opciones con filtros, curva y superficie de IV, regla descriptiva de volumen inusual y paso al modelo
+    BSM.
+- **Estados honestos:** sin fuente autorizada, los paneles lo dicen y no simulan nada.
+- `docs/acciones-requeridas-usuario.md`.
+
+### Cambiado
+- **Mapa de calor:**
+  - prioridad única de fuentes (`mercado.PRIORIDAD_FUENTE`) y precio ajustado por splits;
+  - ventanas de 1, 5 y 20 sesiones;
+  - filtros por mercado, clase, sector y proveedor;
+  - escala azul y naranja apta para daltonismo;
+  - ficha de la celda con método, cierres, fuente, captura, rezago y calidad, y enlace a velas.
+
+  Cierra los hallazgos 3, 4 y 5 de la auditoría del 12-oct.
+- **RSI de Wilder** en la serie de Mercado; antes usaba promedio simple.
+- La ruta de Order Flow se llama `/api/flujo/libro-operaciones`, para que la prueba que prohíbe rutas de «órdenes»
+  siga estricta.
+
 ## [0.27.0] — 2026-10-12 (centro de investigación, mapa, opciones y correcciones P0 de la auditoría)
 
 ### Agregado (trabajo de otra sesión del 11–12 oct, confirmado ahora)

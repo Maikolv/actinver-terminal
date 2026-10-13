@@ -30,8 +30,13 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (2026-10-07, v0.26.0, rama `main`)
+## Estado comprobado (2026-10-12, v0.28.0, rama `main`)
 
+- **12-oct noche (v0.28.0, etapa 1 aprobada por el usuario):**
+  - Velas OHLCV, Order Flow y Option Flow en `terminal/flujo/` (`docs/flujo-ordenes-opciones.md`). Solo datos
+    reales (Alpaca SIP/IEX/opciones indicativas; Bitso vía ccxt) o CSV importado; sin fuente, los paneles no simulan.
+  - Mapa de calor con prioridad única, ajuste por splits, ventanas de 1/5/20 y ficha; RSI de Wilder.
+  - Acciones del usuario: `docs/acciones-requeridas-usuario.md`. Etapas 2 y 3: `docs/integracion-repositorios.md`.
 - **Cuenta del Reto (lunes 12-oct, 18:02, captura confirmada):**
   - Mismas 7 posiciones; valuación $970,442.17 (−2.96 %); poder de compra $4,077.53. La terminal valúa $969,921 (−0.05 %).
   - Desde el 9-oct: MU −4.6 %, AMD −2.9 %, NVDA −2.0 %, NVAX −2.6 %; ALPEK +4.9 %, XOM +0.8 %.

@@ -937,10 +937,76 @@ def get_mercado(con=Depends(con_db)):
                         "insiders": "SEC EDGAR Formulario 4"}}
 
 
+# Velas OHLCV, Order Flow y Option Flow: solo lectura y simulación (terminal/flujo). Sin rutas de órdenes.
+@app.get("/api/flujo/estado")
+def flujo_estado(con=Depends(con_db)):
+    from .flujo import servicio
+    return {**servicio.estado(con, AJUSTES), "catalogo": servicio.catalogo(con, AJUSTES)}
+
+
+@app.get("/api/flujo/velas")
+def flujo_velas(simbolo: str, intervalo: str = "1Day", dias: int = 180, con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.velas(con, AJUSTES, simbolo, intervalo, max(1, min(dias, 3650)))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/libro-operaciones")
+def flujo_orderflow(simbolo: str, minutos: int = 240, niveles: int = 20, con=Depends(con_db)):
+    from .flujo import servicio
+    return servicio.orderflow(con, AJUSTES, simbolo, max(1, min(minutos, 10080)), max(1, min(niveles, 200)))
+
+
+@app.get("/api/flujo/optionflow")
+def flujo_optionflow(subyacente: str, vencimiento: str = "", tipo: str = "", strike_min: str = "", strike_max: str = "",
+                     volumen_min: str = "", oi_min: str = "", delta_abs_max: str = "", ratio_oi: str = "",
+                     percentil: str = "", vol_inusual_min: str = "", con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.optionflow(con, AJUSTES, subyacente, {k: v for k, v in locals().items()
+                                                               if k not in ("con", "subyacente", "servicio")})
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/flujo/actualizar")
+def flujo_actualizar(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.actualizar(con, AJUSTES, str(cuerpo.get("tipo", "")), str(cuerpo.get("simbolo", "")),
+                                   str(cuerpo.get("intervalo") or "1Day"), max(1, min(int(cuerpo.get("dias") or 180), 3650)))
+    except (ValueError, TypeError) as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/flujo/importar/{tipo}")
+async def flujo_importar(tipo: str, archivo: UploadFile = File(...), con=Depends(con_db)):
+    from .flujo import importar_csv
+    contenido = await archivo.read(importar_csv.MAX_BYTES + 1)
+    try:
+        return importar_csv.importar(con, tipo, contenido)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/plantilla/{tipo}")
+def flujo_plantilla(tipo: str):
+    from .flujo import importar_csv
+    if tipo not in importar_csv.COLUMNAS:
+        raise HTTPException(404, "plantilla desconocida")
+    return PlainTextResponse(importar_csv.plantilla(tipo), media_type="text/csv",
+                             headers={"Content-Disposition": f'attachment; filename="plantilla-{tipo}.csv"'})
+
+
 @app.get("/api/visualizaciones/mercado")
-def mapa_mercado(con=Depends(con_db)):
+def mapa_mercado(ventana: int = 1, con=Depends(con_db)):
     from . import visualizaciones
-    datos = visualizaciones.mapa(con, AJUSTES)
+    try:
+        datos = visualizaciones.mapa(con, AJUSTES, ventana)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
     ins = mercado.instrumentos(con)
     for celda in datos["celdas"]:
         celda["grafica"] = bool(simbolo_tradingview(ins.get(celda["id"])))

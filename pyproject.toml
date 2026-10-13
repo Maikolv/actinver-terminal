@@ -51,6 +51,14 @@ dev = [
     "pip-audit>=2.10.1",
     "pytest>=9.1.1",
 ]
+# Adaptador de libro y cinta de cripto (Order Flow fuera del Reto). MIT. Se instala con el entorno por omisión; el
+# adaptador se apaga con [flujo.cripto] activo = false.
+cripto = [
+    "ccxt>=4.4",
+]
+
+[tool.uv]
+default-groups = ["dev", "cripto"]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }

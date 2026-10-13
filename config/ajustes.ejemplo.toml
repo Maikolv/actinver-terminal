@@ -34,6 +34,18 @@ recalcular_cada_min = 5              # recalcula propuestas y alertas con precio
 umbral_movimiento = 0.01             # …o antes, si algún símbolo se mueve ≥ 1 % desde el último cálculo
 recalculo_minimo_seg = 120           # nunca dos cálculos en vivo con menos de 2 min de diferencia
 
+[flujo.alpaca]
+# Velas OHLCV, operaciones e indicadores de opciones de Alpaca (datos de mercado gratuitos; solo data.alpaca.markets).
+# Se consulta solo cuando usted pulsa «Actualizar» en Velas, Order Flow u Option Flow. false = apagado.
+activo = true
+
+[flujo.cripto]
+# Libro y operaciones públicos de un exchange de cripto vía ccxt (MIT). Fuera del Reto. false = apagado.
+activo = true
+exchange = "bitso"                   # bitso (MXN), kraken, coinbase… cualquier id de ccxt con datos públicos
+pares = ["BTC/MXN", "ETH/MXN", "SOL/MXN", "XRP/MXN"]
+niveles = 50
+
 [finviz]
 # Finviz Elite (DE PAGO; contratarlo es decisión del usuario). Sin FINVIZ_AUTH_TOKEN en .env no hace ninguna petición.
 # Una consulta en lote de todas las emisoras SIC con la bolsa de Nueva York abierta. Sin hora del último hecho: se

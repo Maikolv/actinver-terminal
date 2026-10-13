@@ -55,6 +55,9 @@
     <button role="tab" class="secundaria" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
     <button role="tab" class="secundaria" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
     <button role="tab" class="secundaria" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
+    <button role="tab" class="secundaria" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
+    <button role="tab" class="secundaria" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
+    <button role="tab" class="secundaria" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
     <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
     <button role="tab" class="secundaria" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
@@ -324,6 +327,24 @@
         <button type="submit" class="boton boton--secundario">Importar registros</button>
       </form>
     </details>
+  </section>
+
+  <section role="tabpanel" id="panel-velas" aria-labelledby="tab-velas" hidden>
+    <h1>Velas OHLCV</h1>
+    <p class="ayuda">Velas japonesas solo con apertura, máximo, mínimo, cierre y volumen reales de un proveedor o de un CSV que usted importe. Los cierres diarios locales nunca se convierten en velas. Indicadores descriptivos; no son señales.</p>
+    <div id="velas-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-orderflow" aria-labelledby="tab-orderflow" hidden>
+    <h1>Order Flow</h1>
+    <p class="ayuda">Libro de órdenes, profundidad, cinta de operaciones, delta de volumen y perfil de volumen por precio, solo con datos reales. Si no hay fuente autorizada, el panel lo dice: nunca se simula flujo.</p>
+    <div id="orderflow-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-optionflow" aria-labelledby="tab-optionflow" hidden>
+    <h1>Option Flow</h1>
+    <p class="ayuda">Cadena de opciones por vencimiento y strike, curva y superficie de volatilidad y una regla descriptiva de volumen inusual. Solo informa: la terminal no opera opciones.</p>
+    <div id="optionflow-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-modelos" aria-labelledby="tab-modelos" hidden>

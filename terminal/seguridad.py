@@ -38,7 +38,8 @@ CABECERAS = {
 }
 LIMITES = {"/api/propuestas/calcular": 6, "/api/datos/actualizar": 4, "/api/importar": 20, "/api/investigacion/calcular": 4,
            "/api/cobertura/verificar": 4, "/api/centro-investigacion/actualizar": 4,
-           "/api/centro-investigacion/importar": 10}
+           "/api/centro-investigacion/importar": 10, "/api/flujo/actualizar": 30,
+           **{f"/api/flujo/importar/{t}": 10 for t in ("velas", "operaciones", "libro", "opciones")}}
 RUTA_WEBHOOK = "/webhook/tradingview"
 MAX_WEBHOOK = 10_000
 LIMITE_WEBHOOK = 30
