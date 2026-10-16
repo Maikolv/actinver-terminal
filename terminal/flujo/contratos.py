@@ -136,6 +136,9 @@ class ContratoOpcion:
     theta: float | None = None
     vega: float | None = None
     origen_iv: str | None = None          # proveedor | calculado | importado
+    multiplicador: float | None = None    # títulos por contrato; solo si la fuente lo informa (nunca se supone 100)
+    spot: float | None = None             # precio del subyacente de la MISMA referencia/instante que la cotización
+    moneda: str | None = None             # moneda del spot y del contrato
 
 
 class MarketDataProvider(Protocol):

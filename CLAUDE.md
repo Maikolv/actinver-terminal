@@ -214,3 +214,11 @@ confirmar y cambien la estrategia).
 - Refresco en ciclos completos con caché y cupos; falla de una fuente no detiene las demás. Demo no consulta APIs.
 - Configuración, plantillas y proyectos cuantitativos: `docs/centro-investigacion.md`.
 - Verificación de esta entrega: 150 pruebas relevantes en verde; consulta real BLS con 115 observaciones; interfaz comprobada en escritorio/móvil sin errores JavaScript. Alpha Vantage/FRED/CoinGecko/EIA pendientes de claves; otras APIs no activadas.
+
+## Actualización 16-oct-2026 — indicadores, GEX y laboratorio
+
+- Velas: EMA20/50, MACD12/26/9, estocástico14/3/3 y SAR0.02–0.2, con calentamiento nulo; se descartan respuestas antiguas si cambian los controles rápido.
+- Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio visibles en la navegación principal. GEX conserva signo convencional separado de exposición absoluta y exige OI, gamma, multiplicador, spot y moneda compatibles.
+- Laboratorio: signos por bloques, semilla, p con corrección +1 y Holm; no demuestra alfa. Plan intradía informativo separado, sin órdenes, con pausa y calidad de datos.
+- Verificación: suite completa de 561 pruebas aprobada; después de los ajustes finales, 41 pruebas enfocadas aprobadas. Sintaxis JS y 15 archivos nuevos/modificados revisados sin patrones de secretos. Laboratorio y persistencia de controles comprobados en navegador; datos sintéticos solo como ejemplo identificado.
+- Pendientes: feed apto de tiempo real, tape de opciones y OI/especificaciones para poblar GEX; medir pérdida intradía requiere entrada manual. No se contrataron servicios ni activaron órdenes. Ver `docs/mejoras-intradia-permutaciones.md`.

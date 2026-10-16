@@ -28,8 +28,12 @@ COLUMNAS = {
 }
 
 
+# Opcionales de opciones (se aceptan al final del encabezado): necesarios para GEX, nunca se suponen.
+EXTRA_OPCIONES = ["multiplicador", "spot", "moneda"]
+
+
 def plantilla(tipo: str) -> str:
-    return ",".join(COLUMNAS[tipo]) + "\n"
+    return ",".join(COLUMNAS[tipo] + (EXTRA_OPCIONES if tipo == "opciones" else [])) + "\n"
 
 
 def _texto(f, campo, maximo=80):
@@ -47,7 +51,8 @@ def importar(con, tipo: str, contenido: bytes, ahora: datetime | None = None) ->
     ahora = ahora or datetime.now(UTC)
     try:
         lector = csv.DictReader(io.StringIO(contenido.decode("utf-8-sig")), restkey="_extra", strict=True)
-        if lector.fieldnames != COLUMNAS[tipo]:
+        columnas = COLUMNAS[tipo] + (EXTRA_OPCIONES if tipo == "opciones" and lector.fieldnames == COLUMNAS[tipo] + EXTRA_OPCIONES else [])
+        if lector.fieldnames != columnas:
             raise ValueError("use exactamente los encabezados y el orden de la plantilla: " + ",".join(COLUMNAS[tipo]))
         grupos: dict[tuple, list] = defaultdict(list)   # (fuente, licencia, mercado) → filas válidas
         libros: dict[tuple, list] = defaultdict(list)
@@ -57,7 +62,7 @@ def importar(con, tipo: str, contenido: bytes, ahora: datetime | None = None) ->
             if n > MAX_FILAS:
                 raise ValueError(f"máximo {MAX_FILAS:,} filas")
             try:
-                if f.get("_extra") or any(f.get(c) is None for c in COLUMNAS[tipo]):
+                if f.get("_extra") or any(f.get(c) is None for c in columnas):
                     raise ValueError("número de columnas incorrecto")
                 clave = (_texto(f, "fuente"), _texto(f, "licencia", 200), _texto(f, "mercado", 40))
                 if tipo == "velas":
@@ -104,7 +109,10 @@ def importar(con, tipo: str, contenido: bytes, ahora: datetime | None = None) ->
                         _texto(f, "contrato", 40), simbolo(f["subyacente"]), venc, positivo(f["strike"], "strike"),
                         tipo_op, instante(f["instante"], ahora), bid, ask, opcional(f["ultimo"], "ultimo"),
                         opcional(f["volumen"], "volumen"), opcional(f["interes_abierto"], "interes_abierto"), iv,
-                        origen_iv="importado" if iv is not None else None, **griegas))
+                        origen_iv="importado" if iv is not None else None, **griegas,
+                        multiplicador=opcional(f.get("multiplicador"), "multiplicador", cero=False),
+                        spot=opcional(f.get("spot"), "spot", cero=False),
+                        moneda=(f.get("moneda") or "").strip().upper()[:8] or None))
             except (ValueError, TypeError) as e:
                 raise ValueError(f"fila {i}: {e}") from None
     except UnicodeError:

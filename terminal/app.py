@@ -630,6 +630,15 @@ def get_plan_accion(con=Depends(con_db)):
     return plan
 
 
+@app.get("/api/plan-intradia")
+def get_plan_intradia(perdida_dia_mxn: float | None = None, con=Depends(con_db)):
+    """Plan intradía defensivo e INFORMATIVO, separado del plan de acción: sin órdenes ni cambios en la cartera."""
+    from . import plan_intradia
+    if perdida_dia_mxn is not None and not (0 <= perdida_dia_mxn <= 1e10):
+        raise HTTPException(422, "perdida_dia_mxn: número entre 0 y 10 000 millones (pérdida positiva)")
+    return plan_intradia.calcular(con, AJUSTES, perdida_dia_mxn)
+
+
 @app.get("/api/portal/captura")
 def get_captura_portal(con=Depends(con_db)):
     """Última captura del portal del Reto (la que el participante pegó), con sus cambios frente a la anterior."""
@@ -971,6 +980,12 @@ def flujo_optionflow(subyacente: str, vencimiento: str = "", tipo: str = "", str
         raise HTTPException(422, str(e)) from None
 
 
+@app.get("/api/flujo/gex")
+def flujo_gex(subyacente: str, con=Depends(con_db)):
+    from .flujo import servicio
+    return servicio.gex(con, AJUSTES, subyacente)
+
+
 @app.post("/api/flujo/actualizar")
 def flujo_actualizar(cuerpo: dict = Body(...), con=Depends(con_db)):
     from .flujo import servicio
@@ -1032,6 +1047,21 @@ async def flujo_importar_externo(archivo: UploadFile = File(...), simbolo: str =
     try:
         return externos.importar_velas_externas(con, contenido, simbolo.strip().upper(), mercado.strip(), intervalo,
                                                 fuente.strip(), licencia.strip(), zona.strip())
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/laboratorio/permutacion")
+def laboratorio_permutacion(cuerpo: dict = Body(...)):
+    """Prueba de permutación de signos por bloques del exceso medio neto (laboratorio.py). Solo cálculo: no guarda ni opera."""
+    from . import laboratorio
+    try:
+        if cuerpo.get("csv") is not None:
+            bench, ests = laboratorio.leer_csv(str(cuerpo["csv"]))
+        else:
+            bench, ests = cuerpo.get("benchmark"), cuerpo.get("estrategias")
+        return laboratorio.permutacion(bench, ests, cuerpo.get("bloque"), cuerpo.get("B", 5000), cuerpo.get("semilla", 12345),
+                                       cuerpo.get("alpha", 0.05), cuerpo.get("hipotesis_exploradas"))
     except ValueError as e:
         raise HTTPException(422, str(e)) from None
 

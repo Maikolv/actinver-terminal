@@ -19,6 +19,75 @@ def sma(valores: list[float], n: int = 20) -> list[float | None]:
     return out
 
 
+def ema(valores: list[float], n: int = 20) -> list[float | None]:
+    """EMA con semilla SMA de las primeras `n` observaciones (convención de TradingView); nula antes de tener `n` datos."""
+    out: list[float | None] = [None] * len(valores)
+    if n < 1 or len(valores) < n:
+        return out
+    a = 2 / (n + 1)
+    out[n - 1] = prev = sum(valores[:n]) / n
+    for i in range(n, len(valores)):
+        out[i] = prev = valores[i] * a + prev * (1 - a)
+    return out
+
+
+def macd(valores: list[float], rapida: int = 12, lenta: int = 26, senal: int = 9) -> dict[str, list[float | None]]:
+    """MACD = EMA rápida − EMA lenta; señal = EMA de la línea MACD (semilla SMA); histograma = MACD − señal.
+    La línea MACD empieza en la barra `lenta` − 1 y la señal `senal` − 1 barras después: sin relleno antes."""
+    er, el = ema(valores, rapida), ema(valores, lenta)
+    linea = [None if a is None or b is None else a - b for a, b in zip(er, el)]
+    ini = next((i for i, v in enumerate(linea) if v is not None), len(linea))
+    sen = [None] * ini + ema(linea[ini:], senal)
+    hist = [None if m is None or g is None else m - g for m, g in zip(linea, sen)]
+    return {"macd": linea, "senal": sen, "hist": hist}
+
+
+def estocastico(maximos: list[float], minimos: list[float], cierres: list[float], n: int = 14, suave: int = 3,
+                d: int = 3) -> dict[str, list[float | None]]:
+    """Estocástico lento: %K bruto sobre `n` barras, %K = SMA(`suave`) del bruto, %D = SMA(`d`) de %K.
+    Con rango máximo = mínimo el %K bruto no está definido (división entre cero): queda nulo, no 0 ni 50."""
+    t = len(cierres)
+    bruto: list[float | None] = [None] * t
+    for i in range(n - 1, t):
+        hh, ll = max(maximos[i - n + 1:i + 1]), min(minimos[i - n + 1:i + 1])
+        bruto[i] = (cierres[i] - ll) / (hh - ll) * 100 if hh > ll else None
+
+    def sma_nula(x, k):
+        return [None if i < k - 1 or any(v is None for v in x[i - k + 1:i + 1]) else sum(x[i - k + 1:i + 1]) / k
+                for i in range(len(x))]
+    k_ = sma_nula(bruto, suave)
+    return {"k": k_, "d": sma_nula(k_, d)}
+
+
+def sar_parabolico(maximos: list[float], minimos: list[float], cierres: list[float], paso: float = 0.02,
+                   maximo_af: float = 0.2) -> dict[str, list]:
+    """SAR parabólico de Wilder. Tendencia inicial según el cierre de la barra 1 frente al de la 0; el SAR de la barra 0
+    no existe (nulo). El SAR nunca entra en el rango de las dos barras previas; al cruzarlo se invierte hacia el EP previo."""
+    t = len(cierres)
+    sar: list[float | None] = [None] * t
+    alza: list[bool | None] = [None] * t
+    if t < 2:
+        return {"sar": sar, "alcista": alza}
+    sube = cierres[1] >= cierres[0]
+    s, ep, af = (minimos[0], maximos[0], paso) if sube else (maximos[0], minimos[0], paso)
+    for i in range(1, t):
+        s = s + af * (ep - s)
+        if sube:
+            s = min(s, minimos[i - 1], minimos[i - 2] if i >= 2 else minimos[i - 1])
+            if minimos[i] < s:
+                sube, s, ep, af = False, ep, minimos[i], paso
+            elif maximos[i] > ep:
+                ep, af = maximos[i], min(af + paso, maximo_af)
+        else:
+            s = max(s, maximos[i - 1], maximos[i - 2] if i >= 2 else maximos[i - 1])
+            if maximos[i] > s:
+                sube, s, ep, af = True, ep, maximos[i], paso
+            elif minimos[i] < ep:
+                ep, af = minimos[i], min(af + paso, maximo_af)
+        sar[i], alza[i] = s, sube
+    return {"sar": sar, "alcista": alza}
+
+
 def rsi_wilder(valores: list[float], n: int = 14) -> list[float | None]:
     """RSI de Wilder (media móvil suavizada), el mismo método que usa TradingView."""
     out: list[float | None] = [None] * len(valores)

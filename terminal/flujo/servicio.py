@@ -159,16 +159,23 @@ def velas(con, ajustes, simbolo: str, intervalo: str = "1Day", dias: int = 180) 
     bs = almacen.barras(con, simbolo, intervalo, desde, demo=ajustes.es_demo)
     cierres = [b["cierre"] for b in bs]
     bol = calculos.bollinger(cierres)
+    mx, mn = [b["maximo"] for b in bs], [b["minimo"] for b in bs]
+    m, est, sar = calculos.macd(cierres), calculos.estocastico(mx, mn, cierres), calculos.sar_parabolico(mx, mn, cierres)
     out = [{**{k: b[k] for k in ("inicio", "apertura", "maximo", "minimo", "cierre", "volumen", "vwap", "fuente", "feed",
                                 "calidad", "retraso_s", "capturado_en")},
-            "sma20": s, "rsi14": r, "boll_inf": bb[0] if bb else None, "boll_sup": bb[1] if bb else None, "vwap_anclado": v}
-           for b, s, r, bb, v in zip(bs, calculos.sma(cierres, 20), calculos.rsi_wilder(cierres, 14), bol,
-                                     calculos.vwap_anclado(bs))]
+            "sma20": s, "rsi14": r, "boll_inf": bb[0] if bb else None, "boll_sup": bb[1] if bb else None, "vwap_anclado": v,
+            "ema20": e1, "ema50": e2, "macd": m["macd"][i], "macd_senal": m["senal"][i], "macd_hist": m["hist"][i],
+            "estoc_k": est["k"][i], "estoc_d": est["d"][i], "sar": sar["sar"][i], "sar_alcista": sar["alcista"][i]}
+           for i, (b, s, r, bb, v, e1, e2) in enumerate(zip(bs, calculos.sma(cierres, 20), calculos.rsi_wilder(cierres, 14), bol,
+                                                         calculos.vwap_anclado(bs), calculos.ema(cierres, 20),
+                                                         calculos.ema(cierres, 50)))]
     return {"simbolo": simbolo, "intervalo": intervalo, "barras": out, "procedencia": _procedencia(bs),
             "zona_horaria": "Instantes en UTC; se muestran en America/Mexico_City",
             "vacio": None if out else SIN_FUENTE,
             "nota": "Velas solo con OHLCV real (proveedor o CSV). Los cierres diarios locales no se convierten en velas. "
-                    "SMA20, RSI14 (Wilder), Bollinger (20, 2) y VWAP anclado al inicio del rango son descriptivos."}
+                    "SMA20, EMA20/50, MACD (12, 26, 9), estocástico (14, 3, 3), SAR parabólico (0.02; 0.2), RSI14 (Wilder), "
+                    "Bollinger (20, 2) y VWAP anclado al inicio del rango son descriptivos; valen nulo durante su "
+                    "calentamiento (sin relleno)."}
 
 
 def orderflow(con, ajustes, simbolo: str, minutos: int = 240, niveles: int = 20) -> dict:
@@ -256,3 +263,11 @@ def heston(con, ajustes, subyacente: str) -> dict:
     f = con.execute("SELECT inicio FROM flujo_barras WHERE simbolo=? ORDER BY inicio DESC LIMIT 1", (subyacente,)).fetchone()
     return {**r, "subyacente": subyacente, "origen_tasa": origen_tasa,
             "origen_spot": f"último cierre guardado ({f[0][:10] if f else 'tabla de precios'}), USD de origen"}
+
+
+def gex(con, ajustes, subyacente: str) -> dict:
+    """GEX de la última cadena guardada. No usa `_spot` ni ninguna otra tabla: solo datos de la misma cadena."""
+    from . import gex as g
+    cadena = almacen.cadena(con, subyacente, demo=ajustes.es_demo)
+    return {"subyacente": subyacente, **g.calcular(cadena), "procedencia": _procedencia(cadena),
+            "nota": "Exposición gamma de contratos (opciones), no flujo de operaciones: no indica quién compró o vendió."}

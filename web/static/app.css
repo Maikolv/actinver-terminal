@@ -333,3 +333,10 @@ td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: a
 @media (max-width: 640px) { .perfil-fila { grid-template-columns: 1fr 1fr; } .perfil-fila .barra { grid-column: 1 / -1; } }
 .fila-peso { display: grid; grid-template-columns: minmax(80px, 160px) 60px; gap: 6px; align-items: center; }
 select[multiple] { min-width: 230px; }
+/* Accesos a análisis y navegación entre paneles relacionados */
+.accesos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.accesos .boton { flex: 1 1 150px; min-height: 44px; }
+.accesos--relacionados { margin: 0 0 10px; align-items: center; }
+.accesos--relacionados .boton { flex: 0 1 auto; }
+.celda-gex { display: inline-block; min-width: 3.6em; padding: 1px 4px; border-radius: 3px; text-align: right; }
+.area-csv { width: 100%; font-family: ui-monospace, Consolas, monospace; font-size: .85rem; box-sizing: border-box; }

@@ -38,12 +38,16 @@ def inicializar(con: sqlite3.Connection) -> None:
       id INTEGER PRIMARY KEY, contrato TEXT NOT NULL, subyacente TEXT NOT NULL, vencimiento TEXT NOT NULL,
       strike REAL NOT NULL, tipo TEXT NOT NULL CHECK (tipo IN ('call','put')), instante TEXT NOT NULL,
       bid REAL, ask REAL, ultimo REAL, volumen REAL, interes_abierto REAL, iv REAL, delta REAL, gamma REAL, theta REAL,
-      vega REAL, origen_iv TEXT, {PROC}, UNIQUE (contrato, fuente, instante));
+      vega REAL, origen_iv TEXT, multiplicador REAL, spot REAL, moneda TEXT, {PROC}, UNIQUE (contrato, fuente, instante));
     CREATE INDEX IF NOT EXISTS ix_flujo_opciones ON flujo_opciones (subyacente, vencimiento, strike);
     CREATE TABLE IF NOT EXISTS flujo_consultas (
       clave TEXT PRIMARY KEY, intento_en TEXT NOT NULL, estado TEXT NOT NULL, registros INTEGER NOT NULL DEFAULT 0,
       mensaje TEXT NOT NULL DEFAULT '');
     """)
+    columnas = {r[1] for r in con.execute("PRAGMA table_info(flujo_opciones)")}  # bases anteriores a GEX
+    for c, t in (("multiplicador", "REAL"), ("spot", "REAL"), ("moneda", "TEXT")):
+        if c not in columnas:
+            con.execute(f"ALTER TABLE flujo_opciones ADD COLUMN {c} {t}")
 
 
 def _p(p: Procedencia) -> tuple:
@@ -84,10 +88,11 @@ def guardar_operaciones(con, ops: list[Operacion], p: Procedencia) -> int:
 
 def guardar_opciones(con, contratos: list[ContratoOpcion], p: Procedencia) -> int:
     con.executemany(f"INSERT OR REPLACE INTO flujo_opciones (contrato, subyacente, vencimiento, strike, tipo, instante, bid, "
-                    f"ask, ultimo, volumen, interes_abierto, iv, delta, gamma, theta, vega, origen_iv, {COLS_P}) "
-                    f"VALUES ({','.join('?' * 26)})",
+                    f"ask, ultimo, volumen, interes_abierto, iv, delta, gamma, theta, vega, origen_iv, multiplicador, spot, "
+                    f"moneda, {COLS_P}) VALUES ({','.join('?' * 29)})",
                     [(c.contrato, c.subyacente, c.vencimiento, c.strike, c.tipo, c.instante, c.bid, c.ask, c.ultimo,
-                      c.volumen, c.interes_abierto, c.iv, c.delta, c.gamma, c.theta, c.vega, c.origen_iv, *_p(p))
+                      c.volumen, c.interes_abierto, c.iv, c.delta, c.gamma, c.theta, c.vega, c.origen_iv, c.multiplicador,
+                      c.spot, c.moneda, *_p(p))
                      for c in contratos])
     return len(contratos)
 

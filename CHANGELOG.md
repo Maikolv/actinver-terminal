@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-16 — indicadores, GEX, permutaciones e intradía]
+
+### Agregado
+- Indicadores EMA 20/50, MACD 12/26/9, estocástico 14/3/3 y SAR parabólico en `/api/flujo/velas` y en Velas (paneles separados), con nulos en el calentamiento.
+- Accesos prominentes a Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio, y enlaces entre análisis.
+- GEX por strike y vencimiento (`/api/flujo/gex`) solo con gamma, interés abierto, multiplicador y spot de la misma cadena; vista de disponibilidad cuando faltan. Columnas opcionales `multiplicador, spot, moneda` en la importación de opciones.
+- Laboratorio de alfa: permutación de signos por bloques con Holm (`/api/laboratorio/permutacion`).
+- Plan intradía defensivo e informativo (`/api/plan-intradia`), sin órdenes.
+- `docs/mejoras-intradia-permutaciones.md` y `tests/test_mejoras_intradia.py`.
+
 ## [0.30.0] — 2026-10-12 (etapa 3: riesgo, seguimiento y backtesting reproducible)
 
 ### Agregado

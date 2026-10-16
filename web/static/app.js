@@ -1746,7 +1746,7 @@ document.getElementById("form-opciones").addEventListener("submit", async (ev) =
 });
 
 /* ---------- Velas, Order Flow y Option Flow (terminal/flujo): solo datos reales o importados ---------- */
-const flujo = { estado: null, velas: { simbolo: "", intervalo: "1Day", dias: 180, sma: true, boll: false, vwap: false },
+const flujo = { estado: null, velas: { simbolo: "", intervalo: "1Day", dias: 180, sma: true, boll: false, vwap: false, ema20: false, ema50: false, sar: false, macd: false, estoc: false },
   of: { simbolo: "", minutos: 240, niveles: 20 }, op: { subyacente: "", filtros: {} } };
 const fmtHora = new Intl.DateTimeFormat("es-MX", { timeZone: "America/Mexico_City", dateStyle: "short", timeStyle: "medium" });
 const horaCdmx = (iso) => { if (!iso) return "—"; const d = new Date(iso); return Number.isNaN(d.getTime()) ? iso : `${fmtHora.format(d)} CDMX`; };
@@ -1823,6 +1823,7 @@ function graficaVelas(barras, op, intervalo) {
   const n = barras.length;
   const extra = [];
   if (op.boll) barras.forEach((b) => { if (b.boll_inf != null) extra.push(b.boll_inf, b.boll_sup); });
+  ["ema20", "ema50", "sar"].forEach((k) => { if (op[k]) barras.forEach((b) => { if (b[k] != null) extra.push(b[k]); }); });
   let min = Math.min(...barras.map((b) => b.minimo), ...extra), max = Math.max(...barras.map((b) => b.maximo), ...extra);
   if (min === max) { min -= 1; max += 1; }
   const paso = (ancho - m.i - m.d) / n, cuerpo = Math.max(1, paso * 0.65);
@@ -1860,29 +1861,79 @@ function graficaVelas(barras, op, intervalo) {
   if (op.sma) linea("sma20", "var(--retrasado)");
   if (op.boll) { linea("boll_inf", "var(--serie-2)", true); linea("boll_sup", "var(--serie-2)", true); }
   if (op.vwap) linea("vwap_anclado", "var(--sintetico)");
+  if (op.ema20) linea("ema20", "var(--acento)");
+  if (op.ema50) linea("ema50", "var(--texto-2)", true);
+  if (op.sar) barras.forEach((b, i) => { if (b.sar != null) svg.append(s("circle", { cx: X(i), cy: Y(b.sar), r: 2.2, fill: b.sar_alcista ? "var(--vela-sube)" : "var(--vela-baja)" },
+    s("title", {}, `SAR ${num(b.sar)} · ${b.sar_alcista ? "tendencia alcista (punto bajo el precio)" : "tendencia bajista (punto sobre el precio)"}`))); });
   svg.append(s("text", { x: m.i, y: alto + 14 }, "Volumen"));
   [0, Math.floor(n / 2), n - 1].forEach((i, j) => svg.append(s("text", { x: X(i), y: alto - 4, "text-anchor": ["start", "middle", "end"][j] },
     etiquetaBarra(barras[i].inicio, intervalo).replace("sesión ", "").replace(" CDMX", ""))));
   const leyenda = muestraLeyenda([["var(--vela-sube)", "Sube (cuerpo hueco)"], ["var(--vela-baja)", "Baja (cuerpo lleno)"],
     op.sma ? ["var(--retrasado)", "SMA 20"] : null, op.boll ? ["var(--serie-2)", "Bollinger 20, 2σ"] : null,
-    op.vwap ? ["var(--sintetico)", "VWAP anclado al inicio del rango"] : null].filter(Boolean));
+    op.vwap ? ["var(--sintetico)", "VWAP anclado al inicio del rango"] : null, op.ema20 ? ["var(--acento)", "EMA 20"] : null,
+    op.ema50 ? ["var(--texto-2)", "EMA 50 (guiones)"] : null, op.sar ? ["var(--vela-sube)", "SAR 0.02 / 0.2 (puntos)"] : null].filter(Boolean));
   // eje ordenable: fecha de sesión (diario) o instante UTC (intradía)
   const rsi = barras.map((b) => ({ x: intervalo === "1Day" ? fmtSesion.format(new Date(b.inicio)) : `${String(b.inicio).slice(0, 16).replace("T", " ")} UTC`, y: b.rsi14 }));
   return h("figure", {}, svg, leyenda,
-    rsi.some((p) => p.y != null) ? grafica([{ nombre: "RSI 14 (Wilder)", color: "var(--acento)", datos: rsi }], { alto: 140, formato: num, etiqueta: "RSI de 14 periodos" }) : null);
+    rsi.some((p) => p.y != null) ? grafica([{ nombre: "RSI 14 (Wilder)", color: "var(--acento)", datos: rsi }], { alto: 140, formato: num, etiqueta: "RSI de 14 periodos" }) : null,
+    op.macd ? panelIndicador(barras, intervalo, { titulo: "MACD 12/26/9", lineas: [{ campo: "macd", color: "var(--acento)", nombre: "MACD" }, { campo: "macd_senal", color: "var(--retrasado)", nombre: "Señal" }],
+      hist: "macd_hist", cero: true }) : null,
+    op.estoc ? panelIndicador(barras, intervalo, { titulo: "Estocástico 14/3/3", lineas: [{ campo: "estoc_k", color: "var(--acento)", nombre: "%K (lento)" }, { campo: "estoc_d", color: "var(--retrasado)", nombre: "%D" }],
+      fijo: [0, 100], niveles: [20, 80] }) : null);
+}
+
+/* Panel inferior alineado con las velas (mismo eje X): líneas, histograma opcional y eje propio. Los nulos del calentamiento
+   quedan sin dibujar: no se rellenan ni se unen. */
+function panelIndicador(barras, intervalo, { titulo, lineas, hist, fijo, niveles = [], cero = false }) {
+  const ancho = 760, alto = 150, m = { i: 64, d: 12, s: 10, inf: 22 };
+  const campos = [...lineas.map((l) => l.campo), hist].filter(Boolean);
+  const vals = barras.flatMap((b) => campos.map((c) => b[c]).filter((v) => v != null));
+  if (!vals.length) return h("p", { clase: "ayuda", texto: `${titulo}: sin datos suficientes (calentamiento incompleto o rango plano); no se rellena.` });
+  let min = fijo ? fijo[0] : Math.min(...vals, cero ? 0 : Infinity), max = fijo ? fijo[1] : Math.max(...vals, cero ? 0 : -Infinity);
+  if (min === max) { min -= 1; max += 1; }
+  const n = barras.length, paso = (ancho - m.i - m.d) / n;
+  const X = (i) => m.i + paso * (i + 0.5), Y = (y) => m.s + (1 - (y - min) / (max - min)) * (alto - m.s - m.inf);
+  const svg = s("svg", { viewBox: `0 0 ${ancho} ${alto}`, class: "grafica", role: "img", "aria-label": `${titulo}; ${vals.length} valores calculados, el detalle numérico está en la tabla de velas` });
+  for (let k = 0; k <= 3; k++) {
+    const y = min + ((max - min) * k) / 3;
+    svg.append(s("line", { x1: m.i, x2: ancho - m.d, y1: Y(y), y2: Y(y), stroke: "var(--borde)", "stroke-width": 1 }));
+    svg.append(s("text", { x: m.i - 6, y: Y(y) + 4, "text-anchor": "end" }, num(y)));
+  }
+  niveles.forEach((y) => { svg.append(s("line", { x1: m.i, x2: ancho - m.d, y1: Y(y), y2: Y(y), stroke: "var(--texto-2)", "stroke-width": 1, "stroke-dasharray": "3 3" })); });
+  if (min < 0 && max > 0) svg.append(s("line", { x1: m.i, x2: ancho - m.d, y1: Y(0), y2: Y(0), stroke: "var(--texto-2)", "stroke-width": 1 }));
+  if (hist) barras.forEach((b, i) => {
+    const v = b[hist];
+    if (v == null) return;
+    const y0 = Y(Math.max(min, Math.min(0, max)));
+    svg.append(s("rect", { x: X(i) - Math.max(1, paso * 0.6) / 2, y: Math.min(Y(v), y0), width: Math.max(1, paso * 0.6), height: Math.max(0.5, Math.abs(Y(v) - y0)),
+      fill: v >= 0 ? "var(--vela-sube)" : "var(--vela-baja)", opacity: 0.45 }, s("title", {}, `Histograma ${num(v)}`)));
+  });
+  lineas.forEach((l) => {
+    let d = "", previo = false;
+    barras.forEach((b, i) => { const v = b[l.campo]; if (v == null) { previo = false; return; } d += `${previo ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; previo = true; });
+    if (d) svg.append(s("path", { d, fill: "none", stroke: l.color, "stroke-width": 1.6 }));
+  });
+  [0, Math.floor(n / 2), n - 1].forEach((i, j) => svg.append(s("text", { x: X(i), y: alto - 6, "text-anchor": ["start", "middle", "end"][j] },
+    etiquetaBarra(barras[i].inicio, intervalo).replace("sesión ", "").replace(" CDMX", ""))));
+  return h("figure", {}, h("figcaption", { clase: "ayuda", texto: titulo }), svg,
+    muestraLeyenda([...lineas.map((l) => [l.color, l.nombre]), hist ? ["var(--vela-sube)", "Histograma (azul ≥ 0, naranja < 0)"] : null].filter(Boolean)));
 }
 
 const fmtSesion = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" });
 /* Barra diaria: fecha de la sesión (el proveedor marca su inicio a medianoche de Nueva York); intradía: hora CDMX. */
 const etiquetaBarra = (iso, intervalo) => (intervalo === "1Day" ? `sesión ${fmtSesion.format(new Date(iso))}` : horaCdmx(iso));
 const NOMBRE_INTERVALO = { "1Min": "1 minuto", "5Min": "5 minutos", "15Min": "15 minutos", "1Hour": "1 hora", "1Day": "1 día" };
+let cargaVelasId = 0;
 async function cargarVelas() {
+  const solicitud = ++cargaVelasId;
   try {
     await estadoFlujo();
+    if (solicitud !== cargaVelasId) return;
     const v = flujo.velas;
     const botonAct = h("button", { type: "button", clase: "boton boton--primario", texto: "Actualizar desde proveedor" });
     botonAct.addEventListener("click", async () => { if (await pedirActualizacion("velas", v.simbolo, { intervalo: v.intervalo, dias: v.dias }, botonAct)) cargarVelas(); });
-    const casillas = [["sma", "SMA 20"], ["boll", "Bollinger"], ["vwap", "VWAP"]].map(([k, t]) => {
+    const casillas = [["sma", "SMA 20"], ["ema20", "EMA 20"], ["ema50", "EMA 50"], ["sar", "SAR parabólico"], ["boll", "Bollinger"], ["vwap", "VWAP"],
+      ["macd", "Panel MACD"], ["estoc", "Panel estocástico"]].map(([k, t]) => {
       const c = h("input", { type: "checkbox" }); c.checked = v[k];
       c.addEventListener("change", () => { v[k] = c.checked; cargarVelas(); });
       return h("label", {}, c, ` ${t}`);
@@ -1897,6 +1948,7 @@ async function cargarVelas() {
       return;
     }
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
+    if (solicitud !== cargaVelasId) return;
     const ult = d.barras.slice(-12).reverse();
     limpiar("velas-contenido", controles,
       d.barras.length ? h("div", {},
@@ -1905,11 +1957,16 @@ async function cargarVelas() {
         tabla([{ t: v.intervalo === "1Day" ? "Sesión (Nueva York)" : "Inicio (CDMX)", f: (b) => etiquetaBarra(b.inicio, v.intervalo).replace("sesión ", "") }, { t: "Apertura", f: (b) => num(b.apertura), num: true },
           { t: "Máximo", f: (b) => num(b.maximo), num: true }, { t: "Mínimo", f: (b) => num(b.minimo), num: true },
           { t: "Cierre", f: (b) => num(b.cierre), num: true }, { t: "Volumen", f: (b) => num(b.volumen), num: true },
-          { t: "RSI 14", f: (b) => num(b.rsi14), num: true }, { t: "Calidad", f: (b) => chipCalidad(b.calidad) }], ult,
+          { t: "RSI 14", f: (b) => num(b.rsi14), num: true },
+          ...(v.ema20 ? [{ t: "EMA 20", f: (b) => num(b.ema20), num: true }] : []), ...(v.ema50 ? [{ t: "EMA 50", f: (b) => num(b.ema50), num: true }] : []),
+          ...(v.sar ? [{ t: "SAR", f: (b) => (b.sar == null ? "—" : `${num(b.sar)} ${b.sar_alcista ? "▲" : "▼"}`), num: true }] : []),
+          ...(v.macd ? [{ t: "MACD", f: (b) => num(b.macd), num: true }, { t: "Señal", f: (b) => num(b.macd_senal), num: true }, { t: "Hist.", f: (b) => num(b.macd_hist), num: true }] : []),
+          ...(v.estoc ? [{ t: "%K", f: (b) => num(b.estoc_k), num: true }, { t: "%D", f: (b) => num(b.estoc_d), num: true }] : []),
+          { t: "Calidad", f: (b) => chipCalidad(b.calidad) }], ult,
         { caption: "Últimas 12 barras (alternativa accesible a la gráfica)" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio }),
       formImportar("velas", cargarVelas), formImportarExterno(v.simbolo, cargarVelas));
-  } catch (e) { limpiar("velas-contenido", errorCaja(e)); }
+  } catch (e) { if (solicitud === cargaVelasId) limpiar("velas-contenido", errorCaja(e)); }
 }
 
 /* Order Flow: libro, profundidad, cinta, delta y perfil de volumen. */
@@ -2104,7 +2161,10 @@ async function cargarOptionFlow() {
           { t: "", f: (c) => usarEnModelo(c) }], d.contratos.slice(0, 400),
         { caption: d.contratos.length > 400 ? "Primeros 400 contratos: use los filtros para acotar." : "Cadena filtrada" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio }),
+      h("h2", { texto: "GEX: exposición gamma por strike y vencimiento" }),
+      h("div", { id: "gex-contenido", "aria-live": "polite" }, h("p", { clase: "ayuda", texto: "Calculando disponibilidad…" })),
       formImportar("opciones", cargarOptionFlow));
+    cargarGex(o.subyacente);
   } catch (e) { limpiar("optionflow-contenido", errorCaja(e)); }
 }
 
@@ -2371,3 +2431,166 @@ CARGAS["tab-riesgo"] = () => cargarRiesgo();
 CARGAS["tab-seguimiento"] = () => cargarSeguimiento();
 CARGAS["tab-backtesting"] = () => cargarBacktesting();
 Object.assign(ATAJOS, { RIE: "tab-riesgo", SEG: "tab-seguimiento", BT: "tab-backtesting" });
+
+
+/* ---------- Accesos y navegación orgánica entre análisis ---------- */
+function compartirSimbolo(origen, destino) {
+  const sym = { "panel-velas": flujo.velas.simbolo, "panel-orderflow": flujo.of.simbolo, "panel-optionflow": flujo.op.subyacente }[origen];
+  if (!sym) return;
+  if (destino === "tab-velas") flujo.velas.simbolo = sym;
+  if (destino === "tab-orderflow") flujo.of.simbolo = sym;
+  if (destino === "tab-optionflow" && !sym.includes("/")) flujo.op.subyacente = sym; // las opciones solo existen para el SIC
+}
+document.addEventListener("click", (ev) => {
+  const b = ev.target.closest("[data-ir]");
+  if (!b) return;
+  const panel = b.closest('[role="tabpanel"]');
+  compartirSimbolo(panel && panel.id, b.dataset.ir);
+  irA(b.dataset.ir);
+});
+
+/* ---------- GEX (terminal/flujo/gex.py): mapa de calor por strike y vencimiento ---------- */
+const gexUI = { vista: "absoluta" };
+const fmtCompacto = new Intl.NumberFormat("es-MX", { notation: "compact", maximumFractionDigits: 1 });
+async function cargarGex(subyacente) {
+  const cont = document.getElementById("gex-contenido");
+  if (!cont) return;
+  try { cont.replaceChildren(pintarGex(await api(`/api/flujo/gex?subyacente=${encodeURIComponent(subyacente)}`))); }
+  catch (e) { cont.replaceChildren(errorCaja(e)); }
+}
+function pintarGex(d) {
+  const encabezado = h("p", { clase: "ayuda", texto: `${d.formula}. ${d.nota}` });
+  if (!d.disponible) {
+    const desc = Object.entries(d.descartados || {}).map(([k, v]) => `${v} ${k}`).join("; ");
+    return h("div", {}, encabezado,
+      h("div", { clase: "aviso-caja", role: "status" }, h("strong", { texto: "GEX no disponible. " }), `${d.motivo}${desc && !d.motivo.includes(desc) ? ` Descartados: ${desc}.` : ""}`),
+      h("p", { clase: "ayuda", texto: `Qué se necesita: ${d.requisito}` }), h("p", { clase: "ayuda", texto: d.convencion }));
+  }
+  const cont = h("div", {});
+  const dibujar = () => {
+    const firmada = gexUI.vista === "firmada";
+    const valor = (z) => (firmada ? z.firmada : z.absoluta);
+    let strikes = d.strikes;
+    if (strikes.length > 24) strikes = [...strikes].sort((a, b) => Math.abs(a - d.spot) - Math.abs(b - d.spot)).slice(0, 24).sort((a, b) => a - b);
+    const mapa = new Map(d.celdas.map((z) => [`${z.vencimiento}|${z.strike}`, z]));
+    const mx = Math.max(...d.celdas.map((z) => Math.abs(valor(z))), 1e-12);
+    const cols = [{ t: "Vencimiento", f: (v) => v }, ...strikes.map((k) => ({ t: num(k), num: true, f: (v) => {
+      const z = mapa.get(`${v}|${k}`);
+      if (!z) return "—";
+      const x = valor(z), marca = h("span", { clase: "celda-gex", texto: fmtCompacto.format(x),
+        title: `Strike ${num(k)} · ${v}: calls ${fmtCompacto.format(z.calls)}, puts ${fmtCompacto.format(z.puts)} ${d.moneda} por 1 %; ${z.n} contrato(s)` });
+      const color = firmada && x < 0 ? "var(--vela-baja)" : firmada ? "var(--vela-sube)" : "var(--serie-2)";
+      marca.style.backgroundColor = `color-mix(in srgb, ${color} ${Math.round(12 + 70 * Math.abs(x) / mx)}%, transparent)`;
+      return marca;
+    } }))];
+    cont.replaceChildren(...[
+      h("div", { clase: "fila-controles" }, selectorSimple(gexUI.vista, [["absoluta", "Exposición absoluta (calls + puts)"], ["firmada", "Estimación firmada (convención)"]], (x) => { gexUI.vista = x; dibujar(); }, "Vista")),
+      d.aviso ? h("div", { clase: "aviso-caja", role: "status", texto: d.aviso }) : null,
+      firmada ? h("div", { clase: "aviso-caja", role: "note", texto: d.convencion }) : h("p", { clase: "ayuda", texto: "Absoluta: cuánta gamma hay abierta, sin signo ni dirección. Cambie a «firmada» para ver la convención calls + / puts −." }),
+      h("div", { clase: "kpis" }, kpi("Spot de la referencia", `${num(d.spot)} ${d.moneda}`), kpi("Instante de la cadena", horaCdmx(d.instante)),
+        kpi(firmada ? "Total firmado (convención)" : "Total absoluto", `${fmtCompacto.format(firmada ? d.totales.firmada : d.totales.absoluta)} ${d.moneda}/1 %`),
+        kpi("Contratos usados", `${d.contratos_usados} de ${d.total}`)),
+      cajaProcedencia(d.procedencia),
+      tabla(cols, d.vencimientos, { caption: `${firmada ? "GEX firmado (convención)" : "GEX absoluto"} por vencimiento y strike, ${d.moneda} por movimiento de 1 % del subyacente${d.strikes.length > 24 ? " (24 strikes más cercanos al spot)" : ""}` }),].filter(Boolean));
+  };
+  dibujar();
+  return h("div", {}, encabezado, cont);
+}
+
+/* ---------- Laboratorio de alfa: permutación de signos por bloques ---------- */
+const lab = { ejemplo: null };
+function ejemploSintetico() {  // datos INVENTADOS con semilla fija (mulberry32 + Box-Muller); no son rendimientos de nadie
+  let a = 20261016;
+  const u = () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const z = () => Math.sqrt(-2 * Math.log(u() || 1e-12)) * Math.cos(2 * Math.PI * u());
+  const filas = ["benchmark,estrategia_sin_exceso_sintetica,estrategia_con_exceso_sintetica"];
+  for (let i = 0; i < 160; i++) {
+    const b = 0.0004 + 0.01 * z();
+    filas.push([b, b + 0.006 * z(), b + 0.0012 + 0.006 * z()].map((x) => x.toFixed(6)).join(","));
+  }
+  return filas.join("\n");
+}
+function cargarLaboratorio() {
+  const ta = h("textarea", { rows: 9, spellcheck: "false", "aria-label": "Rendimientos netos emparejados en CSV", clase: "area-csv", placeholder: "benchmark,mi_estrategia\n0.0042,0.0051\n-0.0031,-0.0012" });
+  ta.value = lab.ejemplo || "";
+  const archivo = h("input", { type: "file", accept: ".csv,text/csv", "aria-label": "Archivo CSV de rendimientos" });
+  archivo.addEventListener("change", async () => { if (archivo.files[0]) { ta.value = await archivo.files[0].text(); lab.ejemplo = null; } });
+  const campo = (etq, nombre, valor, extra = {}) => h("label", {}, `${etq} `, h("input", { type: "number", name: nombre, value: valor, step: "any", ...extra }));
+  const salida = h("div", { "aria-live": "polite" });
+  const ejemplo = botonAccion("Cargar ejemplo SINTÉTICO", "boton--secundario", () => { lab.ejemplo = ejemploSintetico(); ta.value = lab.ejemplo; salida.replaceChildren(); });
+  const form = h("form", { clase: "tarjeta" },
+    h("p", { clase: "ayuda", texto: "Pegue o cargue un CSV con encabezado: una columna «benchmark» (o «referencia»), una o más columnas de estrategia y, opcionalmente, «fecha». Rendimientos simples NETOS de costos, en decimal (0.01 = 1 %), emparejados por fecha. Máx. 5 000 filas y 20 estrategias." }),
+    h("div", { clase: "fila-controles" }, archivo, ejemplo), ta,
+    h("div", { clase: "fila-controles" }, campo("Bloque (vacío = automático)", "bloque", "", { min: 1, step: 1 }), campo("Volteos B", "B", 5000, { min: 199, max: 20000, step: 1 }),
+      campo("Semilla", "semilla", 12345, { min: 0, step: 1 }), campo("Nivel α", "alpha", 0.05, { min: 0.001, max: 0.49 }),
+      campo("Hipótesis exploradas (≥ estrategias)", "exploradas", "", { min: 1, step: 1 })),
+    h("button", { type: "submit", clase: "boton boton--primario", texto: "Ejecutar prueba" }));
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const boton = form.querySelector('button[type="submit"]'), f = form.elements;
+    ocupado([boton], true);
+    try {
+      const r = await api("/api/laboratorio/permutacion", { method: "POST", json: { csv: ta.value, bloque: f.bloque.value || null, B: Number(f.B.value), semilla: Number(f.semilla.value),
+        alpha: Number(f.alpha.value), hipotesis_exploradas: f.exploradas.value || null } });
+      salida.replaceChildren(pintarPermutacion(r, lab.ejemplo !== null && ta.value === lab.ejemplo));
+    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([boton], false); }
+  });
+  limpiar("laboratorio-contenido", h("div", { clase: "aviso-caja", role: "note", texto: "Preregistre hipótesis y variantes antes de mirar resultados; valide con walk-forward con purga/embargo y un holdout; use solo rendimientos netos de costos. Un p < 0.05 aislado no es alfa probado." }), form, salida);
+}
+function pintarPermutacion(r, sintetico) {
+  return h("div", { clase: "tarjeta" },
+    sintetico ? h("p", {}, chip("sintetico", "DATOS SINTÉTICOS"), " Ejemplo inventado para ver cómo funciona la prueba; no son rendimientos reales de ninguna estrategia.") : null,
+    h("h2", { texto: "Resultado" }),
+    h("p", { clase: "ayuda", texto: `${r.hipotesis}. Estadístico: ${r.estadistico}. Método: ${r.metodo}.` }),
+    h("div", { clase: "kpis" }, kpi("Observaciones", String(r.n)), kpi("Bloque / bloques", `${r.bloque} / ${r.bloques}`), kpi("Volteos B", String(r.B)),
+      kpi("Semilla", String(r.semilla)), kpi("p mínimo posible", num(r.p_minimo)), kpi("Familia (Holm)", `${r.familia} → ${r.familia_total_holm}`)),
+    tabla([{ t: "Estrategia", f: (x) => x.estrategia }, { t: "Exceso medio por periodo", f: (x) => `${(x.exceso_medio * 100).toFixed(3)} %`, num: true },
+      { t: "p", f: (x) => num(x.p), num: true }, { t: "p Holm", f: (x) => num(x.p_holm), num: true },
+      { t: `Holm ≤ ${num(r.alpha)}`, f: (x) => (x.supera_alpha_holm ? "Sí" : "No") }, { t: "Lectura", f: (x) => x.lectura }], r.resultados, { caption: "Hipótesis unilateral: exceso medio neto > 0" }),
+    h("h3", { texto: "Advertencias y supuestos" }), h("ul", {}, r.advertencias.map((a) => h("li", { texto: a }))),
+    h("p", { clase: "ayuda", texto: `Huella sha256 de entradas y parámetros (reproducibilidad): ${r.huella_sha256}` }));
+}
+
+/* ---------- Plan intradía defensivo (informativo) ---------- */
+const intradia = { perdida: "" };
+async function cargarIntradia() {
+  try {
+    const q = intradia.perdida !== "" ? `?perdida_dia_mxn=${encodeURIComponent(intradia.perdida)}` : "";
+    const d = await api(`/api/plan-intradia${q}`);
+    const entrada = h("input", { type: "number", min: 0, step: "any", value: intradia.perdida, "aria-label": "Pérdida del día en pesos (positiva)" });
+    const boton = botonAccion("Evaluar pausa", "boton--secundario", () => { intradia.perdida = entrada.value; cargarIntradia(); });
+    const P = d.presupuesto_perdida, C = d.concentracion;
+    limpiar("intradia-contenido",
+      h("div", { clase: "aviso-caja", role: "note", texto: d.aviso }),
+      h("div", { clase: `tarjeta ${d.inhibida ? "" : "tarjeta--destacada"}` }, h("h2", { texto: "Señal ejecutable" }),
+        h("p", {}, chip(d.inhibida ? "retrasado" : "vigente", d.inhibida ? "INHIBIDA" : "Sin inhibiciones de datos"), " ", d.nota_senal),
+        d.motivos_inhibicion.length ? h("ul", {}, d.motivos_inhibicion.map((m) => h("li", { texto: m }))) : null),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Pausa y presupuesto de pérdida" }),
+        h("div", { clase: "fila-controles" }, h("label", {}, "Pérdida del día (MXN, positiva) ", entrada), boton),
+        h("p", {}, chip(d.pausa.activa ? "vencido" : "sin_datos", d.pausa.estado.replaceAll("_", " ")), " ", d.pausa.mensaje),
+        h("div", { clase: "kpis" }, kpi("Valor de la cartera", mxn(P.valor_cartera_mxn)), kpi(`Pérdida diaria máx. (${num(P.perdida_diaria_pct)} %)`, mxn(P.perdida_diaria_mxn)),
+          kpi(`Pérdida máx. por idea (${num(P.perdida_por_idea_pct)} %)`, mxn(P.perdida_por_idea_mxn))),
+        h("p", { clase: "ayuda", texto: `Umbrales de disciplina editables en [intradia] de la configuración (no son resultados de un modelo): ${Object.entries(d.parametros).map(([k, v]) => `${k} = ${v}`).join("; ")}.` })),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Concentración" }),
+        h("div", { clase: "kpis" }, kpi("Mayor posición", C.mayor ? `${C.mayor} · ${pct(C.peso_mayor)}` : "—"), kpi("Tope aplicable", pct(C.tope)), kpi("HHI", num(C.hhi))),
+        C.excede.length ? h("div", { clase: "aviso-caja", role: "status", texto: `Exceden el tope: ${C.excede.map(([k, w]) => `${k} ${pct(w)}`).join(", ")}.` }) : null),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "No promediar pérdidas" }), h("p", { texto: d.no_promediar.regla }),
+        tabla([{ t: "Instrumento", f: (x) => x.clave || x.instrumento_id }, { t: "No realizado", f: (x) => pct(x.no_realizado_pct), num: true }], d.no_promediar.posiciones_en_perdida, { vacio: "Ninguna posición en pérdida registrada." })),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Liquidez" }),
+        tabla([{ t: "Instrumento", f: (x) => x.instrumento_id }, { t: "Títulos", f: (x) => num(x.titulos), num: true },
+          { t: "% del volumen diario", f: (x) => (x.pct_del_volumen == null ? "—" : `${num(x.pct_del_volumen)} %`), num: true },
+          { t: "Estado", f: (x) => chip(x.estado === "ok" ? "vigente" : x.estado === "alerta" ? "vencido" : "sin_datos", x.estado === "sin_datos" ? "Sin datos" : x.estado === "ok" ? "Dentro del límite" : "Supera el límite") },
+          { t: "Nota", f: (x) => x.nota }], d.liquidez, { vacio: "Sin posiciones." })),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Costos del Reto" }),
+        h("div", { clase: "kpis" }, kpi("Por operación (comisión + IVA)", d.costos.por_operacion_pct == null ? "—" : pct(d.costos.por_operacion_pct)),
+          kpi("Ida y vuelta", d.costos.ida_y_vuelta_pct == null ? "—" : pct(d.costos.ida_y_vuelta_pct))), h("p", { clase: "ayuda", texto: d.costos.nota })),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Datos intradía por posición" }),
+        tabla([{ t: "Instrumento", f: (x) => x.instrumento_id }, { t: "Tipo", f: (x) => x.tipo }, { t: "Apto", f: (x) => chip(x.apto ? "vigente" : "retrasado", x.apto ? "Apto" : "Inhibe") }, { t: "Motivo", f: (x) => x.motivo }], d.datos, { vacio: "Sin posiciones." })),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Disponibilidad" }),
+        tabla([{ t: "Dato", f: (x) => x.dato }, { t: "Estado", f: (x) => chip(x.estado === "ok" ? "vigente" : "retrasado", x.estado === "ok" ? "Disponible" : "Falta") }, { t: "Qué se necesita", f: (x) => x.requiere }], d.disponibilidad)),
+      h("div", { clase: "tarjeta" }, h("h2", { texto: "Reglas" }), h("ul", {}, d.reglas.map((r) => h("li", { texto: r })))));
+  } catch (e) { limpiar("intradia-contenido", errorCaja(e)); }
+}
+CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
+CARGAS["tab-intradia"] = () => cargarIntradia();
+Object.assign(ATAJOS, { LAB: "tab-laboratorio", INT: "tab-intradia", GEX: "tab-optionflow" });
