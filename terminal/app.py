@@ -630,6 +630,12 @@ def get_plan_accion(con=Depends(con_db)):
     return plan
 
 
+@app.get("/api/aprendizaje")
+def get_aprendizaje():
+    from . import aprendizaje
+    return aprendizaje.catalogo(AJUSTES.es_demo)
+
+
 @app.get("/api/plan-intradia")
 def get_plan_intradia(perdida_dia_mxn: float | None = None, con=Depends(con_db)):
     """Plan intradía defensivo e INFORMATIVO, separado del plan de acción: sin órdenes ni cambios en la cartera."""

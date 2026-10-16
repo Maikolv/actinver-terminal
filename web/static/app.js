@@ -2034,6 +2034,7 @@ async function cargarOrderFlow() {
           { t: "Ask", f: (f) => num(f.a?.precio), num: true }, { t: "Ask tamaño", f: (f) => num(f.a?.tamano), num: true }],
         filasLibro, { caption: "Libro de órdenes por nivel" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio_libro }),
+      pintarMicroestructura(d),
       h("h2", { texto: "Cinta de operaciones" }),
       d.operaciones.length ? h("div", {}, cajaProcedencia(d.procedencia_operaciones),
         h("div", { clase: "kpis" }, kpi("Operaciones", num(R.n)), kpi("Volumen", num(R.volumen)),
@@ -2594,3 +2595,63 @@ async function cargarIntradia() {
 CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
 CARGAS["tab-intradia"] = () => cargarIntradia();
 Object.assign(ATAJOS, { LAB: "tab-laboratorio", INT: "tab-intradia", GEX: "tab-optionflow" });
+
+/* Recursos aportados: fórmulas verificadas y microestructura sin inventar datos. */
+async function cargarAprendizaje() {
+  try {
+    const d = await api('/api/aprendizaje');
+    const link = (titulo, url) => url ? h('a', {href:url, target:'_blank', rel:'noopener noreferrer', texto:titulo}) : h('span', {texto:titulo});
+    const c = d.captura_referencia;
+    limpiar('aprendizaje-contenido', h('p', {clase:'ayuda', texto:`Revisión ${d.revisado}. ${d.aviso}`}),
+      h('h2', {texto:'Indicadores — PDF de Ana Jiménez, Actinver Acelera Academy'}),
+      ...d.indicadores.map(i => h('article', {clase:'tarjeta'}, h('h3', {texto:i.titulo}), h('p', {}, h('code', {texto:i.formula})),
+        h('p', {texto:i.interpretacion}), h('p', {clase:'ayuda', texto:`Precisión: ${i.precision} Fuente: ${i.archivo}, página 1.`}))),
+      h('p', {}, h('button', {type:'button', clase:'boton', 'data-ir':'tab-velas', texto:'Practicar con las velas'})),
+      h('h2', {texto:'Capturas de la plataforma'}), ...d.capturas_plataforma.map(r => h('p', {texto:`${r.archivo}: ${r.observado} ${r.aplicacion}`})),
+      h('h2', {texto:'YouTube y documentación de Order Flow'}),
+      ...d.cursos.map(r => h('article', {clase:'tarjeta'}, h('h3', {}, link(r.titulo,r.url)), h('p', {texto:`${r.autor} · ${r.captura}. ${r.estado}`}),
+        h('p', {texto:r.conceptos.join(' · ')}), h('p', {texto:`Ejercicio: ${r.ejercicio}`}))),
+      h('h2', {texto:'Certificaciones de la infografía: condiciones verificadas'}),
+      h('p', {texto:'Las letras son el ranking subjetivo de la imagen; no una clasificación de calidad acreditada. No se contrata ni inscribe a ningún curso.'}),
+      tabla([{t:'Programa',f:r=>link(r.nombre,r.url)},{t:'Letra en imagen',f:r=>r.imagen},{t:'Verificación y límites',f:r=>r.estado}],d.certificaciones,{caption:'Acceso al contenido y certificado son condiciones distintas'}),
+      h('h2', {texto:'Captura de cotizaciones: referencia local'}),
+      c ? h('div', {}, h('p', {clase:'aviso-caja', texto:c.nota+' Fecha, moneda y mercado no confirmados. No se usa para valorar la cartera.'}),
+        tabla([{t:'Símbolo visible',f:r=>r.simbolo},{t:'Número de la captura (sin moneda confirmada)',f:r=>num(r.precio_captura),num:true}],c.filas,{caption:'Referencia aportada por el usuario; no son precios actuales ni posiciones confirmadas'}))
+        : h('p',{texto:'No hay captura local de cotizaciones; no se incorporaron números sin fecha a la base de precios.'}));
+  } catch(e) { limpiar('aprendizaje-contenido',errorCaja(e)); }
+}
+
+function pintarMicroestructura(d) {
+  const F=d.footprint, H=d.liquidez_historica;
+  const vista=h('div'), hist=h('div');
+  const modo=selectorSimple('bidask',[['bidask','Bid × Ask ejecutado'],['volumen','Volumen'],['delta','Delta']], valor=>dibujar(valor),'Lectura del footprint');
+  function dibujar(valor) {
+    const columnas=[{t:'Inicio UTC',f:r=>horaCdmx(r.inicio)},{t:'Fuente / feed',f:r=>`${r.fuente} / ${r.feed}`},{t:'Precio',f:r=>num(r.precio),num:true}];
+    if(valor==='bidask') columnas.push({t:'Bid · ventas agresoras',f:r=>num(r.bid),num:true},{t:'Ask · compras agresoras',f:r=>num(r.ask),num:true});
+    else columnas.push({t:valor==='delta'?'Delta':'Volumen',f:r=>num(r[valor]),num:true});
+    vista.replaceChildren(tabla(columnas,F.celdas,{caption:'Footprint por precio e intervalos de 5 minutos',vacio:'Sin operaciones guardadas para construir footprint.'}));
+    const campo=valor==='delta'?'delta':'volumen', valores=F.barras.map(b=>b[campo]).filter(x=>x!=null);
+    const max=Math.max(1,...valores.map(Math.abs)), ancho=740, alto=140, paso=700/Math.max(1,F.barras.length);
+    const svg=s('svg',{viewBox:`0 0 ${ancho} ${alto}`,class:'grafica',role:'img','aria-label':`Histograma de ${campo} por intervalo guardado`});
+    svg.append(s('line',{x1:20,x2:720,y1:70,y2:70,stroke:'var(--borde)'}));
+    F.barras.forEach((b,i)=>{const v=b[campo];if(v==null)return;const altura=Math.abs(v)/max*60;
+      svg.append(s('rect',{x:20+i*paso,y:v>=0?70-altura:70,width:Math.max(.5,paso-2),height:altura,fill:v>=0?'var(--serie-2)':'var(--vencido)'},
+        s('title',{},`${b.inicio} · ${b.fuente}/${b.feed}: ${campo} ${num(v)}`)));});
+    hist.replaceChildren(F.barras.length?svg:h('p',{texto:'Sin intervalos para el histograma.'}),
+      tabla([{t:'Intervalo',f:r=>horaCdmx(r.inicio)},{t:'Fuente',f:r=>r.fuente},{t:'Volumen',f:r=>num(r.volumen),num:true},
+        {t:'Delta',f:r=>num(r.delta),num:true},{t:'Delta %',f:r=>r.delta_pct==null?'—':`${num(r.delta_pct)} %`,num:true}],F.barras,{caption:'Estadísticas por intervalo; delta nulo cuando falta agresor'}));
+  }
+  dibujar('bidask');
+  const tiempos=H.instantes.slice(-20), porCelda=new Map(H.celdas.map(c=>[`${c.precio}|${c.instante}`,c]));
+  const maxL=Math.max(1,...H.celdas.map(c=>c.tamano));
+  const mapa=tabla([{t:'Precio',f:p=>num(p),num:true},...tiempos.map(t=>({t:horaCdmx(t),num:true,f:p=>{
+    const c=porCelda.get(`${p}|${t}`);if(!c)return '—';
+    const el=h('span',{texto:`${c.lado} ${num(c.tamano)}`});
+    el.style.backgroundColor=`color-mix(in srgb, var(--serie-2) ${Math.round(10+65*c.tamano/maxL)}%, transparent)`;return el;
+  }}))],H.precios,{caption:'Heatmap de liquidez pasiva: últimas 20 capturas; — significa no observado',vacio:'Sin capturas de profundidad guardadas. IEX de un nivel no equivale a Level 2 completo.'});
+  return h('section',{},h('h2',{texto:'Footprint, volumen y delta'}),modo,vista,hist,h('p',{clase:'ayuda',texto:F.nota+(F.parcial?' Cobertura parcial por límites de la consulta.':'')}),
+    h('h2',{texto:'Historial de liquidez visible (DOM)'}),mapa,h('p',{clase:'ayuda',texto:H.nota}),
+    h('p',{},h('button',{type:'button',clase:'boton boton--texto','data-ir':'tab-aprendizaje',texto:'Ver conceptos y recursos de las capturas'})));
+}
+CARGAS['tab-aprendizaje']=cargarAprendizaje;
+Object.assign(ATAJOS,{APRENDER:'tab-aprendizaje'});

@@ -54,6 +54,7 @@
     <button role="tab" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
     <button role="tab" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
     <button role="tab" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio</button>
+    <button role="tab" class="secundaria" id="tab-aprendizaje" aria-controls="panel-aprendizaje" aria-selected="false" tabindex="-1">Aprender y recursos</button>
     <!-- Secundarias: información técnica y trazabilidad; se muestran con «Más» -->
     <button role="tab" class="secundaria" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
     <button role="tab" class="secundaria" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
@@ -71,9 +72,15 @@
 </nav>
 
 <main id="principal" tabindex="-1">
+  <section role="tabpanel" id="panel-aprendizaje" aria-labelledby="tab-aprendizaje" hidden>
+    <h1>Aprender y recursos</h1>
+    <p>Indicadores de los PDF de Actinver Acelera, capturas de plataformas, recursos de Order Flow y formación para LinkedIn. Síntesis educativa; los cruces y patrones no prueban rentabilidad.</p>
+    <div id="aprendizaje-contenido"></div>
+  </section>
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
     <h1 class="oculto-visual">Plan de acción</h1>
     <nav class="accesos" aria-label="Accesos a análisis">
+      <button type="button" class="boton boton--secundario" data-ir="tab-aprendizaje">Aprender con los recursos</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-mercado">Mercado</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-velas">Velas e indicadores</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-orderflow">Order Flow</button>

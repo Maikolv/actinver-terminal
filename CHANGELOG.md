@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-16 — recursos educativos y microestructura]
+
+- Catálogo de cuatro PDF y diez capturas: precisiones de indicadores, recursos de YouTube y condiciones de certificados; panel Aprender y recursos y API de lectura.
+- Footprint de cinco minutos con volumen/delta y heatmap de snapshots guardados, separados por feed y con ausencia de datos explícita.
+- Captura personal de cotizaciones únicamente en data local ignorado; sin valorar cartera ni publicar originales.
+- 83 pruebas enfocadas aprobadas; documentación en docs/recursos-educativos.md.
+
 ## [2026-10-16 — indicadores, GEX, permutaciones e intradía]
 
 ### Agregado

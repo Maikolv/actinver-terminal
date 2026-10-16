@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "revisado": "2026-10-16",
+  "indicadores": [
+    {
+      "titulo": "SMA y EMA",
+      "archivo": "2_12.pdf",
+      "formula": "SMA(n)=suma de los últimos n cierres/n. EMA(t)=EMA(t-1)+2/(n+1)×[C(t)-EMA(t-1)]. Semilla=SMA(n).",
+      "interpretacion": "La EMA pondera más el dato reciente. Un cruce es una descripción rezagada; no garantiza dirección.",
+      "precision": "Al desplazar SMA sale el dato más antiguo. n=2/alfa−1 devuelve períodos, no un porcentaje. EMA50 pondera 3.9216%; alfa50% corresponde a n=3."
+    },
+    {
+      "titulo": "MACD 12/26/9",
+      "archivo": "2_1.pdf",
+      "formula": "Línea MACD=EMA12−EMA26; señal=EMA9(línea MACD); histograma=línea MACD−señal.",
+      "interpretacion": "Cruce y divergencia son hipótesis de momentum que requieren validación. El histograma no confirma que una señal sea verdadera.",
+      "precision": "El PDF llama MACD(12,26,9) a la diferencia final; en la terminal se rotula histograma para no confundirla con la línea MACD."
+    },
+    {
+      "titulo": "Estocástico lento 14/3/3",
+      "archivo": "2_7.pdf",
+      "formula": "K rápido=100×(cierre−mínimo14)/(máximo14−mínimo14); K lento=SMA3(K rápido); D lento=SMA3(K lento).",
+      "interpretacion": "20/80 son referencias descriptivas; sobreventa no implica comprar y sobrecompra no implica vender.",
+      "precision": "Si máximo=mínimo el cociente es indefinido: null. Son períodos de la barra elegida, no siempre días. Calentamiento sin relleno."
+    },
+    {
+      "titulo": "SAR parabólico",
+      "archivo": "2_11.pdf",
+      "formula": "SAR(t)=SAR(t−1)+AF(t−1)×[EP(t−1)−SAR(t−1)]. AF inicial/paso0.02 y máximo0.2.",
+      "interpretacion": "Más aceleración acerca el SAR al precio; puede alternar repetidamente en rango lateral. No es stop garantizado.",
+      "precision": "La expresión impresa del PDF omite el agrupamiento de EP−SAR dentro del factor AF. Se conserva la recurrencia de Wilder y reglas de extremos/reversión; no se copia la errata."
+    }
+  ],
+  "cursos": [
+    {
+      "titulo": "Bookmap Education Course Part 1 — Basic Market Mechanics",
+      "captura": "Foto 5",
+      "autor": "Bookmap",
+      "url": "https://bookmap.com/learning-center/en/market-mechanics/bookmap-education-course/trading-order-flow-dom-market-depth-trading",
+      "estado": "Curso relacionado verificado en fuente oficial; no transcripción integral",
+      "conceptos": [
+        "Órdenes límite y de mercado",
+        "Bid/ask, spread y profundidad",
+        "Agresión frente a liquidez pasiva"
+      ],
+      "ejercicio": "Explicar qué cambia al colocar, cancelar y ejecutar una orden; no confundir profundidad con operaciones."
+    },
+    {
+      "titulo": "Order Flow Education — liquidity heatmap",
+      "captura": "Foto 6",
+      "autor": "Bookmap",
+      "url": "https://bookmap.com/learning-center/en/getting-started/liquidity-heatmap/heatmap-overview",
+      "estado": "Concepto verificado en documentación oficial; 34 videos es el conteo visible en la captura",
+      "conceptos": [
+        "Liquidez histórica por precio y tiempo",
+        "Brillo = tamaño pasivo visible",
+        "Huecos de datos y cancelaciones"
+      ],
+      "ejercicio": "Recorrer el replay del Artifact y distinguir retiro de liquidez de un fill; un heatmap de liquidez no es un GEX heatmap."
+    },
+    {
+      "titulo": "Start Trading with Orderflow",
+      "captura": "Foto 7",
+      "autor": "Matt Owen",
+      "url": null,
+      "estado": "Título, autor y 6 videos observados en la captura; enlace y temario completo no confirmados",
+      "conceptos": [
+        "La captura muestra una cadena de opciones",
+        "Una cadena no es tape de operaciones"
+      ],
+      "ejercicio": "Distinguir delta de opción de delta de volumen; identificar qué no permite concluir una cadena."
+    },
+    {
+      "titulo": "Order Flow Bootcamp — Day 1: The Basics of Order Flow",
+      "captura": "Foto 8",
+      "autor": "cbrackn",
+      "url": "https://www.youtube.com/watch?v=xT77Go7HK6s",
+      "estado": "Primer video localizado; 17 videos es el conteo de la captura, no verificación de toda la playlist",
+      "conceptos": [
+        "DOM y lectura de agresión/liquidez",
+        "Contexto antes de entrada"
+      ],
+      "ejercicio": "Comparar absorción y agotamiento como hipótesis; exigir datos de precio y ejecución."
+    },
+    {
+      "titulo": "Order Flow First Steps — Follow Up",
+      "captura": "Foto 9",
+      "autor": "Jigsaw Trading",
+      "url": "https://www.jigsawtrading.com/blog/order-flow-follow-up/",
+      "estado": "Sesión localizada en sitio oficial; no se afirma revisar los 9 videos de la captura",
+      "conceptos": [
+        "Depth & Sales",
+        "Volumen reciente y profundidad",
+        "Replay y práctica deliberada"
+      ],
+      "ejercicio": "Registrar hipótesis antes de revelar el siguiente evento; no inferir intención sólo por una cancelación."
+    },
+    {
+      "titulo": "Complete Orderflow Trading Course For Beginners",
+      "captura": "Foto 10",
+      "autor": "Andrea Cimi",
+      "url": null,
+      "estado": "Título, autor y 22 videos observados; URL exacta y contenido completo no confirmados",
+      "conceptos": [
+        "La captura identifica una lección sobre contratos de futuros",
+        "Tick, punto, vencimiento y valor nominal"
+      ],
+      "ejercicio": "Resolver el tamaño MES/MNQ/ES/NQ y seleccionar un vencimiento concreto; un continuo no es un contrato ejecutable."
+    }
+  ],
+  "certificaciones": [
+    {
+      "nombre": "J.P. Morgan IB Simulation / Forage",
+      "imagen": "S",
+      "estado": "Forage ofrece simulaciones gratuitas y constancia; disponibilidad del programa concreto de J.P. Morgan por confirmar. No es empleo ni certificación profesional.",
+      "url": "https://www.theforage.com/simulations?careers=banking-and-financial-services"
+    },
+    {
+      "nombre": "CFI Free Courses",
+      "imagen": "A",
+      "estado": "Corregido: CFI informa vistas previas gratuitas del catálogo y Careers in Finance como curso completo gratuito. No asumir FMVA ni todos los certificados gratuitos.",
+      "url": "https://help.corporatefinanceinstitute.com/article/307-free-courses-and-resources"
+    },
+    {
+      "nombre": "Bloomberg Market Concepts",
+      "imagen": "A",
+      "estado": "Existe BMC; comprobar convenio de tu institución y precio final. La etiqueta FREE* de la captura es condicional; rango USD150–250 no verificado.",
+      "url": "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/"
+    },
+    {
+      "nombre": "Yale Financial Markets",
+      "imagen": "B",
+      "estado": "Curso de Yale/Robert Shiller en Coursera. Acceso, prueba, auditoría o ayuda financiera no equivalen automáticamente a certificado gratuito.",
+      "url": "https://www.coursera.org/learn/financial-markets-global"
+    },
+    {
+      "nombre": "Wharton Introduction to Corporate Finance",
+      "imagen": "B",
+      "estado": "Curso introductorio, no MBA ni equivalencia académica. Experiencia con certificado sujeta a compra/plan o ayuda elegible.",
+      "url": "https://www.coursera.org/learn/wharton-finance/"
+    },
+    {
+      "nombre": "365 Financial Analyst",
+      "imagen": "C",
+      "estado": "Hay promoción histórica Finance Learning Challenge 2025. No se confirma promoción abierta ni futura de noviembre2026; revisar vigencia y certificado antes de inscribirse.",
+      "url": "https://365financialanalyst.com/knowledge-hub/finance-learning-challenge-2025/"
+    },
+    {
+      "nombre": "Rice Finance for Non-Finance Professionals",
+      "imagen": "C",
+      "estado": "Curso introductorio de Rice. Comprobar condiciones del certificado; no forma por sí solo en fiscalidad mexicana.",
+      "url": "https://www.coursera.org/learn/finance-for-non-finance/"
+    },
+    {
+      "nombre": "Sitios de certificados sin emisor verificable",
+      "imagen": "D",
+      "estado": "Categoría genérica de la imagen, no un programa verificable. Priorizar evaluación, identidad del emisor y proyecto demostrable.",
+      "url": null
+    },
+    {
+      "nombre": "CFA Investment Foundations",
+      "imagen": "F / no gratuito",
+      "estado": "USD350 publicado en fuente oficial consultada previamente. USD79 estudiantil es afirmación de la captura pendiente de validar oferta actual. F describe costo en la infografía, no calidad.",
+      "url": "https://www.cfainstitute.org/programs/investment-foundations-certificate"
+    }
+  ],
+  "capturas_plataforma": [
+    {
+      "archivo": "Foto 3",
+      "observado": "Dos paneles ES/MNQ, 5min, footprint, perfil lateral y estadísticas inferiores. Los valores son de una captura, no precios vigentes.",
+      "aplicacion": "Footprint e histograma de volumen/delta de5min con datos guardados; no replicar indicadores propietarios que no estén identificados."
+    },
+    {
+      "archivo": "Foto 4",
+      "observado": "Footprint #1 con volumen activado; Footprint #2 con delta activado; Sell(Bid) aparece como alternativa.",
+      "aplicacion": "Selector de lectura bid/ask, volumen o delta. El significado preciso del overlay requiere configuración del proveedor."
+    }
+  ],
+  "aviso": "Síntesis educativa y fuentes verificables. No incorpora las imágenes originales ni cotizaciones personales al repositorio. Los títulos de playlists no equivalen a haber visto todas sus lecciones."
+}

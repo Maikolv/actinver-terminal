@@ -116,6 +116,22 @@ def barras(con, simbolo: str, intervalo: str, desde: str | None = None, hasta: s
     return [dict(f) for f in reversed(filas)]
 
 
+def historia_libro(con, simbolo: str, desde: str, demo: bool = False) -> list[dict]:
+    corte = datetime.now(UTC).isoformat()
+    filas = con.execute(f"SELECT * FROM flujo_libro WHERE simbolo=? AND instante>=? AND disponible_desde<=? "
+                        f"AND ({_filtro_calidad(demo)}) ORDER BY instante DESC, id DESC LIMIT 60",
+                        (simbolo, desde, corte)).fetchall()
+    if not filas:
+        return []
+    ids = [f["id"] for f in filas]
+    niveles = con.execute(f"SELECT * FROM flujo_libro_niveles WHERE libro_id IN ({','.join('?' for _ in ids)}) "
+                          "ORDER BY libro_id,lado,nivel", ids).fetchall()
+    por_id = {i: [] for i in ids}
+    for n in niveles:
+        por_id[n["libro_id"]].append(dict(n))
+    return [{**dict(f), "niveles": por_id[f["id"]]} for f in reversed(filas)]
+
+
 def ultimo_libro(con, simbolo: str, demo: bool = False, hasta: str | None = None) -> dict | None:
     corte = hasta or datetime.now(UTC).isoformat()
     f = con.execute(f"SELECT * FROM flujo_libro WHERE simbolo=? AND disponible_desde <= ? AND ({_filtro_calidad(demo)}) "

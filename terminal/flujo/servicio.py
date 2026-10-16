@@ -179,6 +179,7 @@ def velas(con, ajustes, simbolo: str, intervalo: str = "1Day", dias: int = 180) 
 
 
 def orderflow(con, ajustes, simbolo: str, minutos: int = 240, niveles: int = 20) -> dict:
+    from . import microestructura
     libro = almacen.ultimo_libro(con, simbolo, demo=ajustes.es_demo)
     desde = (datetime.now(UTC) - timedelta(minutes=int(minutos))).isoformat()
     ops = almacen.operaciones(con, simbolo, desde, demo=ajustes.es_demo)
@@ -187,6 +188,8 @@ def orderflow(con, ajustes, simbolo: str, minutos: int = 240, niveles: int = 20)
             "libro_meta": {k: libro[k] for k in ("instante", "fuente", "licencia", "mercado", "feed", "calidad", "retraso_s",
                                                  "nota", "capturado_en")} if libro else None,
             "operaciones": ops[-200:], "resumen": res, "procedencia_operaciones": _procedencia(ops),
+            "footprint": microestructura.footprint(ops),
+            "liquidez_historica": microestructura.liquidez(almacen.historia_libro(con, simbolo, desde, demo=ajustes.es_demo)),
             "vacio_libro": None if libro else SIN_FUENTE, "vacio_operaciones": None if ops else SIN_FUENTE,
             "nota": "Delta de volumen solo cuando el proveedor informa el lado del agresor de TODAS las operaciones; "
                     "nunca se infiere. El perfil de volumen usa solo las operaciones guardadas del rango."}

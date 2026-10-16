@@ -222,3 +222,11 @@ confirmar y cambien la estrategia).
 - Laboratorio: signos por bloques, semilla, p con corrección +1 y Holm; no demuestra alfa. Plan intradía informativo separado, sin órdenes, con pausa y calidad de datos.
 - Verificación: suite completa de 561 pruebas aprobada; después de los ajustes finales, 41 pruebas enfocadas aprobadas. Sintaxis JS y 15 archivos nuevos/modificados revisados sin patrones de secretos. Laboratorio y persistencia de controles comprobados en navegador; datos sintéticos solo como ejemplo identificado.
 - Pendientes: feed apto de tiempo real, tape de opciones y OI/especificaciones para poblar GEX; medir pérdida intradía requiere entrada manual. No se contrataron servicios ni activaron órdenes. Ver `docs/mejoras-intradia-permutaciones.md`.
+
+## Actualización 16-oct-2026 — adjuntos y práctica de microestructura
+
+- Aprender y recursos: síntesis de cuatro PDF y diez capturas, fórmulas precisadas y fuentes verificables en config/aprendizaje.json; API de lectura /api/aprendizaje.
+- Order Flow: footprint de 5 minutos y selector bid/ask, volumen/delta; heatmap de snapshots compatibles sin interpolar ni mezclar feeds.
+- Referencia personal de precios solo en data local ignorado; no se incorpora a cartera ni cotizaciones. Artifact independiente ampliado con replay y ejercicios.
+- Verificación: 83 pruebas enfocadas aprobadas; sintaxis JS y comprobación de catálogo, replay y medias en navegador.
+- Pendiente: dos URL exactas de playlists, revisión integral de videos y fuente Level 2/tape autorizada para datos completos. No se contrataron servicios ni se habilitaron órdenes. Ver docs/recursos-educativos.md.
