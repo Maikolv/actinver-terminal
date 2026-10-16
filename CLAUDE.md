@@ -32,6 +32,9 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado (2026-10-12, v0.30.0, rama `main`)
 
+- **Cuenta del Reto (jueves 15-oct, cierre 14:00, captura confirmada):**
+  - Valuación $935,448.69 (−6.46 %); poder de compra $4,077.32; ACTDUAL B $0.21.
+  - Desde el 14-oct: AMD +3.5 %, MU +1.4 %; NVDA −2.4 %, XOM −2.1 %, ALPEK −1.9 %, NVAX −1.2 %, GMEXICO −0.7 %.
 - **Cuenta del Reto (miércoles 14-oct, 15:06, captura confirmada):**
   - Valuación $930,543.32 (−6.95 %); poder de compra $4,077.32. Nueva posición mínima: 1 título de ACTDUAL B ($0.21).
   - Desde el 13-oct: AMD −10.0 %, MU −3.6 %, NVDA −2.4 %, GMEXICO −1.5 %; ALPEK +4.2 %, XOM +2.5 %, NVAX +1.7 %.
