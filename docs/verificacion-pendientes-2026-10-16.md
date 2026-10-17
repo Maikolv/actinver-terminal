@@ -76,3 +76,36 @@ TPO OHLC es una cota inferior, sin calendario de cierres anticipados; no un perf
 completo de ticks. GEX sigue sin poblarse con la fuente gratuita sin OI fechado.
 Finnhub y Twelve Data no se conectaron. Contratos Alpaca y tema Colab siguen
 condicionados a las decisiones explícitas del usuario. Sin ventaja demostrada.
+
+## Cierre de la verificación visual pendiente (16-oct-2026)
+
+La desconexión descrita arriba se resolvió al retomar la tarea. Se revisó el código
+final del commit `20638e7` en una nueva sesión Chrome, únicamente en la base demo
+y en `127.0.0.1:8777`, con los mismos interruptores de aislamiento.
+
+- Viewport comprobado: 375 px; documento de 360 px, sin desbordamiento global.
+- Campo OCC: se introdujo `MU261120C00110000`; Tab pasa a «Evaluar cinta guardada»
+  y después a «Actualizar cinta indicativa». Enter en actualizar muestra
+  «En demostración no se consultan proveedores» y evalúa la cinta sintética guardada.
+- Tabla Skylit: región con `tabindex=0`; las flechas movieron `scrollLeft` de 0
+  a 120 px, conservando el foco. El filtro sigue explícitamente incompleto.
+- TPO: tabla con foco de teclado, periodos A/B/C y zona America/New_York visibles.
+  POC/VAH/VAL mantienen los valores sintéticos registrados arriba.
+- Laboratorio: la lista recibe foco; al volver a abrir el resultado con otros
+  rendimientos sintéticos devuelve el aviso de holdout usado y conserva la huella
+  `89a94ef54301963a93ff942c88828fa7a57dc30228cfd869d0e1844af750b2ba`.
+- Consola del recorrido final: **0 errores**. Capturas locales nuevas de campo OCC,
+  tabla con desplazamiento, TPO y Laboratorio. Se restauró el tamaño del navegador,
+  se cerró la pestaña de prueba y se detuvo el servidor temporal.
+
+La comprobación visual de los dos últimos ajustes queda completada. No se activó
+ninguna conexión de contratos, proveedor nuevo, cuenta ni servicio persistente.
+
+### Resultado definitivo de la suite completa
+
+`uv run pytest -q` sobre la versión final `20638e7`: **610 pruebas aprobadas**,
+1 aviso de deprecación Starlette/AnyIO ya existente, **831.34 s (13 min 51 s)**.
+La corrida incluye los últimos casos de selección/caché, nanosegundos, rutas y
+medianoche de cripto. Sintaxis JavaScript y revisión de secretos correctas.
+Esta nueva corrida completa sustituye la combinación de resultados parciales
+como evidencia del estado final. En la continuación solo cambió documentación.

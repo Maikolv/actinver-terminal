@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-16 — cierre de verificación final]
+
+- Revisión final completada en demo a 375 px: campo OCC, Tab/Enter y desplazamiento de tablas con flechas.
+- Laboratorio mantiene la huella del holdout al reabrirlo con otros datos. TPO y Skylit revisados; cero errores de consola.
+- Suite completa sobre la versión final: 610 pruebas aprobadas. Sintaxis JavaScript correcta y sin patrones de secretos.
+- Navegador restaurado y servidor temporal detenido. TradingView ajeno preservado; contratos Alpaca y Colab siguen condicionados.
+
 ## [2026-10-16 — cinta indicativa y perfiles de sesión]
 
 ### Agregado

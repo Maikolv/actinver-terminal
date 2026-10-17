@@ -265,3 +265,20 @@ confirmar y cambien la estrategia).
   GEX sin datos nuevos de OI; ningún modelo tiene ventaja predictiva demostrada.
   Detalles: `docs/verificacion-pendientes-2026-10-16.md`, `docs/perfiles-sesion.md`
   y `docs/mejoras-intradia-permutaciones.md` §8. TradingView ajeno preservado.
+
+## Cierre 16-oct-2026 — revisión visual de la versión final
+
+- Resuelta la desconexión del navegador: comprobados a 375 px el campo de contratos
+  OCC, el orden de Tab/Enter y el desplazamiento de la tabla Skylit con flechas.
+  La región conserva el foco y su desplazamiento pasó de 0 a 120 px.
+- Repetidas las vistas finales de Order Flow/TPO y Laboratorio. Al reabrir el
+  experimento demo con otros rendimientos conserva la huella y devuelve el resultado
+  guardado. Consola del recorrido final: cero errores.
+- Base demo, credenciales/motor desactivados, ningún proveedor consultado; tamaño
+  del navegador restaurado, pestaña y servidor temporal cerrados.
+- Suite completa repetida sobre la revisión final: **610 pruebas aprobadas** en
+  831.34 s; solo el aviso de deprecación preexistente de Starlette/AnyIO.
+  Sintaxis JS y revisión de secretos correctas. Evidencia definitiva en
+  `docs/verificacion-pendientes-2026-10-16.md`.
+- Solo siguen condicionados el endpoint de contratos de Alpaca (autorización textual)
+  y el notebook Colab (tema elegido). Sin datos nuevos para GEX ni ventaja demostrada.
