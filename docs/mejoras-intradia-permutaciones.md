@@ -75,3 +75,32 @@ Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio son pestañas prin
 - Volumen/OI no prueba apertura de posiciones: el OI tiene desfase y la operación puede cerrar, cubrir o ser parte de una estructura.
 - Con las fuentes gratuitas no es completo: Alpaca trae operaciones indicativas con condición, pero no el NBBO del instante, las patas ni el OI (`docs/proveedores-gratuitos.md`).
 - Pruebas: `tests/test_preregistro_skylit.py` (17).
+
+## 8. Cinta guardada y perfiles de sesión (16-oct-2026)
+
+- `Alpaca.operaciones_opciones(contratos, minutos)` consulta únicamente datos de mercado
+  `/v1beta1/options/trades`, feed indicativo, con corte de 16 minutos de retraso. Conserva
+  `t, x, p, s, c` y procedencia en `flujo_opciones_operaciones`; paginación acotada y aviso
+  de resultados parciales. Actualización bajo demanda, caché mínima de 120 segundos.
+- Option Flow permite actualizar y evaluar esa cinta además del CSV existente. Requiere
+  una cadena guardada y permite seleccionar explícitamente hasta 100 contratos OCC de ella;
+  con selección vacía usa toda la cadena solo si no supera 100. La caché distingue selecciones.
+  No reemplaza NBBO, patas ni OI. Solo complementa spot/multiplicador del mismo contrato,
+  instante y moneda USD. El filtro completo sigue sin aplicarse con esta fuente.
+- Order Flow muestra TPO observado sobre barras guardadas de 5 minutos (API admite 1/5/15),
+  periodos de 30 minutos y zona de origen. Es una cota inferior basada en OHLC: no rellena
+  precios intermedios ni periodos. No certifica una sesión completa. Para símbolos sin
+  sesión de origen verificada no supone horario. Cripto usa sesión de 24 horas CDMX.
+- POC y área de valor ≥70 % reutilizan las cubetas del perfil de volumen del rango.
+  POC representa el centro de la cubeta; VAH/VAL son sus límites externos. Algoritmo y
+  desempates en `docs/perfiles-sesion.md`. Con pocos datos devuelve nulo.
+- Las nuevas lecturas tienen límite HTTP de 30/minuto; las actualizaciones conservan
+  CSRF, origen local, tamaño y límites existentes.
+- La carga normal de `terminal.app` sí llama `cargar_ajustes()` y carga `.env`.
+  Se comprobó únicamente presencia de credenciales, sin imprimir valores ni hacer red.
+  `TERMINAL_SIN_ENV` omite la carga intencionalmente; `TERMINAL_SIN_MOTOR` solo apaga
+  motor/bot/sincronizador. No se reprodujo el fallo con el arranque normal ni se cambió
+  ese comportamiento. No se puede atribuir retrospectivamente el error de otra sesión
+  sin conocer su entorno; el modo de pruebas define ambos interruptores expresamente.
+- Sin autorización textual para contratos Alpaca: endpoint de trading sin implementar.
+  Colab sin tema elegido: no se creó notebook. Ningún modelo adquiere ventaja demostrada.

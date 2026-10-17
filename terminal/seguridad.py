@@ -44,6 +44,7 @@ RUTA_WEBHOOK = "/webhook/tradingview"
 MAX_WEBHOOK = 10_000
 LIMITE_WEBHOOK = 30
 LIMITE_MUTACION = 60
+LIMITES_LECTURA = {"/api/flujo/perfiles": 30, "/api/flujo/skylit": 30}
 
 
 def _lista(var: str) -> set[str]:
@@ -106,6 +107,9 @@ class Seguridad(BaseHTTPMiddleware):
                 return JSONResponse({"error": f"Cuerpo ausente o demasiado grande (máx. {tope // 1_000_000} MB)"}, status_code=413)
             ruta = request.url.path
             if self._excede(ruta, LIMITES.get(ruta, LIMITE_MUTACION)):
+                return JSONResponse({"error": "Demasiadas solicitudes; espere un minuto"}, status_code=429)
+        elif request.method in ("GET", "HEAD") and request.url.path in LIMITES_LECTURA:
+            if self._excede("lectura:" + request.url.path, LIMITES_LECTURA[request.url.path]):
                 return JSONResponse({"error": "Demasiadas solicitudes; espere un minuto"}, status_code=429)
         elif request.method == "OPTIONS":
             return JSONResponse({"error": "Método no permitido"}, status_code=405)

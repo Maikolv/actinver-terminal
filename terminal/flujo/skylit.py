@@ -1,5 +1,4 @@
-"""Perfil EXPERIMENTAL del filtro de Option Flow descrito en un video de Skylit, aplicado a operaciones de opciones que el
-usuario importa en CSV. Son criterios de un video, no reglas validadas ni una recomendación de comprar opciones.
+"""Perfil EXPERIMENTAL del filtro de Option Flow descrito en un video de Skylit, aplicado a operaciones de opciones importadas por CSV o guardadas desde datos de mercado. Son criterios de un video, no reglas validadas ni una recomendación de comprar opciones.
 
 Criterios por operación: prima ≥ USD 100 000; vencimiento ≤ ~183 días; volumen del contrato / interés abierto ≥ 10;
 fuera del dinero; subyacente acción (no ETF ni índice); una sola pata; precio en el ask o encima del NBBO del instante.
@@ -121,6 +120,12 @@ def evaluar_csv(texto: str) -> dict:
             errores.append({"fila": i, "error": "valor inválido (números ≥ 0, fechas ISO con zona, tipo call/put)"})
     if not filas:
         raise ValueError("ninguna operación válida" + (f": {errores[0]['error']} (fila {errores[0]['fila']})" if errores else ""))
+    return {**resumir(filas, errores), "calidad": "importado",
+            "nota": "Datos del CSV del usuario; la terminal no los guarda ni los verifica contra un proveedor."}
+
+
+def resumir(filas: list[dict], errores: list[dict] | None = None) -> dict:
+    errores = errores or []
     conteo = {r: sum(1 for x in filas if x["resultado"] == r) for r in ("pasa", "no_pasa", "no_evaluable")}
     faltantes: dict[str, int] = {}
     for x in filas:
@@ -128,6 +133,5 @@ def evaluar_csv(texto: str) -> dict:
             if c["estado"] == "no_evaluable":
                 faltantes[k] = faltantes.get(k, 0) + 1
     return {"perfil": PERFIL, "operaciones": len(filas), "conteo": conteo, "no_evaluables_por_criterio": faltantes,
-            "filtro_completo_aplicado": conteo["no_evaluable"] == 0 and not faltantes,
-            "filas": filas[:500], "errores": errores[:50], "avisos": AVISOS,
-            "calidad": "importado", "nota": "Datos del CSV del usuario; la terminal no los guarda ni los verifica contra un proveedor."}
+            "filtro_completo_aplicado": bool(filas) and conteo["no_evaluable"] == 0 and not faltantes,
+            "filas": filas[:500], "errores": errores[:50], "avisos": AVISOS}

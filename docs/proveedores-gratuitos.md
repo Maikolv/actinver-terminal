@@ -20,9 +20,9 @@ Leyenda de acceso:
 | [Tiingo](https://www.tiingo.com/about/pricing) | Gratis permanente (Starter) | EE. UU., USD | Diaria (el IEX intradía del plan gratis no se pudo confirmar) | Más de 30 años | Cierres | No | No | 50 por hora, 1,000 por día, 500 símbolos al mes, 1 GB | Cuenta, sin tarjeta | **Solo uso interno y personal**: no se puede mostrar a terceros | **Implementado** | No figura |
 | [EODHD](https://eodhd.com/pricing) | Gratis (sandbox) | La BMV la confirmó la propia terminal; la página no lista bolsas | Diaria | 1 año | Cierres; cotización con 15 min de retraso | No | No | 20 por día (más 500 de bienvenida una sola vez) | Cuenta | Términos de EODHD | **Implementado** (BMV) | No figura |
 | [Alpha Vantage](https://www.alphavantage.co/premium/) | Gratis permanente | EE. UU. y otros | Diaria (lo premium no está detallado) | Según la función | Para tiempo real o 15 min exige trámite de «data entitlement» | No | Sin confirmar en el plan gratis | 25 por día | Clave gratuita | Términos de Alpha Vantage | **Implementado** (estados financieros) | Conector «Alpha Vantage» |
-| [Twelve Data](https://twelvedata.com/pricing) | Gratis permanente (Basic) | 3 mercados sin nombrar; BMV sin confirmar | Intradía y diaria | Sin confirmar | Anuncia tiempo real para acciones y ETF de EE. UU. | No | No | 8 créditos por minuto, 800 por día; WebSocket de prueba | Cuenta | Términos de Twelve Data | Especificación ya existe (`config/proveedores/twelvedata_bmv.json`), **sin activar** | No figura |
+| [Twelve Data](https://twelvedata.com/pricing) | Gratis permanente (Basic) | EE. UU., forex y cripto; **BMV fuera de Basic**, salvo símbolo de prueba | Intradía y diaria | Sin confirmar | Anuncia tiempo real para acciones y ETF de EE. UU. | No | No | 8 créditos por minuto, 800 por día; WebSocket de prueba | Cuenta | Uso personal, interno y no comercial; Basic indica uso interno sin visualización | Especificación ya existe (`config/proveedores/twelvedata_bmv.json`), **sin activar** | No figura |
 | [Massive (antes Polygon)](https://massive.com/pricing) | Gratis permanente (Stocks Basic) | EE. UU., USD | Agregados de 1 minuto | 2 años | **Solo cierre del día** | Sin operaciones ni cotizaciones | No se pudo confirmar | 5 por minuto | Cuenta | Términos de Massive | No implementado: no agrega nada a Alpaca | Conector «Polygon.io» |
-| Finnhub | Gratis | EE. UU. | — | — | **No se pudo confirmar en la página oficial** (60/min y 50 símbolos por WebSocket solo en fuentes de terceros) | — | — | — | Cuenta | — | No implementado | No figura |
+| [Finnhub](https://finnhub.io/pricing) | Gratis, condiciones sin confirmar | EE. UU., cobertura gratuita sin confirmar | — | — | Sin confirmar | — | — | **Cupo gratuito sin confirmar**; techo general de 30 llamadas/s y HTTP 429 por exceso (extracto oficial; §7) | Cuenta | Sin confirmar | No implementado | No figura |
 | [Databento](https://databento.com/pricing) | Crédito único de USD 125, solo para datos históricos | CME, OPRA, Nasdaq TotalView y otros | Ticks y barras | Amplia | Tiempo real **solo de pago** (desde USD 199 al mes) | Ticks con lado del agresor y libro completo (MBO/MBP) | OPRA histórico con el crédito | Por consumo | Cuenta; tarjeta no confirmada | Licencia por dataset | No implementado (el crédito es un gasto: lo decide usted) | No figura |
 | Quantower | Software gratuito; los datos de cada conector se pagan aparte | — | — | — | Depende del conector | dxFeed, Rithmic, IB y Tradier dan profundidad u opciones **con su propia suscripción** | — | — | — | — | No aplica: Quantower es otra aplicación y no lee la base de la terminal | — |
 
@@ -39,11 +39,11 @@ Notas:
 | Herramienta | Datos mínimos | Cálculo | Con lo gratuito hoy |
 |---|---|---|---|
 | Velas con SMA/EMA, MACD, estocástico y SAR | OHLCV | Medias, MACD 12/26/9, estocástico 14/3/3, SAR 0.02–0.2; valor nulo mientras calienta | **Sí**: EE. UU. (Alpaca SIP, ≥ 15 min), cripto (Bitso), BMV diaria (EODHD) o CSV |
-| Perfil de volumen | Operaciones con precio y tamaño | Volumen por nivel de precio (POC/VAH/VAL aún no se calculan) | **Sí, implementado en Order Flow** con la cinta guardada: SIP diferida (EE. UU.) o Bitso (cripto) |
-| TPO / Market Profile | Barras de 30 min por sesión | Letras por periodo y nivel | Calculable con las barras de Alpaca; **no implementado** |
+| Perfil de volumen | Operaciones con precio y tamaño | Volumen por nivel de precio, POC y área de valor del 70 % (VAH/VAL) | **Sí, implementado en Order Flow** con la cinta guardada: SIP diferida (EE. UU.) o Bitso (cripto) |
+| TPO / Market Profile | Barras de 30 min por sesión | Periodos de 30 min por sesión y nivel, con zona horaria explícita | **Implementado en Order Flow** sobre barras guardadas; sin barras suficientes devuelve nulo, sin interpolación |
 | DOM y mapa de calor de liquidez | Libro por niveles en el tiempo | Instantáneas sin interpolar | **Solo cripto** (Bitso). En EE. UU., IEX da 1 nivel; la profundidad es de pago |
 | Footprint y delta acumulado | Operaciones con **lado del agresor** | Volumen por precio y lado; delta = compras − ventas | **Solo cripto**. El SIP no trae el lado; con OHLCV no se puede reconstruir |
-| Option Flow (cinta y filtro de Skylit) | Cinta de opciones con NBBO del instante, condición, patas, OI con fecha, spot | Ver el filtro de Skylit en `docs/mejoras-intradia-permutaciones.md` | **Parcial**: Alpaca trae operaciones indicativas con condición, pero no el NBBO histórico del instante, ni las patas, ni el OI en datos de mercado. Una cadena no sustituye la cinta |
+| Option Flow (cinta y filtro de Skylit) | Cinta de opciones con NBBO del instante, condición, patas, OI con fecha, spot | Ver el filtro de Skylit en `docs/mejoras-intradia-permutaciones.md` | **Parcial, implementado**: cinta indicativa de Alpaca guardada con condición y filtro sobre ella o CSV. NBBO histórico del instante, patas y OI siguen «no evaluable» si faltan; la interfaz indica que el filtro completo no se aplicó |
 | GEX | Gamma, OI, multiplicador, spot y moneda de una misma referencia | gamma × OI × multiplicador × S² × 0.01 | **No con datos de mercado gratuitos** (sin OI). El endpoint de contratos de Alpaca trae OI y tamaño (ver §4); mientras tanto, solo por CSV |
 
 Otras distinciones:
@@ -59,7 +59,8 @@ panel muestra fuente, retraso, horario y calentamiento, y avisa cuando faltan da
    - velas e indicadores de EE. UU. con ≥ 15 min de retraso;
    - cinta SIP diferida sin lado;
    - bid/ask de IEX;
-   - cadena de opciones indicativa (IV y griegas cuando vienen).
+   - cadena de opciones indicativa (IV y griegas cuando vienen);
+   - cinta de opciones indicativa diferida (≥ 15 min), con condición y procedencia, para evaluación parcial de Skylit.
 2. **Bitso por ccxt** (implementado): libro, cinta con lado, footprint y mapa de calor reales, solo de cripto en MXN.
 3. **EODHD, Banxico y FRED** (implementados): cierres de la BMV, FIX y tasas.
 4. **Importación de CSV autorizados** para lo que no da ninguna fuente gratuita: libro y cinta de EE. UU., opciones con
@@ -72,8 +73,8 @@ Lo que exige proveedor de pago o archivo con licencia:
 
 ## 4. Conectores y configuración
 
-No se agregó ningún conector nuevo en esta entrega. Los gratuitos pertinentes ya estaban implementados, con caché,
-límites, validación y manejo de errores.
+Se amplió el adaptador Alpaca existente con la cinta histórica de opciones de Market Data
+(`GET /v1beta1/options/trades`), caché, límites y procedencia. No se conectaron Finnhub ni Twelve Data.
 
 **Candidato pendiente de su decisión:** OI y multiplicador desde el endpoint de contratos de Alpaca
 (`/v2/options/contracts`). Ese endpoint vive en la **API de trading** (cuenta de broker), no en la de datos. Aunque la
@@ -90,7 +91,9 @@ Guía, paso a paso (claves solo en `.env`, nunca en el código):
 
 ## 5. Disponibilidad real comprobada (16-oct-2026)
 
-Una consulta mínima por fuente. Se registró solo el resultado, sin claves.
+Registro de la verificación real anterior del 16-oct-2026: una consulta mínima por fuente, solo resultado sin claves.
+Esta ampliación se valida con un cliente HTTP falso, sin red ni claves; **no se repitieron consultas reales**
+y estos resultados previos no prueban por sí solos la nueva ingestión de cinta.
 
 | Fuente | Resultado |
 |---|---|
@@ -108,6 +111,29 @@ Una consulta mínima por fuente. Se registró solo el resultado, sin claves.
 - Decidir si se usa el endpoint de contratos de Alpaca (OI y tamaño) para GEX y el filtro de Skylit (§4).
 - El NBBO histórico del instante y las patas de las opciones no vienen en ninguna fuente gratuita verificada. El
   filtro de Skylit solo es completo con un CSV con esos campos.
-- TPO / Market Profile y POC/VAH/VAL del perfil de volumen: calculables con datos gratuitos, no implementados.
-- Finnhub y Twelve Data: confirmar en su documentación oficial (cobertura de la BMV, límites) antes de conectarlos.
+- TPO / Market Profile y POC/VAH/VAL están implementados; su disponibilidad por instrumento depende de barras u operaciones guardadas suficientes.
+- Finnhub: límites gratuitos pendientes de confirmación oficial legible; Twelve Data Basic no cubre la BMV general (ver §7). Ambos continúan desconectados.
 - Databento (USD 125 de crédito histórico) y cualquier proveedor de pago: decisión suya.
+
+
+## 7. Revisión documental oficial de Finnhub y Twelve Data (16-oct-2026)
+
+- **Finnhub:** se consultaron [precios](https://finnhub.io/pricing) y
+  [límites de la API](https://finnhub.io/docs/api/rate-limit). En esta revisión ambas páginas
+  devolvieron contenido sin texto legible al lector web. Por ello **no se pudieron confirmar
+  con documentación oficial los límites del plan gratuito**. Las cifras de 60 llamadas/minuto
+  y 50 símbolos WebSocket que aparecen en terceros no se elevan a dato verificado ni se usan
+  para configurar un conector. La búsqueda restringida al dominio oficial sí recuperó en el
+  extracto indexado de [Country List / Rate Limits](https://www.finnhub.io/docs/api/country)
+  un **techo general adicional de 30 llamadas/segundo** para todos los planes y respuesta
+  **HTTP 429** al exceder límites. Es evidencia del extracto oficial indexado, no de una
+  lectura completa de la página (que sigue sin texto legible), y **no confirma el cupo
+  específico gratuito por minuto ni los símbolos WebSocket**. No se hizo ninguna petición autenticada.
+- **Twelve Data Basic:** la [tarifa oficial](https://twelvedata.com/pricing) publica
+  **8 créditos API/minuto, 800/día y 8 créditos WebSocket de prueba**; los créditos dependen
+  del peso del endpoint y del número de símbolos. El [catálogo filtrado por Basic](https://twelvedata.com/exchanges?level=basic)
+  enumera EE. UU., forex y cripto. La [ficha oficial de la BMV (XMEX)](https://twelvedata.com/exchanges/XMEX)
+  indica **Pro+** para particulares, **Venture+** para empresas y datos **EOD (cierre)**.
+  Por tanto, **Basic no incluye la cobertura general de la BMV**. La ficha ofrece GMEXICOB
+  como símbolo de prueba; esa excepción no equivale a acceso al mercado completo.
+  No se activó el proveedor ni se comprobó el acceso de ninguna cuenta mediante API.

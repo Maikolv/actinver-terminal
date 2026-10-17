@@ -5,10 +5,11 @@ sabía en una fecha (sin fuga de información futura en pruebas históricas).
 """
 from __future__ import annotations
 
+import json
 import sqlite3
 from datetime import UTC, datetime
 
-from .contratos import Barra, ContratoOpcion, Libro, Operacion, Procedencia
+from .contratos import Barra, ContratoOpcion, Libro, Operacion, OperacionOpcion, Procedencia
 
 PROC = ("fuente TEXT NOT NULL, licencia TEXT NOT NULL, mercado TEXT NOT NULL, feed TEXT NOT NULL DEFAULT '', "
         "calidad TEXT NOT NULL CHECK (calidad IN ('proveedor','importado','calculado','sintetico')), "
@@ -40,6 +41,12 @@ def inicializar(con: sqlite3.Connection) -> None:
       bid REAL, ask REAL, ultimo REAL, volumen REAL, interes_abierto REAL, iv REAL, delta REAL, gamma REAL, theta REAL,
       vega REAL, origen_iv TEXT, multiplicador REAL, spot REAL, moneda TEXT, {PROC}, UNIQUE (contrato, fuente, instante));
     CREATE INDEX IF NOT EXISTS ix_flujo_opciones ON flujo_opciones (subyacente, vencimiento, strike);
+    CREATE TABLE IF NOT EXISTS flujo_opciones_operaciones (
+      id INTEGER PRIMARY KEY, contrato TEXT NOT NULL, subyacente TEXT NOT NULL, instante TEXT NOT NULL,
+      t TEXT NOT NULL, x TEXT NOT NULL, p REAL NOT NULL, s REAL NOT NULL, c TEXT NOT NULL, vencimiento TEXT NOT NULL,
+      strike REAL NOT NULL, tipo TEXT NOT NULL, {PROC},
+      UNIQUE (contrato, t, x, p, s, c, fuente, feed));
+    CREATE INDEX IF NOT EXISTS ix_flujo_opciones_operaciones ON flujo_opciones_operaciones (subyacente, instante);
     CREATE TABLE IF NOT EXISTS flujo_consultas (
       clave TEXT PRIMARY KEY, intento_en TEXT NOT NULL, estado TEXT NOT NULL, registros INTEGER NOT NULL DEFAULT 0,
       mensaje TEXT NOT NULL DEFAULT '');
@@ -178,3 +185,22 @@ def registrar_consulta(con, clave: str, estado: str, registros: int, mensaje: st
 def ultima_consulta(con, clave: str) -> dict | None:
     f = con.execute("SELECT * FROM flujo_consultas WHERE clave=?", (clave,)).fetchone()
     return dict(f) if f else None
+
+
+def guardar_operaciones_opciones(con, ops: list[OperacionOpcion], p: Procedencia) -> int:
+    antes = con.total_changes
+    con.executemany(f"INSERT OR IGNORE INTO flujo_opciones_operaciones "
+                    f"(contrato,subyacente,instante,t,x,p,s,c,vencimiento,strike,tipo,{COLS_P}) "
+                    f"VALUES ({','.join('?' * 20)})",
+                    [(o.contrato,o.subyacente,o.instante,o.t_origen,o.mercado_origen,o.precio,o.tamano,
+                      json.dumps(o.condiciones, ensure_ascii=False),o.vencimiento,o.strike,o.tipo,*_p(p)) for o in ops])
+    return con.total_changes - antes
+
+
+def operaciones_opciones(con, subyacente: str, demo: bool = False, hasta: str | None = None,
+                         limite: int = 5000) -> list[dict]:
+    corte = hasta or datetime.now(UTC).isoformat()
+    filas = con.execute(f"SELECT * FROM flujo_opciones_operaciones WHERE subyacente=? AND instante<=? "
+                        f"AND disponible_desde<=? AND ({_filtro_calidad(demo)}) "
+                        "ORDER BY instante DESC,id DESC LIMIT ?", (subyacente,corte,corte,limite)).fetchall()
+    return [{**dict(f), "c": json.loads(f["c"])} for f in reversed(filas)]

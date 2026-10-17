@@ -5,14 +5,15 @@ usuario pulsa «Actualizar» en un panel.
 from __future__ import annotations
 
 import os
+from hashlib import sha256
 from datetime import UTC, datetime, timedelta
 
 from .. import db
 from . import almacen, calculos
-from .adaptadores import Alpaca, Cripto, FuenteNoDisponible, tasa_libre_riesgo
+from .adaptadores import Alpaca, Cripto, FuenteNoDisponible, tasa_libre_riesgo, _nanosegundos
 from .contratos import INTERVALOS
 
-ESPERA_S = {"velas": 60, "operaciones": 30, "libro": 5, "opciones": 120}
+ESPERA_S = {"velas": 60, "operaciones": 30, "libro": 5, "opciones": 120, "opciones_operaciones": 120}
 SIN_FUENTE = ("Sin fuente autorizada para este dato. No se simula: importe un CSV con datos que tenga derecho a usar "
               "(plantilla en este panel) o configure un proveedor (ver docs/acciones-requeridas-usuario.md).")
 
@@ -71,7 +72,7 @@ def _puede(con, clave: str, tipo: str, ahora: datetime) -> bool:
 
 
 def actualizar(con, ajustes, tipo: str, simbolo: str, intervalo: str = "1Day", dias: int = 180,
-               env: dict | None = None, cliente=None, exchange=None) -> dict:
+               env: dict | None = None, cliente=None, exchange=None, contratos: list[str] | None = None) -> dict:
     """Consulta el proveedor del símbolo y guarda. En demostración no consulta (no hay datos sintéticos de flujo)."""
     if ajustes.es_demo:
         return {"estado": "demo", "mensaje": "En demostración no se consultan proveedores ni se simula flujo."}
@@ -81,6 +82,8 @@ def actualizar(con, ajustes, tipo: str, simbolo: str, intervalo: str = "1Day", d
         raise ValueError("intervalo inválido")
     ahora = datetime.now(UTC)
     clave = f"{tipo}:{simbolo}:{intervalo if tipo == 'velas' else ''}"
+    if tipo == "opciones_operaciones" and isinstance(contratos, list) and all(isinstance(c, str) for c in contratos):
+        clave += sha256(",".join(sorted(set(contratos))).encode()).hexdigest()[:16]
     if not _puede(con, clave, tipo, ahora):
         return {"estado": "en_espera", "mensaje": f"Consultado hace menos de {ESPERA_S[tipo]} s; se muestran los datos guardados."}
     try:
@@ -113,6 +116,24 @@ def actualizar(con, ajustes, tipo: str, simbolo: str, intervalo: str = "1Day", d
             elif tipo == "libro":
                 libro, p = a.mejor_precio(origen, simbolo)
                 n = almacen.guardar_libro(con, libro, p)
+            elif tipo == "opciones_operaciones":
+                guardados = almacen.cadena(con, simbolo, demo=False)
+                disponibles = set(c["contrato"] for c in guardados)
+                if not disponibles:
+                    raise FuenteNoDisponible("sin contratos guardados: actualice la cadena o importe un CSV primero")
+                if contratos is not None:
+                    if not isinstance(contratos, list) or not contratos or len(contratos) > 100 or any(
+                            not isinstance(c, str) or c not in disponibles for c in contratos):
+                        raise ValueError("seleccione de 1 a 100 contratos presentes en la cadena guardada del subyacente")
+                    nombres = list(dict.fromkeys(contratos))
+                else:
+                    nombres = sorted(disponibles)
+                if len(nombres) > 100:
+                    raise FuenteNoDisponible("la cadena supera 100 contratos; indique una lista explícita de hasta 100 en el panel")
+                ops, p = a.operaciones_opciones(nombres, 60)
+                for op in ops:
+                    op.subyacente = simbolo
+                n = almacen.guardar_operaciones_opciones(con, ops, p)
             else:
                 spot = _spot(con, simbolo, origen)
                 tasa, _ = tasa_libre_riesgo(con)
@@ -274,3 +295,28 @@ def gex(con, ajustes, subyacente: str) -> dict:
     cadena = almacen.cadena(con, subyacente, demo=ajustes.es_demo)
     return {"subyacente": subyacente, **g.calcular(cadena), "procedencia": _procedencia(cadena),
             "nota": "Exposición gamma de contratos (opciones), no flujo de operaciones: no indica quién compró o vendió."}
+
+
+def skylit_guardado(con, ajustes, subyacente: str, hasta: str | None = None) -> dict:
+    """Filtro sobre cinta guardada, con complementos estrictamente simultáneos; nunca reutiliza NBBO."""
+    from . import skylit
+    ops = almacen.operaciones_opciones(con, subyacente, demo=ajustes.es_demo, hasta=hasta)
+    filas = []
+    corte = hasta or datetime.now(UTC).isoformat()
+    for op in ops:
+        f = {"instante": op["instante"], "contrato": op["contrato"], "subyacente": op["subyacente"],
+             "tipo": op["tipo"], "strike": op["strike"], "vencimiento": op["vencimiento"],
+             "precio": op["p"], "tamano": op["s"], "moneda": "USD"}
+        # Solo mismo contrato, instante, moneda y modo; no usar cotizaciones de otra hora ni OI sin fecha.
+        calidad = "calidad IN ('sintetico','importado')" if ajustes.es_demo else "calidad<>'sintetico'"
+        compatible = con.execute(f"SELECT multiplicador,spot FROM flujo_opciones WHERE contrato=? AND instante=? "
+                                 f"AND moneda='USD' AND disponible_desde<=? AND ({calidad}) "
+                                 "ORDER BY capturado_en DESC LIMIT 1", (op["contrato"], op["instante"], corte)).fetchone()
+        # SQLite conserva el instante normalizado a microsegundos: una fracción adicional no demuestra simultaneidad.
+        if compatible and _nanosegundos(op["t"]) % 1000 == 0:
+            f.update(multiplicador=compatible["multiplicador"], spot=compatible["spot"])
+        filas.append(skylit.evaluar_fila(f))
+    resultado = skylit.resumir(filas)
+    return {**resultado, "calidad": "guardado", "subyacente": subyacente, "procedencia": _procedencia(ops),
+            "nota": "Cinta guardada indicativa y diferida (≥ 15 min). El filtro completo no se aplicó: "
+                    "faltan NBBO del instante, patas e interés abierto fechado. Sin inferencias de lado ni apertura."}

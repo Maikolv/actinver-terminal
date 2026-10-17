@@ -237,3 +237,31 @@ confirmar y cambien la estrategia).
 - Option Flow: perfil experimental del filtro de Skylit sobre CSV; los criterios sin datos quedan «no evaluables» y no cuentan como filtro completo (§7).
 - `docs/proveedores-gratuitos.md` (fuentes oficiales al 16-oct, matriz por herramienta, disponibilidad comprobada) y `docs/proyecto-colab.md` (esperando que el usuario elija el tema).
 - 591 pruebas en verde. Decisión del usuario: usar o no el endpoint de contratos de Alpaca (API de trading) para OI/multiplicador.
+
+## Actualización 16-oct-2026 — cinta de opciones y perfiles de sesión
+
+- Alpaca Market Data: cinta indicativa con corte de 16 min, procedencia y campos originales
+  `t/x/p/s/c` en `flujo_opciones_operaciones`. Selección explícita de hasta 100 contratos
+  de la cadena guardada, tres páginas como máximo y caché de 120 s por selección.
+- Option Flow: evaluación Skylit de cinta guardada además del CSV. No reutiliza NBBO de
+  otra hora, no inventa OI/patas, no une fracciones temporales distintas en nanosegundos.
+  Con esta fuente el filtro completo sigue sin aplicarse.
+- Order Flow: TPO observado por sesión de 30 min, zona de origen, sin interpolar;
+  es una cota inferior OHLC. POC/VAH/VAL ≥70 % del perfil de volumen del rango,
+  con algoritmo documentado y valores nulos si no alcanzan los datos.
+- Nuevas lecturas limitadas a 30/min; tablas desplazables con foco de teclado.
+- Recorrido demo de preregistro guardar/evaluar/reevaluar/exportar verificado, con
+  huella conservada tras cambiar datos. Revisión móvil a 375 px: Laboratorio,
+  Order Flow y Skylit con ejemplos SINTÉTICOS, sin errores JS en los recorridos.
+- Arranque normal carga `.env` y detecta presencia de credenciales; no se reprodujo
+  el fallo anterior. `TERMINAL_SIN_ENV` omite la carga deliberadamente;
+  `TERMINAL_SIN_MOTOR` no la omite. No se alteraron esos interruptores.
+- Twelve Data Basic no cubre la BMV general según ficha XMEX oficial; Finnhub conserva
+  límites gratuitos no confirmados. Ambos desconectados. Ver matriz de proveedores.
+- Suite completa: 601 aprobadas; tras los últimos ajustes, 49 pruebas enfocadas
+  finales aprobadas. Sintaxis JS correcta y 0 hallazgos de secretos en 18 archivos.
+  Secuencia y límites de revisión en el informe de verificación de esta entrega.
+- Pendientes: autorización textual del endpoint de contratos Alpaca y tema Colab.
+  GEX sin datos nuevos de OI; ningún modelo tiene ventaja predictiva demostrada.
+  Detalles: `docs/verificacion-pendientes-2026-10-16.md`, `docs/perfiles-sesion.md`
+  y `docs/mejoras-intradia-permutaciones.md` §8. TradingView ajeno preservado.

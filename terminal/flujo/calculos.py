@@ -6,7 +6,8 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 
 def sma(valores: list[float], n: int = 20) -> list[float | None]:
@@ -165,7 +166,8 @@ def resumen_libro(libro: dict | None, niveles: int = 10) -> dict | None:
 def resumen_operaciones(ops: list[dict], cubetas: int = 24) -> dict:
     """Volumen acumulado, delta (solo con lado informado por el proveedor) y perfil de volumen por precio."""
     if not ops:
-        return {"n": 0, "volumen": 0.0, "delta": None, "delta_acumulado": [], "perfil": [], "con_lado": 0}
+        return {"n": 0, "volumen": 0.0, "delta": None, "delta_acumulado": [], "perfil": [], "con_lado": 0,
+                "area_valor": None}
     con_lado = [o for o in ops if o.get("lado") in ("compra", "venta")]
     delta_acum, d = [], 0.0
     if len(con_lado) == len(ops):
@@ -181,9 +183,104 @@ def resumen_operaciones(ops: list[dict], cubetas: int = 24) -> dict:
         perfil[k]["volumen"] += o["tamano"]
         if o.get("lado") in ("compra", "venta"):
             perfil[k][o["lado"]] += o["tamano"]
+    niveles = [{"desde": lo + k * ancho, "hasta": lo + (k + 1) * ancho, **v} for k, v in sorted(perfil.items())]
     return {"n": len(ops), "volumen": sum(o["tamano"] for o in ops), "con_lado": len(con_lado),
             "delta": d if delta_acum else None, "delta_acumulado": delta_acum,
-            "perfil": [{"desde": lo + k * ancho, "hasta": lo + (k + 1) * ancho, **v} for k, v in sorted(perfil.items())]}
+            "perfil": niveles, "area_valor": area_valor(niveles, len(ops))}
+
+
+def area_valor(perfil: list[dict], n_operaciones: int | None = None) -> dict | None:
+    """POC y área contigua ≥ 70 % sobre las cubetas existentes; algoritmo en docs/perfiles-sesion.md."""
+    niveles = sorted(perfil, key=lambda p: p["desde"])
+    if len(niveles) < 2 or (n_operaciones is not None and n_operaciones < 2):
+        return None
+    if any(not all(math.isfinite(p[k]) for k in ("desde", "hasta", "volumen"))
+           or p["volumen"] < 0 or p["hasta"] <= p["desde"] for p in niveles):
+        return None
+    total = sum(p["volumen"] for p in niveles)
+    if total <= 0:
+        return None
+    # Empate de POC: nivel más bajo. Empate entre vecinos: se incorporan ambos.
+    poc = max(range(len(niveles)), key=lambda i: niveles[i]["volumen"])
+    inferior = superior = poc
+    incluido = niveles[poc]["volumen"]
+    while incluido < total * 0.7:
+        abajo = niveles[inferior - 1]["volumen"] if inferior > 0 else -1
+        arriba = niveles[superior + 1]["volumen"] if superior + 1 < len(niveles) else -1
+        if abajo >= arriba and inferior > 0:
+            inferior -= 1
+            incluido += niveles[inferior]["volumen"]
+        if arriba >= abajo and superior + 1 < len(niveles):
+            superior += 1
+            incluido += niveles[superior]["volumen"]
+    return {"poc": (niveles[poc]["desde"] + niveles[poc]["hasta"]) / 2,
+            "poc_desde": niveles[poc]["desde"], "poc_hasta": niveles[poc]["hasta"],
+            "val": niveles[inferior]["desde"], "vah": niveles[superior]["hasta"],
+            "fraccion_objetivo": 0.7, "fraccion_observada": incluido / total,
+            "volumen_area": incluido, "volumen_total": total}
+
+
+def perfil_tpo(barras: list[dict], zona_horaria: str = "America/New_York", apertura: str = "09:30",
+               cierre: str = "16:00", cubetas: int = 24) -> dict:
+    """TPO observado por sesión: una marca por cubeta y periodo de 30 min, solo con precios OHLC presentes.
+
+    No infiere precios entre extremos ni rellena periodos ausentes; no equivale a un perfil de ticks completo.
+    Solo admite barras de ≤ 30 minutos que no crucen un periodo ni el cierre de sesión.
+    """
+    from .contratos import INTERVALOS
+    zona = ZoneInfo(zona_horaria)
+    abre = time.fromisoformat(apertura)
+    medianoche_siguiente = cierre == "24:00"
+    cierra = time(0) if medianoche_siguiente else time.fromisoformat(cierre)
+    if (not medianoche_siguiente and abre >= cierra) or not 1 <= cubetas <= 200:
+        raise ValueError("sesión o número de cubetas inválido")
+    sesiones = defaultdict(list)
+    for b in barras:
+        segundos = INTERVALOS.get(b.get("intervalo"), 0)
+        if not 0 < segundos <= 1800:
+            continue
+        t = datetime.fromisoformat(b["inicio"].replace("Z", "+00:00"))
+        if t.tzinfo is None:
+            continue
+        t = t.astimezone(zona)
+        inicio = datetime.combine(t.date(), abre, zona)
+        fin = datetime.combine(t.date() + timedelta(days=medianoche_siguiente), cierra, zona)
+        if t < inicio or t + timedelta(seconds=segundos) > fin:
+            continue
+        periodo = int((t - inicio).total_seconds() // 1800)
+        if t + timedelta(seconds=segundos) > inicio + timedelta(minutes=30 * (periodo + 1)):
+            continue
+        precios = [b.get(k) for k in ("apertura", "maximo", "minimo", "cierre")]
+        if any(p is None or not math.isfinite(p) or p <= 0 for p in precios):
+            continue
+        sesiones[t.date().isoformat()].append((periodo, precios))
+    resultado = []
+    for fecha, filas in sorted(sesiones.items()):
+        periodos = sorted({p for p, _ in filas})
+        niveles = None
+        if len(periodos) >= 2:
+            lo = min(min(precios) for _, precios in filas)
+            hi = max(max(precios) for _, precios in filas)
+            ancho = (hi - lo) / cubetas if hi > lo else 1.0
+            marcas = defaultdict(set)
+            for periodo, precios in filas:
+                for precio in precios:
+                    k = min(int((precio - lo) / ancho), cubetas - 1) if hi > lo else 0
+                    marcas[k].add(periodo)
+            niveles = [{"desde": lo + k * ancho, "hasta": lo + (k + 1) * ancho,
+                        "tpo": len(ps), "periodos": sorted(ps)} for k, ps in sorted(marcas.items())]
+        inicio = datetime.combine(date.fromisoformat(fecha), abre, zona)
+        resultado.append({"fecha": fecha, "inicio": inicio.isoformat(),
+                          "fin": datetime.combine(date.fromisoformat(fecha) + timedelta(days=medianoche_siguiente),
+                                                  cierra, zona).isoformat(),
+                          "barras": len(filas), "perfil": niveles,
+                          "periodos": [{"indice": p, "inicio": (inicio + timedelta(minutes=p * 30)).isoformat()}
+                                       for p in periodos],
+                          "motivo": None if niveles else "Se necesitan al menos dos periodos de 30 min observados."})
+    return {"zona_horaria": zona_horaria, "apertura": apertura, "cierre": cierre, "periodo_minutos": 30,
+            "sesiones": resultado,
+            "nota": "TPO observado: una marca por cubeta/periodo con precios OHLC guardados. Cota inferior; "
+                    "no se interpolan precios ni periodos. Sesiones parciales, sin calendario de festivos o cierres anticipados."}
 
 
 def volumen_inusual(contratos: list[dict], ratio_oi: float = 1.0, percentil: float = 0.95, minimo: float = 100) -> list[dict]:

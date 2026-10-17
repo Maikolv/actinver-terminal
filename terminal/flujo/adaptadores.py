@@ -17,12 +17,25 @@ from datetime import UTC, date, datetime, timedelta
 import httpx
 
 from .. import modelos_opciones
-from .contratos import Barra, ContratoOpcion, Libro, Nivel, Operacion, Procedencia, instante
+from .contratos import Barra, ContratoOpcion, Libro, Nivel, Operacion, OperacionOpcion, Procedencia, instante
 
 URL_DATOS = "https://data.alpaca.markets"
 RETRASO_SIP_S = 16 * 60
 LIC_ALPACA = "Alpaca Market Data, plan gratuito: uso personal, sin redistribución"
 OCC = re.compile(r"^([A-Z.]{1,6})(\d{6})([CP])(\d{8})$")
+
+
+def _nanosegundos(valor: str) -> int:
+    """Compara marcas ISO sin perder la fracción original de hasta nueve dígitos."""
+    t = datetime.fromisoformat(valor.replace("Z", "+00:00"))
+    if t.tzinfo is None:
+        raise ValueError("instante sin zona horaria")
+    fraccion = re.search(r"\.(\d+)", valor)
+    digitos = fraccion[1] if fraccion else ""
+    if len(digitos) > 9:
+        raise ValueError("precisión temporal superior a nanosegundos")
+    delta = t.replace(microsecond=0).astimezone(UTC) - datetime(1970, 1, 1, tzinfo=UTC)
+    return (delta.days * 86400 + delta.seconds) * 1_000_000_000 + int(digitos.ljust(9, "0") or "0")
 
 
 class FuenteNoDisponible(Exception):
@@ -84,6 +97,52 @@ class Alpaca:
         return ops, Procedencia("alpaca", LIC_ALPACA, "EE. UU. (consolidado SIP)", feed="sip", retraso_s=RETRASO_SIP_S,
                                 nota="Operaciones del consolidado SIP con ≥ 15 min de retraso. El proveedor no informa el "
                                      "lado del agresor: no hay delta de volumen.")
+
+    def operaciones_opciones(self, contratos: list[str], minutos: int = 60) -> tuple[list[OperacionOpcion], Procedencia]:
+        """Cinta indicativa diferida; solo datos de mercado. Máximo 100 contratos y 3 páginas."""
+        contratos = list(dict.fromkeys(contratos))
+        if not contratos or len(contratos) > 100 or any(not OCC.fullmatch(c) for c in contratos):
+            raise ValueError("se requieren de 1 a 100 contratos OCC válidos")
+        if not 1 <= int(minutos) <= 1440:
+            raise ValueError("minutos debe estar entre 1 y 1440")
+        fin = datetime.now(UTC) - timedelta(seconds=RETRASO_SIP_S)
+        inicio = fin - timedelta(minutes=int(minutos))
+        params = {"symbols": ",".join(contratos), "feed": "indicative", "start": inicio.isoformat(),
+                  "end": fin.isoformat(), "limit": 10000, "sort": "asc"}
+        out, tokens = [], set()
+        truncada = False
+        for _ in range(3):
+            d = self._get("/v1beta1/options/trades", params)
+            for contrato, trades in (d.get("trades") or {}).items():
+                if contrato not in contratos:
+                    continue
+                m = OCC.fullmatch(contrato)
+                venc = date(2000 + int(m[2][:2]), int(m[2][2:4]), int(m[2][4:])).isoformat()
+                for t in trades:
+                    ts = instante(t["t"])
+                    if not _nanosegundos(inicio.isoformat()) <= _nanosegundos(str(t["t"])) <= _nanosegundos(fin.isoformat()):
+                        continue  # nunca aceptar datos posteriores al corte solicitado
+                    precio, tamano = float(t["p"]), float(t["s"])
+                    if not math.isfinite(precio) or not math.isfinite(tamano) or precio <= 0 or tamano <= 0:
+                        raise ValueError("precio o tamaño de operación inválido")
+                    out.append(OperacionOpcion(contrato, m[1], ts, str(t.get("x") or ""), precio, tamano,
+                                               list(t.get("c") or []), str(t["t"]), venc, int(m[4]) / 1000,
+                                               "call" if m[3] == "C" else "put"))
+            token = d.get("next_page_token")
+            if not token:
+                break
+            truncada = True
+            if token in tokens:
+                break
+            tokens.add(token)
+            params["page_token"] = token
+            truncada = False
+        else:
+            truncada = bool(token)
+        return out, Procedencia("alpaca", LIC_ALPACA, "EE. UU. (OPRA indicativo)", feed="indicative",
+                                retraso_s=RETRASO_SIP_S,
+                                nota="Cinta indicativa solicitada con ≥ 15 min de retraso. Sin NBBO del instante, patas ni OI. "
+                                     + ("Resultado parcial: límite de paginación alcanzado." if truncada else ""))
 
     def mejor_precio(self, simbolo_origen: str, simbolo: str) -> tuple[Libro, Procedencia]:
         d = self._get(f"/v2/stocks/{simbolo_origen}/quotes/latest", {"feed": "iex"})

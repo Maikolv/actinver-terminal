@@ -155,3 +155,18 @@ class TradesProvider(Protocol):
 
 class OptionsChainProvider(Protocol):
     def cadena(self, subyacente: str) -> tuple[list[ContratoOpcion], Procedencia]: ...
+
+
+@dataclass
+class OperacionOpcion:
+    contrato: str
+    subyacente: str
+    instante: str
+    mercado_origen: str
+    precio: float
+    tamano: float
+    condiciones: list[str]
+    t_origen: str
+    vencimiento: str
+    strike: float
+    tipo: str

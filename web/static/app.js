@@ -83,7 +83,7 @@ function tabla(columnas, filas, { caption, vacio: textoVacio = "Sin registros.",
     const v = c.f(f);
     return h("td", { clase: clase(c) }, v instanceof Node ? v : (v ?? "—"));
   })));
-  return h("div", { clase: "tabla-contenedor" }, h("table", {}, caption ? h("caption", { texto: caption }) : null,
+  return h("div", { clase: "tabla-contenedor", tabindex: "0", role: "region", "aria-label": caption || "Tabla desplazable" }, h("table", {}, caption ? h("caption", { texto: caption }) : null,
     h("thead", {}, cab), h("tbody", {}, cuerpo)));
 }
 function limpiar(id, ...hijos) { const el = document.getElementById(id); el.replaceChildren(...hijos); return el; }
@@ -2003,6 +2003,20 @@ function botonAccion(texto, clase, alPulsar) {
   return b;
 }
 
+function pintarTpo(d) {
+  const letra = (i) => i < 26 ? String.fromCharCode(65 + i) : String.fromCharCode(97 + i - 26);
+  return h("section", { clase: "tarjeta" }, h("h2", { texto: "TPO observado / Market Profile" }),
+    h("p", { clase: "ayuda", texto: `${d.zona_horaria} · ${d.apertura}–${d.cierre} · periodos de 30 min · barras ${d.intervalo}. ${d.nota}` }),
+    cajaProcedencia(d.procedencia),
+    !d.sesiones.length ? h("p", { clase: "vacio", texto: "Sin barras intradía guardadas suficientes. Importe o actualice barras de 5 minutos en Velas; no se inventan niveles." }) : null,
+    ...d.sesiones.map((sesion) => h("div", {}, h("h3", { texto: sesion.fecha }),
+      sesion.perfil ? tabla([{ t: "Precio (cubeta)", f: (p) => `${num(p.desde)}–${num(p.hasta)}` },
+        { t: "TPO", f: (p) => p.tpo }, { t: "Periodos observados", f: (p) => p.periodos.map(letra).join(" ") }],
+      [...sesion.perfil].reverse(), { caption: `TPO observado del ${sesion.fecha}; cota inferior OHLC` })
+        : h("p", { clase: "vacio", texto: sesion.motivo }),
+      h("p", { clase: "ayuda", texto: sesion.periodos.map((p) => `${letra(p.indice)}: ${p.inicio.slice(11, 16)}`).join(" · ") }))));
+}
+
 async function cargarOrderFlow() {
   try {
     await estadoFlujo();
@@ -2021,6 +2035,7 @@ async function cargarOrderFlow() {
     }
     const d = await api(`/api/flujo/libro-operaciones?simbolo=${encodeURIComponent(o.simbolo)}&minutos=${o.minutos}&niveles=${o.niveles}`);
     const L = d.libro, R = d.resumen;
+    const perfiles = await api(`/api/flujo/perfiles?simbolo=${encodeURIComponent(o.simbolo)}`);
     const filasLibro = L ? Array.from({ length: Math.max(L.bids.length, L.asks.length) }, (_, i) => ({ b: L.bids[i], a: L.asks[i] })) : [];
     limpiar("orderflow-contenido", controles, provs,
       h("h2", { texto: "Libro y profundidad" }),
@@ -2035,6 +2050,7 @@ async function cargarOrderFlow() {
         filasLibro, { caption: "Libro de órdenes por nivel" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio_libro }),
       pintarMicroestructura(d),
+      pintarTpo(perfiles),
       h("h2", { texto: "Cinta de operaciones" }),
       d.operaciones.length ? h("div", {}, cajaProcedencia(d.procedencia_operaciones),
         h("div", { clase: "kpis" }, kpi("Operaciones", num(R.n)), kpi("Volumen", num(R.volumen)),
@@ -2042,6 +2058,10 @@ async function cargarOrderFlow() {
         R.delta == null ? h("p", { clase: "ayuda", texto: `Delta no disponible: la fuente informa el lado del agresor en ${R.con_lado} de ${R.n} operaciones. No se infiere.` })
           : grafica([{ nombre: "Delta acumulado (compras − ventas del agresor)", color: "var(--acento)", datos: R.delta_acumulado.map((p) => ({ x: p.instante, y: p.delta })) }], { alto: 160, formato: num, etiqueta: "Delta de volumen acumulado" }),
         h("h3", { texto: "Perfil de volumen por precio" }), perfilVolumen(R.perfil),
+        R.area_valor ? h("div", {}, h("div", { clase: "kpis" },
+          kpi("POC (centro de cubeta)", num(R.area_valor.poc)), kpi("VAH", num(R.area_valor.vah)), kpi("VAL", num(R.area_valor.val))),
+          h("p", { clase: "ayuda", texto: "Área de valor ≥ 70 % del volumen observado del rango; cubetas contiguas desde POC. No representa una sesión completa." }))
+          : h("p", { clase: "ayuda", texto: "POC / VAH / VAL: datos insuficientes (se requieren al menos dos operaciones y dos niveles)." }),
         tabla([{ t: "Hora", f: (f) => horaCdmx(f.instante) }, { t: "Precio", f: (f) => num(f.precio), num: true },
           { t: "Tamaño", f: (f) => num(f.tamano), num: true },
           { t: "Lado del agresor", f: (f) => (f.lado ? h("span", { clase: f.lado === "compra" ? "positivo" : "negativo", texto: f.lado }) : "no informado") }],
@@ -2603,12 +2623,14 @@ function seccionSkylit() {
   const salida = h("div", { "aria-live": "polite" });
   const estado = (e) => chip(e === "cumple" || e === "pasa" ? "vigente" : e === "no_evaluable" ? "sin_datos" : "vencido",
     e === "cumple" ? "Cumple" : e === "pasa" ? "Pasa" : e === "no_evaluable" ? "No evaluable" : e === "no_pasa" ? "No pasa" : "No cumple");
-  const boton = botonAccion("Evaluar operaciones", "boton--primario", async (b) => {
+  const evaluar = async (b, guardado = false) => {
     ocupado([b], true);
     try {
-      const r = await api("/api/flujo/skylit", { method: "POST", json: { csv: ta.value } });
+      const r = guardado ? await api(`/api/flujo/skylit?subyacente=${encodeURIComponent(flujo.op.subyacente)}`)
+        : await api("/api/flujo/skylit", { method: "POST", json: { csv: ta.value } });
       const faltan = Object.entries(r.no_evaluables_por_criterio);
       salida.replaceChildren(h("div", {},
+        h("p", { clase: "aviso-caja", role: "status", texto: r.nota }), cajaProcedencia(r.procedencia || []),
         h("div", { clase: "kpis" }, kpi("Operaciones", String(r.operaciones)), kpi("Pasan", String(r.conteo.pasa)), kpi("No pasan", String(r.conteo.no_pasa)),
           kpi("No evaluables", String(r.conteo.no_evaluable)), kpi("Filtro completo aplicado", r.filtro_completo_aplicado ? "Sí" : "No")),
         faltan.length ? h("div", { clase: "aviso-caja", role: "status",
@@ -2618,13 +2640,23 @@ function seccionSkylit() {
           { t: "Volumen contrato", f: (x) => (x.volumen_contrato_dia == null ? "—" : num(x.volumen_contrato_dia)), num: true },
           { t: "Interés abierto", f: (x) => (x.interes_abierto == null ? "—" : `${num(x.interes_abierto)}${x.fecha_oi ? ` (${x.fecha_oi})` : ""}`), num: true },
           ...Object.keys(NOMBRES_SKYLIT).map((k) => ({ t: NOMBRES_SKYLIT[k], f: (x) => h("span", { title: x.criterios[k].motivo || "" }, estado(x.criterios[k].estado)) })),
-          { t: "Resultado", f: (x) => estado(x.resultado) }], r.filas, { caption: "Criterios del video por operación (calidad: importado)" }),
+          { t: "Resultado", f: (x) => estado(x.resultado) }], r.filas, { caption: `Criterios del video por operación (calidad: ${r.calidad})` }),
         r.errores.length ? h("p", { clase: "ayuda", texto: `Filas descartadas: ${r.errores.map((e) => `${e.fila} (${e.error})`).join("; ")}` }) : null,
         h("ul", {}, r.avisos.map((a) => h("li", { texto: a })))));
     } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+  };
+  const boton = botonAccion("Evaluar CSV", "boton--primario", (b) => evaluar(b));
+  const guardado = botonAccion("Evaluar cinta guardada", "boton--secundario", (b) => evaluar(b, true));
+  const contratos = h("input", { type: "text", maxlength: 2400, "aria-label": "Contratos de la cadena para actualizar cinta (OCC separados por coma)" });
+  const actualizar = botonAccion("Actualizar cinta indicativa (≥ 15 min)", "boton--secundario", async (b) => {
+    const seleccion = contratos.value.split(",").map((x) => x.trim().toUpperCase()).filter(Boolean);
+    if (await pedirActualizacion("opciones_operaciones", flujo.op.subyacente, seleccion.length ? { contratos: seleccion } : {}, b)) await evaluar(guardado, true);
   });
   return h("div", { clase: "tarjeta" }, h("h2", { texto: "Filtro de Option Flow (perfil experimental, criterios de un video de Skylit)" }),
     h("p", { clase: "ayuda", texto: "Necesita la cinta de operaciones de opciones con NBBO del instante, condición, número de patas, interés abierto con su fecha, spot y clase del subyacente. Una cadena de opciones no la sustituye; el feed gratuito de Alpaca no trae interés abierto ni patas. Sin esos campos el criterio queda «no evaluable». No es una regla validada ni una recomendación." }),
+    h("p", { clase: "aviso-caja", texto: "Cinta Alpaca indicativa y retrasada: el filtro completo no se aplica sin NBBO del instante, patas e interés abierto. Actualice primero la cadena para elegir contratos." }),
+    h("label", { clase: "campo-bloque" }, "Contratos de la cadena para consultar (OCC separados por coma; máximo 100; vacío usa toda la cadena si cabe) ", contratos),
+    h("div", { clase: "fila-controles" }, guardado, actualizar),
     h("div", { clase: "fila-controles" }, archivo, h("a", { href: "/api/flujo/skylit/plantilla", clase: "boton boton--secundario", texto: "Descargar plantilla" }), boton), ta, salida);
 }
 

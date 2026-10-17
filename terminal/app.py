@@ -974,6 +974,31 @@ def flujo_orderflow(simbolo: str, minutos: int = 240, niveles: int = 20, con=Dep
     return servicio.orderflow(con, AJUSTES, simbolo, max(1, min(minutos, 10080)), max(1, min(niveles, 200)))
 
 
+@app.get("/api/flujo/perfiles")
+def flujo_perfiles(simbolo: str, intervalo: str = "5Min", dias: int = 7, con=Depends(con_db)):
+    from datetime import UTC, datetime, timedelta
+    from .flujo import almacen, calculos, servicio
+    if intervalo not in ("1Min", "5Min", "15Min"):
+        raise HTTPException(422, "TPO requiere barras de 1, 5 o 15 minutos")
+    desde = (datetime.now(UTC) - timedelta(days=max(1, min(dias, 30)))).isoformat()
+    barras = almacen.barras(con, simbolo, intervalo, desde, demo=AJUSTES.es_demo)
+    # Una procedencia por cálculo: no unir feeds ni importar rangos incompatibles.
+    if barras:
+        clave = (barras[-1]["fuente"], barras[-1]["feed"], barras[-1]["calidad"])
+        barras = [b for b in barras if (b["fuente"], b["feed"], b["calidad"]) == clave]
+    cripto = servicio.es_cripto(simbolo)
+    origen = servicio.origen_eeuu(con, simbolo)
+    if not cripto and not origen:
+        return {"zona_horaria": "sin configurar", "apertura": "—", "cierre": "—", "periodo_minutos": 30,
+                "sesiones": [], "procedencia": [], "intervalo": intervalo,
+                "nota": "Sin sesión de origen verificada para este símbolo; no se supone un horario para el CSV."}
+    zona = "America/Mexico_City" if cripto else "America/New_York"
+    return {**calculos.perfil_tpo(barras, zona_horaria=zona,
+                                apertura="00:00" if cripto else "09:30",
+                                cierre="24:00" if cripto else "16:00"),
+            "procedencia": servicio._procedencia(barras), "intervalo": intervalo}
+
+
 @app.get("/api/flujo/optionflow")
 def flujo_optionflow(subyacente: str, vencimiento: str = "", tipo: str = "", strike_min: str = "", strike_max: str = "",
                      volumen_min: str = "", oi_min: str = "", delta_abs_max: str = "", ratio_oi: str = "",
@@ -997,7 +1022,8 @@ def flujo_actualizar(cuerpo: dict = Body(...), con=Depends(con_db)):
     from .flujo import servicio
     try:
         return servicio.actualizar(con, AJUSTES, str(cuerpo.get("tipo", "")), str(cuerpo.get("simbolo", "")),
-                                   str(cuerpo.get("intervalo") or "1Day"), max(1, min(int(cuerpo.get("dias") or 180), 3650)))
+                                   str(cuerpo.get("intervalo") or "1Day"), max(1, min(int(cuerpo.get("dias") or 180), 3650)),
+                                   contratos=cuerpo.get("contratos"))
     except (ValueError, TypeError) as e:
         raise HTTPException(422, str(e)) from None
 
@@ -1121,6 +1147,15 @@ def flujo_skylit(cuerpo: dict = Body(...)):
     from .flujo import skylit
     try:
         return skylit.evaluar_csv(str(cuerpo.get("csv") or ""))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/skylit")
+def flujo_skylit_guardado(subyacente: str, con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.skylit_guardado(con, AJUSTES, subyacente)
     except ValueError as e:
         raise HTTPException(422, str(e)) from None
 

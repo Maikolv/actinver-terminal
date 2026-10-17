@@ -2,6 +2,29 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-16 — cinta indicativa y perfiles de sesión]
+
+### Agregado
+- Cinta histórica Alpaca Market Data indicativa con corte de 16 minutos, campos originales y procedencia.
+  Selección explícita de hasta 100 contratos guardados, paginación acotada y caché por selección.
+- Evaluación Skylit sobre cinta persistida además del CSV. Sin NBBO prestado, patas u OI inventados;
+  comparación temporal con nanosegundos. La interfaz explica por qué el filtro completo no se aplicó.
+- TPO observado sobre OHLC guardados, periodos de 30 minutos por sesión y zona horaria explícita,
+  sin interpolación. POC/VAH/VAL del perfil de volumen, algoritmo del 70 % documentado y nulos sin datos.
+- Límites de lectura HTTP y foco de teclado en tablas desplazables.
+
+### Verificado
+- HTTP falso, persistencia, cortes sin fuga, aislamiento sintético, cálculos numéricos y rutas seguras.
+- Preregistro demo: guardar → evaluar → cambiar datos → reevaluar devuelve lo guardado → exportar.
+- Laboratorio, Skylit y TPO revisados a 375 px; detalles de pruebas y consola en
+  `docs/verificacion-pendientes-2026-10-16.md`.
+- Revisión oficial: Twelve Data Basic sin BMV general; límites gratuitos Finnhub aún no confirmados.
+- Arranque normal sí carga credenciales; omisión con TERMINAL_SIN_ENV intencional, sin alterar seguridad.
+
+### Pendiente
+- Endpoint de contratos Alpaca sin implementar por falta de autorización textual; Colab sin tema elegido.
+- Sin datos nuevos para GEX ni ventaja predictiva demostrada. Ninguna cuenta, pago u orden activados.
+
 ## [2026-10-16 — preregistro, filtro de Skylit y proveedores gratuitos]
 
 ### Agregado
