@@ -230,3 +230,10 @@ confirmar y cambien la estrategia).
 - Referencia personal de precios solo en data local ignorado; no se incorpora a cartera ni cotizaciones. Artifact independiente ampliado con replay y ejercicios.
 - Verificación: 83 pruebas enfocadas aprobadas; sintaxis JS y comprobación de catálogo, replay y medias en navegador.
 - Pendiente: dos URL exactas de playlists, revisión integral de videos y fuente Level 2/tape autorizada para datos completos. No se contrataron servicios ni se habilitaron órdenes. Ver docs/recursos-educativos.md.
+
+## Actualización 16-oct-2026 — preregistro, filtro de Skylit y proveedores gratuitos
+
+- Laboratorio: preregistro con huella, tramos exploración | embargo | holdout (un solo uso) y exportación JSON (`docs/mejoras-intradia-permutaciones.md` §6).
+- Option Flow: perfil experimental del filtro de Skylit sobre CSV; los criterios sin datos quedan «no evaluables» y no cuentan como filtro completo (§7).
+- `docs/proveedores-gratuitos.md` (fuentes oficiales al 16-oct, matriz por herramienta, disponibilidad comprobada) y `docs/proyecto-colab.md` (esperando que el usuario elija el tema).
+- 591 pruebas en verde. Decisión del usuario: usar o no el endpoint de contratos de Alpaca (API de trading) para OI/multiplicador.

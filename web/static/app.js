@@ -2114,7 +2114,7 @@ async function cargarOptionFlow() {
     if (!o.subyacente) {
       limpiar("optionflow-contenido", h("div", { clase: "fila-controles" }, sim, botonAct),
         h("p", { clase: "vacio", texto: "Elija un subyacente del SIC. Proveedor: Alpaca, feed «indicative» de OPRA (gratuito y diferido; sin interés abierto). Opciones de MexDer: solo por CSV." }),
-        formImportar("opciones", cargarOptionFlow));
+        formImportar("opciones", cargarOptionFlow), seccionSkylit());
       return;
     }
     const qs = new URLSearchParams({ subyacente: o.subyacente, ...Object.fromEntries(Object.entries(F).filter(([, v]) => v !== "" && v != null)) });
@@ -2164,7 +2164,7 @@ async function cargarOptionFlow() {
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio }),
       h("h2", { texto: "GEX: exposición gamma por strike y vencimiento" }),
       h("div", { id: "gex-contenido", "aria-live": "polite" }, h("p", { clase: "ayuda", texto: "Calculando disponibilidad…" })),
-      formImportar("opciones", cargarOptionFlow));
+      formImportar("opciones", cargarOptionFlow), seccionSkylit());
     cargarGex(o.subyacente);
   } catch (e) { limpiar("optionflow-contenido", errorCaja(e)); }
 }
@@ -2537,6 +2537,7 @@ function cargarLaboratorio() {
     } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([boton], false); }
   });
   limpiar("laboratorio-contenido", h("div", { clase: "aviso-caja", role: "note", texto: "Preregistre hipótesis y variantes antes de mirar resultados; valide con walk-forward con purga/embargo y un holdout; use solo rendimientos netos de costos. Un p < 0.05 aislado no es alfa probado." }), form, salida);
+  seccionPreregistro(ta, form).then((x) => document.getElementById("laboratorio-contenido").append(x));
 }
 function pintarPermutacion(r, sintetico) {
   return h("div", { clase: "tarjeta" },
@@ -2591,6 +2592,88 @@ async function cargarIntradia() {
         tabla([{ t: "Dato", f: (x) => x.dato }, { t: "Estado", f: (x) => chip(x.estado === "ok" ? "vigente" : "retrasado", x.estado === "ok" ? "Disponible" : "Falta") }, { t: "Qué se necesita", f: (x) => x.requiere }], d.disponibilidad)),
       h("div", { clase: "tarjeta" }, h("h2", { texto: "Reglas" }), h("ul", {}, d.reglas.map((r) => h("li", { texto: r })))));
   } catch (e) { limpiar("intradia-contenido", errorCaja(e)); }
+}
+/* ---------- Option Flow: perfil EXPERIMENTAL del filtro de Skylit (CSV de operaciones; no guarda nada) ---------- */
+const NOMBRES_SKYLIT = { prima: "Prima ≥ USD 100 000", vencimiento: "≤ 183 días", volumen_oi: "Volumen/OI ≥ 10", fuera_del_dinero: "Fuera del dinero",
+  accion: "Subyacente acción", una_pata: "Una sola pata", en_ask: "En el ask o encima" };
+function seccionSkylit() {
+  const ta = h("textarea", { rows: 5, spellcheck: "false", clase: "area-csv", "aria-label": "Operaciones de opciones en CSV (plantilla Skylit)" });
+  const archivo = h("input", { type: "file", accept: ".csv,text/csv", "aria-label": "Archivo CSV de operaciones de opciones" });
+  archivo.addEventListener("change", async () => { if (archivo.files[0]) ta.value = await archivo.files[0].text(); });
+  const salida = h("div", { "aria-live": "polite" });
+  const estado = (e) => chip(e === "cumple" || e === "pasa" ? "vigente" : e === "no_evaluable" ? "sin_datos" : "vencido",
+    e === "cumple" ? "Cumple" : e === "pasa" ? "Pasa" : e === "no_evaluable" ? "No evaluable" : e === "no_pasa" ? "No pasa" : "No cumple");
+  const boton = botonAccion("Evaluar operaciones", "boton--primario", async (b) => {
+    ocupado([b], true);
+    try {
+      const r = await api("/api/flujo/skylit", { method: "POST", json: { csv: ta.value } });
+      const faltan = Object.entries(r.no_evaluables_por_criterio);
+      salida.replaceChildren(h("div", {},
+        h("div", { clase: "kpis" }, kpi("Operaciones", String(r.operaciones)), kpi("Pasan", String(r.conteo.pasa)), kpi("No pasan", String(r.conteo.no_pasa)),
+          kpi("No evaluables", String(r.conteo.no_evaluable)), kpi("Filtro completo aplicado", r.filtro_completo_aplicado ? "Sí" : "No")),
+        faltan.length ? h("div", { clase: "aviso-caja", role: "status",
+          texto: "Criterios sin datos: " + faltan.map(([k, n]) => `${NOMBRES_SKYLIT[k]} (${n})`).join(", ") + ". Esas operaciones no cuentan como filtradas." }) : null,
+        tabla([{ t: "Instante", f: (x) => horaCdmx(x.instante) }, { t: "Contrato", f: (x) => x.contrato }, { t: "Días", f: (x) => x.dte, num: true },
+          { t: "Prima USD", f: (x) => (x.prima_usd == null ? "—" : num(x.prima_usd)), num: true },
+          { t: "Volumen contrato", f: (x) => (x.volumen_contrato_dia == null ? "—" : num(x.volumen_contrato_dia)), num: true },
+          { t: "Interés abierto", f: (x) => (x.interes_abierto == null ? "—" : `${num(x.interes_abierto)}${x.fecha_oi ? ` (${x.fecha_oi})` : ""}`), num: true },
+          ...Object.keys(NOMBRES_SKYLIT).map((k) => ({ t: NOMBRES_SKYLIT[k], f: (x) => h("span", { title: x.criterios[k].motivo || "" }, estado(x.criterios[k].estado)) })),
+          { t: "Resultado", f: (x) => estado(x.resultado) }], r.filas, { caption: "Criterios del video por operación (calidad: importado)" }),
+        r.errores.length ? h("p", { clase: "ayuda", texto: `Filas descartadas: ${r.errores.map((e) => `${e.fila} (${e.error})`).join("; ")}` }) : null,
+        h("ul", {}, r.avisos.map((a) => h("li", { texto: a })))));
+    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+  });
+  return h("div", { clase: "tarjeta" }, h("h2", { texto: "Filtro de Option Flow (perfil experimental, criterios de un video de Skylit)" }),
+    h("p", { clase: "ayuda", texto: "Necesita la cinta de operaciones de opciones con NBBO del instante, condición, número de patas, interés abierto con su fecha, spot y clase del subyacente. Una cadena de opciones no la sustituye; el feed gratuito de Alpaca no trae interés abierto ni patas. Sin esos campos el criterio queda «no evaluable». No es una regla validada ni una recomendación." }),
+    h("div", { clase: "fila-controles" }, archivo, h("a", { href: "/api/flujo/skylit/plantilla", clase: "boton boton--secundario", texto: "Descargar plantilla" }), boton), ta, salida);
+}
+
+/* ---------- Laboratorio: preregistro y holdout de un solo uso ---------- */
+async function seccionPreregistro(taCsv, formParams) {
+  const t = (n, etq, max, filas = 1) => h("label", { clase: "campo-bloque" }, `${etq} `, filas > 1 ? h("textarea", { name: n, rows: filas, maxlength: max }) : h("input", { name: n, maxlength: max }));
+  const salida = h("div", { "aria-live": "polite" });
+  const lista = h("div", {});
+  const form = h("form", { clase: "tarjeta" }, h("h2", { texto: "1. Preregistro (antes de mirar resultados)" }),
+    h("p", { clase: "ayuda", texto: "Fija hipótesis, estrategias, costos, fuentes, cómo se estimaron los parámetros (walk-forward), holdout y embargo. Usa B, semilla, α, bloque e hipótesis exploradas del formulario de arriba. Queda guardado con huella sha256 y fecha." }),
+    t("nombre", "Nombre", 80), t("hipotesis", "Hipótesis", 600, 2), t("benchmark", "Benchmark", 120), t("costos", "Costos incluidos", 400, 2),
+    t("fuentes", "Fuentes y licencia de los datos", 600, 2), t("walk_forward", "Walk-forward y purga usados para generar los rendimientos", 600, 2),
+    t("estrategias", "Estrategias (nombres de columna, separados por coma)", 400),
+    h("div", { clase: "fila-controles" }, h("label", {}, "Holdout (fracción final) ", h("input", { type: "number", name: "holdout", value: 0.3, min: 0.1, max: 0.5, step: 0.05 })),
+      h("label", {}, "Embargo (observaciones) ", h("input", { type: "number", name: "embargo", value: 5, min: 0, max: 250, step: 1 }))),
+    h("button", { type: "submit", clase: "boton boton--primario", texto: "Guardar preregistro" }));
+  const pintarEvaluacion = (r) => salida.replaceChildren(h("div", { clase: "tarjeta" },
+    r.holdout_ya_usado ? h("div", { clase: "aviso-caja", role: "status", texto: r.aviso_reuso }) : null,
+    h("div", { clase: "kpis" }, kpi("Exploración", String(r.tramos.exploracion)), kpi("Embargo", String(r.tramos.embargo)), kpi("Holdout", String(r.tramos.holdout))),
+    h("p", { clase: "ayuda", texto: r.lectura }), h("h3", { texto: "Holdout (confirmatorio)" }), pintarPermutacion(r.holdout, false),
+    h("h3", { texto: "Exploración (descriptiva)" }), pintarPermutacion(r.exploracion, false),
+    h("p", { clase: "ayuda", texto: `Huella del preregistro: ${r.huella_preregistro}` })));
+  const pintarLista = async () => {
+    const d = await api("/api/laboratorio/experimentos");
+    lista.replaceChildren(h("h2", { texto: "2. Evaluar con el CSV de arriba (el holdout se usa una sola vez)" }),
+      tabla([{ t: "#", f: (x) => x.id, num: true }, { t: "Nombre", f: (x) => x.nombre }, { t: "Preregistrado", f: (x) => horaCdmx(x.creado_en) },
+        { t: "Holdout", f: (x) => (x.evaluado_en ? `usado ${horaCdmx(x.evaluado_en)}` : "sin usar") },
+        { t: "", f: (x) => h("span", {}, botonAccion(x.evaluado_en ? "Ver resultado" : "Evaluar", "boton--secundario", async (b) => {
+          ocupado([b], true);
+          try { pintarEvaluacion(await api(`/api/laboratorio/experimentos/${x.id}/evaluar`, { method: "POST", json: { csv: taCsv.value } })); pintarLista(); }
+          catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+        }), " ", h("a", { href: `/api/laboratorio/experimentos/${x.id}/exportar`, clase: "boton boton--texto", texto: "Exportar JSON" })) }],
+      d.experimentos, { vacio: "Sin preregistros." }));
+  };
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const f = form.elements, p = formParams.elements, b = form.querySelector('button[type="submit"]');
+    ocupado([b], true);
+    try {
+      const r = await api("/api/laboratorio/preregistro", { method: "POST", json: { nombre: f.nombre.value, hipotesis: f.hipotesis.value, benchmark: f.benchmark.value,
+        costos: f.costos.value, fuentes: f.fuentes.value, walk_forward: f.walk_forward.value, estrategias: f.estrategias.value.split(",").map((s) => s.trim()).filter(Boolean),
+        holdout: Number(f.holdout.value), embargo: Number(f.embargo.value), B: Number(p.B.value), semilla: Number(p.semilla.value), alpha: Number(p.alpha.value),
+        bloque: p.bloque.value || null, exploradas: p.exploradas.value || null } });
+      notificar(`Preregistro #${r.id} guardado (huella ${r.huella_preregistro.slice(0, 12)}…).`);
+      pintarLista();
+    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+  });
+  try { await pintarLista(); } catch (e) { lista.replaceChildren(errorCaja(e)); }
+  return h("div", {}, form, h("div", { clase: "tarjeta" }, lista), salida);
 }
 CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
 CARGAS["tab-intradia"] = () => cargarIntradia();

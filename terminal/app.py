@@ -1072,6 +1072,66 @@ def laboratorio_permutacion(cuerpo: dict = Body(...)):
         raise HTTPException(422, str(e)) from None
 
 
+@app.post("/api/laboratorio/preregistro")
+def laboratorio_preregistro(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import laboratorio
+    try:
+        return laboratorio.preregistrar(con, cuerpo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/laboratorio/experimentos")
+def laboratorio_experimentos(con=Depends(con_db)):
+    from . import laboratorio
+    return {"experimentos": laboratorio.experimentos(con)}
+
+
+@app.post("/api/laboratorio/experimentos/{eid}/evaluar")
+def laboratorio_evaluar(eid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Exploración + holdout de un solo uso con los parámetros preregistrados. Solo cálculo: no opera."""
+    from . import laboratorio
+    try:
+        if cuerpo.get("csv") is not None:
+            bench, ests = laboratorio.leer_csv(str(cuerpo["csv"]))
+        else:
+            bench, ests = cuerpo.get("benchmark"), cuerpo.get("estrategias")
+        return laboratorio.evaluar(con, eid, bench, ests)
+    except LookupError as e:
+        raise HTTPException(404, str(e)) from None
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/laboratorio/experimentos/{eid}/exportar")
+def laboratorio_exportar(eid: int, con=Depends(con_db)):
+    from . import laboratorio
+    try:
+        d = laboratorio.exportar(con, eid)
+    except LookupError as e:
+        raise HTTPException(404, str(e)) from None
+    return Response(json.dumps(d, ensure_ascii=False, indent=2), media_type="application/json; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="experimento_{eid}.json"'})
+
+
+@app.post("/api/flujo/skylit")
+def flujo_skylit(cuerpo: dict = Body(...)):
+    """Perfil EXPERIMENTAL del filtro de Option Flow descrito en un video (Skylit) sobre un CSV de operaciones de opciones.
+    No guarda datos, no es una regla validada ni una recomendación."""
+    from .flujo import skylit
+    try:
+        return skylit.evaluar_csv(str(cuerpo.get("csv") or ""))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/skylit/plantilla")
+def flujo_skylit_plantilla():
+    from .flujo import skylit
+    return PlainTextResponse(skylit.plantilla(), media_type="text/csv; charset=utf-8",
+                             headers={"Content-Disposition": 'attachment; filename="plantilla_skylit.csv"'})
+
+
 # Etapa 3: riesgo, seguimiento, comparación y backtesting (solo análisis y simulación).
 @app.get("/api/riesgo")
 def get_riesgo(ventana: int = 252, horizonte: int | None = None, con=Depends(con_db)):

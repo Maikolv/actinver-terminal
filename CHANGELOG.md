@@ -2,6 +2,31 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-16 — preregistro, filtro de Skylit y proveedores gratuitos]
+
+### Agregado
+- Laboratorio: preregistro con huella sha256 (hipótesis, estrategias, costos, fuentes, walk-forward, B, semilla, α, bloque, holdout y embargo).
+  - Evaluación en tramos cronológicos (exploración | embargo | holdout) con permutación y Holm en cada uno.
+  - Holdout de un solo uso: una segunda evaluación devuelve lo guardado.
+  - Exportación JSON.
+  - Rutas `/api/laboratorio/preregistro`, `/experimentos`, `/experimentos/{id}/evaluar` y `/experimentos/{id}/exportar`.
+- Option Flow: perfil EXPERIMENTAL del filtro de Skylit sobre un CSV de operaciones de opciones (`/api/flujo/skylit` y su plantilla).
+  - Siete criterios; cada uno es cumple, no cumple o «no evaluable».
+  - Prima, volumen y OI se muestran por separado.
+  - No guarda datos.
+- `docs/proveedores-gratuitos.md`: tabla de proveedores con enlaces oficiales y fecha, matriz por herramienta, combinación gratuita mínima, guía de claves y disponibilidad comprobada con una consulta mínima por fuente.
+- `docs/proyecto-colab.md`: secuencia de los reels y tres temas recomendados, en espera de su elección.
+
+### Verificación
+- Suite completa: 591 pruebas aprobadas, 17 de ellas nuevas en `tests/test_preregistro_skylit.py`.
+- `node --check` correcto; revisión de patrones de secretos sin hallazgos.
+- Navegador: filtro con un ejemplo SINTÉTICO (pasa / no evaluable) y formulario de preregistro, sin errores de consola.
+
+### Pendiente o decisión suya
+- OI y tamaño desde el endpoint de contratos de Alpaca. Está en la API de trading, así que no se implementó sin su autorización.
+- NBBO histórico y patas de opciones: sin fuente gratuita verificada.
+- TPO y POC/VAH/VAL: calculables, sin implementar.
+
 ## [2026-10-16 — recursos educativos y microestructura]
 
 - Catálogo de cuatro PDF y diez capturas: precisiones de indicadores, recursos de YouTube y condiciones de certificados; panel Aprender y recursos y API de lectura.

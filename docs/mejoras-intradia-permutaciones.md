@@ -45,3 +45,33 @@ Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio son pestañas prin
 - `node --check web/static/app.js` correcto; revisión de patrones de secretos en 15 archivos de la entrega sin hallazgos.
 - Navegador: controles de indicadores conservan selección al cambiar rápido; respuestas antiguas ya no reemplazan la vista más reciente. Con solo 21 barras, MACD avisa calentamiento insuficiente y no inventa valores; estocástico sí aparece cuando hay datos suficientes.
 - Ejemplo del laboratorio ejecutado desde la UI, con rótulo sintético, semilla y Holm visibles. No representa resultados financieros reales.
+
+## 6. Preregistro y holdout de un solo uso (`terminal/laboratorio.py`, 16-oct-2026)
+- `POST /api/laboratorio/preregistro` guarda, antes de ver datos:
+  - nombre, hipótesis, benchmark, costos, fuentes, cómo se generaron los rendimientos (walk-forward/purga) y estrategias;
+  - B, semilla, α, bloque e hipótesis exploradas;
+  - fracción de holdout (0.1–0.5) y embargo (0–250 observaciones).
+  Se guarda en la tabla `laboratorio_experimentos` con huella sha256 y fecha.
+- `POST /api/laboratorio/experimentos/{id}/evaluar`:
+  - exige exactamente las estrategias preregistradas;
+  - corta en orden cronológico: exploración | embargo (descartado) | holdout;
+  - aplica la misma prueba de permutación y Holm a ambos tramos; solo el holdout es confirmatorio.
+- El holdout se usa una sola vez: una segunda evaluación devuelve el resultado guardado y no recalcula, aunque cambien los datos.
+- `GET /api/laboratorio/experimentos/{id}/exportar` entrega un JSON con preregistro, huellas y resultado.
+- Límite: la terminal no puede comprobar que los rendimientos vengan de un walk-forward real. El preregistro lo declara y queda trazado.
+
+## 7. Filtro de Option Flow, perfil experimental de Skylit (`terminal/flujo/skylit.py`, `POST /api/flujo/skylit`)
+- Criterios del video, no reglas validadas ni recomendación de comprar opciones:
+  - prima ≥ USD 100 000 (precio × tamaño × multiplicador, moneda USD);
+  - DTE ≤ 183;
+  - volumen del contrato / OI ≥ 10;
+  - fuera del dinero;
+  - subyacente acción;
+  - una sola pata;
+  - precio ≥ ask del NBBO del instante.
+- Prima, volumen y OI se muestran por separado. Cada criterio es `cumple`, `no_cumple` o `no_evaluable` (falta NBBO, condición, patas, OI u OI = 0, spot, clase o multiplicador).
+- Una operación «pasa» solo si los 7 criterios se cumplen. `filtro_completo_aplicado` es falso si alguno no fue evaluable.
+- Entrada: CSV con la plantilla `GET /api/flujo/skylit/plantilla`. No se guarda nada; la calidad es «importado».
+- Volumen/OI no prueba apertura de posiciones: el OI tiene desfase y la operación puede cerrar, cubrir o ser parte de una estructura.
+- Con las fuentes gratuitas no es completo: Alpaca trae operaciones indicativas con condición, pero no el NBBO del instante, las patas ni el OI (`docs/proveedores-gratuitos.md`).
+- Pruebas: `tests/test_preregistro_skylit.py` (17).

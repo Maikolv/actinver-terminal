@@ -185,3 +185,113 @@ def permutacion(benchmark, estrategias: dict, bloque: int | None = None, B: int 
             "n": n, "bloque": bloque, "bloques": nb, "B": B, "semilla": semilla, "alpha": alpha,
             "p_minimo": 1 / (B + 1), "familia": len(nombres), "familia_total_holm": max(exploradas or 0, len(nombres)),
             "resultados": filas, "huella_sha256": huella, "advertencias": avisos}
+
+
+# ---------- Preregistro, holdout de un solo uso y exportación ----------
+# El preregistro fija hipótesis, nombres de estrategias, parámetros, fracción de holdout y embargo ANTES de ver datos.
+# La evaluación divide los rendimientos en orden cronológico: exploración | embargo (descartado) | holdout (final).
+# El holdout se usa una sola vez: una segunda evaluación devuelve el resultado guardado y nunca recalcula con otros datos.
+CAMPOS_TEXTO = {"nombre": 80, "hipotesis": 600, "benchmark": 120, "costos": 400, "fuentes": 600, "walk_forward": 600}
+
+
+def _tabla(con) -> None:
+    con.execute("""CREATE TABLE IF NOT EXISTS laboratorio_experimentos (
+      id INTEGER PRIMARY KEY, creado_en TEXT NOT NULL, preregistro TEXT NOT NULL, huella_preregistro TEXT NOT NULL,
+      evaluado_en TEXT, huella_datos TEXT, resultado TEXT)""")
+
+
+def _huella(obj) -> str:
+    return hashlib.sha256(json.dumps(obj, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def preregistrar(con, d: dict) -> dict:
+    from datetime import UTC, datetime
+    if not isinstance(d, dict):
+        raise ValueError("preregistro inválido")
+    p = {}
+    for campo, maximo in CAMPOS_TEXTO.items():
+        v = str(d.get(campo) or "").strip()
+        if not v or len(v) > maximo:
+            raise ValueError(f"{campo}: obligatorio, hasta {maximo} caracteres")
+        p[campo] = v
+    nombres = d.get("estrategias")
+    if not isinstance(nombres, list) or not 1 <= len(nombres) <= MAX_ESTRATEGIAS or \
+            any(not isinstance(n, str) or not n.strip() or len(n) > 40 for n in nombres) or len(set(nombres)) != len(nombres):
+        raise ValueError(f"estrategias: lista de 1 a {MAX_ESTRATEGIAS} nombres únicos (1 a 40 caracteres)")
+    try:
+        p.update(estrategias=[n.strip() for n in nombres], B=int(d.get("B", 5000)), semilla=int(d.get("semilla", 12345)),
+                 alpha=float(d.get("alpha", 0.05)), embargo=int(d.get("embargo", 5)), holdout=float(d.get("holdout", 0.3)),
+                 bloque=None if d.get("bloque") in (None, "") else int(d["bloque"]),
+                 exploradas=None if d.get("exploradas") in (None, "") else int(d["exploradas"]))
+    except (TypeError, ValueError, OverflowError):
+        raise ValueError("B, semilla, bloque, embargo y exploradas deben ser enteros; alpha y holdout, números") from None
+    if not 0.1 <= p["holdout"] <= 0.5 or not math.isfinite(p["holdout"]):
+        raise ValueError("holdout: fracción entre 0.1 y 0.5 del final de la muestra")
+    if not 0 <= p["embargo"] <= 250:
+        raise ValueError("embargo: entre 0 y 250 observaciones")
+    if not MIN_B <= p["B"] <= MAX_B or not 0 < p["alpha"] < 0.5 or not 0 <= p["semilla"] < 2**32:
+        raise ValueError(f"B entre {MIN_B} y {MAX_B}, alpha entre 0 y 0.5 y semilla entre 0 y 4294967295")
+    if p["exploradas"] is not None and not len(nombres) <= p["exploradas"] <= MAX_EXPLORADAS:
+        raise ValueError(f"hipótesis exploradas: entre {len(nombres)} y {MAX_EXPLORADAS}")
+    _tabla(con)
+    ahora = datetime.now(UTC).isoformat()
+    huella = _huella({**p, "creado_en": ahora})
+    cur = con.execute("INSERT INTO laboratorio_experimentos (creado_en, preregistro, huella_preregistro) VALUES (?,?,?)",
+                      (ahora, json.dumps(p, ensure_ascii=False), huella))
+    con.commit()
+    return {"id": cur.lastrowid, "creado_en": ahora, "huella_preregistro": huella, "preregistro": p}
+
+
+def _fila(con, eid: int):
+    _tabla(con)
+    f = con.execute("SELECT * FROM laboratorio_experimentos WHERE id=?", (eid,)).fetchone()
+    if f is None:
+        raise LookupError("experimento no encontrado")
+    return f
+
+
+def evaluar(con, eid: int, benchmark, estrategias: dict) -> dict:
+    from datetime import UTC, datetime
+    f = _fila(con, eid)
+    p = json.loads(f["preregistro"])
+    if f["resultado"]:
+        return {**json.loads(f["resultado"]), "holdout_ya_usado": True,
+                "aviso_reuso": "El holdout ya se usó: se devuelve el resultado guardado. Una nueva idea requiere un nuevo preregistro."}
+    if not isinstance(estrategias, dict) or sorted(estrategias) != sorted(p["estrategias"]):
+        raise ValueError("las estrategias deben ser exactamente las preregistradas: " + ", ".join(p["estrategias"]))
+    n = len(benchmark) if isinstance(benchmark, (list, tuple)) else 0
+    nh = int(n * p["holdout"])
+    ne = n - nh - p["embargo"]
+    if nh < MIN_N or ne < MIN_N:
+        raise ValueError(f"muestra insuficiente: con {n} observaciones quedan {ne} de exploración y {nh} de holdout (mínimo {MIN_N} cada uno)")
+    args = dict(bloque=p["bloque"], B=p["B"], semilla=p["semilla"], alpha=p["alpha"], exploradas=p["exploradas"])
+    corte = {k: list(v) for k, v in estrategias.items()}
+    exploracion = permutacion(list(benchmark[:ne]), {k: v[:ne] for k, v in corte.items()}, **args)
+    holdout = permutacion(list(benchmark[n - nh:]), {k: v[n - nh:] for k, v in corte.items()}, **args)
+    res = {"id": eid, "preregistro": p, "huella_preregistro": f["huella_preregistro"],
+           "tramos": {"n": n, "exploracion": ne, "embargo": p["embargo"], "holdout": nh},
+           "exploracion": exploracion, "holdout": holdout,
+           "lectura": "Solo el holdout es confirmatorio; la exploración es descriptiva. Un holdout con Holm ≤ α es compatible con "
+                      "exceso neto > 0 bajo los supuestos, no prueba alfa ni rentabilidad futura. Los rendimientos deben venir "
+                      "de parámetros estimados con walk-forward (declarado en el preregistro), no ajustados al holdout."}
+    ahora = datetime.now(UTC).isoformat()
+    res["evaluado_en"] = ahora
+    con.execute("UPDATE laboratorio_experimentos SET evaluado_en=?, huella_datos=?, resultado=? WHERE id=? AND resultado IS NULL",
+                (ahora, holdout["huella_sha256"], json.dumps(res, ensure_ascii=False), eid))
+    con.commit()
+    return {**res, "holdout_ya_usado": False}
+
+
+def experimentos(con) -> list[dict]:
+    _tabla(con)
+    return [{"id": r["id"], "creado_en": r["creado_en"], "nombre": json.loads(r["preregistro"])["nombre"],
+             "evaluado_en": r["evaluado_en"], "huella_preregistro": r["huella_preregistro"]}
+            for r in con.execute("SELECT * FROM laboratorio_experimentos ORDER BY id DESC LIMIT 100")]
+
+
+def exportar(con, eid: int) -> dict:
+    f = _fila(con, eid)
+    return {"formato": "actinver-terminal/laboratorio v1", "id": eid, "creado_en": f["creado_en"],
+            "preregistro": json.loads(f["preregistro"]), "huella_preregistro": f["huella_preregistro"],
+            "evaluado_en": f["evaluado_en"], "huella_datos_holdout": f["huella_datos"],
+            "resultado": json.loads(f["resultado"]) if f["resultado"] else None}

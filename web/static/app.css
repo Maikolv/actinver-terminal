@@ -340,3 +340,5 @@ select[multiple] { min-width: 230px; }
 .accesos--relacionados .boton { flex: 0 1 auto; }
 .celda-gex { display: inline-block; min-width: 3.6em; padding: 1px 4px; border-radius: 3px; text-align: right; }
 .area-csv { width: 100%; font-family: ui-monospace, Consolas, monospace; font-size: .85rem; box-sizing: border-box; }
+.campo-bloque { display: block; margin: .5rem 0; }
+.campo-bloque input, .campo-bloque textarea { display: block; width: 100%; max-width: 48rem; box-sizing: border-box; }
