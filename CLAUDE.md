@@ -118,3 +118,7 @@ necesita decisión del usuario (sección 7 del mandato: gastar dinero, cuentas o
 tokens a su nombre, su sesión personal de Actinver, exponer la terminal fuera de
 este PC, borrar trabajo no recuperable, o reglas del Reto que no se puedan
 confirmar y cambien la estrategia).
+
+## Recursos de formación añadidos el 18-oct-2026
+
+Aprender y recursos ofrece 92 fichas por área/coste, PDF maestro, CSV, doce posts, enlaces TheBenchmark/Flickflow/Quantower/TradingView y los dos prompts. La práctica local de tesis, DCF/reverse DCF y volatilidad usa ejemplos sintéticos, sin red/persistencia (13 comprobaciones JS aprobadas). 8 pruebas de recursos/microestructura aprobadas; no suite completa. Ver `docs/recursos-certificaciones-2026-10-18.md`. La auditoría `docs/auditoria-post-terminal-Dej_B7_MXrX-2026-10-18.md` distingue demos aisladas de yfinance/FinBERT de conectores reales; SEC actual es Formulario 4, no balances.

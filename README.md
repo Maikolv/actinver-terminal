@@ -151,3 +151,7 @@ Reglas en `config/reto.yaml` (fuente: bases oficiales, consultadas el 23-sep-202
 ## Aviso
 
 Herramienta de análisis personal. No es asesoría de inversión ni recomendación; los rendimientos esperados son estimaciones inciertas con datos históricos. Verifique disponibilidad, costos y reglas con Actinver y con las bases del Reto.
+
+## Formación y recursos (18-oct-2026)
+
+En **Aprender y recursos**: [catálogo maestro PDF](web/static/recursos/certificaciones-maestro-2026-10-18.pdf), [CSV](web/static/recursos/certificaciones-maestro-2026-10-18.csv), prompts de Quantower/TradingView y [práctica local](web/static/recursos/practica-proyectos-financieros.html). Son 92 fichas de formación por área y condición de coste, doce posts revisados y accesos a TheBenchmark/Flickflow. [Alcance y verificación](docs/recursos-certificaciones-2026-10-18.md) y [auditoría del reel de la mini terminal](docs/auditoria-post-terminal-Dej_B7_MXrX-2026-10-18.md). No se habilitan órdenes ni nuevos feeds.

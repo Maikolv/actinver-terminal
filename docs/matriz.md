@@ -109,3 +109,7 @@ Estados: **Implementado** · **Previsto si se publica** (no se implementa porque
 |---|---|---|
 | Galería de antes y después | No aplica | El equivalente funcional es la tabla «actual → objetivo» y el diálogo «Simular cambio» (antes/después de la cartera) |
 | Ayudas emergentes enriquecidas | No aplica (se usa ayuda breve) | Títulos (`title`) en controles clave, explicación por criterio de puntuación y pestaña Ayuda; ventanas emergentes ricas no aportan utilidad comprobable |
+
+## Formación y plataformas (18-oct-2026)
+
+Incorporados: doce posts, catálogo de 92 fichas, PDF/CSV y accesos TheBenchmark/Flickflow/Quantower/TradingView. Integración: fichas y archivos locales en Aprender y recursos; no APIs ni cuentas externas. Práctica educativa de tesis/DCF/volatilidad, sin red. Límites y auditoría del reel en `recursos-certificaciones-2026-10-18.md` y `auditoria-post-terminal-Dej_B7_MXrX-2026-10-18.md`.

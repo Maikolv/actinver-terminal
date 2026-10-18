@@ -814,3 +814,11 @@ Este número de versión también cubre las entregas fechadas del 16 y 17-oct qu
 
 ## [0.1.0] — 2026-09-22
 - Primera versión funcional: libro de operaciones, importación CSV, vigencia de datos, universo verificado (Nasdaq Trader + BMV + Actinver), optimizador media-varianza (skfolio) con validación walk-forward y escenarios, interfaz local en `127.0.0.1:8765`, modo demo con datos sintéticos aislados, botón para cambiar a datos reales, cartera demo de 1 000 000.
+
+## Recursos y formación — 18-oct-2026
+
+- Catálogo maestro de 92 fichas por área y condición de coste, PDF/CSV y enlaces de doce posts.
+- Accesos informativos TheBenchmark, Flickflow, Quantower y TradingView; prompts locales de configuración.
+- Práctica sin red de tesis, DCF/reverse DCF y volatilidad; 13 comprobaciones JS aprobadas.
+- Auditoría del uso real de Dej_B7_MXrX; sin afirmar integración de yfinance/FinBERT al motor.
+- 8 pruebas de recursos/microestructura aprobadas y JS válido; suite completa no repetida.

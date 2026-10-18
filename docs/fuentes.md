@@ -57,3 +57,7 @@ Opciones para tener tiempo real genuino (decisión del usuario):
 4. **Lectura manual**: TradingView (widget o app) para seguimiento intradía; la terminal recalcula con los cierres.
 
 La arquitectura está lista para cualquiera de estas: un adaptador nuevo con `tipo_dato = "tiempo_real"` (vigencia 120 s) o `"retrasado"` (20 min) y consulta por *streaming* (WebSocket) con reconexión.
+
+## Recursos externos de consulta (18-oct-2026)
+
+TheBenchmark News y Flickflow se enlazan desde Aprender y recursos como contexto/noticias y análisis macro/calendario. No se conectó un feed ni OAuth ni se presupone licencia de redistribución, datos CME o profundidad. Quantower/TradingView se enlazan con prompts de configuración. Los doce posts se contrastan con emisores oficiales en `recursos-certificaciones-2026-10-18.md`; el PDF distingue contenido gratis de certificado de pago.

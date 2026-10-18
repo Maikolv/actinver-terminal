@@ -1,0 +1,1615 @@
+{
+  "fecha": "2026-10-18",
+  "alcance": "Formaciones identificadas en este chat y entregables previos; revisión de respaldos de otros chats documentada en el informe de incorporación. No certifica haberlas cursado.",
+  "orden": "Área; gratuitas; condicionadas; contenido gratis/certificado pago; de pago; pendientes. No se comparan como equivalentes importes en monedas distintas ni suscripciones y exámenes.",
+  "entradas": [
+    {
+      "nombre": "Companies and financial accounting — OpenLearn / The Open University",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Constancia de participación",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0; constancia gratuita de participación",
+      "url": "https://www.open.edu/openlearn/money-business/companies-and-financial-accounting/content-section-0",
+      "condiciones": "Curso introductorio de seis horas. Página confirma free statement of participation al terminar; no llamarlo certificación profesional, crédito universitario ni licencia fiscal. Trata estructura societaria y estados financieros, no sustituye normativa fiscal mexicana vigente.",
+      "fuente_origen": "DeV6omDsRQk — azamath_",
+      "fuentes": [
+        "https://www.open.edu/openlearn/money-business/companies-and-financial-accounting/content-section-0"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C001",
+      "imagen": "DeV6omDsRQk — azamath_",
+      "estado": "Gratuita. USD 0; constancia gratuita de participación. Curso introductorio de seis horas. Página confirma free statement of participation al terminar; no llamarlo certificación profesional, crédito universitario ni licencia fiscal. Trata estructura societaria y estados financieros, no sustituye normativa fiscal mexicana vigente."
+    },
+    {
+      "nombre": "Financial Analysis using Excel — Basel Institute on Governance",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Certificado de finalización",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0; Excel o software compatible puede requerir licencia",
+      "url": "https://learn.baselgovernance.org/enrol/index.php?id=9",
+      "condiciones": "Basel LEARN confirma cursos gratuitos y certificado tras completar satisfactoriamente. Nueve sesiones, unas tres horas; español disponible. Enfocado en análisis de transacciones e investigación financiera/AML, no certificación fiscal mexicana. Puede requerir cuenta gratuita.",
+      "fuente_origen": "DeV6omDsRQk — azamath_",
+      "fuentes": [
+        "https://learn.baselgovernance.org/enrol/index.php?id=9",
+        "https://baselgovernance.org/learning/events/basel-learn-free-courses-on-financial-investigation-asset-tracing-intelligence-g-2386/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C002",
+      "imagen": "DeV6omDsRQk — azamath_",
+      "estado": "Gratuita. USD 0; Excel o software compatible puede requerir licencia. Basel LEARN confirma cursos gratuitos y certificado tras completar satisfactoriamente. Nueve sesiones, unas tres horas; español disponible. Enfocado en análisis de transacciones e investigación financiera/AML, no certificación fiscal mexicana. Puede requerir cuenta gratuita."
+    },
+    {
+      "nombre": "Certificación Profesional de Contador Público — IMCP / EUC-CP",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Certificación profesional mexicana",
+      "costo_categoria": "paga",
+      "precio_texto": "Cuota/sede/colegio pendiente",
+      "url": "https://imcp.org.mx/category/certificacion-1/examen/",
+      "condiciones": "Guía EUC-CP 2026 oficial disponible; verificar título, cédula y experiencia/documentos exigidos antes de inscribirse.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://imcp.org.mx/category/certificacion-1/examen/"
+      ],
+      "id": "C003",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. Cuota/sede/colegio pendiente. Guía EUC-CP 2026 oficial disponible; verificar título, cédula y experiencia/documentos exigidos antes de inscribirse."
+    },
+    {
+      "nombre": "CertIFR — ACCA",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Certificado IFRS",
+      "costo_categoria": "paga",
+      "precio_texto": "GBP 310 general / GBP 230 miembros; sólo evaluación GBP 200 / 150",
+      "url": "https://www.accaglobal.com/gb/en/qualifications/glance/certifr/date-fee.html",
+      "condiciones": "Tarifa distingue curso+evaluación de evaluación sola. No acredita fiscalidad mexicana ni equivale a membresía ACCA.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://www.accaglobal.com/gb/en/qualifications/glance/certifr/date-fee.html"
+      ],
+      "id": "C004",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. GBP 310 general / GBP 230 miembros; sólo evaluación GBP 200 / 150. Tarifa distingue curso+evaluación de evaluación sola. No acredita fiscalidad mexicana ni equivale a membresía ACCA."
+    },
+    {
+      "nombre": "CFI Accounting Fundamentals",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Curso con certificado en plan elegible",
+      "costo_categoria": "paga",
+      "precio_texto": "Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión",
+      "url": "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+      "condiciones": "Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdAWgncB1Sj",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+        "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi"
+      ],
+      "id": "C005",
+      "imagen": "DdAWgncB1Sj",
+      "estado": "De pago. Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión. Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos."
+    },
+    {
+      "nombre": "DipIFR — ACCA",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Diploma IFRS",
+      "costo_categoria": "paga",
+      "precio_texto": "Registro y examen por región; importe no comprobado",
+      "url": "https://www.accaglobal.com/uk/en/qualifications/glance/dipifr/who.html",
+      "condiciones": "Requisitos por formación/experiencia; no equivale a ser miembro ACCA. Solicitar tarifas regionales vigentes; no reutilizar cuotas de folletos antiguos.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://www.accaglobal.com/uk/en/qualifications/glance/dipifr/who.html",
+        "https://accaportal.accaglobal.com/article/KA-02373/en-us"
+      ],
+      "id": "C006",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. Registro y examen por región; importe no comprobado. Requisitos por formación/experiencia; no equivale a ser miembro ACCA. Solicitar tarifas regionales vigentes; no reutilizar cuotas de folletos antiguos."
+    },
+    {
+      "nombre": "Wharton Introduction to Financial Accounting",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio según país, plan y cuenta; no comprobado",
+      "url": "https://www.coursera.org/learn/wharton-accounting",
+      "condiciones": "Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK; DdAWgncB1Sj",
+      "fuentes": [
+        "https://www.coursera.org/learn/wharton-accounting"
+      ],
+      "id": "C007",
+      "imagen": "DdXnw2lRsuK; DdAWgncB1Sj",
+      "estado": "De pago. Precio según país, plan y cuenta; no comprobado. Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario."
+    },
+    {
+      "nombre": "Certificación por disciplina en Fiscal — IMCP",
+      "area": "Contabilidad, auditoría y fiscal",
+      "tipo": "Certificación profesional; convocatoria pendiente",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Oferta vigente y cuota sin confirmar",
+      "url": "https://imcp.org.mx/",
+      "condiciones": "No se confirmó convocatoria 2026 específica de Fiscal; material histórico no prueba disponibilidad actual. Pedir guía ECD Fiscal al IMCP/colegio.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://imcp.org.mx/"
+      ],
+      "id": "C008",
+      "imagen": "Investigación profesional previa",
+      "estado": "Por confirmar / programa no identificado. Oferta vigente y cuota sin confirmar. No se confirmó convocatoria 2026 específica de Fiscal; material histórico no prueba disponibilidad actual. Pedir guía ECD Fiscal al IMCP/colegio."
+    },
+    {
+      "nombre": "AI Fluency: Framework and foundations — Claude Academy",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badge de finalización",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://academy.claude.com/courses/ai-fluency-framework-foundations",
+      "condiciones": "Curso gratuito oficial Anthropic, 14 lecciones/4h/1quiz. Badge tras evaluación final. Framework: Delegation, Description, Discernment, Diligence. No es certificación profesional de arquitectura Claude.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Ampliación oficial solicitada por padre",
+      "fuentes": [
+        "https://academy.claude.com/courses/ai-fluency-framework-foundations",
+        "https://academy.claude.com/"
+      ],
+      "id": "C009",
+      "imagen": "Ampliación oficial solicitada por padre",
+      "estado": "Gratuita. USD 0. Curso gratuito oficial Anthropic, 14 lecciones/4h/1quiz. Badge tras evaluación final. Framework: Delegation, Description, Discernment, Diligence. No es certificación profesional de arquitectura Claude."
+    },
+    {
+      "nombre": "Alteryx Designer Cloud Core",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación de producto",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Examen gratuito según badge del emisor",
+      "url": "https://www.credly.com/org/alteryx/badge/alteryx-designer-cloud-core",
+      "condiciones": "Ejemplo verificado, no identificación segura del reel; 1.5h, conocimientos y práctica. Comprobar acceso/licencia al entorno por separado.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Ejemplo oficial que desambigua Alteryx",
+      "fuentes": [
+        "https://www.credly.com/org/alteryx/badge/alteryx-designer-cloud-core"
+      ],
+      "id": "C010",
+      "imagen": "Ejemplo oficial que desambigua Alteryx",
+      "estado": "Gratuita. Examen gratuito según badge del emisor. Ejemplo verificado, no identificación segura del reel; 1.5h, conocimientos y práctica. Comprobar acceso/licencia al entorno por separado."
+    },
+    {
+      "nombre": "AWS Training Knowledge Badges",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badges de aprendizaje",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Rutas elegibles gratuitas",
+      "url": "https://aws.amazon.com/training/badges/",
+      "condiciones": "Seleccionar ruta que emita badge; el emisor cita evaluación mínima 80%. No equivale a AWS Certification.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Desambiguación oficial de AWS",
+      "fuentes": [
+        "https://aws.amazon.com/training/badges/"
+      ],
+      "id": "C011",
+      "imagen": "Desambiguación oficial de AWS",
+      "estado": "Gratuita. Rutas elegibles gratuitas. Seleccionar ruta que emita badge; el emisor cita evaluación mínima 80%. No equivale a AWS Certification."
+    },
+    {
+      "nombre": "BCG GenAI Job Simulation / Forage",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/simulations/bcg/gen-ai-anlo",
+      "condiciones": "Simulación oficial de chatbot financiero y análisis10K/10Q,3–4h. Constancia al completar, no empleo ni internship ni certificación profesional.",
+      "fuente_origen": "DeQNieIxked",
+      "fuentes": [
+        "https://www.theforage.com/simulations/bcg/gen-ai-anlo"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C012",
+      "imagen": "DeQNieIxked",
+      "estado": "Gratuita. USD 0. Simulación oficial de chatbot financiero y análisis10K/10Q,3–4h. Constancia al completar, no empleo ni internship ni certificación profesional."
+    },
+    {
+      "nombre": "ChatGPT for Finance — Simplilearn SkillUp",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificado de finalización",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0;90días de acceso al curso",
+      "url": "https://www.simplilearn.com/chatgpt-for-finance-course-skillup",
+      "condiciones": "Dos horas de contenido y certificado tras completar requisitos. Es formación Simplilearn; no certificación emitida por OpenAI. Herramientas o suscripciones utilizadas en ejercicios pueden tener condiciones aparte.",
+      "fuente_origen": "DeQNieIxked",
+      "fuentes": [
+        "https://www.simplilearn.com/chatgpt-for-finance-course-skillup"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C013",
+      "imagen": "DeQNieIxked",
+      "estado": "Gratuita. USD 0;90días de acceso al curso. Dos horas de contenido y certificado tras completar requisitos. Es formación Simplilearn; no certificación emitida por OpenAI. Herramientas o suscripciones utilizadas en ejercicios pueden tener condiciones aparte."
+    },
+    {
+      "nombre": "Cisco Networking Academy: cursos con digital badge",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badges de finalización",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Cursos gratuitos seleccionados; badge elegible sin coste",
+      "url": "https://www.netacad.com/articles/news/s-accept-your-badge",
+      "condiciones": "Muchos cursos completados emiten badge; comprobar ficha y criterios. No todos los cursos emiten certificado imprimible.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Alternativa oficial a Cisco genérico",
+      "fuentes": [
+        "https://www.netacad.com/articles/news/s-accept-your-badge",
+        "https://www.netacad.com/catalogs/learn?courseLang=en-US"
+      ],
+      "id": "C014",
+      "imagen": "Alternativa oficial a Cisco genérico",
+      "estado": "Gratuita. Cursos gratuitos seleccionados; badge elegible sin coste. Muchos cursos completados emiten badge; comprobar ficha y criterios. No todos los cursos emiten certificado imprimible."
+    },
+    {
+      "nombre": "freeCodeCamp Data Analysis with Python (archivo)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación de proyectos heredada",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.freecodecamp.org/learn/data-analysis-with-python",
+      "condiciones": "Contenido archivado/no actualizado; conservar nombre previo y comprobar ruta activa para reclamar credencial. Aviso oficial dic2025 indica que credenciales obtenidas se conservan; no replicar anuncio antiguo de expiración sin revisión.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://www.freecodecamp.org/learn/data-analysis-with-python",
+        "https://www.freecodecamp.org/news/freecodecamps-new-python-certification-is-now-live"
+      ],
+      "id": "C015",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "Gratuita. USD 0. Contenido archivado/no actualizado; conservar nombre previo y comprobar ruta activa para reclamar credencial. Aviso oficial dic2025 indica que credenciales obtenidas se conservan; no replicar anuncio antiguo de expiración sin revisión."
+    },
+    {
+      "nombre": "freeCodeCamp Python Certification (currículo actual)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación con evaluación",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.freecodecamp.org/news/freecodecamps-new-python-certification-is-now-live",
+      "condiciones": "Alternativa actual al archivo; completar formación y evaluación, con entorno de examen en computadora. No es el mismo curso Data Analysis del reel.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Ampliación oficial para corregir archivo",
+      "fuentes": [
+        "https://www.freecodecamp.org/news/freecodecamps-new-python-certification-is-now-live"
+      ],
+      "id": "C016",
+      "imagen": "Ampliación oficial para corregir archivo",
+      "estado": "Gratuita. USD 0. Alternativa actual al archivo; completar formación y evaluación, con entorno de examen en computadora. No es el mismo curso Data Analysis del reel."
+    },
+    {
+      "nombre": "HackerRank SQL (Basic / Intermediate / Advanced)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Evaluaciones de habilidades con certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.hackerrank.com/skills-verification",
+      "condiciones": "Certificaciones cronometradas gratuitas confirmadas por soporte oficial. Elegir nivel y cumplir evaluación personalmente.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdAWgncB1Sj",
+      "fuentes": [
+        "https://www.hackerrank.com/skills-verification",
+        "https://help.hackerrank.com/articles/2563639100"
+      ],
+      "id": "C017",
+      "imagen": "DdAWgncB1Sj",
+      "estado": "Gratuita. USD 0. Certificaciones cronometradas gratuitas confirmadas por soporte oficial. Elegir nivel y cumplir evaluación personalmente."
+    },
+    {
+      "nombre": "IBM SkillsBuild Artificial Intelligence Fundamentals",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badge de formación",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD0",
+      "url": "https://www.credly.com/org/ibm-skillsbuild/badge/artificial-intelligence-fundamentals",
+      "condiciones": "Credencial exacta IBM verificada; completar criterios de la ruta SkillsBuild. Diferenciar versión con Capstone que puede requerir organización asociada y cambios de currículo/nombre actuales.",
+      "fuente_origen": "Dekd8maPkSB",
+      "fuentes": [
+        "https://www.credly.com/org/ibm-skillsbuild/badge/artificial-intelligence-fundamentals",
+        "https://skillsbuild.org/frequently-asked-questions"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C018",
+      "imagen": "Dekd8maPkSB",
+      "estado": "Gratuita. USD0. Credencial exacta IBM verificada; completar criterios de la ruta SkillsBuild. Diferenciar versión con Capstone que puede requerir organización asociada y cambios de currículo/nombre actuales."
+    },
+    {
+      "nombre": "IBM SkillsBuild digital credentials",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badges de formación",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Formación y credenciales elegibles gratuitas",
+      "url": "https://skillsbuild.org/frequently-asked-questions",
+      "condiciones": "Elegir curso que ofrezca credencial y completar criterios; algunas rutas académicas requieren elegibilidad. No toda actividad emite badge.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Alternativa oficial a IBM genérico",
+      "fuentes": [
+        "https://skillsbuild.org/frequently-asked-questions"
+      ],
+      "id": "C019",
+      "imagen": "Alternativa oficial a IBM genérico",
+      "estado": "Gratuita. Formación y credenciales elegibles gratuitas. Elegir curso que ofrezca credencial y completar criterios; algunas rutas académicas requieren elegibilidad. No toda actividad emite badge."
+    },
+    {
+      "nombre": "Kaggle Learn Intro to SQL",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Microcurso con certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.kaggle.com/learn/intro-to-sql",
+      "condiciones": "Catálogo Kaggle Learn gratuito; comprobar curso y criterios de finalización en la cuenta. No equivale a certificación profesional con examen supervisado.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdAWgncB1Sj",
+      "fuentes": [
+        "https://www.kaggle.com/learn/intro-to-sql",
+        "https://www.kaggle.com/learn/intro-to-programming"
+      ],
+      "id": "C020",
+      "imagen": "DdAWgncB1Sj",
+      "estado": "Gratuita. USD 0. Catálogo Kaggle Learn gratuito; comprobar curso y criterios de finalización en la cuenta. No equivale a certificación profesional con examen supervisado."
+    },
+    {
+      "nombre": "Kaggle Learn Python",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Microcurso con certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.kaggle.com/learn/python",
+      "condiciones": "Catálogo Kaggle Learn gratuito; comprobar curso y criterios de finalización en la cuenta. No equivale a certificación profesional con examen supervisado.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdAWgncB1Sj",
+      "fuentes": [
+        "https://www.kaggle.com/learn/python",
+        "https://www.kaggle.com/learn/intro-to-programming"
+      ],
+      "id": "C021",
+      "imagen": "DdAWgncB1Sj",
+      "estado": "Gratuita. USD 0. Catálogo Kaggle Learn gratuito; comprobar curso y criterios de finalización en la cuenta. No equivale a certificación profesional con examen supervisado."
+    },
+    {
+      "nombre": "Microsoft Learn Badge / Excel y Power BI (familia)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Logros de formación",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Formación Learn gratuita",
+      "url": "https://learn.microsoft.com/en-us/training/support/faq",
+      "condiciones": "Logros por módulos no equivalen a Microsoft Certification. Para Power BI/Excel identificar ruta o examen exacto y coste por país.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8; DdAWgncB1Sj",
+      "fuentes": [
+        "https://learn.microsoft.com/en-us/training/support/faq"
+      ],
+      "id": "C022",
+      "imagen": "DcbSXQPqHH8; DdAWgncB1Sj",
+      "estado": "Gratuita. Formación Learn gratuita. Logros por módulos no equivalen a Microsoft Certification. Para Power BI/Excel identificar ruta o examen exacto y coste por país."
+    },
+    {
+      "nombre": "Salesforce Trailhead / Superbadges",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badges y retos prácticos",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Formación práctica Trailhead gratuita",
+      "url": "https://trailhead.salesforce.com/",
+      "condiciones": "Cumplir requisitos del superbadge personalmente; no confundir badges con Salesforce Certification ni encargar su evaluación a IA.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://trailhead.salesforce.com/",
+        "https://trailhead.salesforce.com/superbadges"
+      ],
+      "id": "C023",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "Gratuita. Formación práctica Trailhead gratuita. Cumplir requisitos del superbadge personalmente; no confundir badges con Salesforce Certification ni encargar su evaluación a IA."
+    },
+    {
+      "nombre": "Snowflake Badge / Hands-On Essentials",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Badges prácticos",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Talleres Hands-On Essentials gratuitos",
+      "url": "https://www.snowflake.com/en/resources/learn/snowflake-essentials-training/",
+      "condiciones": "Laboratorios evaluados por DORA que cumplen criterios reciben badge; verificar disponibilidad del taller. Consumo de cuenta cloud/trial aparte; no equivale a SnowPro Certification.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://www.snowflake.com/en/resources/learn/snowflake-essentials-training/"
+      ],
+      "id": "C024",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "Gratuita. Talleres Hands-On Essentials gratuitos. Laboratorios evaluados por DORA que cumplen criterios reciben badge; verificar disponibilidad del taller. Consumo de cuenta cloud/trial aparte; no equivale a SnowPro Certification."
+    },
+    {
+      "nombre": "Vista Equity Partners AI in Action / Forage",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/simulations/vista-equity-partners/ai-in-action-cugo",
+      "condiciones": "Coincide programa oficial AI in Action,1–2h. La transcripción APB's Community Partners parece error ASR; no atribuir a otra entidad. Prompting, evaluación y flujos GenAI; constancia extracurricular.",
+      "fuente_origen": "DeQNieIxked",
+      "fuentes": [
+        "https://www.theforage.com/simulations/vista-equity-partners/ai-in-action-cugo"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C025",
+      "imagen": "DeQNieIxked",
+      "estado": "Gratuita. USD 0. Coincide programa oficial AI in Action,1–2h. La transcripción APB's Community Partners parece error ASR; no atribuir a otra entidad. Prompting, evaluación y flujos GenAI; constancia extracurricular."
+    },
+    {
+      "nombre": "Bloomberg Spreadsheet Analysis (BSA)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificado de análisis financiero en Excel/BQL",
+      "costo_categoria": "condicional",
+      "precio_texto": "Puede estar incluido en convenio institucional; tarifa individual no comprobada",
+      "url": "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+      "condiciones": "Cuatro módulos de BQL, macroeconomía, acciones y renta fija. El certificado se obtiene al terminar programa; verificar acceso institucional y software. No asumir uso gratuito comercial de Bloomberg/BQL.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DduVfo6T0Oq",
+      "fuentes": [
+        "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+        "https://talentsearch.bloomberginstitute.com/certifications",
+        "https://libguides.sandiego.edu/bloomberg/certificates"
+      ],
+      "id": "C026",
+      "imagen": "DduVfo6T0Oq",
+      "estado": "Gratuidad o credencial condicionada. Puede estar incluido en convenio institucional; tarifa individual no comprobada. Cuatro módulos de BQL, macroeconomía, acciones y renta fija. El certificado se obtiene al terminar programa; verificar acceso institucional y software. No asumir uso gratuito comercial de Bloomberg/BQL."
+    },
+    {
+      "nombre": "Oracle Cloud Infrastructure AI Foundations Associate (versión a confirmar)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación con examen",
+      "costo_categoria": "condicional",
+      "precio_texto": "Ruta Foundations gratuita; confirmar versión e intento de examen en MyLearn",
+      "url": "https://learn.oracle.com/ols/learning-path/become-an-oci-ai-foundations-associate/146553/163544",
+      "condiciones": "Título relacionado oficial; ruta actual muestra 1Z0-1122-26. Reel no dicta código/versión. Revisar examen vigente e inclusión gratuita específica, no aplicar promociones2025 a cualquier Oracle Professional.",
+      "fuente_origen": "Dekd8maPkSB",
+      "fuentes": [
+        "https://learn.oracle.com/ols/learning-path/become-an-oci-ai-foundations-associate/146553/163544",
+        "https://docs.oracle.com/en/education/customer-success/digital-learning-kit/ml-cert-faq/topics/ExamAttemptPurchases.html"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C027",
+      "imagen": "Dekd8maPkSB",
+      "estado": "Gratuidad o credencial condicionada. Ruta Foundations gratuita; confirmar versión e intento de examen en MyLearn. Título relacionado oficial; ruta actual muestra 1Z0-1122-26. Reel no dicta código/versión. Revisar examen vigente e inclusión gratuita específica, no aplicar promociones2025 a cualquier Oracle Professional."
+    },
+    {
+      "nombre": "AWS Certification (familia)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación profesional con examen",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 100 fundacional/business; 150 associate; 300 professional/specialty",
+      "url": "https://aws.amazon.com/certification/faqs/",
+      "condiciones": "Costes publicados en USD; confirmar examen, moneda e impuestos. Formación gratuita no vuelve gratuito el examen.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Desambiguación oficial de AWS",
+      "fuentes": [
+        "https://aws.amazon.com/certification/faqs/"
+      ],
+      "id": "C028",
+      "imagen": "Desambiguación oficial de AWS",
+      "estado": "De pago. USD 100 fundacional/business; 150 associate; 300 professional/specialty. Costes publicados en USD; confirmar examen, moneda e impuestos. Formación gratuita no vuelve gratuito el examen."
+    },
+    {
+      "nombre": "Claude Certified Architect — Foundations",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación técnica con examen",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 125 publicados; no gratis universal",
+      "url": "https://anthropic-partners.skilljar.com/page/partner-certifications",
+      "condiciones": "Reel omite nivel: Foundations es candidato identificable; Professional publica USD175. Formación preparatoria gratis no significa examen gratis. Comprobar nivel, elegibilidad y canal oficial; no usar terceros que prometan plazas o certificados.",
+      "fuente_origen": "DeQNieIxked",
+      "fuentes": [
+        "https://anthropic-partners.skilljar.com/page/partner-certifications",
+        "https://anthropic-partners.skilljar.com/page/faq-certifications"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C029",
+      "imagen": "DeQNieIxked",
+      "estado": "De pago. USD 125 publicados; no gratis universal. Reel omite nivel: Foundations es candidato identificable; Professional publica USD175. Formación preparatoria gratis no significa examen gratis. Comprobar nivel, elegibilidad y canal oficial; no usar terceros que prometan plazas o certificados."
+    },
+    {
+      "nombre": "GitHub Foundations",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación con examen",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 99; precio regional puede variar",
+      "url": "https://learn.github.com/certifications",
+      "condiciones": "Voucher único gratuito para estudiantes verificados del Student Developer Pack, aplicable a Foundations o Copilot; no asumir elegibilidad ni gratuidad universal.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://learn.github.com/certifications"
+      ],
+      "id": "C030",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "De pago. USD 99; precio regional puede variar. Voucher único gratuito para estudiantes verificados del Student Developer Pack, aplicable a Foundations o Copilot; no asumir elegibilidad ni gratuidad universal."
+    },
+    {
+      "nombre": "Microsoft Office Specialist: Excel Expert (Microsoft 365 Apps), MO-211",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Certificación con examen",
+      "costo_categoria": "paga",
+      "precio_texto": "Página publica USD 100; varía según país/proveedor e impuestos",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/exams/mo-211/",
+      "condiciones": "Verificar versión elegida (MO-211 Microsoft365 vs MO-201 Office2019) antes de preparación. Página estima unas150h de instrucción/práctica; formación y licencia Office aparte. No equivale a badge Learn.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://learn.microsoft.com/en-us/credentials/certifications/exams/mo-211/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C031",
+      "imagen": "DedIkMSRbAR",
+      "estado": "De pago. Página publica USD 100; varía según país/proveedor e impuestos. Verificar versión elegida (MO-211 Microsoft365 vs MO-201 Office2019) antes de preparación. Página estima unas150h de instrucción/práctica; formación y licencia Office aparte. No equivale a badge Learn."
+    },
+    {
+      "nombre": "Agentic AI Foundation Associate (emisor no identificado en reel)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Credencial mencionada; identidad pendiente",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Candidato Oracle sí gratuito; identidad reel pendiente",
+      "url": "https://blogs.oracle.com/oracleuniversity/oracle-agentic-ai-foundations-training-certification-now-available",
+      "condiciones": "Oracle Agentic AI Foundations tiene curso y certificación gratuita confirmada por anuncio junio2026. El reel no dicta emisor y dice Foundation singular: no asegurar equivalencia. Verificar emisor/código antes de registrarlo; no inferir de AWS/IBM anteriores.",
+      "fuente_origen": "Dekd8maPkSB",
+      "fuentes": [
+        "https://blogs.oracle.com/oracleuniversity/oracle-agentic-ai-foundations-training-certification-now-available",
+        "https://mylearn.oracle.com/ou/course/oracle-agentic-ai-foundations-2026/163240/271872"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C032",
+      "imagen": "Dekd8maPkSB",
+      "estado": "Por confirmar / programa no identificado. Candidato Oracle sí gratuito; identidad reel pendiente. Oracle Agentic AI Foundations tiene curso y certificación gratuita confirmada por anuncio junio2026. El reel no dicta emisor y dice Foundation singular: no asegurar equivalencia. Verificar emisor/código antes de registrarlo; no inferir de AWS/IBM anteriores."
+    },
+    {
+      "nombre": "Alteryx Core (producto no identificado en reel)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Familia de certificación",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Variantes gratuitas; producto exacto pendiente",
+      "url": "https://community.alteryx.com/t5/Certification-Exams/bd-p/product-certification",
+      "condiciones": "Distinguir Desktop Core, microcredenciales y Designer Cloud Core; licencia del software puede tener coste distinto.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://community.alteryx.com/t5/Certification-Exams/bd-p/product-certification"
+      ],
+      "id": "C033",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "Por confirmar / programa no identificado. Variantes gratuitas; producto exacto pendiente. Distinguir Desktop Core, microcredenciales y Designer Cloud Core; licencia del software puede tener coste distinto."
+    },
+    {
+      "nombre": "AWS Badge (familia del reel)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Familia de badges",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Muchos training badges gratis; otros requisitos según badge",
+      "url": "https://aws.amazon.com/training/badges/",
+      "condiciones": "Aceptar badge en Credly no cuesta, pero origen y programa pueden exigir formación o pago. Elegir badge exacto.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://aws.amazon.com/training/badges/"
+      ],
+      "id": "C034",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "Por confirmar / programa no identificado. Muchos training badges gratis; otros requisitos según badge. Aceptar badge en Credly no cuesta, pero origen y programa pueden exigir formación o pago. Elegir badge exacto."
+    },
+    {
+      "nombre": "AWS Generative AI Certification (título del reel ambiguo)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Familia no identificada",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Training/badges pueden ser gratis; certificación Professional normalmente USD300",
+      "url": "https://aws.amazon.com/certification/",
+      "condiciones": "No identifica examen: AWS Certified AI Practitioner, Generative AI Developer–Professional y badges CloudQuest/SimuLearn son distintos. No equipararlos ni declarar examen gratis; solicitar título/código exacto.",
+      "fuente_origen": "Dekd8maPkSB",
+      "fuentes": [
+        "https://aws.amazon.com/certification/",
+        "https://docs.aws.amazon.com/aws-certification/latest/examguides/",
+        "https://aws.amazon.com/certification/faqs/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C035",
+      "imagen": "Dekd8maPkSB",
+      "estado": "Por confirmar / programa no identificado. Training/badges pueden ser gratis; certificación Professional normalmente USD300. No identifica examen: AWS Certified AI Practitioner, Generative AI Developer–Professional y badges CloudQuest/SimuLearn son distintos. No equipararlos ni declarar examen gratis; solicitar título/código exacto."
+    },
+    {
+      "nombre": "Cisco Networking Certificates (familia)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Familia no identificada",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Cursos/badges elegibles gratis; certificaciones profesionales distintas",
+      "url": "https://www.netacad.com/",
+      "condiciones": "Elegir curso exacto y comprobar badge. No llamar CCNA a una constancia introductoria ni prometer examen profesional gratis.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://www.netacad.com/"
+      ],
+      "id": "C036",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "Por confirmar / programa no identificado. Cursos/badges elegibles gratis; certificaciones profesionales distintas. Elegir curso exacto y comprobar badge. No llamar CCNA a una constancia introductoria ni prometer examen profesional gratis."
+    },
+    {
+      "nombre": "IBM Certificate (familia del reel)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Familia no identificada",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Depende de programa: no todos gratuitos",
+      "url": "https://skillsbuild.org/",
+      "condiciones": "IBM Professional Certificates de otras plataformas no se confunden con badges gratuitos de SkillsBuild. Falta título exacto del reel.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://skillsbuild.org/"
+      ],
+      "id": "C037",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "Por confirmar / programa no identificado. Depende de programa: no todos gratuitos. IBM Professional Certificates de otras plataformas no se confunden con badges gratuitos de SkillsBuild. Falta título exacto del reel."
+    },
+    {
+      "nombre": "Microsoft Applied Skills (familia)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Credenciales prácticas por escenario",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Consultar ficha de evaluación elegida; precio no verificado",
+      "url": "https://learn.microsoft.com/en-us/credentials/support/applied-skills-faq",
+      "condiciones": "Se distingue de certificación por examen; no se identificó título concreto en reel. No inferir coste de examen de una promoción histórica.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Desambiguación de Microsoft",
+      "fuentes": [
+        "https://learn.microsoft.com/en-us/credentials/support/applied-skills-faq"
+      ],
+      "id": "C038",
+      "imagen": "Desambiguación de Microsoft",
+      "estado": "Por confirmar / programa no identificado. Consultar ficha de evaluación elegida; precio no verificado. Se distingue de certificación por examen; no se identificó título concreto en reel. No inferir coste de examen de una promoción histórica."
+    },
+    {
+      "nombre": "Microsoft Generative AI Professional Certification (nombre del reel ambiguo)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Curso/ruta no identificado inequívocamente",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Posible ruta gratuita o acceso por suscripción; vigencia por comprobar",
+      "url": "https://www.linkedin.com/learning/paths/career-essentials-in-generative-ai-by-microsoft-and-linkedin",
+      "condiciones": "Coincidencia relacionada Career Essentials in Generative AI by Microsoft and LinkedIn; no afirmar identidad exacta sólo por semejanza. Es certificado de ruta, no Microsoft Certification con examen proctored. Anuncio Microsoft2023 decía gratis hasta2025: no prueba gratuidad en octubre2026.",
+      "fuente_origen": "Dekd8maPkSB",
+      "fuentes": [
+        "https://www.linkedin.com/learning/paths/career-essentials-in-generative-ai-by-microsoft-and-linkedin",
+        "https://news.microsoft.com/pt-br/microsoft-e-linkedin-oferecem-curso-de-inteligencia-artificial-generativa/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C039",
+      "imagen": "Dekd8maPkSB",
+      "estado": "Por confirmar / programa no identificado. Posible ruta gratuita o acceso por suscripción; vigencia por comprobar. Coincidencia relacionada Career Essentials in Generative AI by Microsoft and LinkedIn; no afirmar identidad exacta sólo por semejanza. Es certificado de ruta, no Microsoft Certification con examen proctored. Anuncio Microsoft2023 decía gratis hasta2025: no prueba gratuidad en octubre2026."
+    },
+    {
+      "nombre": "Oracle Foundations (familia del reel)",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Familia no identificada",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Variantes y programas gratuitos/pagos; confirmar examen",
+      "url": "https://docs.oracle.com/en/education/customer-success/digital-learning-kit/ml-cert-faq/topics/ExamAttemptPurchases.html",
+      "condiciones": "Oracle menciona oportunidades Foundations/Associate sin coste en suscripción Free Training and Certification; Database/Java Foundations también aparecen en catálogo de compra. Sin título/código no afirmar examen gratis.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DcbSXQPqHH8",
+      "fuentes": [
+        "https://docs.oracle.com/en/education/customer-success/digital-learning-kit/ml-cert-faq/topics/ExamAttemptPurchases.html",
+        "https://www.oracle.com/education/training/buy/"
+      ],
+      "id": "C040",
+      "imagen": "DcbSXQPqHH8",
+      "estado": "Por confirmar / programa no identificado. Variantes y programas gratuitos/pagos; confirmar examen. Oracle menciona oportunidades Foundations/Associate sin coste en suscripción Free Training and Certification; Database/Java Foundations también aparecen en catálogo de compra. Sin título/código no afirmar examen gratis."
+    },
+    {
+      "nombre": "Sitios genéricos de 'free certificate'",
+      "area": "Datos, programación y tecnología",
+      "tipo": "Referencia no identificable",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Sin programa ni emisor verificable",
+      "url": "https://www.linkedin.com/help/linkedin/answer/a567169",
+      "condiciones": "No es una credencial concreta; conservar como observación de Foto1, sin inventar entidad ni recomendarla.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1",
+      "fuentes": [
+        "https://www.linkedin.com/help/linkedin/answer/a567169"
+      ],
+      "id": "C041",
+      "imagen": "Foto 1",
+      "estado": "Por confirmar / programa no identificado. Sin programa ni emisor verificable. No es una credencial concreta; conservar como observación de Foto1, sin inventar entidad ni recomendarla."
+    },
+    {
+      "nombre": "Bank of America Global Markets Sales and Trading Analyst / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/simulations/bank-of-america/sales-and-trading-analyst-i5jo",
+      "condiciones": "Programa Global Markets separado de Investment Banking; catálogo oficial lo identifica como introductorio de 3–4h. No es acceso a operar, cuenta de corretaje ni licencia profesional.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Otro chat recuperado por agente padre; antecedente en chat previo, sin certificado obtenido",
+      "fuentes": [
+        "https://www.theforage.com/simulations/bank-of-america/sales-and-trading-analyst-i5jo",
+        "https://www.theforage.com/company/bank-of-america",
+        "https://www.theforage.com/"
+      ],
+      "id": "C042",
+      "imagen": "Otro chat recuperado por agente padre; antecedente en chat previo, sin certificado obtenido",
+      "estado": "Gratuita. USD 0. Programa Global Markets separado de Investment Banking; catálogo oficial lo identifica como introductorio de 3–4h. No es acceso a operar, cuenta de corretaje ni licencia profesional."
+    },
+    {
+      "nombre": "Bank of America Investment Banking / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/company/bank-of-america",
+      "condiciones": "Completar actividades del programa que ofrezca constancia; no equivale a prácticas contratadas.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://www.theforage.com/company/bank-of-america",
+        "https://www.theforage.com/"
+      ],
+      "id": "C043",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "Gratuita. USD 0. Completar actividades del programa que ofrezca constancia; no equivale a prácticas contratadas."
+    },
+    {
+      "nombre": "Citi Finance Job Simulation / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/simulations/citi/finance-qt4o",
+      "condiciones": "Experiencia de 5–6h con KPIs, riesgos y finanzas. Constancia tras requisitos y aceptación personal de política de CV; no listar como empleo ni internship.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DduVfo6T0Oq",
+      "fuentes": [
+        "https://www.theforage.com/simulations/citi/finance-qt4o"
+      ],
+      "id": "C044",
+      "imagen": "DduVfo6T0Oq",
+      "estado": "Gratuita. USD 0. Experiencia de 5–6h con KPIs, riesgos y finanzas. Constancia tras requisitos y aceptación personal de política de CV; no listar como empleo ni internship."
+    },
+    {
+      "nombre": "Fidelity International Investment Management Virtual Experience Programme / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://careers.fidelityinternational.com/early-careers-overview/interns-and-insights/investment-management-virtual-experience-programme/",
+      "condiciones": "Programa exacto confirmado en caption DeV6omDsRQk y web de Fidelity International: seis tareas, alrededor de cinco horas, ritmo propio y certificado al finalizar. No es empleo ni título profesional. Distinto del título ambiguo Fidelity Investment Customer Relationship observado en otro reel.",
+      "fuente_origen": "DeV6omDsRQk — azamath_",
+      "fuentes": [
+        "https://careers.fidelityinternational.com/early-careers-overview/interns-and-insights/investment-management-virtual-experience-programme/",
+        "https://www.theforage.com/sitemap"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C045",
+      "imagen": "DeV6omDsRQk — azamath_",
+      "estado": "Gratuita. USD 0. Programa exacto confirmado en caption DeV6omDsRQk y web de Fidelity International: seis tareas, alrededor de cinco horas, ritmo propio y certificado al finalizar. No es empleo ni título profesional. Distinto del título ambiguo Fidelity Investment Customer Relationship observado en otro reel."
+    },
+    {
+      "nombre": "Goldman Sachs Risk Job Simulation / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/simulations/goldman-sachs/risk-ljdz",
+      "condiciones": "Simulación oficial introductoria de riesgo, con constancia. No es empleo, pasantía contratada ni certificación profesional regulada; presentarla como actividad extracurricular.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DduVfo6T0Oq",
+      "fuentes": [
+        "https://www.theforage.com/simulations/goldman-sachs/risk-ljdz",
+        "https://www.theforage.com/sitemap"
+      ],
+      "id": "C046",
+      "imagen": "DduVfo6T0Oq",
+      "estado": "Gratuita. USD 0. Simulación oficial introductoria de riesgo, con constancia. No es empleo, pasantía contratada ni certificación profesional regulada; presentarla como actividad extracurricular."
+    },
+    {
+      "nombre": "J.P. Morgan Investment Banking Job Simulation / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0 en Forage",
+      "url": "https://www.theforage.com/simulations?careers=banking-and-financial-services",
+      "condiciones": "Forage confirma simulaciones gratuitas y constancia al completar las que la ofrecen. Confirmar disponibilidad y nombre exacto de JPMorgan en catálogo; no es empleo ni licencia.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1; DdAWgncB1Sj",
+      "fuentes": [
+        "https://www.theforage.com/simulations?careers=banking-and-financial-services",
+        "https://www.theforage.com/",
+        "https://eabforage.zendesk.com/hc/en-us/articles/38227406193687-Get-Your-Completion-Certificate"
+      ],
+      "id": "C047",
+      "imagen": "Foto 1; DdAWgncB1Sj",
+      "estado": "Gratuita. USD 0 en Forage. Forage confirma simulaciones gratuitas y constancia al completar las que la ofrecen. Confirmar disponibilidad y nombre exacto de JPMorgan en catálogo; no es empleo ni licencia."
+    },
+    {
+      "nombre": "J.P. Morgan Quantitative Research Job Simulation / Forage",
+      "area": "Finanzas e inversión",
+      "tipo": "Simulación con constancia",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://www.theforage.com/simulations/jpmorgan/quantitative-research-11oc",
+      "condiciones": "Programa específico distinto de JPMorgan Investment Banking. La página de carreras JPMorgan enlaza experiencia gratuita a ritmo propio; no representa empleo ni habilitación como investigador quant.",
+      "fuente_origen": "DeQNieIxked",
+      "fuentes": [
+        "https://www.theforage.com/simulations/jpmorgan/quantitative-research-11oc",
+        "https://careers.jpmorgan.com/us/en/students/programs/quant-fin-programs"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C048",
+      "imagen": "DeQNieIxked",
+      "estado": "Gratuita. USD 0. Programa específico distinto de JPMorgan Investment Banking. La página de carreras JPMorgan enlaza experiencia gratuita a ritmo propio; no representa empleo ni habilitación como investigador quant."
+    },
+    {
+      "nombre": "MIT Analytics of Finance — OpenCourseWare",
+      "area": "Finanzas e inversión",
+      "tipo": "Material de estudio sin certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Contenido gratuito; sin certificado OCW",
+      "url": "https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/",
+      "condiciones": "Recurso oficial OCW; estudiar materiales y ejercicios no otorga crédito académico MIT ni certificado. Distinguir de MITx, educación ejecutiva o MicroMasters con otras condiciones.",
+      "fuente_origen": "DbeXtLjNwa9 — finance_dawgz",
+      "fuentes": [
+        "https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C049",
+      "imagen": "DbeXtLjNwa9 — finance_dawgz",
+      "estado": "Gratuita. Contenido gratuito; sin certificado OCW. Recurso oficial OCW; estudiar materiales y ejercicios no otorga crédito académico MIT ni certificado. Distinguir de MITx, educación ejecutiva o MicroMasters con otras condiciones."
+    },
+    {
+      "nombre": "MIT Finance Theory I — OpenCourseWare",
+      "area": "Finanzas e inversión",
+      "tipo": "Material de estudio sin certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Contenido gratuito; sin certificado OCW",
+      "url": "https://ocw.mit.edu/courses/15-401-finance-theory-i-fall-2008/",
+      "condiciones": "Recurso oficial OCW; estudiar materiales y ejercicios no otorga crédito académico MIT ni certificado. Distinguir de MITx, educación ejecutiva o MicroMasters con otras condiciones.",
+      "fuente_origen": "DbeXtLjNwa9 — finance_dawgz",
+      "fuentes": [
+        "https://ocw.mit.edu/courses/15-401-finance-theory-i-fall-2008/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C050",
+      "imagen": "DbeXtLjNwa9 — finance_dawgz",
+      "estado": "Gratuita. Contenido gratuito; sin certificado OCW. Recurso oficial OCW; estudiar materiales y ejercicios no otorga crédito académico MIT ni certificado. Distinguir de MITx, educación ejecutiva o MicroMasters con otras condiciones."
+    },
+    {
+      "nombre": "MIT Finance Theory II — OpenCourseWare",
+      "area": "Finanzas e inversión",
+      "tipo": "Material de estudio sin certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Contenido gratuito; sin certificado OCW",
+      "url": "https://ocw.mit.edu/courses/15-402-finance-theory-ii-spring-2003/",
+      "condiciones": "Material abierto del curso 15.402; no otorga créditos MIT ni certificado. No confundir con programas MITx de pago o MicroMasters.",
+      "fuente_origen": "DdZlhX5hMt0",
+      "fuentes": [
+        "https://ocw.mit.edu/courses/15-402-finance-theory-ii-spring-2003/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C051",
+      "imagen": "DdZlhX5hMt0",
+      "estado": "Gratuita. Contenido gratuito; sin certificado OCW. Material abierto del curso 15.402; no otorga créditos MIT ni certificado. No confundir con programas MITx de pago o MicroMasters."
+    },
+    {
+      "nombre": "MIT Investments — OpenCourseWare",
+      "area": "Finanzas e inversión",
+      "tipo": "Material de estudio sin certificado",
+      "costo_categoria": "gratuita",
+      "precio_texto": "Contenido gratuito; sin certificado OCW",
+      "url": "https://ocw.mit.edu/courses/15-433-investments-spring-2003/",
+      "condiciones": "Recurso oficial OCW; estudiar materiales y ejercicios no otorga crédito académico MIT ni certificado. Distinguir de MITx, educación ejecutiva o MicroMasters con otras condiciones.",
+      "fuente_origen": "DbeXtLjNwa9 — finance_dawgz",
+      "fuentes": [
+        "https://ocw.mit.edu/courses/15-433-investments-spring-2003/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C052",
+      "imagen": "DbeXtLjNwa9 — finance_dawgz",
+      "estado": "Gratuita. Contenido gratuito; sin certificado OCW. Recurso oficial OCW; estudiar materiales y ejercicios no otorga crédito académico MIT ni certificado. Distinguir de MITx, educación ejecutiva o MicroMasters con otras condiciones."
+    },
+    {
+      "nombre": "Saylor BUS202: Principles of Finance",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de finalización",
+      "costo_categoria": "gratuita",
+      "precio_texto": "USD 0",
+      "url": "https://learn.saylor.org/course/bus202",
+      "condiciones": "Certificado gratuito tras obtener al menos 70% en examen final. Crédito universitario u otras evaluaciones son rutas distintas.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://learn.saylor.org/course/bus202"
+      ],
+      "id": "C053",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "Gratuita. USD 0. Certificado gratuito tras obtener al menos 70% en examen final. Crédito universitario u otras evaluaciones son rutas distintas."
+    },
+    {
+      "nombre": "Bloomberg ESG",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de formación",
+      "costo_categoria": "condicional",
+      "precio_texto": "Acceso institucional o compra; precio final no comprobado",
+      "url": "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+      "condiciones": "No hay gratuidad universal confirmada. Consultar convenio universitario/biblioteca, disponibilidad e inclusión del certificado.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/"
+      ],
+      "id": "C054",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "Gratuidad o credencial condicionada. Acceso institucional o compra; precio final no comprobado. No hay gratuidad universal confirmada. Consultar convenio universitario/biblioteca, disponibilidad e inclusión del certificado."
+    },
+    {
+      "nombre": "Bloomberg Finance Fundamentals (BFF)",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de formación",
+      "costo_categoria": "condicional",
+      "precio_texto": "Puede estar incluido en convenio institucional; tarifa individual no comprobada",
+      "url": "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+      "condiciones": "Curso oficial de cuatro módulos. Gratuidad del reel depende del acceso al laboratorio/convenio universitario; confirmar elegibilidad local, inclusión y certificado antes de comprar. No equivale a licencia profesional.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DduVfo6T0Oq",
+      "fuentes": [
+        "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+        "https://talentsearch.bloomberginstitute.com/certifications",
+        "https://libguides.sandiego.edu/bloomberg/certificates"
+      ],
+      "id": "C055",
+      "imagen": "DduVfo6T0Oq",
+      "estado": "Gratuidad o credencial condicionada. Puede estar incluido en convenio institucional; tarifa individual no comprobada. Curso oficial de cuatro módulos. Gratuidad del reel depende del acceso al laboratorio/convenio universitario; confirmar elegibilidad local, inclusión y certificado antes de comprar. No equivale a licencia profesional."
+    },
+    {
+      "nombre": "Bloomberg Market Concepts (BMC)",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de formación",
+      "costo_categoria": "condicional",
+      "precio_texto": "Acceso institucional o compra; precio final no comprobado",
+      "url": "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+      "condiciones": "No hay gratuidad universal confirmada. Consultar convenio universitario/biblioteca, disponibilidad e inclusión del certificado.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1; DcbSXQPqHH8",
+      "fuentes": [
+        "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/"
+      ],
+      "id": "C056",
+      "imagen": "Foto 1; DcbSXQPqHH8",
+      "estado": "Gratuidad o credencial condicionada. Acceso institucional o compra; precio final no comprobado. No hay gratuidad universal confirmada. Consultar convenio universitario/biblioteca, disponibilidad e inclusión del certificado."
+    },
+    {
+      "nombre": "CFI Careers in Finance",
+      "area": "Finanzas e inversión",
+      "tipo": "Curso completo gratuito; certificado por confirmar",
+      "costo_categoria": "condicional",
+      "precio_texto": "Acceso completo USD 0",
+      "url": "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi",
+      "condiciones": "Único curso completo gratuito confirmado por CFI; comprobar si la cuenta otorga certificado antes de anunciarlo como credencial.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1; corrección oficial de CFI",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi"
+      ],
+      "id": "C057",
+      "imagen": "Foto 1; corrección oficial de CFI",
+      "estado": "Gratuidad o credencial condicionada. Acceso completo USD 0. Único curso completo gratuito confirmado por CFI; comprobar si la cuenta otorga certificado antes de anunciarlo como credencial."
+    },
+    {
+      "nombre": "LSEG Finance Essentials",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de finalización con evaluación",
+      "costo_categoria": "condicional",
+      "precio_texto": "Gratuito con acceso al Learning Centre y correo admitido",
+      "url": "https://www.lseg.com/en/training/learning-centre/certification/lsegfe-certification",
+      "condiciones": "Nombre oficial Finance Essentials, aunque reel dice Financial Essentials. FAQ de webinar oficial: no requiere licencia Workspace; acceso con correo corporativo/académico. Con correo público contactar soporte. No usar cupón 2025 como vigente.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DduVfo6T0Oq",
+      "fuentes": [
+        "https://www.lseg.com/en/training/learning-centre/certification/lsegfe-certification",
+        "https://solutions.lseg.com/FinanceEssentialsWebinar2025OnDemand",
+        "https://www.lseg.com/en/training/learning-centre"
+      ],
+      "id": "C058",
+      "imagen": "DduVfo6T0Oq",
+      "estado": "Gratuidad o credencial condicionada. Gratuito con acceso al Learning Centre y correo admitido. Nombre oficial Finance Essentials, aunque reel dice Financial Essentials. FAQ de webinar oficial: no requiere licencia Workspace; acceso con correo corporativo/académico. Con correo público contactar soporte. No usar cupón 2025 como vigente."
+    },
+    {
+      "nombre": "LSEG Workspace Certification",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de producto",
+      "costo_categoria": "condicional",
+      "precio_texto": "Educación Learning Centre sin coste para usuarios/clientes potenciales; confirmar acceso",
+      "url": "https://www.lseg.com/en/training/learning-centre/certification/workspace-certification",
+      "condiciones": "Certificado fundacional de navegación, noticias, gráficas, empresas, industrias y Excel. FAQ oficial permite usuarios y no usuarios; disponer del producto ayuda, pero certificación no entrega licencia de datos. Registro con correo corporativo/académico o validación por soporte.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DduVfo6T0Oq",
+      "fuentes": [
+        "https://www.lseg.com/en/training/learning-centre/certification/workspace-certification",
+        "https://www.lseg.com/content/dam/lseg/learning-centre/documents/lseg-learning-centre-certification-faqs.pdf",
+        "https://www.lseg.com/en/training/learning-centre"
+      ],
+      "id": "C059",
+      "imagen": "DduVfo6T0Oq",
+      "estado": "Gratuidad o credencial condicionada. Educación Learning Centre sin coste para usuarios/clientes potenciales; confirmar acceso. Certificado fundacional de navegación, noticias, gráficas, empresas, industrias y Excel. FAQ oficial permite usuarios y no usuarios; disponer del producto ayuda, pero certificación no entrega licencia de datos. Registro con correo corporativo/académico o validación por soporte."
+    },
+    {
+      "nombre": "Columbia+ Introduction to Financial Engineering and Risk Management",
+      "area": "Finanzas e inversión",
+      "tipo": "Curso con certificado opcional",
+      "costo_categoria": "contenido_gratis_certificado_pago",
+      "precio_texto": "Contenido USD 0; certificado opcional USD 20",
+      "url": "https://plus.columbia.edu/content/introduction-financial-engineering-and-risk-management",
+      "condiciones": "Material y evaluaciones gratuitos; certificado verificado requiere completar requisitos y pago opcional. No extrapolar ese precio a Coursera.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DebBqQzhcHC",
+      "fuentes": [
+        "https://plus.columbia.edu/content/introduction-financial-engineering-and-risk-management"
+      ],
+      "id": "C060",
+      "imagen": "DebBqQzhcHC",
+      "estado": "Contenido gratis; certificado de pago. Contenido USD 0; certificado opcional USD 20. Material y evaluaciones gratuitos; certificado verificado requiere completar requisitos y pago opcional. No extrapolar ese precio a Coursera."
+    },
+    {
+      "nombre": "365 Financial Analyst",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificados de cursos y rutas",
+      "costo_categoria": "paga",
+      "precio_texto": "Plan gratuito parcial; Premium mensual publicado USD 36; anual promocional a confirmar",
+      "url": "https://www.learn.365financialanalyst.com/pricing/",
+      "condiciones": "No extrapolar promoción 2025 a noviembre 2026. Tabla web incluye elementos de planes con diseño visual; confirmar explícitamente exámenes y certificados del plan gratuito antes de atribuirlos.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1",
+      "fuentes": [
+        "https://www.learn.365financialanalyst.com/pricing/"
+      ],
+      "id": "C061",
+      "imagen": "Foto 1",
+      "estado": "De pago. Plan gratuito parcial; Premium mensual publicado USD 36; anual promocional a confirmar. No extrapolar promoción 2025 a noviembre 2026. Tabla web incluye elementos de planes con diseño visual; confirmar explícitamente exámenes y certificados del plan gratuito antes de atribuirlos."
+    },
+    {
+      "nombre": "AMIB Figura 3 / Serie 210 — Asesor en Estrategias de Inversión",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificación profesional mexicana",
+      "costo_categoria": "paga",
+      "precio_texto": "Cotización vigente AMIB pendiente",
+      "url": "https://www.amib.com.mx/NetHelpGuiaDeCertificacionVersion6.0/Documents/grupo3certificacinasesorenestrategiasdeinversinserie210.htm",
+      "condiciones": "Confirmar guía, elegibilidad, documentación, examen, ética, vigencia y renovación. Curso preparatorio no sustituye certificación.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://www.amib.com.mx/NetHelpGuiaDeCertificacionVersion6.0/Documents/grupo3certificacinasesorenestrategiasdeinversinserie210.htm"
+      ],
+      "id": "C062",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. Cotización vigente AMIB pendiente. Confirmar guía, elegibilidad, documentación, examen, ética, vigencia y renovación. Curso preparatorio no sustituye certificación."
+    },
+    {
+      "nombre": "CFA Level I — CFA Institute",
+      "area": "Finanzas e inversión",
+      "tipo": "Nivel de un programa profesional",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 1140 temprano / USD 1490 estándar para exámenes desde 2026",
+      "url": "https://www.cfainstitute.org/programs/cfa-program/dates-fees",
+      "condiciones": "Nivel ya comprendido en CFA Program del maestro; se separa sólo porque reel lo enumera. No sumar otra vez al presupuesto ni llamarse CFA por aprobar Level I.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://www.cfainstitute.org/programs/cfa-program/dates-fees",
+        "https://www.cfainstitute.org/about/press-room/2024/pricing-changes-for-cfa-program"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C063",
+      "imagen": "DedIkMSRbAR",
+      "estado": "De pago. USD 1140 temprano / USD 1490 estándar para exámenes desde 2026. Nivel ya comprendido en CFA Program del maestro; se separa sólo porque reel lo enumera. No sumar otra vez al presupuesto ni llamarse CFA por aprobar Level I."
+    },
+    {
+      "nombre": "CFA Program — CFA Institute",
+      "area": "Finanzas e inversión",
+      "tipo": "Designación profesional",
+      "costo_categoria": "paga",
+      "precio_texto": "Exámenes 3 niveles: USD 3520 temprano / USD 4570 estándar desde 2026",
+      "url": "https://www.cfainstitute.org/about/press-room/2024/pricing-changes-for-cfa-program",
+      "condiciones": "Suma de tarifas publicadas: I y II 1140/1490 cada uno, III 1240/1590. No incluye preparación, reintentos, impuestos ni membresía. Designación requiere experiencia y membresía además de exámenes.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://www.cfainstitute.org/about/press-room/2024/pricing-changes-for-cfa-program"
+      ],
+      "id": "C064",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. Exámenes 3 niveles: USD 3520 temprano / USD 4570 estándar desde 2026. Suma de tarifas publicadas: I y II 1140/1490 cada uno, III 1240/1590. No incluye preparación, reintentos, impuestos ni membresía. Designación requiere experiencia y membresía además de exámenes."
+    },
+    {
+      "nombre": "CFI Corporate Finance Fundamentals",
+      "area": "Finanzas e inversión",
+      "tipo": "Curso con certificado en plan elegible",
+      "costo_categoria": "paga",
+      "precio_texto": "Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión",
+      "url": "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+      "condiciones": "Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+        "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi"
+      ],
+      "id": "C065",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "De pago. Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión. Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos."
+    },
+    {
+      "nombre": "CFI Excel Formulas for Finance",
+      "area": "Finanzas e inversión",
+      "tipo": "Curso con certificado en plan elegible",
+      "costo_categoria": "paga",
+      "precio_texto": "Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión",
+      "url": "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+      "condiciones": "Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdAWgncB1Sj",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+        "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi"
+      ],
+      "id": "C066",
+      "imagen": "DdAWgncB1Sj",
+      "estado": "De pago. Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión. Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos."
+    },
+    {
+      "nombre": "CFI Fundamentals of Credit",
+      "area": "Finanzas e inversión",
+      "tipo": "Curso con certificado en plan elegible",
+      "costo_categoria": "paga",
+      "precio_texto": "Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión",
+      "url": "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+      "condiciones": "Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+        "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi"
+      ],
+      "id": "C067",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "De pago. Previews gratis; plan Course-Only publicado USD 347/año; confirmar inclusión. Crear cuenta gratis no desbloquea todos los cursos ni certificados. El título exacto e inclusión requieren comprobar catálogo; precio sin promoción ni impuestos."
+    },
+    {
+      "fuente_origen": "DeCuZ8yPkyd",
+      "area": "Finanzas e inversión",
+      "fuentes": [
+        "https://corporatefinanceinstitute.com/topic/investment-banking/",
+        "https://help.corporatefinanceinstitute.com/article/307-free-courses-and-resources",
+        "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging"
+      ],
+      "nombre": "CFI Introduction to Investment Banking",
+      "precio_texto": "Preview gratis; Course-Only publicado USD 347/año; confirmar inclusión",
+      "verificado_fecha": "2026-10-18",
+      "costo_categoria": "paga",
+      "condiciones": "Curso identificado por el catálogo oficial. CFI cambió cursos gratuitos por previews desde septiembre 2024; sólo Careers in Finance completo gratis. Verificar título activo, certificado e inclusión del plan antes de pagar.",
+      "tipo": "Curso con certificado en plan elegible",
+      "url": "https://corporatefinanceinstitute.com/topic/investment-banking/",
+      "id": "C068",
+      "imagen": "DeCuZ8yPkyd",
+      "estado": "De pago. Preview gratis; Course-Only publicado USD 347/año; confirmar inclusión. Curso identificado por el catálogo oficial. CFI cambió cursos gratuitos por previews desde septiembre 2024; sólo Careers in Finance completo gratis. Verificar título activo, certificado e inclusión del plan antes de pagar."
+    },
+    {
+      "nombre": "CMT Level I — CMT Association",
+      "area": "Finanzas e inversión",
+      "tipo": "Primer nivel del programa CMT",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 875 temprano / 1075 estándar / 1475 tardío; convenio académico USD 295 elegible",
+      "url": "https://cmtassociation.org/cmt-program/register/",
+      "condiciones": "Ventana diciembre2026; el 18oct2026 corresponde tarifa tardía publicada hasta 4nov. Currículo incluido; impuestos aparte. Aprobar nivel I no equivale a designación CMT; confirmar requisitos de niveles y membresía.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://cmtassociation.org/cmt-program/register/",
+        "https://cmtassociation.org/cmt-program/frequently-asked-questions/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C069",
+      "imagen": "DedIkMSRbAR",
+      "estado": "De pago. USD 875 temprano / 1075 estándar / 1475 tardío; convenio académico USD 295 elegible. Ventana diciembre2026; el 18oct2026 corresponde tarifa tardía publicada hasta 4nov. Currículo incluido; impuestos aparte. Aprobar nivel I no equivale a designación CMT; confirmar requisitos de niveles y membresía."
+    },
+    {
+      "nombre": "Columbia Economics of Money and Banking",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Certificado por compra/plan; precio final según país y cuenta",
+      "url": "https://www.coursera.org/learn/money-banking",
+      "condiciones": "Curso de Perry Mehrling; no equivale a título ni a licencia bancaria. Inscribirse gratis o prueba no garantiza certificado gratuito; ayuda y modalidades sin certificado según elegibilidad.",
+      "fuente_origen": "DdZlhX5hMt0",
+      "fuentes": [
+        "https://www.coursera.org/learn/money-banking"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C070",
+      "imagen": "DdZlhX5hMt0",
+      "estado": "De pago. Certificado por compra/plan; precio final según país y cuenta. Curso de Perry Mehrling; no equivale a título ni a licencia bancaria. Inscribirse gratis o prueba no garantiza certificado gratuito; ayuda y modalidades sin certificado según elegibilidad."
+    },
+    {
+      "nombre": "Columbia Introduction to Financial Engineering and Risk Management (Coursera)",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio según país, plan y cuenta; no comprobado",
+      "url": "https://www.coursera.org/learn/financial-engineering-1",
+      "condiciones": "Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DebBqQzhcHC",
+      "fuentes": [
+        "https://www.coursera.org/learn/financial-engineering-1"
+      ],
+      "id": "C071",
+      "imagen": "DebBqQzhcHC",
+      "estado": "De pago. Precio según país, plan y cuenta; no comprobado. Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario."
+    },
+    {
+      "nombre": "Duke Behavioral Finance",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio según país, plan y cuenta; no comprobado",
+      "url": "https://www.coursera.org/learn/duke-behavioral-finance",
+      "condiciones": "Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdXnw2lRsuK",
+      "fuentes": [
+        "https://www.coursera.org/learn/duke-behavioral-finance"
+      ],
+      "id": "C072",
+      "imagen": "DdXnw2lRsuK",
+      "estado": "De pago. Precio según país, plan y cuenta; no comprobado. Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario."
+    },
+    {
+      "nombre": "EDUCBA Valuation and Financial Modeling",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de especialización Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio por plan/cuenta; no comprobado",
+      "url": "https://www.coursera.org/specializations/valuation-financial-modeling",
+      "condiciones": "Programa relacionado localizado; título del reel Financial Modeling and Valuation no es coincidencia exacta. EDUCBA no es universidad Ivy League.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DebBqQzhcHC",
+      "fuentes": [
+        "https://www.coursera.org/specializations/valuation-financial-modeling"
+      ],
+      "id": "C073",
+      "imagen": "DebBqQzhcHC",
+      "estado": "De pago. Precio por plan/cuenta; no comprobado. Programa relacionado localizado; título del reel Financial Modeling and Valuation no es coincidencia exacta. EDUCBA no es universidad Ivy League."
+    },
+    {
+      "nombre": "FMVA — Corporate Finance Institute",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificación de modelación y valuación",
+      "costo_categoria": "paga",
+      "precio_texto": "Self-Study USD 497/año; Full-Immersion USD 847/año publicados",
+      "url": "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging",
+      "condiciones": "Plan Course-Only no equivale a certificación FMVA. Comprobar impuestos, promociones, inclusión y requisitos actuales.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1083-pricing-packaging"
+      ],
+      "id": "C074",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. Self-Study USD 497/año; Full-Immersion USD 847/año publicados. Plan Course-Only no equivale a certificación FMVA. Comprobar impuestos, promociones, inclusión y requisitos actuales."
+    },
+    {
+      "nombre": "FRM Part I — GARP",
+      "area": "Finanzas e inversión",
+      "tipo": "Primera parte de certificación profesional",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 600 temprano / 800 estándar + USD 400 alta nueva",
+      "url": "https://www.garp.org/frm/fees-payments",
+      "condiciones": "Ya incluido en FRM completo del maestro: evitar doble conteo presupuestal. Part I aprobado no equivale a FRM; faltan Part II y experiencia. Tabla consultada anuncia mayo2027.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://www.garp.org/frm/fees-payments"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C075",
+      "imagen": "DedIkMSRbAR",
+      "estado": "De pago. USD 600 temprano / 800 estándar + USD 400 alta nueva. Ya incluido en FRM completo del maestro: evitar doble conteo presupuestal. Part I aprobado no equivale a FRM; faltan Part II y experiencia. Tabla consultada anuncia mayo2027."
+    },
+    {
+      "nombre": "FRM — GARP",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificación profesional de riesgo",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 400 alta + USD 600 temprano / USD 800 estándar por parte; consultar ventana",
+      "url": "https://www.garp.org/frm/fees-payments",
+      "condiciones": "Dos exámenes y experiencia pertinente; tabla consultada ya anuncia mayo 2027. Tarifas no incluyen impuestos; no suponer inscripción abierta a una ventana pasada.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Investigación profesional previa",
+      "fuentes": [
+        "https://www.garp.org/frm/fees-payments"
+      ],
+      "id": "C076",
+      "imagen": "Investigación profesional previa",
+      "estado": "De pago. USD 400 alta + USD 600 temprano / USD 800 estándar por parte; consultar ventana. Dos exámenes y experiencia pertinente; tabla consultada ya anuncia mayo 2027. Tarifas no incluyen impuestos; no suponer inscripción abierta a una ventana pasada."
+    },
+    {
+      "nombre": "Illinois Financial Analysis of Scenarios and Decisions",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Certificado por compra/plan; precio final según país y cuenta",
+      "url": "https://www.coursera.org/learn/financial-analysis-of-scenarios-and-decisions",
+      "condiciones": "El título oficial dice Scenarios, no Situations; relacionado con Illinois genérico DeCuZ pero no prueba que aquel reel hablara de este mismo curso. Inscribirse gratis o prueba no garantiza certificado gratuito; ayuda y modalidades sin certificado según elegibilidad.",
+      "fuente_origen": "DdZlhX5hMt0",
+      "fuentes": [
+        "https://www.coursera.org/learn/financial-analysis-of-scenarios-and-decisions"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C077",
+      "imagen": "DdZlhX5hMt0",
+      "estado": "De pago. Certificado por compra/plan; precio final según país y cuenta. El título oficial dice Scenarios, no Situations; relacionado con Illinois genérico DeCuZ pero no prueba que aquel reel hablara de este mismo curso. Inscribirse gratis o prueba no garantiza certificado gratuito; ayuda y modalidades sin certificado según elegibilidad."
+    },
+    {
+      "nombre": "Investment Foundations Certificate — CFA Institute",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de conocimientos",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 350 general; oferta estudiante por verificar",
+      "url": "https://www.cfainstitute.org/programs/investment-foundations-certificate",
+      "condiciones": "Acceso 12 meses y evaluación final. La imagen menciona USD 79 estudiante; no confirmado aquí. No equivale a CFA Level I.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1",
+      "fuentes": [
+        "https://www.cfainstitute.org/programs/investment-foundations-certificate"
+      ],
+      "id": "C078",
+      "imagen": "Foto 1",
+      "estado": "De pago. USD 350 general; oferta estudiante por verificar. Acceso 12 meses y evaluación final. La imagen menciona USD 79 estudiante; no confirmado aquí. No equivale a CFA Level I."
+    },
+    {
+      "nombre": "Rice Finance for Non-Finance Professionals",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio según país, plan y cuenta; no comprobado",
+      "url": "https://www.coursera.org/learn/finance-for-non-finance",
+      "condiciones": "Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1",
+      "fuentes": [
+        "https://www.coursera.org/learn/finance-for-non-finance"
+      ],
+      "id": "C079",
+      "imagen": "Foto 1",
+      "estado": "De pago. Precio según país, plan y cuenta; no comprobado. Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario."
+    },
+    {
+      "nombre": "Securities Industry Essentials (SIE) — FINRA",
+      "area": "Finanzas e inversión",
+      "tipo": "Examen de conocimientos sectoriales",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 100",
+      "url": "https://www.finra.org/registration-exams-ce/qualification-exams/securities-industry-essentials-exam",
+      "condiciones": "Mayores de 18; no requiere patrocinio para SIE. Resultado válido cuatro años. Aprobarlo solo no autoriza registro ni negocio de valores; requisitos adicionales y firma miembro para exámenes profesionales correspondientes. No sustituye AMIB.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://www.finra.org/registration-exams-ce/qualification-exams/securities-industry-essentials-exam"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C080",
+      "imagen": "DedIkMSRbAR",
+      "estado": "De pago. USD 100. Mayores de 18; no requiere patrocinio para SIE. Resultado válido cuatro años. Aprobarlo solo no autoriza registro ni negocio de valores; requisitos adicionales y firma miembro para exámenes profesionales correspondientes. No sustituye AMIB."
+    },
+    {
+      "nombre": "Wall Street Prep Financial & Valuation Modeling Certification — Premium Package",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificación de formación práctica",
+      "costo_categoria": "paga",
+      "precio_texto": "USD 499 publicados",
+      "url": "https://www.wallstreetprep.com/self-study-programs/premium-package/",
+      "condiciones": "Completar evaluaciones requeridas del paquete. El reel dice Modeling: este programa es coincidencia relacionada identificable, verificar paquete concreto antes de pagar. No licencia regulatoria.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://www.wallstreetprep.com/self-study-programs/premium-package/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C081",
+      "imagen": "DedIkMSRbAR",
+      "estado": "De pago. USD 499 publicados. Completar evaluaciones requeridas del paquete. El reel dice Modeling: este programa es coincidencia relacionada identificable, verificar paquete concreto antes de pagar. No licencia regulatoria."
+    },
+    {
+      "nombre": "Wharton / Penn Introduction to Corporate Finance",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio según país, plan y cuenta; no comprobado",
+      "url": "https://www.coursera.org/learn/wharton-finance",
+      "condiciones": "Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1; DebBqQzhcHC",
+      "fuentes": [
+        "https://www.coursera.org/learn/wharton-finance"
+      ],
+      "id": "C082",
+      "imagen": "Foto 1; DebBqQzhcHC",
+      "estado": "De pago. Precio según país, plan y cuenta; no comprobado. Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario."
+    },
+    {
+      "nombre": "Wharton Decision-Making and Scenarios",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Certificado por compra/plan; precio final según país y cuenta",
+      "url": "https://www.coursera.org/learn/wharton-decision-making-scenarios",
+      "condiciones": "Parte de Business and Financial Modeling; evaluación de proyectos, estados y escenarios. Inscribirse gratis o prueba no garantiza certificado gratuito; ayuda y modalidades sin certificado según elegibilidad.",
+      "fuente_origen": "DdZlhX5hMt0",
+      "fuentes": [
+        "https://www.coursera.org/learn/wharton-decision-making-scenarios"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C083",
+      "imagen": "DdZlhX5hMt0",
+      "estado": "De pago. Certificado por compra/plan; precio final según país y cuenta. Parte de Business and Financial Modeling; evaluación de proyectos, estados y escenarios. Inscribirse gratis o prueba no garantiza certificado gratuito; ayuda y modalidades sin certificado según elegibilidad."
+    },
+    {
+      "nombre": "Yale Financial Markets",
+      "area": "Finanzas e inversión",
+      "tipo": "Certificado de curso Coursera",
+      "costo_categoria": "paga",
+      "precio_texto": "Precio según país, plan y cuenta; no comprobado",
+      "url": "https://www.coursera.org/learn/financial-markets-global",
+      "condiciones": "Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1; DdAWgncB1Sj",
+      "fuentes": [
+        "https://www.coursera.org/learn/financial-markets-global"
+      ],
+      "id": "C084",
+      "imagen": "Foto 1; DdAWgncB1Sj",
+      "estado": "De pago. Precio según país, plan y cuenta; no comprobado. Certificado mediante experiencia de pago/plan elegible; ayuda financiera o modalidad sin certificado según oferta. Inscripción gratuita o prueba no garantiza certificado gratis. No equivale a grado universitario."
+    },
+    {
+      "verificado_fecha": "2026-10-18",
+      "fuentes": [
+        "https://www.theforage.com/sitemap"
+      ],
+      "precio_texto": "Coste y disponibilidad específica sin confirmar",
+      "area": "Finanzas e inversión",
+      "costo_categoria": "pendiente",
+      "fuente_origen": "DeCuZ8yPkyd, puesto 8",
+      "condiciones": "Se conserva el título del autor del reel. No se localizó una simulación activa oficial inequívoca BlackRock Investment Management; no sustituir por cursos de otra entidad ni por productos de inversión BlackRock. No se afirma inexistencia definitiva.",
+      "tipo": "Simulación mencionada sin identidad activa confirmada",
+      "url": "https://www.theforage.com/simulations?careers=banking-and-financial-services",
+      "nombre": "BlackRock Investment Management Simulation (mencionada; programa pendiente)",
+      "id": "C085",
+      "imagen": "DeCuZ8yPkyd, puesto 8",
+      "estado": "Por confirmar / programa no identificado. Coste y disponibilidad específica sin confirmar. Se conserva el título del autor del reel. No se localizó una simulación activa oficial inequívoca BlackRock Investment Management; no sustituir por cursos de otra entidad ni por productos de inversión BlackRock. No se afirma inexistencia definitiva."
+    },
+    {
+      "nombre": "CFI Free Courses (familia de la imagen)",
+      "area": "Finanzas e inversión",
+      "tipo": "Vistas previas y recursos",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Previews gratis; no certificado gratuito universal",
+      "url": "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi",
+      "condiciones": "No es una certificación única. Separar Careers in Finance de cursos completos y FMVA.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "Foto 1",
+      "fuentes": [
+        "https://help.corporatefinanceinstitute.com/article/1091-getting-started-with-cfi"
+      ],
+      "id": "C086",
+      "imagen": "Foto 1",
+      "estado": "Por confirmar / programa no identificado. Previews gratis; no certificado gratuito universal. No es una certificación única. Separar Careers in Finance de cursos completos y FMVA."
+    },
+    {
+      "verificado_fecha": "2026-10-18",
+      "fuentes": [
+        "https://careers.fidelityinternational.com/early-careers-overview/interns-and-insights/investment-management-virtual-experience-programme/",
+        "https://www.theforage.com/sitemap"
+      ],
+      "precio_texto": "Programa exacto sin confirmar; alternativa Fidelity International gratuita",
+      "area": "Finanzas e inversión",
+      "costo_categoria": "pendiente",
+      "fuente_origen": "DeCuZ8yPkyd, puesto 9",
+      "condiciones": "No se verificó título Customer Relationship ni entidad exacta del reel. Sí existe programa oficial distinto Fidelity International Investment Management: seis tareas, unas cinco horas y certificado gratuito. No confundir Fidelity Investments con Fidelity International ni atribuirles identidad exacta.",
+      "tipo": "Simulación mencionada sin coincidencia exacta",
+      "url": "https://careers.fidelityinternational.com/early-careers-overview/interns-and-insights/investment-management-virtual-experience-programme/",
+      "nombre": "Fidelity Investment Customer Relationship Simulation (título del autor pendiente)",
+      "id": "C087",
+      "imagen": "DeCuZ8yPkyd, puesto 9",
+      "estado": "Por confirmar / programa no identificado. Programa exacto sin confirmar; alternativa Fidelity International gratuita. No se verificó título Customer Relationship ni entidad exacta del reel. Sí existe programa oficial distinto Fidelity International Investment Management: seis tareas, unas cinco horas y certificado gratuito. No confundir Fidelity Investments con Fidelity International ni atribuirles identidad exacta."
+    },
+    {
+      "nombre": "Training The Street (programa no especificado)",
+      "area": "Finanzas e inversión",
+      "tipo": "Familia de formación; título pendiente",
+      "costo_categoria": "pendiente",
+      "precio_texto": "Bundles publicados USD 400–500; cursos guiados desde USD 1150; título exacto pendiente",
+      "url": "https://trainingthestreet.com/train-yourself/",
+      "condiciones": "El reel sólo nombra proveedor. No inventar certificación única ni aplicar precio de un bundle a todo el catálogo. Verificar contenido, evaluación y certificado del programa elegido.",
+      "fuente_origen": "DedIkMSRbAR",
+      "fuentes": [
+        "https://trainingthestreet.com/train-yourself/"
+      ],
+      "verificado_fecha": "2026-10-18",
+      "id": "C088",
+      "imagen": "DedIkMSRbAR",
+      "estado": "Por confirmar / programa no identificado. Bundles publicados USD 400–500; cursos guiados desde USD 1150; título exacto pendiente. El reel sólo nombra proveedor. No inventar certificación única ni aplicar precio de un bundle a todo el catálogo. Verificar contenido, evaluación y certificado del programa elegido."
+    },
+    {
+      "fuente_origen": "DeCuZ8yPkyd",
+      "area": "Finanzas e inversión",
+      "fuentes": [
+        "https://www.coursera.org/specializations/financial-analysis-valuation",
+        "https://www.coursera.org/learn/financial-analysis-of-organizations"
+      ],
+      "nombre": "University of Illinois: Financial Analysis certification (título del reel pendiente)",
+      "precio_texto": "Certificado Coursera normalmente de pago; oferta concreta pendiente",
+      "verificado_fecha": "2026-10-18",
+      "costo_categoria": "pendiente",
+      "condiciones": "Hay varias coincidencias oficiales: Financial Analysis and Valuation; Financial Analysis - Skills for Success; Financial Analysis of Organizations. No afirmar cuál menciona el reel sin captura legible. Enlace es candidato relacionado, no identidad confirmada. Acceso gratuito, prueba o ayuda no equivale automáticamente a certificado gratuito.",
+      "tipo": "Programa universitario no identificado inequívocamente",
+      "url": "https://www.coursera.org/specializations/financial-analysis-valuation",
+      "id": "C089",
+      "imagen": "DeCuZ8yPkyd",
+      "estado": "Por confirmar / programa no identificado. Certificado Coursera normalmente de pago; oferta concreta pendiente. Hay varias coincidencias oficiales: Financial Analysis and Valuation; Financial Analysis - Skills for Success; Financial Analysis of Organizations. No afirmar cuál menciona el reel sin captura legible. Enlace es candidato relacionado, no identidad confirmada. Acceso gratuito, prueba o ayuda no equivale automáticamente a certificado gratuito."
+    },
+    {
+      "fuente_origen": "DeCuZ8yPkyd; DdXnw2lRsuK",
+      "area": "Finanzas e inversión",
+      "fuentes": [
+        "https://www.theforage.com/simulations?careers=banking-and-financial-services",
+        "https://www.theforage.com/sitemap"
+      ],
+      "nombre": "Wells Fargo Investment Banking Simulation / Forage (disponibilidad pendiente)",
+      "precio_texto": "Forage general gratuito; programa específico no confirmado",
+      "verificado_fecha": "2026-10-18",
+      "costo_categoria": "pendiente",
+      "condiciones": "El reel identifica Investment Banking; búsquedas y catálogo oficial actual no permitieron localizar página específica activa de Wells Fargo. No inventar URL ni sustituir por producto bancario o internship real. Actualiza el nombre anterior Wells Fargo Banking Simulation; no contar ambos como credenciales distintas.",
+      "tipo": "Simulación mencionada; programa activo sin confirmar",
+      "url": "https://www.theforage.com/simulations?careers=banking-and-financial-services",
+      "id": "C090",
+      "imagen": "DeCuZ8yPkyd; DdXnw2lRsuK",
+      "estado": "Por confirmar / programa no identificado. Forage general gratuito; programa específico no confirmado. El reel identifica Investment Banking; búsquedas y catálogo oficial actual no permitieron localizar página específica activa de Wells Fargo. No inventar URL ni sustituir por producto bancario o internship real. Actualiza el nombre anterior Wells Fargo Banking Simulation; no contar ambos como credenciales distintas."
+    },
+    {
+      "nombre": "LSE AI Law, Policy and Governance",
+      "area": "Gobernanza y derecho de IA",
+      "tipo": "Certificado de competencia",
+      "costo_categoria": "paga",
+      "precio_texto": "GBP 2420 publicados",
+      "url": "https://www.lse.ac.uk/study-at-lse/executive-education/programmes/ai-law-policy-and-governance",
+      "condiciones": "Ejemplo identificable del catálogo: seis semanas, 6–8h/semana. Verificar convocatoria próxima; cohorte 30sept2026 no implica ingreso tardío abierto.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdCEkOBBjc4; curso visible en capturas del reel LSE",
+      "fuentes": [
+        "https://www.lse.ac.uk/study-at-lse/executive-education/programmes/ai-law-policy-and-governance"
+      ],
+      "id": "C091",
+      "imagen": "DdCEkOBBjc4; curso visible en capturas del reel LSE",
+      "estado": "De pago. GBP 2420 publicados. Ejemplo identificable del catálogo: seis semanas, 6–8h/semana. Verificar convocatoria próxima; cohorte 30sept2026 no implica ingreso tardío abierto."
+    },
+    {
+      "nombre": "LSE Online Certificate Courses (catálogo)",
+      "area": "Gobernanza y derecho de IA",
+      "tipo": "Familia de cursos",
+      "costo_categoria": "paga",
+      "precio_texto": "Matrícula según programa; no existe precio único",
+      "url": "https://www.lse.ac.uk/study-at-lse/executive-education/online-learning/online-certificate-courses",
+      "condiciones": "No asumir gratuidad general por el reel ni equivalencia a grado académico.",
+      "verificado_fecha": "2026-10-18",
+      "fuente_origen": "DdCEkOBBjc4; catálogo mostrado en reel",
+      "fuentes": [
+        "https://www.lse.ac.uk/study-at-lse/executive-education/online-learning/online-certificate-courses"
+      ],
+      "id": "C092",
+      "imagen": "DdCEkOBBjc4; catálogo mostrado en reel",
+      "estado": "De pago. Matrícula según programa; no existe precio único. No asumir gratuidad general por el reel ni equivalencia a grado académico."
+    }
+  ]
+}

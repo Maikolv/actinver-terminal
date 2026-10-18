@@ -2718,6 +2718,8 @@ async function cargarAprendizaje() {
     const link = (titulo, url) => url ? h('a', {href:url, target:'_blank', rel:'noopener noreferrer', texto:titulo}) : h('span', {texto:titulo});
     const c = d.captura_referencia;
     limpiar('aprendizaje-contenido', h('p', {clase:'ayuda', texto:`Revisión ${d.revisado}. ${d.aviso}`}),
+      h('h2', {texto:'Catálogo maestro y configuración de plataformas'}),
+      ...(d.documentos || []).map(r => h('article', {clase:'tarjeta'}, h('h3', {}, link(r.titulo,r.url)), h('p', {texto:r.detalle}))),
       h('h2', {texto:'Indicadores — PDF de Ana Jiménez, Actinver Acelera Academy'}),
       ...d.indicadores.map(i => h('article', {clase:'tarjeta'}, h('h3', {texto:i.titulo}), h('p', {}, h('code', {texto:i.formula})),
         h('p', {texto:i.interpretacion}), h('p', {clase:'ayuda', texto:`Precisión: ${i.precision} Fuente: ${i.archivo}, página 1.`}))),
@@ -2727,8 +2729,8 @@ async function cargarAprendizaje() {
       ...d.cursos.map(r => h('article', {clase:'tarjeta'}, h('h3', {}, link(r.titulo,r.url)), h('p', {texto:`${r.autor} · ${r.captura}. ${r.estado}`}),
         h('p', {texto:r.conceptos.join(' · ')}), h('p', {texto:`Ejercicio: ${r.ejercicio}`}))),
       h('h2', {texto:'Formación de las capturas y los posts: condiciones de acceso'}),
-      h('p', {texto:'Las letras pertenecen al ranking subjetivo de la imagen. Post17-oct identifica recursos adicionales, no una calificación. No se contrata ni inscribe a ningún curso.'}),
-      tabla([{t:'Programa',f:r=>link(r.nombre,r.url)},{t:'Referencia',f:r=>r.imagen},{t:'Verificación y límites',f:r=>r.estado}],d.certificaciones,{caption:'Acceso al contenido y certificado son condiciones distintas'}),
+      h('p', {texto:'Orden por área: gratuitas, condicionadas, contenido gratis con certificado de pago, de pago y pendientes. Cursos, badges y certificaciones profesionales tienen alcances distintos. No se contrata ni inscribe a ningún curso.'}),
+      tabla([{t:'Área',f:r=>r.area || 'Por clasificar'},{t:'Programa',f:r=>link(r.nombre,r.url)},{t:'Referencia',f:r=>r.imagen},{t:'Verificación y límites',f:r=>r.estado}],d.certificaciones,{caption:'Acceso al contenido y certificado son condiciones distintas'}),
       h('h2', {texto:'Captura de cotizaciones: referencia local'}),
       c ? h('div', {}, h('p', {clase:'aviso-caja', texto:c.nota+' Fecha, moneda y mercado no confirmados. No se usa para valorar la cartera.'}),
         tabla([{t:'Símbolo visible',f:r=>r.simbolo},{t:'Número de la captura (sin moneda confirmada)',f:r=>num(r.precio_captura),num:true}],c.filas,{caption:'Referencia aportada por el usuario; no son precios actuales ni posiciones confirmadas'}))
