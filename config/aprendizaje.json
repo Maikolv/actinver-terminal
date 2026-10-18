@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revisado": "2026-10-16",
+  "revisado": "2026-10-17",
   "indicadores": [
     {
       "titulo": "SMA y EMA",
@@ -106,6 +106,117 @@
         "Tick, punto, vencimiento y valor nominal"
       ],
       "ejercicio": "Resolver el tamaño MES/MNQ/ES/NQ y seleccionar un vencimiento concreto; un continuo no es un contrato ejecutable."
+    },
+    {
+      "titulo": "Terminal con datos gratuitos",
+      "captura": "Instagram17-oct-2026",
+      "autor": "chrispathway",
+      "url": "https://www.instagram.com/p/Dej_B7_MXrX/",
+      "estado": "Replit reúne mercado, fundamentales, macro y noticias. Proyecto completo ofrecido por comentario; no se obtuvo.",
+      "conceptos": [
+        "yfinance, SEC EDGAR, FRED y Yahoo Finance; FinBERT para sentimiento",
+        "Separar licencia de código, datos y pesos; FinBERT CC-BY-NC-SA4.0 no habilita automáticamente uso comercial"
+      ],
+      "ejercicio": "Abrir Mercado e Investigación y documentar una fuente y su retraso por panel."
+    },
+    {
+      "titulo": "Arbitraje y riesgo de ejecución",
+      "captura": "Instagram17-oct-2026",
+      "autor": "choicooks",
+      "url": "https://www.instagram.com/p/Dd2ABKWSCzp/",
+      "estado": "Ejemplo entre mercados de predicción; la afirmación de ausencia de riesgo no está demostrada.",
+      "conceptos": [
+        "Resultados complementarios y liquidación equivalente",
+        "Comisiones, capital, ejecución simultánea y riesgo de una pata"
+      ],
+      "ejercicio": "Comprobar 1/3.38+1/2.76 y distinguir margen por pago de retorno sobre capital. Solo cálculo, sin apostar."
+    },
+    {
+      "titulo": "Indicador de anomalías",
+      "captura": "Instagram17-oct-2026",
+      "autor": "jesutraderchile",
+      "url": "https://www.instagram.com/p/DeSsMwAOXWz/",
+      "estado": "Indicador promocionado; fórmula y código completos no recuperados. No se replica un algoritmo desconocido.",
+      "conceptos": [
+        "El reel menciona anomalías de rendimiento y umbral de dos desviaciones estándar",
+        "Log(precio) no garantiza estacionariedad; log-retornos también requieren comprobación",
+        "Señal de anomalía no demuestra rentabilidad ni ausencia de repintado"
+      ],
+      "ejercicio": "Prerregistrar una hipótesis propia de anomalía y validar con datos pasados disponibles antes del evento."
+    },
+    {
+      "titulo": "Time-Series Momentum mensual",
+      "captura": "Instagram17-oct-2026",
+      "autor": "italian_founder",
+      "url": "https://www.instagram.com/p/DejEnwmBclA/",
+      "estado": "Reglas visibles y caption revisados; resultados son del autor, no reproducidos localmente.",
+      "conceptos": [
+        "Comparar cierre mensual con3/6/12meses; elegir ventana solo en entrenamiento",
+        "Largo/efectivo; forex puede ir corto. Mantener un mes sin stop/target",
+        "No equivalente al momentum transversal diario existente ni compatible directamente con Lucid intradía"
+      ],
+      "ejercicio": "Separar entrenamiento/holdout y congelar parámetros. Faltan datos, rango medio y costes para reproducción fiel."
+    },
+    {
+      "titulo": "Cursos LSE y condiciones de acceso",
+      "captura": "Instagram17-oct-2026",
+      "autor": "quantbryan",
+      "url": "https://www.instagram.com/p/DdCEkOBBjc4/",
+      "estado": "La afirmación de gratuidad universal no coincide con el ejemplo oficial mostrado: AI Law, Policy and Governance publica matrícula de2420GBP y seis semanas.",
+      "conceptos": [
+        "Distinguir contenido, matrícula y certificado",
+        "No presentar un curso como título universitario"
+      ],
+      "ejercicio": "Verificar programa y precio final en LSE antes de incluir una credencial en LinkedIn."
+    },
+    {
+      "titulo": "Formación financiera: ESG, simulaciones, crédito y datos",
+      "captura": "Instagram17-oct-2026",
+      "autor": "chase_enloe",
+      "url": "https://www.instagram.com/p/DdXnw2lRsuK/",
+      "estado": "Lista de diez recursos; condiciones contrastadas por emisor, no diez certificados gratuitamente garantizados.",
+      "conceptos": [
+        "BofA/Wells Fargo, Bloomberg ESG, CFI, Duke, Columbia",
+        "freeCodeCamp, Alteryx y Saylor"
+      ],
+      "ejercicio": "Aplicar una habilidad a un proyecto: valoración, cálculo de riesgo o limpieza de datos, sin confundir curso con empleo."
+    },
+    {
+      "titulo": "Badges, cursos y certificaciones técnicas",
+      "captura": "Instagram17-oct-2026",
+      "autor": "matebreton",
+      "url": "https://www.instagram.com/p/DcbSXQPqHH8/",
+      "estado": "El reel mezcla familias de credenciales y no identifica todos los programas exactos.",
+      "conceptos": [
+        "IBM, GitHub, AWS, Microsoft, Bloomberg, Cisco, Salesforce, Oracle, Snowflake",
+        "Un badge de formación no implica aprobar una certificación profesional"
+      ],
+      "ejercicio": "Anotar emisor, nombre exacto, evaluación, coste y URL verificable; no declarar gratuita una familia completa."
+    },
+    {
+      "titulo": "Formación financiera: contabilidad, mercados, Python y SQL",
+      "captura": "Instagram17-oct-2026",
+      "autor": "chase_enloe",
+      "url": "https://www.instagram.com/p/DdAWgncB1Sj/",
+      "estado": "Lista de formación; nombres automáticos contrastados con fotogramas.",
+      "conceptos": [
+        "Bloomberg, Forage, CFI, Yale, Wharton",
+        "Kaggle, HackerRank y Microsoft Learn"
+      ],
+      "ejercicio": "Usar Python/SQL para auditar un dataset y contabilidad para leer estados; conservar evidencia propia."
+    },
+    {
+      "titulo": "Tres cursos: Penn, EDUCBA y Columbia",
+      "captura": "Instagram17-oct-2026",
+      "autor": "nishantaqc",
+      "url": "https://www.instagram.com/p/DebBqQzhcHC/",
+      "estado": "Contenido contrastado con catálogo oficial. Inscripción gratuita no implica certificado gratuito.",
+      "conceptos": [
+        "Finanzas corporativas y valoración",
+        "Modelo de tres estados, DCF/WACC y múltiplos",
+        "Ingeniería financiera y riesgo"
+      ],
+      "ejercicio": "Construir un caso de juguete con supuestos explícitos y explicar sus límites. EDUCBA no es una universidad Ivy League."
     }
   ],
   "certificaciones": [
@@ -162,6 +273,66 @@
       "imagen": "F / no gratuito",
       "estado": "USD350 publicado en fuente oficial consultada previamente. USD79 estudiantil es afirmación de la captura pendiente de validar oferta actual. F describe costo en la infografía, no calidad.",
       "url": "https://www.cfainstitute.org/programs/investment-foundations-certificate"
+    },
+    {
+      "nombre": "LSE Online Certificate Courses",
+      "imagen": "Post17-oct",
+      "url": "https://www.lse.ac.uk/study-at-lse/executive-education/programmes/ai-law-policy-and-governance",
+      "estado": "El ejemplo AI Law, Policy and Governance cuesta2420GBP y dura seis semanas según página oficial. No es un catálogo universalmente gratis ni sin fechas."
+    },
+    {
+      "nombre": "Columbia+ Introduction to Financial Engineering and Risk Management",
+      "imagen": "Post17-oct",
+      "url": "https://plus.columbia.edu/content/introduction-financial-engineering-and-risk-management",
+      "estado": "Contenido y evaluaciones gratuitos; certificado verificado opcional20USD según página consultada. No confundir con todas las condiciones de Coursera."
+    },
+    {
+      "nombre": "Wharton Introduction to Financial Accounting",
+      "imagen": "Post17-oct",
+      "url": "https://www.coursera.org/learn/wharton-accounting/",
+      "estado": "Curso verificado. La experiencia con certificado requiere compra/plan; posibles modalidades sin certificado y ayuda dependen de elegibilidad."
+    },
+    {
+      "nombre": "EDUCBA Valuation and Financial Modeling",
+      "imagen": "Post17-oct",
+      "url": "https://www.coursera.org/specializations/valuation-financial-modeling",
+      "estado": "Programa relacionado localizado; no asegurar que sea el mismo título exacto del reel. EDUCBA no es universidad Ivy League; verificar plan y certificado."
+    },
+    {
+      "nombre": "Bank of America Investment Banking / Forage",
+      "imagen": "Post17-oct",
+      "url": "https://www.theforage.com/company/bank-of-america",
+      "estado": "Simulación laboral gratuita disponible; constancia de finalización, no empleo ni certificación profesional regulada."
+    },
+    {
+      "nombre": "Bloomberg ESG",
+      "imagen": "Post17-oct",
+      "url": "https://professional.bloomberg.com/products/bloomberg-terminal/education/certificate-courses/",
+      "estado": "Curso oficial verificado; no se confirmó acceso/certificado gratuito universal. Comprobar acceso institucional y precio final."
+    },
+    {
+      "nombre": "Saylor BUS202 Principles of Finance",
+      "imagen": "Post17-oct",
+      "url": "https://learn.saylor.org/course/bus202",
+      "estado": "Contenido y examen final gratuitos; certificado de finalización al aprobar con70% según página. No equivale automáticamente a crédito universitario."
+    },
+    {
+      "nombre": "freeCodeCamp Data Analysis with Python",
+      "imagen": "Post17-oct",
+      "url": "https://www.freecodecamp.org/learn/data-analysis-with-python",
+      "estado": "Material disponible; la página avisa que este contenido no se actualiza y remite al currículo actual. Revisar requisitos vigentes para reclamar credencial."
+    },
+    {
+      "nombre": "HackerRank SQL",
+      "imagen": "Post17-oct",
+      "url": "https://www.hackerrank.com/skills-verification",
+      "estado": "Evaluaciones SQL Basic/Intermediate/Advanced verificadas en catálogo. Comprobar condiciones actuales de cuenta y certificado; no sustituye título contable."
+    },
+    {
+      "nombre": "Microsoft Learn / Trailhead y familias técnicas del reel",
+      "imagen": "Post17-oct",
+      "url": "https://learn.microsoft.com/en-us/credentials/",
+      "estado": "Formación, badges, Applied Skills y exámenes son distintos. Los nombres IBM/GitHub/AWS/Cisco/Oracle/Snowflake del reel no identifican un programa exacto; no prometer gratuidad de una certificación profesional."
     }
   ],
   "capturas_plataforma": [

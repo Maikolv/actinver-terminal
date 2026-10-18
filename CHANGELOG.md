@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-17 — investigación de posts y formación]
+
+- Nueve fichas de Instagram y ejercicios en Aprender y recursos, con fuentes y límites: terminal gratuita, arbitraje, anomalías y momentum mensual.
+- Formación ampliada con condiciones de certificado; corrección de gratuidad LSE, CFI y Columbia+; distinción de licencia de código/pesos FinBERT.
+- Se reutilizan los módulos de investigación/backtesting, sin modificar cartera, reglas activas ni añadir órdenes.
+- 8 pruebas enfocadas aprobadas; sintaxis JS y respuesta API comprobadas. Documentación: docs/instagram-2026-10-17.md.
+
 ## [2026-10-16 — cierre de verificación final]
 
 - Revisión final completada en demo a 375 px: campo OCC, Tab/Enter y desplazamiento de tablas con flechas.

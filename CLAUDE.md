@@ -282,3 +282,11 @@ confirmar y cambien la estrategia).
   `docs/verificacion-pendientes-2026-10-16.md`.
 - Solo siguen condicionados el endpoint de contratos de Alpaca (autorización textual)
   y el notebook Colab (tema elegido). Sin datos nuevos para GEX ni ventaja demostrada.
+
+## Actualización 17-oct-2026 — nueve posts, investigación y formación
+
+- Catálogo educativo ampliado con nueve posts: terminal gratuita, arbitraje educativo, anomalías, TSM mensual y cursos.19 entradas de formación con acceso/certificado separados; LSE corregido con matrícula oficial de2420GBP en el ejemplo mostrado.
+- yfinance y FinBERT identificados por audio/fotogramas y fuentes primarias; código/entornos aislados fuera de la terminal. Pesos FinBERT CC-BY-NC-SA4.0: no activar uso comercial por su licencia de código Apache2.0.
+- Se conserva tema3 del notebook y estrategias existentes. No se copia indicador propietario, no se transfiere TSM mensual a Lucid intradía, no se automatiza Actinver ni se habilitan órdenes.
+- Verificación:8 pruebas de recursos/microestructura aprobadas; JS válido; API devuelve15 fichas de cursos/videos, nueve posts y19 entradas de formación. No se repitió suite completa.
+- Inventario local, auditoría Claude Code, prompt Lucid y guía se entregan por separado al usuario. Pendientes: datos/ticks autorizados, especificaciones privadas no recuperadas y validación fuera de muestra. Ver docs/instagram-2026-10-17.md.
