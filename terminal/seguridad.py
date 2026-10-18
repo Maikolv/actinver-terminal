@@ -38,7 +38,7 @@ CABECERAS = {
 }
 LIMITES = {"/api/propuestas/calcular": 6, "/api/datos/actualizar": 4, "/api/importar": 20, "/api/investigacion/calcular": 4,
            "/api/cobertura/verificar": 4, "/api/centro-investigacion/actualizar": 4,
-           "/api/centro-investigacion/importar": 10, "/api/flujo/actualizar": 30, "/api/flujo/heston": 6, "/api/laboratorio/permutacion": 6, "/api/laboratorio/preregistro": 10, "/api/flujo/skylit": 10, "/api/backtests": 12, "/api/lista-seguimiento": 30, "/api/flujo/importar-externo": 10,
+           "/api/centro-investigacion/importar": 10, "/api/flujo/actualizar": 30, "/api/flujo/heston": 6, "/api/laboratorio/permutacion": 6, "/api/laboratorio/preregistro": 10, "/api/flujo/skylit": 10, "/api/investigacion/tsm/preregistro": 10, "/api/backtests": 12, "/api/lista-seguimiento": 30, "/api/flujo/importar-externo": 10,
            **{f"/api/flujo/importar/{t}": 10 for t in ("velas", "operaciones", "libro", "opciones")}}
 RUTA_WEBHOOK = "/webhook/tradingview"
 MAX_WEBHOOK = 10_000

@@ -1167,6 +1167,58 @@ def flujo_skylit_plantilla():
                              headers={"Content-Disposition": 'attachment; filename="plantilla_skylit.csv"'})
 
 
+@app.get("/api/investigacion/tsm")
+def tsm_listar(con=Depends(con_db)):
+    """Investigación educativa de momentum mensual (tsm_mensual.py): separada de la estrategia activa; no opera."""
+    from . import tsm_mensual
+    return {"experimentos": tsm_mensual.experimentos(con), "mercados_defecto": tsm_mensual.MERCADOS_DEFECTO,
+            "lookbacks": list(tsm_mensual.LOOKBACKS), "pendientes_del_autor": tsm_mensual.PENDIENTES_DEL_AUTOR,
+            "version": tsm_mensual.VERSION}
+
+
+@app.post("/api/investigacion/tsm/preregistro")
+def tsm_preregistro(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import tsm_mensual
+    try:
+        return tsm_mensual.preregistrar(con, cuerpo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/investigacion/tsm/{eid}/evaluar")
+def tsm_evaluar(eid: int, con=Depends(con_db)):
+    from . import tsm_mensual
+    if AJUSTES.es_demo:
+        raise HTTPException(409, "la historia externa es real: no se usa en modo demo")
+    try:
+        return tsm_mensual.evaluar(con, eid, tsm_mensual.historia())
+    except LookupError as e:
+        raise HTTPException(404, str(e)) from None
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/investigacion/anomalias")
+def anomalias_volumen(simbolo: str, intervalo: str = "1Day", ventana: int = 20, umbral: float = 2.0, h: int = 1,
+                      con=Depends(con_db)):
+    """Anomalías de volumen propias sobre barras CERRADAS guardadas (anomalias.py). Descriptivo; no es señal."""
+    from . import anomalias
+    from .flujo import almacen, contratos
+    if intervalo not in contratos.INTERVALOS:
+        raise HTTPException(422, "intervalo inválido")
+    bs = almacen.barras(con, simbolo.strip().upper(), intervalo, demo=AJUSTES.es_demo)
+    if not bs:
+        raise HTTPException(404, "sin barras guardadas para ese símbolo e intervalo")
+    from datetime import UTC, datetime, timedelta
+    ahora = datetime.now(UTC)
+    for b in bs:   # una barra cuyo intervalo no terminó no está cerrada
+        b["cerrada"] = datetime.fromisoformat(b["inicio"]) + timedelta(seconds=contratos.INTERVALOS[intervalo]) <= ahora
+    try:
+        return {**anomalias.evaluar(bs, ventana, umbral, h), "procedencia": {k: bs[-1].get(k) for k in ("fuente", "feed", "calidad", "retraso_s")}}
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
 # Etapa 3: riesgo, seguimiento, comparación y backtesting (solo análisis y simulación).
 @app.get("/api/riesgo")
 def get_riesgo(ventana: int = 252, horizonte: int | None = None, con=Depends(con_db)):

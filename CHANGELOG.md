@@ -2,6 +2,29 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-17 — TSM mensual educativo y anomalías de volumen sin repintado]
+
+### Agregado
+- `terminal/tsm_mensual.py`, investigación A elegida por el usuario. Reglas:
+  - pasos públicos del reel, más supuestos propios marcados como tales;
+  - señal al cierre de mes, ejecución en la sesión siguiente;
+  - L ∈ {3, 6, 12} elegido por mercado solo con el entrenamiento;
+  - holdout de un solo uso, con huellas;
+  - Holm sobre las 18 variantes.
+
+  Rutas `/api/investigacion/tsm`, `/tsm/preregistro` y `/tsm/{id}/evaluar`. Protocolo en `docs/tsm-mensual.md`.
+- `terminal/anomalias.py`: z de log-volumen contra las n barras anteriores, solo con barras cerradas. Ruta
+  `/api/investigacion/anomalias`. Hipótesis en `docs/anomalias-volumen.md`. No equivale al indicador privado del reel.
+
+### Resultado (preregistro #1, holdout feb-2018 a sep-2025)
+- TSM no supera a comprar y mantener en ningún mercado (p de Holm = 1.000 en los seis).
+- Redujo la caída máxima en QQQ, EEM y NAFTRAC.
+- Sin ventaja demostrada. La estrategia activa no cambia.
+
+### Verificación
+- 7 pruebas nuevas, entre ellas: sin fuga temporal, sin repintado, sin anticipación, holdout único y API protegida.
+- Suite completa: 639 aprobadas. Las 3 que fallan pertenecen al trabajo sin commitear de otra sesión (`test_notebook_tema3.py` y `test_tiempo_real.py`).
+
 ## [2026-10-17 — investigación de posts y formación]
 
 - Nueve fichas de Instagram y ejercicios en Aprender y recursos, con fuentes y límites: terminal gratuita, arbitraje, anomalías y momentum mensual.

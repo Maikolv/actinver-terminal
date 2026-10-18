@@ -290,3 +290,11 @@ confirmar y cambien la estrategia).
 - Se conserva tema3 del notebook y estrategias existentes. No se copia indicador propietario, no se transfiere TSM mensual a Lucid intradía, no se automatiza Actinver ni se habilitan órdenes.
 - Verificación:8 pruebas de recursos/microestructura aprobadas; JS válido; API devuelve15 fichas de cursos/videos, nueve posts y19 entradas de formación. No se repitió suite completa.
 - Inventario local, auditoría Claude Code, prompt Lucid y guía se entregan por separado al usuario. Pendientes: datos/ticks autorizados, especificaciones privadas no recuperadas y validación fuera de muestra. Ver docs/instagram-2026-10-17.md.
+
+## Actualización 17-oct-2026 — TSM mensual (investigación A) y anomalías de volumen
+
+- `terminal/tsm_mensual.py` (`docs/tsm-mensual.md`): pasos públicos del reel con supuestos propios marcados; señal a fin de mes y ejecución en t+1; L elegido en entrenamiento; holdout único con huellas.
+- Preregistro #1 (holdout feb-2018 a sep-2025, 6 ETF): sin ventaja frente a comprar y mantener (Holm 1.000 en todos); menor caída en QQQ/EEM/NAFTRAC. Estrategia activa sin cambios.
+- `terminal/anomalias.py` (`docs/anomalias-volumen.md`): algoritmo propio sin repintado; no equivale al indicador privado del reel.
+- Pendiente: especificación del autor (rango, riesgo, fills, costos) y si la historia externa incluye dividendos. Sin interfaz propia todavía (solo API), para no chocar con `app.js` de otra sesión.
+
