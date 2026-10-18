@@ -1,6 +1,6 @@
 # Acciones requeridas del usuario
 
-Actualizado: 12-oct-2026. Cada acción indica si **puede automatizarse** (la terminal ya lo hace o lo hará), si
+Actualizado: 18-oct-2026 (antes: 12-oct-2026). Cada acción indica si **puede automatizarse** (la terminal ya lo hace o lo hará), si
 **requiere tu intervención** (sin costo) o si **requiere contrato o proveedor de pago**.
 
 ## 1. Prioridad alta
@@ -8,7 +8,7 @@ Actualizado: 12-oct-2026. Cada acción indica si **puede automatizarse** (la ter
 | Acción | Tipo | Detalle |
 |---|---|---|
 | Capturas del portal del Reto (resumen + tabla de acciones), idealmente entre 2:00 y 2:30 p.m. | Requiere tu intervención | El reglamento prohíbe automatizar el portal. Al registrar una captura, la terminal descarga los cierres del día |
-| Revisar y aprobar la etapa 2 (adaptadores de repositorios) | Requiere tu intervención | `docs/integracion-repositorios.md` |
+| ~~Revisar y aprobar la etapa 2~~ | **Aprobada (12-oct)** | Implementada en v0.29.0; ver `docs/integracion-repositorios.md` |
 | Decidir si quieres profundidad de libro o opciones en tiempo real de EE. UU. | Requiere contrato o proveedor de pago | Ver la sección 3 |
 
 ## 2. Credenciales y cuentas
@@ -95,3 +95,12 @@ Para apagar un adaptador, edita `config/local.toml`:
 - Interés abierto de opciones de EE. UU. (no viene en el feed gratuito).
 - Lado del agresor en acciones de EE. UU. (no viene en SIP ni en IEX).
 - Todo dato en tiempo real de la BMV y de MexDer.
+
+## 8. Decisiones abiertas (auditoría del 18-oct-2026, `docs/auditoria-2026-10-18.md` §6)
+
+| Decisión | Tipo | Detalle |
+|---|---|---|
+| Endpoint de contratos de Alpaca (OI y multiplicador para GEX) | Requiere tu autorización textual | Vive en la API de trading, aunque la consulta sería solo de lectura. Hay trabajo de otra sesión sin commitear que parece implementarlo: confirma si lo autorizaste |
+| Finviz Elite (USD 39.50 al mes), EODHD de pago (USD 19.99 al mes), crédito de Databento (USD 125, solo históricos) | Requiere contrato o proveedor de pago | Ninguno se contrata sin tu decisión |
+| Las 9 propuestas de revisión del mandato | Requiere tu intervención | Pendientes desde el 6-oct (`docs/mandato-autonomia.md`) |
+| Referencia del plan frente a 1/N | Requiere tu intervención | Pendiente desde el 30-sep; ninguna variante ha superado a 1/N fuera de muestra |

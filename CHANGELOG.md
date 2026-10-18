@@ -2,6 +2,36 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [0.31.0] — 2026-10-18 (dependencias, integración continua y documentación)
+
+Este número de versión también cubre las entregas fechadas del 16 y 17-oct que aparecen abajo. `pyproject.toml` pasa de 0.1.0 a 0.31.0.
+
+### Seguridad
+- `multidict` 6.7.1 → 6.9.1 (PYSEC-2026-4244; llegaba por ccxt → aiohttp). `pip-audit`: sin vulnerabilidades conocidas.
+
+### Dependencias
+- ccxt 4.5.85 → 4.5.88
+- fastapi 0.141.1 → 0.143.3
+- uvicorn 0.53.0 → 0.54.0
+- websockets 17.1 → 17.2
+- pypdf 6.19.0 → 6.21.1
+- anthropic 1.9.0 → 1.15.0 (agrega `opentelemetry-api` 1.45.1)
+- **skfolio 1.3.0 → 1.9.4**:
+  - se revisó su changelog (cambios en ShrunkMu Bodnar-Okhrin, ratios, drawdown y VaR);
+  - la terminal usa ShrunkMu con James-Stein por omisión, MeanRisk con utilidad y varianza, y CVaR y RiskBudgeting en el comparador;
+  - `comparar-modelos` en demo dio salida **idéntica** a 1.3.0 (0 diferencias numéricas);
+  - 26 pruebas del optimizador, comparador, robustez y catálogo aprobadas.
+- numpy **se queda en 2.5.3**: 2.5.4 rompe `tests/test_notebook_tema3.py`, que exige versiones fijas.
+- Worker: wrangler 4.145.0 → 4.151.1. 19 pruebas aprobadas y `npm audit` sin vulnerabilidades. No se desplegó.
+
+### Agregado
+- Suite local: 639 aprobadas; 3 fallas del trabajo ajeno sin commitear (notebook del tema 3 y dominio paper de Alpaca).
+- `.github/workflows/pruebas.yml`: pytest en Ubuntu con `TERMINAL_SIN_ENV=1` y pruebas del Worker; sin secretos. Las pruebas de OCR de Windows se omiten solas fuera de Windows.
+
+### Documentación
+- `CLAUDE.md` reducido a lo vigente (de 300 a 120 líneas). El detalle por fecha pasa sin cambios a `docs/historial-estado.md`.
+- `docs/acciones-requeridas-usuario.md`: la etapa 2 queda aprobada y se agregan las decisiones abiertas de la auditoría.
+
 ## [2026-10-17 — TSM mensual educativo y anomalías de volumen sin repintado]
 
 ### Agregado

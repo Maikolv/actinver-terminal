@@ -1,6 +1,6 @@
 [project]
 name = "actinver-terminal"
-version = "0.1.0"
+version = "0.31.0"
 description = "Terminal local de análisis de portafolios (informativa, sin órdenes reales)"
 requires-python = ">=3.12"
 dependencies = [

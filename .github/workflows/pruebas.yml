@@ -1,0 +1,34 @@
+# Integración continua mínima: pruebas de Python y del Worker, sin secretos ni red a proveedores de datos.
+name: pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TERMINAL_SIN_ENV: "1"      # nunca carga un .env (no existe en CI y las pruebas no lo necesitan)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      # Las pruebas de OCR de Windows (winrt) se omiten solas fuera de Windows (tests/test_ocr_portal.py).
+      - run: uv run pytest -q
+
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm --prefix cloud-alerts ci --ignore-scripts
+      - run: npm --prefix cloud-alerts test
