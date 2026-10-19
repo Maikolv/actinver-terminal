@@ -1325,6 +1325,7 @@ document.getElementById("btn-cobertura").addEventListener("click", async (ev) =>
 
 /* ---------- ranking de todas las acciones ---------- */
 estado.rankingFiltro = "ambos";
+estado.rankingClase = "acciones";
 /* ---------- Movimientos públicos (SEC EDGAR: Form 4 y 13F) ---------- */
 const GRUPO_CHIP = { cartera: "vigente", propuesta: "calculada", seguimiento: "retrasado", "operable en el Reto": "sin_datos" };
 const enlaceSec = (url, texto) => h("a", { href: url, target: "_blank", rel: "noopener noreferrer", texto: texto || "documento SEC" });
@@ -1465,13 +1466,19 @@ function pintarRobustez(r) {
 }
 async function cargarRanking() {
   segmentado("selector-ranking", estado.rankingFiltro, (v) => { estado.rankingFiltro = v; cargarRanking(); });
+  segmentado("selector-ranking-clase", estado.rankingClase, (v) => { estado.rankingClase = v; cargarRanking(); });
+  const vigente = turno("ranking");
   try {
-    const d = await api(`/api/ranking?mercado_filtro=${estado.rankingFiltro}`);
-    document.getElementById("ranking-aviso").textContent = `${d.aviso} Criterio: 30 % rendimiento 20 sesiones, 30 % rendimiento 60 sesiones, 20 % estabilidad, 20 % tendencia.`;
-    document.getElementById("ranking-hora").textContent = `Actualizado ${fechaLocal(new Date().toISOString())} · ${d.n} de ${d.universo} emisoras con historia suficiente. Se refresca cada minuto.`;
+    const d = await api(`/api/ranking?mercado_filtro=${estado.rankingFiltro}&clase=${estado.rankingClase}`);
+    if (!vigente()) return;
+    const corta = d.filas.some((f) => f.historia_corta);
+    document.getElementById("ranking-aviso").textContent = `${d.aviso} Criterio: 30 % rendimiento 20 sesiones, 30 % rendimiento 60 sesiones, 20 % estabilidad, 20 % tendencia; percentiles dentro de la clase elegida.`
+      + (corta ? " Fondos con historia corta: las columnas «20 días» y «60 días» usan las ventanas indicadas en cada fila (no son comparables con 20 y 60 sesiones)." : "");
+    document.getElementById("ranking-hora").textContent = `Actualizado ${fechaLocal(new Date().toISOString())} · ${d.n} de ${d.universo} instrumentos con historia suficiente. Se refresca cada minuto.`;
     limpiar("ranking-contenido", tabla([
       { t: "#", f: (f) => f.posicion, num: true },
-      { t: "Emisora", f: (f) => h("span", {}, h("strong", { texto: f.clave_operable }), h("br"), h("span", { clase: "suave", texto: f.nombre })) },
+      { t: "Instrumento", f: (f) => h("span", {}, h("strong", { texto: f.clave_operable }), h("br"), h("span", { clase: "suave", texto: f.nombre }),
+        f.historia_corta ? h("span", {}, h("br"), chip("retrasado", `historia corta: ${f.sesiones} sesiones (ventanas ${f.ventanas[0]} y ${f.ventanas[1]})`)) : null) },
       { t: "Mercado", f: (f) => f.mercado },
       { t: "Puntuación", f: (f) => h("span", {}, h("span", { clase: "cifra", texto: f.puntuacion.toFixed(1) }), " ", barraPct(f.puntuacion, 100)), num: true },
       { t: "Precio MXN", f: (f) => h("span", { title: f.precio_es_referencia ? "Referencia: bolsa de origen × tipo de cambio (no es el precio SIC)" : "" }, mxn(f.precio_mxn, true), f.precio_es_referencia ? " *" : ""), num: true },
@@ -1484,8 +1491,8 @@ async function cargarRanking() {
       { t: "Seeking Alpha", f: (f) => (f.calificacion_sa ? h("span", { title: `Autores ${f.calificacion_sa.autores ?? "—"} · Wall Street ${f.calificacion_sa.wall_street ?? "—"} · importada ${f.calificacion_sa.fecha}` }, `Quant ${f.calificacion_sa.quant ?? "—"}`) : "—") },
       { t: "Dato", f: (f) => h("span", {}, chip(f.vigencia), h("br"), h("span", { clase: "suave", texto: `${f.tipo_dato || "—"} · ${f.fecha || "—"} · ${f.proveedor || "—"}` })) }],
       d.filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC."
-        + (d.fuera_del_catalogo ? ` Se omiten ${d.fuera_del_catalogo} instrumento(s) que no aparecen en el catálogo de su simulador.` : ""), vacio: "Sin emisoras con al menos 61 sesiones de precio." }));
-  } catch (e) { limpiar("ranking-contenido", errorCaja(e)); }
+        + (d.fuera_del_catalogo ? ` Se omiten ${d.fuera_del_catalogo} instrumento(s) que no aparecen en el catálogo de su simulador.` : ""), vacio: estado.rankingClase === "fondos" ? "Sin fondos con al menos 11 sesiones de valor liquidativo." : "Sin instrumentos con al menos 61 sesiones de precio." }));
+  } catch (e) { if (vigente()) limpiar("ranking-contenido", errorCaja(e)); }
 }
 setInterval(() => { if (pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
 

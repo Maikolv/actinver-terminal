@@ -865,11 +865,13 @@ def boleta_ejecutada(bid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
 
 
 @app.get("/api/ranking")
-def get_ranking(mercado_filtro: str = "ambos", con=Depends(con_db)):
+def get_ranking(mercado_filtro: str = "ambos", clase: str = "acciones", con=Depends(con_db)):
     from . import ranking
     if mercado_filtro not in ("ambos", "nacionales", "extranjeras"):
         raise cartera.ErrorValidacion(["mercado_filtro: ambos, nacionales o extranjeras"])
-    return ranking.calcular(con, AJUSTES, mercado_filtro)
+    if clase not in ranking.CLASES:
+        raise cartera.ErrorValidacion(["clase: acciones, etf o fondos"])
+    return ranking.calcular(con, AJUSTES, mercado_filtro, clase)
 
 
 @app.post("/webhook/tradingview")

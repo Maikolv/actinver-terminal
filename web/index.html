@@ -212,8 +212,13 @@
   </section>
 
   <section role="tabpanel" id="panel-ranking" aria-labelledby="tab-ranking" hidden>
-    <h1>Ranking de acciones</h1>
+    <h1>Ranking de acciones, ETF y fondos</h1>
     <p class="ayuda" id="ranking-aviso"></p>
+    <div class="segmentado" role="radiogroup" aria-label="Clase de instrumento" id="selector-ranking-clase">
+      <button type="button" role="radio" aria-checked="true" data-valor="acciones">Acciones</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="etf">ETF</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="fondos">Fondos</button>
+    </div>
     <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-ranking">
       <button type="button" role="radio" aria-checked="true" data-valor="ambos">Todas</button>
       <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Nacionales (BMV)</button>

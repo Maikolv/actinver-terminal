@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-19 — ranking de acciones, ETF y fondos]
+
+### Cambiado
+- El Ranking tiene un selector de clase (Acciones / ETF / Fondos), con percentiles dentro de la clase elegida. Antes, los ETF iban mezclados con las acciones y los fondos no aparecían. Con datos reales: 134 acciones, 40 ETF y 25 fondos.
+- Los fondos solo tienen ≈ 15 sesiones de NAV oficial: se ordenan con ventanas cortas (la mitad y el total disponible, mínimo 11 sesiones) y cada fila lleva el chip «historia corta».
+- Nueva prueba en `tests/test_puntuacion_ranking.py`.
+
 ## [2026-10-19 — asistente dentro de la terminal]
 
 ### Agregado

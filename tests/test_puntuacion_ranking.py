@@ -73,3 +73,20 @@ def test_variantes_por_mercado_sin_cambiar_el_perfil(con, ajustes):
     assert servicios.perfil_actual(con, ajustes).get("mercado_acciones", "ambos") == "ambos"
     guardadas = servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes))
     assert guardadas["mixta_puntuacion_nacionales"]["clave"] == "mixta_puntuacion_nacionales"
+
+
+def test_ranking_por_clase_y_fondos_con_historia_corta(con, ajustes):
+    import pytest
+    from conftest import sembrar_precios
+    etf = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE clase='etf' AND estado='activo' LIMIT 4")]
+    fondos = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE clase LIKE 'fondo%' AND estado='activo' LIMIT 4")]
+    sembrar_precios(con, etf, sesiones=120)
+    sembrar_precios(con, fondos, sesiones=15)                     # como los NAV del portal: pocas sesiones
+    r = ranking.calcular(con, ajustes, "ambos", "etf")
+    assert r["n"] == len(etf) and all(f["clase"] == "etf" and not f["historia_corta"] for f in r["filas"])
+    f = ranking.calcular(con, ajustes, "ambos", "fondos")
+    assert f["n"] == len(fondos) and all(x["historia_corta"] and x["ventanas"] == [7, 14] for x in f["filas"])
+    assert not ranking.calcular(con, ajustes, "ambos", "acciones")["filas"] or all(
+        x["clase"] in ranking.CLASES["acciones"] for x in ranking.calcular(con, ajustes, "ambos", "acciones")["filas"])
+    with pytest.raises(ValueError):
+        ranking.calcular(con, ajustes, "ambos", "cripto")
