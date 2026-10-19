@@ -303,10 +303,12 @@ def serie_historica(transacciones: list[dict], precios: pd.DataFrame) -> pd.Data
     if len(fechas) == 0:
         return pd.DataFrame()
     p = precios.ffill(limit=5)
+    arr = p.loc[fechas].to_numpy(dtype=float)              # acceso por posición: .at por celda dominaba el tiempo
+    col = {c: j for j, c in enumerate(p.columns)}
     est = Estado()
     i = 0
     filas = []
-    for d in fechas:
+    for k, d in enumerate(fechas):
         flujo = 0.0
         while i < len(tx) and pd.Timestamp(tx[i]["fecha"]) <= d:
             t = tx[i]
@@ -317,7 +319,7 @@ def serie_historica(transacciones: list[dict], precios: pd.DataFrame) -> pd.Data
         valor, completo = est.efectivo, True
         for iid, pos in est.posiciones.items():
             if pos.cantidad > TOL:
-                px = p.at[d, iid] if iid in p.columns else np.nan
+                px = arr[k, col[iid]] if iid in col else np.nan
                 if pd.isna(px):
                     completo = False
                 else:

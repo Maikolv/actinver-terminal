@@ -66,6 +66,7 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
 - **Sesiones paralelas (D-30):** revisa `git status` y `git log` antes de commitear. No incluyas trabajo ajeno sin
   commitear (TradingView): arma el índice desde `HEAD` con `git update-index
   --cacheinfo`.
+- **Auditoría 19-oct** (`docs/auditoria-2026-10-19.md`): navegación sin duplicados, respuestas obsoletas descartadas en Order/Option Flow, `/api/cartera` más rápida. Propuestas abiertas: cabecera compacta en celular y reagrupar las 23 pestañas.
 - **Decisiones pendientes del usuario:**
   - fuentes de pago (Finviz, EODHD, Databento);
   - las 9 propuestas de revisión del mandato;

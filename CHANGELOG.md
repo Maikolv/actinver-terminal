@@ -2,6 +2,23 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-19 — auditoría técnica, estética y de utilidad]
+
+### Corregido
+- Order Flow y Option Flow ya no pintan respuestas antiguas al cambiar rápido de instrumento (`turno()`).
+- El sondeo de «Movimientos públicos» se detiene si falla.
+- El estado del motor no se consulta con la pestaña oculta.
+- El instrumento pasa entre Velas, Order Flow y Option Flow también desde la navegación principal.
+- `cartera.serie_historica`: 0.265 s → 0.022 s con salida idéntica (`/api/cartera`).
+
+### Retirado
+- 6 accesos del Plan de acción y 7 barras «Análisis relacionados» que repetían la navegación principal.
+- En ≤ 720 px, la línea de atajos de teclado de la cabecera.
+
+### Verificación
+- 41 pruebas de Python y 6 de la oficina; sin desbordamiento horizontal a 390 px en 8 vistas (demo).
+- Informe en `docs/auditoria-2026-10-19.md`.
+
 ## [2026-10-18] — contratos Paper y Colab de múltiples estrategias
 
 - Consulta autorizada exclusiva de contratos Alpaca Paper, apagada por defecto, sin órdenes ni pagos; acceso comprobado con una petición mínima.

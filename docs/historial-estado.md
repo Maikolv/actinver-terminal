@@ -256,3 +256,7 @@ Archivado de `CLAUDE.md` el 18-oct-2026, sin cambios de texto, para mantener ese
 
 Validación de esta entrega: 649 pruebas aprobadas, JS válido y sin hallazgos de
 patrones de secretos en los 20 archivos tocados.
+
+## Auditoría técnica, estética y de utilidad — 19-oct-2026
+
+Ver `docs/auditoria-2026-10-19.md`: 7 hallazgos (3 P1 corregidos, 2 P2 corregidos, 2 P3), 13 controles duplicados retirados, `serie_historica` 12× más rápida con salida idéntica.

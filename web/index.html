@@ -80,14 +80,8 @@
   </section>
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
     <h1 class="oculto-visual">Plan de acción</h1>
-    <nav class="accesos" aria-label="Accesos a análisis">
+    <nav class="accesos" aria-label="Accesos a secciones de «Más»">
       <button type="button" class="boton boton--secundario" data-ir="tab-aprendizaje">Aprender con los recursos</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-mercado">Mercado</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-velas">Velas e indicadores</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-orderflow">Order Flow</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-optionflow">Option Flow y GEX</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-riesgo">Riesgo</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-laboratorio">Laboratorio de alfa</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía (informativo)</button>
     </nav>
     <div id="resumen-contenido">
@@ -324,7 +318,6 @@
 
   <section role="tabpanel" id="panel-mercado" aria-labelledby="tab-mercado" hidden>
     <h1>Mercado</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-velas">Velas</button><button type="button" class="boton boton--texto" data-ir="tab-orderflow">Order Flow</button><button type="button" class="boton boton--texto" data-ir="tab-optionflow">Option Flow y GEX</button><button type="button" class="boton boton--texto" data-ir="tab-riesgo">Riesgo</button><button type="button" class="boton boton--texto" data-ir="tab-laboratorio">Laboratorio</button><button type="button" class="boton boton--texto" data-ir="tab-intradia">Plan intradía</button></nav>
     <div id="mercado-visualizaciones" aria-live="polite"></div>
     <div id="mercado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
@@ -355,28 +348,24 @@
 
   <section role="tabpanel" id="panel-velas" aria-labelledby="tab-velas" hidden>
     <h1>Velas OHLCV</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-mercado">Mercado</button><button type="button" class="boton boton--texto" data-ir="tab-orderflow">Order Flow</button><button type="button" class="boton boton--texto" data-ir="tab-optionflow">Option Flow y GEX</button><button type="button" class="boton boton--texto" data-ir="tab-riesgo">Riesgo</button><button type="button" class="boton boton--texto" data-ir="tab-laboratorio">Laboratorio</button><button type="button" class="boton boton--texto" data-ir="tab-intradia">Plan intradía</button></nav>
     <p class="ayuda">Velas japonesas solo con apertura, máximo, mínimo, cierre y volumen reales de un proveedor o de un CSV que usted importe. Los cierres diarios locales nunca se convierten en velas. Indicadores descriptivos; no son señales.</p>
     <div id="velas-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-orderflow" aria-labelledby="tab-orderflow" hidden>
     <h1>Order Flow</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-mercado">Mercado</button><button type="button" class="boton boton--texto" data-ir="tab-velas">Velas</button><button type="button" class="boton boton--texto" data-ir="tab-optionflow">Option Flow y GEX</button><button type="button" class="boton boton--texto" data-ir="tab-riesgo">Riesgo</button><button type="button" class="boton boton--texto" data-ir="tab-laboratorio">Laboratorio</button><button type="button" class="boton boton--texto" data-ir="tab-intradia">Plan intradía</button></nav>
     <p class="ayuda">Libro de órdenes, profundidad, cinta de operaciones, delta de volumen y perfil de volumen por precio, solo con datos reales. Si no hay fuente autorizada, el panel lo dice: nunca se simula flujo.</p>
     <div id="orderflow-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-optionflow" aria-labelledby="tab-optionflow" hidden>
     <h1>Option Flow</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-mercado">Mercado</button><button type="button" class="boton boton--texto" data-ir="tab-velas">Velas</button><button type="button" class="boton boton--texto" data-ir="tab-orderflow">Order Flow</button><button type="button" class="boton boton--texto" data-ir="tab-riesgo">Riesgo</button><button type="button" class="boton boton--texto" data-ir="tab-laboratorio">Laboratorio</button><button type="button" class="boton boton--texto" data-ir="tab-intradia">Plan intradía</button></nav>
     <p class="ayuda">Cadena de opciones por vencimiento y strike, curva y superficie de volatilidad y una regla descriptiva de volumen inusual. Solo informa: la terminal no opera opciones.</p>
     <div id="optionflow-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-riesgo" aria-labelledby="tab-riesgo" hidden>
     <h1>Riesgo de la cartera</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-mercado">Mercado</button><button type="button" class="boton boton--texto" data-ir="tab-velas">Velas</button><button type="button" class="boton boton--texto" data-ir="tab-orderflow">Order Flow</button><button type="button" class="boton boton--texto" data-ir="tab-optionflow">Option Flow y GEX</button><button type="button" class="boton boton--texto" data-ir="tab-laboratorio">Laboratorio</button><button type="button" class="boton boton--texto" data-ir="tab-intradia">Plan intradía</button></nav>
     <p class="ayuda">Exposición, concentración, volatilidad, caídas, VaR, CVaR y escenarios con los pesos actuales. Los supuestos se listan al final. Describe el riesgo con datos pasados; no es una recomendación.</p>
     <div id="riesgo-contenido" aria-live="polite"></div>
   </section>
@@ -395,14 +384,12 @@
 
   <section role="tabpanel" id="panel-laboratorio" aria-labelledby="tab-laboratorio" hidden>
     <h1>Laboratorio de alfa: prueba de permutación</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-mercado">Mercado</button><button type="button" class="boton boton--texto" data-ir="tab-velas">Velas</button><button type="button" class="boton boton--texto" data-ir="tab-orderflow">Order Flow</button><button type="button" class="boton boton--texto" data-ir="tab-optionflow">Option Flow y GEX</button><button type="button" class="boton boton--texto" data-ir="tab-riesgo">Riesgo</button><button type="button" class="boton boton--texto" data-ir="tab-intradia">Plan intradía</button></nav>
     <p class="ayuda">Contrasta si el exceso medio NETO de una estrategia sobre su benchmark es mayor que cero, con permutación de signos por bloques. Un valor p pequeño no demuestra alfa: es un descarte estadístico bajo supuestos que se listan en el resultado.</p>
     <div id="laboratorio-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-intradia" aria-labelledby="tab-intradia" hidden>
     <h1>Plan intradía defensivo (informativo)</h1>
-    <nav class="accesos accesos--relacionados" aria-label="Análisis relacionados"><button type="button" class="boton boton--texto" data-ir="tab-mercado">Mercado</button><button type="button" class="boton boton--texto" data-ir="tab-velas">Velas</button><button type="button" class="boton boton--texto" data-ir="tab-orderflow">Order Flow</button><button type="button" class="boton boton--texto" data-ir="tab-optionflow">Option Flow y GEX</button><button type="button" class="boton boton--texto" data-ir="tab-riesgo">Riesgo</button><button type="button" class="boton boton--texto" data-ir="tab-laboratorio">Laboratorio</button></nav>
     <p class="ayuda">Separado del plan de acción. No genera órdenes ni modifica su cartera: muestra contexto, disciplina y si hay datos para hablar de una señal. Los datos diarios o retrasados la inhiben.</p>
     <div id="intradia-contenido" aria-live="polite"></div>
   </section>

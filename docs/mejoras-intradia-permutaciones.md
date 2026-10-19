@@ -10,7 +10,7 @@ Todo es informativo: ninguna ruta envía órdenes, modifica la cartera ni activa
 - UI (Velas): EMA/SMA/SAR sobre las velas; MACD (líneas + histograma, eje con cero) y estocástico (eje fijo 0–100, niveles 20/80) en paneles separados alineados al eje X; la tabla accesible añade las columnas activas.
 
 ## 2. Navegación
-Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio son pestañas principales (ya no están en «Más»); «Plan intradía» está en «Más». El Plan de acción tiene una botonera de accesos y cada panel de análisis, enlaces a los demás; al pasar de Velas/Order Flow/Option Flow se conserva el instrumento (en opciones solo si es del SIC). Se mantiene `role=tab`, flechas/Inicio/Fin y el diseño móvil; atajos `/LAB`, `/INT`, `/GEX`.
+Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio son pestañas principales (ya no están en «Más»); «Plan intradía» está en «Más». El Plan de acción conserva solo dos accesos a secciones de «Más» (Aprender y Plan intradía); los botones que repetían la navegación principal se retiraron el 19-oct (`docs/auditoria-2026-10-19.md`). Al cambiar de pestaña entre Velas, Order Flow y Option Flow se conserva el instrumento (en opciones solo si es del SIC). Se mantiene `role=tab`, flechas/Inicio/Fin y el diseño móvil; atajos `/LAB`, `/INT`, `/GEX`.
 
 ## 3. GEX (`terminal/flujo/gex.py`, `GET /api/flujo/gex?subyacente=`)
 - Por contrato exige gamma, interés abierto, multiplicador, spot y moneda **de la misma cadena** (columnas nuevas opcionales `multiplicador, spot, moneda` en `flujo_opciones`; la importación CSV de opciones las acepta al final del encabezado; las bases anteriores se migran solas). No se supone multiplicador 100 ni se toma spot de otra tabla, hora o moneda.

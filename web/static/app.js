@@ -99,6 +99,10 @@ function segmentado(id, valorActual, alCambiar) {
   });
 }
 
+/* Descarta respuestas antiguas: si el usuario cambia rápido de instrumento, solo se pinta la carga más reciente. */
+const turnos = {};
+function turno(clave) { const n = (turnos[clave] = (turnos[clave] || 0) + 1); return () => turnos[clave] === n; }
+
 /* ---------- pestañas (teclado: flechas, Inicio, Fin) ---------- */
 const CARGAS = {
   "tab-resumen": () => pintarResumen(), "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
@@ -117,6 +121,8 @@ function mostrarSecundarias(si) {
 document.getElementById("btn-mas").addEventListener("click", () => mostrarSecundarias(!navPestanas.classList.contains("con-secundarias")));
 function activarPestana(tab, enfocar) {
   if (tab.classList.contains("secundaria")) mostrarSecundarias(true);
+  const previo = document.querySelector('[role="tabpanel"]:not([hidden])');
+  if (previo && typeof compartirSimbolo === "function") compartirSimbolo(previo.id, tab.id);
   document.querySelectorAll('[role="tab"]').forEach((t) => {
     const sel = t === tab;
     t.setAttribute("aria-selected", sel); t.tabIndex = sel ? 0 : -1;
@@ -1348,8 +1354,10 @@ document.getElementById("btn-mov-actualizar").addEventListener("click", async ()
     await api("/api/movimientos/actualizar", { method: "POST", json: {} });
     notificar("Consultando la SEC (incremental, ≤ 5 peticiones por segundo)…");
     const t = setInterval(async () => {
-      const e = await api("/api/movimientos/estado");
-      if (e.estado !== "actualizando") { clearInterval(t); notificar(e.estado === "terminado" ? "SEC consultada." : `SEC: ${e.estado}`); cargarMovimientos(); }
+      try {
+        const e = await api("/api/movimientos/estado");
+        if (e.estado !== "actualizando") { clearInterval(t); notificar(e.estado === "terminado" ? "SEC consultada." : `SEC: ${e.estado}`); cargarMovimientos(); }
+      } catch (e) { clearInterval(t); notificar(e.message); }
     }, 4000);
   } catch (e) { notificar(e.message); }
 });
@@ -1640,7 +1648,8 @@ async function iniciar() {
   pintarResumen();
   const tab = inicial && document.getElementById(inicial);
   if (tab && tab.id !== "tab-resumen") activarPestana(tab);
-  setInterval(cargarEstado, 60000); // detecta ciclos del motor y alertas nuevas
+  setInterval(() => { if (!document.hidden) cargarEstado(); }, 60000); // detecta ciclos del motor y alertas nuevas
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) cargarEstado(); });
 }
 /* La lista de instrumentos del formulario se carga solo al usar el campo (evita 137 KB al inicio). */
 document.querySelector('#form-operacion input[name="instrumento_id"]').addEventListener("focus", async () => {
@@ -2018,8 +2027,10 @@ function pintarTpo(d) {
 }
 
 async function cargarOrderFlow() {
+  const vigente = turno("orderflow");
   try {
     await estadoFlujo();
+    if (!vigente()) return;
     const o = flujo.of;
     const controles = h("div", { clase: "fila-controles" },
       selectorSimbolo(o.simbolo, (x) => { o.simbolo = x; cargarOrderFlow(); }),
@@ -2033,9 +2044,11 @@ async function cargarOrderFlow() {
         formImportar("libro", cargarOrderFlow), formImportar("operaciones", cargarOrderFlow));
       return;
     }
-    const d = await api(`/api/flujo/libro-operaciones?simbolo=${encodeURIComponent(o.simbolo)}&minutos=${o.minutos}&niveles=${o.niveles}`);
+    const [d, perfiles] = await Promise.all([   // independientes: en paralelo
+      api(`/api/flujo/libro-operaciones?simbolo=${encodeURIComponent(o.simbolo)}&minutos=${o.minutos}&niveles=${o.niveles}`),
+      api(`/api/flujo/perfiles?simbolo=${encodeURIComponent(o.simbolo)}`)]);
+    if (!vigente()) return;
     const L = d.libro, R = d.resumen;
-    const perfiles = await api(`/api/flujo/perfiles?simbolo=${encodeURIComponent(o.simbolo)}`);
     const filasLibro = L ? Array.from({ length: Math.max(L.bids.length, L.asks.length) }, (_, i) => ({ b: L.bids[i], a: L.asks[i] })) : [];
     limpiar("orderflow-contenido", controles, provs,
       h("h2", { texto: "Libro y profundidad" }),
@@ -2070,7 +2083,7 @@ async function cargarOrderFlow() {
       h("p", { clase: "ayuda", texto: d.nota }),
       L || d.operaciones.length ? enlaceHftbacktest(o.simbolo) : null,
       formImportar("libro", cargarOrderFlow), formImportar("operaciones", cargarOrderFlow));
-  } catch (e) { limpiar("orderflow-contenido", errorCaja(e)); }
+  } catch (e) { if (vigente()) limpiar("orderflow-contenido", errorCaja(e)); }
 }
 
 /* Option Flow: cadena, curva y superficie de IV, regla descriptiva de volumen inusual. */
@@ -2137,8 +2150,10 @@ function controlesContratosPaper(subyacente) {
 }
 
 async function cargarOptionFlow() {
+  const vigente = turno("optionflow");
   try {
     await estadoFlujo();
+    if (!vigente()) return;
     const o = flujo.op, F = o.filtros;
     const campo = (k, t) => {
       const i = h("input", { type: "number", step: "any", size: 7 }); i.value = F[k] ?? "";
@@ -2156,6 +2171,7 @@ async function cargarOptionFlow() {
     }
     const qs = new URLSearchParams({ subyacente: o.subyacente, ...Object.fromEntries(Object.entries(F).filter(([, v]) => v !== "" && v != null)) });
     const d = await api(`/api/flujo/optionflow?${qs}`);
+    if (!vigente()) return;
     const curvas = d.iv.curvas, vSel = F.vencimiento || Object.keys(curvas)[0];
     const curva = vSel && curvas[vSel] ? curvas[vSel] : [];
     const usarEnModelo = (c) => botonAccion("Al modelo", "boton--secundario", () => {
@@ -2205,7 +2221,7 @@ async function cargarOptionFlow() {
       h("div", { id: "gex-contenido", "aria-live": "polite" }, h("p", { clase: "ayuda", texto: "Calculando disponibilidad…" })),
       formImportar("opciones", cargarOptionFlow), seccionSkylit());
     cargarGex(o.subyacente);
-  } catch (e) { limpiar("optionflow-contenido", errorCaja(e)); }
+  } catch (e) { if (vigente()) limpiar("optionflow-contenido", errorCaja(e)); }
 }
 
 CARGAS["tab-velas"] = () => cargarVelas();
@@ -2484,9 +2500,7 @@ function compartirSimbolo(origen, destino) {
 document.addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-ir]");
   if (!b) return;
-  const panel = b.closest('[role="tabpanel"]');
-  compartirSimbolo(panel && panel.id, b.dataset.ir);
-  irA(b.dataset.ir);
+  irA(b.dataset.ir);   // activarPestana comparte el instrumento del panel visible
 });
 
 /* ---------- GEX (terminal/flujo/gex.py): mapa de calor por strike y vencimiento ---------- */

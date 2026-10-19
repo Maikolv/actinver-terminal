@@ -237,6 +237,7 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
   .comandos-cabecera input { flex: 1 1 auto; width: auto; min-width: 0; }
   .comandos-cabecera .boton { flex: none; }
   .acciones-cabecera .boton { flex: 1 1 140px; white-space: normal; }
+  .ayuda-comandos { display: none; }   /* atajos de teclado (Ctrl+K, /INV): sin teclado físico no aportan y ocupan dos líneas */
   .estado-datos { min-height: 7.5em; }
   .estado-datos .grupo { flex-wrap: wrap; min-width: 0; }
   .franja-alertas, .tarjeta, .alerta { overflow-wrap: anywhere; }
