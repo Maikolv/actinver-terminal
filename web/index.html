@@ -35,41 +35,46 @@
   <div class="estado-datos" id="estado-datos" role="status" aria-live="polite">
     <span class="esqueleto esqueleto--linea" aria-hidden="true"></span><span class="oculto-visual">Cargando estado de datos</span>
   </div>
+  <button type="button" class="boton boton--texto" id="btn-detalle-datos" aria-expanded="false" aria-controls="estado-datos">Ver detalle de datos</button>
   <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
     <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
   </div>
 </header>
 
-<nav class="pestanas" aria-label="Secciones">
+<nav class="pestanas" aria-label="Secciones" data-grupo="cuenta">
+  <div class="grupos-nav" role="group" aria-label="Tareas">
+    <button type="button" data-grupo="cuenta" aria-pressed="false">Mi cuenta</button>
+    <button type="button" data-grupo="decidir" aria-pressed="false">Decidir</button>
+    <button type="button" data-grupo="mercado" aria-pressed="false">Mercado y flujo</button>
+    <button type="button" data-grupo="investigar" aria-pressed="false">Investigar y aprender</button>
+    <button type="button" data-grupo="sistema" aria-pressed="false">Datos y ayuda</button>
+  </div>
   <div role="tablist" id="lista-pestanas">
-    <button role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
-    <button role="tab" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio Actinver</button>
-    <button role="tab" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
-    <button role="tab" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
-    <button role="tab" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
-    <!-- Análisis: accesos prominentes (siempre visibles) -->
-    <button role="tab" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
-    <button role="tab" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
-    <button role="tab" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
-    <button role="tab" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
-    <button role="tab" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
-    <button role="tab" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio</button>
-    <button role="tab" class="secundaria" id="tab-aprendizaje" aria-controls="panel-aprendizaje" aria-selected="false" tabindex="-1">Aprender y recursos</button>
-    <!-- Secundarias: información técnica y trazabilidad; se muestran con «Más» -->
-    <button role="tab" class="secundaria" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
-    <button role="tab" class="secundaria" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
-    <button role="tab" class="secundaria" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
-    <button role="tab" class="secundaria" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
-    <button role="tab" class="secundaria" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
-    <button role="tab" class="secundaria" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
-    <button role="tab" class="secundaria" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
-    <button role="tab" class="secundaria" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
-    <button role="tab" class="secundaria" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
-    <button role="tab" class="secundaria" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
-    <button role="tab" class="secundaria" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
+    <button role="tab" data-grupo="cuenta" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
+    <button role="tab" data-grupo="cuenta" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio Actinver</button>
+    <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
+    <button role="tab" data-grupo="cuenta" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
+    <button role="tab" data-grupo="cuenta" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
+    <button role="tab" data-grupo="mercado" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
+    <button role="tab" data-grupo="mercado" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
+    <button role="tab" data-grupo="mercado" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
+    <button role="tab" data-grupo="mercado" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
+    <button role="tab" data-grupo="mercado" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
+    <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio</button>
+    <button role="tab" data-grupo="investigar" id="tab-aprendizaje" aria-controls="panel-aprendizaje" aria-selected="false" tabindex="-1">Aprender y recursos</button>
+    <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
+    <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+    <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
+    <button role="tab" data-grupo="mercado" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
+    <button role="tab" data-grupo="investigar" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
+    <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
+    <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
+    <button role="tab" data-grupo="decidir" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
+    <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
+    <button role="tab" data-grupo="sistema" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
+    <button role="tab" data-grupo="sistema" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
   <a id="abrir-oficina" class="boton boton--secundario acceso-oficina" href="/static/recursos/oficina-inversion.html" aria-label="Ir a la oficina de inversión">Oficina</a>
-  <button type="button" class="boton boton--texto" id="btn-mas" aria-expanded="false" aria-controls="lista-pestanas">Más ▾</button>
 </nav>
 
 <main id="principal" tabindex="-1">
@@ -80,7 +85,7 @@
   </section>
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
     <h1 class="oculto-visual">Plan de acción</h1>
-    <nav class="accesos" aria-label="Accesos a secciones de «Más»">
+    <nav class="accesos" aria-label="Accesos frecuentes">
       <button type="button" class="boton boton--secundario" data-ir="tab-aprendizaje">Aprender con los recursos</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía (informativo)</button>
     </nav>

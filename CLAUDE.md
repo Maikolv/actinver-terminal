@@ -35,8 +35,8 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (viernes 16-oct, 14:00):**
-  - Valuación $906,431.05 (−9.36 %); poder de compra $4,077.32.
+- **Cuenta del Reto, última captura confirmada (lunes 19-oct, 03:00; precios del cierre del 16-oct):**
+  - Valuación $906,431.05 (−9.36 %); poder de compra $4,077.53.
   - 7 acciones y 1 título de ACTDUAL B. Pesos: MU 45.0 %, GMEXICO 17.5 %, AMD 14.0 %, NVDA 11.4 %, ALPEK 5.9 %,
     XOM 2.9 %, NVAX 2.9 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %).
   - Las capturas se registran con `portal.guardar(..., confirmar=True)`. Precios en MXN, ajustados solo por splits.
@@ -66,7 +66,7 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
 - **Sesiones paralelas (D-30):** revisa `git status` y `git log` antes de commitear. No incluyas trabajo ajeno sin
   commitear (TradingView): arma el índice desde `HEAD` con `git update-index
   --cacheinfo`.
-- **Auditoría 19-oct** (`docs/auditoria-2026-10-19.md`): navegación sin duplicados, respuestas obsoletas descartadas en Order/Option Flow, `/api/cartera` más rápida. Propuestas abiertas: cabecera compacta en celular y reagrupar las 23 pestañas.
+- **Auditoría 19-oct** (`docs/auditoria-2026-10-19.md`): navegación sin duplicados, respuestas obsoletas descartadas en Order/Option Flow, `/api/cartera` más rápida. Navegación en 5 grupos por tarea y cabecera compacta en celular (§8).
 - **Decisiones pendientes del usuario:**
   - fuentes de pago (Finviz, EODHD, Databento);
   - las 9 propuestas de revisión del mandato;

@@ -99,3 +99,28 @@ medida comparable es la de `serie_historica` aislada. No se midió CPU ni RAM de
 - **Pendiente de uso:** los estilos `.accesos--relacionados` quedaron sin uso.
 - **Fuera de alcance:** el resto de los 109 endpoints no se auditó uno por uno. Las pruebas de API existentes cubren
   los de seguridad.
+
+## 8. Aplicado después, por pedido del usuario (19-oct)
+
+- **Navegación agrupada por tarea:** una fila de cinco grupos y, debajo, solo las pestañas del grupo elegido. Sustituye
+  al botón «Más».
+
+  | Grupo | Pestañas |
+  |---|---|
+  | Mi cuenta | Plan de acción, Mi portafolio, Alertas, Reto y perfil, Boletas e historial |
+  | Decidir | Propuestas, Ranking, Robustez, Modelos, Backtesting, Plan intradía |
+  | Mercado y flujo | Mercado, Velas, Order Flow, Option Flow, Riesgo, Movimientos públicos, Seguimiento |
+  | Investigar y aprender | Laboratorio, Investigación, Aprender y recursos |
+  | Datos y ayuda | Datos y fuentes, Ayuda |
+
+  Cada grupo recuerda su última pestaña. Los comandos (`/INV`…) y los accesos cambian de grupo solos. Las flechas,
+  Inicio y Fin recorren las pestañas visibles. Comprobado en demo: los 5 grupos, `/INV` y sin errores de JavaScript.
+- **Cabecera en celular (≤ 720 px):**
+  - precios y tipo de cambio, con sus chips de vigencia, siguen siempre visibles;
+  - sesión, motor y modo en vivo pasan a «Ver detalle de datos» (`aria-expanded`);
+  - el aviso DEMO no se toca;
+  - botones más compactos;
+  - la Oficina queda en la fila de pestañas.
+
+  A 390 px el contenido empieza en 469 px, antes ≈ 585 px, y ya incluye la fila de grupos. Sin desbordamiento
+  horizontal.

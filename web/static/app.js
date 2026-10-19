@@ -99,6 +99,12 @@ function segmentado(id, valorActual, alCambiar) {
   });
 }
 
+document.getElementById("btn-detalle-datos").addEventListener("click", (ev) => {
+  const abierto = document.getElementById("estado-datos").classList.toggle("abierto");
+  ev.currentTarget.setAttribute("aria-expanded", String(abierto));
+  ev.currentTarget.textContent = abierto ? "Ocultar detalle de datos" : "Ver detalle de datos";
+});
+
 /* Descarta respuestas antiguas: si el usuario cambia rápido de instrumento, solo se pinta la carga más reciente. */
 const turnos = {};
 function turno(clave) { const n = (turnos[clave] = (turnos[clave] || 0) + 1); return () => turnos[clave] === n; }
@@ -112,15 +118,19 @@ const CARGAS = {
   "tab-movimientos": () => cargarMovimientos(), "tab-robustez": () => cargarRobustez(),
 };
 const navPestanas = document.querySelector(".pestanas");
-function mostrarSecundarias(si) {
-  navPestanas.classList.toggle("con-secundarias", si);
-  const b = document.getElementById("btn-mas");
-  b.setAttribute("aria-expanded", String(si)); b.textContent = si ? "Menos ▴" : "Más ▾";
-  try { localStorage.setItem("mas", si ? "1" : "0"); } catch { /* sin almacenamiento */ }
+/* Pestañas agrupadas por tarea: el grupo elegido muestra solo sus pestañas (CSS por data-grupo). */
+const ultimaDeGrupo = {};
+function elegirGrupo(g) {
+  navPestanas.dataset.grupo = g;
+  document.querySelectorAll(".grupos-nav [data-grupo]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.grupo === g)));
 }
-document.getElementById("btn-mas").addEventListener("click", () => mostrarSecundarias(!navPestanas.classList.contains("con-secundarias")));
+document.querySelectorAll(".grupos-nav [data-grupo]").forEach((b) => b.addEventListener("click", () => {
+  const g = b.dataset.grupo;
+  activarPestana(document.getElementById(ultimaDeGrupo[g] || "") || document.querySelector(`[role="tab"][data-grupo="${g}"]`));
+}));
+elegirGrupo(navPestanas.dataset.grupo);
 function activarPestana(tab, enfocar) {
-  if (tab.classList.contains("secundaria")) mostrarSecundarias(true);
+  elegirGrupo(tab.dataset.grupo); ultimaDeGrupo[tab.dataset.grupo] = tab.id;
   const previo = document.querySelector('[role="tabpanel"]:not([hidden])');
   if (previo && typeof compartirSimbolo === "function") compartirSimbolo(previo.id, tab.id);
   document.querySelectorAll('[role="tab"]').forEach((t) => {
@@ -1634,7 +1644,7 @@ async function iniciar() {
   try { const aviso = sessionStorage.getItem("aviso"); if (aviso) { sessionStorage.removeItem("aviso"); notificar(aviso); } } catch { /* sin almacenamiento */ }
   document.getElementById("form-operacion").elements.fecha.value = new Date().toISOString().slice(0, 10);
   let inicial = null;
-  try { inicial = localStorage.getItem("pestana"); if (localStorage.getItem("mas") === "1") mostrarSecundarias(true); } catch { /* sin almacenamiento */ }
+  try { inicial = localStorage.getItem("pestana"); } catch { /* sin almacenamiento */ }
   // Carga inicial en paralelo y un solo pintado (menos recálculos de estilo y diseño).
   const [e, r, p, c, a] = await Promise.allSettled([api("/api/estado"), api("/api/reto"), api("/api/propuestas"),
     api("/api/cartera"), api("/api/alertas?limite=5")]);

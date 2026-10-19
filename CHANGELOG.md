@@ -2,6 +2,15 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-19 — navegación por tareas y cabecera móvil]
+
+### Cambiado
+- Las 23 pestañas se agrupan en 5 tareas: Mi cuenta, Decidir, Mercado y flujo, Investigar y aprender, Datos y ayuda. Cada grupo recuerda su última pestaña; los comandos y accesos cambian de grupo solos. Sustituye al botón «Más».
+- Celular: precios y tipo de cambio (con vigencia) siempre visibles; el resto del estado pasa a «Ver detalle de datos». Botones compactos y la Oficina en la fila de pestañas. El contenido empieza en 469 px a 390 px de ancho (antes ≈ 585).
+
+### Datos
+- Captura del portal del 19-oct 03:00 registrada: valuación $906,431.05 y poder de compra $4,077.53. Mismos precios que el cierre del viernes 16-oct.
+
 ## [2026-10-19 — auditoría técnica, estética y de utilidad]
 
 ### Corregido

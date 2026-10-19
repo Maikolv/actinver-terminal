@@ -63,6 +63,7 @@ a { color: var(--acento); }
 .acciones-cabecera { display: flex; gap: 8px; }
 .comandos-cabecera { display: flex; gap: 4px; }
 .comandos-cabecera input { width: min(24vw, 240px); min-width: 165px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); font: inherit; }
+#btn-detalle-datos { display: none; }
 .ayuda-comandos { max-width: 1280px; margin: 6px auto 0; color: var(--texto-2); font-size: .8rem; }
 .estado-datos { min-height: 3.4em; max-width: 1280px; margin: 8px auto 0; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: .85rem; color: var(--texto-2); }
 .estado-datos .grupo { display: inline-flex; gap: 6px; align-items: center; }
@@ -82,10 +83,18 @@ a { color: var(--acento); }
 .pestanas [role="tab"] { font: inherit; background: none; border: none; border-bottom: 3px solid transparent; padding: 11px 12px; color: var(--texto-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
 .pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); font-weight: 600; }
 .pestanas { display: flex; align-items: center; }
-.pestanas [role="tablist"] { flex: 1 1 auto; min-width: 0; }
-#btn-mas { white-space: nowrap; margin-right: var(--espacio); min-height: 44px; flex: none; }
-/* Secciones técnicas (boletas e historial, ranking, mercado, datos, ayuda) se muestran con «Más» */
-.pestanas:not(.con-secundarias) [role="tab"].secundaria:not([aria-selected="true"]) { display: none; }
+.pestanas [role="tablist"] { flex: 1 1 0; min-width: 0; }   /* base 0: la Oficina cabe en la misma fila y las pestañas se desplazan */
+/* Grupos por tarea: una fila de grupos y, debajo, solo las pestañas del grupo activo */
+.pestanas { flex-wrap: wrap; }
+.grupos-nav { display: flex; gap: 6px; flex: 1 0 100%; max-width: 1280px; margin: 0 auto; padding: 8px var(--espacio) 2px; overflow-x: auto; scrollbar-width: none; }
+.grupos-nav button { font: inherit; font-size: .85rem; font-weight: 600; white-space: nowrap; min-height: 36px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--borde); background: none; color: var(--texto-2); cursor: pointer; }
+.grupos-nav button[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--superficie); }
+.pestanas[data-grupo="cuenta"] [role="tab"]:not([data-grupo="cuenta"]),
+.pestanas[data-grupo="decidir"] [role="tab"]:not([data-grupo="decidir"]),
+.pestanas[data-grupo="mercado"] [role="tab"]:not([data-grupo="mercado"]),
+.pestanas[data-grupo="investigar"] [role="tab"]:not([data-grupo="investigar"]),
+.pestanas[data-grupo="sistema"] [role="tab"]:not([data-grupo="sistema"]) { display: none; }
 details.tarjeta > summary { cursor: pointer; font-weight: 600; }
 .zona-capturas { display: grid; gap: 4px; border: 2px dashed var(--borde); border-radius: var(--radio); padding: 16px; margin: 10px 0;
   cursor: pointer; background: var(--superficie); }
@@ -238,7 +247,11 @@ a[target="_blank"]::after { content: " ↗"; font-size: .8em; }
   .comandos-cabecera .boton { flex: none; }
   .acciones-cabecera .boton { flex: 1 1 140px; white-space: normal; }
   .ayuda-comandos { display: none; }   /* atajos de teclado (Ctrl+K, /INV): sin teclado físico no aportan y ocupan dos líneas */
-  .estado-datos { min-height: 7.5em; }
+  .estado-datos { min-height: 3.2em; }
+  /* Celular: precios y tipo de cambio (con su vigencia) siempre visibles; sesión, motor y modo en vivo, a un toque */
+  .estado-datos:not(.abierto) .grupo:nth-child(n+3) { display: none; }
+  #btn-detalle-datos { display: inline-flex; margin: 2px 0 0; }
+  .acciones-cabecera .boton { font-size: .85rem; padding: 7px 10px; min-height: 40px; }
   .estado-datos .grupo { flex-wrap: wrap; min-width: 0; }
   .franja-alertas, .tarjeta, .alerta { overflow-wrap: anywhere; }
   .barra-movil { display: block; position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--superficie); border-top: 1px solid var(--borde); z-index: 15; }
