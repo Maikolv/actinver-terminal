@@ -1,2 +1,27 @@
-
-:root{color-scheme:dark;--fondo:#0a1421;--panel:#111f30;--borde:#304559;--texto:#edf4fa;--suave:#b4c5d5;--acento:#82d5e9;--error:#ffc7b9}*{box-sizing:border-box}body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.65 "Segoe UI",sans-serif}main{max-width:1060px;margin:auto;padding:44px 24px 70px}header{max-width:760px;margin-bottom:36px}.marca{font:12px/1.5 Consolas,monospace;letter-spacing:.14em;color:var(--acento);text-transform:uppercase}h1{font:normal clamp(32px,5vw,52px)/1.12 Georgia,serif;margin:16px 0}h2{font:normal 28px/1.25 Georgia,serif;margin:0 0 16px}h3{font-size:17px;margin:24px 0 10px}p{margin:10px 0;color:var(--suave)}nav{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px}a{color:var(--acento);text-underline-offset:4px}section{border-top:1px solid var(--borde);padding:30px 0;margin-top:12px}.numero{font:13px Consolas,monospace;color:var(--acento);display:block;margin-bottom:10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px}label{display:block;font-size:14px;color:var(--suave)}input,textarea{display:block;width:100%;margin-top:6px;border:1px solid var(--borde);border-radius:5px;background:var(--panel);color:var(--texto);padding:11px;font:inherit}textarea{min-height:108px;resize:vertical}input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--acento);outline-offset:3px}button{border:1px solid var(--acento);border-radius:5px;padding:11px 18px;font:600 14px "Segoe UI",sans-serif;background:var(--acento);color:#0a1421;cursor:pointer}.secundario{background:transparent;color:var(--acento)}.acciones{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}.resultado{background:var(--panel);border-left:3px solid var(--acento);padding:18px 20px;margin-top:18px;white-space:pre-line;font-variant-numeric:tabular-nums;min-height:64px}.error{border-color:var(--error);color:var(--error)}small{display:block;color:var(--suave);font-size:13px;margin-top:8px}.nota{border-left:2px solid var(--borde);padding-left:16px}.ancho{grid-column:1/-1}@media(max-width:650px){.grid{grid-template-columns:1fr}main{padding:28px 18px}h2{font-size:25px}}@media print{body{background:white;color:black}p,label,small{color:#333}input,textarea,.resultado{background:white;color:black;border-color:#777}button,nav{display:none}section{break-inside:avoid}}
+/* Tokens, tipografía y componentes compartidos con la terminal: app.css. */
+.cuaderno-marca { color: var(--texto); text-decoration: none; }
+.cuaderno-marca svg { color: var(--acento); flex-shrink: 0; }
+.cuaderno-intro { margin-bottom: 20px; }
+.cuaderno-contexto { color: var(--texto-2); font-size: .8rem; margin-bottom: 6px; }
+.cuaderno-intro h2 { margin: 0 0 8px; }
+.cuaderno-intro > p, .cuaderno-seccion > p { color: var(--texto-2); max-width: 95ch; }
+.cuaderno-secciones { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 0; }
+.cuaderno-secciones a { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 14px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); text-decoration: none; font-weight: 600; }
+.cuaderno-secciones a:hover { background: var(--superficie-2); }
+.cuaderno-seccion { margin-top: 16px; scroll-margin-top: 16px; }
+.cuaderno-seccion h2 { margin: 4px 0 12px; }
+.cuaderno .numero { color: var(--texto-2); font: .75rem var(--mono); }
+.cuaderno .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 16px; margin: 16px 0; }
+.cuaderno label { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; min-width: 0; }
+.cuaderno .ancho { grid-column: 1 / -1; }
+.cuaderno textarea { width: 100%; min-height: 112px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--fondo); color: var(--texto); padding: 8px 10px; font: inherit; resize: vertical; }
+.cuaderno input { font: inherit; }
+.cuaderno .acciones { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.cuaderno .resultado { background: var(--superficie-2); border-left: 3px solid var(--acento); border-radius: var(--radio); padding: 12px 16px; margin: 16px 0 8px; white-space: pre-line; overflow-wrap: anywhere; }
+.cuaderno .resultado.error { background: var(--vencido-fondo); color: var(--vencido); border-color: var(--vencido); }
+.cuaderno small { display: block; color: var(--texto-2); font-size: .8rem; line-height: 1.55; }
+.cuaderno .nota { border-left: 2px solid var(--borde); padding-left: 12px; margin: 16px 0 0; font-size: .85rem; }
+.cuaderno details { overflow-wrap: anywhere; }
+.cuaderno-pie { border-top: 1px solid var(--borde); margin-top: 24px; padding-top: 16px; color: var(--texto-2); font-size: .85rem; }
+@media (max-width:600px) { .cuaderno .grid { grid-template-columns: 1fr; } .cuaderno .acciones .boton { width: 100%; } }
+@media print { .cuaderno { --fondo: white; --superficie: white; --superficie-2: white; --texto: black; --texto-2: #333; --borde: #999; } .cuaderno nav, .cuaderno button, .cuaderno .saltar { display: none; } .cuaderno main { padding: 16px 0; } .cuaderno-seccion { break-inside: avoid; } }
