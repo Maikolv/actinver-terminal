@@ -339,3 +339,8 @@ Mantenimiento: **activo** = commit en los últimos 30 días; **moderado** = últ
 - **Lectura fácil:** Descarga videos de internet.
 - **Técnico:** Python · Unlicense · 2026-09-16.
 - **Uso:** descartado — descargar webinars queda a decisión y responsabilidad del usuario según los términos de cada plataforma.
+
+
+### Incorporación del TikTok — 19-oct-2026
+
+Tres clones del TikTok registrados con hashes y licencias en `config/oficina-pixel-repos.json`; integración original documentada en `docs/oficina-inversion-pixel.md`.

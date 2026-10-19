@@ -136,3 +136,8 @@ Se aislaron las pruebas de config/local.toml; sus ventanas corresponden a las hi
 sembradas, sin cambiar las ventanas predeterminadas de producción.
 NBBO histórico y patas siguen parciales: no se verificó una fuente gratuita permanente
 completa. Detalles, uso y validación final: docs/contratos-paper-colab-2026-10-18.md.
+
+
+### Incorporación del TikTok — 19-oct-2026
+
+Oficina de inversión incorporada en `web/static/recursos/oficina-inversion.html`, accesible desde Aprender y recursos. Tres repositorios clonados (manifiesto `config/oficina-pixel-repos.json`), sin instalar dependencias ni arrancar sus servidores. Código original de sólo lectura con seis roles descriptivos, informe y preparación de prompt para Claude. Compatibilidad nativa Quantower/TradingView aún requiere adaptadores/verificación. Ver `docs/oficina-inversion-pixel.md`.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revisado": "2026-10-18",
+  "revisado": "2026-10-19",
   "indicadores": [
     {
       "titulo": "SMA y EMA",
@@ -437,6 +437,20 @@
         "Backtest sistemático fuera de muestra y explicación de fallas"
       ],
       "ejercicio": "Redactar antes de probar qué dato refutaría la tesis. Un resultado negativo fuera de muestra se conserva y explica; no se selecciona sólo el backtest ganador."
+    },
+    {
+      "titulo": "TikTok — oficina de inversión con IA",
+      "autor": "desde_ciro",
+      "url": "https://vt.tiktok.com/ZSghdDLfa/",
+      "captura": "Descripción visible revisada el 19-oct-2026",
+      "estado": "Tres repositorios identificados y clonados. Integración original de sólo lectura; ninguna ventaja demostrada.",
+      "conceptos": [
+        "Comité de investigación",
+        "Oficina visual",
+        "Procedencia",
+        "Presupuesto de recursos"
+      ],
+      "ejercicio": "Consultar un símbolo con datos autorizados en la oficina, descargar el informe y contrastar las seis perspectivas. No confundir una visualización con un agente autónomo."
     }
   ],
   "certificaciones": [
@@ -2097,6 +2111,21 @@
       "titulo": "Prompt para presentar proyectos basados en Actinver-terminal",
       "url": "/static/recursos/prompt-claude-presentacion-proyectos-actinver.md",
       "detalle": "Opciones de proyectos con evidencia, datos disponibles, brechas y presentación profesional; no implementa ni publica automáticamente."
+    },
+    {
+      "titulo": "Oficina de inversión — proyecto del TikTok",
+      "url": "/static/recursos/oficina-inversion.html",
+      "detalle": "Seis mesas descriptivas, lectura de datos guardados, informe y prompt para Claude. Sin agentes autónomos ni órdenes."
+    },
+    {
+      "titulo": "Repositorios del TikTok y compatibilidad de plataformas",
+      "url": "/static/recursos/integracion-oficina-pixel.md",
+      "detalle": "Tres repositorios descargados, commits y licencias; estado de incorporación y límites de Quantower/TradingView."
+    },
+    {
+      "titulo": "Prompt para optimizar recursos con Claude Code",
+      "url": "/static/recursos/prompt-optimizacion-recursos-claude.md",
+      "detalle": "Medir y mejorar CPU, RAM, consultas, contexto y costes sin perder trazabilidad ni seguridad."
     }
   ]
 }

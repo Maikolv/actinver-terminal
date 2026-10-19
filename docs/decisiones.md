@@ -205,3 +205,8 @@ Contexto: el usuario confirmó la versión 1 como base vigente y autorizó los c
 
 ### D-61 Historia externa del usuario y Finviz Elite
 Contexto: el usuario entregó un Excel con precios 1962 → 9-oct-2025 del universo del Reto y tres perfiles índice («100 % verificable»), y pidió datos en tiempo real de Finviz (7-oct-2026). Decisión: (1) el Excel se verifica columna por columna contra Tiingo/EODHD; 148 columnas coinciden y solo esas extienden rendimientos hacia atrás. 5 se rechazan, 56 quedan sin verificar (fondos sin solape) y «AC» sin .MX se descarta porque es otra emisora. Nunca entra a la tabla de precios. (2) Con historia desde 2004, «acciones · máximo rendimiento» supera a 1/N con IC entero sobre cero, pero con fuerte sesgo de supervivencia y caída máxima de −70 %: no se declara ventaja ni cambian las propuestas (`docs/historia-externa.md`). (3) Finviz gratuito no permite exportar y su robots.txt lo prohíbe a programas; Elite es de pago. Se implementa el conector Elite apagado (`terminal/finviz.py`), que solo se activa con `FINVIZ_AUTH_TOKEN`; contratarlo es decisión del usuario. Sin hora del último hecho, sus precios se guardan como «retrasado».
+
+
+### Incorporación del TikTok — 19-oct-2026
+
+Oficina ligera de lectura bajo demanda; no copiar código de licencia incierta ni iniciar stacks de exchanges. Seis roles descriptivos y prompt manual para Claude; sin órdenes.

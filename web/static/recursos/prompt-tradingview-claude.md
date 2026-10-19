@@ -90,3 +90,10 @@ Comprueba que el diseño persiste al reabrir, que los símbolos y vencimientos c
 - Pine, estrategias: https://www.tradingview.com/pine-script-docs/concepts/strategies/
 - Pine, alertas: https://www.tradingview.com/pine-script-docs/concepts/alerts/
 - TradingView, continuos ajustados: https://www.tradingview.com/support/solutions/43000685266-how-can-i-enable-backadjustment-for-continuous-futures/
+
+
+## Incorporación del TikTok: oficina de inversión (19-oct-2026)
+
+Lee `docs/oficina-inversion-pixel.md` y `config/oficina-pixel-repos.json` de Actinver-terminal. Inspecciona los clones PixelFund-AI, pixel-hedge-fund y company-pixel-office bajo `C:/Users/MIKE/Desktop/Repos`. La oficina original de sólo lectura está en `/static/recursos/oficina-inversion.html`; sus seis roles son reglas descriptivas y puede preparar un prompt de análisis manual para Claude. No son agentes autónomos ni un fondo rentable demostrado. No copies assets/código sin verificar licencia. No reutilices las rutas de órdenes de Bybit, BloFin o Polymarket; no son conectores CME ni sirven por sí solas para ES/MES/NQ/MNQ.
+
+Reutiliza el contexto, checklist y fórmulas compatibles en Pine, manteniendo la oficina y el comité fuera de Pine. No inventes acceso HTTP a localhost. Las alertas de TradingView no son un canal bidireccional para el comité; no abras túneles ni actives webhook/órdenes. Conserva el trabajo existente en tradingview/ y docs/tradingview-puente.md; valida sesiones, rollover, bar-close y restricciones del plan antes de proponer cambios. La publicación del indicador y la configuración de cuenta no constan aplicadas en esta entrega.

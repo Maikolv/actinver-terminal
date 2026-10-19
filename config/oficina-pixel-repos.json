@@ -1,0 +1,35 @@
+{
+  "fecha": "2026-10-19",
+  "fuente": "https://vt.tiktok.com/ZSghdDLfa/",
+  "url_resuelta": "https://www.tiktok.com/@desde_ciro/video/7698135026516413717",
+  "evidencia": "Los tres enlaces constan en la descripción visible de la publicación. No se afirma revisión completa del audio.",
+  "repositorios": [
+    {
+      "nombre": "PixelFund-AI",
+      "url": "https://github.com/kyjwang/PixelFund-AI",
+      "commit": "a821c685c7885b93af83b769042299f0840cc662",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\PixelFund-AI",
+      "licencia": "MIT",
+      "estado": "Clonado superficialmente; dependencias no instaladas; servidor no iniciado",
+      "reutilizacion": "Referencia de diseño; no se copió código ni assets al módulo original"
+    },
+    {
+      "nombre": "pixel-hedge-fund",
+      "url": "https://github.com/jaypolanco96/pixel-hedge-fund",
+      "commit": "eb34f4d306901c5fb949c83a1bea74479bf44fec",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\pixel-hedge-fund",
+      "licencia": "No se encontró licencia general en la raíz",
+      "estado": "Clonado superficialmente; dependencias no instaladas; servidor no iniciado",
+      "reutilizacion": "Referencia de diseño; no se copió código ni assets al módulo original"
+    },
+    {
+      "nombre": "company-pixel-office",
+      "url": "https://github.com/ATK-zk/company-pixel-office",
+      "commit": "a5414480cbdeb813b1c2cfc02c1390ffa938127b",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\company-pixel-office",
+      "licencia": "Sólo LICENSE-pixel-agents-MIT para recursos de terceros; licencia general no identificada",
+      "estado": "Clonado superficialmente; dependencias no instaladas; servidor no iniciado",
+      "reutilizacion": "Referencia de diseño; no se copió código ni assets al módulo original"
+    }
+  ]
+}

@@ -110,3 +110,10 @@ Lee `recursos-adjuntos.md`. Los cuatro PDF de Ana Jiménez / Actinver Acelera re
 El Artifact incorpora módulos6–8: replay sintético de DOM/heatmap, cálculo de indicadores y ruta de Bookmap, Matt Owen, cbrackn, Jigsaw y Andrea Cimi. Respetar el estado de verificación de cada referencia: títulos y conteos de una captura no equivalen a transcripción completa. Añadir una pared, cancelarla y ejecutar una operación son eventos distintos; el heatmap de liquidez no es GEX.
 
 En Quantower configura perfiles de5min y estadísticas de volumen/delta sólo si el feed suministra esos datos. Footprint#1 volumen y Footprint#2 delta describen la captura; no constituyen una regla de entrada validada. Relaciona cada decisión con datos point-in-time, costos y riesgo. La captura de precios Foto2 carece de fecha/moneda/listado confirmados y no alimenta cotizaciones ni posiciones de la terminal.
+
+
+## Incorporación del TikTok: oficina de inversión (19-oct-2026)
+
+Lee `docs/oficina-inversion-pixel.md` y `config/oficina-pixel-repos.json` de Actinver-terminal. Inspecciona los clones PixelFund-AI, pixel-hedge-fund y company-pixel-office bajo `C:/Users/MIKE/Desktop/Repos`. La oficina original de sólo lectura está en `/static/recursos/oficina-inversion.html`; sus seis roles son reglas descriptivas y puede preparar un prompt de análisis manual para Claude. No son agentes autónomos ni un fondo rentable demostrado. No copies assets/código sin verificar licencia. No reutilices las rutas de órdenes de Bybit, BloFin o Polymarket; no son conectores CME ni sirven por sí solas para ES/MES/NQ/MNQ.
+
+Diseña, sólo si aporta valor, un adaptador C# de lectura con la versión real del SDK: exportación normalizada de barras/trades/libro, símbolo y vencimiento exactos, timestamp con zona, fuente/feed, licencia, retraso y agresor sólo si está informado. Reutiliza los contratos de importación existentes en terminal/flujo; crea fixtures y pruebas antes de configurar el feed. No copies la web Svelte como plugin ni habilites ejecución. La compilación e instalación requieren verificar el entorno y no constan aplicadas en esta entrega.
