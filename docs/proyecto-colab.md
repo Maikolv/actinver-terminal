@@ -1,7 +1,9 @@
 # Proyecto explicable en Google Colab (secuencia de los reels de quantbryan)
 
-Estado: **paso 1, esperando que usted elija el tema.** No se programó ningún notebook todavía. Tampoco se contrataron
-datos ni se publicó contenido académico.
+Estado: **tema 3 elegido por el usuario el 18-oct-2026 e implementado** en
+[`notebooks/multiples_estrategias.ipynb`](../notebooks/multiples_estrategias.ipynb).
+No se contrataron datos ni se publicó contenido académico. El ejemplo SINTÉTICO demuestra
+ejecución y bloquea conclusiones financieras; no hay ventaja demostrada.
 
 ## Secuencia
 
@@ -37,4 +39,36 @@ Los temas 15 a 18 necesitan cinta, OI o ticks con lado del agresor que hoy no ha
 Se eligen por utilidad y licencia, en el notebook y no en el entorno de la terminal: `pandas`, `numpy`, `matplotlib`,
 `scipy` y, solo si el tema lo exige, `statsmodels`. No se instalan paquetes por aparecer en una infografía.
 
-Siguiente paso: dígame el número del tema y armo el notebook.
+## Uso del tema 3
+
+1. Abra el notebook en Colab y ejecute las celdas en orden. La instalación es explícita y
+   opcional: NumPy 2.5.3 y pandas 3.0.6. No requiere SciPy, servidor de la terminal ni claves.
+2. Ejecute primero el modo **SINTÉTICO**, sin cambiar nada. Exporta un JSON y un CSV locales
+   con ese rótulo; no descarga datos ni presenta los resultados como evidencia financiera.
+3. Antes de pasar a REAL, declare todas las variantes probadas, familia total, benchmark,
+   fuente, costos, generación causal, semilla, bloque, purga, embargo y corte del holdout.
+   Conserve configuración y huella con fecha verificable **antes de observar los datos**.
+4. Cargue manualmente un CSV autorizado con `fecha,benchmark,variante_1,variante_2,variante_3`
+   (o los nombres configurados): rendimientos simples netos, misma moneda y periodo,
+   fechas ISO únicas crecientes, sin faltantes. Confirme netos y preregistro externo.
+   Se aceptan 100–5000 observaciones, hasta 20 variantes y al menos ocho bloques por tramo.
+5. La selección usa exclusivamente la exploración. Se descartan purga y embargo; el holdout
+   evalúa toda la familia mediante volteo de signos por bloques y Holm, con referencia de
+   exceso medio cero. Las variantes exploradas no publicadas cuentan como p=1.
+6. Descargue desde Archivos los resultados de `resultados_tema3/`. El JSON conserva
+   configuración, versiones, huellas, cortes, selección y todas las filas, incluidos nulos;
+   el CSV contiene todas las variantes. No se sobrescriben archivos distintos.
+
+El holdout queda congelado en la sesión: reevaluar devuelve lo guardado, y cambiar datos,
+configuración o selección bloquea la evaluación. **No equivale a un registro externo ni
+impide reiniciar Colab para eludir el control**. El usuario debe conservar el preregistro y
+no reutilizar el tramo reservado. El notebook no verifica cómo se generó el CSV: la purga
+de la frontera no corrige estrategias entrenadas con datos futuros. Ajuste su longitud al
+solapamiento máximo antes de observar resultados. Los supuestos de simetría de signos y
+dependencia dentro del bloque pueden fallar; no rechazar H0 no demuestra equivalencia.
+
+Verificación reproducible: `tests/test_notebook_tema3.py` ejecuta todas las celdas sin pip
+en directorio temporal, comprueba exportación sintética y congelación, un caso conocido de
+Holm, rechazo de fechas/faltantes inválidos, cambios de configuración/selección,
+reextracción del holdout y protección de exportaciones anteriores. El CSV usa saltos
+de línea explícitos para permitir reevaluación idéntica en Windows y Colab. No se conectó Colab ni se evaluó un CSV real.

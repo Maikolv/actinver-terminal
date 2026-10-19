@@ -2120,6 +2120,22 @@ function superficieTabla(curvas) {
   } }))], vencs, { caption: "Superficie de volatilidad implícita (promedio de calls y puts alrededor de cada strike)" });
 }
 
+function controlesContratosPaper(subyacente) {
+  const proveedor = flujo.estado.proveedores.find((p) => p.id === "alpaca_contratos_paper");
+  const disponible = Boolean(proveedor?.configurado) && flujo.estado.modo !== "sintetico";
+  const boton = botonAccion("Actualizar OI y multiplicador (Paper)", "boton--secundario", async (b) => {
+    if (await pedirActualizacion("contratos_oi", subyacente, {}, b)) cargarOptionFlow();
+  });
+  boton.disabled = !disponible || !subyacente;
+  return h("section", { clase: "tarjeta", "aria-label": "Contratos Alpaca Paper de solo lectura" },
+    h("h2", { texto: "Interés abierto y tamaño del contrato" }),
+    h("p", { clase: "ayuda", texto: "Consulta autorizada únicamente en Paper y de solo lectura. El interés abierto corresponde a un cierre previo, con su fecha; no es tiempo real. No compra contratos ni habilita órdenes o suscripciones." }),
+    h("p", { clase: disponible ? "ayuda" : "aviso-caja", role: "status", texto: disponible
+      ? "Consulta disponible bajo demanda; no se actualiza automáticamente."
+      : "Consulta desactivada o sin credenciales Paper. Configure las claves Paper y habilite contratos_oi en la configuración local; reinicie la terminal. En demo no se consultan proveedores." }),
+    h("p", { clase: "ayuda", texto: "Actualice primero los metadatos y después la cadena. Solo se combina OI de cierre previo que ya era conocido al instante de la referencia; no se rellena un snapshot histórico con información posterior." }), boton);
+}
+
 async function cargarOptionFlow() {
   try {
     await estadoFlujo();
@@ -2133,6 +2149,7 @@ async function cargarOptionFlow() {
     const botonAct = botonAccion("Actualizar cadena desde proveedor", "boton--primario", async (b) => { if (await pedirActualizacion("opciones", o.subyacente, {}, b)) cargarOptionFlow(); });
     if (!o.subyacente) {
       limpiar("optionflow-contenido", h("div", { clase: "fila-controles" }, sim, botonAct),
+        controlesContratosPaper(o.subyacente),
         h("p", { clase: "vacio", texto: "Elija un subyacente del SIC. Proveedor: Alpaca, feed «indicative» de OPRA (gratuito y diferido; sin interés abierto). Opciones de MexDer: solo por CSV." }),
         formImportar("opciones", cargarOptionFlow), seccionSkylit());
       return;
@@ -2150,6 +2167,7 @@ async function cargarOptionFlow() {
     });
     limpiar("optionflow-contenido",
       h("div", { clase: "fila-controles" }, sim, botonAct),
+      controlesContratosPaper(o.subyacente),
       h("div", { clase: "fila-controles" },
         selectorSimple(F.vencimiento || "", [["", "Todos"], ...d.vencimientos.map((v) => [v, v])], (x) => { F.vencimiento = x; cargarOptionFlow(); }, "Vencimiento"),
         selectorSimple(F.tipo || "", [["", "Calls y puts"], ["call", "Calls"], ["put", "Puts"]], (x) => { F.tipo = x; cargarOptionFlow(); }, "Tipo"),
@@ -2175,7 +2193,8 @@ async function cargarOptionFlow() {
         tabla([{ t: "Venc.", f: (c) => c.vencimiento }, { t: "Días", f: (c) => c.dias, num: true }, { t: "Strike", f: (c) => num(c.strike), num: true },
           { t: "Tipo", f: (c) => c.tipo }, { t: "Bid", f: (c) => num(c.bid), num: true }, { t: "Ask", f: (c) => num(c.ask), num: true },
           { t: "Último", f: (c) => num(c.ultimo), num: true }, { t: "Volumen", f: (c) => num(c.volumen), num: true },
-          { t: "Int. abierto", f: (c) => (c.interes_abierto == null ? "no informado" : num(c.interes_abierto)), num: true },
+          { t: "Int. abierto", f: (c) => (c.interes_abierto == null ? "no informado" : `${num(c.interes_abierto)}${c.fecha_oi ? ` (cierre ${c.fecha_oi})` : ""}`), num: true },
+          { t: "Multiplicador", f: (c) => (c.multiplicador == null ? "no informado" : num(c.multiplicador)), num: true },
           { t: "IV", f: (c) => (c.iv == null ? "—" : pct(c.iv)), num: true }, { t: "Origen IV", f: (c) => (c.origen_iv ? chipCalidad(c.origen_iv) : "—") },
           { t: "Delta", f: (c) => num(c.delta), num: true }, { t: "Gamma", f: (c) => num(c.gamma), num: true },
           { t: "Theta", f: (c) => num(c.theta), num: true }, { t: "Vega", f: (c) => num(c.vega), num: true },
@@ -2481,9 +2500,11 @@ async function cargarGex(subyacente) {
 }
 function pintarGex(d) {
   const encabezado = h("p", { clase: "ayuda", texto: `${d.formula}. ${d.nota}` });
+  const avisoOi = d.aviso_oi ? h("div", { clase: "aviso-caja", role: "status",
+    texto: `${d.aviso_oi}${d.oi_desactualizado ? " Hay interés abierto desactualizado; revise la fecha antes de interpretar la exposición." : ""}` }) : null;
   if (!d.disponible) {
     const desc = Object.entries(d.descartados || {}).map(([k, v]) => `${v} ${k}`).join("; ");
-    return h("div", {}, encabezado,
+    return h("div", {}, encabezado, avisoOi,
       h("div", { clase: "aviso-caja", role: "status" }, h("strong", { texto: "GEX no disponible. " }), `${d.motivo}${desc && !d.motivo.includes(desc) ? ` Descartados: ${desc}.` : ""}`),
       h("p", { clase: "ayuda", texto: `Qué se necesita: ${d.requisito}` }), h("p", { clase: "ayuda", texto: d.convencion }));
   }
@@ -2515,7 +2536,7 @@ function pintarGex(d) {
       tabla(cols, d.vencimientos, { caption: `${firmada ? "GEX firmado (convención)" : "GEX absoluto"} por vencimiento y strike, ${d.moneda} por movimiento de 1 % del subyacente${d.strikes.length > 24 ? " (24 strikes más cercanos al spot)" : ""}` }),].filter(Boolean));
   };
   dibujar();
-  return h("div", {}, encabezado, cont);
+  return h("div", {}, encabezado, avisoOi, cont);
 }
 
 /* ---------- Laboratorio de alfa: permutación de signos por bloques ---------- */

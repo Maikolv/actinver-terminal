@@ -13,6 +13,7 @@ os.environ["TERMINAL_DATA_DIR"] = _TMP
 os.environ["TERMINAL_MODO"] = "real"
 os.environ["TERMINAL_SIN_MOTOR"] = "1"  # sin hilo automático ni notificaciones durante las pruebas
 os.environ["TERMINAL_SIN_ENV"] = "1"  # nunca se carga el .env real: sin credenciales reales en pruebas
+os.environ["TERMINAL_SIN_CONFIG_LOCAL"] = "1"  # ni config/local.toml: mismas pruebas en esta PC y en la integración continua
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from terminal import db, vigencia  # noqa: E402
@@ -23,6 +24,8 @@ from terminal.config import cargar_ajustes  # noqa: E402
 def ajustes():
     a = cargar_ajustes()
     a.datos["app"]["modo"] = "real"
+    # sembrar_precios usa ~300 sesiones: ventanas como las del plan gratuito de EODHD (las de config/local.toml del usuario)
+    a.datos["optimizacion"].update(historia_min_sesiones=250, walk_forward_entrenamiento=168, walk_forward_prueba=21)
     return a
 
 

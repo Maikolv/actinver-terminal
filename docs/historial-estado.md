@@ -240,3 +240,19 @@ Archivado de `CLAUDE.md` el 18-oct-2026, sin cambios de texto, para mantener ese
 - Preregistro #1 (holdout feb-2018 a sep-2025, 6 ETF): sin ventaja frente a comprar y mantener (Holm 1.000 en todos); menor caída en QQQ/EEM/NAFTRAC. Estrategia activa sin cambios.
 - `terminal/anomalias.py` (`docs/anomalias-volumen.md`): algoritmo propio sin repintado; no equivale al indicador privado del reel.
 - Pendiente: especificación del autor (rango, riesgo, fills, costos) y si la historia externa incluye dividendos. Sin interfaz propia todavía (solo API), para no chocar con `app.js` de otra sesión.
+
+
+## Actualización 18-oct-2026 — contratos Paper y notebook tema 3
+
+- Autorización posterior atendida: solo GET contratos Paper, apagado por defecto,
+  claves específicas, caché y límites; una consulta mínima real exitosa.
+- OI de cierre previo fechado y multiplicador con procedencia por campo, sin
+  completar datos futuros ni sustituir valores existentes. Aviso visible en GEX.
+- Notebook de múltiples estrategias con holdout congelado, Holm y exportaciones
+  protegidas; ejecución local sintética, sin datos de cartera ni claves.
+- Sin fuente gratuita permanente completa verificada para NBBO histórico/patas;
+  Skylit parcial. TradingView ajeno se conserva. Detalle y pruebas finales en
+  contratos-paper-colab-2026-10-18.md.
+
+Validación de esta entrega: 649 pruebas aprobadas, JS válido y sin hallazgos de
+patrones de secretos en los 20 archivos tocados.

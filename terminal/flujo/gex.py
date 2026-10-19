@@ -1,6 +1,7 @@
-"""Exposición gamma (GEX) por strike y vencimiento, solo con lo que la cadena guardada trae de la MISMA referencia.
+"""Exposición gamma (GEX) por strike y vencimiento, con gamma y spot de la misma referencia y metadatos fechados del contrato.
 
-Cada contrato necesita gamma, interés abierto, multiplicador y spot propios (más la moneda). Nada se supone: ni el
+Cada contrato necesita gamma y spot compatibles (más la moneda), interés abierto y multiplicador propios.
+El OI y multiplicador pueden proceder de contratos Paper conocidos antes del snapshot, con fecha previa explícita. Nada se supone: ni el
 multiplicador 100 (los contratos ajustados por eventos corporativos pueden tener otro), ni un spot tomado de otra
 tabla, hora o moneda. Si faltan, el resultado dice exactamente qué falta y qué importación o proveedor lo resolvería.
 
@@ -16,10 +17,10 @@ import math
 from collections import Counter, defaultdict
 
 PORCENTAJE = 0.01
-REQUISITO = ("Importe un CSV de opciones (Option Flow → «Importar opciones») con las columnas interes_abierto, gamma, "
-             "multiplicador, spot y moneda de la misma referencia e instante, o conecte un proveedor de opciones OPRA "
-             "que entregue interés abierto y especificaciones del contrato (el feed «indicative» gratuito de Alpaca no "
-             "trae interés abierto ni multiplicador).")
+REQUISITO = ("Importe un CSV autorizado con gamma, spot y moneda compatibles, interés abierto y multiplicador; "
+             "o habilite contratos Paper para OI fechado del cierre previo y size. Los metadatos solo se unen si "
+             "ya eran conocidos al instante de la cadena. El feed indicativo (no equivale a OPRA) no aporta OI ni multiplicador y "
+             "contratos Paper no aporta spot ni gamma; ningún campo ausente se inventa.")
 CONVENCION = ("Firmada = calls positivos y puts negativos: es una CONVENCIÓN de signo, no la posición conocida de los "
               "intermediarios (dealers). Con interés abierto no se sabe quién compró o vendió; la lectura firmada puede "
               "ser errónea y no es una señal operativa.")
@@ -58,7 +59,14 @@ def _clasificar(c: dict) -> tuple[str | None, tuple | None]:
 
 def calcular(cadena: list[dict]) -> dict:
     total = len(cadena)
-    base = {"total": total, "formula": FORMULA, "convencion": CONVENCION, "requisito": REQUISITO}
+    metadatos = [c for c in cadena if c.get("procedencia_contratos")]
+    fechas = sorted({c["fecha_oi"] for c in metadatos if c.get("fecha_oi") and
+                     "interes_abierto" in c["procedencia_contratos"].get("campos", ["interes_abierto"])})
+    base = {"total": total, "formula": FORMULA, "convencion": CONVENCION, "requisito": REQUISITO,
+            "fechas_oi": fechas, "oi_desactualizado": any(c.get("oi_desactualizado") for c in metadatos),
+            "procedencia_contratos": [c["procedencia_contratos"] for c in metadatos],
+            "aviso_oi": ("OI de cierre previo, no intradía. Fechas: " + ", ".join(fechas) +
+                         "; desactualizado = antigüedad superior a 4 días calendario." if fechas else None)}
     if not total:
         return {**base, "disponible": False, "contratos_usados": 0, "descartados": {},
                 "motivo": "No hay cadena de opciones guardada para este subyacente.", "celdas": []}

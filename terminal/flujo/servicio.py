@@ -13,7 +13,7 @@ from . import almacen, calculos
 from .adaptadores import Alpaca, Cripto, FuenteNoDisponible, tasa_libre_riesgo, _nanosegundos
 from .contratos import INTERVALOS
 
-ESPERA_S = {"velas": 60, "operaciones": 30, "libro": 5, "opciones": 120, "opciones_operaciones": 120}
+ESPERA_S = {"velas": 60, "operaciones": 30, "libro": 5, "opciones": 120, "opciones_operaciones": 120, "contratos_oi": 3600}
 SIN_FUENTE = ("Sin fuente autorizada para este dato. No se simula: importe un CSV con datos que tenga derecho a usar "
               "(plantilla en este panel) o configure un proveedor (ver docs/acciones-requeridas-usuario.md).")
 
@@ -43,14 +43,19 @@ def catalogo(con, ajustes) -> dict:
 def estado(con, ajustes, env: dict | None = None) -> dict:
     env = os.environ if env is None else env
     alpaca = bool(env.get("ALPACA_API_KEY_ID") and env.get("ALPACA_API_SECRET_KEY"))
+    paper = bool(env.get("ALPACA_PAPER_API_KEY_ID") and env.get("ALPACA_PAPER_API_SECRET_KEY"))
     cripto = Cripto(ajustes)
+    contratos_activo = bool(Alpaca(ajustes, env).cfg.get("contratos_oi", False) and Alpaca(ajustes, env).cfg.get("activo", True))
     try:
         import ccxt  # noqa: F401
         ccxt_ok = True
     except ImportError:
         ccxt_ok = False
     consultas = [dict(r) for r in con.execute("SELECT * FROM flujo_consultas ORDER BY intento_en DESC LIMIT 20")]
-    return {"proveedores": [
+    return {"contratos_oi_activo": contratos_activo, "proveedores": [
+        {"id": "alpaca_contratos_paper", "nombre": "Alpaca contratos (solo lectura Paper)",
+         "configurado": bool(paper and contratos_activo), "datos": "OI fechado de cierre previo y multiplicador, si disponibles; sin NBBO ni patas",
+         "licencia": "Uso personal; sin suscripciones de pago"},
         {"id": "alpaca", "nombre": "Alpaca Market Data (gratuito)", "configurado": alpaca,
          "datos": "Velas OHLCV SIP (≥ 15 min de retraso), operaciones SIP (≥ 15 min, sin lado), mejor bid/ask IEX (1 nivel), "
                   "cadenas de opciones (feed indicativo, diferido)", "licencia": "Uso personal; sin redistribución"},
@@ -62,7 +67,7 @@ def estado(con, ajustes, env: dict | None = None) -> dict:
          "datos": "Velas, libro, operaciones y opciones con licencia propia", "licencia": "La que usted declare"},
     ], "consultas": consultas, "modo": "sintetico" if ajustes.es_demo else "real",
         "no_disponible": ["Libro con profundidad de acciones (EE. UU. o BMV): requiere contrato",
-                          "Opciones en tiempo real (OPRA) e interés abierto: requiere suscripción",
+                          "Opciones en tiempo real (OPRA): requiere permiso; OI previo depende de contratos Paper",
                           "Opciones y libro de MexDer/BMV: requiere contrato"]}
 
 
@@ -107,7 +112,12 @@ def actualizar(con, ajustes, tipo: str, simbolo: str, intervalo: str = "1Day", d
                 raise FuenteNoDisponible("sin proveedor para este instrumento (solo emisoras con listado en EE. UU.; "
                                          "para la BMV importe un CSV)")
             a = Alpaca(ajustes, env, cliente)
-            if tipo == "velas":
+            if tipo == "contratos_oi":
+                metadatos, p = a.contratos_opciones(origen)
+                for meta in metadatos:
+                    meta["subyacente"] = simbolo
+                n = almacen.guardar_contratos_opciones(con, metadatos, p)
+            elif tipo == "velas":
                 barras, p = a.barras(origen, simbolo, intervalo, dias)
                 n = almacen.guardar_barras(con, barras, p)
             elif tipo == "operaciones":
@@ -218,7 +228,7 @@ def orderflow(con, ajustes, simbolo: str, minutos: int = 240, niveles: int = 20)
 
 def optionflow(con, ajustes, subyacente: str, filtros: dict | None = None) -> dict:
     f = filtros or {}
-    cadena = almacen.cadena(con, subyacente, demo=ajustes.es_demo)
+    cadena = almacen.enriquecer_contratos(con, almacen.cadena(con, subyacente, demo=ajustes.es_demo), demo=ajustes.es_demo)
     hoy = datetime.now(UTC).date()
     vencs = sorted({c["vencimiento"] for c in cadena})
 
@@ -292,7 +302,7 @@ def heston(con, ajustes, subyacente: str) -> dict:
 def gex(con, ajustes, subyacente: str) -> dict:
     """GEX de la última cadena guardada. No usa `_spot` ni ninguna otra tabla: solo datos de la misma cadena."""
     from . import gex as g
-    cadena = almacen.cadena(con, subyacente, demo=ajustes.es_demo)
+    cadena = almacen.enriquecer_contratos(con, almacen.cadena(con, subyacente, demo=ajustes.es_demo), demo=ajustes.es_demo)
     return {"subyacente": subyacente, **g.calcular(cadena), "procedencia": _procedencia(cadena),
             "nota": "Exposición gamma de contratos (opciones), no flujo de operaciones: no indica quién compró o vendió."}
 
@@ -315,8 +325,10 @@ def skylit_guardado(con, ajustes, subyacente: str, hasta: str | None = None) -> 
         # SQLite conserva el instante normalizado a microsegundos: una fracción adicional no demuestra simultaneidad.
         if compatible and _nanosegundos(op["t"]) % 1000 == 0:
             f.update(multiplicador=compatible["multiplicador"], spot=compatible["spot"])
+        f = almacen.enriquecer_contratos(con, [f], hasta=corte, demo=ajustes.es_demo)[0]
         filas.append(skylit.evaluar_fila(f))
     resultado = skylit.resumir(filas)
     return {**resultado, "calidad": "guardado", "subyacente": subyacente, "procedencia": _procedencia(ops),
             "nota": "Cinta guardada indicativa y diferida (≥ 15 min). El filtro completo no se aplicó: "
-                    "faltan NBBO del instante, patas e interés abierto fechado. Sin inferencias de lado ni apertura."}
+                    "faltan NBBO del instante y patas; OI/multiplicador solo si hay metadatos compatibles guardados. "
+                    "No se infiere volumen diario de la cinta parcial. Sin inferencias de lado ni apertura."}

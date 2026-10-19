@@ -3,7 +3,7 @@
 
 - Alpaca (datos de mercado, plan gratuito): barras OHLCV SIP con ≥ 15 min de retraso; operaciones SIP históricas con
   ≥ 15 min de retraso (sin lado del agresor); mejor bid/ask de IEX (un solo nivel); cadenas de opciones con el feed
-  «indicative» (diferido). Solo usa `data.alpaca.markets`: no existe código hacia la API de operaciones.
+  «indicative» (diferido). Contratos: GET autorizado solo en Paper; nunca órdenes, cuentas ni posiciones.
 - Cripto (ccxt, MIT): libro y operaciones públicos del exchange configurado (Bitso por omisión, pares en MXN). Fuera
   del Reto: sirve para analizar flujo de órdenes con datos reales y autorizados.
 """
@@ -19,6 +19,7 @@ import httpx
 from .. import modelos_opciones
 from .contratos import Barra, ContratoOpcion, Libro, Nivel, Operacion, OperacionOpcion, Procedencia, instante
 
+URL_CONTRATOS_PAPER = "https://paper-api.alpaca.markets/v2/options/contracts"
 URL_DATOS = "https://data.alpaca.markets"
 RETRASO_SIP_S = 16 * 60
 LIC_ALPACA = "Alpaca Market Data, plan gratuito: uso personal, sin redistribución"
@@ -75,6 +76,61 @@ class Alpaca:
         if r.status_code != 200:
             raise FuenteNoDisponible(f"Alpaca: HTTP {r.status_code}")
         return r.json()
+
+    def contratos_opciones(self, subyacente: str, limite: int = 1000, paginas: int = 3) -> tuple[list[dict], Procedencia]:
+        """Metadatos: única excepción autorizada, Paper y GET sin redirecciones."""
+        if not self.cfg.get("activo", True) or not self.cfg.get("contratos_oi", False):
+            raise FuenteNoDisponible("consulta de contratos Paper desactivada en [flujo.alpaca] contratos_oi")
+        if not re.fullmatch(r"[A-Z][A-Z.]{0,9}", subyacente) or not 1 <= limite <= 1000 or not 1 <= paginas <= 3:
+            raise ValueError("subyacente o límites de contratos inválidos")
+        kid, sec = self.env.get("ALPACA_PAPER_API_KEY_ID"), self.env.get("ALPACA_PAPER_API_SECRET_KEY")
+        if not (kid and sec):
+            raise FuenteNoDisponible("faltan credenciales específicas ALPACA_PAPER_API_KEY_ID/ALPACA_PAPER_API_SECRET_KEY para Paper")
+        hoy = datetime.now(UTC).date()
+        params = {"underlying_symbols": subyacente, "limit": limite, "status": "active",
+                  "expiration_date_gte": hoy.isoformat(), "expiration_date_lte": (hoy + timedelta(days=183)).isoformat()}
+        cli = self.cliente or httpx.Client(timeout=15)
+        out, tokens, parcial = [], set(), False
+        try:
+            for _ in range(paginas):
+                try:
+                    r = cli.get(URL_CONTRATOS_PAPER, params=params,
+                                headers={"APCA-API-KEY-ID": kid, "APCA-API-SECRET-KEY": sec}, follow_redirects=False)
+                except httpx.HTTPError:
+                    raise FuenteNoDisponible("Alpaca Paper: sin conexión") from None
+                if r.status_code != 200:
+                    raise FuenteNoDisponible(f"Alpaca Paper: consulta no disponible (HTTP {r.status_code}); sin alternativa de pago")
+                try:
+                    d = r.json()
+                    for c in d.get("option_contracts") or []:
+                        contrato = c.get("symbol") or ""
+                        if not OCC.fullmatch(contrato) or c.get("underlying_symbol") != subyacente:
+                            continue
+                        def numero(v, positivo=False):
+                            if v in (None, ""):
+                                return None
+                            n = float(v)
+                            if not math.isfinite(n) or n < 0 or (positivo and n <= 0):
+                                raise ValueError()
+                            return n
+                        fecha = date.fromisoformat(c["open_interest_date"]).isoformat() if c.get("open_interest_date") else None
+                        out.append({"contrato": contrato, "subyacente": subyacente,
+                                    "interes_abierto": numero(c.get("open_interest")), "fecha_oi": fecha,
+                                    "multiplicador": numero(c.get("size"), True)})
+                    token = d.get("next_page_token")
+                    parcial = bool(token)
+                    if not token or token in tokens:
+                        break
+                    tokens.add(token)
+                    params["page_token"] = token
+                except (ValueError, TypeError, KeyError, AttributeError):
+                    raise FuenteNoDisponible("Alpaca Paper: respuesta de contratos inválida") from None
+        finally:
+            if self.cliente is None:
+                cli.close()
+        return out, Procedencia("alpaca_paper", LIC_ALPACA, "EE. UU. (contratos de opciones)", feed="contracts-paper",
+                                nota="Solo lectura Paper. OI de cierre previo, fechado; no es intradía. Sin spot, NBBO ni patas. "
+                                     + ("Cobertura parcial por límite de paginación." if parcial else ""))
 
     def barras(self, simbolo_origen: str, simbolo: str, intervalo: str, dias: int) -> tuple[list[Barra], Procedencia]:
         fin = datetime.now(UTC) - timedelta(seconds=RETRASO_SIP_S)

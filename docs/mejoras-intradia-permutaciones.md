@@ -104,3 +104,16 @@ Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio son pestañas prin
   sin conocer su entorno; el modo de pruebas define ambos interruptores expresamente.
 - Sin autorización textual para contratos Alpaca: endpoint de trading sin implementar.
   Colab sin tema elegido: no se creó notebook. Ningún modelo adquiere ventaja demostrada.
+
+
+## 9. Cierre de pendientes autorizados — 18-oct-2026
+
+El usuario autorizó contratos Alpaca sin pagos y eligió el tema 3. Se implementó
+la consulta exclusiva de contratos Paper, con OI fechado y multiplicador, apagada
+por defecto; acceso real comprobado con una sola consulta mínima. Se entrega
+notebooks/multiples_estrategias.ipynb, probado localmente en modo SINTÉTICO.
+La revisión de fuentes oficiales no confirmó NBBO histórico y patas completos
+con acceso gratuito permanente: Skylit conserva su alcance parcial.
+La falta de autorización y tema del cierre del 16-oct queda resuelta por estas
+instrucciones posteriores. No hay ventaja demostrada ni se habilitan órdenes.
+Informe: contratos-paper-colab-2026-10-18.md.

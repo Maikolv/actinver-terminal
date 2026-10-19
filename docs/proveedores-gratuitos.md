@@ -1,6 +1,6 @@
 # Proveedores con acceso gratuito y herramientas visibles en la terminal
 
-Revisión: **16-oct-2026**, con la documentación oficial enlazada en cada fila. Cuando una página no permite confirmar
+Revisión general: **16-oct-2026**; alternativas para Skylit revisadas **18-oct-2026**, con la documentación oficial enlazada en cada fila. Cuando una página no permite confirmar
 una condición, la celda lo dice. Ningún plan se contrató ni se creó ninguna cuenta para esta revisión. Los
 conectores marcados «implementado» ya existían en la terminal y se reutilizan.
 
@@ -23,7 +23,7 @@ Leyenda de acceso:
 | [Twelve Data](https://twelvedata.com/pricing) | Gratis permanente (Basic) | EE. UU., forex y cripto; **BMV fuera de Basic**, salvo símbolo de prueba | Intradía y diaria | Sin confirmar | Anuncia tiempo real para acciones y ETF de EE. UU. | No | No | 8 créditos por minuto, 800 por día; WebSocket de prueba | Cuenta | Uso personal, interno y no comercial; Basic indica uso interno sin visualización | Especificación ya existe (`config/proveedores/twelvedata_bmv.json`), **sin activar** | No figura |
 | [Massive (antes Polygon)](https://massive.com/pricing) | Gratis permanente (Stocks Basic) | EE. UU., USD | Agregados de 1 minuto | 2 años | **Solo cierre del día** | Sin operaciones ni cotizaciones | No se pudo confirmar | 5 por minuto | Cuenta | Términos de Massive | No implementado: no agrega nada a Alpaca | Conector «Polygon.io» |
 | [Finnhub](https://finnhub.io/pricing) | Gratis, condiciones sin confirmar | EE. UU., cobertura gratuita sin confirmar | — | — | Sin confirmar | — | — | **Cupo gratuito sin confirmar**; techo general de 30 llamadas/s y HTTP 429 por exceso (extracto oficial; §7) | Cuenta | Sin confirmar | No implementado | No figura |
-| [Databento](https://databento.com/pricing) | Crédito único de USD 125, solo para datos históricos | CME, OPRA, Nasdaq TotalView y otros | Ticks y barras | Amplia | Tiempo real **solo de pago** (desde USD 199 al mes) | Ticks con lado del agresor y libro completo (MBO/MBP) | OPRA histórico con el crédito | Por consumo | Cuenta; tarjeta no confirmada | Licencia por dataset | No implementado (el crédito es un gasto: lo decide usted) | No figura |
+| [Databento](https://databento.com/pricing) | Crédito único de USD 125 (vence a los 6 meses; histórico o primer mes de suscripción) | CME, OPRA, Nasdaq TotalView y otros | Ticks y barras | Amplia | Tiempo real **solo de pago** (desde USD 199 al mes) | Ticks con lado del agresor y libro completo (MBO/MBP) | OPRA histórico con el crédito | Por consumo | Cuenta; tarjeta no confirmada | Licencia por dataset | No implementado (el crédito es un gasto: lo decide usted) | No figura |
 | Quantower | Software gratuito; los datos de cada conector se pagan aparte | — | — | — | Depende del conector | dxFeed, Rithmic, IB y Tradier dan profundidad u opciones **con su propia suscripción** | — | — | — | — | No aplica: Quantower es otra aplicación y no lee la base de la terminal | — |
 
 Notas:
@@ -31,8 +31,8 @@ Notas:
   implementadas, solo Alpaca y Alpha Vantage aparecen en su lista.
 - Acceder gratis a un precio no da licencia para mostrarlo o redistribuirlo. Tiingo lo prohíbe expresamente; la
   terminal escucha solo en 127.0.0.1 y es de uso personal.
-- Ninguna fuente gratuita ofrece un feed completo de CME u OPRA en tiempo real. No hay datos gratuitos de la BMV ni
-  de MexDer en tiempo real.
+- Entre las fuentes revisadas no se verificó una alternativa gratuita permanente que complete todos los campos
+  de Skylit; ver §8. Esto no es una afirmación exhaustiva sobre todos los proveedores del mercado.
 
 ## 2. Matriz por herramienta
 
@@ -44,7 +44,7 @@ Notas:
 | DOM y mapa de calor de liquidez | Libro por niveles en el tiempo | Instantáneas sin interpolar | **Solo cripto** (Bitso). En EE. UU., IEX da 1 nivel; la profundidad es de pago |
 | Footprint y delta acumulado | Operaciones con **lado del agresor** | Volumen por precio y lado; delta = compras − ventas | **Solo cripto**. El SIP no trae el lado; con OHLCV no se puede reconstruir |
 | Option Flow (cinta y filtro de Skylit) | Cinta de opciones con NBBO del instante, condición, patas, OI con fecha, spot | Ver el filtro de Skylit en `docs/mejoras-intradia-permutaciones.md` | **Parcial, implementado**: cinta indicativa de Alpaca guardada con condición y filtro sobre ella o CSV. NBBO histórico del instante, patas y OI siguen «no evaluable» si faltan; la interfaz indica que el filtro completo no se aplicó |
-| GEX | Gamma, OI, multiplicador, spot y moneda de una misma referencia | gamma × OI × multiplicador × S² × 0.01 | **No con datos de mercado gratuitos** (sin OI). El endpoint de contratos de Alpaca trae OI y tamaño (ver §4); mientras tanto, solo por CSV |
+| GEX | Gamma, OI, multiplicador, spot y moneda de una misma referencia | gamma × OI × multiplicador × S² × 0.01 | **Condicionado a datos compatibles**: contratos Paper autorizado aporta OI de cierre previo fechado y tamaño si disponibles (ver §4). Acceso mínimo comprobado; no certifica gamma/spot ni cobertura. CSV autorizado sigue disponible |
 
 Otras distinciones:
 - El volumen no sustituye al interés abierto.
@@ -64,7 +64,8 @@ panel muestra fuente, retraso, horario y calentamiento, y avisa cuando faltan da
 2. **Bitso por ccxt** (implementado): libro, cinta con lado, footprint y mapa de calor reales, solo de cripto en MXN.
 3. **EODHD, Banxico y FRED** (implementados): cierres de la BMV, FIX y tasas.
 4. **Importación de CSV autorizados** para lo que no da ninguna fuente gratuita: libro y cinta de EE. UU., opciones con
-   interés abierto (GEX), cinta de opciones con NBBO (filtro de Skylit) y opciones de MexDer.
+   datos faltantes para GEX, cinta de opciones con NBBO (filtro de Skylit) y opciones de MexDer.
+5. **Contratos Alpaca Paper** (implementado, apagado por defecto): OI fechado y multiplicador; una consulta mínima exitosa. No mueve dinero ni completa NBBO/patas.
 
 Lo que exige proveedor de pago o archivo con licencia:
 - Profundidad de EE. UU. (Level 2): Databento, dxFeed u otro distribuidor.
@@ -76,10 +77,13 @@ Lo que exige proveedor de pago o archivo con licencia:
 Se amplió el adaptador Alpaca existente con la cinta histórica de opciones de Market Data
 (`GET /v1beta1/options/trades`), caché, límites y procedencia. No se conectaron Finnhub ni Twelve Data.
 
-**Candidato pendiente de su decisión:** OI y multiplicador desde el endpoint de contratos de Alpaca
-(`/v2/options/contracts`). Ese endpoint vive en la **API de trading** (cuenta de broker), no en la de datos. Aunque la
-consulta sería solo de lectura, usted pidió no abrir conexiones de corretaje sin necesidad concreta, así que no se
-implementó ni se probó. Si lo autoriza, permitiría calcular GEX con el OI del cierre previo.
+**Autorización recibida (18-oct-2026):** se permite consultar exclusivamente
+`GET https://paper-api.alpaca.markets/v2/options/contracts`, solo metadatos, sin órdenes, cuentas,
+posiciones ni suscripciones de pago. La integración está implementada y queda desactivada por defecto.
+El 18-oct se hizo una consulta mínima de un contrato y una página: **éxito**. Esto confirma acceso a esa
+consulta, no cobertura completa de OI, gamma o spot. El endpoint pertenece a la API de trading,
+pero la consulta no compra contratos. OI fechado y multiplicador pueden completar entradas de GEX si son
+compatibles con los demás datos; no completan el NBBO histórico ni todas las patas.
 
 Guía, paso a paso (claves solo en `.env`, nunca en el código):
 1. `ALPACA_API_KEY_ID` y `ALPACA_API_SECRET_KEY`: cuenta gratuita de Alpaca, en «API Keys».
@@ -88,6 +92,13 @@ Guía, paso a paso (claves solo en `.env`, nunca en el código):
 4. `EODHD_API_KEY`, `TIINGO_API_KEY`, `ALPHAVANTAGE_API_KEY` y `EIA_API_KEY`: registro gratuito de cada proveedor.
 5. Bitso no requiere clave. Para apagarlo: `[flujo.cripto] activo = false` en `config/local.toml`.
 6. Reinicie la terminal y revise **Más → Datos** y el estado de cada panel.
+
+Contratos Paper usa `ALPACA_PAPER_API_KEY_ID` y `ALPACA_PAPER_API_SECRET_KEY`, sin fallback del
+adaptador a las claves de mercado. La comprobación autorizada usó explícitamente el par existente contra
+Paper; tras su éxito se conservó ese mismo par bajo los nombres Paper en `.env` local ignorado, sin
+cambiar valores ni crear claves. El interruptor no cambió. Para habilitar consultas manuales añada
+`contratos_oi = true` dentro de `[flujo.alpaca]` en `config/local.toml` y reinicie. Actualice primero
+metadatos y después cadena: no se completan snapshots anteriores con información conocida después.
 
 ## 5. Disponibilidad real comprobada (16-oct-2026)
 
@@ -108,9 +119,10 @@ y estos resultados previos no prueban por sí solos la nueva ingestión de cinta
 
 ## 6. Pendiente
 
-- Decidir si se usa el endpoint de contratos de Alpaca (OI y tamaño) para GEX y el filtro de Skylit (§4).
-- El NBBO histórico del instante y las patas de las opciones no vienen en ninguna fuente gratuita verificada. El
-  filtro de Skylit solo es completo con un CSV con esos campos.
+- Contratos Paper: acceso mínimo verificado; el interruptor sigue apagado por defecto. Cada cadena necesita
+  metadatos compatibles y gamma/spot reales para que GEX sea calculable (§4).
+- No se verificó una alternativa gratuita permanente completa entre las fuentes revisadas (§8). Según la decisión
+  del usuario, Skylit se mantiene parcial; un archivo autorizado con todos los campos faltantes permitiría completarlo.
 - TPO / Market Profile y POC/VAH/VAL están implementados; su disponibilidad por instrumento depende de barras u operaciones guardadas suficientes.
 - Finnhub: límites gratuitos pendientes de confirmación oficial legible; Twelve Data Basic no cubre la BMV general (ver §7). Ambos continúan desconectados.
 - Databento (USD 125 de crédito histórico) y cualquier proveedor de pago: decisión suya.
@@ -137,3 +149,21 @@ y estos resultados previos no prueban por sí solos la nueva ingestión de cinta
   Por tanto, **Basic no incluye la cobertura general de la BMV**. La ficha ofrece GMEXICOB
   como símbolo de prueba; esa excepción no equivale a acceso al mercado completo.
   No se activó el proveedor ni se comprobó el acceso de ninguna cuenta mediante API.
+
+## 8. Alternativas gratuitas para completar Skylit (18-oct-2026)
+
+Revisión de documentación pública oficial, sin cuentas nuevas, credenciales, APIs autenticadas, compras ni
+consumo de créditos. Se necesita NBBO del instante e identificación de patas por operación, además de los
+otros campos del filtro. Una cadena actual o una vela no reconstruyen esos datos.
+
+| Fuente | Oferta y condición documentada | Límite para completar Skylit |
+|---|---|---|
+| [Alpaca Basic / planes](https://docs.alpaca.markets/us/docs/about-market-data-api), [fuentes históricas](https://docs.alpaca.markets/us/docs/historical-option-data) y [condiciones](https://docs.alpaca.markets/us/docs/market-data-faq) | Basic gratuito, 200 peticiones históricas/min; excluye los últimos 15 min. OPRA en tiempo real es de pago. `indicative` retrasa operaciones y modifica cotizaciones. Las condiciones distinguen algunas operaciones Single Leg y Multi Leg. | Quote indicativa modificada no prueba NBBO exacto. La condición aporta información parcial, sin identificar siempre todas las patas; `I`/`S` no bastan. La guía específica de histórico indica que OPRA está disponible solo para usuarios suscritos; la exclusión de los últimos 15 min de la tabla Basic no demuestra acceso OPRA gratuito. No se cambia de feed ni se comprueba el permiso de la cuenta. |
+| [Tradier Market Data](https://docs.tradier.com/docs/market-data), [Time & Sales](https://docs.tradier.com/reference/brokerage-api-markets-get-timesales) e [histórico](https://docs.tradier.com/docs/historical-data) | Sandbox retrasa acciones/opciones 15 min, sin griegas y **sin ticks**. Histórico descrito como quotes es OHLCV diario; no hay histórico de opciones expiradas. Tiempo real requiere cuenta Brokerage. | Sandbox no aporta la cinta de ticks necesaria. Las páginas no documentan NBBO histórico y todas las patas enlazados por print gratis permanentemente. No se crea cuenta ni se conecta Tradier. |
+| [Cboe Delayed Quotes](https://www.cboe.com/delayed_quotes/) y [DataShop Option Trades](https://datashop.cboe.com/option-trades) | Delayed Quotes excedió el tamaño del lector: no se verificó desde ella una descarga ni derechos de automatización. DataShop vende histórico y suscripción diaria; Option Trades describe NBBO por operación y ofrece muestra. | Cadena diferida o muestra no prueban cinta histórica gratuita permanente con patas. No se compra ni se extrae el portal; no se obtuvo precio para un universo/período concreto. |
+| [Databento: créditos y facturación](https://databento.com/docs/faqs/usage-pricing-and-data-credits) | USD 125 de bienvenida por equipo, una sola vez, vence a los 6 meses; válido para histórico o primer mes de suscripción. Histórico facturado por bytes. | **Crédito finito, no plan gratuito permanente**. No se confirma que cubra el universo/período ni la asociación de patas requerida. No se registra cuenta ni se consume saldo. |
+
+**Conclusión limitada a estas fuentes:** hay datos gratuitos útiles, pero no se verificó una alternativa gratuita
+permanente que complete todos los campos de Skylit. No se verificó una licencia gratuita de automatización o redistribución que amplíe los accesos descritos; las muestras y los créditos no equivalen a esa licencia. Se conserva el filtro parcial con faltantes visibles, como
+indicó el usuario. Contratos Paper puede aportar OI y multiplicador, sin eliminar otros faltantes ni realizar
+transacciones reales. Esta revisión no demuestra que no exista solución en ningún otro proveedor.

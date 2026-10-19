@@ -126,10 +126,16 @@ def test_alpaca_requiere_clave_y_secreto(con):
 
 
 def test_solo_dominios_de_datos_de_alpaca():
-    """Ningún archivo del paquete apunta a la API de operaciones de Alpaca (órdenes, cuentas, posiciones)."""
+    """Solo datos y la excepción autorizada de contratos Paper; jamás órdenes/cuentas/posiciones ni live."""
     codigo = "\n".join(p.read_text(encoding="utf-8") for p in (RAIZ / "terminal").rglob("*.py"))
-    assert not re.search(r"(paper-)?api\.alpaca\.markets|/v2/orders|/v2/positions|/v2/account", codigo)
-    assert set(re.findall(r"https?://[\w.]*alpaca\.markets", codigo)) == {"https://data.alpaca.markets", "https://alpaca.markets"}
+    assert not re.search(r"(?<!paper-)\bapi\.alpaca\.markets|/v2/orders|/v2/positions|/v2/account", codigo)
+    assert set(re.findall(r"https?://[\w.-]*alpaca\.markets", codigo)) == {
+        "https://data.alpaca.markets", "https://alpaca.markets", "https://paper-api.alpaca.markets"}
+    for p in (RAIZ / "terminal").rglob("*.py"):
+        texto = p.read_text(encoding="utf-8")
+        if "paper-api.alpaca.markets" in texto:
+            assert p == RAIZ / "terminal" / "flujo" / "adaptadores.py"
+            assert texto.count("https://paper-api.alpaca.markets/v2/options/contracts") == 1
 
 
 def test_detalle_de_telegram_y_enrutado(monkeypatch):

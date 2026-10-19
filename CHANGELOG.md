@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-18] — contratos Paper y Colab de múltiples estrategias
+
+- Consulta autorizada exclusiva de contratos Alpaca Paper, apagada por defecto, sin órdenes ni pagos; acceso comprobado con una petición mínima.
+- OI fechado de cierre previo y multiplicador con cortes temporales y procedencia por campo; avisos visibles en GEX. Skylit conserva NBBO/patas no evaluables.
+- Notebook del tema 3 con semilla/versiones fijas, holdout congelado, Holm y exportaciones protegidas; ejecución sintética local sin ventaja demostrada.
+- Pruebas aisladas de la configuración local; documentación de alternativas gratuitas y límites comprobados.
+
 ## [0.31.0] — 2026-10-18 (dependencias, integración continua y documentación)
 
 Este número de versión también cubre las entregas fechadas del 16 y 17-oct que aparecen abajo. `pyproject.toml` pasa de 0.1.0 a 0.31.0.

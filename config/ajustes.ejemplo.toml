@@ -35,9 +35,12 @@ umbral_movimiento = 0.01             # …o antes, si algún símbolo se mueve �
 recalculo_minimo_seg = 120           # nunca dos cálculos en vivo con menos de 2 min de diferencia
 
 [flujo.alpaca]
-# Velas OHLCV, operaciones e indicadores de opciones de Alpaca (datos de mercado gratuitos; solo data.alpaca.markets).
+# Velas, operaciones y cadena: datos de mercado gratuitos en data.alpaca.markets.
 # Se consulta solo cuando usted pulsa «Actualizar» en Velas, Order Flow u Option Flow. false = apagado.
 activo = true
+# Excepción autorizada: solo GET de contratos en Paper, sin órdenes/cuentas/posiciones.
+# OI fechado del cierre previo y size; no habilita OPRA ni una suscripción. Opt-in local.
+contratos_oi = false
 
 [flujo.cripto]
 # Libro y operaciones públicos de un exchange de cripto vía ccxt (MIT). Fuera del Reto. false = apagado.

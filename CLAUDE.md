@@ -51,23 +51,22 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
 - **Evidencia:** ningún modelo tiene ventaja demostrada: V1 frente a 1/N, pronóstico al cierre, Kronos y TSM
   (Holm 1.000 en 6 ETF). La estrategia activa es «máximo rendimiento» aceptando riesgo de cola (D-59).
 - **Datos:**
-  - Alpaca: SIP con ≥ 16 min de retraso, IEX y opciones indicativas.
+  - Alpaca: SIP con ≥ 16 min de retraso, IEX y opciones indicativas. Contratos Paper de solo lectura, OI fechado de cierre previo y multiplicador, apagado por defecto.
   - EODHD: cierres BMV, 20 consultas al día.
   - Banxico FIX, FRED, EIA y Alpha Vantage.
   - Bitso por ccxt (cripto).
   - Historia externa hasta el 9-oct-2025.
   - Ningún dato en tiempo real. Matriz en `docs/proveedores-gratuitos.md`.
 - **Pruebas:**
-  - Python: 639 aprobadas el 18-oct; las 3 fallas son del trabajo sin commitear de otra sesión (notebook del tema 3 y dominio paper de Alpaca).
+  - Python: 649 aprobadas el 18-oct tras integrar contratos Paper y notebook tema 3; véase el informe de esta entrega.
   - Worker: 19.
   - Integración continua en `.github/workflows/pruebas.yml` (Ubuntu, sin secretos).
 - **Dependencias (18-oct):** `pip-audit` y `npm audit` sin vulnerabilidades. Numpy queda en 2.5.3 porque el notebook
   del tema 3 lo exige fijo. Auditoría en `docs/auditoria-2026-10-18.md`.
 - **Sesiones paralelas (D-30):** revisa `git status` y `git log` antes de commitear. No incluyas trabajo ajeno sin
-  commitear (TradingView, contratos de Alpaca paper, notebook): arma el índice desde `HEAD` con `git update-index
+  commitear (TradingView): arma el índice desde `HEAD` con `git update-index
   --cacheinfo`.
 - **Decisiones pendientes del usuario:**
-  - autorización textual del endpoint de contratos de Alpaca (API de trading);
   - fuentes de pago (Finviz, EODHD, Databento);
   - las 9 propuestas de revisión del mandato;
   - la referencia del plan frente a 1/N.
@@ -81,7 +80,7 @@ uv run terminal demo         # datos sintéticos, base separada en data/demo/
 uv run terminal actualizar   # descarga incremental respetando límites por proveedor
 uv run terminal iniciar      # datos reales, http://127.0.0.1:8765
 uv run terminal reporte cierre   # preapertura | cierre | semanal (--sin-actualizar para no consultar proveedores)
-uv run pytest -q             # ≈ 640 pruebas, ≈ 10 min (más npm --prefix cloud-alerts test: 19)
+uv run pytest -q             # ≈ 650 pruebas, duración dependiente del equipo (más npm --prefix cloud-alerts test: 19)
 uv run terminal comparar-modelos   # walk-forward de modelos (TERMINAL_MODO=demo solo como prueba funcional)
 start.bat                    # arranque en un comando (Windows)
 uv run python scripts/verificar_universo.py --descargar   # re-verifica universo BMV/Nasdaq
@@ -122,3 +121,18 @@ confirmar y cambien la estrategia).
 ## Recursos de formación añadidos el 18-oct-2026
 
 Aprender y recursos ofrece 92 fichas por área/coste, PDF maestro, CSV, doce posts, enlaces TheBenchmark/Flickflow/Quantower/TradingView y los dos prompts. La práctica local de tesis, DCF/reverse DCF y volatilidad usa ejemplos sintéticos, sin red/persistencia (13 comprobaciones JS aprobadas). 8 pruebas de recursos/microestructura aprobadas; no suite completa. Ver `docs/recursos-certificaciones-2026-10-18.md`. La auditoría `docs/auditoria-post-terminal-Dej_B7_MXrX-2026-10-18.md` distingue demos aisladas de yfinance/FinBERT de conectores reales; SEC actual es Formulario 4, no balances.
+
+
+## Entrega 18-oct-2026 — contratos Paper y Colab tema 3
+
+Autorización posterior del usuario: contratos Alpaca solo lectura, sin suscripciones
+pagadas; tema 3 elegido y Skylit parcial si no hay fuente gratuita completa.
+Adaptador limitado a GET de contratos Paper, apagado por defecto y con par de claves
+específico; una consulta mínima real exitosa. OI fechado de cierre previo y multiplicador
+se unen solo a snapshots compatibles, sin fuga temporal ni atribuir campos preexistentes.
+Notebook autocontenido con holdout congelado y Holm; doce pruebas, ejecución sintética
+local y ninguna ventaja demostrada. No se ejecutó Colab remoto ni un CSV real.
+Se aislaron las pruebas de config/local.toml; sus ventanas corresponden a las historias
+sembradas, sin cambiar las ventanas predeterminadas de producción.
+NBBO histórico y patas siguen parciales: no se verificó una fuente gratuita permanente
+completa. Detalles, uso y validación final: docs/contratos-paper-colab-2026-10-18.md.

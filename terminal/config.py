@@ -104,7 +104,7 @@ def cargar_ajustes() -> Ajustes:
     with (CONFIG_DIR / "ajustes.ejemplo.toml").open("rb") as fh:
         datos = tomllib.load(fh)
     local = CONFIG_DIR / "local.toml"
-    if local.exists():
+    if local.exists() and not os.environ.get("TERMINAL_SIN_CONFIG_LOCAL"):  # pruebas: no depender de la config del usuario
         with local.open("rb") as fh:
             datos = _fusionar(datos, tomllib.load(fh))
     return Ajustes(datos)

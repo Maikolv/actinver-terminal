@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import UTC, datetime
+from datetime import UTC, datetime, date
+from zoneinfo import ZoneInfo
 
 from .contratos import Barra, ContratoOpcion, Libro, Operacion, OperacionOpcion, Procedencia
 
@@ -47,6 +48,10 @@ def inicializar(con: sqlite3.Connection) -> None:
       strike REAL NOT NULL, tipo TEXT NOT NULL, {PROC},
       UNIQUE (contrato, t, x, p, s, c, fuente, feed));
     CREATE INDEX IF NOT EXISTS ix_flujo_opciones_operaciones ON flujo_opciones_operaciones (subyacente, instante);
+    CREATE TABLE IF NOT EXISTS flujo_opciones_contratos (
+      id INTEGER PRIMARY KEY, contrato TEXT NOT NULL, subyacente TEXT NOT NULL, interes_abierto REAL,
+      fecha_oi TEXT, multiplicador REAL, {PROC}, UNIQUE(contrato, fuente, capturado_en));
+    CREATE INDEX IF NOT EXISTS ix_flujo_contratos ON flujo_opciones_contratos(subyacente, contrato);
     CREATE TABLE IF NOT EXISTS flujo_consultas (
       clave TEXT PRIMARY KEY, intento_en TEXT NOT NULL, estado TEXT NOT NULL, registros INTEGER NOT NULL DEFAULT 0,
       mensaje TEXT NOT NULL DEFAULT '');
@@ -204,3 +209,42 @@ def operaciones_opciones(con, subyacente: str, demo: bool = False, hasta: str | 
                         f"AND disponible_desde<=? AND ({_filtro_calidad(demo)}) "
                         "ORDER BY instante DESC,id DESC LIMIT ?", (subyacente,corte,corte,limite)).fetchall()
     return [{**dict(f), "c": json.loads(f["c"])} for f in reversed(filas)]
+
+
+def guardar_contratos_opciones(con, contratos: list[dict], p: Procedencia) -> int:
+    con.executemany(f"INSERT OR IGNORE INTO flujo_opciones_contratos "
+                    f"(contrato,subyacente,interes_abierto,fecha_oi,multiplicador,{COLS_P}) VALUES ({','.join('?' * 14)})",
+                    [(c["contrato"], c["subyacente"], c.get("interes_abierto"), c.get("fecha_oi"),
+                      c.get("multiplicador"), *_p(p)) for c in contratos])
+    return len(contratos)
+
+
+def enriquecer_contratos(con, filas: list[dict], hasta: str | None = None, demo: bool = False) -> list[dict]:
+    """Une OI de cierre previo conocido al corte; conserva precios, griegas y procedencia del snapshot."""
+    corte = hasta or datetime.now(UTC).isoformat()
+    salida = []
+    for original in filas:
+        c = dict(original)
+        fecha = datetime.fromisoformat(c["instante"].replace("Z", "+00:00")).astimezone(ZoneInfo("America/New_York")).date()
+        metas = con.execute(f"SELECT * FROM flujo_opciones_contratos WHERE contrato=? AND subyacente=? "
+                            f"AND disponible_desde<=? AND disponible_desde<=? AND ({_filtro_calidad(demo)}) ORDER BY capturado_en DESC,id DESC",
+                            (c["contrato"], c["subyacente"], corte, c["instante"])).fetchall()
+        for fila in metas:
+            m = dict(fila)
+            if not m["fecha_oi"] or date.fromisoformat(m["fecha_oi"]) >= fecha:
+                continue
+            usados = []
+            for k in ("interes_abierto", "multiplicador"):
+                if c.get(k) is None and m[k] is not None:
+                    c[k] = m[k]
+                    usados.append(k)
+            if usados:
+                if "interes_abierto" in usados:
+                    c["fecha_oi"] = m["fecha_oi"]
+                    c["oi_antiguedad_dias"] = (fecha - date.fromisoformat(m["fecha_oi"])).days
+                    c["oi_desactualizado"] = c["oi_antiguedad_dias"] > 4
+                c["procedencia_contratos"] = {k: m[k] for k in ("fuente", "feed", "licencia", "capturado_en", "disponible_desde", "fecha_oi", "nota")}
+                c["procedencia_contratos"]["campos"] = usados
+            break
+        salida.append(c)
+    return salida
