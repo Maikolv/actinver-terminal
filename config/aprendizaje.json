@@ -2126,6 +2126,11 @@
       "titulo": "Prompt para optimizar recursos con Claude Code",
       "url": "/static/recursos/prompt-optimizacion-recursos-claude.md",
       "detalle": "Medir y mejorar CPU, RAM, consultas, contexto y costes sin perder trazabilidad ni seguridad."
+    },
+    {
+      "titulo": "Prompt de auditoría técnica, estética y de utilidad",
+      "url": "/static/recursos/prompt-auditoria-tecnica-estetica-claude.md",
+      "detalle": "Revisión de integridad, rendimiento, espacios, jerarquía, navegación y eliminación verificable de elementos sin función."
     }
   ]
 }

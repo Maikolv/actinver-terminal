@@ -21,14 +21,15 @@
     <div class="acciones-cabecera"><span class="chip chip--sin_datos">Sólo lectura</span><a class="boton boton--secundario" href="/">Volver a la terminal</a></div>
   </div>
 </header>
-<nav class="oficina-navegacion" aria-label="Navegación de la oficina"><div><a href="#principal" aria-current="page">Oficina de inversión</a><a href="#mesas">Mesas de revisión</a><a href="#documentos">Documentos</a></div></nav>
 <main id="principal" tabindex="-1">
-  <div class="oficina-titulo"><div><p class="oficina-contexto">Aprender y recursos / Investigación</p><h1>Oficina de inversión</h1><p class="ayuda">Una revisión del instrumento desde datos, análisis y riesgo.</p></div><span class="oficina-identificador">6 mesas · consulta local</span></div>
+  <div class="oficina-titulo"><div><p class="oficina-contexto">Aprender y recursos / Investigación</p><h1>Oficina de inversión</h1><p class="ayuda">Una revisión del instrumento desde datos, análisis y riesgo.</p></div></div>
   <form id="consulta" class="formulario oficina-consulta">
-    <div class="oficina-campos"><label for="simbolo">Instrumento<input id="simbolo" value="SIC:NVDA" maxlength="80" required spellcheck="false" autocomplete="off" aria-describedby="ayuda-simbolo" placeholder="Identificador del catálogo"></label>
-    <label for="intervalo">Intervalo de las velas<select id="intervalo"><option value="5Min">5 minutos</option><option value="1Min">1 minuto</option><option value="15Min">15 minutos</option><option value="1Day">1 día</option></select></label>
-    <button id="consultar" class="boton boton--primario">Consultar mesas</button></div>
-    <p id="ayuda-simbolo" class="ayuda">Usa el identificador de tus datos guardados; en futuros, incluye el vencimiento. Velas: últimos 7 días. Operaciones: últimos 60 minutos.</p>
+    <div class="oficina-campos"><div class="oficina-campo"><label for="simbolo">Instrumento</label><select id="simbolo" required disabled aria-describedby="ayuda-simbolo catalogo-estado"><option value="">Cargando catálogo…</option></select></div>
+    <div class="oficina-campo"><label for="intervalo">Intervalo de las velas</label><select id="intervalo"><option value="5Min">5 minutos</option><option value="1Min">1 minuto</option><option value="15Min">15 minutos</option><option value="1Day">1 día</option></select></div>
+    <button id="consultar" class="boton boton--primario" disabled>Consultar mesas</button></div>
+    <p id="ayuda-simbolo" class="ayuda">Catálogo de la terminal y símbolos importados. Tener un instrumento en el catálogo no garantiza velas u operaciones en el rango consultado.</p>
+    <p id="catalogo-estado" class="ayuda" role="status">Leyendo catálogo local…</p>
+    <button id="recargar-catalogo" class="boton boton--texto" type="button" hidden>Reintentar carga del catálogo</button>
   </form>
   <p id="estado" class="oficina-estado ayuda" role="status">Sin informe. Selecciona un instrumento para consultar los datos locales.</p>
   <div class="oficina-distribucion">
@@ -40,13 +41,11 @@
       <div class="oficina-exportar"><span class="ayuda">Conserva la evidencia o prepara su revisión.</span><div><button id="exportar" class="boton boton--secundario" type="button" disabled>Descargar informe</button><button id="claude" class="boton boton--secundario" type="button" disabled>Preparar análisis para Claude</button></div></div>
     </section>
     <aside class="oficina-apoyo" aria-label="Apoyo a la investigación">
-      <section class="tarjeta"><h2>Cómo leer el informe</h2><ol class="oficina-pasos"><li><strong>Confirma la fuente</strong><span>Revisa fecha, feed y calidad antes de interpretar los indicadores.</span></li><li><strong>Contrasta las mesas</strong><span>Una comparación de medias y un delta describen ventanas distintas.</span></li><li><strong>Documenta lo pendiente</strong><span>Descarga el informe con su procedencia para continuar la investigación.</span></li></ol></section>
-      <section id="documentos" class="tarjeta"><h2>Documentos de trabajo</h2><ul class="oficina-enlaces"><li><a href="integracion-oficina-pixel.md">Proyecto y repositorios<span>Versiones, licencias e integración</span></a></li><li><a href="prompt-optimizacion-recursos-claude.md">Optimización de recursos<span>Prompt para Claude Code</span></a></li><li><a href="prompt-quantower-claude.md">Quantower<span>Configuración y compatibilidad</span></a></li><li><a href="prompt-tradingview-claude.md">TradingView<span>Configuración y compatibilidad</span></a></li></ul></section>
+      <section id="documentos" class="tarjeta"><h2>Documentos de trabajo</h2><ul class="oficina-enlaces"><li><a href="prompt-auditoria-tecnica-estetica-claude.md">Auditoría de la terminal<span>Técnica, diseño y depuración</span></a></li><li><a href="integracion-oficina-pixel.md">Proyecto y repositorios<span>Versiones, licencias e integración</span></a></li><li><a href="prompt-optimizacion-recursos-claude.md">Optimización de recursos<span>Prompt para Claude Code</span></a></li><li><a href="prompt-quantower-claude.md">Quantower<span>Configuración y compatibilidad</span></a></li><li><a href="prompt-tradingview-claude.md">TradingView<span>Configuración y compatibilidad</span></a></li></ul></section>
     </aside>
   </div>
   <section id="analisis-claude" class="tarjeta oficina-claude" hidden><h2>Preparar análisis para Claude</h2><p class="ayuda">Revisa el contenido antes de copiarlo. La terminal no lo envía a ningún servicio.</p><textarea id="prompt-comite" rows="14" readonly aria-label="Prompt para Claude"></textarea></section>
-  <details class="oficina-alcance"><summary>Alcance y método</summary><p>Las seis mesas aplican reglas descriptivas a datos guardados. No son agentes de IA autónomos ni generan órdenes, posiciones o rentabilidad. Gamma, opciones y TPO se consultan en sus apartados de la terminal.</p><p class="ayuda">La consulta no actualiza proveedores. Dos lecturas locales por consulta, sin refresco periódico ni servicios externos.</p></details>
-  <footer class="oficina-pie"><span>Actinver Terminal · Investigación</span><span>Datos locales y procedencia verificable</span></footer>
+  <details class="oficina-alcance"><summary>Alcance y método</summary><p>Las seis mesas aplican reglas descriptivas a datos guardados. No son agentes de IA autónomos ni generan órdenes, posiciones o rentabilidad. Gamma, opciones y TPO se consultan en sus apartados de la terminal.</p><p class="ayuda">Consulta local: velas de los últimos 7 días y operaciones de los últimos 60 minutos. No actualiza proveedores ni crea cotizaciones.</p></details>
 </main>
 <script type="module" src="oficina-inversion.mjs"></script>
 </body></html>

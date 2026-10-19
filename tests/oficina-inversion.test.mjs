@@ -1,8 +1,19 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {resumir} from '../web/static/recursos/oficina-inversion.mjs';
+import {resumir, instrumentosDelCatalogo} from '../web/static/recursos/oficina-inversion.mjs';
 const ahora=Date.parse('2026-10-19T15:05:00Z');
 const barra={inicio:'2026-10-19T15:00:00Z',fuente:'autorizada',feed:'CME',calidad:'proveedor',ema20:101,ema50:100};
+test('catálogo completo, sin duplicados ni instrumentos inactivos, preserva vencimiento',()=>{
+ const u={instrumentos:[{id:'BMV:NAFTRAC',clave_operable:'NAFTRAC',nombre:'ETF',estado:'activo'},{id:'SIC:NVDA',nombre:'NVIDIA',estado:'activo'},{id:'BAJA',estado:'inactivo'}]};
+ const f={sic:[{id:'SIC:NVDA',clave:'NVDA'}],con_datos:['SIC:NVDA','CME:MNQZ26','CME:MNQZ26']};
+ const r=instrumentosDelCatalogo(u,f);
+ assert.equal(r.length,3);assert.equal(r.find(i=>i.id==='SIC:NVDA').conDatos,true);
+ assert.equal(r.find(i=>i.id==='CME:MNQZ26').id,'CME:MNQZ26');assert.ok(r.find(i=>i.id==='BMV:NAFTRAC'));
+});
+test('catálogo parcial o vacío no inventa instrumentos',()=>{
+ assert.deepEqual(instrumentosDelCatalogo(),[]);
+ assert.deepEqual(instrumentosDelCatalogo({}, {con_datos:['CME:MESZ26']}).map(i=>i.id),['CME:MESZ26']);
+});
 test('sin datos no inventa mercado ni delta',()=>{
  const r=resumir({}, {},ahora);assert.match(r.mensajes[0].texto,/No hay velas/);assert.match(r.mensajes[2].texto,/no disponible/);assert.equal(r.ordenes_habilitadas,false);
 });

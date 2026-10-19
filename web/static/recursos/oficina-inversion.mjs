@@ -26,9 +26,58 @@ export function resumir(velas = {}, flujo = {}, ahora = Date.now()) {
   return {simbolo:velas.simbolo || flujo.simbolo || '', generado_en:new Date(ahora).toISOString(), motor:'reglas descriptivas; sin LLM', ordenes_habilitadas:false, edad_inicio_barra_min:edad, evidencia:{intervalo:velas.intervalo,procedencia_velas:velas.procedencia || [],procedencia_operaciones:p,nota_velas:velas.nota,nota_operaciones:flujo.nota}, mensajes};
 }
 
+export function instrumentosDelCatalogo(universo = {}, flujo = {}) {
+  const filas = new Map();
+  const agregar = (id, nombre, grupo) => {
+    if (typeof id !== 'string' || !id.trim() || filas.has(id)) return;
+    filas.set(id, {id, nombre: nombre || id, grupo, conDatos:false});
+  };
+  for (const i of universo.instrumentos || []) {
+    if (i.estado !== 'inactivo') agregar(i.id, `${i.clave_operable || i.id} — ${i.nombre || i.id}`, 'Catálogo de la terminal');
+  }
+  for (const i of [...(flujo.sic || []), ...(flujo.cripto || [])]) agregar(i.id, i.clave || i.id, 'Otros instrumentos de flujo');
+  for (const id of flujo.con_datos || []) {
+    agregar(id, id, 'Símbolos importados');
+    if (filas.has(id)) filas.get(id).conDatos = true;
+  }
+  return [...filas.values()].sort((a,b) => a.grupo.localeCompare(b.grupo,'es') || a.nombre.localeCompare(b.nombre,'es'));
+}
+
 if (typeof document !== 'undefined') {
   const $ = id => document.getElementById(id);
   let informe;
+  const leer = async path => {
+    const res = await fetch(path,{signal:AbortSignal.timeout(15000),cache:'no-store'});
+    if(!res.ok) throw new Error(`Consulta fallida (${res.status})`);
+    return res.json();
+  };
+  function invalidarInforme() {
+    informe=null;$('exportar').disabled=true;$('claude').disabled=true;
+    $('analisis-claude').hidden=true;$('prompt-comite').value='';
+    $('estado-informe').textContent='Sin consulta';
+    $('estado').textContent='Selecciona el instrumento y pulsa Consultar mesas. Velas: 7 días; operaciones: 60 minutos.';
+    const p=document.createElement('p');p.className='vacio';p.textContent='Consulta pendiente para esta selección.';
+    $('oficina').replaceChildren(p);
+  }
+  async function cargarCatalogo() {
+    $('simbolo').disabled=true;$('consultar').disabled=true;$('recargar-catalogo').hidden=true;
+    $('catalogo-estado').textContent='Leyendo catálogo local…';
+    const [universo, flujo] = await Promise.allSettled([leer('/api/universo'),leer('/api/flujo/estado')]);
+    const lista=instrumentosDelCatalogo(universo.status==='fulfilled' ? universo.value : {}, flujo.status==='fulfilled' ? flujo.value.catalogo : {});
+    $('simbolo').replaceChildren(new Option(lista.length ? 'Selecciona un instrumento' : 'Catálogo no disponible',''));
+    for(const nombre of new Set(lista.map(i=>i.grupo))) {
+      const grupo=document.createElement('optgroup');grupo.label=nombre;
+      for(const i of lista.filter(i=>i.grupo===nombre))grupo.append(new Option(`${i.nombre}${i.conDatos ? ' · con datos guardados' : ''}`,i.id));
+      $('simbolo').append(grupo);
+    }
+    const parcial=universo.status!=='fulfilled' || flujo.status!=='fulfilled';
+    $('catalogo-estado').textContent=lista.length ? `${lista.length} instrumentos${parcial ? ' · catálogo parcial; una fuente local no respondió' : ''}.` : 'No se pudo obtener un catálogo con instrumentos. Reintenta la carga.';
+    $('simbolo').disabled=!lista.length;
+    $('recargar-catalogo').hidden=!parcial && !!lista.length;
+  }
+  $('simbolo').addEventListener('change',()=>{invalidarInforme();$('consultar').disabled=!$('simbolo').value;});
+  $('intervalo').addEventListener('change',invalidarInforme);
+  $('recargar-catalogo').addEventListener('click',()=>{invalidarInforme();cargarCatalogo();});
   function mostrar(r) {
     $('oficina').replaceChildren(...r.mensajes.map((m,i) => {
       const card = document.createElement('article');
@@ -43,15 +92,16 @@ if (typeof document !== 'undefined') {
   $('consulta').addEventListener('submit', async e => {
     e.preventDefault();$('consultar').disabled=true;$('exportar').disabled=true;$('claude').disabled=true;$('analisis-claude').hidden=true;informe=null;
     const simbolo=$('simbolo').value.trim();
+    if(!simbolo){$('consultar').disabled=true;return;}
+    $('simbolo').disabled=true;$('intervalo').disabled=true;
     $('estado').textContent='Leyendo datos guardados…';$('estado-informe').textContent='Consultando';$('oficina').setAttribute('aria-busy','true');$('oficina').replaceChildren();
     try {
       const q=encodeURIComponent(simbolo), intervalo=$('intervalo').value;
-      const leer=async path => {const res=await fetch(path,{signal:AbortSignal.timeout(15000),cache:'no-store'});if(!res.ok)throw new Error(`Consulta fallida (${res.status})`);return res.json();};
       const [velas,flujo]=await Promise.all([leer(`/api/flujo/velas?simbolo=${q}&intervalo=${intervalo}&dias=7`),leer(`/api/flujo/libro-operaciones?simbolo=${q}&minutos=60&niveles=5`)]);
       informe=resumir(velas,flujo);mostrar(informe);
       $('estado').textContent=`${simbolo} · informe ${new Date(informe.generado_en).toLocaleString('es-MX')} · lectura local; no actualiza proveedores.`;
     } catch(err) {$('estado-informe').textContent='Consulta no disponible';$('estado').textContent=`${err.message}. Abre esta vista desde la terminal local y verifica los datos importados.`;}
-    finally {$('consultar').disabled=false;$('oficina').setAttribute('aria-busy','false');}
+    finally {$('consultar').disabled=false;$('simbolo').disabled=false;$('intervalo').disabled=false;$('oficina').setAttribute('aria-busy','false');}
   });
   $('exportar').addEventListener('click',()=>{
     if(!informe)return;
@@ -63,4 +113,5 @@ if (typeof document !== 'undefined') {
     $('prompt-comite').value='Actúa como comité de investigación de Actinver-terminal. Examina esta evidencia con seis roles: Datos, Cuantitativo, Order Flow, Crítico, Riesgo y Coordinación. Son perspectivas de una revisión, no agentes ejecutándose de forma autónoma. Separa hechos, hipótesis y datos ausentes. Cita fuente, feed, fecha y calidad; no confundas hora del informe con vigencia del mercado. No inventes cotizaciones, alfa, gamma, órdenes ni P&L. Propón un experimento preregistrado con costes, holdout temporal y permutaciones por bloques; rechaza usos intradía si el feed es insuficiente. Resume desacuerdos y próximos pasos sin ejecutar operaciones. Si faltan observaciones crudas, solicítalas antes de cálculos nuevos.\n\nEvidencia local:\n'+JSON.stringify(informe,null,2);
     $('analisis-claude').hidden=false;$('prompt-comite').focus();
   });
+  cargarCatalogo();
 }

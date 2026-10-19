@@ -144,3 +144,6 @@ Oficina de inversión incorporada en `web/static/recursos/oficina-inversion.html
 
 
 La oficina comparte `app.css` desde el 19-oct: diseño de informe numerado, sin personajes ni ilustraciones, con sidebar adaptable. Funciones de consulta e informe conservadas; revisión visual en escritorio y 390 px, sin desbordamiento.
+
+
+Oficina: acceso fijo en navegación principal; selector unificado de universo e instrumentos importados; invalida informes al cambiar selección. Depuración de controles/estilos duplicados. Seis pruebas Node y recorrido de ida/vuelta verificados. Prompt de auditoría técnica/estética en `web/static/recursos/prompt-auditoria-tecnica-estetica-claude.md`; auditoría completa aún no ejecutada.

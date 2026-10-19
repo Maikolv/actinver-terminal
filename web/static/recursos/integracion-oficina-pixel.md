@@ -48,3 +48,16 @@ Cuatro pruebas Node y ocho Python aprobadas. Navegador: se verificaron las seis 
 ### Diseño integrado en la terminal — 19-oct-2026
 
 La oficina reutiliza directamente `web/static/app.css`: misma paleta azul/neutra, Segoe UI, botones, bordes y modo claro/oscuro según el sistema. Se retiraron personajes pixelados, colores decorativos y textura de suelo. Las mesas son filas numeradas con jerarquía de informe; los documentos y la guía ocupan una columna lateral que se apila en móvil. Sin imágenes generadas, fuentes externas ni dependencias nuevas. Cuatro pruebas funcionales existentes aprobadas; consulta y preparación de prompt verificadas en navegador. Escritorio y móvil de 390 px revisados sin desbordamiento horizontal. No se cambiaron las fórmulas ni las fuentes de datos.
+
+
+### Navegación, catálogo y depuración — 19-oct-2026
+
+Acceso **Oficina** fijo junto a la navegación principal y **Volver a la terminal** en la cabecera de la oficina. Se comprobó que la sección previa se restaura mediante el mecanismo existente de la terminal; no se añadió un historial paralelo.
+
+El instrumento se selecciona de `/api/universo` y del catálogo de `/api/flujo/estado`: unión por identificador exacto, sin duplicados ni instrumentos inactivos, incluidos símbolos importados y sus vencimientos. En la prueba local se mostraron 240 instrumentos. El número depende del catálogo del usuario. Un símbolo catalogado no garantiza datos recientes. Se maneja catálogo parcial/vacío con reintento cuando corresponde. Cambiar instrumento o intervalo invalida el informe anterior y bloquea su exportación; los controles de selección se bloquean durante la consulta para evitar respuestas de otra selección.
+
+Limpieza aplicada: retirados el acceso duplicado a la oficina en el encabezado de Aprender y recursos, el menú interno de anclas, la guía lateral repetitiva, el rótulo duplicado de seis mesas, el pie decorativo y sus reglas CSS sin uso. El campo libre se sustituyó por el selector. Se conservaron procedencia, alcance, errores, exportación y preparación del análisis porque tienen una función comprobable. No se eliminaron datos, repositorios ni cambios de otras sesiones. Esto es una depuración acotada a navegación y oficina, no una afirmación de que toda la terminal haya pasado una auditoría exhaustiva.
+
+El prompt `prompt-auditoria-tecnica-estetica-claude.md` pide auditar e implementar mejoras técnicas y visuales en toda la terminal: mapa de funciones, prioridad de espacios y tareas, controles con propósito, rendimiento, integridad de datos, accesibilidad y eliminación de elementos con evidencia. La auditoría completa está preparada para Claude; no se presenta como ejecutada en esta entrega.
+
+Verificación: seis pruebas Node aprobadas; selector accesible, consulta, invalidación, navegación de ida/vuelta y restauración de sección comprobadas en navegador. Sin errores de consola observados durante la navegación. Escritorio y 390 px sin desbordamiento horizontal.
