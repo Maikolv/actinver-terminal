@@ -154,3 +154,6 @@ Oficina: acceso fijo en navegación principal; selector unificado de universo e 
 ### Reel de backtesting — 19-oct-2026
 
 Reel DepEDXbRMRF incorporado: laboratorio offline opcional `laboratorios/reel-bots/` (backtesting.py 0.6.5), siete pruebas y demo sintética ejecutadas. Dos repositorios descargados (backtesting.py/LEAN), tres existentes verificados. ZIP y guía desde Aprender y recursos/oficina. Prompts Quantower, TradingView y recursos ampliados; sin integración nativa instalada ni ejecución real.
+
+
+Navegación común: `web/static/navegacion.{json,mjs,css}` y selector de las 24 secciones en las cuatro vistas. Enlaces directos `/?vista=tab-...`, panel inicial inmediato y preservación de elecciones durante la carga. Nueve pruebas Node y recorridos en navegador verificados; versión móvil compacta. Ver `docs/oficina-inversion-pixel.md`.

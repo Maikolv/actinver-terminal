@@ -1,0 +1,122 @@
+{
+  "areas": [
+    {
+      "titulo": "Terminal principal",
+      "url": "/"
+    },
+    {
+      "titulo": "Oficina de inversión",
+      "url": "/static/recursos/oficina-inversion.html"
+    },
+    {
+      "titulo": "Laboratorio de alfa",
+      "url": "/?vista=tab-laboratorio"
+    },
+    {
+      "titulo": "Laboratorio de bots",
+      "url": "/static/recursos/laboratorio-bots-reel.html"
+    },
+    {
+      "titulo": "Cuaderno financiero",
+      "url": "/static/recursos/practica-proyectos-financieros.html"
+    }
+  ],
+  "secciones": [
+    {
+      "titulo": "Plan de acción",
+      "url": "/?vista=tab-resumen"
+    },
+    {
+      "titulo": "Mi portafolio Actinver",
+      "url": "/?vista=tab-cartera"
+    },
+    {
+      "titulo": "Propuestas",
+      "url": "/?vista=tab-propuestas"
+    },
+    {
+      "titulo": "Alertas",
+      "url": "/?vista=tab-alertas"
+    },
+    {
+      "titulo": "Reto y perfil",
+      "url": "/?vista=tab-perfil"
+    },
+    {
+      "titulo": "Mercado",
+      "url": "/?vista=tab-mercado"
+    },
+    {
+      "titulo": "Velas",
+      "url": "/?vista=tab-velas"
+    },
+    {
+      "titulo": "Order Flow",
+      "url": "/?vista=tab-orderflow"
+    },
+    {
+      "titulo": "Option Flow",
+      "url": "/?vista=tab-optionflow"
+    },
+    {
+      "titulo": "Riesgo",
+      "url": "/?vista=tab-riesgo"
+    },
+    {
+      "titulo": "Asistente",
+      "url": "/?vista=tab-asistente"
+    },
+    {
+      "titulo": "Laboratorio",
+      "url": "/?vista=tab-laboratorio"
+    },
+    {
+      "titulo": "Aprender y recursos",
+      "url": "/?vista=tab-aprendizaje"
+    },
+    {
+      "titulo": "Boletas e historial",
+      "url": "/?vista=tab-tiempo"
+    },
+    {
+      "titulo": "Ranking",
+      "url": "/?vista=tab-ranking"
+    },
+    {
+      "titulo": "Robustez",
+      "url": "/?vista=tab-robustez"
+    },
+    {
+      "titulo": "Movimientos públicos",
+      "url": "/?vista=tab-movimientos"
+    },
+    {
+      "titulo": "Investigación",
+      "url": "/?vista=tab-investigacion"
+    },
+    {
+      "titulo": "Modelos",
+      "url": "/?vista=tab-modelos"
+    },
+    {
+      "titulo": "Seguimiento",
+      "url": "/?vista=tab-seguimiento"
+    },
+    {
+      "titulo": "Backtesting",
+      "url": "/?vista=tab-backtesting"
+    },
+    {
+      "titulo": "Plan intradía",
+      "url": "/?vista=tab-intradia"
+    },
+    {
+      "titulo": "Datos y fuentes",
+      "url": "/?vista=tab-universo"
+    },
+    {
+      "titulo": "Ayuda",
+      "url": "/?vista=tab-ayuda"
+    }
+  ]
+}

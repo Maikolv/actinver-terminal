@@ -61,3 +61,14 @@ Limpieza aplicada: retirados el acceso duplicado a la oficina en el encabezado d
 El prompt `prompt-auditoria-tecnica-estetica-claude.md` pide auditar e implementar mejoras técnicas y visuales en toda la terminal: mapa de funciones, prioridad de espacios y tareas, controles con propósito, rendimiento, integridad de datos, accesibilidad y eliminación de elementos con evidencia. La auditoría completa está preparada para Claude; no se presenta como ejecutada en esta entrega.
 
 Verificación: seis pruebas Node aprobadas; selector accesible, consulta, invalidación, navegación de ida/vuelta y restauración de sección comprobadas en navegador. Sin errores de consola observados durante la navegación. Escritorio y 390 px sin desbordamiento horizontal.
+
+
+### Navegación común — 19-oct-2026
+
+Barra compartida en la terminal, oficina, laboratorio de bots y cuaderno financiero. Cinco accesos: Terminal principal, Oficina de inversión, Laboratorio de alfa, Laboratorio de bots y Cuaderno financiero. Selector con las 24 pestañas reales y todas las áreas independientes, sin destinos duplicados. Configuración en `web/static/navegacion.json`; prueba de cobertura contra las pestañas del HTML para detectar futuros enlaces rotos.
+
+Las secciones principales admiten `/?vista=tab-...`; se muestra el panel antes de que terminen las consultas iniciales. Elegir otra sección dentro de la terminal conserva la página y actualiza el destino; desde un laboratorio abre directamente el panel indicado. Los cambios tempranos del usuario no se sobrescriben al terminar la carga inicial. Se conservan la agrupación por tareas y los accesos de teclado existentes.
+
+Se retiraron los enlaces de regreso/Oficina anteriores sustituidos por la barra y su regla CSS huérfana. La navegación usa enlaces reales que también admiten abrir en otra pestaña con el navegador. El cuaderno mantiene su comportamiento previo: no persiste los ejercicios; conserva las notas antes de abandonar la página. Si falla el catálogo del selector, los cinco accesos directos siguen disponibles.
+
+Verificación: nueve pruebas Node aprobadas; navegación entre terminal, oficina, bots y cuaderno, salto directo a Riesgo y cambio interno a Velas comprobados en navegador. Cinco accesos y 24 secciones cubiertos por pruebas de integridad. En móvil de 390 px, barra de 107 px y sin desbordamiento horizontal. Vista previa en modo demostración, sin motor ni credenciales. No se ejecutó una auditoría de cálculo de cada sección por este cambio de navegación.

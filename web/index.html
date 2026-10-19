@@ -11,7 +11,7 @@
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/app.js" defer></script>
-</head>
+<link rel="stylesheet" href="/static/navegacion.css"><script type="module" src="/static/navegacion.mjs"></script></head>
 <body>
 <a class="saltar" href="#principal">Saltar al contenido</a>
 <header class="cabecera">
@@ -39,7 +39,7 @@
   <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
     <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
   </div>
-</header>
+</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/laboratorio-bots-reel.html" aria-label="Laboratorio de bots"><span class="nav-global__texto-largo">Laboratorio de bots</span><span class="nav-global__texto-corto" aria-hidden="true">Bots</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
 
 <nav class="pestanas" aria-label="Secciones" data-grupo="cuenta">
   <div class="grupos-nav" role="group" aria-label="Tareas">
@@ -77,7 +77,6 @@
     <button role="tab" data-grupo="sistema" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
   <button type="button" class="desplazar-pestanas" data-dir="1" aria-label="Ver más pestañas" hidden>›</button>
-  <a id="abrir-oficina" class="boton boton--secundario acceso-oficina" href="/static/recursos/oficina-inversion.html" aria-label="Ir a la oficina de inversión">Oficina</a>
 </nav>
 
 <main id="principal" tabindex="-1">

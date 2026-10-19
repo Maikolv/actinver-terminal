@@ -142,10 +142,10 @@ document.querySelectorAll(".desplazar-pestanas").forEach((b) => b.addEventListen
   listaPestanas.scrollBy({ left: Number(b.dataset.dir) * listaPestanas.clientWidth * 0.7 })));
 listaPestanas.addEventListener("scroll", flechasPestanas, { passive: true });
 window.addEventListener("resize", flechasPestanas);
-function activarPestana(tab, enfocar) {
+function activarPestana(tab, enfocar, cargar = true) {
   elegirGrupo(tab.dataset.grupo); ultimaDeGrupo[tab.dataset.grupo] = tab.id;
   const previo = document.querySelector('[role="tabpanel"]:not([hidden])');
-  if (previo && typeof compartirSimbolo === "function") compartirSimbolo(previo.id, tab.id);
+  if (cargar && previo && typeof compartirSimbolo === "function") compartirSimbolo(previo.id, tab.id);
   document.querySelectorAll('[role="tab"]').forEach((t) => {
     const sel = t === tab;
     t.setAttribute("aria-selected", sel); t.tabIndex = sel ? 0 : -1;
@@ -154,7 +154,10 @@ function activarPestana(tab, enfocar) {
   tab.scrollIntoView({ block: "nearest", inline: "nearest" });
   if (enfocar) tab.focus();
   try { localStorage.setItem("pestana", tab.id); } catch { /* sin almacenamiento */ }
-  if (CARGAS[tab.id]) CARGAS[tab.id]();
+  const destino = new URL(location.href); destino.searchParams.set("vista", tab.id);
+  history.replaceState(null, "", destino);
+  document.dispatchEvent(new CustomEvent("terminal:pestana", {detail:tab.id}));
+  if (cargar && CARGAS[tab.id]) CARGAS[tab.id]();
 }
 document.getElementById("lista-pestanas").addEventListener("keydown", (ev) => {
   const tabs = [...document.querySelectorAll('[role="tab"]')].filter((t) => getComputedStyle(t).display !== "none");
@@ -1666,6 +1669,10 @@ async function iniciar() {
   document.getElementById("form-operacion").elements.fecha.value = new Date().toISOString().slice(0, 10);
   let inicial = null;
   try { inicial = localStorage.getItem("pestana"); } catch { /* sin almacenamiento */ }
+  const solicitada = new URLSearchParams(location.search).get("vista");
+  const candidata = document.getElementById(solicitada || inicial || "");
+  inicial = candidata?.matches('[role="tab"]') ? candidata.id : "tab-resumen";
+  activarPestana(document.getElementById(inicial), false, false);
   // Carga inicial en paralelo y un solo pintado (menos recálculos de estilo y diseño).
   const [e, r, p, c, a] = await Promise.allSettled([api("/api/estado"), api("/api/reto"), api("/api/propuestas"),
     api("/api/cartera"), api("/api/alertas?limite=5")]);
@@ -1677,7 +1684,7 @@ async function iniciar() {
   await cargarEstado(valor(e) || undefined);
   ajustarCampos();
   pintarResumen();
-  const tab = inicial && document.getElementById(inicial);
+  const tab = document.querySelector('[role="tab"][aria-selected="true"]');
   if (tab && tab.id !== "tab-resumen") activarPestana(tab);
   setInterval(() => { if (!document.hidden) cargarEstado(); }, 60000); // detecta ciclos del motor y alertas nuevas
   document.addEventListener("visibilitychange", () => { if (!document.hidden) cargarEstado(); });
