@@ -49,6 +49,7 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
   - TSM mensual educativo (`docs/tsm-mensual.md`) y anomalías de volumen (`docs/anomalias-volumen.md`);
   - centro de investigación y Aprender y recursos.
   - Asistente (`terminal/asistente.py`): datos, documentación y notas del usuario; Claude/Ollama si hay credencial.
+  - Avisos de pérdida del día a Telegram (cartera −0.5 %, posición −1 % por escalón) con precios en vivo del SIC; solo informan.
 - **Evidencia:** ningún modelo tiene ventaja demostrada: V1 frente a 1/N, pronóstico al cierre, Kronos y TSM
   (Holm 1.000 en 6 ETF). La estrategia activa es «máximo rendimiento» aceptando riesgo de cola (D-59).
 - **Datos:**

@@ -202,10 +202,10 @@ PRIORIDAD = {"critica": 1, "aviso": 2, "info": 3}
 CADUCIDAD_H = {"datos_inciertos": 6, "dato_vencido": 6, "cambio_brusco": 8, "stop_loss": 24, "take_profit": 24,
                "deriva": 24, "concentracion": 24, "ruptura_tesis": 24, "macro": 48, "evento_corporativo": 72, "noticia": 48,
                "insider": 72, "cinco_acciones": 24, "diferencia_portal": 24, "deterioro_modelo": 168,
-               "cambio_portal": 48, "captura_pendiente": 16, "plan_propuesta": 24, "movimiento_publico": 72}
+               "cambio_portal": 48, "captura_pendiente": 16, "plan_propuesta": 24, "movimiento_publico": 72, "perdida_dia": 6}
 # Avisos que el participante espera en cuanto ocurren (su propia captura, el recordatorio de cierre y un plan nuevo):
 # no se silencian fuera del horario de la BMV.
-SIEMPRE = {"cambio_portal", "captura_pendiente", "plan_propuesta"}
+SIEMPRE = {"cambio_portal", "captura_pendiente", "plan_propuesta", "perdida_dia"}  # pérdida: también tras el cierre BMV (EE. UU. sigue)
 # Reglas cuyo aviso nuevo REEMPLAZA al anterior (un plan recalculado deja sin efecto el plan avisado antes).
 REEMPLAZA_ANTERIOR = {"plan_propuesta"}
 
@@ -473,6 +473,76 @@ def reglas_cambio_brusco(cfg: dict, cartera: dict, precios_hist: pd.DataFrame) -
     return out
 
 
+def variacion_dia(cartera: dict, precios_hist: pd.DataFrame, ahora_dt: datetime) -> dict:
+    """Variación de HOY frente al cierre anterior, solo con precios fechados hoy (en vivo IEX para el SIC).
+    Las posiciones sin precio de hoy (BMV sin fuente en vivo) no se inventan: cuentan como sin cambio y se listan."""
+    hoy = pd.Timestamp(ahora_dt).tz_convert("America/Mexico_City").date()
+    filas, cambio, base = [], 0.0, 0.0
+    for p in cartera.get("posiciones", []):
+        iid, px, cant = p["instrumento_id"], p.get("precio_mxn"), p.get("cantidad") or 0
+        s = precios_hist[iid].dropna() if iid in precios_hist.columns else pd.Series(dtype=float)
+        previos = s[s.index.date < hoy]
+        en_vivo = px is not None and str(p.get("fecha_precio") or "")[:10] == hoy.isoformat()
+        if not len(previos) or not cant:
+            continue
+        cierre = float(previos.iloc[-1])
+        var = (px / cierre - 1) if en_vivo else None
+        cambio += cant * (px - cierre) if en_vivo else 0.0
+        base += cant * cierre
+        filas.append({"instrumento_id": iid, "clave": p.get("clave_operable") or iid, "precio_mxn": px, "cierre_previo": cierre,
+                      "fecha_cierre": str(previos.index[-1].date()), "variacion": var, "en_vivo": en_vivo,
+                      "impacto_mxn": cant * (px - cierre) if en_vivo else None, "proveedor": p.get("proveedor")})
+    base += float(cartera.get("efectivo") or 0)
+    return {"fecha": hoy.isoformat(), "variacion": cambio / base if base else None, "cambio_mxn": cambio, "base_mxn": base,
+            "posiciones": filas, "sin_dato_hoy": [f["clave"] for f in filas if not f["en_vivo"]]}
+
+
+def reglas_perdida_dia(cfg: dict, cartera: dict, precios_hist: pd.DataFrame, ahora_dt: datetime) -> list[Condicion]:
+    """Avisos escalonados de pérdida del día: uno por cada escalón nuevo (−0.5 %, −1.0 %, −1.5 %… en la cartera;
+    −1 %, −2 %… por posición). Solo informan: la decisión y cualquier orden son del participante."""
+    if not cfg.get("perdida_dia_activa", True):
+        return []
+    u_cart, u_pos = float(cfg.get("perdida_dia_cartera_pct", 0.005)), float(cfg.get("perdida_dia_posicion_pct", 0.01))
+    v = variacion_dia(cartera, precios_hist, ahora_dt)
+    out = []
+    if v["variacion"] is not None and v["variacion"] <= -u_cart:
+        nivel = int(-v["variacion"] // u_cart)
+        sin = f" Sin precio de hoy (cuentan sin cambio): {', '.join(v['sin_dato_hoy'])}." if v["sin_dato_hoy"] else ""
+        out.append(Condicion("perdida_dia", f"cartera|{v['fecha']}|{nivel}", True, "critica",
+                             f"Cartera {v['variacion']:+.2%} hoy ({v['cambio_mxn']:+,.0f} MXN)",
+                             f"Escalón {nivel} de {u_cart:.1%}: la cartera va {v['variacion']:+.2%} frente al cierre anterior "
+                             f"con precios en vivo del SIC (IEX × FIX).{sin}",
+                             {"impacto_mxn": round(v["cambio_mxn"], 2), "calculo": f"{v['cambio_mxn']:,.2f} / {v['base_mxn']:,.2f}",
+                              "incertidumbre": "Media: IEX es una sola bolsa y el precio del SIC puede diferir."},
+                             "alpaca_vivo", "Revisa el Plan intradía (concentración, pausa, costos); la decisión y la orden son tuyas.",
+                             rearme=False))
+    for f in v["posiciones"]:
+        if f["variacion"] is not None and f["variacion"] <= -u_pos:
+            nivel = int(-f["variacion"] // u_pos)
+            out.append(Condicion("perdida_dia", f"{f['instrumento_id']}|{v['fecha']}|{nivel}", True, "aviso",
+                                 f"{f['clave']} {f['variacion']:+.2%} hoy ({f['impacto_mxn']:+,.0f} MXN)",
+                                 f"Precio {f['precio_mxn']:,.2f} MXN frente al cierre {f['cierre_previo']:,.2f} del {f['fecha_cierre']}; "
+                                 f"escalón {nivel} de {u_pos:.0%}.", {"impacto_mxn": round(f["impacto_mxn"], 2)},
+                                 f.get("proveedor") or "", "Revisa la posición y su tesis; la decisión y la orden son tuyas.",
+                                 rearme=False))
+    return out
+
+
+def vigilar_perdida(ajustes, notificar: bool = True, ahora_dt: datetime | None = None) -> list[dict]:
+    """Revisión ligera entre ciclos completos (cada pocos minutos con el mercado de EE. UU. abierto): solo la regla de
+    pérdida del día, con la cartera valuada a los precios en vivo ya guardados. No consulta proveedores ni opera."""
+    from . import db, servicios
+    ahora_dt = ahora_dt or datetime.now(UTC)
+    con = db.conectar()
+    try:
+        cart = servicios.cartera_actual(con, ajustes)
+        ids = sorted({p["instrumento_id"] for p in cart.get("posiciones", [])})
+        precios = mercado.precios_mxn(con, ajustes, ids, ajustados="splits") if ids else pd.DataFrame()
+        return procesar(con, reglas_perdida_dia(ajustes["alertas"], cart, precios, ahora_dt), ajustes["alertas"], ahora_dt, notificar)
+    finally:
+        con.close()
+
+
 def reglas_evento_corporativo(con, cfg: dict, ids: set[str], ahora_dt: datetime) -> list[Condicion]:
     out = []
     desde = (ahora_dt - timedelta(days=int(cfg.get("evento_corporativo_dias", 10)))).date().isoformat()
@@ -623,6 +693,7 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
              + reglas_noticias(con, cfg, ids, ahora_dt)
              + reglas_tecnicas(con, cfg, cartera, propuestas, mercado.ultimo_fx(con, ajustes))
              + reglas_reto(con, cfg, cartera, ahora_dt) + reglas_cambio_brusco(cfg, cartera, precios)
+             + reglas_perdida_dia(cfg, cartera, precios, ahora_dt)
              + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
              + reglas_webhook(con, ahora_dt) + reglas_tesis(con, cartera)
              + reglas_portal(con, ahora_dt) + reglas_plan_propuesta(cartera, propuestas)

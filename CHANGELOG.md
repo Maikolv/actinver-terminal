@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-19 — avisos de pérdida del día con precios en vivo]
+
+### Agregado
+- Regla `perdida_dia` (`terminal/alertas.py`): variación de hoy frente al cierre anterior con los precios en vivo del SIC (IEX × FIX). Avisa a Telegram por escalones: cartera −0.5 %, −1.0 %…; posición −1 %, −2 %…
+  - Un aviso por escalón nuevo; no se silencia tras el cierre de la BMV, porque EE. UU. sigue abierto.
+  - Las posiciones BMV sin precio de hoy se listan, no se estiman.
+- El motor revisa esta regla cada 2 minutos con los mercados abiertos (`vigilar_perdida_min`), sin consultar proveedores. También corre en cada ciclo completo.
+- Tarjeta «Hoy frente al cierre anterior» en Plan intradía y ruta `/api/variacion-dia`.
+- Solo informa: ninguna regla compra, vende ni toca el portal. 3 pruebas nuevas.
+
 ## [2026-10-19 — ranking de acciones, ETF y fondos]
 
 ### Cambiado

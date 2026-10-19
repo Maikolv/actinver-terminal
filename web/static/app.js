@@ -2655,8 +2655,18 @@ async function cargarIntradia() {
     const entrada = h("input", { type: "number", min: 0, step: "any", value: intradia.perdida, "aria-label": "Pérdida del día en pesos (positiva)" });
     const boton = botonAccion("Evaluar pausa", "boton--secundario", () => { intradia.perdida = entrada.value; cargarIntradia(); });
     const P = d.presupuesto_perdida, C = d.concentracion;
+    let V = null;
+    try { V = await api("/api/variacion-dia"); } catch { /* sin precios de hoy: la tarjeta lo dice */ }
+    const tarjetaHoy = V ? h("div", { clase: "tarjeta" }, h("h2", { texto: "Hoy frente al cierre anterior" }),
+      h("div", { clase: "kpis" }, kpi("Cartera hoy", V.variacion == null ? "—" : pct(V.variacion), signo(V.variacion)), kpi("Cambio", mxn(V.cambio_mxn)),
+        kpi("Aviso de pérdida", `cartera cada ${pct(V.umbrales.cartera)} · posición cada ${pct(V.umbrales.posicion)}`)),
+      tabla([{ t: "Instrumento", f: (x) => x.clave }, { t: "Hoy", f: (x) => (x.variacion == null ? "sin precio de hoy" : h("span", { clase: signo(x.variacion) }, pct(x.variacion))), num: true },
+        { t: "Impacto", f: (x) => (x.impacto_mxn == null ? "—" : mxn(x.impacto_mxn)), num: true },
+        { t: "Cierre anterior", f: (x) => `${mxn(x.cierre_previo, true)} (${x.fecha_cierre})`, num: true }], V.posiciones, { vacio: "Sin posiciones." }),
+      h("p", { clase: "ayuda", texto: V.nota })) : null;
     limpiar("intradia-contenido",
       h("div", { clase: "aviso-caja", role: "note", texto: d.aviso }),
+      tarjetaHoy,
       h("div", { clase: `tarjeta ${d.inhibida ? "" : "tarjeta--destacada"}` }, h("h2", { texto: "Señal ejecutable" }),
         h("p", {}, chip(d.inhibida ? "retrasado" : "vigente", d.inhibida ? "INHIBIDA" : "Sin inhibiciones de datos"), " ", d.nota_senal),
         d.motivos_inhibicion.length ? h("ul", {}, d.motivos_inhibicion.map((m) => h("li", { texto: m }))) : null),

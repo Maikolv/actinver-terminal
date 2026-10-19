@@ -56,6 +56,7 @@ def _programador(stop: threading.Event) -> None:
     prog = AJUSTES["programacion"]
     siguiente = time.monotonic() + 5  # primer ciclo pocos segundos después de arrancar
     captura = portal.ultima_captura_id()
+    vigilancia = time.monotonic() + 60
     while not stop.wait(15):
         servicios.resumen_seguro(AJUSTES)  # plan del día por Telegram a primera hora (una vez por sesión)
         ahora = time.monotonic()
@@ -70,6 +71,13 @@ def _programador(stop: threading.Event) -> None:
         elif FLUJO and FLUJO.debe_recalcular():
             if servicios.ciclo_seguro(AJUSTES, forzar=True, en_vivo=True) is not None:
                 FLUJO.marcar_recalculo()
+        if time.monotonic() >= vigilancia:  # pérdida del día con precios en vivo, cada `vigilar_perdida_min`
+            vigilancia = time.monotonic() + int(prog.get("vigilar_perdida_min", 2)) * 60
+            if vigencia.mercado_abierto("XNYS") or vigencia.mercado_abierto("XMEX"):
+                try:
+                    alertas.vigilar_perdida(AJUSTES)
+                except Exception:  # noqa: BLE001 - una falla de la vigilancia no detiene el motor
+                    log.exception("vigilancia de pérdida del día")
 
 
 @asynccontextmanager
@@ -634,6 +642,21 @@ def get_plan_accion(con=Depends(con_db)):
 def get_aprendizaje():
     from . import aprendizaje
     return aprendizaje.catalogo(AJUSTES.es_demo)
+
+
+@app.get("/api/variacion-dia")
+def variacion_dia(con=Depends(con_db)):
+    """Cartera de hoy frente al cierre anterior con precios en vivo del SIC; umbrales de los avisos de pérdida."""
+    from datetime import UTC, datetime
+    cart = servicios.cartera_actual(con, AJUSTES)
+    ids = sorted({p["instrumento_id"] for p in cart.get("posiciones", [])})
+    precios = mercado.precios_mxn(con, AJUSTES, ids, ajustados="splits") if ids else None
+    v = alertas.variacion_dia(cart, precios if precios is not None else __import__("pandas").DataFrame(), datetime.now(UTC))
+    cfg = AJUSTES["alertas"]
+    return {**v, "umbrales": {"cartera": float(cfg.get("perdida_dia_cartera_pct", 0.005)),
+                              "posicion": float(cfg.get("perdida_dia_posicion_pct", 0.01))},
+            "nota": "Precios del SIC en vivo por IEX (una sola bolsa) × FIX; la BMV no tiene fuente gratuita en vivo. "
+                    "Los avisos llegan a Telegram por escalón; la terminal no compra ni vende."}
 
 
 @app.get("/api/plan-intradia")

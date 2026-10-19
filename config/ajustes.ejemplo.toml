@@ -21,6 +21,7 @@ pesos_60_40 = [0.60, 0.40]
 [programacion]
 # Motor automático: en horario de mercado revisa cada `revisar_cada_min`; fuera de horario cada `fuera_horario_min`.
 revisar_cada_min = 15
+vigilar_perdida_min = 2           # revisión ligera de la pérdida del día entre ciclos (sin consultar proveedores)
 fuera_horario_min = 60
 
 [tiempo_real]
@@ -174,6 +175,10 @@ macro_horas = 24                     # evento de alto impacto USD/MXN en las pr�
 insider_valor_min_usd = 250000       # compras/ventas de insiders relevantes
 noticia_sentimiento_min = 1.0        # |sentimiento| mínimo para alerta de noticia de alto impacto
 cambio_brusco_pct = 0.05             # |cambio| entre los dos últimos precios de una posición
+# Pérdida del día con precios en vivo (SIC por IEX): un aviso a Telegram por cada escalón nuevo; solo informan.
+perdida_dia_activa = true
+perdida_dia_cartera_pct = 0.005      # cartera: −0.5 %, −1.0 %, −1.5 %… frente al cierre anterior
+perdida_dia_posicion_pct = 0.01      # posición: −1 %, −2 %, −3 %…
 concentracion_aviso = 0.45           # aviso desde 45 %; crítica sobre el tope del Reto (50 %)
 perdida_maxima = -0.10               # pérdida máxima que usted acepta frente al capital de la etapa
 diferencia_portal_pct = 0.01         # diferencia entre la estimación y el saldo capturado del portal
