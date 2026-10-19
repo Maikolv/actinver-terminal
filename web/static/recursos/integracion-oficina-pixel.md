@@ -43,3 +43,8 @@ Usa [el prompt de optimización](prompt-optimizacion-recursos-claude.md). Define
 ## Validación de esta entrega
 
 Cuatro pruebas Node y ocho Python aprobadas. Navegador: se verificaron las seis mesas sin datos, el prompt para Claude y la descarga del JSON sin órdenes. Cinco archivos estáticos respondieron HTTP 200 y el catálogo expone el acceso. No se probaron datos CME en vivo, agentes LLM autónomos ni adaptadores nativos instalados. La prueba Python mostró una advertencia de deprecación Starlette/AnyIO.
+
+
+### Diseño integrado en la terminal — 19-oct-2026
+
+La oficina reutiliza directamente `web/static/app.css`: misma paleta azul/neutra, Segoe UI, botones, bordes y modo claro/oscuro según el sistema. Se retiraron personajes pixelados, colores decorativos y textura de suelo. Las mesas son filas numeradas con jerarquía de informe; los documentos y la guía ocupan una columna lateral que se apila en móvil. Sin imágenes generadas, fuentes externas ni dependencias nuevas. Cuatro pruebas funcionales existentes aprobadas; consulta y preparación de prompt verificadas en navegador. Escritorio y móvil de 390 px revisados sin desbordamiento horizontal. No se cambiaron las fórmulas ni las fuentes de datos.

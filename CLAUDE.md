@@ -141,3 +141,6 @@ completa. Detalles, uso y validación final: docs/contratos-paper-colab-2026-10-
 ### Incorporación del TikTok — 19-oct-2026
 
 Oficina de inversión incorporada en `web/static/recursos/oficina-inversion.html`, accesible desde Aprender y recursos. Tres repositorios clonados (manifiesto `config/oficina-pixel-repos.json`), sin instalar dependencias ni arrancar sus servidores. Código original de sólo lectura con seis roles descriptivos, informe y preparación de prompt para Claude. Compatibilidad nativa Quantower/TradingView aún requiere adaptadores/verificación. Ver `docs/oficina-inversion-pixel.md`.
+
+
+La oficina comparte `app.css` desde el 19-oct: diseño de informe numerado, sin personajes ni ilustraciones, con sidebar adaptable. Funciones de consulta e informe conservadas; revisión visual en escritorio y 390 px, sin desbordamiento.

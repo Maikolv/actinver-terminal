@@ -1,15 +1,52 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
-<title>Oficina de inversión · Actinver-terminal</title><link rel="stylesheet" href="oficina-inversion.css"></head>
-<body><main><nav><a href="/">← Volver a la terminal</a><span>LABORATORIO · SÓLO LECTURA</span></nav>
-<header><p class="etiqueta">ACTINVER / RESEARCH DESK</p><h1>Tu oficina de inversión</h1><p>Seis mesas para revisar una misma evidencia. Inspirada en el proyecto del TikTok; implementación propia y ligera.</p></header>
-<aside>Esta versión usa reglas descriptivas, sin agentes de IA ejecutándose. No representa un fondo operativo ni demuestra alfa. No envía órdenes ni consulta exchanges externos.</aside>
-<form id="consulta"><label>Símbolo guardado en la terminal<input id="simbolo" value="SIC:NVDA" maxlength="80" required placeholder="Identificador exacto del catálogo"></label>
-<label>Velas<select id="intervalo"><option value="5Min">5 minutos</option><option value="1Min">1 minuto</option><option value="15Min">15 minutos</option><option value="1Day">1 día</option></select></label>
-<button id="consultar">Consultar mesas</button><button id="exportar" type="button" disabled>Descargar informe</button><button id="claude" type="button" disabled>Preparar análisis para Claude</button></form>
-<p id="estado" role="status">Sin consultas automáticas. Importa primero datos autorizados en Velas u Order Flow; utiliza el identificador exacto, incluido vencimiento si se trata de futuros.</p>
-<section id="oficina" aria-label="Mesas de investigación"><article><h2>Empieza con evidencia</h2><p>Elige un símbolo con datos locales y pulsa Consultar mesas. Si no hay datos, cada mesa lo indicará.</p></article></section>
-<section id="analisis-claude" hidden><h2>Prompt para tu comité de investigación</h2><p>Revisa el contenido antes de copiarlo a Claude. La terminal no lo envía a ningún servicio.</p><textarea id="prompt-comite" rows="16" readonly aria-label="Prompt para Claude"></textarea></section>
-<footer><h2>Proyecto y plataformas</h2><p><a href="integracion-oficina-pixel.md">Repositorios, licencias e integración</a> · <a href="prompt-optimizacion-recursos-claude.md">Prompt de optimización</a> · <a href="prompt-quantower-claude.md">Quantower</a> · <a href="prompt-tradingview-claude.md">TradingView</a></p><p>Dos lecturas locales por consulta, sin refresco periódico, sin animaciones continuas, sin dependencias añadidas y sin costes de LLM.</p></footer>
-</main><script type="module" src="oficina-inversion.mjs"></script></body></html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Oficina de inversión · Actinver Terminal</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="oficina-inversion.css">
+</head>
+<body>
+<a class="saltar" href="#principal">Saltar al contenido</a>
+<header class="cabecera">
+  <div class="cabecera__fila">
+    <a class="marca oficina-marca" href="/" aria-label="Actinver Terminal, inicio">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Actinver Terminal</span>
+    </a>
+    <div class="acciones-cabecera"><span class="chip chip--sin_datos">Sólo lectura</span><a class="boton boton--secundario" href="/">Volver a la terminal</a></div>
+  </div>
+</header>
+<nav class="oficina-navegacion" aria-label="Navegación de la oficina"><div><a href="#principal" aria-current="page">Oficina de inversión</a><a href="#mesas">Mesas de revisión</a><a href="#documentos">Documentos</a></div></nav>
+<main id="principal" tabindex="-1">
+  <div class="oficina-titulo"><div><p class="oficina-contexto">Aprender y recursos / Investigación</p><h1>Oficina de inversión</h1><p class="ayuda">Una revisión del instrumento desde datos, análisis y riesgo.</p></div><span class="oficina-identificador">6 mesas · consulta local</span></div>
+  <form id="consulta" class="formulario oficina-consulta">
+    <div class="oficina-campos"><label for="simbolo">Instrumento<input id="simbolo" value="SIC:NVDA" maxlength="80" required spellcheck="false" autocomplete="off" aria-describedby="ayuda-simbolo" placeholder="Identificador del catálogo"></label>
+    <label for="intervalo">Intervalo de las velas<select id="intervalo"><option value="5Min">5 minutos</option><option value="1Min">1 minuto</option><option value="15Min">15 minutos</option><option value="1Day">1 día</option></select></label>
+    <button id="consultar" class="boton boton--primario">Consultar mesas</button></div>
+    <p id="ayuda-simbolo" class="ayuda">Usa el identificador de tus datos guardados; en futuros, incluye el vencimiento. Velas: últimos 7 días. Operaciones: últimos 60 minutos.</p>
+  </form>
+  <p id="estado" class="oficina-estado ayuda" role="status">Sin informe. Selecciona un instrumento para consultar los datos locales.</p>
+  <div class="oficina-distribucion">
+    <section id="mesas" class="oficina-informe" aria-labelledby="titulo-mesas">
+      <div class="oficina-seccion"><div><h2 id="titulo-mesas">Mesas de revisión</h2><p class="ayuda">La evidencia de cada área, en una sola lectura.</p></div><span id="estado-informe" class="chip chip--sin_datos">Sin consulta</span></div>
+      <section id="oficina" class="oficina-mesas" aria-label="Resultados de las mesas">
+        <div class="oficina-vacio"><span class="oficina-folio" aria-hidden="true">—</span><div><h3>El informe aparecerá aquí</h3><p>Consulta un instrumento con velas u operaciones importadas en la terminal.</p><p class="ayuda">Cada mesa indicará qué datos están disponibles y qué falta revisar.</p></div></div>
+      </section>
+      <div class="oficina-exportar"><span class="ayuda">Conserva la evidencia o prepara su revisión.</span><div><button id="exportar" class="boton boton--secundario" type="button" disabled>Descargar informe</button><button id="claude" class="boton boton--secundario" type="button" disabled>Preparar análisis para Claude</button></div></div>
+    </section>
+    <aside class="oficina-apoyo" aria-label="Apoyo a la investigación">
+      <section class="tarjeta"><h2>Cómo leer el informe</h2><ol class="oficina-pasos"><li><strong>Confirma la fuente</strong><span>Revisa fecha, feed y calidad antes de interpretar los indicadores.</span></li><li><strong>Contrasta las mesas</strong><span>Una comparación de medias y un delta describen ventanas distintas.</span></li><li><strong>Documenta lo pendiente</strong><span>Descarga el informe con su procedencia para continuar la investigación.</span></li></ol></section>
+      <section id="documentos" class="tarjeta"><h2>Documentos de trabajo</h2><ul class="oficina-enlaces"><li><a href="integracion-oficina-pixel.md">Proyecto y repositorios<span>Versiones, licencias e integración</span></a></li><li><a href="prompt-optimizacion-recursos-claude.md">Optimización de recursos<span>Prompt para Claude Code</span></a></li><li><a href="prompt-quantower-claude.md">Quantower<span>Configuración y compatibilidad</span></a></li><li><a href="prompt-tradingview-claude.md">TradingView<span>Configuración y compatibilidad</span></a></li></ul></section>
+    </aside>
+  </div>
+  <section id="analisis-claude" class="tarjeta oficina-claude" hidden><h2>Preparar análisis para Claude</h2><p class="ayuda">Revisa el contenido antes de copiarlo. La terminal no lo envía a ningún servicio.</p><textarea id="prompt-comite" rows="14" readonly aria-label="Prompt para Claude"></textarea></section>
+  <details class="oficina-alcance"><summary>Alcance y método</summary><p>Las seis mesas aplican reglas descriptivas a datos guardados. No son agentes de IA autónomos ni generan órdenes, posiciones o rentabilidad. Gamma, opciones y TPO se consultan en sus apartados de la terminal.</p><p class="ayuda">La consulta no actualiza proveedores. Dos lecturas locales por consulta, sin refresco periódico ni servicios externos.</p></details>
+  <footer class="oficina-pie"><span>Actinver Terminal · Investigación</span><span>Datos locales y procedencia verificable</span></footer>
+</main>
+<script type="module" src="oficina-inversion.mjs"></script>
+</body></html>

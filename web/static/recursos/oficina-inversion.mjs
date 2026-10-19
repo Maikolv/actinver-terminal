@@ -32,25 +32,26 @@ if (typeof document !== 'undefined') {
   function mostrar(r) {
     $('oficina').replaceChildren(...r.mensajes.map((m,i) => {
       const card = document.createElement('article');
-      const icon = document.createElement('div'); icon.className='persona p'+i; icon.setAttribute('aria-hidden','true');
-      const h = document.createElement('h2');h.textContent=m.rol;
+      const folio = document.createElement('span'); folio.className='oficina-folio'; folio.textContent=String(i+1).padStart(2,'0'); folio.setAttribute('aria-hidden','true');
+      const texto = document.createElement('div');
+      const h = document.createElement('h3');h.textContent=m.rol;
       const p = document.createElement('p');p.textContent=m.texto;
-      card.append(icon,h,p);return card;
+      texto.append(h,p);card.append(folio,texto);return card;
     }));
-    $('exportar').disabled=false;$('claude').disabled=false;
+    $('exportar').disabled=false;$('claude').disabled=false;$('estado-informe').textContent='Informe disponible';
   }
   $('consulta').addEventListener('submit', async e => {
     e.preventDefault();$('consultar').disabled=true;$('exportar').disabled=true;$('claude').disabled=true;$('analisis-claude').hidden=true;informe=null;
     const simbolo=$('simbolo').value.trim();
-    $('estado').textContent='Leyendo datos guardados…';$('oficina').replaceChildren();
+    $('estado').textContent='Leyendo datos guardados…';$('estado-informe').textContent='Consultando';$('oficina').setAttribute('aria-busy','true');$('oficina').replaceChildren();
     try {
       const q=encodeURIComponent(simbolo), intervalo=$('intervalo').value;
       const leer=async path => {const res=await fetch(path,{signal:AbortSignal.timeout(15000),cache:'no-store'});if(!res.ok)throw new Error(`Consulta fallida (${res.status})`);return res.json();};
       const [velas,flujo]=await Promise.all([leer(`/api/flujo/velas?simbolo=${q}&intervalo=${intervalo}&dias=7`),leer(`/api/flujo/libro-operaciones?simbolo=${q}&minutos=60&niveles=5`)]);
       informe=resumir(velas,flujo);mostrar(informe);
       $('estado').textContent=`${simbolo} · informe ${new Date(informe.generado_en).toLocaleString('es-MX')} · lectura local; no actualiza proveedores.`;
-    } catch(err) {$('estado').textContent=`${err.message}. Abre esta vista desde la terminal local y verifica los datos importados.`;}
-    finally {$('consultar').disabled=false;}
+    } catch(err) {$('estado-informe').textContent='Consulta no disponible';$('estado').textContent=`${err.message}. Abre esta vista desde la terminal local y verifica los datos importados.`;}
+    finally {$('consultar').disabled=false;$('oficina').setAttribute('aria-busy','false');}
   });
   $('exportar').addEventListener('click',()=>{
     if(!informe)return;
