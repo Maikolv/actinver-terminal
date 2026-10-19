@@ -35,8 +35,8 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (lunes 19-oct, 03:00; precios del cierre del 16-oct):**
-  - Valuación $906,431.05 (−9.36 %); poder de compra $4,077.53.
+- **Cuenta del Reto, última captura confirmada (lunes 19-oct, 10:05):**
+  - Valuación $929,338.13 (−7.07 %); poder de compra $4,077.53.
   - 7 acciones y 1 título de ACTDUAL B. Pesos: MU 45.0 %, GMEXICO 17.5 %, AMD 14.0 %, NVDA 11.4 %, ALPEK 5.9 %,
     XOM 2.9 %, NVAX 2.9 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %).
   - Las capturas se registran con `portal.guardar(..., confirmar=True)`. Precios en MXN, ajustados solo por splits.
@@ -48,6 +48,7 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
   - Laboratorio (permutación, Holm, preregistro y holdout único);
   - TSM mensual educativo (`docs/tsm-mensual.md`) y anomalías de volumen (`docs/anomalias-volumen.md`);
   - centro de investigación y Aprender y recursos.
+  - Asistente (`terminal/asistente.py`): datos, documentación y notas del usuario; Claude/Ollama si hay credencial.
 - **Evidencia:** ningún modelo tiene ventaja demostrada: V1 frente a 1/N, pronóstico al cierre, Kronos y TSM
   (Holm 1.000 en 6 ETF). La estrategia activa es «máximo rendimiento» aceptando riesgo de cola (D-59).
 - **Datos:**

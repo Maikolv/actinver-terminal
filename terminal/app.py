@@ -1219,6 +1219,27 @@ def anomalias_volumen(simbolo: str, intervalo: str = "1Day", ventana: int = 20, 
         raise HTTPException(422, str(e)) from None
 
 
+_ASISTENTE: dict = {}
+
+
+@app.post("/api/asistente")
+def asistente_preguntar(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Asistente dentro de la terminal (asistente.py): datos, documentación y notas del usuario. No opera ni asesora."""
+    from . import asistente, bot_telegram
+    if "chatbot" not in _ASISTENTE:
+        _ASISTENTE["chatbot"] = bot_telegram.Chatbot(AJUSTES)
+    try:
+        return asistente.responder(con, AJUSTES, str((cuerpo or {}).get("texto", "")), _ASISTENTE["chatbot"])
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/asistente/notas")
+def asistente_notas(con=Depends(con_db)):
+    from . import asistente
+    return {"notas": asistente.notas(con)}
+
+
 # Etapa 3: riesgo, seguimiento, comparación y backtesting (solo análisis y simulación).
 @app.get("/api/riesgo")
 def get_riesgo(ventana: int = 252, horizonte: int | None = None, con=Depends(con_db)):

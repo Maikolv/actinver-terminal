@@ -2766,6 +2766,46 @@ async function seccionPreregistro(taCsv, formParams) {
   try { await pintarLista(); } catch (e) { lista.replaceChildren(errorCaja(e)); }
   return h("div", {}, form, h("div", { clase: "tarjeta" }, lista), salida);
 }
+/* ---------- Asistente (terminal/asistente.py): datos, documentación y notas del usuario ---------- */
+const asistenteUI = { mensajes: [] };
+const NOMBRE_MOTOR = { claude: "Claude", ollama: "Ollama (local)", local: "respuestas locales", documentacion: "documentación y notas", comando: "comando", notas: "notas" };
+function pintarAsistente() {
+  const c = document.getElementById("asistente-conversacion");
+  if (!asistenteUI.mensajes.length) {
+    c.replaceChildren(h("p", { clase: "ayuda", texto: "Escribe una pregunta, por ejemplo «¿qué significa VaR?» o «¿por qué MU?». Para enseñarme algo: /nota <texto>." }));
+    return;
+  }
+  c.replaceChildren(...asistenteUI.mensajes.map((m) => h("div", { clase: `asistente-msg asistente-msg--${m.de}` },
+    h("span", { clase: "asistente-quien", texto: m.de === "tu" ? "Tú" : `Asistente${m.motor ? ` · ${NOMBRE_MOTOR[m.motor] || m.motor}` : ""}` }),
+    h("div", { clase: "asistente-texto", texto: m.texto }))));
+  c.scrollTop = c.scrollHeight;
+}
+async function preguntarAsistente(texto) {
+  texto = (texto || "").trim();
+  if (!texto) return;
+  const f = document.getElementById("form-asistente"), b = f.querySelector('button[type="submit"]');
+  asistenteUI.mensajes.push({ de: "tu", texto });
+  pintarAsistente();
+  ocupado([b], true);
+  try {
+    const r = await api("/api/asistente", { method: "POST", json: { texto } });
+    asistenteUI.mensajes.push({ de: "asistente", texto: r.respuesta, motor: r.motor });
+    if (["claude", "ollama", "local"].includes(r.motor)) document.getElementById("asistente-motor").textContent = `Motor: ${NOMBRE_MOTOR[r.motor]}.`;
+  } catch (e) { asistenteUI.mensajes.push({ de: "asistente", texto: `Error: ${e.message}` }); }
+  finally { ocupado([b], false); pintarAsistente(); }
+}
+document.getElementById("form-asistente").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const t = document.getElementById("asistente-texto");
+  const v = t.value; t.value = "";
+  preguntarAsistente(v);
+});
+document.getElementById("asistente-texto").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); document.getElementById("form-asistente").requestSubmit(); }
+});
+document.querySelectorAll("[data-pregunta]").forEach((b) => b.addEventListener("click", () => preguntarAsistente(b.dataset.pregunta)));
+CARGAS["tab-asistente"] = () => { pintarAsistente(); document.getElementById("asistente-texto").focus(); };
+ATAJOS.ASI = "tab-asistente";
 CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
 CARGAS["tab-intradia"] = () => cargarIntradia();
 Object.assign(ATAJOS, { LAB: "tab-laboratorio", INT: "tab-intradia", GEX: "tab-optionflow" });

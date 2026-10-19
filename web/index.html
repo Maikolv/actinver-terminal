@@ -61,6 +61,7 @@
     <button role="tab" data-grupo="mercado" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
     <button role="tab" data-grupo="mercado" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
     <button role="tab" data-grupo="mercado" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
+    <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
     <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio</button>
     <button role="tab" data-grupo="investigar" id="tab-aprendizaje" aria-controls="panel-aprendizaje" aria-selected="false" tabindex="-1">Aprender y recursos</button>
     <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
@@ -88,6 +89,7 @@
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
     <h1 class="oculto-visual">Plan de acción</h1>
     <nav class="accesos" aria-label="Accesos frecuentes">
+      <button type="button" class="boton boton--secundario" data-ir="tab-asistente">Preguntar al asistente</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-aprendizaje">Aprender con los recursos</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía (informativo)</button>
     </nav>
@@ -387,6 +389,25 @@
     <h1>Backtesting</h1>
     <p class="ayuda">Pruebas históricas reproducibles con comisiones, deslizamiento y datos disponibles a cada fecha. Cada corrida queda registrada con sus parámetros, la huella de los datos y el resultado.</p>
     <div id="backtesting-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-asistente" aria-labelledby="tab-asistente" hidden>
+    <h1>Asistente</h1>
+    <p class="ayuda">Responde con los datos de la terminal, su documentación y lo que tú le enseñes con <code>/nota</code>. No envía órdenes ni da asesoría personalizada: las decisiones son tuyas.</p>
+    <div id="asistente-motor" class="ayuda" role="status"></div>
+    <div id="asistente-conversacion" class="asistente-conversacion" role="log" aria-live="polite" aria-label="Conversación con el asistente" tabindex="0"></div>
+    <form id="form-asistente" class="asistente-form" autocomplete="off">
+      <label class="oculto-visual" for="asistente-texto">Pregunta, comando o nota</label>
+      <textarea id="asistente-texto" rows="2" maxlength="4010" placeholder="Pregunta algo, usa /plan o enséñame con /nota …"></textarea>
+      <button type="submit" class="boton boton--primario">Enviar</button>
+    </form>
+    <div class="asistente-sugerencias" aria-label="Preguntas sugeridas">
+      <button type="button" class="boton boton--secundario" data-pregunta="/plan">Plan de hoy</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="/cartera">Mi cartera</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="/estado">Estado de los datos</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="¿Cómo funciona el preregistro del Laboratorio?">¿Cómo funciona el Laboratorio?</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="/notas">Mis notas</button>
+    </div>
   </section>
 
   <section role="tabpanel" id="panel-laboratorio" aria-labelledby="tab-laboratorio" hidden>

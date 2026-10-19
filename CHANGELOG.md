@@ -2,6 +2,17 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-19 — asistente dentro de la terminal]
+
+### Agregado
+- Pestaña **Asistente** (grupo «Investigar y aprender», atajo `/ASI`, acceso en el Plan de acción) y rutas `/api/asistente` y `/api/asistente/notas`.
+- Reutiliza el chatbot del bot de Telegram: Claude si hay credencial, Ollama si hay `OLLAMA_URL` y, si no, respuestas locales.
+- Suma búsqueda BM25 en la documentación (`scripts/indice_contexto.py`) y notas del usuario (`/nota`, `/notas`, `/olvidar`), citadas como no verificadas. Sin credencial de LLM, las dudas se responden con fragmentos originales de la documentación.
+- 5 pruebas nuevas; 26 aprobadas con las del bot y el resumen. Verificado en el navegador con datos reales.
+
+### Datos
+- Captura del portal del 19-oct a las 10:05 registrada: valuación $929,338.13 (−7.07 %).
+
 ## [2026-10-19 — navegación por tareas y cabecera móvil]
 
 ### Cambiado
