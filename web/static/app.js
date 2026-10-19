@@ -123,12 +123,25 @@ const ultimaDeGrupo = {};
 function elegirGrupo(g) {
   navPestanas.dataset.grupo = g;
   document.querySelectorAll(".grupos-nav [data-grupo]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.grupo === g)));
+  if (typeof flechasPestanas === "function") requestAnimationFrame(flechasPestanas);
 }
 document.querySelectorAll(".grupos-nav [data-grupo]").forEach((b) => b.addEventListener("click", () => {
   const g = b.dataset.grupo;
   activarPestana(document.getElementById(ultimaDeGrupo[g] || "") || document.querySelector(`[role="tab"][data-grupo="${g}"]`));
 }));
 elegirGrupo(navPestanas.dataset.grupo);
+/* Flechas para las pestañas que no caben: solo aparecen si hay desbordamiento hacia ese lado. */
+const listaPestanas = document.getElementById("lista-pestanas");
+function flechasPestanas() {
+  const max = listaPestanas.scrollWidth - listaPestanas.clientWidth;
+  document.querySelectorAll(".desplazar-pestanas").forEach((b) => {
+    b.hidden = b.dataset.dir === "-1" ? listaPestanas.scrollLeft <= 1 : listaPestanas.scrollLeft >= max - 1;
+  });
+}
+document.querySelectorAll(".desplazar-pestanas").forEach((b) => b.addEventListener("click", () =>
+  listaPestanas.scrollBy({ left: Number(b.dataset.dir) * listaPestanas.clientWidth * 0.7 })));
+listaPestanas.addEventListener("scroll", flechasPestanas, { passive: true });
+window.addEventListener("resize", flechasPestanas);
 function activarPestana(tab, enfocar) {
   elegirGrupo(tab.dataset.grupo); ultimaDeGrupo[tab.dataset.grupo] = tab.id;
   const previo = document.querySelector('[role="tabpanel"]:not([hidden])');
@@ -138,6 +151,7 @@ function activarPestana(tab, enfocar) {
     t.setAttribute("aria-selected", sel); t.tabIndex = sel ? 0 : -1;
     document.getElementById(t.getAttribute("aria-controls")).hidden = !sel;
   });
+  tab.scrollIntoView({ block: "nearest", inline: "nearest" });
   if (enfocar) tab.focus();
   try { localStorage.setItem("pestana", tab.id); } catch { /* sin almacenamiento */ }
   if (CARGAS[tab.id]) CARGAS[tab.id]();

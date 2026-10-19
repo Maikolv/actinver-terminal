@@ -77,19 +77,22 @@ a { color: var(--acento); }
 .boton--texto { background: none; border: none; color: var(--acento); padding: 4px 6px; min-height: 32px; text-decoration: underline; }
 .boton[disabled] { opacity: .55; cursor: progress; }
 
-/* Pestañas */
-.pestanas { background: var(--superficie); border-bottom: 1px solid var(--borde); position: sticky; top: 0; z-index: 5; }
-.pestanas [role="tablist"] { display: flex; gap: 2px; max-width: 1280px; margin: 0 auto; padding: 0 var(--espacio); overflow-x: auto; scrollbar-width: none; }
-.pestanas [role="tab"] { font: inherit; background: none; border: none; border-bottom: 3px solid transparent; padding: 11px 12px; color: var(--texto-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
-.pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); font-weight: 600; }
-.pestanas { display: flex; align-items: center; }
-.pestanas [role="tablist"] { flex: 1 1 0; min-width: 0; }   /* base 0: la Oficina cabe en la misma fila y las pestañas se desplazan */
-/* Grupos por tarea: una fila de grupos y, debajo, solo las pestañas del grupo activo */
-.pestanas { flex-wrap: wrap; }
-.grupos-nav { display: flex; gap: 6px; flex: 1 0 100%; max-width: 1280px; margin: 0 auto; padding: 8px var(--espacio) 2px; overflow-x: auto; scrollbar-width: none; }
-.grupos-nav button { font: inherit; font-size: .85rem; font-weight: 600; white-space: nowrap; min-height: 36px; padding: 6px 12px; border-radius: 999px;
+/* Pestañas: dos filas alineadas con la cabecera (ancho máx. 1280 px): grupos por tarea arriba; pestañas del grupo
+   y Oficina abajo. Si las pestañas no caben, aparecen flechas para desplazarlas. */
+.pestanas { background: var(--superficie); border-bottom: 1px solid var(--borde); position: sticky; top: 0; z-index: 5;
+  display: flex; flex-wrap: wrap; align-items: center; padding: 0 max(var(--espacio), calc((100% - 1280px) / 2)); }
+.grupos-nav { display: flex; gap: 8px; flex: 1 0 100%; padding: 10px 0 4px; overflow-x: auto; scrollbar-width: none; }
+.grupos-nav button { font: inherit; font-size: .92rem; font-weight: 600; white-space: nowrap; min-height: 40px; padding: 8px 16px; border-radius: 999px;
   border: 1px solid var(--borde); background: none; color: var(--texto-2); cursor: pointer; }
+.grupos-nav button:hover { color: var(--texto); border-color: var(--texto-2); }
 .grupos-nav button[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--superficie); }
+.pestanas [role="tablist"] { display: flex; gap: 2px; flex: 1 1 12rem; min-width: 0;   /* base > 0: nunca cabe junto a los grupos, siempre baja a la 2.ª fila */ overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+.pestanas [role="tab"] { font: inherit; background: none; border: none; border-bottom: 3px solid transparent; padding: 11px 14px; color: var(--texto-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
+.pestanas [role="tab"]:hover { color: var(--texto); }
+.pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); font-weight: 600; }
+.desplazar-pestanas { flex: none; font: inherit; font-size: 1.1rem; width: 36px; min-height: 40px; border: 1px solid var(--borde); border-radius: var(--radio);
+  background: var(--superficie); color: var(--texto); cursor: pointer; }
+.desplazar-pestanas[hidden] { display: none; }
 .pestanas[data-grupo="cuenta"] [role="tab"]:not([data-grupo="cuenta"]),
 .pestanas[data-grupo="decidir"] [role="tab"]:not([data-grupo="decidir"]),
 .pestanas[data-grupo="mercado"] [role="tab"]:not([data-grupo="mercado"]),
@@ -358,4 +361,4 @@ select[multiple] { min-width: 230px; }
 .campo-bloque input, .campo-bloque textarea { display: block; width: 100%; max-width: 48rem; box-sizing: border-box; }
 
 /* Acceso entre áreas: junto a la navegación, separado de acciones de datos. */
-.acceso-oficina { display: inline-flex; align-items: center; align-self: center; flex: none; white-space: nowrap; text-decoration: none; margin: 0 8px; padding: 7px 12px; min-height: 40px; font-size: .88rem; }
+.acceso-oficina { display: inline-flex; align-items: center; align-self: center; flex: none; white-space: nowrap; text-decoration: none; margin: 0 0 0 8px; padding: 7px 12px; min-height: 40px; font-size: .88rem; }
