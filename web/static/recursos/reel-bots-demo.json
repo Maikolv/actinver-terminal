@@ -1,0 +1,33 @@
+{
+  "motor": "backtesting.py",
+  "version": "0.6.5",
+  "procedencia": {
+    "simbolo": "DEMO:SINTETICO",
+    "fuente": "fixture matemático local",
+    "licencia": "CC0; fixture generado para pruebas",
+    "calidad": "sintetico",
+    "multiplicador": 1,
+    "nota": "No representa un instrumento ni sesiones de mercado reales"
+  },
+  "sha256_csv_normalizado": "7b883da9a992af91e526deb4826c2773a9db2bd7fab3868548b5dd325f66a184",
+  "estrategia": "SMA20/50 long/flat, tamaño fijo 1, señal al cierre y ejecución en apertura siguiente",
+  "corte_temporal": "2026-01-07 06:30:00+00:00",
+  "barras_calentamiento": 50,
+  "parametros_optimizados": false,
+  "ordenes_reales": false,
+  "capital_virtual": 1000000,
+  "comision_por_lado_por_unidad": 1.0,
+  "spread_relativo": 0.0001,
+  "operaciones": 1,
+  "pnl_neto_virtual": 3.4770607656100765,
+  "retorno_capital_virtual_pct": 0.0003477060765610076,
+  "drawdown_max_pct": -0.0001946988521073223,
+  "primera_entrada": "2026-01-07 13:40:00+00:00",
+  "limites": [
+    "Ejemplo exploratorio; no demuestra alfa ni aplica reglas de una prop firm",
+    "Margin=1: sin apalancamiento; no modela márgenes, rollover, colas, ticks ni liquidación de futuros",
+    "Multiplicador transforma precios en valor por contrato/unidad; verificar especificación y comisiones",
+    "Spread constante no sustituye un modelo de slippage con libro de órdenes",
+    "Repetir el experimento o elegir reglas tras ver el periodo deja de ser un holdout independiente"
+  ]
+}

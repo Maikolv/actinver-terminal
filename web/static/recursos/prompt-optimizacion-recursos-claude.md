@@ -32,3 +32,12 @@ Prueba ausencia de datos, indicadores en calentamiento, feed caído/antiguo, fue
 ## 4. Entregar
 
 Una tabla antes/después con carga, método y fecha; mejoras absolutas y porcentuales sólo si medidas. Lista archivos/configuraciones tocados, pruebas y resultados, recursos opcionales apagados, instrucciones de uso y reversión y limitaciones. Distingue cambios aplicados de propuestas pendientes. Recomienda perfiles ligero/equilibrado/completo sólo a partir del hardware y de las mediciones; por defecto selecciona el más simple que cumpla las necesidades. No llames alfa a una mejora de velocidad ni prometas mayor ganancia.
+
+
+## Ampliación para el reel DepEDXbRMRF
+
+Incluye `laboratorios/reel-bots/` y el manifiesto `config/repositorios-reel-bots.json` en la auditoría. Conserva el entorno principal: el laboratorio es opcional, aislado, sin red ni brokers durante su ejecución. Usa inicialmente un solo motor (backtesting.py) y una hipótesis fija; Freqtrade sólo si el objetivo es cripto; LEAN/Nautilus únicamente si justificas su coste de instalación y prueba. No mantengas cinco servicios ni dupliques históricos para cada framework. No copies la venv al ZIP. Usa el lock de versiones probado, verificando compatibilidad si lo actualizas.
+
+Mide tiempo, RAM pico y tamaño de datos con una muestra idéntica. Empieza con concurrencia 1 y lotes pequeños; aumenta sólo tras medir recursos disponibles. No fijes un número de hilos a ciegas ni uses todos los núcleos por defecto. Si comparas parámetros con vectorbt, procesa por bloques acotados y guarda el número total de ensayos, no sólo los ganadores. Nunca optimices sobre el tramo reservado. Conserva metadatos y hashes y descarta la caché cuando cambie cualquiera de ellos. No reclames ganancias ni ahorro porcentual sin medición.
+
+Para una futura evaluación CME agrega primero calendario, vencimientos, multiplicador, tick, margen, comisiones y slippage coherentes; el ejemplo Margin=1 no equivale a una cuenta Flex 50K ni a un simulador de cola. Evita usar LLMs por tick: reserva Claude para revisión de experimentos y evidencia. Prioriza los cálculos deterministas locales y los servicios ya existentes.

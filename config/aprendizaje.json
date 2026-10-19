@@ -451,6 +451,21 @@
         "Presupuesto de recursos"
       ],
       "ejercicio": "Consultar un símbolo con datos autorizados en la oficina, descargar el informe y contrastar las seis perspectivas. No confundir una visualización con un agente autónomo."
+    },
+    {
+      "titulo": "Instagram — cinco repositorios para investigar un bot",
+      "autor": "artillerytrades",
+      "url": "https://www.instagram.com/p/DepEDXbRMRF/",
+      "captura": "Descripción visible revisada el 19-oct-2026",
+      "estado": "Freqtrade, backtesting.py, vectorbt, LEAN y NautilusTrader identificados. Dos nuevos clones y tres existentes verificados. No se comentó ni solicitó DM.",
+      "conceptos": [
+        "Backtesting offline",
+        "Costes",
+        "Conexiones por verificar",
+        "Licencias",
+        "Presupuesto de recursos"
+      ],
+      "ejercicio": "Ejecutar el laboratorio con --demo, revisar procedencia sintética y límites. No usar el resultado como prueba de alfa ni como bot listo para una cuenta prop."
     }
   ],
   "certificaciones": [
@@ -2131,6 +2146,11 @@
       "titulo": "Prompt de auditoría técnica, estética y de utilidad",
       "url": "/static/recursos/prompt-auditoria-tecnica-estetica-claude.md",
       "detalle": "Revisión de integridad, rendimiento, espacios, jerarquía, navegación y eliminación verificable de elementos sin función."
+    },
+    {
+      "titulo": "Laboratorio de backtesting — reel DepEDXbRMRF",
+      "url": "/static/recursos/laboratorio-bots-reel.html",
+      "detalle": "Cinco repositorios verificados; backtesting.py offline con demostración sintética, guía y ZIP. Sin órdenes reales."
     }
   ]
 }

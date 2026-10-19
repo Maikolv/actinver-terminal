@@ -149,3 +149,8 @@ La oficina comparte `app.css` desde el 19-oct: diseño de informe numerado, sin 
 
 
 Oficina: acceso fijo en navegación principal; selector unificado de universo e instrumentos importados; invalida informes al cambiar selección. Depuración de controles/estilos duplicados. Seis pruebas Node y recorrido de ida/vuelta verificados. Prompt de auditoría técnica/estética en `web/static/recursos/prompt-auditoria-tecnica-estetica-claude.md`; auditoría completa aún no ejecutada.
+
+
+### Reel de backtesting — 19-oct-2026
+
+Reel DepEDXbRMRF incorporado: laboratorio offline opcional `laboratorios/reel-bots/` (backtesting.py 0.6.5), siete pruebas y demo sintética ejecutadas. Dos repositorios descargados (backtesting.py/LEAN), tres existentes verificados. ZIP y guía desde Aprender y recursos/oficina. Prompts Quantower, TradingView y recursos ampliados; sin integración nativa instalada ni ejecución real.

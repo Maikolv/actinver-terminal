@@ -210,3 +210,8 @@ Contexto: el usuario entregó un Excel con precios 1962 → 9-oct-2025 del unive
 ### Incorporación del TikTok — 19-oct-2026
 
 Oficina ligera de lectura bajo demanda; no copiar código de licencia incierta ni iniciar stacks de exchanges. Seis roles descriptivos y prompt manual para Claude; sin órdenes.
+
+
+### Reel de backtesting — 19-oct-2026
+
+Un solo motor offline opcional para el ejemplo del reel, sin modificar dependencias de producción. No activar brokers, TradersPost ni cinco stacks por el número de repositorios. El modelo simplificado no demuestra alfa ni reproduce una cuenta de futuros.

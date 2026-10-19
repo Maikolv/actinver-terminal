@@ -1,0 +1,53 @@
+{
+  "fecha": "2026-10-19",
+  "fuente": "https://www.instagram.com/p/DepEDXbRMRF/",
+  "autor": "artillerytrades",
+  "evidencia": "Descripción visible del reel, cinco nombres identificados; repositorios oficiales contrastados. No se afirma transcripción completa del audio.",
+  "repositorios": [
+    {
+      "nombre": "Freqtrade",
+      "url": "https://github.com/freqtrade/freqtrade",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\freqtrade",
+      "commit": "06831520bab8e0399b48a2d335775e667105fc83",
+      "licencia": "GPL-3.0",
+      "estado": "Existente; sólo verificado",
+      "uso": "Bot de cripto; referencia de dry-run y gestión. No es conector directo CME."
+    },
+    {
+      "nombre": "backtesting.py",
+      "url": "https://github.com/kernc/backtesting.py",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\backtesting.py",
+      "commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "licencia": "AGPL-3.0",
+      "estado": "Descargado en esta entrega",
+      "uso": "Motor instalado en entorno aislado, versión 0.6.5 probada; ejemplo offline funcional."
+    },
+    {
+      "nombre": "vectorbt",
+      "url": "https://github.com/polakowo/vectorbt",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\vectorbt",
+      "commit": "f54802a5982c9fd8123d85c3b5a1d06a80b2726a",
+      "licencia": "Apache-2.0 con Commons Clause; revisar ambos textos",
+      "estado": "Existente; sólo verificado",
+      "uso": "Exploración vectorizada con límite de combinaciones; sin instalar ni ejecutar en esta entrega."
+    },
+    {
+      "nombre": "QuantConnect LEAN",
+      "url": "https://github.com/QuantConnect/Lean",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\Lean",
+      "commit": "d4cac37514427c84d40064cecbf3f0e6be4b0137",
+      "licencia": "Apache-2.0",
+      "estado": "Descargado en esta entrega",
+      "uso": "Motor multiactivo C#/Python; compilación, datos y servicios separados, no iniciados."
+    },
+    {
+      "nombre": "NautilusTrader",
+      "url": "https://github.com/nautechsystems/nautilus_trader",
+      "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\nautilus_trader",
+      "commit": "da61fdf81238b32a60c67ed672054cdc1bf3efd4",
+      "licencia": "LGPL-3.0",
+      "estado": "Existente; sólo verificado",
+      "uso": "Motor por eventos Rust/Python; evaluación futura, sin activar adaptadores."
+    }
+  ]
+}

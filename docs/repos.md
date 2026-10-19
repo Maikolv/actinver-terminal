@@ -344,3 +344,8 @@ Mantenimiento: **activo** = commit en los últimos 30 días; **moderado** = últ
 ### Incorporación del TikTok — 19-oct-2026
 
 Tres clones del TikTok registrados con hashes y licencias en `config/oficina-pixel-repos.json`; integración original documentada en `docs/oficina-inversion-pixel.md`.
+
+
+### Reel de backtesting — 19-oct-2026
+
+Reel DepEDXbRMRF: cinco repositorios oficiales registrados en `config/repositorios-reel-bots.json`; backtesting.py y LEAN descargados, tres clones existentes conservados. Proyecto offline en `laboratorios/reel-bots/`; guía `docs/reel-bots-DepEDXbRMRF.md`.
