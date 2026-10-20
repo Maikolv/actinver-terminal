@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-20 — cierre BMV de respaldo con la captura del portal]
+
+### Agregado
+- `portal.cierres_desde_captura`: una captura tomada después del cierre de la BMV guarda el precio de cada emisora local como cierre de ese día (proveedor `actinver_portal`, prioridad 13, por debajo de EODHD). Antes del cierre, en días sin sesión, en el SIC y en fondos no guarda nada.
+- Aplicado a las capturas existentes: 29 cierres. El plan ya no usa precios del 16-oct por falta del cierre de ALPEK, que EODHD no bajó por el cupo de 20 consultas al día. 3 pruebas nuevas.
+- `docs/auditoria-funcionamiento-total-2026-10-20.md`: qué falta para que todo funcione y quién lo resuelve.
+
 ## [2026-10-19 — avisos de pérdida del día con precios en vivo]
 
 ### Agregado

@@ -21,7 +21,7 @@ from datetime import UTC, datetime
 
 import pandas as pd
 
-from . import cotizaciones, reto
+from . import cotizaciones, reto, vigencia
 from .db import auditar, transaccion
 
 FUENTE = "captura manual del portal del Reto (copiar y pegar)"
@@ -275,11 +275,52 @@ def guardar(con: sqlite3.Connection, texto: str, hora_portal: str, instrumentos:
                         "valor) VALUES (?,?,?,?,?,?,?)",
                         [(c.lastrowid, p["instrumento_id"], p["texto"], p["titulos"], p["costo_promedio"], p["precio"],
                           p["valor"]) for p in r["posiciones"]])
+        r["cierres_respaldo"] = cierres_desde_captura(con, hora, r["posiciones"], instrumentos)
         auditar(con, "captura_portal", c.lastrowid, "alta",
                 despues={"hora_portal": hora, "valor": r["valor_portafolio"], "efectivo": r["efectivo"],
                          "posiciones": len(r["posiciones"])})
     r.update(id=c.lastrowid, confirmado=True, capturado_en=ahora)
     return r
+
+
+PROVEEDOR_CIERRE = "actinver_portal"
+
+
+def cierres_desde_captura(con: sqlite3.Connection, hora: str, posiciones: list[dict], ins: dict) -> int:
+    """Respaldo del cierre BMV: si la captura se tomó DESPUÉS del cierre de una sesión de la BMV, el precio que muestra
+    el portal para cada emisora local (MXN, no fondos ni SIC) se guarda como cierre de ese día con el proveedor
+    `actinver_portal`. Tiene menor prioridad que EODHD (`mercado.PRIORIDAD_FUENTE`): si luego llega el cierre del
+    proveedor, gana el proveedor. Antes del cierre o en un día sin sesión no guarda nada (no es un cierre)."""
+    t = pd.Timestamp(hora)
+    t = t.tz_localize("America/Mexico_City") if t.tzinfo is None else t
+    d = t.tz_convert("America/Mexico_City").date()
+    cierre = vigencia.cierre_de_sesion("XMEX", d)
+    if cierre is None or t < pd.Timestamp(cierre):
+        return 0
+    ahora = datetime.now(UTC).isoformat(timespec="seconds")
+    filas = []
+    for p in posiciones:
+        meta = ins.get(p.get("instrumento_id")) or {}
+        px = p.get("precio")
+        if (px and px > 0 and meta.get("mercado_operable") == "BMV" and (meta.get("moneda_referencia") or "MXN") == "MXN"
+                and not str(meta.get("clase") or "").startswith("fondo")):
+            filas.append((p["instrumento_id"], d.isoformat(), float(px), None, None, "MXN", PROVEEDOR_CIERRE, "cierre",
+                          t.isoformat(), ahora))
+    con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, "
+                    "proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+    return len(filas)
+
+
+def cierres_de_capturas_guardadas(con: sqlite3.Connection) -> int:
+    """Aplica el respaldo a las capturas ya guardadas (una vez, idempotente)."""
+    from . import mercado
+    ins = mercado.instrumentos(con)
+    n = 0
+    with transaccion(con):
+        for c in con.execute("SELECT id, hora_portal FROM capturas_portal").fetchall():
+            pos = [dict(r) for r in con.execute("SELECT instrumento_id, precio FROM posiciones_portal WHERE captura_id=?", (c["id"],))]
+            n += cierres_desde_captura(con, c["hora_portal"], pos, ins)
+    return n
 
 
 def ultima_captura_id() -> int | None:
