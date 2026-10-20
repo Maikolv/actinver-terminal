@@ -35,8 +35,9 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (lunes 19-oct, 14:30):**
-  - Valuación $917,413.67 (−8.26 %); poder de compra $3,123.43. El usuario compró 1 SLV a $954.11 (primer ETF).
+- **Cuenta del Reto, última captura confirmada (martes 20-oct, 14:10):**
+  - Valuación $911,711.75 (−8.83 %); poder de compra $3,123.43. 7 acciones, 1 SLV (comprado el 19-oct a $954.11) y 1 ACTDUAL B.
+  - Desde el 19-oct 14:30: ALPEK +3.0 %, SLV +1.3 %; NVAX −2.3 %, GMEXICO −1.3 %, MU −0.8 %, XOM −0.8 %, AMD −0.5 %, NVDA −0.5 %.
   - 7 acciones y 1 título de ACTDUAL B. Pesos: MU 45.0 %, GMEXICO 17.5 %, AMD 14.0 %, NVDA 11.4 %, ALPEK 5.9 %,
     XOM 2.9 %, NVAX 2.9 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %).
   - Las capturas se registran con `portal.guardar(..., confirmar=True)`. Precios en MXN, ajustados solo por splits.
