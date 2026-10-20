@@ -86,7 +86,7 @@ function tabla(columnas, filas, { caption, vacio: textoVacio = "Sin registros.",
   return h("div", { clase: "tabla-contenedor", tabindex: "0", role: "region", "aria-label": caption || "Tabla desplazable" }, h("table", {}, caption ? h("caption", { texto: caption }) : null,
     h("thead", {}, cab), h("tbody", {}, cuerpo)));
 }
-function limpiar(id, ...hijos) { const el = document.getElementById(id); el.replaceChildren(...hijos); return el; }
+function limpiar(id, ...hijos) { const el = document.getElementById(id); el.replaceChildren(...hijos.filter((x) => x != null && x !== false)); return el; }  // null/false: nada (antes se pintaba «null»)
 function errorCaja(e) { return h("div", { clase: "error-caja", role: "alert" }, e.message || String(e)); }
 function ocupado(botones, si) { botones.forEach((b) => { b.disabled = si; b.setAttribute("aria-busy", si ? "true" : "false"); }); }
 function kpi(etiqueta, valor, clase) { return h("div", { clase: "kpi" }, h("span", { clase: "etiqueta", texto: etiqueta }), h("span", { clase: `valor ${clase || ""}`, texto: valor })); }
@@ -948,7 +948,7 @@ function pintarMapaMercado() {
     ...[["baja-3", "≤ −4 %"], ["baja-2", "−4 a −1.5 %"], ["baja-1", "−1.5 a 0 %"], ["sube-1", "0 a 1.5 %"], ["sube-2", "1.5 a 4 %"], ["sube-3", "≥ 4 %"], ["sin-dato", "sin dato"]]
       .map(([k, t]) => h("span", { clase: `mercado-tile--${k}`, texto: t })),
     h("span", { clase: "suave", texto: "(azul sube, naranja baja; también se indica el signo)" }));
-  raiz.replaceChildren(h("h2", { texto: "Mapa de calor de cierres" }),
+  limpiar("mercado-visualizaciones", h("h2", { texto: "Mapa de calor de cierres" }),
     visuales.modo === "sintetico" ? h("div", { clase: "aviso-caja", texto: "DATOS SINTÉTICOS de demostración: no son precios reales." }) : null,
     h("p", { clase: "ayuda", texto: `${visuales.metodo} ${visuales.nota}` }),
     h("div", { clase: "fila-controles" }, h("label", {}, "Ventana ", selVentana),
