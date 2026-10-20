@@ -1,0 +1,939 @@
+{
+  "fecha": "2026-10-19",
+  "fuente": "Inventario verificado de remotos de este chat; estado de carpetas reconfirmado al generar este archivo",
+  "alcance": "Recursos locales candidatos, no dependencias instaladas ni ejecución confirmada",
+  "repositorios": [
+    {
+      "repositorio": "maikolv/actinver-terminal",
+      "url": "https://github.com/maikolv/actinver-terminal",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "panniantong/agent-reach",
+      "url": "https://github.com/panniantong/agent-reach",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Agent-Reach"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Agent-Reach"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "0xethanq/astra-quant-agent",
+      "url": "https://github.com/0xethanq/astra-quant-agent",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\astra-quant-agent"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\astra-quant-agent"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "the-swarm-corporation/autohedge",
+      "url": "https://github.com/the-swarm-corporation/autohedge",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\AutoHedge"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\AutoHedge"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "awesomedata/awesome-public-datasets",
+      "url": "https://github.com/awesomedata/awesome-public-datasets",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-public-datasets"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-public-datasets"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "wilsonfreitas/awesome-quant",
+      "url": "https://github.com/wilsonfreitas/awesome-quant",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-quant"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-quant"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "wangzhe3224/awesome-systematic-trading",
+      "url": "https://github.com/wangzhe3224/awesome-systematic-trading",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-systematic-trading"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-systematic-trading"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "kernc/backtesting.py",
+      "url": "https://github.com/kernc/backtesting.py",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\backtesting.py"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\backtesting.py"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\repositorios-reel-bots.json",
+        "repositorios-reel-DepEDXbRMRF.json"
+      ]
+    },
+    {
+      "repositorio": "mementum/backtrader",
+      "url": "https://github.com/mementum/backtrader",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\backtrader"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\backtrader"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "browser-use/browser-use",
+      "url": "https://github.com/browser-use/browser-use",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\browser-use"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\browser-use"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "ccxt/ccxt",
+      "url": "https://github.com/ccxt/ccxt",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ccxt"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ccxt"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "agricidaniel/claude-obsidian",
+      "url": "https://github.com/agricidaniel/claude-obsidian",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\claude-obsidian"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\claude-obsidian"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "cline/cline",
+      "url": "https://github.com/cline/cline",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\cline"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\cline"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "deusdata/codebase-memory-mcp",
+      "url": "https://github.com/deusdata/codebase-memory-mcp",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\codebase-memory-mcp"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\codebase-memory-mcp"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "atk-zk/company-pixel-office",
+      "url": "https://github.com/atk-zk/company-pixel-office",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\company-pixel-office"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\company-pixel-office"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\oficina-pixel-repos.json",
+        "actinver-terminal\\docs\\oficina-inversion-pixel.md",
+        "repositorios-tiktok-2026-10-19.json"
+      ]
+    },
+    {
+      "repositorio": "mksglu/context-mode",
+      "url": "https://github.com/mksglu/context-mode",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\context-mode"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\context-mode"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "crewaiinc/crewai",
+      "url": "https://github.com/crewaiinc/crewai",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\crewAI"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\crewAI"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "cathrynlavery/diagram-design",
+      "url": "https://github.com/cathrynlavery/diagram-design",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\diagram-design"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\diagram-design"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "anthropics/financial-services",
+      "url": "https://github.com/anthropics/financial-services",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\financial-services"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\financial-services"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "prosusai/finbert",
+      "url": "https://github.com/prosusai/finbert",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\finBERT"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\finBERT"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\instagram-2026-10-17.md",
+        "repositorios-instagram-2026-10-17.csv",
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "fincept-corporation/finceptterminal",
+      "url": "https://github.com/fincept-corporation/finceptterminal",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\FinceptTerminal"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\FinceptTerminal"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "ai4finance-foundation/finrl",
+      "url": "https://github.com/ai4finance-foundation/finrl",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\FinRL"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\FinRL"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "firecrawl/firecrawl",
+      "url": "https://github.com/firecrawl/firecrawl",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\firecrawl"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\firecrawl"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "cvxv666/fomo-robinhood-radar",
+      "url": "https://github.com/cvxv666/fomo-robinhood-radar",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\fomo-robinhood-radar"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\fomo-robinhood-radar"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "freqtrade/freqtrade",
+      "url": "https://github.com/freqtrade/freqtrade",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\freqtrade"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\freqtrade"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\repositorios-reel-bots.json",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md",
+        "repositorios-reel-DepEDXbRMRF.json"
+      ]
+    },
+    {
+      "repositorio": "nutlope/hallmark",
+      "url": "https://github.com/nutlope/hallmark",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\hallmark"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\hallmark"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md",
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "alipharsad/heston-calibration",
+      "url": "https://github.com/alipharsad/heston-calibration",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Heston-Calibration"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Heston-Calibration"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "nkaz001/hftbacktest",
+      "url": "https://github.com/nkaz001/hftbacktest",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\hftbacktest"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\hftbacktest"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "blader/humanizer",
+      "url": "https://github.com/blader/humanizer",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\humanizer"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\humanizer"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "hummingbot/hummingbot",
+      "url": "https://github.com/hummingbot/hummingbot",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\hummingbot"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\hummingbot"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "pbakaus/impeccable",
+      "url": "https://github.com/pbakaus/impeccable",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\impeccable"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\impeccable"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "shiyu-coder/kronos",
+      "url": "https://github.com/shiyu-coder/kronos",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Kronos"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Kronos"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "mvanhorn/last30days-skill",
+      "url": "https://github.com/mvanhorn/last30days-skill",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\last30days-skill"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\last30days-skill"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "quantconnect/lean",
+      "url": "https://github.com/quantconnect/lean",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Lean"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Lean"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\repositorios-reel-bots.json",
+        "repositorios-reel-DepEDXbRMRF.json"
+      ]
+    },
+    {
+      "repositorio": "lumiwealth/lumibot",
+      "url": "https://github.com/lumiwealth/lumibot",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\lumibot"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\lumibot"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "nautechsystems/nautilus_trader",
+      "url": "https://github.com/nautechsystems/nautilus_trader",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\nautilus_trader"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\nautilus_trader"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\repositorios-reel-bots.json",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md",
+        "repositorios-reel-DepEDXbRMRF.json"
+      ]
+    },
+    {
+      "repositorio": "ollama/ollama",
+      "url": "https://github.com/ollama/ollama",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ollama"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ollama"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "openbq-org/openbb",
+      "url": "https://github.com/openbq-org/openbb",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\OpenBB"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\OpenBB"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "open-dev-society/openstock",
+      "url": "https://github.com/open-dev-society/openstock",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\OpenStock"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\OpenStock"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "i25959341/orderbook",
+      "url": "https://github.com/i25959341/orderbook",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\orderbook"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\orderbook"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "paperswithbacktest/awesome-systematic-trading",
+      "url": "https://github.com/paperswithbacktest/awesome-systematic-trading",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\paperswithbacktest-awesome-systematic-trading"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\paperswithbacktest-awesome-systematic-trading"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "firecrawl/pdf-inspector",
+      "url": "https://github.com/firecrawl/pdf-inspector",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\pdf-inspector"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\pdf-inspector"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "jaypolanco96/pixel-hedge-fund",
+      "url": "https://github.com/jaypolanco96/pixel-hedge-fund",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\pixel-hedge-fund"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\pixel-hedge-fund"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\oficina-pixel-repos.json",
+        "actinver-terminal\\docs\\oficina-inversion-pixel.md",
+        "repositorios-tiktok-2026-10-19.json"
+      ]
+    },
+    {
+      "repositorio": "kyjwang/pixelfund-ai",
+      "url": "https://github.com/kyjwang/pixelfund-ai",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\PixelFund-AI"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\PixelFund-AI"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\oficina-pixel-repos.json",
+        "actinver-terminal\\docs\\oficina-inversion-pixel.md",
+        "repositorios-tiktok-2026-10-19.json"
+      ]
+    },
+    {
+      "repositorio": "sonnyfully/polymarket-bot",
+      "url": "https://github.com/sonnyfully/polymarket-bot",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\polymarket-bot"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\polymarket-bot"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "dietrichgebert/ponytail",
+      "url": "https://github.com/dietrichgebert/ponytail",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ponytail"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ponytail"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md",
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "microsoft/qlib",
+      "url": "https://github.com/microsoft/qlib",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\qlib"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\qlib"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "microsoft/rd-agent",
+      "url": "https://github.com/microsoft/rd-agent",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\RD-Agent"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\RD-Agent"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "morluto/rea",
+      "url": "https://github.com/morluto/rea",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\rea"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\rea"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "yamadashy/repomix",
+      "url": "https://github.com/yamadashy/repomix",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\repomix"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\repomix"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "d4vinci/scrapling",
+      "url": "https://github.com/d4vinci/scrapling",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Scrapling"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Scrapling"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md",
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "skfolio/skfolio",
+      "url": "https://github.com/skfolio/skfolio",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\skfolio"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\skfolio"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "senlindesign/taste-skill",
+      "url": "https://github.com/senlindesign/taste-skill",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\taste-skill"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\taste-skill"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "luxalgo/trade-journal",
+      "url": "https://github.com/luxalgo/trade-journal",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\trade-journal"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\trade-journal"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md",
+        "trade-journal\\README.md",
+        "trade-journal\\SECURITY.md",
+        "trade-journal\\TRADEMARKS.md",
+        "trade-journal\\docs\\importers.md"
+      ]
+    },
+    {
+      "repositorio": "lukstei/trading-backtest",
+      "url": "https://github.com/lukstei/trading-backtest",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\trading-backtest"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\trading-backtest"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "trading-backtest\\README.md"
+      ]
+    },
+    {
+      "repositorio": "tauricresearch/tradingagents",
+      "url": "https://github.com/tauricresearch/tradingagents",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "vongchu/tradingagents_tauricresearch",
+      "url": "https://github.com/vongchu/tradingagents_tauricresearch",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents_TauricResearch"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents_TauricResearch"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "deonmenezes/tradingviewmcp",
+      "url": "https://github.com/deonmenezes/tradingviewmcp",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\tradingviewmcp"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\tradingviewmcp"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "maikolv/tradingviewmcp",
+      "url": "https://github.com/maikolv/tradingviewmcp",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\tradingviewmcp"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\tradingviewmcp"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera"
+      ]
+    },
+    {
+      "repositorio": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ui-ux-pro-max-skill"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\ui-ux-pro-max-skill"
+      ],
+      "evidencias": [
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "polakowo/vectorbt",
+      "url": "https://github.com/polakowo/vectorbt",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\vectorbt"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\vectorbt"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\config\\repositorios-reel-bots.json",
+        "repositorios-reel-DepEDXbRMRF.json"
+      ]
+    },
+    {
+      "repositorio": "hkuds/vibe-trading",
+      "url": "https://github.com/hkuds/vibe-trading",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Vibe-Trading"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\Vibe-Trading"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "openai/whisper",
+      "url": "https://github.com/openai/whisper",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\whisper"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\whisper"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "koala73/worldmonitor",
+      "url": "https://github.com/koala73/worldmonitor",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\worldmonitor"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\worldmonitor"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    },
+    {
+      "repositorio": "ranaroussi/yfinance",
+      "url": "https://github.com/ranaroussi/yfinance",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\yfinance"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\yfinance"
+      ],
+      "evidencias": [
+        "Clon local de proyecto financiero o referencia financiera",
+        "actinver-terminal\\docs\\instagram-2026-10-17.md",
+        "repositorios-instagram-2026-10-17.csv",
+        "repositorios-verificados.csv"
+      ]
+    },
+    {
+      "repositorio": "yt-dlp/yt-dlp",
+      "url": "https://github.com/yt-dlp/yt-dlp",
+      "rutas": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\yt-dlp"
+      ],
+      "rutas_existentes": [
+        "C:\\Users\\MIKE\\Desktop\\Repos\\yt-dlp"
+      ],
+      "evidencias": [
+        "actinver-terminal\\docs\\repository-adoption-matrix.md"
+      ]
+    }
+  ],
+  "prioridades": {
+    "nucleo": [
+      "actinver-terminal",
+      "futuros-lab",
+      "Quantower SDK local"
+    ],
+    "verificacion_externa": [
+      "backtrader",
+      "backtesting.py"
+    ],
+    "microestructura_con_datos_apropiados": [
+      "hftbacktest",
+      "nautilus_trader"
+    ],
+    "alternativa_no_dependencia_simultanea": [
+      "Lean"
+    ],
+    "no_conector_cme": [
+      "ccxt",
+      "freqtrade",
+      "hummingbot"
+    ]
+  }
+}

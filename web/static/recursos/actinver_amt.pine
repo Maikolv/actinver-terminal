@@ -1,0 +1,67 @@
+//@version=6
+indicator("Actinver · Auction Market Theory (niveles previos verificados)", overlay=true)
+// Indicador descriptivo. NO envía órdenes. Sin request.security ni lookahead.
+// Copiar VAH/VAL/POC de una sesión COMPLETA ANTERIOR (TPO o volumen, elegir uno).
+// Ventana de validez obligatoria: renovar niveles en cada sesión.
+vah = input.float(0, "VAH anterior", minval=0)
+val = input.float(0, "VAL anterior", minval=0)
+poc = input.float(0, "POC anterior", minval=0)
+desde = input.time(0, "Inicio de validez de niveles (sesión actual)")
+hasta = input.time(0, "Fin de validez de niveles (sesión actual)")
+sesionOrigenFin = input.time(0, "Fin de sesión de origen de los niveles")
+n = input.int(2, "Cierres de aceptación (hipótesis)", minval=2, maxval=10)
+sesion = "0930-1600" // RTH fijo; el IB de esta versión es 09:30–10:30 NY.
+zona = "America/New_York"
+enSesion = not na(time(timeframe.period, sesion, zona))
+sesionDia = time("D", "0000-2359", zona)
+nuevoDia = ta.change(sesionDia) != 0
+var float ibHigh = na
+var float ibLow = na
+var int ibBarras = 0
+var int arriba = 0
+var int abajo = 0
+segundos = timeframe.in_seconds()
+tfValido = timeframe.isintraday and (segundos == 60 or segundos == 300 or segundos == 900)
+minuto = hour(time, zona)*60 + minute(time, zona)
+enIB = enSesion and minuto >= 570 and minuto < 630
+if barstate.isconfirmed
+    if nuevoDia
+        ibHigh := na
+        ibLow := na
+        ibBarras := 0
+        arriba := 0
+        abajo := 0
+    if enIB and tfValido
+        ibHigh := na(ibHigh) ? high : math.max(ibHigh, high)
+        ibLow := na(ibLow) ? low : math.min(ibLow, low)
+        ibBarras += 1
+
+valido = tfValido and enSesion and desde > 0 and hasta > desde and hasta-desde <= 86400000 and sesionOrigenFin > 0 and sesionOrigenFin <= desde and time >= desde and time_close <= hasta and val > 0 and vah > val and poc >= val and poc <= vah
+ibCompleto = tfValido and minuto >= 630 and ibBarras == int(3600/segundos)
+if barstate.isconfirmed
+    continuo = time == time_close[1]
+    arriba := valido and close > vah ? (continuo ? arriba+1 : 1) : 0
+    abajo := valido and close < val ? (continuo ? abajo+1 : 1) : 0
+aceptaArriba = valido and barstate.isconfirmed and arriba >= n
+aceptaAbajo = valido and barstate.isconfirmed and abajo >= n
+dentro = valido and close >= val and close <= vah
+rechazaArriba = dentro and high > vah and barstate.isconfirmed
+rechazaAbajo = dentro and low < val and barstate.isconfirmed
+plot(valido ? vah : na, "VAH previo", color=color.orange, style=plot.style_linebr)
+plot(valido ? val : na, "VAL previo", color=color.orange, style=plot.style_linebr)
+plot(valido ? poc : na, "POC previo", color=color.blue, style=plot.style_linebr)
+plot(enSesion and ibCompleto ? ibHigh : na, "IB alto confirmado", color=color.gray, style=plot.style_linebr)
+plot(enSesion and ibCompleto ? ibLow : na, "IB bajo confirmado", color=color.gray, style=plot.style_linebr)
+plotshape(aceptaArriba and arriba == n, "Aceptación alcista", shape.triangleup, location.belowbar, color=color.teal, size=size.tiny)
+plotshape(aceptaAbajo and abajo == n, "Aceptación bajista", shape.triangledown, location.abovebar, color=color.red, size=size.tiny)
+plotshape(rechazaArriba or rechazaAbajo, "Rechazo", shape.circle, location.abovebar, color=color.orange, size=size.tiny)
+var table panel = table.new(position.top_right, 1, 2)
+if barstate.islast
+    estado = not valido ? "NO EVALUAR: revisar niveles, fechas o timeframe" : aceptaArriba ? "Aceptación alcista" : aceptaAbajo ? "Aceptación bajista" : rechazaArriba and rechazaAbajo ? "Rechazo de ambos extremos" : rechazaArriba ? "Rechazo superior" : rechazaAbajo ? "Rechazo inferior" : dentro ? "Rotación en valor" : "Exploración"
+    table.cell(panel, 0, 0, "AMT · contexto educativo", text_color=chart.fg_color, bgcolor=chart.bg_color)
+    table.cell(panel, 0, 1, estado, text_color=chart.fg_color, bgcolor=chart.bg_color)
+// Crear alertas de cierre. Mensajes informativos compatibles con el receptor existente.
+// Sustituir <SECRETO> sólo en el diálogo privado de la alerta; no versionar credenciales.
+alertcondition(aceptaArriba and arriba == n, "AMT aceptación alcista", '{"secreto":"<SECRETO>","simbolo":"{{exchange}}:{{ticker}}","precio":{{close}},"hora":"{{timenow}}","alerta":"AMT aceptación alcista: revisar, no ejecutar"}')
+alertcondition(aceptaAbajo and abajo == n, "AMT aceptación bajista", '{"secreto":"<SECRETO>","simbolo":"{{exchange}}:{{ticker}}","precio":{{close}},"hora":"{{timenow}}","alerta":"AMT aceptación bajista: revisar, no ejecutar"}')
+alertcondition(rechazaArriba or rechazaAbajo, "AMT rechazo", '{"secreto":"<SECRETO>","simbolo":"{{exchange}}:{{ticker}}","precio":{{close}},"hora":"{{timenow}}","alerta":"AMT rechazo: revisar, no ejecutar"}')

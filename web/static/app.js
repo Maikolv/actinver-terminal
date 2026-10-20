@@ -1794,7 +1794,7 @@ document.getElementById("form-opciones").addEventListener("submit", async (ev) =
 
 /* ---------- Velas, Order Flow y Option Flow (terminal/flujo): solo datos reales o importados ---------- */
 const flujo = { estado: null, velas: { simbolo: "", intervalo: "1Day", dias: 180, sma: true, boll: false, vwap: false, ema20: false, ema50: false, sar: false, macd: false, estoc: false },
-  of: { simbolo: "", minutos: 240, niveles: 20 }, op: { subyacente: "", filtros: {} } };
+  of: { simbolo: "", minutos: 240, niveles: 20, pasoAmt: .25 }, op: { subyacente: "", filtros: {} } };
 const fmtHora = new Intl.DateTimeFormat("es-MX", { timeZone: "America/Mexico_City", dateStyle: "short", timeStyle: "medium" });
 const horaCdmx = (iso) => { if (!iso) return "—"; const d = new Date(iso); return Number.isNaN(d.getTime()) ? iso : `${fmtHora.format(d)} CDMX`; };
 const retrasoTexto = (sg) => (vacio(sg) ? "retraso desconocido" : sg < 60 ? `retraso ${num(Math.round(sg))} s`
@@ -2050,6 +2050,28 @@ function botonAccion(texto, clase, alPulsar) {
   return b;
 }
 
+function pintarSubasta(d, procedencia) {
+  const estados = { sin_referencia: "Sin referencia previa", aceptacion_alcista: "Aceptación alcista", aceptacion_bajista: "Aceptación bajista", rechazo_superior: "Rechazo superior", rechazo_inferior: "Rechazo inferior", rechazo_ambos_extremos: "Rechazo de ambos extremos", rotacion_en_valor: "Rotación en valor", exploracion_fuera_de_valor: "Exploración fuera de valor" };
+  return h("section", { clase: "tarjeta" },
+    h("h2", { texto: "Auction Market Theory · contexto de subasta" }),
+    h("p", { clase: "ayuda", texto: d ? `${d.zona} · ${d.sesion} · rejilla fija ${num(d.paso_precio)}. ${d.nota}` : "Sin sesión de origen verificada. No se supone un horario ni se inventan niveles." }),
+    cajaProcedencia(procedencia),
+    d?.sesiones.length ? tabla([
+      { t: "Sesión", f: (s) => s.fecha },
+      { t: "Contexto", f: (s) => estados[s.estado] || s.estado },
+      { t: "Cobertura", f: (s) => pct(s.cobertura) },
+      { t: "POC observado", f: (s) => num(s.perfil_tpo_observado?.poc) },
+      { t: "VAL / VAH previo", f: (s) => s.referencia ? `${num(s.referencia.val)} / ${num(s.referencia.vah)} (${s.referencia.fecha})` : "Sin referencia completa" },
+      { t: "Balance inicial", f: (s) => s.ib ? `${num(s.ib.bajo)} – ${num(s.ib.alto)}` : "Pendiente / incompleto" }
+    ], d.sesiones, { caption: "AMT descriptivo con barras cerradas; no son órdenes de trading" })
+      : h("p", { clase: "vacio", texto: "Sin barras intradía suficientes. Importe o actualice barras de 5 minutos en Velas." }),
+    h("details", {}, h("summary", { texto: "Cómo leerlo y usarlo en Quantower / TradingView" }),
+      h("p", { clase: "ayuda", texto: "Aceptación: dos cierres consecutivos fuera del valor previo. Rechazo: la última barra explora fuera y cierra dentro. Rotación: cierre dentro sin barrido. Son hipótesis, no evidencia de ventaja. La sesión es RTH 09:30–16:00 de Nueva York; no es la sesión Globex." }),
+      h("a", { href: "/static/recursos/auction-market-theory.md", texto: "Guía, fuentes y límites del módulo" }),
+      h("p", {}, h("a", { href: "/static/recursos/actinver_amt.pine", download: "actinver_amt.pine", texto: "Descargar indicador AMT para TradingView" })),
+      h("p", {}, h("a", { href: "/static/recursos/amt-proyectos-financieros.zip", download: "amt-proyectos-financieros.zip", texto: "Descargar fuentes, observador Quantower y prompt de Claude" }))));
+}
+
 function pintarTpo(d) {
   const letra = (i) => i < 26 ? String.fromCharCode(65 + i) : String.fromCharCode(97 + i - 26);
   return h("section", { clase: "tarjeta" }, h("h2", { texto: "TPO observado / Market Profile" }),
@@ -2074,6 +2096,7 @@ async function cargarOrderFlow() {
       selectorSimbolo(o.simbolo, (x) => { o.simbolo = x; cargarOrderFlow(); }),
       selectorSimple(o.minutos, [[30, "30 min"], [240, "4 h"], [1440, "1 día"], [10080, "7 días"]], (x) => { o.minutos = Number(x); cargarOrderFlow(); }, "Ventana de operaciones"),
       selectorSimple(o.niveles, [5, 10, 20, 50].map((x) => [x, String(x)]), (x) => { o.niveles = Number(x); cargarOrderFlow(); }, "Niveles"),
+      selectorSimple(o.pasoAmt, [.01, .05, .25, .5, 1, 5, 10].map((x) => [x, String(x)]), (x) => { o.pasoAmt = Number(x); cargarOrderFlow(); }, "Rejilla AMT (precio; no tick verificado)"),
       botonAccion("Actualizar libro", "boton--primario", async (b) => { if (await pedirActualizacion("libro", o.simbolo, {}, b)) cargarOrderFlow(); }),
       botonAccion("Actualizar operaciones", "boton--secundario", async (b) => { if (await pedirActualizacion("operaciones", o.simbolo, {}, b)) cargarOrderFlow(); }));
     const provs = h("p", { clase: "ayuda", texto: `Fuentes: ${flujo.estado.proveedores.map((p) => `${p.nombre} — ${p.configurado ? "disponible" : "no configurado"}`).join(" · ")}. No disponible gratuitamente: ${flujo.estado.no_disponible.join("; ")}.` });
@@ -2084,7 +2107,7 @@ async function cargarOrderFlow() {
     }
     const [d, perfiles] = await Promise.all([   // independientes: en paralelo
       api(`/api/flujo/libro-operaciones?simbolo=${encodeURIComponent(o.simbolo)}&minutos=${o.minutos}&niveles=${o.niveles}`),
-      api(`/api/flujo/perfiles?simbolo=${encodeURIComponent(o.simbolo)}`)]);
+      api(`/api/flujo/perfiles?simbolo=${encodeURIComponent(o.simbolo)}&paso_precio=${o.pasoAmt}`)]);
     if (!vigente()) return;
     const L = d.libro, R = d.resumen;
     const filasLibro = L ? Array.from({ length: Math.max(L.bids.length, L.asks.length) }, (_, i) => ({ b: L.bids[i], a: L.asks[i] })) : [];
@@ -2101,6 +2124,7 @@ async function cargarOrderFlow() {
         filasLibro, { caption: "Libro de órdenes por nivel" }))
         : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio_libro }),
       pintarMicroestructura(d),
+      pintarSubasta(perfiles.subasta, perfiles.procedencia),
       pintarTpo(perfiles),
       h("h2", { texto: "Cinta de operaciones" }),
       d.operaciones.length ? h("div", {}, cajaProcedencia(d.procedencia_operaciones),

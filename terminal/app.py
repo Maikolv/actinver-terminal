@@ -1000,9 +1000,12 @@ def flujo_orderflow(simbolo: str, minutos: int = 240, niveles: int = 20, con=Dep
 
 
 @app.get("/api/flujo/perfiles")
-def flujo_perfiles(simbolo: str, intervalo: str = "5Min", dias: int = 7, con=Depends(con_db)):
+def flujo_perfiles(simbolo: str, intervalo: str = "5Min", dias: int = 7, paso_precio: float = .25, con=Depends(con_db)):
     from datetime import UTC, datetime, timedelta
-    from .flujo import almacen, calculos, servicio
+    from .flujo import almacen, calculos, servicio, subasta
+    import math
+    if not math.isfinite(paso_precio) or not .000001 <= paso_precio <= 100000:
+        raise HTTPException(422, "Paso de precio fuera de rango")
     if intervalo not in ("1Min", "5Min", "15Min"):
         raise HTTPException(422, "TPO requiere barras de 1, 5 o 15 minutos")
     desde = (datetime.now(UTC) - timedelta(days=max(1, min(dias, 30)))).isoformat()
@@ -1018,10 +1021,16 @@ def flujo_perfiles(simbolo: str, intervalo: str = "5Min", dias: int = 7, con=Dep
                 "sesiones": [], "procedencia": [], "intervalo": intervalo,
                 "nota": "Sin sesión de origen verificada para este símbolo; no se supone un horario para el CSV."}
     zona = "America/Mexico_City" if cripto else "America/New_York"
+    try:
+        amt = subasta.analizar(barras, paso=paso_precio, zona=zona,
+                              apertura="00:00" if cripto else "09:30",
+                              cierre="24:00" if cripto else "16:00")
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
     return {**calculos.perfil_tpo(barras, zona_horaria=zona,
                                 apertura="00:00" if cripto else "09:30",
                                 cierre="24:00" if cripto else "16:00"),
-            "procedencia": servicio._procedencia(barras), "intervalo": intervalo}
+            "procedencia": servicio._procedencia(barras), "intervalo": intervalo, "subasta": amt}
 
 
 @app.get("/api/flujo/optionflow")
