@@ -35,9 +35,10 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (martes 20-oct, 14:10):**
-  - Valuación $911,711.75 (−8.83 %); poder de compra $3,123.43. 7 acciones, 1 SLV (comprado el 19-oct a $954.11) y 1 ACTDUAL B.
-  - Desde el 19-oct 14:30: ALPEK +3.0 %, SLV +1.3 %; NVAX −2.3 %, GMEXICO −1.3 %, MU −0.8 %, XOM −0.8 %, AMD −0.5 %, NVDA −0.5 %.
+- **Cuenta del Reto, última captura confirmada (miércoles 21-oct, 14:30):**
+  - Valuación $937,750.85 (−6.22 %); poder de compra $3,123.43. 7 acciones, 1 SLV (comprado el 19-oct a $954.11) y 1 ACTDUAL B.
+  - Desde el 20-oct: NVAX +5.5 %, AMD +4.8 %, NVDA +4.2 %, MU +3.2 %, XOM +2.0 %, SLV +1.4 %, GMEXICO +0.5 %; ALPEK −0.5 %.
+  - Las capturas posteriores al cierre BMV guardan el cierre de respaldo (`actinver_portal`).
   - 7 acciones y 1 título de ACTDUAL B. Pesos: MU 45.0 %, GMEXICO 17.5 %, AMD 14.0 %, NVDA 11.4 %, ALPEK 5.9 %,
     XOM 2.9 %, NVAX 2.9 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %).
   - Las capturas se registran con `portal.guardar(..., confirmar=True)`. Precios en MXN, ajustados solo por splits.
@@ -159,3 +160,8 @@ Reel DepEDXbRMRF incorporado: laboratorio offline opcional `laboratorios/reel-bo
 
 
 Navegación común: `web/static/navegacion.{json,mjs,css}` y selector de las 24 secciones en las cuatro vistas. Enlaces directos `/?vista=tab-...`, panel inicial inmediato y preservación de elecciones durante la carga. Nueve pruebas Node y recorridos en navegador verificados; versión móvil compacta. Ver `docs/oficina-inversion-pixel.md`.
+
+
+### NQ — aporte Codex20/oct/2026
+
+Ficha añadida a Aprender y recursos, con guía, prerregistro y resultados agregados. Replay offline en futuros-lab:6901barras,5RTH completas,4sesiones desarrollo,0trades;6tests específicos aprobados. Sin ventaja demostrada; sin forward ni prueba real de OCO. No se alteró la interfaz ni se desplegó Quantower. Coordinación con Claude mediante documento local; expediente futuros-lab/entregables/nq-investigacion-20261020.
