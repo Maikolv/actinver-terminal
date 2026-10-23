@@ -35,9 +35,9 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (miércoles 21-oct, 14:30):**
-  - Valuación $937,750.85 (−6.22 %); poder de compra $3,123.43. 7 acciones, 1 SLV (comprado el 19-oct a $954.11) y 1 ACTDUAL B.
-  - Desde el 20-oct: NVAX +5.5 %, AMD +4.8 %, NVDA +4.2 %, MU +3.2 %, XOM +2.0 %, SLV +1.4 %, GMEXICO +0.5 %; ALPEK −0.5 %.
+- **Cuenta del Reto, última captura confirmada (viernes 23-oct, 07:51):**
+  - Valuación $897,785.97 (−10.22 %); poder de compra $3,123.43. 7 acciones, 1 SLV y 1 ACTDUAL B. Sin captura del 22-oct.
+  - Desde el 21-oct 14:30: NVAX −8.7 %, AMD −7.2 %, SLV −6.7 %, NVDA −4.2 %, MU −3.9 %, GMEXICO −3.7 %, ALPEK −2.0 %, XOM −0.2 %.
   - Las capturas posteriores al cierre BMV guardan el cierre de respaldo (`actinver_portal`).
   - 7 acciones y 1 título de ACTDUAL B. Pesos: MU 45.0 %, GMEXICO 17.5 %, AMD 14.0 %, NVDA 11.4 %, ALPEK 5.9 %,
     XOM 2.9 %, NVAX 2.9 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %).
