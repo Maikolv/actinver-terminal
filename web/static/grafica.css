@@ -3,3 +3,7 @@ header { padding: 8px 12px; border-bottom: 1px solid #34373c; }
 a { color: #6fb0dd; }
 .tradingview-widget-container { height: calc(100% - 40px); width: 100%; }
 .tradingview-widget-container__widget { height: 100%; width: 100%; }
+.sin-cabecera .tradingview-widget-container { height: 100%; }
+.sin-cabecera .tradingview-widget-container__widget { height: calc(100% - 22px); }
+.tradingview-widget-copyright { font-size: 11px; padding: 2px 6px; }
+body.sin-cabecera { overflow: hidden; }

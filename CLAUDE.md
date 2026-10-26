@@ -11,6 +11,16 @@ legal (sin saltar anti-bot/paywalls), sin automatizar la cuenta personal de
 Actinver, nada destructivo fuera de este repo y de los adjuntos, nunca simular un
 precio como si fuera vigente, servir solo en `127.0.0.1`.
 
+## Directriz post-Reto (activa desde el 13-nov-2026, 15:00 CDMX)
+
+Al terminar el Reto, la terminal pasa a llamarse **help-quote-terminal**:
+- se quitan todas las reglas del Reto;
+- se prioriza el mejor portafolio de largo plazo e intradía;
+- se conservan todas las funciones;
+- el nombre nuevo se refleja en el código, en los documentos locales, en GitHub y en la memoria.
+Los límites duros de arriba no cambian. Los datos del Reto se archivan, no se borran. Renombrar el repositorio o la
+carpeta requiere confirmación del usuario. Detalle y pasos: `docs/directriz-post-reto.md`.
+
 ## Qué es
 
 Terminal local (FastAPI + SQLite + HTML/CSS/JS sin build) para comparar dos

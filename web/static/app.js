@@ -990,6 +990,8 @@ async function cargarVisualizacionesMercado() {
 
 async function cargarMercado() {
   try {
+    const w = document.getElementById("mercado-widgets");
+    if (w && !w.childElementCount) w.append(panoramaTradingView());  // una vez: recargar los marcos no aporta
     cargarVisualizacionesMercado();
     const d = await api("/api/mercado");
     const insiderEstado = (estado.datos && estado.datos.proveedores || []).find((p) => p.proveedor === "sec_edgar");
@@ -1837,6 +1839,47 @@ function graficaTradingView(v) {
     marco);
 }
 
+// Widgets gratuitos de TradingView en marcos aislados (/widget/...). Solo muestran; no alimentan cálculos.
+const AVISO_TV = "Datos de TradingView: EE. UU. con la cotización gratuita de Cboe en USD; las emisoras de la BMV no están disponibles en estos widgets gratuitos. Pueden diferir del simulador del Reto. Solo informa.";
+function marcoWidget(tipo, params, alto, titulo) {
+  const q = new URLSearchParams(params).toString();
+  const m = h("iframe", { clase: "widget-tv", title: titulo, loading: "lazy", src: `/widget/${tipo}${q ? `?${q}` : ""}` });
+  m.style.height = `${alto}px`;  // por CSSOM: la CSP bloquea el atributo style
+  return m;
+}
+function bloqueWidget(titulo, contenido, abierto = false) {
+  return h("details", { clase: "tarjeta widget-bloque", open: abierto }, h("summary", { texto: titulo }), ...[].concat(contenido));
+}
+
+function panoramaTradingView() {
+  const mapa = marcoWidget("mapa", { mapa: "NASDAQ100" }, 560, "Mapa de calor de acciones");
+  const filtro = marcoWidget("filtro", { filtro: "america" }, 560, "Filtro de acciones");
+  return h("section", { "aria-label": "Panorama de TradingView" },
+    h("h2", { texto: "Panorama de TradingView" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
+    marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
+    bloqueWidget("Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
+    bloqueWidget("Mapa de calor por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
+      (x) => { mapa.src = `/widget/mapa?mapa=${x}`; }, "Índice"), mapa]),
+    bloqueWidget("Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
+    bloqueWidget("Filtro de acciones", [selectorSimple("america", [["america", "EE. UU."], ["mexico", "México"]],
+      (x) => { filtro.src = `/widget/filtro?filtro=${x}`; }, "Mercado"), filtro]),
+    bloqueWidget("Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")));
+}
+
+function fichaTradingView(simbolo) {
+  const s = { simbolo };
+  return h("section", { "aria-label": "Ficha de TradingView" },
+    h("h3", { texto: "Ficha de la emisora (TradingView)" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
+    marcoWidget("info", s, 190, "Precio y rango del día"),
+    bloqueWidget("Panorama del precio", marcoWidget("panorama", s, 420, "Panorama del precio")),
+    bloqueWidget("Perfil de la empresa", marcoWidget("perfil", s, 420, "Perfil de la empresa")),
+    bloqueWidget("Datos fundamentales", marcoWidget("finanzas", s, 520, "Datos fundamentales")),
+    bloqueWidget("Noticias de la emisora", marcoWidget("noticias-emisora", s, 480, "Noticias de la emisora")),
+    bloqueWidget("Resumen técnico de TradingView (no es una recomendación)", [
+      h("div", { clase: "aviso-caja", role: "note", texto: "Este medidor de «Comprar / Vender» lo calcula TradingView con promedios móviles y osciladores. No es una recomendación ni una predicción, y la terminal no tiene evidencia de que esas señales funcionen. La decisión es tuya." }),
+      marcoWidget("tecnico", s, 460, "Resumen técnico de TradingView")]));
+}
+
 function selectorSimple(valor, opciones, alCambiar, etiqueta) {
   const sel = h("select", { "aria-label": etiqueta, onchange: (e) => alCambiar(e.target.value) }, opciones.map(([v, t]) => h("option", { value: v }, t)));
   sel.value = String(valor);
@@ -2009,7 +2052,7 @@ async function cargarVelas() {
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
     if (solicitud !== cargaVelasId) return;
     const ult = d.barras.slice(-12).reverse();
-    limpiar("velas-contenido", controles, d.grafica ? graficaTradingView(v) : null,
+    limpiar("velas-contenido", controles, d.grafica ? graficaTradingView(v) : null, d.grafica ? fichaTradingView(v.simbolo) : null,
       d.barras.length ? h("div", {},
         h("p", { clase: "ayuda" }, chip("retrasado", v.intervalo === "1Day" ? "Barras diarias" : "Barras intradía"), " ", `${d.zona_horaria}. ${d.nota}`),
         cajaProcedencia(d.procedencia), graficaVelas(d.barras, v, v.intervalo),

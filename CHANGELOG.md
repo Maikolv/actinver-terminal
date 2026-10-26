@@ -2,6 +2,21 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-25 — velas en movimiento y widgets gratuitos de TradingView]
+
+### Agregado
+- **Velas:** gráfica de TradingView dentro de la pestaña (1 min, 5 min, 15 min, 1 h o diario) y ficha de la emisora: precio del día, panorama, perfil, datos fundamentales, noticias y resumen técnico de TradingView, este último con aviso de que no es una recomendación.
+- **Mercado:** «Panorama de TradingView» con cinta de tus posiciones de EE. UU., resumen de índices, dólar y materias primas, mapa de calor (Nasdaq 100 / S&P 500), calendario económico de EE. UU. y México, filtro de acciones (EE. UU. / México) y noticias.
+- Ruta `/widget/{tipo}` con lista cerrada de tipos y parámetros, CSP propia y enmarcable solo desde la terminal. Los widgets solo muestran: nada entra en cálculos ni se guarda. 2 pruebas nuevas (`tests/test_grafica_vivo.py`).
+- `docs/auditoria-2026-10-25.md`: hallazgos y prompt de mejoras.
+- `docs/directriz-post-reto.md` (referida en CLAUDE.md): desde el 13-nov-2026 15:00 la terminal pasa a «help-quote-terminal», sin reglas del Reto, con todas sus funciones y los mismos límites duros.
+
+### Corregido
+- `terminal.__version__` decía 0.1.0 y así sellaba backtests y evaluaciones; ahora se lee de `pyproject.toml` (0.31.0).
+
+### Limitaciones comprobadas
+- Los widgets gratuitos muestran error con símbolos de la BMV (ALPEK, GMEXICO, IPC): se excluyen de la cinta y del resumen. EE. UU. sale de Cboe One en USD.
+
 ## [2026-10-20 — cierre BMV de respaldo con la captura del portal]
 
 ### Agregado

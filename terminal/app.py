@@ -1437,6 +1437,79 @@ retraso según TradingView; pueden diferir del simulador). <a href="/" target="_
     return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
 
 
+# Widgets gratuitos de TradingView (sin cuenta). Solo muestran: nada de lo que dibujan entra en cálculos ni se guarda.
+# Cada tipo: (script de TradingView, ¿necesita símbolo?). La configuración se arma aquí con valores de listas cerradas.
+WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", False), "mapa": ("stock-heatmap", False),
+              "calendario": ("events", False), "filtro": ("screener", False), "noticias": ("timeline", False),
+              "info": ("symbol-info", True), "panorama": ("symbol-overview", True), "perfil": ("symbol-profile", True),
+              "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True)}
+MAPAS_TV = {"NASDAQ100", "SPX500"}
+FILTROS_TV = {"america", "mexico"}
+BASE_TV = {"colorTheme": "dark", "isTransparent": False, "locale": "es", "width": "100%", "height": "100%"}
+
+
+def _simbolos_cartera(con) -> list[str]:
+    """Símbolos de TradingView de las posiciones de la última captura del portal (para la cinta)."""
+    from . import portal
+    cid = portal.ultima_captura_id()
+    ins = mercado.instrumentos(con)
+    ids = [r[0] for r in con.execute("SELECT instrumento_id FROM posiciones_portal WHERE captura_id=?", (cid,))] if cid else []
+    # Sin BMV: los widgets gratuitos muestran error con sus símbolos (comprobado el 25-oct-2026).
+    return [s for s in (simbolo_tradingview(ins[i]) for i in ids if i in ins) if s and not s.startswith("BMV:")]
+
+
+def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> dict:
+    if tipo == "cinta":
+        sims = _simbolos_cartera(con) or ["NASDAQ:NDX"]
+        return {**BASE_TV, "symbols": [{"proName": s, "title": s.split(":")[1]} for s in sims], "showSymbolLogo": True,
+                "displayMode": "adaptive"}
+    if tipo == "resumen":
+        grupo = lambda t, ss: {"title": t, "symbols": [{"s": s, "d": d} for s, d in ss]}  # noqa: E731
+        return {**BASE_TV, "dateRange": "1D", "showChart": True, "showSymbolLogo": True, "tabs": [
+            grupo("Índices", [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"), ("FOREXCOM:DJI", "Dow Jones")]),
+            grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso")]),
+            grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("TVC:USOIL", "Petróleo WTI")])]}
+    if tipo == "mapa":
+        return {**BASE_TV, "dataSource": mapa, "grouping": "sector", "blockSize": "market_cap_basic", "blockColor": "change",
+                "hasTopBar": False, "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
+    if tipo == "calendario":
+        return {**BASE_TV, "importanceFilter": "0,1", "countryFilter": "us,mx"}
+    if tipo == "filtro":
+        return {**BASE_TV, "market": filtro, "defaultColumn": "overview", "defaultScreen": "most_capitalized", "showToolbar": True}
+    if tipo == "noticias":
+        return {**BASE_TV, "feedMode": "market", "market": "stock", "displayMode": "regular"}
+    if tipo == "noticias-emisora":
+        return {**BASE_TV, "feedMode": "symbol", "symbol": sim, "displayMode": "regular"}
+    if tipo == "panorama":
+        return {**BASE_TV, "symbols": [[sim.split(":")[1], f"{sim}|1D"]], "chartOnly": False, "autosize": True}
+    if tipo == "tecnico":
+        return {**BASE_TV, "symbol": sim, "interval": "1D", "showIntervalTabs": True, "displayMode": "single"}
+    return {**BASE_TV, "symbol": sim}  # info, perfil, finanzas
+
+
+@app.get("/widget/{tipo}", response_class=HTMLResponse)
+def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", filtro: str = "america", con=Depends(con_db)):
+    if tipo not in WIDGETS_TV or mapa not in MAPAS_TV or filtro not in FILTROS_TV:
+        raise HTTPException(422, "widget inválido")
+    script, con_simbolo = WIDGETS_TV[tipo]
+    sim = None
+    if con_simbolo:
+        ins = mercado.instrumentos(con).get(simbolo)
+        sim = simbolo_tradingview(ins) if ins else None
+        if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
+            raise HTTPException(404, "Instrumento sin widget disponible")
+    # `</` se escapa para que ningún valor cierre la etiqueta <script> donde va la configuración.
+    cfg = json.dumps(_config_widget(tipo, sim, con, mapa, filtro), ensure_ascii=False).replace("</", "<\\/")
+    pagina = f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Widget de TradingView — Actinver Terminal</title><link rel="stylesheet" href="/static/grafica.css"></head>
+<body class="sin-cabecera"><div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">Datos de TradingView</a></div>
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-{script}.js" async>{cfg}</script></div>
+</body></html>"""
+    return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
+
+
 # ------------------------------------------------------------------------------------------------------------
 # Interfaz
 @app.get("/", response_class=HTMLResponse)
