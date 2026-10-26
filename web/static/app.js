@@ -1793,7 +1793,7 @@ document.getElementById("form-opciones").addEventListener("submit", async (ev) =
 });
 
 /* ---------- Velas, Order Flow y Option Flow (terminal/flujo): solo datos reales o importados ---------- */
-const flujo = { estado: null, velas: { simbolo: "", intervalo: "1Day", dias: 180, sma: true, boll: false, vwap: false, ema20: false, ema50: false, sar: false, macd: false, estoc: false },
+const flujo = { estado: null, velas: { tv: "1", simbolo: "", intervalo: "1Day", dias: 180, sma: true, boll: false, vwap: false, ema20: false, ema50: false, sar: false, macd: false, estoc: false },
   of: { simbolo: "", minutos: 240, niveles: 20, pasoAmt: .25 }, op: { subyacente: "", filtros: {} } };
 const fmtHora = new Intl.DateTimeFormat("es-MX", { timeZone: "America/Mexico_City", dateStyle: "short", timeStyle: "medium" });
 const horaCdmx = (iso) => { if (!iso) return "—"; const d = new Date(iso); return Number.isNaN(d.getTime()) ? iso : `${fmtHora.format(d)} CDMX`; };
@@ -1823,6 +1823,18 @@ function selectorSimbolo(valor, alCambiar, { incluirCripto = true, etiqueta = "I
     incluirCripto && c.cripto.length ? h("optgroup", { label: "Cripto (fuera del Reto)" }, c.cripto.map((x) => h("option", { value: x.id }, x.id))) : null);
   sel.value = valor;
   return h("label", {}, `${etiqueta} `, sel);
+}
+
+// Widget oficial de TradingView: las velas se mueven solas con los datos y el retraso de TradingView, no de la terminal.
+function graficaTradingView(v) {
+  const url = (x) => `/grafica/${encodeURIComponent(v.simbolo)}?intervalo=${x}`;
+  const marco = h("iframe", { clase: "grafica-vivo", title: `Gráfica de TradingView de ${v.simbolo}`, loading: "lazy", src: url(v.tv) });
+  return h("section", { clase: "tarjeta", "aria-label": "Gráfica en movimiento" },
+    h("h3", { texto: "Gráfica en movimiento (TradingView)" }),
+    h("p", { clase: "ayuda", texto: "Las velas se actualizan solas mientras el mercado está abierto. Datos y retraso según TradingView: acciones de EE. UU. con la cotización gratuita de Cboe (no el consolidado completo) y BMV con retraso. Puede diferir del precio del simulador del Reto. Solo informa." }),
+    selectorSimple(v.tv, [["1", "1 minuto"], ["5", "5 minutos"], ["15", "15 minutos"], ["60", "1 hora"], ["D", "Diario"]],
+      (x) => { v.tv = x; marco.src = url(x); }, "Velas de"),
+    marco);
 }
 
 function selectorSimple(valor, opciones, alCambiar, etiqueta) {
@@ -1997,7 +2009,7 @@ async function cargarVelas() {
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
     if (solicitud !== cargaVelasId) return;
     const ult = d.barras.slice(-12).reverse();
-    limpiar("velas-contenido", controles,
+    limpiar("velas-contenido", controles, d.grafica ? graficaTradingView(v) : null,
       d.barras.length ? h("div", {},
         h("p", { clase: "ayuda" }, chip("retrasado", v.intervalo === "1Day" ? "Barras diarias" : "Barras intradía"), " ", `${d.zona_horaria}. ${d.nota}`),
         cajaProcedencia(d.procedencia), graficaVelas(d.barras, v, v.intervalo),

@@ -372,3 +372,7 @@ select[multiple] { min-width: 230px; }
 .asistente-form textarea { flex: 1 1 auto; min-width: 0; font: inherit; padding: 8px 10px; border-radius: var(--radio); resize: vertical; }
 .asistente-sugerencias { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 @media (max-width: 720px) { .asistente-msg { max-width: 100%; } }
+
+/* Gráfica de TradingView incrustada en Velas */
+.grafica-vivo { display: block; width: 100%; height: 540px; border: 1px solid var(--borde); border-radius: 6px; margin-top: .5rem; }
+@media (max-width: 640px) { .grafica-vivo { height: 420px; } }

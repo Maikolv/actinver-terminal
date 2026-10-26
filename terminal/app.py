@@ -988,9 +988,12 @@ def flujo_estado(con=Depends(con_db)):
 def flujo_velas(simbolo: str, intervalo: str = "1Day", dias: int = 180, con=Depends(con_db)):
     from .flujo import servicio
     try:
-        return servicio.velas(con, AJUSTES, simbolo, intervalo, max(1, min(dias, 3650)))
+        r = servicio.velas(con, AJUSTES, simbolo, intervalo, max(1, min(dias, 3650)))
     except ValueError as e:
         raise HTTPException(422, str(e)) from None
+    ins = mercado.instrumentos(con).get(simbolo)
+    r["grafica"] = bool(ins and simbolo_tradingview(ins))  # hay widget de TradingView para incrustar en Velas
+    return r
 
 
 @app.get("/api/flujo/libro-operaciones")
@@ -1406,16 +1409,19 @@ def simbolo_tradingview(ins: dict) -> str | None:
 
 CSP_GRAFICA = ("default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; "
                "frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; "
-               "img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'none'")
+               "img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'")
+INTERVALOS_TV = {"1", "5", "15", "60", "D"}  # minutos de TradingView; «D» = diario
 
 
 @app.get("/grafica/{iid}", response_class=HTMLResponse)
-def grafica(iid: str, con=Depends(con_db)):
+def grafica(iid: str, intervalo: str = "D", con=Depends(con_db)):
     ins = mercado.instrumentos(con).get(iid)
     sim = simbolo_tradingview(ins) if ins else None
     if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
         raise HTTPException(404, "Instrumento sin gráfica disponible")
-    cfg = json.dumps({"autosize": True, "symbol": sim, "interval": "D", "timezone": "America/Mexico_City",
+    if intervalo not in INTERVALOS_TV:
+        raise HTTPException(422, "intervalo inválido")
+    cfg = json.dumps({"autosize": True, "symbol": sim, "interval": intervalo, "timezone": "America/Mexico_City",
                       "theme": "dark", "style": "1", "locale": "es", "allow_symbol_change": False,
                       "support_host": "https://www.tradingview.com"})
     pagina = f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
@@ -1423,11 +1429,12 @@ def grafica(iid: str, con=Depends(con_db)):
 <title>Gráfica {html.escape(sim)} — Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
 <link rel="stylesheet" href="/static/grafica.css"></head><body>
 <header><strong>{html.escape(ins['clave_operable'])}</strong> · {html.escape(sim)} · Widget de TradingView (datos y
-retraso según TradingView; pueden diferir del simulador). <a href="/">Volver</a></header>
+retraso según TradingView; pueden diferir del simulador). <a href="/" target="_top">Volver</a></header>
 <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
 <script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{cfg}</script></div>
 </body></html>"""
-    return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA})
+    # Se incrusta en la pestaña Velas: solo el mismo origen puede enmarcarla.
+    return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
 
 
 # ------------------------------------------------------------------------------------------------------------
