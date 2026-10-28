@@ -2,6 +2,70 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-28 — diseño unificado, generador de portafolios en tiempo real, Excel con marca y más widgets]
+
+### Agregado
+- **Generador de propuestas** en Mis portafolios (`markowitz.generar`, `POST /api/portafolios/generar`):
+  - cada cambio de especificación recalcula la mejor propuesta tras 0.5 s;
+  - completa los instrumentos fijados por el usuario con los mejores del Ranking que no se mueven igual (ρ ≤ 0.85);
+  - sugerencias de la terminal con acción de un clic: quitar lo que no recibe peso, subir el tope, cambiar a máximo
+    Sharpe o mínima varianza, quitar pares redundantes; además, otros candidatos listos;
+  - caché de 5 min de las filas del Ranking: 25 s la primera vez, 1.6–3.7 s después.
+- Seis widgets gratuitos de TradingView en Mercado: cotizaciones por grupo, destacados de EE. UU., mapa de ETF, tipos de
+  cambio cruzados, mapa de divisas y mapa de cripto. Widgets y gráfica siguen el modo claro/oscuro.
+- `docs/auditoria-2026-10-28.md` y `docs/prompt-pendientes-2026-10-28.md` (lo que necesita el usuario y el prompt con
+  los pendientes de las auditorías del 18 al 28-oct). Dependencia nueva: `pillow` (logo en Excel).
+
+### Cambiado
+- Perfiles Conservador, Moderado, Crecimiento y Agresivo en lugar de la pirámide de Maslow; los portafolios guardados
+  con los nombres anteriores se leen con su equivalente.
+- Un solo logo (el de `favicon.svg`, color fijo `--marca`) en la terminal, Oficina, Laboratorio de bots, Cuaderno, 404
+  y páginas de TradingView; títulos «Sección · Actinver Terminal».
+- Excel: logo en cada hoja, Segoe UI y colores de la terminal, hoja «Guía» con pasos numerados y celdas exactas
+  (incluido Solver).
+
+### Retirado
+- Pestaña «Aprender y recursos» (se conservan `config/aprendizaje.json` y `/api/aprendizaje`).
+
+### Verificación
+- Fórmulas de Excel evaluadas en Python (`formulas`): 0 errores; E 59.60 %, σ 15.50 %, Sharpe 3.392, iguales a la
+  terminal. No se abrió en Excel: la automatización no respondió ni con un libro vacío.
+- Recorrido del generador en el navegador interno; capturas del logo en las seis páginas.
+- Widgets nuevos: scripts con HTTP 200; no se vieron dibujados (el navegador interno bloquea scripts externos).
+- GEX con mercado abierto: no calculable (0 de 902 contratos completos).
+- Suite: 688 pruebas aprobadas (`uv run pytest tests`) y 9 de Node.
+
+## [2026-10-27 — constructor de portafolios con Markowitz, capitalización bursátil y GEX listo]
+
+### Agregado
+- **Mis portafolios (Markowitz)**, en la pestaña Mi cuenta (`terminal/markowitz.py`):
+  - Portafolios ilimitados, aparte de la cuenta del Reto: crear, abrir, editar, duplicar y eliminar.
+  - Objetivos según la pirámide de Maslow (compilado de Acelera Academy).
+  - Seis métodos: máximo Sharpe, mínima varianza, rendimiento objetivo, riesgo objetivo, utilidad y 1/N.
+  - Resultados: frontera eficiente, CAL, y*, comparación con 1/N, pesos, montos, títulos y correlaciones.
+  - «Sugerir instrumentos» toma lo mejor del Ranking y evita pares con correlación > 0.85.
+  - Solo simula; no envía órdenes.
+- **Excel de Markowitz con fórmulas vivas** (`terminal/excel_markowitz.py`):
+  - Plantilla paramétrica del taller de Acelera, con las fórmulas `#REF!` del original corregidas.
+  - Libro de uno o de todos los portafolios guardados: precios, rendimientos, E, σ, covarianzas, correlaciones, pesos editables, frontera y gráfica.
+  - Verificado en Excel: 0 errores; da los mismos E, σ y Sharpe que la terminal.
+- **Ranking por capitalización bursátil** (`terminal/capitalizacion.py`):
+  - Columna, filtro y explicación de mega, large, mid, small y micro cap.
+  - EE. UU.: acciones en circulación de la SEC (10-K/10-Q). Con varias series se usa el capital flotante del 10-K, marcado «aprox.».
+  - Los ADR no se clasifican.
+  - BMV: `config/capitalizacion_bmv.csv`, que llena el usuario.
+  - Resultado: 76 verificadas, 21 aproximadas y 39 sin dato (sobre todo BMV).
+- **GEX:** botón «Preparar GEX: OI y luego cadena» en Option Flow. Contratos Paper de solo lectura activados en `config/local.toml`, con la autorización del usuario.
+- `docs/auditoria-2026-10-27.md`: estado medido, 10 mejoras y alternativas de datos y API, con costos de referencia. No se contrató nada.
+- 10 pruebas nuevas (`tests/test_markowitz.py`); suite completa: 687 aprobadas. Dependencia nueva: `openpyxl`.
+
+### Corregido
+- CLAUDE.md, brecha 3: ya no cita la captura del 16-oct.
+
+### Limitaciones comprobadas
+- Fuera de horario el GEX no se calcula: la cadena conserva las cotizaciones del cierre, anteriores al OI consultado (regla anti-fuga).
+- `/api/ranking` tarda de 10 a 30 s: queda como mejora 2 de la auditoría.
+
 ## [2026-10-25 — velas en movimiento y widgets gratuitos de TradingView]
 
 ### Agregado

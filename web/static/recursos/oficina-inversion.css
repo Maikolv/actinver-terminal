@@ -1,6 +1,5 @@
 /* Componentes específicos; colores, tipografía y controles provienen de app.css. */
 .oficina-marca { color: var(--texto); text-decoration: none; }
-.oficina-marca svg { color: var(--acento); }
 .acciones-cabecera { align-items: center; flex-wrap: wrap; }
 a.boton { display: inline-flex; align-items: center; text-decoration: none; }
 .oficina-titulo { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 4px 0 22px; }

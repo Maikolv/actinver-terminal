@@ -1,6 +1,5 @@
 /* Tokens, tipografía y componentes compartidos con la terminal: app.css. */
 .cuaderno-marca { color: var(--texto); text-decoration: none; }
-.cuaderno-marca svg { color: var(--acento); flex-shrink: 0; }
 .cuaderno-intro { margin-bottom: 20px; }
 .cuaderno-contexto { color: var(--texto-2); font-size: .8rem; margin-bottom: 6px; }
 .cuaderno-intro h2 { margin: 0 0 8px; }

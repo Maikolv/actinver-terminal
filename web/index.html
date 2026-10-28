@@ -16,10 +16,10 @@
 <a class="saltar" href="#principal">Saltar al contenido</a>
 <header class="cabecera">
   <div class="cabecera__fila">
-    <div class="marca">
-      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-5 4 3 6-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <a class="marca" href="/" aria-label="Actinver Terminal, inicio">
+      <svg class="marca__logo" aria-hidden="true" width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg>
       <span>Actinver Terminal</span>
-    </div>
+    </a>
     <div class="acciones-cabecera">
       <form id="form-comandos" class="comandos-cabecera" role="search" autocomplete="off">
         <label class="oculto-visual" for="barra-comandos">Ir a una sección o abrir la gráfica de un símbolo</label>
@@ -46,13 +46,14 @@
     <button type="button" data-grupo="cuenta" aria-pressed="false">Mi cuenta</button>
     <button type="button" data-grupo="decidir" aria-pressed="false">Decidir</button>
     <button type="button" data-grupo="mercado" aria-pressed="false">Mercado y flujo</button>
-    <button type="button" data-grupo="investigar" aria-pressed="false">Investigar y aprender</button>
+    <button type="button" data-grupo="investigar" aria-pressed="false">Investigar</button>
     <button type="button" data-grupo="sistema" aria-pressed="false">Datos y ayuda</button>
   </div>
   <button type="button" class="desplazar-pestanas" data-dir="-1" aria-label="Ver pestañas anteriores" hidden>‹</button>
   <div role="tablist" id="lista-pestanas">
     <button role="tab" data-grupo="cuenta" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
     <button role="tab" data-grupo="cuenta" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio Actinver</button>
+    <button role="tab" data-grupo="cuenta" id="tab-portafolios" aria-controls="panel-portafolios" aria-selected="false" tabindex="-1">Mis portafolios</button>
     <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
     <button role="tab" data-grupo="cuenta" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
     <button role="tab" data-grupo="cuenta" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
@@ -63,7 +64,6 @@
     <button role="tab" data-grupo="mercado" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
     <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
     <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio</button>
-    <button role="tab" data-grupo="investigar" id="tab-aprendizaje" aria-controls="panel-aprendizaje" aria-selected="false" tabindex="-1">Aprender y recursos</button>
     <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
     <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
     <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
@@ -80,21 +80,22 @@
 </nav>
 
 <main id="principal" tabindex="-1">
-  <section role="tabpanel" id="panel-aprendizaje" aria-labelledby="tab-aprendizaje" hidden>
-    <h1>Aprender y recursos</h1>
-    <p>Indicadores de los PDF de Actinver Acelera, capturas de plataformas, recursos de Order Flow y formación para LinkedIn. Síntesis educativa; los cruces y patrones no prueban rentabilidad.</p>
-    <div id="aprendizaje-contenido"></div>
-  </section>
   <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
     <h1 class="oculto-visual">Plan de acción</h1>
     <nav class="accesos" aria-label="Accesos frecuentes">
       <button type="button" class="boton boton--secundario" data-ir="tab-asistente">Preguntar al asistente</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-aprendizaje">Aprender con los recursos</button>
+      <button type="button" class="boton boton--secundario" data-ir="tab-portafolios">Generar un portafolio</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía (informativo)</button>
     </nav>
     <div id="resumen-contenido">
       <div class="rejilla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
     </div>
+  </section>
+
+  <section role="tabpanel" id="panel-portafolios" aria-labelledby="tab-portafolios" hidden>
+    <h1>Mis portafolios</h1>
+    <p class="ayuda">Cree tantos portafolios como quiera, aparte de su cuenta del Reto. El generador arma la mejor propuesta para sus especificaciones con la teoría media-varianza de Markowitz, la terminal le sugiere mejoras y puede descargar el modelo en Excel. Es una simulación: no envía órdenes.</p>
+    <div id="portafolios-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 
   <section role="tabpanel" id="panel-propuestas" aria-labelledby="tab-propuestas" hidden>
@@ -224,6 +225,7 @@
       <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Extranjeras (SIC)</button>
     </div>
     <p class="suave" id="ranking-hora"></p>
+    <div id="ranking-capitalizacion"></div>
     <div id="ranking-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 

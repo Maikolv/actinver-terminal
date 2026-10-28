@@ -260,3 +260,14 @@ patrones de secretos en los 20 archivos tocados.
 ## Auditoría técnica, estética y de utilidad — 19-oct-2026
 
 Ver `docs/auditoria-2026-10-19.md`: 7 hallazgos (3 P1 corregidos, 2 P2 corregidos, 2 P3), 13 controles duplicados retirados, `serie_historica` 12× más rápida con salida idéntica.
+
+## Entrega y captura — 27 y 28-oct-2026
+
+- 27-oct: constructor de portafolios (Markowitz), capitalización bursátil en el Ranking y GEX con «Preparar GEX»
+  (`docs/auditoria-2026-10-27.md`).
+- 28-oct: un solo logo y colores en todas las páginas; generador de propuestas en Mis portafolios (perfiles sin
+  Maslow, recálculo en vivo, sugerencias aplicables); Excel con marca y «Guía»; 6 widgets nuevos de TradingView;
+  «Aprender y recursos» retirado de la interfaz. 688 pruebas de Python y 9 de Node aprobadas. GEX aún no calculable
+  con datos gratuitos (0 de 902 contratos completos). Auditoría `docs/auditoria-2026-10-28.md` y prompt
+  `docs/prompt-pendientes-2026-10-28.md`.
+- Captura del 28-oct 14:30 (registro 24): valuación $963,453.14 (−3.65 %, +3.0 % frente al 27-oct), sin operaciones.

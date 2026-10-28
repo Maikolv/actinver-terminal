@@ -897,6 +897,122 @@ def get_ranking(mercado_filtro: str = "ambos", clase: str = "acciones", con=Depe
     return ranking.calcular(con, AJUSTES, mercado_filtro, clase)
 
 
+@app.get("/api/capitalizacion")
+def get_capitalizacion(con=Depends(con_db)):
+    from . import capitalizacion
+    return {**capitalizacion.guia(), "estados": dict(con.execute("SELECT estado, COUNT(*) FROM capitalizacion GROUP BY estado").fetchall())}
+
+
+@app.post("/api/capitalizacion/actualizar")
+def post_capitalizacion(con=Depends(con_db)):
+    """Acciones en circulación: SEC (emisoras de EE. UU.) y config/capitalizacion_bmv.csv (BMV)."""
+    from . import capitalizacion
+    return capitalizacion.actualizar(con, AJUSTES)
+
+
+# ---------- constructor de portafolios del usuario (Markowitz; solo simulación) ----------
+XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+def _markowitz(fn, *args):
+    from . import markowitz
+    try:
+        return fn(*args)
+    except markowitz.ErrorPortafolio as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    except KeyError:
+        raise HTTPException(404, "Portafolio no encontrado") from None
+
+
+def _xlsx(datos: bytes, nombre: str) -> Response:
+    return Response(datos, media_type=XLSX, headers={"Content-Disposition": f'attachment; filename="{nombre}"'})
+
+
+@app.get("/api/portafolios")
+def get_portafolios(con=Depends(con_db)):
+    from . import markowitz
+    resumen = [{"id": p["id"], "nombre": p["nombre"], "actualizado_en": p["actualizado_en"], "especificacion": p["especificacion"],
+                **({k: p["resultado"].get(k) for k in ("metricas", "metodo_nombre", "objetivo_nombre", "calculado_en")}
+                   | {"n_activos": sum(1 for a in p["resultado"]["activos"] if a["peso"] >= 0.005)} if p["resultado"] else {})}
+               for p in markowitz.listar(con)]
+    return {"portafolios": resumen, "objetivos": markowitz.OBJETIVOS, "metodos": markowitz.METODOS,
+            "ventanas": markowitz.VENTANAS, "aviso": markowitz.AVISO}
+
+
+@app.get("/api/portafolios/sugerir")
+def get_sugerir_portafolio(objetivo: str = "crecimiento", n: int = 8, mercado_filtro: str = "ambos", clase: str = "acciones",
+                           caps: str = "", con=Depends(con_db)):
+    from . import capitalizacion, markowitz, ranking
+    if mercado_filtro not in ("ambos", "nacionales", "extranjeras") or clase not in ranking.CLASES:
+        raise cartera.ErrorValidacion(["mercado_filtro o clase inválidos"])
+    lista = [c for c in caps.split(",") if c]
+    if any(c not in {k for k, *_ in capitalizacion.CATEGORIAS} for c in lista):
+        raise cartera.ErrorValidacion(["caps: mega, large, mid, small o micro"])
+    return _markowitz(markowitz.sugerir, con, AJUSTES, objetivo, n, mercado_filtro, clase, lista)
+
+
+@app.post("/api/portafolios/calcular")
+def post_calcular_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import markowitz
+    return _markowitz(markowitz.calcular, con, AJUSTES, cuerpo)
+
+
+@app.post("/api/portafolios/generar")
+def post_generar_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Generador de propuestas: especificaciones del usuario + instrumentos y consejos de la terminal (solo simula)."""
+    from . import markowitz
+    return _markowitz(markowitz.generar, con, AJUSTES, cuerpo)
+
+
+@app.post("/api/portafolios")
+def post_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import markowitz
+    return _markowitz(markowitz.guardar, con, AJUSTES, cuerpo)
+
+
+@app.get("/api/portafolios/excel")
+def get_portafolios_excel(con=Depends(con_db)):
+    from . import excel_markowitz, markowitz
+    todos = markowitz.listar(con)
+    if not todos:
+        raise cartera.ErrorValidacion(["Aún no hay portafolios guardados; descargue la plantilla o guarde uno primero."])
+    return _xlsx(_markowitz(excel_markowitz.libro, con, AJUSTES, todos), "portafolios_markowitz.xlsx")
+
+
+@app.get("/api/markowitz/plantilla.xlsx")
+def get_plantilla_markowitz():
+    from . import excel_markowitz
+    return _xlsx(excel_markowitz.plantilla(), "plantilla_markowitz.xlsx")
+
+
+@app.get("/api/portafolios/{pid}")
+def get_portafolio(pid: int, con=Depends(con_db)):
+    from . import markowitz
+    p = _markowitz(markowitz.obtener, con, pid)
+    return {"id": p["id"], **(p["resultado"] or {}), "especificacion": p["especificacion"]}
+
+
+@app.put("/api/portafolios/{pid}")
+def put_portafolio(pid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import markowitz
+    return _markowitz(markowitz.guardar, con, AJUSTES, cuerpo, pid)
+
+
+@app.delete("/api/portafolios/{pid}")
+def delete_portafolio(pid: int, con=Depends(con_db)):
+    from . import markowitz
+    if not markowitz.eliminar(con, pid):
+        raise HTTPException(404, "Portafolio no encontrado")
+    return {"eliminado": pid}
+
+
+@app.get("/api/portafolios/{pid}/excel")
+def get_portafolio_excel(pid: int, con=Depends(con_db)):
+    from . import excel_markowitz, markowitz
+    p = _markowitz(markowitz.obtener, con, pid)
+    return _xlsx(_markowitz(excel_markowitz.libro, con, AJUSTES, [p]), f"portafolio_{pid}_markowitz.xlsx")
+
+
 @app.post("/webhook/tradingview")
 async def webhook_tradingview(request: Request):
     cuerpo = await request.body()
@@ -1411,28 +1527,41 @@ CSP_GRAFICA = ("default-src 'none'; script-src https://s3.tradingview.com; style
                "frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; "
                "img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'")
 INTERVALOS_TV = {"1", "5", "15", "60", "D"}  # minutos de TradingView; «D» = diario
+TEMAS_TV = {"dark", "light"}  # el navegador pide el mismo modo claro/oscuro que usa la terminal
+LOGO_SVG = ('<svg class="marca__logo" aria-hidden="true" width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" '
+            'rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg>')
+
+
+def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "") -> str:
+    """Página aislada para un widget de TradingView, con el logo y los colores de la terminal."""
+    clase = ("tema-claro" if tema == "light" else "tema-oscuro") + ("" if cabecera else " sin-cabecera")
+    barra = (f'<header><a class="marca" href="/" target="_top">{LOGO_SVG}<span>Actinver Terminal</span></a> {cabecera}</header>'
+             if cabecera else "")
+    return f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>{html.escape(titulo)} · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/grafica.css"></head><body class="{clase}">
+{barra}
+{cuerpo}
+</body></html>"""
 
 
 @app.get("/grafica/{iid}", response_class=HTMLResponse)
-def grafica(iid: str, intervalo: str = "D", con=Depends(con_db)):
+def grafica(iid: str, intervalo: str = "D", tema: str = "dark", con=Depends(con_db)):
     ins = mercado.instrumentos(con).get(iid)
     sim = simbolo_tradingview(ins) if ins else None
     if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
         raise HTTPException(404, "Instrumento sin gráfica disponible")
-    if intervalo not in INTERVALOS_TV:
-        raise HTTPException(422, "intervalo inválido")
+    if intervalo not in INTERVALOS_TV or tema not in TEMAS_TV:
+        raise HTTPException(422, "intervalo o tema inválido")
     cfg = json.dumps({"autosize": True, "symbol": sim, "interval": intervalo, "timezone": "America/Mexico_City",
-                      "theme": "dark", "style": "1", "locale": "es", "allow_symbol_change": False,
+                      "theme": tema, "style": "1", "locale": "es", "allow_symbol_change": False,
                       "support_host": "https://www.tradingview.com"})
-    pagina = f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>Gráfica {html.escape(sim)} — Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
-<link rel="stylesheet" href="/static/grafica.css"></head><body>
-<header><strong>{html.escape(ins['clave_operable'])}</strong> · {html.escape(sim)} · Widget de TradingView (datos y
-retraso según TradingView; pueden diferir del simulador). <a href="/" target="_top">Volver</a></header>
-<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
-<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{cfg}</script></div>
-</body></html>"""
+    cuerpo = f"""<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{cfg}</script></div>"""
+    pagina = _pagina_tv(f"Gráfica {sim}", tema, cuerpo,
+                        f"· <strong>{html.escape(ins['clave_operable'])}</strong> · {html.escape(sim)} · Widget de TradingView "
+                        "(datos y retraso según TradingView; pueden diferir del simulador).")
     # Se incrusta en la pestaña Velas: solo el mismo origen puede enmarcarla.
     return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
 
@@ -1442,10 +1571,14 @@ retraso según TradingView; pueden diferir del simulador). <a href="/" target="_
 WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", False), "mapa": ("stock-heatmap", False),
               "calendario": ("events", False), "filtro": ("screener", False), "noticias": ("timeline", False),
               "info": ("symbol-info", True), "panorama": ("symbol-overview", True), "perfil": ("symbol-profile", True),
-              "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True)}
+              "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
+              "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
+              "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
+              "mapa-cripto": ("crypto-coins-heatmap", False)}
 MAPAS_TV = {"NASDAQ100", "SPX500"}
 FILTROS_TV = {"america", "mexico"}
-BASE_TV = {"colorTheme": "dark", "isTransparent": False, "locale": "es", "width": "100%", "height": "100%"}
+BASE_TV = {"isTransparent": False, "locale": "es", "width": "100%", "height": "100%"}
+DIVISAS_TV = ["USD", "MXN", "EUR", "JPY", "GBP", "CAD", "CNY"]
 
 
 def _simbolos_cartera(con) -> list[str]:
@@ -1459,6 +1592,24 @@ def _simbolos_cartera(con) -> list[str]:
 
 
 def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> dict:
+    if tipo == "cotizaciones":
+        grupo = lambda t, ss: {"name": t, "symbols": [{"name": s, "displayName": d} for s, d in ss]}  # noqa: E731
+        return {**BASE_TV, "showSymbolLogo": True, "symbolsGroups": [
+            grupo("Índices", [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"), ("FOREXCOM:DJI", "Dow Jones"),
+                              ("INDEX:NKY", "Nikkei 225"), ("INDEX:DEU40", "DAX")]),
+            grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso"), ("FX_IDC:EURMXN", "Euro / peso"), ("FX:EURUSD", "Euro / dólar")]),
+            grupo("Bonos de EE. UU.", [("TVC:US02Y", "2 años"), ("TVC:US10Y", "10 años"), ("TVC:US30Y", "30 años")]),
+            grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:USOIL", "Petróleo WTI"), ("TVC:SILVER", "Plata")])]}
+    if tipo == "destacados":
+        return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}
+    if tipo == "mapa-etf":
+        return {**BASE_TV, "dataSource": "AllUSEtf", "blockSize": "aum", "blockColor": "change", "grouping": "asset_class",
+                "hasTopBar": False, "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
+    if tipo in ("divisas", "mapa-divisas"):
+        return {**BASE_TV, "currencies": DIVISAS_TV}
+    if tipo == "mapa-cripto":
+        return {**BASE_TV, "dataSource": "Crypto", "blockSize": "market_cap_calc", "blockColor": "change", "hasTopBar": False,
+                "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
     if tipo == "cinta":
         sims = _simbolos_cartera(con) or ["NASDAQ:NDX"]
         return {**BASE_TV, "symbols": [{"proName": s, "title": s.split(":")[1]} for s in sims], "showSymbolLogo": True,
@@ -1488,8 +1639,9 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
 
 
 @app.get("/widget/{tipo}", response_class=HTMLResponse)
-def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", filtro: str = "america", con=Depends(con_db)):
-    if tipo not in WIDGETS_TV or mapa not in MAPAS_TV or filtro not in FILTROS_TV:
+def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", filtro: str = "america", tema: str = "dark",
+                       con=Depends(con_db)):
+    if tipo not in WIDGETS_TV or mapa not in MAPAS_TV or filtro not in FILTROS_TV or tema not in TEMAS_TV:
         raise HTTPException(422, "widget inválido")
     script, con_simbolo = WIDGETS_TV[tipo]
     sim = None
@@ -1499,14 +1651,11 @@ def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", fi
         if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
             raise HTTPException(404, "Instrumento sin widget disponible")
     # `</` se escapa para que ningún valor cierre la etiqueta <script> donde va la configuración.
-    cfg = json.dumps(_config_widget(tipo, sim, con, mapa, filtro), ensure_ascii=False).replace("</", "<\\/")
-    pagina = f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>Widget de TradingView — Actinver Terminal</title><link rel="stylesheet" href="/static/grafica.css"></head>
-<body class="sin-cabecera"><div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+    config = {**_config_widget(tipo, sim, con, mapa, filtro), "colorTheme": tema}
+    cfg = json.dumps(config, ensure_ascii=False).replace("</", "<\\/")
+    pagina = _pagina_tv("Widget de TradingView", tema, f"""<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
 <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">Datos de TradingView</a></div>
-<script src="https://s3.tradingview.com/external-embedding/embed-widget-{script}.js" async>{cfg}</script></div>
-</body></html>"""
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-{script}.js" async>{cfg}</script></div>""")
     return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
 
 

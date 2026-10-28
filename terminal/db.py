@@ -191,6 +191,18 @@ CREATE TABLE IF NOT EXISTS propuestas (
     id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, creado_en TEXT NOT NULL,
     parametros TEXT NOT NULL, resultado TEXT NOT NULL
 );
+
+-- Acciones en circulación para la capitalización bursátil (SEC para emisoras de EE. UU.; archivo del usuario para BMV)
+CREATE TABLE IF NOT EXISTS capitalizacion (
+    instrumento_id TEXT PRIMARY KEY, acciones REAL, fecha_dato TEXT, formulario TEXT, fuente TEXT NOT NULL,
+    estado TEXT NOT NULL, detalle TEXT, consultado_en TEXT NOT NULL, flotante_usd REAL, fecha_flotante TEXT
+);
+
+-- Portafolios creados por el usuario en el constructor (Markowitz). Solo simulación: no generan órdenes.
+CREATE TABLE IF NOT EXISTS portafolios_usuario (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL, especificacion TEXT NOT NULL, resultado TEXT,
+    creado_en TEXT NOT NULL, actualizado_en TEXT NOT NULL
+);
 """
 
 

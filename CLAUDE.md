@@ -45,11 +45,11 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (martes 27-oct, 14:30; registro 23):**
-  - Valuación $934,937.60 (−6.51 %, +3.3 % frente al 26-oct); poder de compra $2,922.11. Sin operaciones nuevas.
+- **Cuenta del Reto, última captura confirmada (miércoles 28-oct, 14:30; registro 24):**
+  - Valuación $963,453.14 (−3.65 %, +3.0 % frente al 27-oct); poder de compra $2,922.11. Sin operaciones nuevas.
   - Las capturas posteriores al cierre BMV guardan el cierre de respaldo (`actinver_portal`).
-  - 8 acciones y 1 título de ACTDUAL B. Pesos: MU 46.3 %, GMEXICO 16.2 %, AMD 14.6 %, NVDA 11.3 %, ALPEK 5.7 %,
-    XOM 2.9 %, NVAX 2.5 %, PFE 0.1 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %).
+  - 8 acciones y 1 título de ACTDUAL B. Pesos: MU 47.5 %, GMEXICO 15.8 %, AMD 14.5 %, NVDA 10.8 %, ALPEK 5.6 %,
+    XOM 2.8 %, NVAX 2.5 %, PFE 0.1 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %; MU a 2.5 puntos del tope).
   - Las capturas se registran con `portal.guardar(..., confirmar=True)`. Precios en MXN, ajustados solo por splits.
 - **Funciones** (todas informan o simulan; ninguna envía órdenes):
   - propuestas y plan del día (Telegram `/plan`);
@@ -58,7 +58,17 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
     Skylit experimental);
   - Laboratorio (permutación, Holm, preregistro y holdout único);
   - TSM mensual educativo (`docs/tsm-mensual.md`) y anomalías de volumen (`docs/anomalias-volumen.md`);
-  - centro de investigación y Aprender y recursos.
+  - centro de investigación. «Aprender y recursos» se retiró de la interfaz el 28-oct (datos y `/api/aprendizaje` se
+    conservan).
+  - Mis portafolios (28-oct): generador de propuestas que se recalcula con cada cambio (perfiles Conservador, Moderado,
+    Crecimiento y Agresivo; sin Maslow), completa con el Ranking, sugiere mejoras aplicables y guarda portafolios
+    ilimitados; Excel con logo y colores de la terminal, guía con celdas exactas (`terminal/markowitz.py`,
+    `terminal/excel_markowitz.py`).
+  - Ranking con capitalización bursátil (mega/large/mid/small/micro; SEC + `config/capitalizacion_bmv.csv`).
+  - GEX en Option Flow con botón «Preparar GEX». Con mercado abierto (28-oct) sigue sin calcularse: falta spot de la
+    misma referencia, gamma u OI en todos los contratos (ver `docs/prompt-pendientes-2026-10-28.md`).
+  - Un solo logo (`favicon.svg`, color fijo `--marca`) en todas las páginas; 18 widgets de TradingView que siguen el
+    modo claro/oscuro. Auditoría y pendientes: `docs/auditoria-2026-10-28.md`.
   - Asistente (`terminal/asistente.py`): datos, documentación y notas del usuario; Claude/Ollama si hay credencial.
   - Avisos de pérdida del día a Telegram (cartera −0.5 %, posición −1 % por escalón) con precios en vivo del SIC; solo informan.
 - **Evidencia:** ningún modelo tiene ventaja demostrada: V1 frente a 1/N, pronóstico al cierre, Kronos y TSM
@@ -113,8 +123,8 @@ importados por el usuario — es intencional (D-12), no un bug.
    verificado puede ir por delante de lo que se puede refrescar a diario. Vigilar
    `docs/matriz.md` y considerar una cola de actualización que
    priorice los instrumentos con posición abierta o en una propuesta activa.
-3. **Cuenta del Reto**: depende de capturas manuales del portal (no se automatiza, por reglamento). La última
-   confirmada es del 16-oct; sin captura reciente, el plan compara contra una cartera desactualizada.
+3. **Cuenta del Reto**: depende de capturas manuales del portal (no se automatiza, por reglamento). Ver la última
+   confirmada en «Estado comprobado»; sin captura reciente, el plan compara contra una cartera desactualizada.
 4. **Ranking de modelos** (D-33): el comparador ya existe; falta evaluarlo con las
    series reales disponibles y una prueba fuera de muestra suficiente. La cobertura
    parcial y la historia corta impiden declarar una ventaja predictiva.

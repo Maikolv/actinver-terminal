@@ -31,6 +31,10 @@
       "url": "/?vista=tab-cartera"
     },
     {
+      "titulo": "Mis portafolios",
+      "url": "/?vista=tab-portafolios"
+    },
+    {
       "titulo": "Propuestas",
       "url": "/?vista=tab-propuestas"
     },
@@ -69,10 +73,6 @@
     {
       "titulo": "Laboratorio",
       "url": "/?vista=tab-laboratorio"
-    },
-    {
-      "titulo": "Aprender y recursos",
-      "url": "/?vista=tab-aprendizaje"
     },
     {
       "titulo": "Boletas e historial",

@@ -18,7 +18,7 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
-from . import mercado, reto
+from . import capitalizacion, mercado, reto
 from .config import Ajustes
 
 PESOS = {"rend_20": 0.30, "rend_60": 0.30, "estabilidad": 0.20, "tendencia": 0.20}
@@ -69,6 +69,10 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "a
         c = cal.get(f["id"])
         f["calificacion_sa"] = ({"quant": c["quant"], "autores": c["autores"], "wall_street": c["wall_street"],
                                  "fecha": c["fecha"]} if c else None)
+    caps = capitalizacion.para_precios(con, ajustes, {f["id"]: f["precio_mxn"] for f in filas})
+    for f in filas:
+        f.update(caps.get(f["id"]) or {"cap_mxn": None, "cap_usd": None, "cap_categoria": None, "cap_estado": "sin_dato",
+                                        "cap_detalle": None, "cap_fecha": None, "cap_fuente": None})
     if filas:
         df = pd.DataFrame(filas)
         df["puntuacion"] = sum(df[k].rank(pct=True) * w for k, w in PESOS.items()) * 100
@@ -76,7 +80,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "a
         df["posicion"] = df.index + 1
         filas = df.round(6).astype(object).where(df.notna(), None).to_dict("records")
     return {"filas": filas, "n": len(filas), "universo": len(ids), "criterio": PESOS, "filtro": mercado_filtro, "clase": clase,
-            "fuera_del_catalogo": len(fuera),
+            "fuera_del_catalogo": len(fuera), "capitalizacion": capitalizacion.guia(),
             "aviso": ("Ordena por comportamiento reciente y estabilidad; no es recomendación ni pronóstico. Se actualiza con "
                       "cada precio nuevo: hoy los precios BMV son cierres (EOD) y los del SIC son referencia de su bolsa de "
                       "origen convertida a pesos, no la cotización del SIC.")}

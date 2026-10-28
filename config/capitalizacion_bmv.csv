@@ -1,0 +1,4 @@
+# Acciones en circulación de emisoras BMV para la clasificación por capitalización (mega/large/mid/small/micro).
+# Anote la cifra de un documento oficial (reporte trimestral o anual en bmv.com.mx) con su fecha y fuente.
+# La terminal no inventa este dato: las emisoras sin fila aparecen como «sin dato» en el Ranking.
+clave,acciones_circulacion,fecha,fuente

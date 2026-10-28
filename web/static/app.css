@@ -18,6 +18,7 @@
   --serie-1: #1f5f8b;
   --serie-2: #b0600f;
   --foco: #1f5f8b;
+  --marca: #1f5f8b;        /* color fijo del logo: igual en claro, oscuro, favicon y Excel */
   --radio: 6px;
   --espacio: 16px;
   --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -59,7 +60,10 @@ a { color: var(--acento); }
 /* Cabecera */
 .cabecera { background: var(--superficie); border-bottom: 1px solid var(--borde); padding: 12px var(--espacio) 10px; }
 .cabecera__fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; }
-.marca { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 1.05rem; }
+.marca { display: flex; align-items: center; gap: 10px; font-weight: 650; font-size: 1.05rem; color: var(--texto); text-decoration: none; }
+.marca__logo { flex: none; display: block; }
+.marca__logo rect { fill: var(--marca); }
+.marca__logo path { fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 .acciones-cabecera { display: flex; gap: 8px; }
 .comandos-cabecera { display: flex; gap: 4px; }
 .comandos-cabecera input { width: min(24vw, 240px); min-width: 165px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); font: inherit; }
@@ -378,3 +382,31 @@ select[multiple] { min-width: 230px; }
 @media (max-width: 640px) { .grafica-vivo { height: 420px; } }
 .widget-tv { display: block; width: 100%; border: 1px solid var(--borde); border-radius: 6px; margin-top: .5rem; }
 .widget-bloque > summary { cursor: pointer; font-weight: 600; }
+
+/* Mis portafolios: generador de propuestas (Markowitz) */
+.pf-rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .75rem 1rem; margin: .5rem 0; }
+.pf-rejilla label { display: flex; flex-direction: column; gap: .25rem; }
+.pf-seleccion { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 1rem; min-width: 0; }
+.pf-seleccion .chip { white-space: normal; max-width: 100%; overflow-wrap: anywhere; }
+.pf-quitar { margin-left: .35rem; background: none; border: none; color: inherit; cursor: pointer; font-size: 1rem; line-height: 1; }
+.pf-caps { display: flex; flex-wrap: wrap; gap: .5rem 1rem; border: 1px solid var(--borde); border-radius: 6px; padding: .5rem .75rem; }
+.pf-etiqueta { font-size: .85rem; font-weight: 600; color: var(--texto-2); align-self: center; }
+.chip--fijo { background: color-mix(in srgb, var(--acento) 14%, transparent); color: var(--acento); }
+.pf-alternativa { border: 1px solid var(--borde); cursor: pointer; font: inherit; font-size: .85rem; }
+.pf-deslizador { display: flex; flex-direction: column; gap: .25rem; }
+.pf-deslizador output { font-weight: 650; color: var(--acento); }
+.pf-deslizador input[type=range] { accent-color: var(--acento); width: 100%; }
+.pf-check { display: flex; align-items: center; gap: .4rem; margin: .75rem 0 .5rem; }
+.pf-check input, .pf-caps input { accent-color: var(--acento); }
+.pf-estado { margin-top: .75rem; min-height: 1.5em; }
+.pf-generador .segmentado { margin-bottom: .5rem; }
+@media (max-width: 560px) { .pf-generador .segmentado { display: grid; grid-template-columns: 1fr 1fr; width: 100%; } .pf-generador .segmentado button { white-space: nowrap; } }
+.pf-consejos { list-style: none; padding: 0; margin: 0 0 .75rem; display: grid; gap: .5rem; }
+.pf-consejos li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding: .6rem .8rem;
+  border-left: 3px solid var(--acento); background: var(--superficie-2); border-radius: var(--radio); }
+.pf-consejos li.pf-consejo--aviso { border-left-color: var(--retrasado); }
+.pf-consejos li.pf-consejo--info { border-left-color: var(--sin-datos); }
+.pf-consejos li span { flex: 1 1 320px; }
+#portafolios-contenido div[aria-busy="true"] { opacity: .6; transition: opacity .2s; }
+.grafica .etiqueta-punto { font-size: 10px; fill: var(--texto-2); }
+a.boton { text-decoration: none; display: inline-flex; align-items: center; }

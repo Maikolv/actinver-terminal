@@ -115,6 +115,7 @@ const CARGAS = {
   "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
   "tab-investigacion": () => cargarCentroInvestigacion(),
   "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
+  "tab-portafolios": () => cargarPortafolios(),
   "tab-movimientos": () => cargarMovimientos(), "tab-robustez": () => cargarRobustez(),
 };
 const navPestanas = document.querySelector(".pestanas");
@@ -200,7 +201,7 @@ document.getElementById("form-comandos").addEventListener("submit", async (ev) =
       return;
     }
     if (!encontrados[0].grafica) { notificar("Ese instrumento no tiene gráfica disponible."); return; }
-    window.location.assign(`/grafica/${encodeURIComponent(encontrados[0].id)}`);
+    window.location.assign(`/grafica/${encodeURIComponent(encontrados[0].id)}?tema=${TEMA_TV}`);
   } catch (e) { notificar(e.message); }
 });
 
@@ -757,7 +758,7 @@ function pintarCartera(c, txs) {
       { t: "No realizado", f: (f) => h("span", { clase: signo(f.no_realizado), texto: `${mxn(f.no_realizado)} (${pct(f.no_realizado_pct)})` }), num: true },
       { t: "Realizado", f: (f) => mxn(f.realizado), num: true },
       { t: "Dato", f: (f) => h("span", {}, chip(f.vigencia, f.etiqueta_vigencia), h("br"), h("span", { clase: "suave", texto: `${f.fecha_precio || ""} ${f.proveedor || ""}` })) },
-      { t: "", f: (f) => h("a", { href: `/grafica/${encodeURIComponent(f.instrumento_id)}`, target: "_blank", rel: "noopener", texto: "Gráfica" }) }],
+      { t: "", f: (f) => h("a", { href: `/grafica/${encodeURIComponent(f.instrumento_id)}?tema=${TEMA_TV}`, target: "_blank", rel: "noopener", texto: "Gráfica" }) }],
     c.posiciones, { caption: "Costo promedio ponderado; comisiones de compra incluidas en el costo." }));
   }
   out.push(h("h2", { texto: "Operaciones registradas" }), tabla([
@@ -923,7 +924,7 @@ function fichaCelda(c) {
     h("div", { clase: "fila-controles" },
       h("button", { type: "button", clase: "boton boton--secundario", texto: "Ver cierres e indicadores", onclick: () => cargarSerieMercado(c.id) }),
       botonVelas,
-      c.grafica ? h("a", { href: `/grafica/${encodeURIComponent(c.id)}`, target: "_blank", rel: "noopener", clase: "boton boton--secundario", texto: "Velas de TradingView (externo)" }) : null));
+      c.grafica ? h("a", { href: `/grafica/${encodeURIComponent(c.id)}?tema=${TEMA_TV}`, target: "_blank", rel: "noopener", clase: "boton boton--secundario", texto: "Velas de TradingView (externo)" }) : null));
 }
 
 function pintarMapaMercado() {
@@ -1480,11 +1481,19 @@ async function cargarRanking() {
     document.getElementById("ranking-aviso").textContent = `${d.aviso} Criterio: 30 % rendimiento 20 sesiones, 30 % rendimiento 60 sesiones, 20 % estabilidad, 20 % tendencia; percentiles dentro de la clase elegida.`
       + (corta ? " Fondos con historia corta: las columnas «20 días» y «60 días» usan las ventanas indicadas en cada fila (no son comparables con 20 y 60 sesiones)." : "");
     document.getElementById("ranking-hora").textContent = `Actualizado ${fechaLocal(new Date().toISOString())} · ${d.n} de ${d.universo} instrumentos con historia suficiente. Se refresca cada minuto.`;
+    const caps = d.capitalizacion.categorias, nombreCap = Object.fromEntries(caps.map((c) => [c.clave, c.nombre]));
+    const filas = estado.rankingCap === "todas" ? d.filas : d.filas.filter((f) => (f.cap_categoria || "sin") === estado.rankingCap);
+    if (estado.rankingClase === "acciones") pintarFiltroCap(d, caps, filas.length);
+    else limpiar("ranking-capitalizacion", h("p", { clase: "suave", texto: "La capitalización bursátil aplica a acciones; para ETF y fondos el tamaño se mide por activos administrados." }));
     limpiar("ranking-contenido", tabla([
       { t: "#", f: (f) => f.posicion, num: true },
       { t: "Instrumento", f: (f) => h("span", {}, h("strong", { texto: f.clave_operable }), h("br"), h("span", { clase: "suave", texto: f.nombre }),
         f.historia_corta ? h("span", {}, h("br"), chip("retrasado", `historia corta: ${f.sesiones} sesiones (ventanas ${f.ventanas[0]} y ${f.ventanas[1]})`)) : null) },
       { t: "Mercado", f: (f) => f.mercado },
+      { t: "Capitalización", f: (f) => (f.cap_categoria
+        ? h("span", { title: `${f.cap_detalle || ""} · ${fmtCompacto.format(f.cap_mxn)} MXN` }, h("strong", { texto: nombreCap[f.cap_categoria] }), h("br"),
+          h("span", { clase: "suave", texto: `${f.cap_estado === "aproximado" ? "≥ " : ""}${fmtCompacto.format(f.cap_usd)} USD${f.cap_estado === "aproximado" ? " (aprox.)" : ""}` }))
+        : h("span", { clase: "suave", title: f.cap_detalle || "Sin acciones en circulación verificadas", texto: f.cap_estado === "extranjero" ? "ADR: sin clasificar" : "sin dato" })) },
       { t: "Puntuación", f: (f) => h("span", {}, h("span", { clase: "cifra", texto: f.puntuacion.toFixed(1) }), " ", barraPct(f.puntuacion, 100)), num: true },
       { t: "Precio MXN", f: (f) => h("span", { title: f.precio_es_referencia ? "Referencia: bolsa de origen × tipo de cambio (no es el precio SIC)" : "" }, mxn(f.precio_mxn, true), f.precio_es_referencia ? " *" : ""), num: true },
       { t: "1 día", f: (f) => h("span", { clase: signo(f.rend_1) }, pct(f.rend_1)), num: true },
@@ -1495,11 +1504,34 @@ async function cargarRanking() {
       { t: "Caída 60 d", f: (f) => pct(f.caida_60), num: true },
       { t: "Seeking Alpha", f: (f) => (f.calificacion_sa ? h("span", { title: `Autores ${f.calificacion_sa.autores ?? "—"} · Wall Street ${f.calificacion_sa.wall_street ?? "—"} · importada ${f.calificacion_sa.fecha}` }, `Quant ${f.calificacion_sa.quant ?? "—"}`) : "—") },
       { t: "Dato", f: (f) => h("span", {}, chip(f.vigencia), h("br"), h("span", { clase: "suave", texto: `${f.tipo_dato || "—"} · ${f.fecha || "—"} · ${f.proveedor || "—"}` })) }],
-      d.filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC."
+      filas, { caption: "* Precio de referencia de la bolsa de origen convertido a pesos; no es la cotización del SIC."
         + (d.fuera_del_catalogo ? ` Se omiten ${d.fuera_del_catalogo} instrumento(s) que no aparecen en el catálogo de su simulador.` : ""), vacio: estado.rankingClase === "fondos" ? "Sin fondos con al menos 11 sesiones de valor liquidativo." : "Sin instrumentos con al menos 61 sesiones de precio." }));
   } catch (e) { if (vigente()) limpiar("ranking-contenido", errorCaja(e)); }
 }
 setInterval(() => { if (pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
+
+/* Clasificación por capitalización bursátil: filtro, explicación de cada categoría y consulta a la SEC. */
+estado.rankingCap = "todas";
+function pintarFiltroCap(d, caps, mostradas) {
+  const cuenta = (k) => d.filas.filter((f) => (f.cap_categoria || "sin") === k).length;
+  const opciones = [["todas", `Todas (${d.filas.length})`], ...caps.map((c) => [c.clave, `${c.nombre} (${cuenta(c.clave)})`]), ["sin", `Sin dato (${cuenta("sin")})`]];
+  const actualizar = botonAccion("Actualizar capitalización (SEC)", "boton--secundario", async (b) => {
+    ocupado([b], true);
+    try { const r = await api("/api/capitalizacion/actualizar", { method: "POST" }); notificar(r.mensaje); cargarRanking(); }
+    catch (e) { notificar(e.message); } finally { ocupado([b], false); }
+  });
+  limpiar("ranking-capitalizacion",
+    h("div", { clase: "fila-controles" },
+      selectorSimple(estado.rankingCap, opciones, (v) => { estado.rankingCap = v; cargarRanking(); }, "Capitalización bursátil"),
+      h("span", { clase: "suave", texto: `${mostradas} instrumento(s) en la vista` }), actualizar),
+    h("details", { clase: "tarjeta", open: Boolean(estado.capAbierto), ontoggle: (e) => { estado.capAbierto = e.target.open; } },
+      h("summary", { texto: "¿Qué significa mega, large, mid, small y micro cap?" }),
+      h("p", { texto: d.capitalizacion.explicacion }),
+      tabla([{ t: "Categoría", f: (c) => h("strong", { texto: c.nombre }) },
+        { t: "Capitalización (USD)", f: (c) => (c.minimo_usd ? `desde ${fmtCompacto.format(c.minimo_usd)}` : "menos de 300 M") },
+        { t: "Qué implica", f: (c) => c.descripcion }], caps, { caption: "Cortes convencionales del mercado de EE. UU.; no hay una norma oficial." }),
+      h("p", { clase: "ayuda", texto: "Fuente: acciones en circulación del último 10-K/10-Q en la SEC × precio de referencia. Los ADR (emisores extranjeros) no se clasifican porque la SEC reporta acciones ordinarias. Para la BMV anote las acciones en circulación en config/capitalizacion_bmv.csv (no hay API gratuita); el filtro «most capitalized» del widget de TradingView en Mercado es una referencia visual." })));
+}
 
 /* ---------- universo y proveedores ---------- */
 async function cargarUniverso() {
@@ -1533,7 +1565,7 @@ function pintarUniverso() {
     { t: "Tipo", f: (f) => f.tipo_dato || "—" }, { t: "Proveedor", f: (f) => f.proveedor || "—" },
     { t: "Retraso", f: (f) => (f.retraso_horas == null ? "—" : `${f.retraso_horas} h`), num: true },
     { t: "Vigencia", f: (f) => chip(f.vigencia, f.etiqueta) },
-    { t: "", f: (f) => (f.grafica ? h("a", { href: `/grafica/${encodeURIComponent(f.id)}`, target: "_blank", rel: "noopener", texto: "Gráfica" }) : "") }],
+    { t: "", f: (f) => (f.grafica ? h("a", { href: `/grafica/${encodeURIComponent(f.id)}?tema=${TEMA_TV}`, target: "_blank", rel: "noopener", texto: "Gráfica" }) : "") }],
   filas.slice(0, 400), { caption: `${filas.length} de ${estado.universo.length} instrumentos. Clase verificada con fuente independiente; la sección del PDF no determina la clase.` }));
 }
 ["filtro-texto", "filtro-clase", "filtro-vigencia"].forEach((id) => document.getElementById(id).addEventListener("input", () => estado.universo && pintarUniverso()));
@@ -1829,7 +1861,7 @@ function selectorSimbolo(valor, alCambiar, { incluirCripto = true, etiqueta = "I
 
 // Widget oficial de TradingView: las velas se mueven solas con los datos y el retraso de TradingView, no de la terminal.
 function graficaTradingView(v) {
-  const url = (x) => `/grafica/${encodeURIComponent(v.simbolo)}?intervalo=${x}`;
+  const url = (x) => `/grafica/${encodeURIComponent(v.simbolo)}?intervalo=${x}&tema=${TEMA_TV}`;
   const marco = h("iframe", { clase: "grafica-vivo", title: `Gráfica de TradingView de ${v.simbolo}`, loading: "lazy", src: url(v.tv) });
   return h("section", { clase: "tarjeta", "aria-label": "Gráfica en movimiento" },
     h("h3", { texto: "Gráfica en movimiento (TradingView)" }),
@@ -1841,9 +1873,11 @@ function graficaTradingView(v) {
 
 // Widgets gratuitos de TradingView en marcos aislados (/widget/...). Solo muestran; no alimentan cálculos.
 const AVISO_TV = "Datos de TradingView: EE. UU. con la cotización gratuita de Cboe en USD; las emisoras de la BMV no están disponibles en estos widgets gratuitos. Pueden diferir del simulador del Reto. Solo informa.";
+// Los widgets y la gráfica de TradingView siguen el modo claro/oscuro del sistema, igual que la terminal.
+const TEMA_TV = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+const urlWidget = (tipo, params = {}) => `/widget/${tipo}?${new URLSearchParams({ ...params, tema: TEMA_TV })}`;
 function marcoWidget(tipo, params, alto, titulo) {
-  const q = new URLSearchParams(params).toString();
-  const m = h("iframe", { clase: "widget-tv", title: titulo, loading: "lazy", src: `/widget/${tipo}${q ? `?${q}` : ""}` });
+  const m = h("iframe", { clase: "widget-tv", title: titulo, loading: "lazy", src: urlWidget(tipo, params) });
   m.style.height = `${alto}px`;  // por CSSOM: la CSP bloquea el atributo style
   return m;
 }
@@ -1859,11 +1893,17 @@ function panoramaTradingView() {
     marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
     bloqueWidget("Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
     bloqueWidget("Mapa de calor por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
-      (x) => { mapa.src = `/widget/mapa?mapa=${x}`; }, "Índice"), mapa]),
+      (x) => { mapa.src = urlWidget("mapa", { mapa: x }); }, "Índice"), mapa]),
     bloqueWidget("Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
     bloqueWidget("Filtro de acciones", [selectorSimple("america", [["america", "EE. UU."], ["mexico", "México"]],
-      (x) => { filtro.src = `/widget/filtro?filtro=${x}`; }, "Mercado"), filtro]),
-    bloqueWidget("Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")));
+      (x) => { filtro.src = urlWidget("filtro", { filtro: x }); }, "Mercado"), filtro]),
+    bloqueWidget("Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
+    bloqueWidget("Cotizaciones por grupo (índices, dólar y euro, bonos de EE. UU., materias primas)", marcoWidget("cotizaciones", {}, 520, "Cotizaciones por grupo")),
+    bloqueWidget("Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
+    bloqueWidget("Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
+    bloqueWidget("Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
+    bloqueWidget("Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")),
+    bloqueWidget("Criptomonedas: mapa de calor (fuera del Reto)", marcoWidget("mapa-cripto", {}, 520, "Mapa de calor de criptomonedas")));
 }
 
 function fichaTradingView(simbolo) {
@@ -2257,13 +2297,22 @@ function controlesContratosPaper(subyacente) {
     if (await pedirActualizacion("contratos_oi", subyacente, {}, b)) cargarOptionFlow();
   });
   boton.disabled = !disponible || !subyacente;
+  // GEX necesita OI conocido ANTES del instante de la cadena: primero metadatos, después una cadena nueva (mercado abierto)
+  const gex = botonAccion("Preparar GEX: OI y luego cadena", "boton--primario", async (b) => {
+    const oi = await pedirActualizacion("contratos_oi", subyacente, {}, b);
+    if (!oi || !["ok", "en_espera", "vacio"].includes(oi.estado)) return;
+    if (await pedirActualizacion("opciones", subyacente, {}, b)) cargarOptionFlow();
+  });
+  gex.disabled = boton.disabled;
   return h("section", { clase: "tarjeta", "aria-label": "Contratos Alpaca Paper de solo lectura" },
     h("h2", { texto: "Interés abierto y tamaño del contrato" }),
     h("p", { clase: "ayuda", texto: "Consulta autorizada únicamente en Paper y de solo lectura. El interés abierto corresponde a un cierre previo, con su fecha; no es tiempo real. No compra contratos ni habilita órdenes o suscripciones." }),
     h("p", { clase: disponible ? "ayuda" : "aviso-caja", role: "status", texto: disponible
       ? "Consulta disponible bajo demanda; no se actualiza automáticamente."
       : "Consulta desactivada o sin credenciales Paper. Configure las claves Paper y habilite contratos_oi en la configuración local; reinicie la terminal. En demo no se consultan proveedores." }),
-    h("p", { clase: "ayuda", texto: "Actualice primero los metadatos y después la cadena. Solo se combina OI de cierre previo que ya era conocido al instante de la referencia; no se rellena un snapshot histórico con información posterior." }), boton);
+    h("p", { clase: "ayuda", texto: "Actualice primero los metadatos y después la cadena. Solo se combina OI de cierre previo que ya era conocido al instante de la referencia; no se rellena un snapshot histórico con información posterior." }),
+    h("p", { clase: "ayuda", texto: "«Preparar GEX» hace las dos consultas en ese orden. Úselo con el mercado de EE. UU. abierto: fuera de horario la cadena conserva las cotizaciones del cierre, anteriores al OI consultado, y el GEX no se calcula." }),
+    h("div", { clase: "fila-controles" }, gex, boton));
 }
 
 async function cargarOptionFlow() {
@@ -2913,33 +2962,7 @@ CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
 CARGAS["tab-intradia"] = () => cargarIntradia();
 Object.assign(ATAJOS, { LAB: "tab-laboratorio", INT: "tab-intradia", GEX: "tab-optionflow" });
 
-/* Recursos aportados: fórmulas verificadas y microestructura sin inventar datos. */
-async function cargarAprendizaje() {
-  try {
-    const d = await api('/api/aprendizaje');
-    const link = (titulo, url) => url ? h('a', {href:url, target:'_blank', rel:'noopener noreferrer', texto:titulo}) : h('span', {texto:titulo});
-    const c = d.captura_referencia;
-    limpiar('aprendizaje-contenido', h('p', {clase:'ayuda', texto:`Revisión ${d.revisado}. ${d.aviso}`}),
-      h('h2', {texto:'Catálogo maestro y configuración de plataformas'}),
-      ...(d.documentos || []).map(r => h('article', {clase:'tarjeta'}, h('h3', {}, link(r.titulo,r.url)), h('p', {texto:r.detalle}))),
-      h('h2', {texto:'Indicadores — PDF de Ana Jiménez, Actinver Acelera Academy'}),
-      ...d.indicadores.map(i => h('article', {clase:'tarjeta'}, h('h3', {texto:i.titulo}), h('p', {}, h('code', {texto:i.formula})),
-        h('p', {texto:i.interpretacion}), h('p', {clase:'ayuda', texto:`Precisión: ${i.precision} Fuente: ${i.archivo}, página 1.`}))),
-      h('p', {}, h('button', {type:'button', clase:'boton', 'data-ir':'tab-velas', texto:'Practicar con las velas'})),
-      h('h2', {texto:'Capturas de la plataforma'}), ...d.capturas_plataforma.map(r => h('p', {texto:`${r.archivo}: ${r.observado} ${r.aplicacion}`})),
-      h('h2', {texto:'Videos, investigación y documentación de mercados'}),
-      ...d.cursos.map(r => h('article', {clase:'tarjeta'}, h('h3', {}, link(r.titulo,r.url)), h('p', {texto:`${r.autor} · ${r.captura}. ${r.estado}`}),
-        h('p', {texto:r.conceptos.join(' · ')}), h('p', {texto:`Ejercicio: ${r.ejercicio}`}))),
-      h('h2', {texto:'Formación de las capturas y los posts: condiciones de acceso'}),
-      h('p', {texto:'Orden por área: gratuitas, condicionadas, contenido gratis con certificado de pago, de pago y pendientes. Cursos, badges y certificaciones profesionales tienen alcances distintos. No se contrata ni inscribe a ningún curso.'}),
-      tabla([{t:'Área',f:r=>r.area || 'Por clasificar'},{t:'Programa',f:r=>link(r.nombre,r.url)},{t:'Referencia',f:r=>r.imagen},{t:'Verificación y límites',f:r=>r.estado}],d.certificaciones,{caption:'Acceso al contenido y certificado son condiciones distintas'}),
-      h('h2', {texto:'Captura de cotizaciones: referencia local'}),
-      c ? h('div', {}, h('p', {clase:'aviso-caja', texto:c.nota+' Fecha, moneda y mercado no confirmados. No se usa para valorar la cartera.'}),
-        tabla([{t:'Símbolo visible',f:r=>r.simbolo},{t:'Número de la captura (sin moneda confirmada)',f:r=>num(r.precio_captura),num:true}],c.filas,{caption:'Referencia aportada por el usuario; no son precios actuales ni posiciones confirmadas'}))
-        : h('p',{texto:'No hay captura local de cotizaciones; no se incorporaron números sin fecha a la base de precios.'}));
-  } catch(e) { limpiar('aprendizaje-contenido',errorCaja(e)); }
-}
-
+/* Microestructura sin inventar datos. */
 function pintarMicroestructura(d) {
   const F=d.footprint, H=d.liquidez_historica;
   const vista=h('div'), hist=h('div');
@@ -2969,8 +2992,303 @@ function pintarMicroestructura(d) {
     el.style.backgroundColor=`color-mix(in srgb, var(--serie-2) ${Math.round(10+65*c.tamano/maxL)}%, transparent)`;return el;
   }}))],H.precios,{caption:'Heatmap de liquidez pasiva: últimas 20 capturas; — significa no observado',vacio:'Sin capturas de profundidad guardadas. IEX de un nivel no equivale a Level 2 completo.'});
   return h('section',{},h('h2',{texto:'Footprint, volumen y delta'}),modo,vista,hist,h('p',{clase:'ayuda',texto:F.nota+(F.parcial?' Cobertura parcial por límites de la consulta.':'')}),
-    h('h2',{texto:'Historial de liquidez visible (DOM)'}),mapa,h('p',{clase:'ayuda',texto:H.nota}),
-    h('p',{},h('button',{type:'button',clase:'boton boton--texto','data-ir':'tab-aprendizaje',texto:'Ver conceptos y recursos de las capturas'})));
+    h('h2',{texto:'Historial de liquidez visible (DOM)'}),mapa,h('p',{clase:'ayuda',texto:H.nota}));
 }
-CARGAS['tab-aprendizaje']=cargarAprendizaje;
-Object.assign(ATAJOS,{APRENDER:'tab-aprendizaje'});
+
+/* ---------- Mis portafolios: generador de propuestas con Markowitz (terminal/markowitz.py). Solo simulación. ----------
+   El formulario se arma una vez (para no perder el foco al escribir); cada cambio recalcula la propuesta tras una pausa
+   breve y solo se repintan las zonas dinámicas: instrumentos, sugerencias de la terminal y resultado. */
+const pf = { meta: null, lista: [], universo: null, editando: null, ultimo: null, g: null, ui: null, espera: null };
+const PF_PCT = ["rf", "peso_max", "rend_objetivo", "riesgo_objetivo"];
+function genInicial(perfil = "crecimiento") {
+  const o = pf.meta.objetivos[perfil];
+  return { objetivo: perfil, clase: "acciones", mercado_filtro: "ambos", caps: [], n: Math.max(o.min_activos, 6), fijos: [], excluir: [],
+    completar: true, metodo: "auto", peso_max: o.peso_max, capital: 100000, rf: 0.07, ventana: 252, aversion: o.aversion,
+    rend_objetivo: 0.12, riesgo_objetivo: 0.18, nombre: "", descripcion: "" };
+}
+async function cargarPortafolios() {
+  const vigente = turno("portafolios");
+  try {
+    const [d, u] = await Promise.all([api("/api/portafolios"), pf.universo ? null : api("/api/universo")]);
+    if (!vigente()) return;
+    pf.meta = d; pf.lista = d.portafolios;
+    if (u) pf.universo = u.instrumentos.filter((i) => i.estado === "activo");
+    const primera = !pf.g;
+    if (primera) pf.g = genInicial();
+    pintarPortafolios();
+    if (primera || !pf.ultimo) generarPropuesta(); else pintarPropuesta();
+  } catch (e) { if (vigente()) limpiar("portafolios-contenido", errorCaja(e)); }
+}
+const nombreIns = (id) => { const i = (pf.universo || []).find((x) => x.id === id); return i ? `${i.clave_operable} · ${(i.nombre || "").trim().slice(0, 40)}` : id; };
+const claveIns = (id) => ((pf.universo || []).find((x) => x.id === id) || {}).clave_operable || id;
+
+function pintarPortafolios() {
+  const hay = pf.lista.length > 0;
+  const barra = h("div", { clase: "fila-controles" },
+    h("button", { type: "button", clase: "boton boton--secundario", texto: "Empezar de nuevo",
+      onclick: () => { pf.editando = null; pf.g = genInicial(pf.g.objetivo); pintarPortafolios(); generarPropuesta(); } }),
+    h("a", { clase: "boton boton--secundario", href: "/api/markowitz/plantilla.xlsx", download: "", texto: "Plantilla de Excel" }),
+    hay ? h("a", { clase: "boton boton--secundario", href: "/api/portafolios/excel", download: "", texto: `Descargar los ${pf.lista.length} portafolios (Excel)` }) : null);
+  pf.ui = { instrumentos: h("div"), estado: h("p", { clase: "suave pf-estado", role: "status", "aria-live": "polite" }),
+    sugerencias: h("div"), resultado: h("div"), guardar: h("div") };
+  limpiar("portafolios-contenido", barra, generadorPortafolio(),
+    h("section", { clase: "tarjeta pf-sugerencias", "aria-label": "Sugerencias de la terminal" }, h("h2", { texto: "Sugerencias de la terminal" }), pf.ui.sugerencias),
+    pf.ui.resultado, pf.ui.guardar,
+    h("section", { clase: "tarjeta" }, h("h2", { texto: "Portafolios guardados" }), tablaGuardados()),
+    h("p", { clase: "ayuda", texto: pf.meta.aviso }));
+  pintarPropuesta();
+}
+
+function tablaGuardados() {
+  return tabla([
+    { t: "Portafolio", f: (p) => h("span", {}, h("strong", { texto: p.nombre }), h("br"), h("span", { clase: "suave", texto: `${p.objetivo_nombre || "—"} · ${p.metodo_nombre || "—"}` })) },
+    { t: "E(r) anual", f: (p) => pct(p.metricas?.rend), num: true },
+    { t: "Riesgo σ", f: (p) => pct(p.metricas?.riesgo), num: true },
+    { t: "Sharpe", f: (p) => (vacio(p.metricas?.sharpe) ? "—" : p.metricas.sharpe.toFixed(2)), num: true },
+    { t: "Activos", f: (p) => p.n_activos ?? "—", num: true },
+    { t: "Actualizado", f: (p) => fechaLocal(p.actualizado_en) },
+    { t: "Acciones", f: (p) => h("span", { clase: "fila-controles" },
+      h("button", { type: "button", clase: "boton boton--secundario", texto: "Abrir", onclick: () => abrirPortafolio(p, false) }),
+      h("button", { type: "button", clase: "boton boton--secundario", texto: "Duplicar", onclick: () => abrirPortafolio(p, true) }),
+      h("a", { clase: "boton boton--secundario", href: `/api/portafolios/${p.id}/excel`, download: "", texto: "Excel" }),
+      h("button", { type: "button", clase: "boton boton--secundario", texto: "Eliminar", onclick: () => eliminarPortafolio(p) })) }],
+  pf.lista, { caption: "Portafolios guardados (simulados; no son órdenes)", vacio: "Aún no hay portafolios guardados: guarde la propuesta de arriba cuando le guste." });
+}
+
+// Un portafolio guardado se abre en el generador con sus instrumentos fijos y sin completar con sugerencias.
+function abrirPortafolio(p, copia) {
+  const s = p.especificacion;
+  pf.editando = copia ? null : p.id;
+  pf.g = { ...genInicial(s.objetivo in pf.meta.objetivos ? s.objetivo : "crecimiento"), ...s, fijos: [...s.activos], excluir: [], completar: false,
+    n: s.activos.length, metodo: s.metodo, nombre: copia ? `${s.nombre} (copia)` : s.nombre };
+  delete pf.g.activos;
+  pintarPortafolios(); generarPropuesta();
+  document.getElementById("panel-portafolios")?.scrollIntoView({ behavior: "smooth" });
+}
+async function eliminarPortafolio(p) {
+  if (!window.confirm(`¿Eliminar el portafolio «${p.nombre}»? Esta acción no se puede deshacer.`)) return;
+  try {
+    await api(`/api/portafolios/${p.id}`, { method: "DELETE", json: {} });
+    if (pf.editando === p.id) pf.editando = null;
+    notificar("Portafolio eliminado."); cargarPortafolios();
+  } catch (e) { notificar(e.message); }
+}
+
+// Cambio del usuario → nueva propuesta tras 500 ms sin más cambios (o de inmediato si se pide).
+function cambioGen(inmediato = false) {
+  clearTimeout(pf.espera);
+  if (pf.ui) pf.ui.estado.textContent = "Ajustando la propuesta…";
+  pf.espera = setTimeout(generarPropuesta, inmediato ? 0 : 500);
+}
+async function generarPropuesta() {
+  const vigente = turno("portafolios-generar");
+  if (pf.ui) { pf.ui.estado.textContent = "Calculando la mejor propuesta con sus especificaciones…"; pf.ui.resultado.setAttribute("aria-busy", "true"); }
+  try {
+    const r = await api("/api/portafolios/generar", { method: "POST", json: pf.g });
+    if (!vigente()) return;
+    pf.ultimo = r; pf.error = null;
+  } catch (e) {
+    if (!vigente()) return;
+    pf.error = e.errores ? e.errores.join(" ") : e.message;
+  }
+  pintarPropuesta();
+}
+
+function generadorPortafolio() {
+  const g = pf.g, M = pf.meta;
+  const numero = (k, etiqueta, attrs = {}) => {
+    const esPct = PF_PCT.includes(k);
+    return h("label", {}, etiqueta, h("input", { type: "number", step: "any", value: esPct ? +(g[k] * 100).toFixed(4) : g[k], ...attrs,
+      oninput: (e) => { const n = parseFloat(e.target.value); if (!Number.isNaN(n)) { g[k] = esPct ? n / 100 : n; cambioGen(); } } }));
+  };
+  const deslizador = (k, etiqueta, min, max, paso, fmt) => {
+    const salida = h("output", { texto: fmt(g[k]) });
+    const input = h("input", { type: "range", min, max, step: paso, value: k === "peso_max" ? Math.round(g[k] * 100) : g[k],
+      oninput: (e) => { g[k] = k === "peso_max" ? +e.target.value / 100 : +e.target.value; salida.textContent = fmt(g[k]); cambioGen(); } });
+    return h("label", { clase: "pf-deslizador" }, h("span", {}, etiqueta, " ", salida), input);
+  };
+  const perfiles = h("div", { clase: "segmentado", role: "radiogroup", "aria-label": "Perfil" },
+    Object.entries(M.objetivos).map(([k, o]) => h("button", { type: "button", role: "radio", "aria-checked": String(g.objetivo === k), texto: o.nombre,
+      onclick: () => { Object.assign(g, { objetivo: k, peso_max: o.peso_max, aversion: o.aversion, n: Math.max(g.fijos.length, o.min_activos, g.n) });
+        pintarPortafolios(); cambioGen(true); } })));
+  const o = M.objetivos[g.objetivo];
+  const sel = (k, opciones, etiqueta, alCambiar) => selectorSimple(g[k], opciones, (v) => { g[k] = v; if (alCambiar) alCambiar(v); cambioGen(true); }, etiqueta);
+  const metodos = [["auto", `Automático (${M.metodos[o.metodo]})`], ...Object.entries(M.metodos)];
+  const objetivoMetodo = g.metodo === "rend_objetivo" ? numero("rend_objetivo", "Rendimiento objetivo anual (%)")
+    : g.metodo === "riesgo_objetivo" ? numero("riesgo_objetivo", "Riesgo objetivo anual σ (%)") : null;
+  const caps = h("fieldset", { clase: "pf-caps" }, h("legend", { texto: "Tamaño de empresa (capitalización; vacío = todas)" }),
+    ["mega", "large", "mid", "small", "micro"].map((c) => h("label", {}, h("input", { type: "checkbox", checked: g.caps.includes(c),
+      onchange: (e) => { g.caps = e.target.checked ? [...g.caps, c] : g.caps.filter((x) => x !== c); cambioGen(); } }), ` ${c} cap`)));
+  // buscador para fijar instrumentos propios
+  const lista = h("datalist", { id: "pf-universo" }, (pf.universo || []).map((i) => h("option", { value: `${i.clave_operable} | ${i.id}` }, `${(i.nombre || "").trim().slice(0, 50)} · ${CLASES[i.clase] || i.clase}`)));
+  const buscar = h("input", { type: "text", list: "pf-universo", placeholder: "Clave, p. ej. NVDA o WALMEX", "aria-label": "Buscar instrumento para fijarlo" });
+  const agregar = () => {
+    const t = buscar.value.trim(); if (!t) return;
+    const id = t.includes("|") ? t.split("|").pop().trim() : (pf.universo.find((i) => i.clave_operable.toUpperCase().startsWith(t.toUpperCase()) || i.id.toUpperCase().endsWith(`:${t.toUpperCase()}`)) || {}).id;
+    if (!id || !pf.universo.some((i) => i.id === id)) { notificar("No encontré ese instrumento en el universo."); return; }
+    fijar(id); buscar.value = "";
+  };
+  buscar.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); agregar(); } });
+  return h("section", { clase: "tarjeta pf-generador", "aria-label": "Generador de propuestas" },
+    h("h2", { texto: pf.editando ? `Generador de propuestas · editando «${g.nombre}»` : "Generador de propuestas" }),
+    h("p", { clase: "ayuda", texto: "Elija sus especificaciones: la propuesta se recalcula sola con cada cambio. La terminal completa con los mejores instrumentos del Ranking que no se mueven igual y le sugiere mejoras. Usa precios de cierre, no en tiempo real." }),
+    h("h3", { texto: "1. Perfil" }), perfiles,
+    h("p", { clase: "suave", texto: `${o.descripcion} Parte de: ${M.metodos[o.metodo]}, tope de ${pct(o.peso_max)} por instrumento, ${o.min_activos} o más instrumentos.` }),
+    h("h3", { texto: "2. Qué instrumentos considerar" }),
+    h("div", { clase: "pf-rejilla" },
+      sel("clase", [["acciones", "Acciones"], ["etf", "ETF"], ["mixto", "Acciones y ETF"], ["fondos", "Fondos"]], "Clase"),
+      sel("mercado_filtro", [["ambos", "Nacionales y extranjeras"], ["nacionales", "Solo BMV"], ["extranjeras", "Solo SIC"]], "Mercado"),
+      deslizador("n", "Instrumentos en total:", 2, 20, 1, (v) => String(v))),
+    caps,
+    h("label", { clase: "pf-check" }, h("input", { type: "checkbox", checked: g.completar, onchange: (e) => { g.completar = e.target.checked; cambioGen(true); } }),
+      " Completar con sugerencias de la terminal (si lo desmarca, solo usa los instrumentos que usted fije)"),
+    h("div", { clase: "fila-controles" }, buscar, lista, h("button", { type: "button", clase: "boton boton--secundario", texto: "Fijar instrumento", onclick: agregar })),
+    pf.ui.instrumentos,
+    h("h3", { texto: "3. Cómo optimizar" }),
+    h("div", { clase: "pf-rejilla" },
+      sel("metodo", metodos, "Método", () => pintarPortafolios()),
+      deslizador("peso_max", "Tope por instrumento:", 5, 100, 5, (v) => pct(v)),
+      numero("capital", "Capital a simular (MXN)", { min: 0 }),
+      numero("rf", "Tasa libre de riesgo anual (%)", { min: -5, max: 50 }),
+      selectorSimple(g.ventana, M.ventanas.map((v) => [v, `${v} sesiones (~${(v / 252).toFixed(1)} años)`]), (v) => { g.ventana = +v; cambioGen(true); }, "Historia para estimar"),
+      numero("aversion", "Aversión al riesgo A", { min: 0.1, max: 50 }),
+      objetivoMetodo),
+    h("p", { clase: "ayuda", texto: "Tasa libre de riesgo: use la de CETES vigente. Aversión A: 1–2 agresivo, 4–6 moderado, 8–10 conservador. Un tope más alto concentra; uno más bajo diversifica." }),
+    pf.ui.estado);
+}
+
+function fijar(id) {
+  const g = pf.g;
+  g.excluir = g.excluir.filter((x) => x !== id);
+  if (!g.fijos.includes(id)) g.fijos.push(id);
+  g.n = Math.max(g.n, g.fijos.length);
+  cambioGen(true);
+}
+function aplicarSugerencia(a) {
+  const g = pf.g;
+  if (a.excluir) { g.fijos = g.fijos.filter((x) => x !== a.excluir); if (!g.excluir.includes(a.excluir)) g.excluir.push(a.excluir); if (!g.completar) g.n = Math.max(2, g.fijos.length); }
+  if (a.peso_max) g.peso_max = a.peso_max;
+  if (a.metodo) g.metodo = a.metodo;
+  if (a.agregar) { fijar(a.agregar); }
+  pintarPortafolios(); cambioGen(true);
+}
+
+const rellenar = (el, ...hijos) => el.replaceChildren(...hijos.filter((x) => x !== null && x !== undefined && x !== false));
+function pintarPropuesta() {
+  if (!pf.ui) return;
+  const r = pf.ultimo, g = pf.g;
+  pf.ui.resultado.removeAttribute("aria-busy");
+  // instrumentos: fijos del usuario, sugeridos por la terminal y excluidos
+  const chip = (id, clase, extra, botones) => h("span", { clase: `chip ${clase}` }, h("strong", { texto: claveIns(id) }), extra ? h("span", { clase: "suave", texto: ` · ${extra}` }) : null, ...botones);
+  const boton = (texto, etiqueta, fn) => h("button", { type: "button", clase: "pf-quitar", "aria-label": etiqueta, title: etiqueta, texto, onclick: fn });
+  const quitarFijo = (id) => { g.fijos = g.fijos.filter((x) => x !== id); if (!g.completar) g.n = Math.max(2, g.fijos.length); cambioGen(true); pintarPropuesta(); };
+  const sugeridos = r && !pf.error ? r.sugeridos : [];
+  rellenar(pf.ui.instrumentos,
+    h("div", { clase: "pf-seleccion", "aria-label": "Instrumentos fijados por usted" },
+      h("span", { clase: "pf-etiqueta", texto: "Fijados por usted:" }),
+      g.fijos.length ? g.fijos.map((id) => chip(id, "chip--fijo", null, [boton("×", `Quitar ${claveIns(id)}`, () => quitarFijo(id))]))
+        : h("span", { clase: "suave", texto: "ninguno (la terminal elige todo)" })),
+    h("div", { clase: "pf-seleccion", "aria-label": "Instrumentos sugeridos por la terminal" },
+      h("span", { clase: "pf-etiqueta", texto: "Sugeridos por la terminal:" }),
+      sugeridos.length ? sugeridos.map((id) => chip(id, "chip--calculada", r.motivos[id],
+        [boton("fijar", `Fijar ${claveIns(id)}`, () => fijar(id)), boton("×", `Descartar ${claveIns(id)}`, () => aplicarSugerencia({ excluir: id }))]))
+        : h("span", { clase: "suave", texto: g.completar ? "—" : "desactivado" })),
+    g.excluir.length ? h("div", { clase: "pf-seleccion" }, h("span", { clase: "pf-etiqueta", texto: "Descartados:" }),
+      g.excluir.map((id) => chip(id, "chip--sin_datos", null, [boton("↺", `Volver a considerar ${claveIns(id)}`, () => { g.excluir = g.excluir.filter((x) => x !== id); cambioGen(true); pintarPropuesta(); })]))) : null);
+  if (pf.error) {
+    pf.ui.estado.textContent = "";
+    pf.ui.sugerencias.replaceChildren(h("div", { clase: "aviso-caja", role: "alert", texto: pf.error }));
+    pf.ui.resultado.replaceChildren(); pf.ui.guardar.replaceChildren();
+    return;
+  }
+  if (!r) return;
+  pf.ui.estado.textContent = `Propuesta actualizada a las ${new Date().toLocaleTimeString("es-MX")} · ${r.criterio}`;
+  const accion = (sg) => sg.accion ? h("button", { type: "button", clase: "boton boton--secundario", texto: sg.etiqueta, onclick: () => aplicarSugerencia(sg.accion) }) : null;
+  rellenar(pf.ui.sugerencias,
+    r.sugerencias.length ? h("ul", { clase: "pf-consejos" }, r.sugerencias.map((sg) => h("li", { clase: sg.tipo ? `pf-consejo--${sg.tipo}` : "" }, h("span", { texto: sg.texto }), accion(sg))))
+      : h("p", { texto: "Sin observaciones: la propuesta respeta su perfil y no tiene pares redundantes." }),
+    r.alternativas.length ? h("div", { clase: "pf-seleccion" }, h("span", { clase: "pf-etiqueta", texto: "Otros candidatos listos:" }),
+      r.alternativas.map((a) => h("button", { type: "button", clase: "chip chip--calculada pf-alternativa", title: a.motivo, texto: `+ ${a.clave}`, onclick: () => fijar(a.id) }))) : null);
+  pf.ui.resultado.replaceChildren(pintarResultadoPf(r.resultado));
+  const nombre = h("input", { type: "text", maxlength: "80", value: g.nombre, placeholder: "p. ej. Retiro 2040", oninput: (e) => { g.nombre = e.target.value; } });
+  const notas = h("textarea", { maxlength: "500", rows: "2", texto: g.descripcion, oninput: (e) => { g.descripcion = e.target.value; } });
+  const guardar = async (b, nuevo) => {
+    if (!g.nombre.trim()) { notificar("Póngale un nombre al portafolio antes de guardarlo."); nombre.focus(); return; }
+    ocupado([b], true);
+    try {
+      const cuerpo = { ...pf.ultimo.resultado.especificacion, nombre: g.nombre, descripcion: g.descripcion };
+      const editar = pf.editando && !nuevo;
+      const res = await api(editar ? `/api/portafolios/${pf.editando}` : "/api/portafolios", { method: editar ? "PUT" : "POST", json: cuerpo });
+      pf.editando = res.id; notificar("Portafolio guardado."); await cargarPortafolios();
+    } catch (e) { notificar(e.errores ? e.errores.join(" ") : e.message); } finally { ocupado([b], false); }
+  };
+  pf.ui.guardar.replaceChildren(h("section", { clase: "tarjeta" }, h("h2", { texto: "Guardar esta propuesta" }),
+    h("p", { clase: "ayuda", texto: "Se guardan los instrumentos y parámetros de la propuesta actual. Después puede abrirla, ajustarla o descargarla en Excel con todas las fórmulas." }),
+    h("div", { clase: "pf-rejilla" }, h("label", {}, "Nombre", nombre), h("label", {}, "Notas (opcional)", notas)),
+    h("div", { clase: "fila-controles" },
+      botonAccion(pf.editando ? "Guardar cambios" : "Guardar portafolio", "boton--primario", (b) => guardar(b, false)),
+      pf.editando ? botonAccion("Guardar como nuevo", "boton--secundario", (b) => guardar(b, true)) : null)));
+}
+
+function graficaFrontera(r) {
+  const ancho = 760, alto = 320, m = { i: 58, d: 16, s: 14, inf: 34 };
+  const rf = r.especificacion.rf;
+  const pts = [...r.frontera.map((p) => [p.riesgo, p.rend]), ...r.activos.map((a) => [a.riesgo, a.rend]), [0, rf]];
+  const xmax = Math.max(...pts.map((p) => p[0])) * 1.08, ymin = Math.min(...pts.map((p) => p[1]), 0), ymax = Math.max(...pts.map((p) => p[1])) * 1.08;
+  const X = (x) => m.i + (x / (xmax || 1)) * (ancho - m.i - m.d);
+  const Y = (y) => m.s + (1 - (y - ymin) / ((ymax - ymin) || 1)) * (alto - m.s - m.inf);
+  const svg = s("svg", { viewBox: `0 0 ${ancho} ${alto}`, class: "grafica", role: "img", "aria-label": "Frontera eficiente: riesgo contra rendimiento esperado" });
+  for (let k = 0; k <= 4; k++) {
+    const y = ymin + ((ymax - ymin) * k) / 4, x = (xmax * k) / 4;
+    svg.append(s("line", { x1: m.i, x2: ancho - m.d, y1: Y(y), y2: Y(y), stroke: "var(--borde)" }), s("text", { x: m.i - 6, y: Y(y) + 4, "text-anchor": "end" }, pct(y)),
+      s("text", { x: X(x), y: alto - 18, "text-anchor": "middle" }, pct(x)));
+  }
+  svg.append(s("text", { x: ancho / 2, y: alto - 3, "text-anchor": "middle" }, "Riesgo σ anual"));
+  const t = r.tangente;
+  if (t.riesgo > 0) svg.append(s("line", { x1: X(0), y1: Y(rf), x2: X(xmax), y2: Y(rf + (xmax * (t.rend - rf)) / t.riesgo), stroke: "var(--texto-2)", "stroke-dasharray": "5 4", "stroke-width": 1.4 }));
+  svg.append(s("polyline", { points: r.frontera.map((p) => `${X(p.riesgo).toFixed(1)},${Y(p.rend).toFixed(1)}`).join(" "), fill: "none", stroke: "var(--serie-1)", "stroke-width": 2.2 }));
+  r.activos.forEach((a) => svg.append(s("circle", { cx: X(a.riesgo), cy: Y(a.rend), r: 3.5, fill: "var(--sin-datos)" }, s("title", {}, `${a.clave}: E ${pct(a.rend)}, σ ${pct(a.riesgo)}`)),
+    s("text", { x: X(a.riesgo) + 5, y: Y(a.rend) - 4, class: "etiqueta-punto" }, a.clave.split(" ")[0])));
+  [[r.metricas_1n, "var(--retrasado)", "1/N"], [r.min_varianza, "var(--positivo)", "Mínima varianza"], [t, "var(--serie-2)", "Tangente (máx. Sharpe)"], [r.metricas, "var(--texto)", "Elegido"]]
+    .forEach(([p, c, n], k) => svg.append(s("circle", { cx: X(p.riesgo), cy: Y(p.rend), r: k === 3 ? 7 : 5.5, fill: c, stroke: "var(--fondo)", "stroke-width": 1.5 }, s("title", {}, `${n}: E ${pct(p.rend)}, σ ${pct(p.riesgo)}`))));
+  return h("figure", {}, svg, muestraLeyenda([["var(--serie-1)", "Frontera eficiente"], ["var(--texto)", "Elegido"], ["var(--texto-2)", "Línea de asignación de capital (CAL)"],
+    ["var(--serie-2)", "Tangente"], ["var(--positivo)", "Mínima varianza"], ["var(--retrasado)", "1/N"], ["var(--sin-datos)", "Activos individuales"]]));
+}
+
+function pintarResultadoPf(r) {
+  const m = r.metricas, sp = r.especificacion;
+  const comp = [["Elegido", m], ["Tangente (máx. Sharpe)", r.tangente], ["Mínima varianza", r.min_varianza], ["1/N (referencia)", r.metricas_1n]];
+  const ids = r.correlacion.ids, clave = (id) => (r.activos.find((a) => a.id === id) || {}).clave || id;
+  const corr = tabla([{ t: "", f: (i) => h("strong", { texto: clave(ids[i]) }) }, ...ids.map((id, j) => ({ t: clave(id), num: true, f: (i) => {
+    const v = r.correlacion.matriz[i][j], el = h("span", { clase: "celda-iv", texto: v.toFixed(2) });
+    el.style.backgroundColor = `color-mix(in srgb, var(${v >= 0 ? "--negativo" : "--positivo"}) ${Math.round(Math.abs(v) * 55)}%, transparent)`;
+    return el;
+  } }))], ids.map((_, i) => i), { caption: "Correlación de rendimientos diarios (rojo = se mueven juntos; verde = se compensan)" });
+  return h("section", { clase: "tarjeta" },
+    h("h2", { texto: `Propuesta: ${r.metodo_nombre}` }),
+    h("p", { clase: "suave", texto: `Perfil ${r.objetivo_nombre} · datos ${r.datos.inicio} a ${r.datos.fin} (${r.datos.sesiones} sesiones, ${r.datos.precios}) · calculado ${fechaLocal(r.calculado_en)}` }),
+    h("div", { clase: "rejilla" }, kpi("Rendimiento esperado anual", pct(m.rend), signo(m.rend)), kpi("Riesgo (σ anual)", pct(m.riesgo)),
+      kpi("Sharpe", vacio(m.sharpe) ? "—" : m.sharpe.toFixed(2)), kpi("Caída máxima en la ventana", pct(r.caida_maxima), "negativo"),
+      kpi("Peor día", pct(r.peor_dia), "negativo"), kpi("Parte en riesgo sugerida y*", vacio(r.asignacion_riesgosa) ? "—" : pct(Math.max(0, Math.min(1, r.asignacion_riesgosa))))),
+    h("p", { clase: "ayuda", texto: `y* = (E − r_f)/(A·σ²) con A = ${sp.aversion}: fracción del capital para este portafolio riesgoso; el resto iría a un instrumento libre de riesgo (p. ej. CETES). Valores > 100 % se muestran como 100 %.` }),
+    r.avisos.length ? h("div", { clase: "aviso-caja", role: "status" }, r.avisos.map((a) => h("p", { texto: a }))) : null,
+    r.datos.excluidos.length ? h("p", { clase: "suave", texto: `Excluidos: ${r.datos.excluidos.map((e) => `${nombreIns(e.id)} (${e.motivo})`).join("; ")}` }) : null,
+    h("h3", { texto: "Frontera eficiente" }), graficaFrontera(r),
+    tabla([{ t: "Portafolio", f: (x) => x[0] }, { t: "E(r)", f: (x) => pct(x[1].rend), num: true }, { t: "σ", f: (x) => pct(x[1].riesgo), num: true },
+      { t: "Sharpe", f: (x) => (vacio(x[1].sharpe) ? "—" : x[1].sharpe.toFixed(2)), num: true }, { t: "Utilidad U", f: (x) => x[1].utilidad.toFixed(4), num: true }],
+    comp, { caption: "Comparación con la referencia 1/N: si el optimizado no la supera fuera de muestra, no hay ventaja demostrada" }),
+    h("h3", { texto: "Pesos y montos simulados" }),
+    tabla([{ t: "Instrumento", f: (a) => h("span", {}, h("strong", { texto: a.clave }), h("br"), h("span", { clase: "suave", texto: a.nombre })) },
+      { t: "Peso", f: (a) => h("span", {}, pct(a.peso), " ", barraPct(a.peso, Math.max(...r.activos.map((x) => x.peso)))), num: true },
+      { t: "E(r)", f: (a) => h("span", { clase: signo(a.rend) }, pct(a.rend)), num: true }, { t: "σ", f: (a) => pct(a.riesgo), num: true },
+      { t: "Sharpe", f: (a) => (vacio(a.sharpe) ? "—" : a.sharpe.toFixed(2)), num: true },
+      { t: "Aporte al riesgo", f: (a) => pct(a.contribucion_riesgo), num: true }, { t: "Precio MXN", f: (a) => mxn(a.precio_mxn, true), num: true },
+      { t: "Monto", f: (a) => mxn(a.monto), num: true }, { t: "Títulos", f: (a) => num(a.titulos), num: true }, { t: "Invertido", f: (a) => mxn(a.invertido), num: true }],
+    [...r.activos].sort((a, b) => b.peso - a.peso), { caption: `Capital ${mxn(sp.capital)} · efectivo sin invertir por redondeo ${mxn(r.efectivo_restante)}. Precios del último cierre disponible, no en tiempo real.` }),
+    h("p", { clase: "suave", texto: `Reglas del Reto (solo informativo): ${r.reglas_reto.emisoras} emisoras con peso, máximo ${pct(r.reglas_reto.peso_max)} → ${r.reglas_reto.cumple ? "cumple" : "no cumple"} (≥ 5 emisoras, ≤ 50 %).` }),
+    h("h3", { texto: "Correlaciones" }), corr,
+    h("div", { clase: "fila-controles" }, r.id ? h("a", { clase: "boton boton--secundario", href: `/api/portafolios/${r.id}/excel`, download: "", texto: "Descargar este modelo en Excel" })
+      : h("span", { clase: "suave", texto: "Guarde el portafolio para descargar su Excel con fórmulas." })),
+    h("p", { clase: "ayuda", texto: r.aviso }));
+}
+Object.assign(ATAJOS, { PORT: "tab-portafolios", MARKOWITZ: "tab-portafolios" });
