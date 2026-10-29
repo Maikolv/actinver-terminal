@@ -181,3 +181,59 @@ def test_api_flujo_protegida_y_plantillas():
         assert c.get("/api/flujo/velas", params={"simbolo": "SIC:MU", "intervalo": "2Min"}).status_code == 422
         assert c.get("/api/visualizaciones/mercado", params={"ventana": 5}).json()["ventana"] == 5
         assert c.get("/api/visualizaciones/mercado", params={"ventana": 3}).status_code == 422
+
+
+def test_cadena_une_spot_de_la_misma_referencia_y_el_gex_se_calcula(ajustes):
+    """Opción (a) del 28-oct: spot = última operación de la acción en Alpaca a ≤ 60 s de la cotización más reciente."""
+    from dataclasses import asdict
+
+    from terminal.flujo import gex
+    ref = datetime.now(UTC).replace(microsecond=0) - timedelta(minutes=20)
+    vistos = []
+
+    def responder(r):
+        vistos.append(r)
+        if r.url.path == "/v2/stocks/NVDA/trades":
+            assert r.url.params["feed"] == "sip" and r.url.params["end"] == ref.isoformat()   # nada posterior a R
+            return httpx.Response(200, json={"trades": [{"t": (ref - timedelta(seconds=8)).isoformat(), "p": 190.5}]})
+        q = lambda t: {"latestQuote": {"bp": 5.0, "ap": 5.2, "t": t.isoformat()},  # noqa: E731
+                       "impliedVolatility": 0.45, "greeks": {"gamma": 0.012}}
+        return httpx.Response(200, json={"snapshots": {
+            "NVDA261120C00190000": q(ref), "NVDA261120P00190000": q(ref - timedelta(seconds=40)),
+            "NVDA261120C00250000": q(ref - timedelta(minutes=5))}})       # cotización vieja: no comparte referencia
+    a = Alpaca(ajustes, {"ALPACA_API_KEY_ID": "id", "ALPACA_API_SECRET_KEY": "s"}, httpx.Client(transport=httpx.MockTransport(responder)))
+    contratos, p = a.cadena("NVDA", 190.0, 4.0)
+    spots = {c.contrato: (c.spot, c.moneda) for c in contratos}
+    assert spots["NVDA261120C00190000"] == spots["NVDA261120P00190000"] == (190.5, "USD")
+    assert spots["NVDA261120C00250000"] == (None, None) and "unido a 2 de 3" in p.nota
+    filas = [{**asdict(c), "interes_abierto": 1000, "multiplicador": 100} for c in contratos]   # OI fechado de Paper
+    r = gex.calcular(filas)
+    assert r["disponible"] and r["contratos_usados"] == 2 and r["spot"] == 190.5
+    assert r["descartados"] == {"sin spot de la misma referencia": 1}
+    assert r["totales"]["calls"] == pytest.approx(0.012 * 1000 * 100 * 190.5 ** 2 * 0.01)
+
+
+def test_cadena_sin_operacion_cercana_no_inventa_spot(ajustes):
+    ref = datetime.now(UTC).replace(microsecond=0) - timedelta(minutes=20)
+
+    def responder(r):
+        if r.url.path.endswith("/trades"):
+            return httpx.Response(200, json={"trades": []})
+        return httpx.Response(200, json={"snapshots": {"NVDA261120C00190000": {"latestQuote": {"bp": 5.0, "ap": 5.2, "t": ref.isoformat()}}}})
+    a = Alpaca(ajustes, {"ALPACA_API_KEY_ID": "id", "ALPACA_API_SECRET_KEY": "s"}, httpx.Client(transport=httpx.MockTransport(responder)))
+    contratos, p = a.cadena("NVDA", 190.0, 4.0)
+    assert contratos[0].spot is None and "sin spot" in p.nota.lower()
+
+
+def test_gex_programado_apagado_y_una_vez_por_paso(con, ajustes, monkeypatch):
+    llamadas = []
+    monkeypatch.setattr(servicio, "actualizar", lambda con, aj, tipo, s: llamadas.append((tipo, s)) or {"estado": "ok"})
+    a_las = lambda h, m: datetime(2026, 10, 28, h, m, tzinfo=servicio.NY)  # noqa: E731 - miércoles
+    assert servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(10, 5)) == []          # apagado por omisión
+    ajustes.datos.setdefault("flujo", {})["gex_programado"] = {"activo": True}
+    assert [r["paso"] for r in servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(8, 30))] == ["oi"]
+    assert servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(8, 45)) == []          # ya hecho hoy
+    assert [r["paso"] for r in servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(10, 1))] == ["cadena_10"]
+    assert servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(12, 0)) == []          # entre pasos: nada
+    assert [r["paso"] for r in servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(14, 10))] == ["cadena_14"]
+    assert llamadas == [("contratos_oi", "SIC:NVDA"), ("opciones", "SIC:NVDA"), ("opciones", "SIC:NVDA")]

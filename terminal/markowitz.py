@@ -14,20 +14,76 @@ Es una simulación educativa: no envía órdenes ni es una recomendación person
 """
 from __future__ import annotations
 
+import csv
 import json
 import math
 import sqlite3
 import time
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
+import httpx
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from . import db, mercado, ranking
-from .config import Ajustes
+from . import db, mercado, ranking, reto
+from .config import Ajustes, credencial
 
 ANUAL = 252
 VENTANAS = (126, 252, 504, 756)
+
+# Tasa libre de riesgo inicial del generador: CETES a 28 días, subasta semanal (Banxico SIE SF43936, «Valores
+# gubernamentales, Resultados de la subasta semanal, Tasa de rendimiento, Cetes a 28 días», porcentaje; clave
+# confirmada en el catálogo SIE el 28-oct-2026). Se guarda en la base y se vuelve a consultar cada 12 h.
+SERIE_CETES28 = "SF43936"
+URL_SIE = "https://www.banxico.org.mx/SieAPIRest/service/v1/series/{s}/datos/oportuno"
+RF_RESPALDO = 0.07
+
+
+def tasa_libre(con: sqlite3.Connection, ajustes: Ajustes, cliente: httpx.Client | None = None) -> dict:
+    """{valor, fecha, fuente, aviso}. Si Banxico no responde, la última guardada; si nunca hubo, 7 % y lo dice."""
+    f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='cetes28'").fetchone()
+    previo = json.loads(f[0]) if f else None
+    if previo and datetime.now(UTC) - datetime.fromisoformat(previo["consultado_en"]) < timedelta(hours=12):
+        return previo
+    token = None if ajustes.es_demo else credencial("banxico")
+    error = "sin BANXICO_TOKEN" if not token else None
+    if token:
+        try:
+            r = (cliente or httpx.Client(timeout=15)).get(URL_SIE.format(s=SERIE_CETES28),
+                                                         headers={"Bmx-Token": token, "Accept": "application/json"})
+            r.raise_for_status()
+            d = r.json()["bmx"]["series"][0]["datos"][-1]
+            dd, mm, aa = d["fecha"].split("/")
+            nuevo = {"valor": round(float(d["dato"].replace(",", "")) / 100, 6), "fecha": f"{aa}-{mm}-{dd}",
+                     "fuente": f"Banxico SIE {SERIE_CETES28} (CETES 28 días, subasta semanal)", "aviso": None,
+                     "consultado_en": datetime.now(UTC).isoformat(timespec="seconds")}
+            db.escribir(con, "INSERT INTO ajustes_usuario VALUES ('cetes28', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
+                             "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(nuevo), db.ahora()))
+            return nuevo
+        except (httpx.HTTPError, KeyError, IndexError, ValueError) as e:
+            error = f"Banxico no respondió ({type(e).__name__})"
+    if previo:
+        return {**previo, "aviso": f"{error}: se usa la última tasa guardada"}
+    return {"valor": RF_RESPALDO, "fecha": None, "fuente": "valor fijo", "aviso": f"{error}: se usa 7 % fijo"}
+
+
+# Sector (config/sectores.csv, columna «grupo»): acciones de EE. UU. por grupo mayor SIC de la SEC (2 dígitos;
+# scripts/sectores_sec.py); ETF por el sector que declara el nombre oficial del fondo. BMV y ETF amplios quedan sin
+# grupo: no cuentan para el tope por sector (se dice en el resultado). Las taxonomías no se mezclan entre sí.
+ARCHIVO_SECTORES = Path(__file__).resolve().parent.parent / "config" / "sectores.csv"
+COVARIANZAS = {"muestral": "Muestral", "ledoit_wolf": "Ledoit-Wolf (contracción)"}
+PASO_REBALANCEO = 21  # sesiones: rebalanceo mensual en la prueba fuera de muestra
+
+
+def sectores() -> dict[str, str]:
+    if not ARCHIVO_SECTORES.exists():
+        return {}
+    with ARCHIVO_SECTORES.open(encoding="utf-8") as f:
+        return {r["id"]: r["grupo"] for r in csv.DictReader(f) if r.get("grupo")}
+
+
 MAX_ACTIVOS = 40
 METODOS = {
     "max_sharpe": "Máximo Sharpe (portafolio tangente)",
@@ -104,15 +160,37 @@ def normalizar(spec: dict, ins: dict) -> dict:
         "aversion": _num(spec, "aversion", base["aversion"], 0.1, 50),
         "rend_objetivo": _num(spec, "rend_objetivo", 0.12, -1, 5), "riesgo_objetivo": _num(spec, "riesgo_objetivo", 0.18, 0.001, 5),
         "horizonte_anios": _num(spec, "horizonte_anios", base["horizonte_anios"], 0.1, 60),
+        "covarianza": spec.get("covarianza") or "muestral",
+        "usd_max": None if spec.get("usd_max") in (None, "") else _num(spec, "usd_max", 1, 0, 1),
+        "sector_max": None if spec.get("sector_max") in (None, "") else _num(spec, "sector_max", 1, 0.01, 1),
     }
+    if out["covarianza"] not in COVARIANZAS:
+        raise ErrorPortafolio("covarianza: muestral o ledoit_wolf")
     if out["peso_min"] > out["peso_max"]:
         raise ErrorPortafolio("el peso mínimo no puede superar el máximo")
+    vistas = spec.get("vistas") or []
+    if not isinstance(vistas, list) or len(vistas) > len(activos):
+        raise ErrorPortafolio("vistas: lista de hasta una vista por instrumento")
+    normalizadas = []
+    for vista in vistas:
+        if not isinstance(vista, dict) or vista.get("activo") not in activos:
+            raise ErrorPortafolio("vista: activo desconocido o fuera del portafolio")
+        contra = vista.get("contra") or None
+        if contra is not None and (contra not in activos or contra == vista["activo"]):
+            raise ErrorPortafolio("vista: comparación inválida")
+        normalizadas.append({"activo": vista["activo"], "contra": contra,
+                            "rend": _num(vista, "rend", 0, -1, 5),
+                            "confianza": _num(vista, "confianza", 0.5, 0.01, 1)})
+    if len({(v["activo"], v["contra"]) for v in normalizadas}) != len(normalizadas):
+        raise ErrorPortafolio("vistas duplicadas")
+    out["vistas"] = normalizadas
     return out
 
 
-def _datos(con, ajustes, ids: list[str], ventana: int) -> tuple[pd.DataFrame, list[dict]]:
-    """Precios en MXN (ajustados por dividendos y splits) en fechas comunes. Excluye lo que tiene huecos."""
-    p = mercado.precios_mxn(con, ajustes, ids)
+def _datos(con, ajustes, ids: list[str], ventana: int, base: pd.DataFrame | None = None) -> tuple[pd.DataFrame, list[dict]]:
+    """Precios en MXN (ajustados por dividendos y splits) en fechas comunes. Excluye lo que tiene huecos.
+    `base`: matriz de `mercado.precios_mxn` ya leída que contiene estos ids (cada columna es independiente)."""
+    p = mercado.precios_mxn(con, ajustes, ids) if base is None else base[[i for i in ids if i in base.columns]]
     excluidos = [{"id": i, "motivo": "sin precios"} for i in ids if i not in p.columns]
     p = p[[i for i in ids if i in p.columns]].dropna(how="all").iloc[-(ventana + 1):]
     cobertura = p.notna().mean()
@@ -127,12 +205,162 @@ def _vol(w, cov):
 
 
 def _optimizar(objetivo, n, lo, hi, extra=(), w0=None):
+    """`objetivo(w)` devuelve (valor, gradiente): con derivadas exactas SLSQP no aproxima por diferencias (10× menos CPU)."""
     w0 = np.full(n, 1 / n) if w0 is None else w0
-    cons = [{"type": "eq", "fun": lambda w: w.sum() - 1}, *extra]
-    r = minimize(objetivo, w0, method="SLSQP", bounds=[(lo, hi)] * n, constraints=cons,
+    cons = [{"type": "eq", "fun": lambda w: w.sum() - 1, "jac": lambda w: np.ones_like(w)}, *extra]
+    r = minimize(objetivo, w0, jac=True, method="SLSQP", bounds=[(lo, hi)] * n, constraints=cons,
                  options={"maxiter": 500, "ftol": 1e-12})
     w = np.clip(r.x, lo, hi)
     return w / w.sum(), bool(r.success)
+
+
+def _estimar(R: pd.DataFrame, metodo: str) -> tuple[np.ndarray, np.ndarray]:
+    """Rendimiento y covarianza anuales. Ledoit-Wolf contrae la covarianza muestral hacia un blanco estructurado:
+    menos error de estimación con pocas sesiones y muchos instrumentos (los pesos dependen menos del ruido)."""
+    mu = R.mean().values * ANUAL
+    if metodo == "ledoit_wolf":
+        from sklearn.covariance import ledoit_wolf
+        return mu, ledoit_wolf(R.values)[0] * ANUAL
+    return mu, R.cov().values * ANUAL
+
+
+def _black_litterman(ids: list[str], cov: np.ndarray, vistas: list[dict], aversion: float) -> np.ndarray:
+    """Posterior de rendimientos anuales con prior de equilibrio equiponderado y vistas explícitas.
+
+    La confianza controla la varianza de cada vista; sin vistas, el prior no se modifica.
+    No usa rendimientos posteriores a la fecha de entrenamiento.
+    """
+    n = len(ids)
+    prior = aversion * cov @ np.full(n, 1 / n)
+    if not vistas:
+        return prior
+    filas, valores, incertidumbre = [], [], []
+    for vista in vistas:
+        if vista["activo"] not in ids or (vista["contra"] and vista["contra"] not in ids):
+            continue  # un activo excluido por falta de historia no aporta una vista
+        p = np.zeros(n)
+        p[ids.index(vista["activo"])] = 1
+        if vista["contra"]:
+            p[ids.index(vista["contra"])] = -1
+        filas.append(p)
+        valores.append(vista["rend"])
+        incertidumbre.append(max(float(p @ (0.05 * cov) @ p), 1e-12) *
+                             (1 - vista["confianza"]) / vista["confianza"] + 1e-12)
+    if not filas:
+        return prior
+    P = np.array(filas)
+    tau_cov = 0.05 * cov
+    sistema = P @ tau_cov @ P.T + np.diag(incertidumbre)
+    return prior + tau_cov @ P.T @ np.linalg.solve(sistema, np.array(valores) - P @ prior)
+
+
+def _grupos(ids: list[str], ins: dict, s: dict) -> list[tuple[str, np.ndarray, float]]:
+    """(nombre, máscara, tope) de las restricciones opcionales: moneda USD (SIC) y cada sector conocido."""
+    out = []
+    if s.get("usd_max") is not None:
+        out.append(("USD (SIC)", np.array([ins[i].get("moneda_referencia") == "USD" for i in ids], float), s["usd_max"]))
+    if s.get("sector_max") is not None:
+        sec = sectores()
+        for nombre in sorted({sec[i] for i in ids if i in sec}):
+            out.append((nombre, np.array([sec.get(i) == nombre for i in ids], float), s["sector_max"]))
+    return out
+
+
+def _restricciones(grupos) -> list[dict]:
+    return [{"type": "ineq", "fun": (lambda w, m=m, t=t: t - m @ w), "jac": (lambda w, m=m: -m)} for _, m, t in grupos]
+
+
+def _pesos(s: dict, mu: np.ndarray, cov: np.ndarray, lo: float, hi: float, extra: list, w_min=None, w_tan=None):
+    """Pesos del método elegido. Devuelve (w, avisos, w_min, w_tan)."""
+    n, rf = len(mu), s["rf"]
+    var = lambda w: (w @ cov @ w, 2 * cov @ w)  # noqa: E731
+
+    def sharpe_neg(w):
+        v = max(_vol(w, cov), 1e-12)
+        exceso = w @ mu - rf
+        return -exceso / v, -(mu * v - exceso * (cov @ w) / v) / v ** 2
+
+    m, avisos = s["metodo"], []
+    if w_min is None and m in ("min_varianza", "rend_objetivo", "riesgo_objetivo"):
+        w_min, _ = _optimizar(var, n, lo, hi, extra)
+    if w_tan is None and m == "max_sharpe":
+        w_tan, _ = _optimizar(sharpe_neg, n, lo, hi, extra)
+    if m == "min_varianza":
+        w = w_min
+    elif m == "max_sharpe":
+        w = w_tan
+    elif m == "equiponderado":
+        w = np.full(n, 1 / n)
+    elif m == "utilidad":
+        w, _ = _optimizar(lambda w: (-(w @ mu - 0.5 * s["aversion"] * (w @ cov @ w)), -(mu - s["aversion"] * (cov @ w))),
+                          n, lo, hi, extra)
+    elif m == "rend_objetivo":
+        r_lo, r_hi = float(w_min @ mu), _rend_max(mu, lo, hi)
+        e = min(max(s["rend_objetivo"], r_lo), r_hi)
+        if abs(e - s["rend_objetivo"]) > 1e-9:
+            avisos.append(f"El rendimiento objetivo {s['rend_objetivo']:.1%} no es alcanzable con estos topes; se usó {e:.1%}.")
+        w, _ = _optimizar(var, n, lo, hi, [*extra, {"type": "eq", "fun": lambda w: w @ mu - e, "jac": lambda w: mu}], w_min)
+    else:  # riesgo_objetivo
+        t = s["riesgo_objetivo"]
+        if t < _vol(w_min, cov):
+            avisos.append(f"El riesgo objetivo {t:.1%} es menor que el mínimo posible ({_vol(w_min, cov):.1%}); se usó el de mínima varianza.")
+            w = w_min
+        else:
+            w, _ = _optimizar(lambda w: (-(w @ mu), -mu), n, lo, hi,
+                              [*extra, {"type": "ineq", "fun": lambda w: t - _vol(w, cov),
+                                        "jac": lambda w: -(cov @ w) / max(_vol(w, cov), 1e-12)}], w_min)
+    return w, avisos, w_min, w_tan
+
+
+def fuera_de_muestra(P: pd.DataFrame, s: dict, lo: float, hi: float, extra: list, costo: float | None) -> dict:
+    """Walk-forward: con las sesiones previas se estiman los pesos del método; se mantienen un mes (21 sesiones, sin
+    rebalanceo diario) y se paga comisión sobre lo que se compra y vende. Frente a 1/N, igual.
+    Entrenamiento = la ventana elegida, acortada si hace falta para dejar al menos 6 meses de prueba (mínimo 60)."""
+    R = P.pct_change().dropna()
+    ent = min(s["ventana"], len(R) - 6 * PASO_REBALANCEO)
+    if ent < 60:
+        return {"disponible": False, "motivo": f"Se necesitan al menos {60 + 6 * PASO_REBALANCEO} sesiones comunes "
+                                               f"(60 para estimar y 6 meses de prueba); hay {len(R)}."}
+    c = costo or 0.0
+    n = R.shape[1]
+    series: dict[str, list] = {"propuesta": [], "1/N": []}
+    previos: dict = {"propuesta": None, "1/N": None}
+    rotacion = {"propuesta": 0.0, "1/N": 0.0}
+    for t in range(ent, len(R), PASO_REBALANCEO):
+        mu, cov = _estimar(R.iloc[t - ent:t], s["covarianza"])
+        if s.get("vistas"):
+            mu = _black_litterman(list(R.columns), cov, s["vistas"], s["aversion"])
+        w, *_ = _pesos(s, mu, cov, lo, hi, extra)
+        crec = np.cumprod(1 + R.iloc[t:t + PASO_REBALANCEO].values, axis=0)
+        for k, pesos in (("propuesta", w), ("1/N", np.full(n, 1 / n))):
+            rot = float(np.abs(pesos - previos[k]).sum()) if previos[k] is not None else 1.0  # la primera compra también cuesta
+            rotacion[k] += rot
+            valor = np.concatenate([[1.0], (pesos * crec).sum(axis=1)])
+            diarios = valor[1:] / valor[:-1] - 1
+            diarios[0] -= rot * c
+            series[k].extend(diarios.tolist())
+            previos[k] = pesos * crec[-1] / float((pesos * crec[-1]).sum())
+
+    def resumen(x):
+        x = np.array(x)
+        valor = np.cumprod(1 + x)
+        anual, vol = float(valor[-1] ** (ANUAL / len(x)) - 1), float(x.std(ddof=1) * np.sqrt(ANUAL))
+        return {"rend_anual": anual, "riesgo": vol, "sharpe": (anual - s["rf"]) / vol if vol > 0 else None,
+                "rend_total": float(valor[-1] - 1), "caida_maxima": float((valor / np.maximum.accumulate(valor) - 1).min())}
+
+    meses = len(range(ent, len(R), PASO_REBALANCEO))
+    out = {k: resumen(v) | {"rotacion_mensual": rotacion[k] / meses} for k, v in series.items()}
+    gana = out["propuesta"]["rend_total"] > out["1/N"]["rend_total"]
+    return {"disponible": True, **out, "meses": meses, "inicio": R.index[ent].date().isoformat(),
+            "fin": R.index[-1].date().isoformat(), "comision": c, "entrenamiento": ent,
+            "lectura": ("La propuesta superó a 1/N fuera de muestra" if gana else "1/N superó a la propuesta fuera de muestra")
+                       + f" en {meses} meses; un solo periodo no demuestra ventaja (sin prueba de significancia).",
+            "nota": f"Rebalanceo cada {PASO_REBALANCEO} sesiones; pesos estimados con las {ent} sesiones previas y el mismo "
+                    "método" + ("" if ent == s["ventana"] else f" (ventana acortada de {s['ventana']} por historia disponible)")
+                    + "; comisión del Reto "
+                    + (f"{c:.3%} por peso operado (con IVA)" if costo else "no configurada: 0 %") + "."
+                    + (" Las vistas de Black-Litterman son las de hoy y se aplican a todos los meses: si se formaron viendo "
+                       "el pasado reciente, esta prueba favorece a la propuesta." if s.get("vistas") else "")}
 
 
 def _rend_max(mu: np.ndarray, lo: float, hi: float) -> float:
@@ -146,10 +374,11 @@ def _rend_max(mu: np.ndarray, lo: float, hi: float) -> float:
     return float(w @ mu)
 
 
-def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict) -> dict:
+def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict, base: pd.DataFrame | None = None) -> dict:
     ins = mercado.instrumentos(con)
     s = normalizar(spec, ins)
-    precios, excluidos = _datos(con, ajustes, s["activos"], s["ventana"])
+    base = mercado.precios_mxn(con, ajustes, s["activos"]) if base is None else base
+    precios, excluidos = _datos(con, ajustes, s["activos"], s["ventana"], base)
     ids = list(precios.columns)
     if len(ids) < 2 or len(precios) < 61:
         raise ErrorPortafolio("No hay historia común suficiente (mínimo 2 instrumentos y 60 sesiones). "
@@ -160,41 +389,42 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict) -> dict:
     if lo * n > 1 + 1e-9:
         raise ErrorPortafolio(f"Con {n} instrumentos y un mínimo de {lo:.0%} se supera 100 %: baje el mínimo.")
     R = precios.pct_change().dropna()
-    mu, cov = R.mean().values * ANUAL, R.cov().values * ANUAL
+    mu, cov = _estimar(R, s["covarianza"])
+    if s.get("vistas"):
+        mu = _black_litterman(ids, cov, s["vistas"], s["aversion"])
     sig = np.sqrt(np.diag(cov))
     rf = s["rf"]
     rend = lambda w: float(w @ mu)  # noqa: E731
-    w_min, _ = _optimizar(lambda w: w @ cov @ w, n, lo, hi)
-    w_tan, _ = _optimizar(lambda w: -(w @ mu - rf) / max(_vol(w, cov), 1e-12), n, lo, hi)
+    var = lambda w: (w @ cov @ w, 2 * cov @ w)  # noqa: E731
+    grupos = _grupos(ids, ins, s)
+    extra = _restricciones(grupos)
+
+    def sharpe_neg(w):
+        v = max(_vol(w, cov), 1e-12)
+        exceso = w @ mu - rf
+        return -exceso / v, -(mu * v - exceso * (cov @ w) / v) / v ** 2
+
+    w_min, _ = _optimizar(var, n, lo, hi, extra)
+    w_tan, _ = _optimizar(sharpe_neg, n, lo, hi, extra)
     r_lo, r_hi = rend(w_min), _rend_max(mu, lo, hi)
     frontera, w_prev = [], w_min
     for objetivo in np.linspace(r_lo, r_hi, 25):
-        w, ok = _optimizar(lambda w: w @ cov @ w, n, lo, hi, [{"type": "eq", "fun": lambda w, e=objetivo: w @ mu - e}], w_prev)
+        w, ok = _optimizar(var, n, lo, hi, [*extra, {"type": "eq", "fun": lambda w, e=objetivo: w @ mu - e, "jac": lambda w: mu}],
+                           w_prev)
         if ok:
             frontera.append({"rend": rend(w), "riesgo": _vol(w, cov), "pesos": dict(zip(ids, np.round(w, 6).tolist()))})
             w_prev = w
-    avisos = []
     m = s["metodo"]
-    if m == "min_varianza":
-        w = w_min
-    elif m == "max_sharpe":
-        w = w_tan
-    elif m == "equiponderado":
-        w = np.full(n, 1 / n)
-    elif m == "utilidad":
-        w, _ = _optimizar(lambda w: -(w @ mu - 0.5 * s["aversion"] * (w @ cov @ w)), n, lo, hi)
-    elif m == "rend_objetivo":
-        e = min(max(s["rend_objetivo"], r_lo), r_hi)
-        if abs(e - s["rend_objetivo"]) > 1e-9:
-            avisos.append(f"El rendimiento objetivo {s['rend_objetivo']:.1%} no es alcanzable con estos topes; se usó {e:.1%}.")
-        w, _ = _optimizar(lambda w: w @ cov @ w, n, lo, hi, [{"type": "eq", "fun": lambda w: w @ mu - e}], w_min)
-    else:  # riesgo_objetivo
-        t = s["riesgo_objetivo"]
-        if t < _vol(w_min, cov):
-            avisos.append(f"El riesgo objetivo {t:.1%} es menor que el mínimo posible ({_vol(w_min, cov):.1%}); se usó el de mínima varianza.")
-            w = w_min
-        else:
-            w, _ = _optimizar(lambda w: -(w @ mu), n, lo, hi, [{"type": "ineq", "fun": lambda w: t - _vol(w, cov)}], w_min)
+    w, avisos, *_ = _pesos(s, mu, cov, lo, hi, extra, w_min, w_tan)
+    excedidos = [f"{nombre} {float(mk @ w):.0%} > {t:.0%}" for nombre, mk, t in grupos if float(mk @ w) > t + 1e-4]
+    if excedidos:
+        raise ErrorPortafolio("Con esos topes por moneda o sector no se llega a 100 % (" + "; ".join(excedidos)
+                              + "): súbalos o agregue instrumentos en pesos o de otros sectores.")
+    if s.get("sector_max") is not None:
+        sin = [ins[i]["clave_operable"] for i in ids if i not in sectores()]
+        if sin:
+            avisos.append(f"Sin sector conocido (no cuentan para el tope por sector): {', '.join(sin[:8])}"
+                          + (" y otros" if len(sin) > 8 else "") + ". Fuente: clasificación SIC de la SEC.")
     serie = (R.values @ w)
     valor = np.cumprod(1 + serie)
     caida = float((valor / np.maximum.accumulate(valor) - 1).min())
@@ -231,6 +461,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict) -> dict:
         "pesos_tangente": dict(zip(ids, np.round(w_tan, 6).tolist())), "pesos_min_varianza": dict(zip(ids, np.round(w_min, 6).tolist())),
         "asignacion_riesgosa": y, "caida_maxima": caida, "peor_dia": float(serie.min()),
         "activos": filas, "frontera": frontera, "correlacion": {"ids": ids, "matriz": np.round(corr, 4).tolist()},
+        "fuera_de_muestra": fuera_de_muestra(base[ids].ffill(limit=3).dropna(), s, lo, hi, extra, reto.costo_operacion()),
+        "covarianza_nombre": COVARIANZAS[s["covarianza"]],
+        "restricciones": [{"grupo": nombre, "tope": t, "peso": float(mk @ w)} for nombre, mk, t in grupos],
         "efectivo_restante": float(s["capital"] - sum(f["invertido"] for f in filas)),
         "reglas_reto": {"emisoras": activos_con_peso, "peso_max": float(w.max()),
                         "cumple": activos_con_peso >= 5 and float(w.max()) <= 0.5},
@@ -280,19 +513,27 @@ def eliminar(con: sqlite3.Connection, pid: int) -> bool:
 
 
 # ---------- ayuda para construir y generador de propuestas ----------
-_RANKING: dict = {}
-TTL_RANKING = 300  # s: el Ranking tarda segundos; el generador se recalcula con cada cambio del usuario
+_PRECIOS: dict = {}
+
+
+def _precios_cache(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str]) -> pd.DataFrame:
+    """`mercado.precios_mxn` con la misma regla de caché que el Ranking (marca de datos y tolerancia): leer la matriz de
+    precios es lo más lento del generador y solo cambia cuando entran precios o tipo de cambio."""
+    clave = (con.execute("PRAGMA database_list").fetchone()[2], tuple(ids))
+    marca, ahora = ranking._marca(con), time.monotonic()
+    previo = _PRECIOS.get(clave)
+    if previo and ahora - previo[0] < ranking.VIGENCIA_S and (previo[1] == marca or ahora - previo[0] < ranking.TOLERANCIA_S):
+        return previo[2]
+    if len(_PRECIOS) >= 16:  # pocas combinaciones de filtros a la vez; se descarta la más vieja
+        _PRECIOS.pop(min(_PRECIOS, key=lambda k: _PRECIOS[k][0]))
+    p = mercado.precios_mxn(con, ajustes, ids)
+    _PRECIOS[clave] = (ahora, marca, p)
+    return p
 
 
 def _filas_ranking(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str, clase: str) -> list[dict]:
-    """Filas del Ranking con caché corta por base de datos (el Ranking cambia solo cuando llegan precios nuevos)."""
-    clave = (con.execute("PRAGMA database_list").fetchone()[2], mercado_filtro, clase)
-    guardado = _RANKING.get(clave)
-    if guardado and time.monotonic() - guardado[0] < TTL_RANKING:
-        return guardado[1]
-    filas = ranking.calcular(con, ajustes, mercado_filtro, clase)["filas"]
-    _RANKING[clave] = (time.monotonic(), filas)
-    return filas
+    """Filas del Ranking (con su caché: cambia solo cuando llegan datos nuevos)."""
+    return ranking.calcular_cache(con, ajustes, mercado_filtro, clase)["filas"]
 
 
 def _candidatos(con, ajustes, objetivo: str, mercado_filtro: str, clase: str, caps: list[str] | None) -> list[dict]:
@@ -384,9 +625,11 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
     fijos = [f for f in _ids(g.get("fijos"), ins, "fijos") if f not in excluir]
     ventana = int(_num(g, "ventana", 252, 60, 1260))
     sugeridos, motivos, alternativas, criterio = [], {}, [], "Solo los instrumentos que usted eligió."
+    base = None
     if g.get("completar", True) is not False and len(fijos) < n:
         filas = _candidatos(con, ajustes, objetivo, mercado_filtro, clase, caps)[: max(n * 4, 40)]
-        precios, fuera = _datos(con, ajustes, list(dict.fromkeys(fijos + [f["id"] for f in filas])), ventana)
+        base = _precios_cache(con, ajustes, list(dict.fromkeys(fijos + [f["id"] for f in filas])))
+        precios, fuera = _datos(con, ajustes, list(base.columns), ventana, base)
         sin_historia = {e["id"] for e in fuera}
         R = precios.pct_change().dropna()
         sugeridos, motivos, alternativas = _elegir(R, [f for f in filas if f["id"] not in sin_historia], n,
@@ -400,7 +643,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
                               "o la capitalización, o agregue instrumentos propios.")
     metodo = g.get("metodo") or "auto"
     spec = {**{k: g[k] for k in ("nombre", "descripcion", "capital", "rf", "peso_min", "rend_objetivo", "riesgo_objetivo",
-                                  "horizonte_anios") if k in g},
+                                  "horizonte_anios", "covarianza", "usd_max", "sector_max", "vistas") if k in g},
             "objetivo": objetivo, "metodo": perfil["metodo"] if metodo == "auto" else metodo, "activos": activos,
             "ventana": ventana, "peso_max": g.get("peso_max", perfil["peso_max"]), "aversion": g.get("aversion", perfil["aversion"])}
     consejos = []
@@ -410,7 +653,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
         consejos.append({"tipo": "aviso", "texto": f"Con {len(activos)} instrumentos un tope de {peso_max:.0%} no llega a 100 %: "
                                                    f"la terminal lo subió a {spec['peso_max']:.0%}. Agregue instrumentos si "
                                                    "prefiere un tope más bajo."})
-    res = calcular(con, ajustes, spec)
+    res = calcular(con, ajustes, spec, base)
     consejos += _consejos(res, perfil)
     return {"resultado": res, "sugerencias": consejos, "alternativas": alternativas, "motivos": motivos,
             "fijos": [f for f in fijos if f in activos], "sugeridos": sugeridos, "criterio": criterio,

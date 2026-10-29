@@ -447,18 +447,40 @@ def simular(con, ajustes: Ajustes, cambios: list[dict]) -> dict:
 
 
 # --------------------------------------------------------------------------------------------------------------
-def estado_motor(con) -> dict:
+SIN_CICLO_H = 2  # con el mercado abierto, más de 2 h sin ciclo terminado es una falla visible
+
+
+def estado_motor(con, ahora: datetime | None = None) -> dict:
+    """Último ciclo terminado, ciclo en curso (etapa) y aviso «motor sin ciclo desde …» si el mercado está abierto."""
     f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='motor'").fetchone()
-    return json.loads(f["valor"]) if f else {}
+    m = json.loads(f["valor"]) if f else {}
+    ahora = ahora or datetime.now(UTC)
+    ultimo = datetime.fromisoformat(m["ultimo_ciclo"]) if m.get("ultimo_ciclo") else None
+    if ((vigencia.mercado_abierto("XNYS", ahora) or vigencia.mercado_abierto("XMEX", ahora))
+            and (ultimo is None or (ahora - ultimo).total_seconds() > SIN_CICLO_H * 3600)):
+        m["aviso"] = f"Motor sin ciclo desde {ultimo.isoformat(timespec='minutes') if ultimo else 'que arrancó la terminal'}"
+    return m
 
 
-def ids_propuestas(props: dict) -> list[str]:
-    """Instrumentos de las propuestas guardadas, primero los de la mejor puntuada y por peso."""
+def _marcar_motor(con, **cambios) -> None:
+    """Fusiona `cambios` en el estado guardado: el inicio y cada etapa quedan en la base, no solo el final."""
+    f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='motor'").fetchone()
+    valor = {**(json.loads(f["valor"]) if f else {}), **cambios}
+    db.escribir(con, "INSERT INTO ajustes_usuario VALUES ('motor', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
+                     "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(valor), db.ahora()))
+
+
+def ids_propuestas(props: dict, con=None) -> list[str]:
+    """Instrumentos de las propuestas guardadas, primero los de la mejor puntuada y por peso; con `con`, después los de
+    los portafolios que el usuario guardó en Mis portafolios (segundo nivel de la cola de cupos, tras la cartera)."""
     from . import resumen
     ref = resumen.propuesta_referencia(props)
     orden = [a["id"] for a in sorted((ref or {}).get("pesos") or [], key=lambda a: -a["peso"])]
     for p in props.values():
         orden += [a["id"] for a in (p or {}).get("pesos") or []]
+    if con is not None:
+        for (esp,) in con.execute("SELECT especificacion FROM portafolios_usuario ORDER BY actualizado_en DESC"):
+            orden += [a for a in json.loads(esp).get("activos") or [] if isinstance(a, str)]
     return list(dict.fromkeys(orden))
 
 
@@ -467,14 +489,37 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
     """Adquisición → propuesta → alertas. Recalcula solo si hay datos nuevos, cambió el perfil o se fuerza.
     `en_vivo`: lo dispara el flujo de precios en vivo; no consulta proveedores (los precios nuevos ya están en la base)."""
     inicio = datetime.now(UTC)
+    etapas: list[dict] = []
+
+    def etapa(nombre: str) -> None:
+        t = datetime.now(UTC)
+        if etapas:
+            etapas[-1]["s"] = round((t - datetime.fromisoformat(etapas[-1]["inicio"])).total_seconds(), 1)
+        if nombre:
+            etapas.append({"etapa": nombre, "inicio": t.isoformat(timespec="seconds")})
+        _marcar_motor(con, en_curso=bool(nombre), ciclo_inicio=inicio.isoformat(timespec="seconds"), etapa=nombre or None,
+                      etapas=etapas, en_vivo=en_vivo)
+
+    try:
+        return _ciclo(con, ajustes, forzar, notificar, en_vivo, inicio, etapa)
+    except Exception as e:
+        etapa("")
+        _marcar_motor(con, ultimo_error=f"{datetime.now(UTC).isoformat(timespec='seconds')} {type(e).__name__}")
+        raise
+
+
+def _ciclo(con, ajustes: Ajustes, forzar: bool, notificar: bool, en_vivo: bool, inicio: datetime, etapa) -> dict:
+    etapa("cartera")
     cart = cartera_actual(con, ajustes)
     prio = [p["instrumento_id"] for p in cart["posiciones"]]
     perfil = perfil_actual(con, ajustes)
     props = propuestas_guardadas(con, ajustes, perfil)
-    ids_prop = ids_propuestas(props)
+    ids_prop = ids_propuestas(props, con)
+    etapa("ingesta")
     act = {"nuevos": 0} if en_vivo else ingesta.actualizar_todo(con, ajustes, prio, forzar_demo=False, contexto=True,
                                                                 ids_propuesta=ids_prop)
     if not en_vivo and not ajustes.es_demo:
+        etapa("contexto")
         try:
             from . import finviz  # apagado sin FINVIZ_AUTH_TOKEN (Finviz Elite, de pago)
             fv = finviz.actualizar(con, ajustes)
@@ -494,7 +539,9 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
               "código, configuración, perfil o datos cambiaron" if any(v and v.get("recalcular") for v in props.values())
               else "")
     if motivo:
+        etapa("propuestas")
         props = calcular_propuestas(con, ajustes)
+    etapa("investigacion")
     cart = cartera_actual(con, ajustes)
     try:
         from .investigacion import pronosticos
@@ -504,13 +551,13 @@ def ciclo(con: sqlite3.Connection, ajustes: Ajustes, forzar: bool = False, notif
             reto_pronostico.emitir_si_toca(ajustes, (ajustes.get("investigacion") or {}).get("horizontes", [1, 5]))
     except Exception:  # noqa: BLE001 - la investigación nunca detiene el monitor
         log.exception("no se pudieron resolver pronósticos")
+    etapa("alertas")
     nuevas = alertas.evaluar(con, ajustes, cart, props, notificar=notificar)
+    etapa("")
     estado = {"ultimo_ciclo": inicio.isoformat(timespec="seconds"), "duracion_s": round((datetime.now(UTC) - inicio).total_seconds(), 1),
               "recalculo": motivo or "no necesario", "nuevos_datos": act.get("nuevos", 0), "alertas_nuevas": len(nuevas),
               "contexto": {k: v.get("estado") for k, v in (act.get("contexto") or {}).items()}}
-    with db.transaccion(con):
-        con.execute("INSERT INTO ajustes_usuario VALUES ('motor', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
-                    "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(estado), db.ahora()))
+    _marcar_motor(con, **estado)
     return estado
 
 
@@ -555,7 +602,9 @@ def ciclo_seguro(ajustes: Ajustes, forzar: bool = False, en_vivo: bool = False) 
             db.inicializar(con)
             if not ajustes.es_demo:
                 try:
-                    db.respaldo_diario()  # un respaldo verificado al día (data/respaldos, 14 copias)
+                    # un respaldo verificado al día (data/respaldos, 14 copias); tras él, VACUUM mensual con mercados cerrados
+                    if db.respaldo_diario() and not (vigencia.mercado_abierto("XNYS") or vigencia.mercado_abierto("XMEX")):
+                        db.vacuum_mensual()
                 except Exception:  # noqa: BLE001 - un respaldo fallido se registra, no detiene el ciclo
                     log.exception("respaldo diario")
             return ciclo(con, ajustes, forzar=forzar, en_vivo=en_vivo)

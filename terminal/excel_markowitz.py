@@ -444,6 +444,14 @@ def libro(con, ajustes, portafolios: list[dict]) -> bytes:
             cel.number_format = PCT if c in (7, 8) else ("0.000" if c == 9 else (NUM if c == 10 else "General"))
             cel.alignment = Alignment(wrap_text=c == 5, vertical="top")
             cel.border = Border(bottom=LINEA)
+    # Las hojas calculan con covarianza muestral y sin topes por moneda o sector: si la terminal usó otra cosa, se dice.
+    distintos = [p["especificacion"]["nombre"] for p in portafolios
+                 if p["especificacion"].get("covarianza", "muestral") != "muestral"
+                 or p["especificacion"].get("usd_max") is not None or p["especificacion"].get("sector_max") is not None]
+    if distintos:
+        resumen.cell(5 + len(portafolios), 2, "Nota: " + ", ".join(distintos) + " se calcularon en la terminal con Ledoit-Wolf o "
+                     "con topes por moneda o sector. Este libro usa covarianza muestral y no aplica esos topes: sus cifras "
+                     "pueden diferir de las de la terminal.").font = Font(name=FUENTE, italic=True)
     for c, w in zip("ABCDEFGHIJK", (4, 30, 16, 34, 40, 9, 10, 10, 9, 14, 14)):
         resumen.column_dimensions[c].width = w
     resumen.freeze_panes = "A4"

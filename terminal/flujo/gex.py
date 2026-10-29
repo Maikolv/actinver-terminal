@@ -15,12 +15,15 @@ from __future__ import annotations
 
 import math
 from collections import Counter, defaultdict
+from datetime import datetime
 
 PORCENTAJE = 0.01
-REQUISITO = ("Importe un CSV autorizado con gamma, spot y moneda compatibles, interés abierto y multiplicador; "
-             "o habilite contratos Paper para OI fechado del cierre previo y size. Los metadatos solo se unen si "
-             "ya eran conocidos al instante de la cadena. El feed indicativo (no equivale a OPRA) no aporta OI ni multiplicador y "
-             "contratos Paper no aporta spot ni gamma; ningún campo ausente se inventa.")
+VENTANA_S = 60  # cotizaciones del mismo spot más separadas que esto no comparten referencia
+REQUISITO = ("Con el mercado de EE. UU. abierto, pulse «Preparar GEX»: primero el OI fechado del cierre previo y el "
+             "multiplicador (contratos Paper), después la cadena; el spot de la acción en Alpaca se une solo a los contratos "
+             "cotizados a ≤ 60 s de él. También puede importar un CSV autorizado con gamma, spot, moneda, interés abierto y "
+             "multiplicador. El feed indicativo (no equivale a OPRA) no aporta OI ni multiplicador. Los metadatos solo se "
+             "unen si ya eran conocidos al instante de la cadena; ningún campo ausente se inventa.")
 CONVENCION = ("Firmada = calls positivos y puts negativos: es una CONVENCIÓN de signo, no la posición conocida de los "
               "intermediarios (dealers). Con interés abierto no se sabe quién compró o vendió; la lectura firmada puede "
               "ser errónea y no es una señal operativa.")
@@ -82,12 +85,17 @@ def calcular(cadena: list[dict]) -> dict:
         detalle = "; ".join(f"{n} {m}" for m, n in descartes.most_common())
         return {**base, "disponible": False, "contratos_usados": 0, "descartados": dict(descartes), "celdas": [],
                 "motivo": f"GEX no calculable: ningún contrato de {total} tiene todos los datos ({detalle}). "}
-    # Una sola referencia (instante, spot, moneda): se usa la más reciente; el resto se descarta y se cuenta.
+    # Una sola referencia (spot, moneda) con cotizaciones a ≤ VENTANA_S de la más reciente del grupo: se usa la más
+    # reciente; el resto se descarta y se cuenta. El adaptador une el spot solo dentro de esa ventana.
     grupos: dict[tuple, list] = defaultdict(list)
     for v in validos:
-        grupos[v[2]].append(v)
-    ref = max(grupos, key=lambda k: (k[0], len(grupos[k])))
-    usados = grupos[ref]
+        grupos[v[2][1:]].append(v)
+    for k, vs in grupos.items():
+        ultimo = max(datetime.fromisoformat(v[2][0]) for v in vs)
+        grupos[k] = [v for v in vs if (ultimo - datetime.fromisoformat(v[2][0])).total_seconds() <= VENTANA_S]
+    clave = max(grupos, key=lambda k: (max(v[2][0] for v in grupos[k]), len(grupos[k])))
+    usados = grupos[clave]
+    ref = (max(v[2][0] for v in usados), *clave)
     otros = len(validos) - len(usados)
     if otros:
         descartes["otra referencia de instante/spot/moneda"] += otros

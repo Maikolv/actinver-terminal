@@ -2,6 +2,127 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-29 — caché de estado, procedencia por sección y vistas Black-Litterman]
+
+- `/api/estado` usa cotizaciones en caché por la marca del Ranking y las actualiza en segundo plano; el estado y el
+  Ranking se precalientan al arrancar. La prueba tibia respondió en menos de 1 s ante una lectura simulada de 1.2 s.
+- «Datos y fuentes» muestra dato, fuente, retraso y vigencia de las 24 secciones desde una declaración del código;
+  una prueba exige declaración al agregar una sección.
+- El generador acepta vistas anuales propias, absolutas o relativas, y confianza para Black-Litterman. La prueba
+  fuera de muestra recalcula esos pesos con el tramo de entrenamiento y los compara con 1/N.
+- scikit-learn quedó como dependencia directa; referencias de software registran licencia por paquete y una prueba
+  la contrasta con `importlib.metadata` de los paquetes instalados. Las guías describen las funciones actuales.
+- Verificación final: 717 pruebas Python aprobadas en 13 min 08 s, 1 advertencia de Starlette; Node 13/13.
+  Falta comprobar GEX con mercado abierto, el libro en Excel y los widgets en un navegador que los cargue.
+
+
+## [2026-10-29 (madrugada) — barra de estado rápida, Ranking precalentado, sectores de ETF y licencias verificadas]
+
+Trabajo repartido con una sesión de Codex en paralelo (decisión del usuario): Codex hizo la tabla de cobertura por
+sección, Black-Litterman y la revisión de guías; esta sesión, los puntos de abajo.
+
+### Corregido
+- `/api/estado` usa una caché de cotizaciones solo para la barra de estado: responde con el cálculo anterior y lo
+  recalcula en segundo plano si cambiaron los datos (a lo sumo cada 15 s) o pasó 1 min; nunca con más de 10 min. En
+  proceso, 0.18 s con la caché caliente. En el servidor, 0.75–1.2 s con el motor corriendo y un pico de 3.2 s mientras
+  la PC también corría la suite de Codex.
+- El Ranking se precalienta al arrancar, en segundo plano: la primera visita tardó 0.36 s (antes 19–42 s).
+
+### Agregado
+- `config/sectores.csv` con columna `grupo` y una fila por instrumento: 104 acciones de EE. UU. por grupo SIC de la SEC,
+  14 ETF con el sector que declara su nombre oficial (XLE, XLF, XLK, XLV, VGT, SOXX, VNQ, GDX, ICLN, QCLN, TAN, LIT,
+  BOTZ, KWEB) y filas vacías con su motivo: ETF amplios, de bonos o materias primas, y las 44 emisoras BMV. La
+  clasificación oficial de la BMV existe en cada ficha de bmv.com.mx, pero la lista que da los identificadores está
+  protegida contra robots (F5) y no se automatiza. Las taxonomías no se mezclan entre sí.
+- Licencias por paquete en `web/static/referencias.json` y prueba contra `importlib.metadata`. Se corrigió NumPy:
+  `BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0`.
+- `scikit-learn>=1.5` como dependencia directa (antes llegaba por skfolio).
+
+### Verificación final (03:50, tras terminar Codex)
+- 718 pruebas de Python y 13 de Node aprobadas; las 24 pestañas con guía y sin cajas de error.
+- `/api/estado` 0.02–0.06 s con el motor en espera y 0.03–0.35 s durante un recálculo de propuestas.
+- Black-Litterman de Codex revisado; la nota fuera de muestra ahora avisa que las vistas de hoy aplicadas al pasado
+  favorecen a la propuesta.
+- GEX con el mercado abierto: pendiente (el mercado de EE. UU. abre a las 07:30 CDMX).
+
+## [2026-10-29 — guía en cada sección, referencias citadas, Oficina optimizada]
+
+### Agregado
+- **Guía al inicio de cada sección, sin excepción**: las 24 pestañas de la terminal y las páginas Oficina de
+  inversión, Laboratorio de bots y Cuaderno financiero (`web/static/guias.mjs`). Cada guía dice qué es la sección, cómo
+  usarla paso a paso y qué significan sus términos; se puede plegar y recuerda su estado. `tests/guias.test.mjs`
+  falla si una sección nueva no tiene guía.
+- **Referencias y créditos** en Ayuda (`web/static/referencias.json`): 23 fuentes de datos, 5 servicios, 25 entradas
+  de software con su licencia y 24 publicaciones y métodos (Markowitz, Sharpe, Ledoit-Wolf, 1/N, Black-Scholes,
+  Merton, Heston, Holm, Diebold-Mariano, Newey-West, Brier, Platt, TSM, CVaR, SPP, Wilder, Bollinger, MACD,
+  estocástico, Market Profile, GEX y Skylit). `tests/test_referencias.py` comprueba que toda dependencia del proyecto
+  y todo proveedor de datos del código estén citados.
+- `docs/prompt-pendientes-2026-10-29.md`: lo que necesita el usuario y los prompts para Claude Code y para Codex.
+
+### Cambiado
+- **Oficina de inversión**: la consulta se hace sola al elegir el instrumento o el intervalo; recuerda la última
+  selección y acepta `?simbolo=`; los instrumentos con datos guardados aparecen primero; nueva tarjeta «Abrir este
+  instrumento en» (Velas, Order Flow, Option Flow con GEX y Ranking). La terminal acepta `?simbolo=` para abrir esas
+  secciones con el instrumento elegido.
+- Se retiraron de la interfaz los documentos de trabajo: la tarjeta «Documentos de trabajo» de la Oficina y los
+  enlaces a prompts internos del Laboratorio de bots. Los archivos siguen en el repositorio.
+- El texto de requisitos del GEX explica el flujo actual («Preparar GEX» y spot unido a ≤ 60 s).
+
+### Verificación
+- Suite: 707 pruebas de Python y 13 de Node aprobadas.
+- Navegador: las 24 pestañas cargan sin errores ni mensajes de consola; las 3 páginas de área muestran su guía; la
+  Oficina consulta NVDA sola y abre Option Flow con NVDA elegido; sin desbordamiento a 375 px.
+- GEX: la sección aparece y explica qué falta; la cadena guardada es del 28-oct (antes de la unión del spot), así que
+  sigue «no calculable» hasta preparar una cadena nueva con el mercado abierto.
+
+## [2026-10-28 (noche) — pendientes de las auditorías: motor, Ranking, CETES, GEX, fuera de muestra y vela en vivo]
+
+### Corregido
+- **Generador lento con el motor corriendo.** Medido contra la terminal real durante un ciclo completo: 0.4–1.0 s en
+  ingesta, contexto y propuestas (antes 4–18 s; la espera de más de 2 min del 28-oct no se reprodujo). Derivadas
+  exactas en el optimizador (de 0.93 s a 0.2 s), la matriz de precios se lee una sola vez y queda en caché hasta que
+  entran datos nuevos.
+- Escrituras breves con reintento ante «database is locked» (`db.escribir`): estado del motor, nube y CETES.
+
+### Agregado
+- **Motor:** guarda en la base el inicio y cada etapa del ciclo (cartera, ingesta, contexto, propuestas,
+  investigación, alertas); la barra de estado muestra la etapa en curso y «Motor sin ciclo desde …» si pasan más de
+  2 h con el mercado abierto. Un ciclo fallido queda cerrado con su error.
+- **Ranking en caché** por marca de datos (precios, tipo de cambio, calificaciones, capitalización): 0.1 s en tibio
+  (antes 5–30 s); tolera 2 min de atraso del flujo en vivo y se renueva cada 15 min por la vigencia.
+- **Tasa libre de riesgo** inicial del generador: CETES 28 días de Banxico SIE (serie SF43936, confirmada en el
+  catálogo; 6.22 % al 29-oct), con fecha y fuente visibles. Sin dato: la última guardada; sin ninguna, 7 % y lo dice.
+- **GEX, opción (a):** a la cadena de Alpaca se une el spot de la última operación de la acción (SIP o IEX) a ≤ 60 s
+  de la cotización más reciente, solo para los contratos cotizados a ≤ 60 s de ella, con procedencia en la nota.
+  Tarea opcional del motor (`[flujo.gex_programado]`, apagada): OI antes de la apertura y cadena a las 10:00 y 14:00
+  NY para los subyacentes SIC en cartera.
+- **Generador:** prueba fuera de muestra frente a 1/N (walk-forward, rebalanceo mensual, comisión del Reto) junto al
+  resultado; covarianza Ledoit-Wolf opcional; topes opcionales en dólares (SIC) y por sector (grupo SIC de 2 dígitos
+  de la SEC, `config/sectores.csv`, 104 emisoras; `scripts/sectores_sec.py`).
+- **Cola de EODHD:** los portafolios guardados entran con las propuestas, tras la cartera; la barra de estado cuenta
+  las emisoras BMV sin cierre de la última sesión.
+- **Proveedores:** antigüedad del último error («error hace 34 días») y «sin uso reciente» si no corre en 7 días.
+- **Velas:** con el flujo IEX activo, la última vela de 1 minuto se actualiza por SSE (`/api/flujo/vela-viva`) con
+  la etiqueta «IEX en vivo, volumen parcial»; se arma en memoria y nunca se escribe en la base.
+
+### Cambiado
+- `testpaths = ["tests"]`: `uv run pytest` ya no recoge `tools/`. Se retiraron los estilos `.accesos--relacionados`
+  (sin uso en HTML ni JS). `VACUUM` mensual tras el respaldo verificado, con los mercados cerrados. Los registros
+  `data/terminal_*.log` pasan a `data/logs/` con fecha al arrancar desde el lanzador y se conservan 14 días.
+- Bonos de EE. UU. en el widget de cotizaciones: ETF del Tesoro (SHY, IEF, TLT, precio) en lugar de los rendimientos
+  TVC, que el widget gratuito no muestra.
+- El libro de Excel avisa cuando un portafolio se calculó con Ledoit-Wolf o con topes (el libro usa covarianza
+  muestral sin topes).
+
+### Verificación
+- Excel: no se abrió (control de Excel no autorizado en esta sesión; la automatización sigue respondiendo «ocupado»).
+  Fórmulas evaluadas con `formulas`: 0 errores en la plantilla y en un libro del generador; E 30.74 %, σ 14.17 %,
+  Sharpe 1.676, iguales a la terminal.
+- Chrome: los 6 widgets nuevos se ven en oscuro y la tabla de cotizaciones en claro. Los ETF de bonos no se vieron
+  dibujados: al final TradingView dejó de enviar datos a la pestaña (también a widgets sin cambios).
+- GEX: probado con respuestas simuladas; con el mercado abierto aún no se ha comprobado con NVDA.
+- Suite: 704 pruebas de Python (1 falló por WinError 1450 de Windows con la PC cargada y pasó al repetirla) y 9 de Node. Tras reiniciar, la primera llamada al Ranking tarda 19–42 s (caché fría).
+
 ## [2026-10-28 — diseño unificado, generador de portafolios en tiempo real, Excel con marca y más widgets]
 
 ### Agregado

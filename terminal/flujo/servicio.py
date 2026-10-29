@@ -4,7 +4,9 @@ usuario pulsa «Actualizar» en un panel.
 """
 from __future__ import annotations
 
+import json
 import os
+from zoneinfo import ZoneInfo
 from hashlib import sha256
 from datetime import UTC, datetime, timedelta
 
@@ -161,6 +163,36 @@ def actualizar(con, ajustes, tipo: str, simbolo: str, intervalo: str = "1Day", d
     with db.transaccion(con):
         almacen.registrar_consulta(con, clave, estado_c, n, msg)
     return {"estado": estado_c, "mensaje": msg, "registros": n}
+
+
+# Tarea opcional del motor ([flujo.gex_programado] activo = true): OI de cierre previo antes de la apertura y cadena a
+# las 10:00 y 14:00 de Nueva York, solo para los subyacentes en cartera (SIC). Cada paso una vez por día.
+PASOS_GEX = (("oi", (8, 0), (9, 25)), ("cadena_10", (10, 0), (11, 0)), ("cadena_14", (14, 0), (15, 0)))
+NY = ZoneInfo("America/New_York")
+
+
+def gex_programado(con, ajustes, subyacentes: list[str], ahora: datetime | None = None) -> list[dict]:
+    """Ejecuta el paso que toque ahora (si no se hizo hoy). Devuelve lo que corrió; [] si nada."""
+    if not ((ajustes.get("flujo") or {}).get("gex_programado") or {}).get("activo") or ajustes.es_demo or not subyacentes:
+        return []
+    local = (ahora or datetime.now(UTC)).astimezone(NY)
+    if local.weekday() >= 5:
+        return []
+    f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='gex_programado'").fetchone()
+    hecho = json.loads(f[0]) if f else {}
+    hoy = local.date().isoformat()
+    hechos = hecho.get("hechos", []) if hecho.get("fecha") == hoy else []
+    paso = next((p for p, ini, fin in PASOS_GEX if p not in hechos and ini <= (local.hour, local.minute) < fin), None)
+    if not paso:
+        return []
+    out = []
+    for s in subyacentes:
+        for tipo in (("contratos_oi",) if paso == "oi" else ("opciones",)):
+            out.append({"paso": paso, "subyacente": s, **actualizar(con, ajustes, tipo, s)})
+    db.escribir(con, "INSERT INTO ajustes_usuario VALUES ('gex_programado', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
+                     "valor=excluded.valor, actualizado_en=excluded.actualizado_en",
+                (json.dumps({"fecha": hoy, "hechos": hechos + [paso], "ultimo": out}), db.ahora()))
+    return out
 
 
 def _spot(con, simbolo: str, origen: str) -> float | None:

@@ -233,7 +233,11 @@ async function cargarEstado(previo) {
         ...["vigente", "retrasado", "vencido", "sin_datos", "sintetico"].filter((k) => v[k]).map((k) => chip(k, `${v[k]} ${ETIQ[k].toLowerCase()}`))),
       h("span", { clase: "grupo" }, "USD/MXN:", d.fx.valor ? h("span", { clase: "cifra", texto: num(d.fx.valor) }) : "", d.fx.valor ? `(${d.fx.fecha}, ${d.fx.proveedor})` : "", chip(d.fx.estado, d.fx.etiqueta)),
       h("span", { clase: "grupo" }, `Sesión cerrada: NYSE ${d.ultima_sesion.NYSE} · BMV ${d.ultima_sesion.BMV}`),
-      h("span", { clase: "grupo" }, m.ultimo_ciclo ? `Motor: ${fechaLocal(m.ultimo_ciclo)} · ${m.recalculo}` : "Motor: en espera"),
+      d.bmv_sin_cierre?.n ? h("span", { clase: "grupo", title: `Ejemplos: ${d.bmv_sin_cierre.ejemplos.join(", ")}. EODHD gratis da 20 consultas al día: primero cartera, luego portafolios guardados y propuestas.` },
+        chip("vencido", `${d.bmv_sin_cierre.n} emisoras BMV sin cierre del ${d.bmv_sin_cierre.sesion}`)) : "",
+      h("span", { clase: "grupo" }, m.ultimo_ciclo ? `Motor: ${fechaLocal(m.ultimo_ciclo)} · ${m.recalculo}` : "Motor: en espera",
+        m.en_curso && m.etapa ? ` · ciclo en curso: ${m.etapa} desde ${fechaLocal(m.ciclo_inicio)}` : "",
+        m.aviso ? chip("vencido", m.aviso) : ""),
       h("span", { clase: "grupo" }, textoVivo(d.tiempo_real), " · Operaciones reales: deshabilitadas"));
     if (m.ultimo_ciclo && estado.ultimoCiclo && m.ultimo_ciclo !== estado.ultimoCiclo) {
       await cargarPropuestas(); // el motor terminó un ciclo: refrescar sin recargar la página
@@ -1321,6 +1325,10 @@ async function cargarCobertura() {
       h("p", { clase: "suave", texto: `Latencias medidas: ${d.latencias.length ? d.latencias.map((l) => `${l.proveedor} mediana ${l.mediana_s} s`).join(" · ") : "ninguna todavía"}. Webhook TradingView: ${d.webhook_tradingview.configurado ? "configurado" : "sin secreto (uv run terminal webhook-secreto)"}.` }),
       tabla([{ t: "Instrumento", f: (f) => f.clave_operable }, { t: "Mercado", f: (f) => f.mercado }, { t: "Moneda", f: (f) => f.moneda },
         ...provs.map((p) => ({ t: p, f: (f) => chip(est[f[p]] || "sin_datos", f[p]) }))], d.tabla));
+    limpiar("cobertura-secciones", tabla([
+      { t: "Sección", f: (f) => document.getElementById(f.seccion)?.textContent || f.seccion },
+      { t: "Dato", f: (f) => f.dato }, { t: "Fuente", f: (f) => f.fuente },
+      { t: "Retraso", f: (f) => f.retraso }, { t: "Vigencia", f: (f) => f.vigencia }], d.secciones));
   } catch (e) { limpiar("cobertura-contenido", errorCaja(e)); }
 }
 document.getElementById("btn-cobertura").addEventListener("click", async (ev) => {
@@ -1546,7 +1554,9 @@ async function cargarUniverso() {
       { t: "Credencial", f: (f) => (f.requiere_credencial ? "Requerida" : "No") },
       { t: "Estado", f: (f) => (f.configurado ? chip("vigente", "Configurado") : chip("sin_datos", f.requiere_credencial ? "Requiere credencial" : "Desactivado")) },
       { t: "Peticiones restantes", f: (f) => (f.peticiones_restantes ?? "—"), num: true },
-      { t: "Última corrida", f: (f) => (f.ultima_corrida ? `${fechaLocal(f.ultima_corrida.fin)} · ${f.ultima_corrida.estado} · ${f.ultima_corrida.mensaje || ""}` : "—") },
+      { t: "Última corrida", f: (f) => h("span", {}, f.ultima_corrida ? `${fechaLocal(f.ultima_corrida.fin)} · ${f.ultima_corrida.estado} · ${f.ultima_corrida.mensaje || ""}` : "—",
+        f.sin_uso_reciente ? h("span", {}, " ", chip("vencido", f.dias_sin_correr == null ? "sin uso reciente: nunca corrió" : `sin uso reciente: ${f.dias_sin_correr} días`)) : "") },
+      { t: "Último error", f: (f) => (f.ultimo_error ? h("span", { title: f.ultimo_error.mensaje || "" }, chip("retrasado", f.ultimo_error.dias === 0 ? "error hoy" : `error hace ${f.ultimo_error.dias} día${f.ultimo_error.dias === 1 ? "" : "s"}`)) : "—") },
       { t: "Condiciones", f: (f) => f.uso_permitido }], d.proveedores));
   } catch (e) { limpiar("universo-tabla", errorCaja(e)); }
 }
@@ -1711,6 +1721,9 @@ async function iniciar() {
   const [e, r, p, c, a] = await Promise.allSettled([api("/api/estado"), api("/api/reto"), api("/api/propuestas"),
     api("/api/cartera"), api("/api/alertas?limite=5")]);
   const valor = (x) => (x.status === "fulfilled" ? x.value : null);
+  // ?simbolo= (p. ej. desde la Oficina): tras el primer await, cuando `flujo` ya está definido más abajo en el archivo
+  const simbolo = new URLSearchParams(location.search).get("simbolo");
+  if (simbolo) { flujo.velas.simbolo = flujo.of.simbolo = simbolo; if (simbolo.startsWith("SIC:")) flujo.op.subyacente = simbolo; }
   estado.reto = valor(r);
   estado.cartera = valor(c);
   estado.alertasResumen = valor(a) && valor(a).alertas;
@@ -2066,8 +2079,24 @@ const fmtSesion = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York
 const etiquetaBarra = (iso, intervalo) => (intervalo === "1Day" ? `sesión ${fmtSesion.format(new Date(iso))}` : horaCdmx(iso));
 const NOMBRE_INTERVALO = { "1Min": "1 minuto", "5Min": "5 minutos", "15Min": "15 minutos", "1Hour": "1 hora", "1Day": "1 día" };
 let cargaVelasId = 0;
+let velaViva = null;  // EventSource de la vela en vivo (IEX); se cierra al recargar Velas o al ocultar la página
+document.addEventListener("visibilitychange", () => { if (document.hidden && velaViva) { velaViva.close(); velaViva = null; } });
+function seguirVelaViva(barras, v, contenedor, rotulo) {
+  if (velaViva) { velaViva.close(); velaViva = null; }
+  if (v.intervalo !== "1Min" || !v.simbolo.startsWith("SIC:") || !estado.datos?.tiempo_real?.activo) return;
+  velaViva = new EventSource(`/api/flujo/vela-viva?simbolo=${encodeURIComponent(v.simbolo)}`);
+  velaViva.onmessage = (ev) => {
+    const b = JSON.parse(ev.data);
+    if (b.sin_vela) { rotulo.textContent = `Vela en vivo: sin operaciones IEX todavía (${MODOS_VIVO[b.modo] || b.modo}).`; return; }
+    const previas = barras.filter((x) => x.inicio < b.inicio);
+    contenedor.replaceChildren(graficaVelas([...previas, { ...b, retraso_s: 0 }], v, v.intervalo));
+    rotulo.textContent = `Última vela: ${b.etiqueta} · ${fechaLocal(b.inicio)} · C ${num(b.cierre)} · ${b.operaciones} operaciones · vol. ${num(b.volumen)}. Las barras guardadas son SIP con ≥ 15 min de retraso: puede haber un hueco entre ellas.`;
+  };
+}
+
 async function cargarVelas() {
   const solicitud = ++cargaVelasId;
+  if (velaViva) { velaViva.close(); velaViva = null; }
   try {
     await estadoFlujo();
     if (solicitud !== cargaVelasId) return;
@@ -2092,10 +2121,13 @@ async function cargarVelas() {
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
     if (solicitud !== cargaVelasId) return;
     const ult = d.barras.slice(-12).reverse();
+    const contGraf = h("div", {}, d.barras.length ? graficaVelas(d.barras, v, v.intervalo) : null);
+    const rotuloVivo = h("p", { clase: "ayuda", role: "status", "aria-live": "off" });
+    if (d.barras.length) seguirVelaViva(d.barras, v, contGraf, rotuloVivo);
     limpiar("velas-contenido", controles, d.grafica ? graficaTradingView(v) : null, d.grafica ? fichaTradingView(v.simbolo) : null,
       d.barras.length ? h("div", {},
         h("p", { clase: "ayuda" }, chip("retrasado", v.intervalo === "1Day" ? "Barras diarias" : "Barras intradía"), " ", `${d.zona_horaria}. ${d.nota}`),
-        cajaProcedencia(d.procedencia), graficaVelas(d.barras, v, v.intervalo),
+        cajaProcedencia(d.procedencia), contGraf, rotuloVivo,
         tabla([{ t: v.intervalo === "1Day" ? "Sesión (Nueva York)" : "Inicio (CDMX)", f: (b) => etiquetaBarra(b.inicio, v.intervalo).replace("sesión ", "") }, { t: "Apertura", f: (b) => num(b.apertura), num: true },
           { t: "Máximo", f: (b) => num(b.maximo), num: true }, { t: "Mínimo", f: (b) => num(b.minimo), num: true },
           { t: "Cierre", f: (b) => num(b.cierre), num: true }, { t: "Volumen", f: (b) => num(b.volumen), num: true },
@@ -3003,8 +3035,8 @@ const PF_PCT = ["rf", "peso_max", "rend_objetivo", "riesgo_objetivo"];
 function genInicial(perfil = "crecimiento") {
   const o = pf.meta.objetivos[perfil];
   return { objetivo: perfil, clase: "acciones", mercado_filtro: "ambos", caps: [], n: Math.max(o.min_activos, 6), fijos: [], excluir: [],
-    completar: true, metodo: "auto", peso_max: o.peso_max, capital: 100000, rf: 0.07, ventana: 252, aversion: o.aversion,
-    rend_objetivo: 0.12, riesgo_objetivo: 0.18, nombre: "", descripcion: "" };
+    completar: true, metodo: "auto", peso_max: o.peso_max, capital: 100000, rf: pf.meta.tasa_libre.valor, ventana: 252, aversion: o.aversion,
+    rend_objetivo: 0.12, riesgo_objetivo: 0.18, covarianza: "muestral", usd_max: null, sector_max: null, vistas: [], nombre: "", descripcion: "" };
 }
 async function cargarPortafolios() {
   const vigente = turno("portafolios");
@@ -3101,6 +3133,9 @@ function generadorPortafolio() {
     return h("label", {}, etiqueta, h("input", { type: "number", step: "any", value: esPct ? +(g[k] * 100).toFixed(4) : g[k], ...attrs,
       oninput: (e) => { const n = parseFloat(e.target.value); if (!Number.isNaN(n)) { g[k] = esPct ? n / 100 : n; cambioGen(); } } }));
   };
+  const tope = (k, etiqueta) => h("label", {}, etiqueta, h("input", { type: "number", min: 0, max: 100, step: "any", placeholder: "sin límite",
+    value: g[k] == null ? "" : +(g[k] * 100).toFixed(2),
+    oninput: (e) => { const n = parseFloat(e.target.value); g[k] = Number.isNaN(n) ? null : n / 100; cambioGen(); } }));
   const deslizador = (k, etiqueta, min, max, paso, fmt) => {
     const salida = h("output", { texto: fmt(g[k]) });
     const input = h("input", { type: "range", min, max, step: paso, value: k === "peso_max" ? Math.round(g[k] * 100) : g[k],
@@ -3129,6 +3164,19 @@ function generadorPortafolio() {
     fijar(id); buscar.value = "";
   };
   buscar.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); agregar(); } });
+  const vistaActivo = h("select", {}, (pf.universo || []).map((i) => h("option", { value: i.id, texto: `${i.clave_operable} · ${i.id}` })));
+  const vistaContra = h("select", {}, h("option", { value: "", texto: "Rendimiento del instrumento" }),
+    (pf.universo || []).map((i) => h("option", { value: i.id, texto: `Frente a ${i.clave_operable}` })));
+  const vistaRend = h("input", { type: "number", min: -100, max: 500, step: "any", value: 10, "aria-label": "Rendimiento anual esperado (%)" });
+  const vistaConf = h("input", { type: "number", min: 1, max: 100, step: 1, value: 50, "aria-label": "Confianza (%)" });
+  const agregarVista = () => {
+    const activo = vistaActivo.value, contra = vistaContra.value || null, rend = +vistaRend.value / 100, confianza = +vistaConf.value / 100;
+    if (!activo || activo === contra || !Number.isFinite(rend) || !Number.isFinite(confianza) || confianza < 0.01 || confianza > 1) {
+      notificar("Revise el rendimiento y la confianza de la vista."); return;
+    }
+    g.vistas = [...(g.vistas || []).filter((v) => v.activo !== activo || v.contra !== contra), { activo, contra, rend, confianza }];
+    fijar(activo); if (contra) fijar(contra); pintarPortafolios(); cambioGen(true);
+  };
   return h("section", { clase: "tarjeta pf-generador", "aria-label": "Generador de propuestas" },
     h("h2", { texto: pf.editando ? `Generador de propuestas · editando «${g.nombre}»` : "Generador de propuestas" }),
     h("p", { clase: "ayuda", texto: "Elija sus especificaciones: la propuesta se recalcula sola con cada cambio. La terminal completa con los mejores instrumentos del Ranking que no se mueven igual y le sugiere mejoras. Usa precios de cierre, no en tiempo real." }),
@@ -3152,9 +3200,27 @@ function generadorPortafolio() {
       numero("rf", "Tasa libre de riesgo anual (%)", { min: -5, max: 50 }),
       selectorSimple(g.ventana, M.ventanas.map((v) => [v, `${v} sesiones (~${(v / 252).toFixed(1)} años)`]), (v) => { g.ventana = +v; cambioGen(true); }, "Historia para estimar"),
       numero("aversion", "Aversión al riesgo A", { min: 0.1, max: 50 }),
+      sel("covarianza", Object.entries(M.covarianzas), "Covarianza"),
+      tope("usd_max", "Máximo en dólares, SIC (%)"),
+      tope("sector_max", "Máximo por sector (%)"),
       objetivoMetodo),
-    h("p", { clase: "ayuda", texto: "Tasa libre de riesgo: use la de CETES vigente. Aversión A: 1–2 agresivo, 4–6 moderado, 8–10 conservador. Un tope más alto concentra; uno más bajo diversifica." }),
+    h("p", { clase: "ayuda", texto: "Ledoit-Wolf «encoge» la covarianza para que los pesos dependan menos del ruido de pocos datos. Sector: acciones de EE. UU. por grupo SIC de la SEC; ETF por el sector que declara su nombre oficial; las emisoras BMV y los ETF amplios no tienen sector y no cuentan para ese tope. Deje vacío para no limitar." }),
+    h("details", {}, h("summary", { texto: "Vistas propias (Black-Litterman, opcional)" }),
+      h("p", { clase: "ayuda", texto: "Indique un rendimiento anual que usted considere plausible y su confianza. Es un supuesto, no un pronóstico ni un precio vigente; la prueba fuera de muestra usa la misma vista en cada fecha." }),
+      h("div", { clase: "fila-controles" }, h("label", {}, "Instrumento", vistaActivo), h("label", {}, "Tipo de vista", vistaContra),
+        h("label", {}, "Rendimiento anual (%)", vistaRend),
+        h("label", {}, "Confianza (%)", vistaConf), h("button", { type: "button", clase: "boton boton--secundario", texto: "Agregar vista", onclick: agregarVista })),
+      h("ul", {}, (g.vistas || []).map((v) => h("li", {}, `${claveIns(v.activo)}${v.contra ? ` frente a ${claveIns(v.contra)}` : ""}: ${pct(v.rend)} anual, confianza ${pct(v.confianza)} `,
+        h("button", { type: "button", clase: "boton boton--secundario", texto: "Quitar", onclick: () => {
+          g.vistas = g.vistas.filter((x) => x !== v); pintarPortafolios(); cambioGen(true);
+        } }))))),
+    h("p", { clase: "ayuda", texto: textoTasaLibre(M.tasa_libre) + " Aversión A: 1–2 agresivo, 4–6 moderado, 8–10 conservador. Un tope más alto concentra; uno más bajo diversifica." }),
     pf.ui.estado);
+}
+
+function textoTasaLibre(t) {
+  const base = t.fecha ? `Tasa libre de riesgo inicial: ${pct(t.valor)}, ${t.fuente}, dato del ${t.fecha}.` : `Tasa libre de riesgo inicial: ${pct(t.valor)} (${t.fuente}).`;
+  return t.aviso ? `${base} ${t.aviso}.` : base;
 }
 
 function fijar(id) {
@@ -3166,7 +3232,7 @@ function fijar(id) {
 }
 function aplicarSugerencia(a) {
   const g = pf.g;
-  if (a.excluir) { g.fijos = g.fijos.filter((x) => x !== a.excluir); if (!g.excluir.includes(a.excluir)) g.excluir.push(a.excluir); if (!g.completar) g.n = Math.max(2, g.fijos.length); }
+  if (a.excluir) { g.fijos = g.fijos.filter((x) => x !== a.excluir); g.vistas = (g.vistas || []).filter((v) => v.activo !== a.excluir && v.contra !== a.excluir); if (!g.excluir.includes(a.excluir)) g.excluir.push(a.excluir); if (!g.completar) g.n = Math.max(2, g.fijos.length); }
   if (a.peso_max) g.peso_max = a.peso_max;
   if (a.metodo) g.metodo = a.metodo;
   if (a.agregar) { fijar(a.agregar); }
@@ -3181,7 +3247,7 @@ function pintarPropuesta() {
   // instrumentos: fijos del usuario, sugeridos por la terminal y excluidos
   const chip = (id, clase, extra, botones) => h("span", { clase: `chip ${clase}` }, h("strong", { texto: claveIns(id) }), extra ? h("span", { clase: "suave", texto: ` · ${extra}` }) : null, ...botones);
   const boton = (texto, etiqueta, fn) => h("button", { type: "button", clase: "pf-quitar", "aria-label": etiqueta, title: etiqueta, texto, onclick: fn });
-  const quitarFijo = (id) => { g.fijos = g.fijos.filter((x) => x !== id); if (!g.completar) g.n = Math.max(2, g.fijos.length); cambioGen(true); pintarPropuesta(); };
+  const quitarFijo = (id) => { g.fijos = g.fijos.filter((x) => x !== id); g.vistas = (g.vistas || []).filter((v) => v.activo !== id && v.contra !== id); if (!g.completar) g.n = Math.max(2, g.fijos.length); cambioGen(true); pintarPropuesta(); };
   const sugeridos = r && !pf.error ? r.sugeridos : [];
   rellenar(pf.ui.instrumentos,
     h("div", { clase: "pf-seleccion", "aria-label": "Instrumentos fijados por usted" },
@@ -3255,6 +3321,20 @@ function graficaFrontera(r) {
     ["var(--serie-2)", "Tangente"], ["var(--positivo)", "Mínima varianza"], ["var(--retrasado)", "1/N"], ["var(--sin-datos)", "Activos individuales"]]));
 }
 
+function bloqueFueraDeMuestra(f) {
+  if (!f) return null;
+  if (!f.disponible) return h("p", { clase: "aviso-caja", role: "status", texto: `Prueba fuera de muestra frente a 1/N: no disponible. ${f.motivo}` });
+  const filas = [["Propuesta", f.propuesta], ["1/N (partes iguales)", f["1/N"]]];
+  return h("div", {},
+    h("h3", { texto: `Prueba fuera de muestra frente a 1/N (${f.inicio} a ${f.fin}, ${f.meses} meses)` }),
+    tabla([{ t: "", f: (x) => x[0] }, { t: "Rend. total", f: (x) => h("span", { clase: signo(x[1].rend_total) }, pct(x[1].rend_total)), num: true },
+      { t: "Rend. anual", f: (x) => pct(x[1].rend_anual), num: true }, { t: "σ anual", f: (x) => pct(x[1].riesgo), num: true },
+      { t: "Sharpe", f: (x) => (vacio(x[1].sharpe) ? "—" : x[1].sharpe.toFixed(2)), num: true },
+      { t: "Caída máxima", f: (x) => pct(x[1].caida_maxima), num: true }, { t: "Rotación mensual", f: (x) => pct(x[1].rotacion_mensual), num: true }],
+    filas, { caption: f.nota }),
+    h("p", { clase: "suave", texto: f.lectura }));
+}
+
 function pintarResultadoPf(r) {
   const m = r.metricas, sp = r.especificacion;
   const comp = [["Elegido", m], ["Tangente (máx. Sharpe)", r.tangente], ["Mínima varianza", r.min_varianza], ["1/N (referencia)", r.metricas_1n]];
@@ -3273,6 +3353,9 @@ function pintarResultadoPf(r) {
     h("p", { clase: "ayuda", texto: `y* = (E − r_f)/(A·σ²) con A = ${sp.aversion}: fracción del capital para este portafolio riesgoso; el resto iría a un instrumento libre de riesgo (p. ej. CETES). Valores > 100 % se muestran como 100 %.` }),
     r.avisos.length ? h("div", { clase: "aviso-caja", role: "status" }, r.avisos.map((a) => h("p", { texto: a }))) : null,
     r.datos.excluidos.length ? h("p", { clase: "suave", texto: `Excluidos: ${r.datos.excluidos.map((e) => `${nombreIns(e.id)} (${e.motivo})`).join("; ")}` }) : null,
+    bloqueFueraDeMuestra(r.fuera_de_muestra),
+    r.restricciones?.length ? h("p", { clase: "suave", texto: `Topes aplicados: ${r.restricciones.map((x) => `${x.grupo} ${pct(x.peso)} de ${pct(x.tope)}`).join(" · ")}. Covarianza: ${r.covarianza_nombre}.` })
+      : h("p", { clase: "suave", texto: `Covarianza: ${r.covarianza_nombre || "Muestral"}.` }),
     h("h3", { texto: "Frontera eficiente" }), graficaFrontera(r),
     tabla([{ t: "Portafolio", f: (x) => x[0] }, { t: "E(r)", f: (x) => pct(x[1].rend), num: true }, { t: "σ", f: (x) => pct(x[1].riesgo), num: true },
       { t: "Sharpe", f: (x) => (vacio(x[1].sharpe) ? "—" : x[1].sharpe.toFixed(2)), num: true }, { t: "Utilidad U", f: (x) => x[1].utilidad.toFixed(4), num: true }],

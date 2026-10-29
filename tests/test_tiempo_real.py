@@ -200,3 +200,34 @@ def test_simbolos_en_vivo_priorizan_la_cuenta_del_portal_y_la_propuesta_del_plan
     con.commit()
     m = tiempo_real.simbolos(con, 5)
     assert list(m)[:2] == ["MRNA", "MU"] and len(m) == 5
+
+
+def test_vela_viva_en_memoria_sin_escribir_velas(ajustes, con, monkeypatch):
+    f, iid, sim = _flujo(ajustes, con, monkeypatch)
+    f._procesar([{"T": "t", "S": sim, "p": 100.0, "s": 10, "t": "2026-09-22T15:30:05.123456789Z"},
+                 {"T": "t", "S": sim, "p": 101.0, "s": 5, "t": "2026-09-22T15:30:40Z"},
+                 {"T": "t", "S": sim, "p": 99.5, "s": 1, "t": "2026-09-22T15:30:59Z"}])
+    v = f.vela_viva(iid)
+    assert (v["inicio"], v["apertura"], v["maximo"], v["minimo"], v["cierre"], v["volumen"], v["operaciones"]) == \
+        ("2026-09-22T15:30:00+00:00", 100.0, 101.0, 99.5, 99.5, 16.0, 3)
+    assert v["etiqueta"] == "IEX en vivo, volumen parcial" and f.vela_viva("SIC:OTRA") is None
+    f._procesar([{"T": "t", "S": sim, "p": 102.0, "t": "2026-09-22T15:31:01Z"}])   # minuto nuevo: vela nueva
+    assert f.vela_viva(iid)["apertura"] == 102.0 and f.vela_viva(iid)["volumen"] == 0.0
+    assert not con.execute("SELECT COUNT(*) FROM flujo_barras").fetchone()[0]           # ninguna vela en la base
+
+
+def test_sse_de_vela_viva(ajustes, con, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from terminal import app as modulo
+    f, iid, sim = _flujo(ajustes, con, monkeypatch)
+    f._procesar([{"T": "t", "S": sim, "p": 100.0, "s": 10, "t": "2026-09-22T15:30:05Z"}])
+    monkeypatch.setattr(modulo, "FLUJO", f)
+    monkeypatch.setattr(modulo, "VIVO_EVENTOS", 1)
+    with TestClient(modulo.app, base_url="http://127.0.0.1:8765") as c:
+        r = c.get("/api/flujo/vela-viva", params={"simbolo": iid})
+        assert r.headers["content-type"].startswith("text/event-stream")
+        dato = json.loads(r.text.split("data: ", 1)[1])
+        assert dato["cierre"] == 100.0 and dato["simbolo"] == iid
+        dato = json.loads(c.get("/api/flujo/vela-viva", params={"simbolo": "SIC:NADA"}).text.split("data: ", 1)[1])
+        assert dato["sin_vela"]

@@ -185,9 +185,8 @@ def _secuencia(con: sqlite3.Connection) -> int:
 def _registrar(con: sqlite3.Connection, datos: dict) -> None:
     f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='nube'").fetchone()
     previo = json.loads(f[0]) if f else {}
-    with db.transaccion(con):
-        con.execute("INSERT INTO ajustes_usuario VALUES ('nube', ?, ?) ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor, "
-                    "actualizado_en=excluded.actualizado_en", (json.dumps({**previo, **datos}), db.ahora()))
+    db.escribir(con, "INSERT INTO ajustes_usuario VALUES ('nube', ?, ?) ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor, "
+                     "actualizado_en=excluded.actualizado_en", (json.dumps({**previo, **datos}), db.ahora()))
 
 
 def sincronizar(con: sqlite3.Connection, ajustes: Ajustes, prueba: bool = False, cliente: httpx.Client | None = None) -> dict:

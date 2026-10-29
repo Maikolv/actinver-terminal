@@ -46,6 +46,14 @@ function Start-Terminal($remoto) {
     if (-not $uv) { throw 'No se encontro "uv". Instalelo con: winget install astral-sh.uv' }
     & $uv sync --quiet --directory $repo
     New-Item -ItemType Directory -Force -Path (Join-Path $repo 'data') | Out-Null
+    # Rotacion: los registros del arranque anterior pasan a data\logs con fecha; se conservan 14 dias
+    $logs = Join-Path $repo 'data\logs'
+    New-Item -ItemType Directory -Force -Path $logs | Out-Null
+    $sello = Get-Date -Format 'yyyyMMdd-HHmmss'
+    Get-ChildItem (Join-Path $repo 'data') -Filter 'terminal_*.log' -File | Where-Object { $_.Length -gt 0 } |
+        ForEach-Object { Move-Item $_.FullName (Join-Path $logs "$($_.BaseName)_$sello.log") -Force }
+    Get-ChildItem $logs -Filter 'terminal_*_*.log' -File | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-14) } |
+        Remove-Item -Force
     Start-Process -FilePath $uv -ArgumentList @('run', 'terminal', 'iniciar', '--sin-navegador') -WorkingDirectory $repo `
         -WindowStyle Hidden -RedirectStandardOutput (Join-Path $repo 'data\terminal_salida.log') `
         -RedirectStandardError (Join-Path $repo 'data\terminal_errores.log') | Out-Null

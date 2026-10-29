@@ -22,6 +22,7 @@ from .contratos import Barra, ContratoOpcion, Libro, Nivel, Operacion, Operacion
 URL_CONTRATOS_PAPER = "https://paper-api.alpaca.markets/v2/options/contracts"
 URL_DATOS = "https://data.alpaca.markets"
 RETRASO_SIP_S = 16 * 60
+VENTANA_SPOT_S = 60  # máxima distancia entre la cotización de un contrato y el spot que se le une
 LIC_ALPACA = "Alpaca Market Data, plan gratuito: uso personal, sin redistribución"
 OCC = re.compile(r"^([A-Z.]{1,6})(\d{6})([CP])(\d{8})$")
 
@@ -244,14 +245,45 @@ class Alpaca:
                                q.get("bp") or None, q.get("ap") or None, t.get("p"), bar.get("v"), None,
                                s.get("impliedVolatility"), g.get("delta"), g.get("gamma"), g.get("theta"), g.get("vega"),
                                "proveedor" if s.get("impliedVolatility") else None)
-            if c.iv is None and spot and c.bid and c.ask and (venc - hoy).days >= 1:
-                _iv_calculada(c, spot, tasa, (venc - hoy).days)
             out.append(c)
+        nota_spot = self._unir_spot(subyacente, out)
+        for c in out:
+            dias_v = (date.fromisoformat(c.vencimiento) - hoy).days
+            s_iv = c.spot or spot  # el spot unido de la misma referencia; si no hay, el último cierre (sin GEX)
+            if c.iv is None and s_iv and c.bid and c.ask and dias_v >= 1:
+                _iv_calculada(c, s_iv, tasa, dias_v)
         return out, Procedencia("alpaca", LIC_ALPACA + "; feed «indicative» de OPRA, diferido", "EE. UU. (OPRA indicativo)",
                                 feed="indicative", retraso_s=15 * 60,
                                 nota="Feed indicativo gratuito (diferido ~15 min según Alpaca). Sin interés abierto. Si "
                                      "el proveedor no trae IV, se calcula con Black-Scholes-Merton europeo sobre el punto "
-                                     "medio (origen «calculado»); las opciones de EE. UU. son americanas.")
+                                     "medio (origen «calculado»); las opciones de EE. UU. son americanas. " + nota_spot)
+
+    def _unir_spot(self, origen: str, contratos: list[ContratoOpcion]) -> str:
+        """Spot de la MISMA referencia temporal que la cadena: R = la cotización más reciente de la cadena; spot = la
+        última operación de la acción en Alpaca en (R − 60 s, R]. Solo los contratos cotizados a ≤ 60 s de R lo reciben;
+        los demás quedan sin spot y el GEX los excluye y los cuenta. Nunca se usa un cierre ni otra hora."""
+        if not contratos:
+            return ""
+        ref = max(datetime.fromisoformat(c.instante) for c in contratos)
+        feed = "sip" if datetime.now(UTC) - ref >= timedelta(seconds=RETRASO_SIP_S) else "iex"  # SIP solo con ≥ 15 min
+        try:
+            d = self._get(f"/v2/stocks/{origen}/trades", {"feed": feed, "start": (ref - timedelta(seconds=VENTANA_SPOT_S)).isoformat(),
+                                                         "end": ref.isoformat(), "limit": 1, "sort": "desc"})
+        except FuenteNoDisponible as e:
+            return f"Sin spot unido ({e}): el GEX no se calcula."
+        t = (d.get("trades") or [None])[0]
+        if not t or not t.get("p"):
+            return f"Sin operación de {origen} en el minuto previo a la referencia {ref.isoformat()}: sin spot, sin GEX."
+        hora = datetime.fromisoformat(instante(t["t"][:26] + "Z" if len(t["t"]) > 27 else t["t"]))
+        if abs((ref - hora).total_seconds()) > VENTANA_SPOT_S:
+            return "La operación más cercana está a más de 60 s de la referencia: sin spot, sin GEX."
+        n = 0
+        for c in contratos:
+            if abs((datetime.fromisoformat(c.instante) - ref).total_seconds()) <= VENTANA_SPOT_S:
+                c.spot, c.moneda, n = float(t["p"]), "USD", n + 1
+        return (f"Spot {float(t['p']):.2f} USD: última operación de {origen} ({feed.upper()}, Alpaca) a las {hora.isoformat()}, "
+                f"≤ 60 s antes de la referencia {ref.isoformat()}; unido a {n} de {len(contratos)} contratos cotizados a "
+                "≤ 60 s de ella.")
 
 
 def _iv_calculada(c: ContratoOpcion, spot: float, tasa: float | None, dias: int) -> None:

@@ -14,6 +14,8 @@ marca «historia corta»; no es comparable con las ventanas de 20 y 60 sesiones.
 from __future__ import annotations
 
 import sqlite3
+import threading
+import time
 
 import numpy as np
 import pandas as pd
@@ -25,6 +27,35 @@ PESOS = {"rend_20": 0.30, "rend_60": 0.30, "estabilidad": 0.20, "tendencia": 0.2
 CLASES = {"acciones": ("accion", "fibra", "reit"), "etf": ("etf",),
           "fondos": ("fondo_deuda", "fondo_renta_variable", "fondo_multiactivo")}
 MIN_CORTA = 11
+
+# Caché por base de datos: el cálculo tarda segundos y solo cambia cuando llegan precios, tipo de cambio,
+# calificaciones o capitalización (rowid crece con cada INSERT OR REPLACE). El flujo en vivo escribe cada 15–60 s:
+# se tolera hasta TOLERANCIA_S de atraso y se recalcula cada VIGENCIA_S para que la vigencia de cada precio no envejezca.
+TOLERANCIA_S = 120
+VIGENCIA_S = 900
+_CACHE: dict = {}
+_CACHE_LOCK = threading.Lock()
+
+
+def _marca(con: sqlite3.Connection) -> tuple:
+    return tuple(con.execute(f"SELECT MAX(rowid) FROM {t}").fetchone()[0]
+                 for t in ("precios", "fx", "calificaciones", "capitalizacion", "universo_simulador"))
+
+
+def calcular_cache(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "ambos", clase: str = "acciones") -> dict:
+    """`calcular` con caché: devuelve el cálculo anterior si los datos no cambiaron (y dice de cuándo es)."""
+    clave = (con.execute("PRAGMA database_list").fetchone()[2], mercado_filtro, clase)
+    marca, ahora = _marca(con), time.monotonic()
+    with _CACHE_LOCK:
+        previo = _CACHE.get(clave)
+    if previo:
+        edad = ahora - previo[0]
+        if edad < VIGENCIA_S and (previo[1] == marca or edad < TOLERANCIA_S):
+            return {**previo[2], "cache_s": round(edad)}
+    res = calcular(con, ajustes, mercado_filtro, clase)
+    with _CACHE_LOCK:
+        _CACHE[clave] = (ahora, marca, res)
+    return {**res, "cache_s": 0}
 
 
 def calcular(con: sqlite3.Connection, ajustes: Ajustes, mercado_filtro: str = "ambos", clase: str = "acciones") -> dict:

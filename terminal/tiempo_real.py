@@ -85,6 +85,7 @@ class FlujoVivo:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._ultimos: dict[str, tuple[float, str]] = {}
+        self._velas: dict[str, dict] = {}  # vela del minuto en curso por símbolo; solo en memoria, nunca en la base
         self._pendientes: set[str] = set()
         self._base: dict[str, float] = {}
         self._nuevos = False
@@ -109,6 +110,14 @@ class FlujoVivo:
                     "feed": self.cfg.get("feed", "iex"), "simbolos": len(self._mapa),
                     "limite_simbolos": int(self.cfg.get("max_simbolos", 30)), "tipo_dato": self._tipo,
                     "movimiento_max": round(self._movimiento(), 4), **self.estado}
+
+    def vela_viva(self, iid: str) -> dict | None:
+        """Vela de 1 minuto en curso armada con las operaciones recibidas (IEX: volumen parcial). Copia; None si no hay."""
+        with self._lock:
+            s = next((s for s, ids in self._mapa.items() if iid in ids), None)
+            v = self._velas.get(s) if s else None
+            return {**v, "simbolo": iid, "etiqueta": "IEX en vivo, volumen parcial", "fuente": "alpaca",
+                    "feed": self.cfg.get("feed", "iex"), "calidad": "en_vivo_parcial", "modo": self.estado["modo"]} if v else None
 
     def _fijar(self, modo: str, mensaje: str = "") -> None:
         with self._lock:
@@ -246,8 +255,16 @@ class FlujoVivo:
     def _procesar(self, mensajes: list[dict]) -> None:
         for m in mensajes:
             if m.get("T") == "t" and m.get("p"):
+                p = float(m["p"])
+                inicio = pd.Timestamp(m["t"]).tz_convert("UTC").floor("min").isoformat()
                 with self._lock:
-                    self._ultimos[m["S"]] = (float(m["p"]), m["t"])
+                    v = self._velas.get(m["S"])
+                    if not v or v["inicio"] != inicio:  # minuto nuevo: la vela anterior se descarta (no se guarda)
+                        v = self._velas[m["S"]] = {"inicio": inicio, "apertura": p, "maximo": p, "minimo": p, "cierre": p,
+                                                   "volumen": 0.0, "operaciones": 0}
+                    v.update(maximo=max(v["maximo"], p), minimo=min(v["minimo"], p), cierre=p, ultimo=m["t"],
+                             volumen=v["volumen"] + float(m.get("s") or 0), operaciones=v["operaciones"] + 1)
+                    self._ultimos[m["S"]] = (p, m["t"])
                     self._pendientes.add(m["S"])
                     self.estado["mensajes"] += 1
                     self.estado["ultimo_precio"] = m["t"]

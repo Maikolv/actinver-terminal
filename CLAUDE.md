@@ -63,12 +63,29 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
   - Mis portafolios (28-oct): generador de propuestas que se recalcula con cada cambio (perfiles Conservador, Moderado,
     Crecimiento y Agresivo; sin Maslow), completa con el Ranking, sugiere mejoras aplicables y guarda portafolios
     ilimitados; Excel con logo y colores de la terminal, guía con celdas exactas (`terminal/markowitz.py`,
-    `terminal/excel_markowitz.py`).
-  - Ranking con capitalización bursátil (mega/large/mid/small/micro; SEC + `config/capitalizacion_bmv.csv`).
-  - GEX en Option Flow con botón «Preparar GEX». Con mercado abierto (28-oct) sigue sin calcularse: falta spot de la
-    misma referencia, gamma u OI en todos los contratos (ver `docs/prompt-pendientes-2026-10-28.md`).
+    `terminal/excel_markowitz.py`). Desde la noche del 28-oct: prueba fuera de muestra frente a 1/N, Ledoit-Wolf,
+    topes en USD y por sector (SIC de la SEC, `config/sectores.csv`) y tasa inicial CETES 28 de Banxico (SF43936).
+    Responde en 0.4–1.0 s con el motor corriendo.
+  - Ranking con capitalización bursátil (mega/large/mid/small/micro; SEC + `config/capitalizacion_bmv.csv`), en caché
+    por marca de datos: 0.1 s en tibio.
+  - Estado de datos con cotizaciones en caché por la misma marca y actualización en segundo plano; Ranking y estado
+    se precalientan al arrancar. `/api/estado`: 0.02–0.06 s con el motor en espera y 0.03–0.35 s durante un recálculo
+    de propuestas; primera visita al Ranking 0.36 s. «Datos y fuentes» declara dato, fuente, retraso y vigencia de cada
+    sección. Sectores: 104 acciones de EE. UU. (SIC), 14 ETF por su nombre oficial; BMV sin sector (lista oficial
+    protegida contra robots).
+  - Mis portafolios acepta vistas anuales y confianza opcionales de Black-Litterman; se contrastan fuera de muestra
+    frente a 1/N sin atribuir ventaja demostrada (la nota avisa que las vistas de hoy aplicadas al pasado favorecen a la
+    propuesta).
+  - Motor con inicio y etapas en la base y aviso «sin ciclo desde …»; vela de 1 min en vivo por SSE (IEX, volumen
+    parcial, nunca se guarda).
+  - GEX en Option Flow con botón «Preparar GEX». Opción (a) implementada el 28-oct: spot de la acción en Alpaca a
+    ≤ 60 s de la cadena; tarea programada opcional `[flujo.gex_programado]`. Falta comprobarlo con el mercado abierto.
   - Un solo logo (`favicon.svg`, color fijo `--marca`) en todas las páginas; 18 widgets de TradingView que siguen el
     modo claro/oscuro. Auditoría y pendientes: `docs/auditoria-2026-10-28.md`.
+  - Guía al inicio de cada sección y página de área (`web/static/guias.mjs`; `tests/guias.test.mjs` exige una por
+    sección). Ayuda › Referencias y créditos (`web/static/referencias.json`; `tests/test_referencias.py` exige citar toda
+    dependencia y proveedor). Oficina con consulta automática y accesos por instrumento (`?simbolo=`). Pendientes y
+    prompts para Claude Code y Codex: `docs/prompt-pendientes-2026-10-29.md`.
   - Asistente (`terminal/asistente.py`): datos, documentación y notas del usuario; Claude/Ollama si hay credencial.
   - Avisos de pérdida del día a Telegram (cartera −0.5 %, posición −1 % por escalón) con precios en vivo del SIC; solo informan.
 - **Evidencia:** ningún modelo tiene ventaja demostrada: V1 frente a 1/N, pronóstico al cierre, Kronos y TSM
@@ -81,7 +98,9 @@ El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entr
   - Historia externa hasta el 9-oct-2025.
   - Ningún dato en tiempo real. Matriz en `docs/proveedores-gratuitos.md`.
 - **Pruebas:**
-  - Python: 649 aprobadas el 18-oct tras integrar contratos Paper y notebook tema 3; véase el informe de esta entrega.
+  - Python: 718 aprobadas el 29-oct, 03:50 (verificación final tras Codex, `uv run pytest tests`, 10 min 42 s; una
+    advertencia de Starlette). Node: 13 (`node --test tests/*.test.mjs`). Recorrido de las 24 pestañas: todas con guía y
+    sin cajas de error.
   - Worker: 19.
   - Integración continua en `.github/workflows/pruebas.yml` (Ubuntu, sin secretos).
 - **Dependencias (18-oct):** `pip-audit` y `npm audit` sin vulnerabilidades. Numpy queda en 2.5.3 porque el notebook

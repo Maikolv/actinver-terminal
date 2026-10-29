@@ -1,18 +1,20 @@
 """Servidor local (FastAPI). Solo informa y simula: no existe ninguna ruta que envíe órdenes."""
 from __future__ import annotations
 
+import asyncio
 import html
 import json
 import logging
 import os
 import re
 import threading
+import time
 from contextlib import asynccontextmanager
 from datetime import date
 
 from fastapi import Body, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, notificador, reto,
@@ -47,6 +49,22 @@ def disparar_motor(forzar: bool = True) -> None:
 FLUJO: tiempo_real.FlujoVivo | None = None  # precios en vivo de EE. UU. (Alpaca IEX); None si el motor está apagado
 
 
+def _gex_programado() -> None:
+    """OI antes de la apertura y cadena 10:00/14:00 NY de los subyacentes SIC en cartera (opcional, apagado)."""
+    if not ((AJUSTES.get("flujo") or {}).get("gex_programado") or {}).get("activo"):
+        return
+    from .flujo import servicio as flujo_servicio
+    con = db.conectar()
+    try:
+        subyacentes = [p["instrumento_id"] for p in servicios.cartera_actual(con, AJUSTES)["posiciones"]
+                       if p["instrumento_id"].startswith("SIC:")]
+        flujo_servicio.gex_programado(con, AJUSTES, subyacentes)
+    except Exception:  # noqa: BLE001 - la tarea opcional nunca detiene el motor
+        log.exception("GEX programado")
+    finally:
+        con.close()
+
+
 def _programador(stop: threading.Event) -> None:
     """Motor automático: adquiere datos (respetando límites), recalcula si hay datos nuevos y evalúa alertas.
     Entre ciclos completos, si el flujo en vivo trae precios que se movieron, recalcula sin consultar proveedores."""
@@ -71,6 +89,7 @@ def _programador(stop: threading.Event) -> None:
         elif FLUJO and FLUJO.debe_recalcular():
             if servicios.ciclo_seguro(AJUSTES, forzar=True, en_vivo=True) is not None:
                 FLUJO.marcar_recalculo()
+        _gex_programado()
         if time.monotonic() >= vigilancia:  # pérdida del día con precios en vivo, cada `vigilar_perdida_min`
             vigilancia = time.monotonic() + int(prog.get("vigilar_perdida_min", 2)) * 60
             if vigencia.mercado_abierto("XNYS") or vigencia.mercado_abierto("XMEX"):
@@ -78,6 +97,19 @@ def _programador(stop: threading.Event) -> None:
                     alertas.vigilar_perdida(AJUSTES)
                 except Exception:  # noqa: BLE001 - una falla de la vigilancia no detiene el motor
                     log.exception("vigilancia de pérdida del día")
+
+
+def precalentar() -> None:
+    """Prepara el estado y el Ranking en segundo plano, sin bloquear el inicio."""
+    from . import ranking
+    con = db.conectar()
+    try:
+        cotizaciones_estado(con, [i for i, v in mercado.instrumentos(con).items() if v["estado"] == "activo"])
+        ranking.calcular_cache(con, AJUSTES)
+    except Exception:  # noqa: BLE001 - precalentar nunca impide arrancar
+        log.exception("precalentar cachés")
+    finally:
+        con.close()
 
 
 @asynccontextmanager
@@ -89,6 +121,8 @@ async def vida(app: FastAPI):
     con.close()
     global FLUJO
     stop = threading.Event()
+    if not os.environ.get("TERMINAL_SIN_MOTOR"):
+        threading.Thread(target=precalentar, daemon=True).start()
     if AJUSTES["app"].get("actualizacion_automatica") and not os.environ.get("TERMINAL_SIN_MOTOR"):
         FLUJO = tiempo_real.FlujoVivo(AJUSTES)
         FLUJO.iniciar()
@@ -237,14 +271,62 @@ def put_tarea(tid: str, cuerpo: dict = Body(...), con=Depends(con_db)):
 
 # ------------------------------------------------------------------------------------------------------------
 # Estado de datos, universo y motor
+# Caché de cotizaciones SOLO para la barra de estado (conteos de vigencia): con el motor corriendo,
+# mercado.cotizaciones tarda de 1 a 18 s. Se responde con el cálculo anterior y se recalcula en segundo plano si
+# cambiaron los datos (marca de ranking._marca) o pasó COT_FRESCA_S; nunca con más de COT_MAX_S de antigüedad.
+COT_FRESCA_S, COT_MAX_S = 60, 600
+_COT: dict = {}
+_COT_REFRESCO = threading.Lock()
+
+
+def _calcular_cot(ruta: str, ids: list[str]) -> None:
+    from . import ranking
+    c = db.conectar(ruta)
+    try:
+        marca, inicio = ranking._marca(c), time.monotonic()
+        _COT[(ruta, tuple(ids))] = (inicio, marca, mercado.cotizaciones(c, AJUSTES, ids))
+    finally:
+        c.close()
+
+
+def _refrescar_cot(ruta: str, ids: list[str]) -> None:
+    if not _COT_REFRESCO.acquire(blocking=False):
+        return  # ya hay un recálculo en curso
+
+    def tarea():
+        try:
+            _calcular_cot(ruta, ids)
+        except Exception:  # noqa: BLE001 - la barra de estado conserva el cálculo anterior
+            log.exception("cotizaciones de la barra de estado")
+        finally:
+            _COT_REFRESCO.release()
+    threading.Thread(target=tarea, daemon=True).start()
+
+
+def cotizaciones_estado(con, ids: list[str]) -> tuple[dict, int]:
+    """(cotizaciones, antigüedad en s) para /api/estado."""
+    from . import ranking
+    ruta = con.execute("PRAGMA database_list").fetchone()[2]
+    previo, ahora = _COT.get((ruta, tuple(ids))), time.monotonic()
+    if previo and ahora - previo[0] < COT_MAX_S:
+        # con el motor escribiendo a cada rato, a lo sumo un recálculo cada 15 s aunque la marca cambie
+        if ahora - previo[0] > COT_FRESCA_S or (ahora - previo[0] > 15 and previo[1] != ranking._marca(con)):
+            _refrescar_cot(ruta, ids)
+        return previo[2], round(ahora - previo[0])
+    _calcular_cot(ruta, ids)
+    return _COT[(ruta, tuple(ids))][2], 0
+
+
 @app.get("/api/estado")
 def estado(con=Depends(con_db)):
     ins = mercado.instrumentos(con)
     activos = [i for i, v in ins.items() if v["estado"] == "activo"]
-    cot = mercado.cotizaciones(con, AJUSTES, activos)
+    cot, cot_hace_s = cotizaciones_estado(con, activos)
     conteo: dict[str, int] = {}
     for q in cot.values():
         conteo[q["estado"]] = conteo.get(q["estado"], 0) + 1
+    sesion_bmv = vigencia.ultima_sesion_cerrada("XMEX").isoformat()
+    sin_cierre = sorted(i for i in activos if i.startswith("BMV:") and (cot.get(i, {}).get("fecha") or "")[:10] < sesion_bmv)
     return {
         "version": __version__, "modo": AJUSTES.modo, "hoy": date.today().isoformat(),
         "ultima_sesion": {"NYSE": vigencia.ultima_sesion_cerrada("XNYS").isoformat(),
@@ -256,6 +338,8 @@ def estado(con=Depends(con_db)):
         "tiempo_real": FLUJO.resumen() if FLUJO else {"activo": False, "modo": "apagado",
                                                         "mensaje": "Motor automático desactivado"},
         "notificaciones": notificador.configurados(), "operaciones_reales": False,
+        "bmv_sin_cierre": {"n": len(sin_cierre), "sesion": sesion_bmv, "ejemplos": [ins[i]["clave_operable"] for i in sin_cierre[:8]]},
+        "vigencia_hace_s": cot_hace_s,
     }
 
 
@@ -600,8 +684,9 @@ def pronostico_telegram(cuerpo: dict = Body(default={}), con=Depends(con_db)):
 # Cobertura por símbolo, saldo del portal y webhook de TradingView
 @app.get("/api/cobertura")
 def get_cobertura(con=Depends(con_db)):
+    from . import cobertura_secciones
     provs = cotizaciones.construir(con, AJUSTES.es_demo)
-    return {"tabla": cotizaciones.tabla_cobertura(con, provs), "proveedores": [p.estado() for p in provs.values()],
+    return {"secciones": cobertura_secciones.tabla(), "tabla": cotizaciones.tabla_cobertura(con, provs), "proveedores": [p.estado() for p in provs.values()],
             "latencias": cotizaciones.latencias_medidas(con),
             "catalogo_simulador_importado": bool(con.execute("SELECT 1 FROM universo_simulador LIMIT 1").fetchone()),
             "webhook_tradingview": {"configurado": webhook_tv.TradingViewAlertReceiver(con).configurado(),
@@ -894,7 +979,7 @@ def get_ranking(mercado_filtro: str = "ambos", clase: str = "acciones", con=Depe
         raise cartera.ErrorValidacion(["mercado_filtro: ambos, nacionales o extranjeras"])
     if clase not in ranking.CLASES:
         raise cartera.ErrorValidacion(["clase: acciones, etf o fondos"])
-    return ranking.calcular(con, AJUSTES, mercado_filtro, clase)
+    return ranking.calcular_cache(con, AJUSTES, mercado_filtro, clase)
 
 
 @app.get("/api/capitalizacion")
@@ -936,7 +1021,8 @@ def get_portafolios(con=Depends(con_db)):
                    | {"n_activos": sum(1 for a in p["resultado"]["activos"] if a["peso"] >= 0.005)} if p["resultado"] else {})}
                for p in markowitz.listar(con)]
     return {"portafolios": resumen, "objetivos": markowitz.OBJETIVOS, "metodos": markowitz.METODOS,
-            "ventanas": markowitz.VENTANAS, "aviso": markowitz.AVISO}
+            "ventanas": markowitz.VENTANAS, "aviso": markowitz.AVISO, "tasa_libre": markowitz.tasa_libre(con, AJUSTES),
+            "covarianzas": markowitz.COVARIANZAS}
 
 
 @app.get("/api/portafolios/sugerir")
@@ -1168,6 +1254,24 @@ def flujo_optionflow(subyacente: str, vencimiento: str = "", tipo: str = "", str
 def flujo_gex(subyacente: str, con=Depends(con_db)):
     from .flujo import servicio
     return servicio.gex(con, AJUSTES, subyacente)
+
+
+VIVO_CADA_S, VIVO_EVENTOS = 2.0, 900  # ~30 min por conexión; EventSource se reconecta solo
+
+
+@app.get("/api/flujo/vela-viva")
+async def flujo_vela_viva(request: Request, simbolo: str):
+    """SSE: vela de 1 minuto en curso del flujo IEX. Solo se transmite; no se escribe ninguna vela en la base."""
+    async def eventos():
+        for _ in range(VIVO_EVENTOS):
+            if await request.is_disconnected():
+                break
+            v = FLUJO.vela_viva(simbolo) if FLUJO else None
+            dato = v or {"simbolo": simbolo, "sin_vela": True,
+                         "modo": FLUJO.resumen()["modo"] if FLUJO else "apagado"}
+            yield f"data: {json.dumps(dato)}\n\n"
+            await asyncio.sleep(VIVO_CADA_S)
+    return StreamingResponse(eventos(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
 
 
 @app.post("/api/flujo/actualizar")
@@ -1598,7 +1702,7 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
             grupo("Índices", [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"), ("FOREXCOM:DJI", "Dow Jones"),
                               ("INDEX:NKY", "Nikkei 225"), ("INDEX:DEU40", "DAX")]),
             grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso"), ("FX_IDC:EURMXN", "Euro / peso"), ("FX:EURUSD", "Euro / dólar")]),
-            grupo("Bonos de EE. UU.", [("TVC:US02Y", "2 años"), ("TVC:US10Y", "10 años"), ("TVC:US30Y", "30 años")]),
+            grupo("Bonos de EE. UU. (ETF, precio)", [("NASDAQ:SHY", "SHY · Tesoro 1–3 años"), ("NASDAQ:IEF", "IEF · Tesoro 7–10 años"), ("NASDAQ:TLT", "TLT · Tesoro 20+ años")]),
             grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:USOIL", "Petróleo WTI"), ("TVC:SILVER", "Plata")])]}
     if tipo == "destacados":
         return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}

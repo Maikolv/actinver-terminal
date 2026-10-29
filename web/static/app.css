@@ -357,8 +357,6 @@ select[multiple] { min-width: 230px; }
 /* Accesos a análisis y navegación entre paneles relacionados */
 .accesos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 .accesos .boton { flex: 1 1 150px; min-height: 44px; }
-.accesos--relacionados { margin: 0 0 10px; align-items: center; }
-.accesos--relacionados .boton { flex: 0 1 auto; }
 .celda-gex { display: inline-block; min-width: 3.6em; padding: 1px 4px; border-radius: 3px; text-align: right; }
 .area-csv { width: 100%; font-family: ui-monospace, Consolas, monospace; font-size: .85rem; box-sizing: border-box; }
 .campo-bloque { display: block; margin: .5rem 0; }
@@ -410,3 +408,17 @@ select[multiple] { min-width: 230px; }
 #portafolios-contenido div[aria-busy="true"] { opacity: .6; transition: opacity .2s; }
 .grafica .etiqueta-punto { font-size: 10px; fill: var(--texto-2); }
 a.boton { text-decoration: none; display: inline-flex; align-items: center; }
+
+/* Guía al inicio de cada sección (web/static/guias.mjs) */
+.guia { margin: 0 0 16px; padding: 10px 14px; border: 1px solid var(--borde); border-left: 4px solid var(--marca); border-radius: 8px; background: var(--superficie); }
+.guia > summary { cursor: pointer; font-weight: 600; }
+.guia p, .guia ol { margin: 8px 0; }
+.guia ol { padding-left: 1.4em; }
+.guia__terminos { display: grid; grid-template-columns: minmax(120px, max-content) 1fr; gap: 4px 12px; margin: 6px 0 0; }
+.guia__terminos dt { font-weight: 600; }
+.guia__terminos dd { margin: 0; }
+@media (max-width: 560px) { .guia__terminos { grid-template-columns: 1fr; } .guia__terminos dd { margin-bottom: 6px; } }
+.referencias__grupo { margin: 10px 0; }
+.referencias__grupo > summary { cursor: pointer; font-weight: 600; }
+.referencias__lista { padding-left: 1.2em; }
+.referencias__lista li { margin: 4px 0; overflow-wrap: anywhere; }

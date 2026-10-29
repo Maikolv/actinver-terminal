@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 import sqlite3
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from . import vigencia
 from .adaptadores import CLASES, FX_USDMXN, ErrorProveedor, LimiteAlcanzado
@@ -29,7 +29,15 @@ def construir_adaptadores(con: sqlite3.Connection, ajustes: Ajustes, cliente=Non
     return out
 
 
-def estado_proveedores(con: sqlite3.Connection, ajustes: Ajustes) -> list[dict]:
+SIN_USO_DIAS = 7
+
+
+def _dias(iso: str | None, hoy: datetime) -> int | None:
+    return (hoy - datetime.fromisoformat(iso)).days if iso else None
+
+
+def estado_proveedores(con: sqlite3.Connection, ajustes: Ajustes, hoy: datetime | None = None) -> list[dict]:
+    """Por proveedor: configuración, última corrida, último error con su antigüedad y si lleva más de 7 días sin correr."""
     from . import fuentes_web as fw
     prov = ajustes["proveedores"]
     todos = dict(construir_adaptadores(con, ajustes))
@@ -40,10 +48,16 @@ def estado_proveedores(con: sqlite3.Connection, ajustes: Ajustes) -> list[dict]:
     for n, a in todos.items():
         ult = con.execute("SELECT fin, estado, mensaje, registros FROM ingestas WHERE proveedor=? ORDER BY id DESC LIMIT 1",
                           (n,)).fetchone()
+        err = con.execute("SELECT fin, mensaje FROM ingestas WHERE proveedor=? AND estado='error' ORDER BY id DESC LIMIT 1",
+                          (n,)).fetchone()
+        dias_ult = _dias(ult["fin"] if ult else None, hoy or datetime.now(UTC))
         out.append({"proveedor": n, "descripcion": a.descripcion, "uso_permitido": a.uso_permitido,
                     "tipo_dato": a.tipo_dato, "requiere_credencial": a.requiere_credencial,
                     "configurado": a.configurado(), "peticiones_restantes": a.peticiones_restantes(),
-                    "ultima_corrida": dict(ult) if ult else None})
+                    "ultima_corrida": dict(ult) if ult else None, "dias_sin_correr": dias_ult,
+                    "sin_uso_reciente": a.configurado() and (dias_ult is None or dias_ult > SIN_USO_DIAS),
+                    "ultimo_error": ({"fin": err["fin"], "mensaje": err["mensaje"], "dias": _dias(err["fin"], hoy or datetime.now(UTC))}
+                                     if err else None)})
     return out
 
 

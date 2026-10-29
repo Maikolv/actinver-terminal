@@ -1,0 +1,824 @@
+{
+  "aviso": "Recursos citados en la construcción de Actinver Terminal. Cada fuente de datos se usa según sus condiciones; las marcas pertenecen a sus dueños. tests/test_referencias.py comprueba que toda dependencia del proyecto y todo proveedor de datos del código aparezcan aquí.",
+  "grupos": [
+    {
+      "titulo": "Fuentes de datos",
+      "items": [
+        {
+          "nombre": "Actinver — portal del Reto Actinver 2026",
+          "uso": "Cuenta del Reto: capturas que usted copia a mano (el reglamento prohíbe automatizar el portal).",
+          "condiciones": "Reglamento del Reto; uso personal.",
+          "url": "https://www.actinver.com",
+          "ids": [
+            "actinver_portal"
+          ]
+        },
+        {
+          "nombre": "Actinver — Reporte Diario de fondos (PDF)",
+          "uso": "Precio por fondo y serie con su fecha de valuación.",
+          "condiciones": "Documento público; una lectura al día.",
+          "url": "https://www.actinver.com/fondos",
+          "ids": [
+            "actinver_pdf"
+          ]
+        },
+        {
+          "nombre": "Alpaca Market Data",
+          "uso": "Barras y operaciones SIP (≥ 15 min de retraso), precio en vivo IEX, opciones indicativas (OPRA diferido), contratos Paper de solo lectura (interés abierto y multiplicador) y el spot de la acción para el GEX.",
+          "condiciones": "Plan gratuito: uso personal, sin redistribución.",
+          "url": "https://alpaca.markets/data",
+          "ids": [
+            "alpaca",
+            "alpaca_vivo",
+            "alpaca_contratos_paper"
+          ]
+        },
+        {
+          "nombre": "EODHD",
+          "uso": "Cierres diarios de la BMV (20 consultas al día en el plan gratuito).",
+          "condiciones": "Plan gratuito; sin redistribución.",
+          "url": "https://eodhd.com",
+          "ids": [
+            "eodhd"
+          ]
+        },
+        {
+          "nombre": "Tiingo",
+          "uso": "Cierres diarios de EE. UU. ajustados por dividendos y splits.",
+          "condiciones": "Plan gratuito para uso personal.",
+          "url": "https://www.tiingo.com",
+          "ids": [
+            "tiingo"
+          ]
+        },
+        {
+          "nombre": "Twelve Data",
+          "uso": "Cierres diarios de respaldo.",
+          "condiciones": "Plan gratuito con límites por minuto y día.",
+          "url": "https://twelvedata.com",
+          "ids": [
+            "twelvedata"
+          ]
+        },
+        {
+          "nombre": "Barchart OnDemand",
+          "uso": "Cierres diarios de respaldo (si hay clave).",
+          "condiciones": "Según la clave del usuario.",
+          "url": "https://www.barchart.com/ondemand",
+          "ids": [
+            "barchart"
+          ]
+        },
+        {
+          "nombre": "Banco de México — Sistema de Información Económica (SIE)",
+          "uso": "Tipo de cambio FIX (SF43718) y CETES 28 días, subasta semanal (SF43936), tasa libre de riesgo inicial del generador.",
+          "condiciones": "API pública con token personal gratuito.",
+          "url": "https://www.banxico.org.mx/SieAPIRest/service/v1/",
+          "ids": [
+            "banxico"
+          ]
+        },
+        {
+          "nombre": "FRED — Federal Reserve Bank of St. Louis",
+          "uso": "Tipo de cambio de respaldo y series macroeconómicas.",
+          "condiciones": "API pública con clave gratuita; citar la serie y la fuente original.",
+          "url": "https://fred.stlouisfed.org",
+          "ids": [
+            "fred",
+            "fred_macro"
+          ]
+        },
+        {
+          "nombre": "U.S. Energy Information Administration (EIA)",
+          "uso": "Petróleo y energía en Investigación.",
+          "condiciones": "Datos públicos del gobierno de EE. UU.",
+          "url": "https://www.eia.gov/opendata/",
+          "ids": [
+            "eia"
+          ]
+        },
+        {
+          "nombre": "U.S. Bureau of Labor Statistics (BLS)",
+          "uso": "Empleo e inflación de EE. UU. en Investigación.",
+          "condiciones": "Datos públicos del gobierno de EE. UU.",
+          "url": "https://www.bls.gov/developers/",
+          "ids": [
+            "bls"
+          ]
+        },
+        {
+          "nombre": "Alpha Vantage",
+          "uso": "Fundamentales en Investigación.",
+          "condiciones": "Plan gratuito con límite diario.",
+          "url": "https://www.alphavantage.co",
+          "ids": [
+            "alpha_vantage"
+          ]
+        },
+        {
+          "nombre": "CoinGecko",
+          "uso": "Contexto de criptomonedas en Investigación (fuera del Reto).",
+          "condiciones": "API pública gratuita con atribución.",
+          "url": "https://www.coingecko.com/api",
+          "ids": [
+            "coingecko"
+          ]
+        },
+        {
+          "nombre": "Bitso (vía ccxt)",
+          "uso": "Libro y operaciones públicas de cripto en Order Flow (fuera del Reto).",
+          "condiciones": "Datos públicos del exchange.",
+          "url": "https://bitso.com",
+          "ids": [
+            "cripto",
+            "bitso"
+          ]
+        },
+        {
+          "nombre": "SEC EDGAR",
+          "uso": "Form 4 y 13F (Movimientos públicos), acciones en circulación y flotante (capitalización), clasificación industrial SIC (sectores) e índice de tickers.",
+          "condiciones": "Acceso público; ≤ 10 peticiones por segundo con User-Agent identificado.",
+          "url": "https://www.sec.gov/edgar",
+          "ids": [
+            "sec_edgar"
+          ]
+        },
+        {
+          "nombre": "Seeking Alpha (RSS)",
+          "uso": "Titulares de noticias por emisora.",
+          "condiciones": "RSS público; solo titulares y enlace.",
+          "url": "https://seekingalpha.com",
+          "ids": [
+            "seekingalpha_rss"
+          ]
+        },
+        {
+          "nombre": "Forex Factory (faireconomy.media)",
+          "uso": "Calendario económico en el plan del día.",
+          "condiciones": "Archivo público del calendario.",
+          "url": "https://www.forexfactory.com/calendar",
+          "ids": [
+            "forexfactory"
+          ]
+        },
+        {
+          "nombre": "TradingView — widgets gratuitos",
+          "uso": "Panorama de Mercado y gráfica avanzada; datos de TradingView, no alimentan cálculos.",
+          "condiciones": "Widgets gratuitos con atribución visible.",
+          "url": "https://www.tradingview.com/widget/",
+          "ids": [
+            "tradingview"
+          ]
+        },
+        {
+          "nombre": "Nasdaq Trader — Symbol Directory",
+          "uso": "Verificación del universo de emisoras del SIC y ETF.",
+          "condiciones": "Archivo público.",
+          "url": "https://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs",
+          "ids": [
+            "nasdaqtrader"
+          ]
+        },
+        {
+          "nombre": "Historia externa «Benchmarks_time_series» (archivo del usuario)",
+          "uso": "Rendimientos históricos hasta el 9-oct-2025, solo donde se verificaron contra otra fuente.",
+          "condiciones": "Archivo entregado por el usuario; nunca como precio vigente.",
+          "url": "",
+          "ids": [
+            "historia_externa"
+          ]
+        },
+        {
+          "nombre": "Finviz Elite (opcional, de pago)",
+          "uso": "Apagado sin token; contratarlo es decisión del usuario.",
+          "condiciones": "Suscripción de pago.",
+          "url": "https://elite.finviz.com",
+          "ids": [
+            "finviz"
+          ]
+        },
+        {
+          "nombre": "Infosel (opcional, con contrato)",
+          "uso": "Conector previsto para tiempo real BMV; no configurado.",
+          "condiciones": "Contrato con derechos de BMV.",
+          "url": "https://www.infosel.com",
+          "ids": [
+            "infosel"
+          ]
+        },
+        {
+          "nombre": "Archivos que usted importa (CSV, Excel, PDF)",
+          "uso": "Velas, operaciones, precios, transacciones e investigación cargados por usted; se marcan como «importado».",
+          "condiciones": "Usted declara tener derecho a usar esos datos.",
+          "url": "",
+          "ids": [
+            "csv",
+            "archivo"
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Servicios",
+      "items": [
+        {
+          "nombre": "Telegram Bot API",
+          "uso": "Plan del día, avisos y bot de consultas.",
+          "condiciones": "Bot del usuario; el token vive solo en .env.",
+          "url": "https://core.telegram.org/bots/api",
+          "ids": [
+            "telegram"
+          ]
+        },
+        {
+          "nombre": "Anthropic API (Claude)",
+          "uso": "Respuestas redactadas del Asistente si hay clave.",
+          "condiciones": "Pago por uso con la clave del usuario.",
+          "url": "https://docs.anthropic.com",
+          "ids": [
+            "anthropic"
+          ]
+        },
+        {
+          "nombre": "Ollama",
+          "uso": "Alternativa local para el Asistente.",
+          "condiciones": "MIT; modelos con su propia licencia.",
+          "url": "https://ollama.com",
+          "ids": [
+            "ollama"
+          ]
+        },
+        {
+          "nombre": "Cloudflare Workers + D1",
+          "uso": "Monitor de alertas en la nube (cloud-alerts).",
+          "condiciones": "Plan gratuito.",
+          "url": "https://developers.cloudflare.com/workers/",
+          "ids": [
+            "cloudflare"
+          ]
+        },
+        {
+          "nombre": "Hugging Face — pesos NeoQuasar/Kronos",
+          "uso": "Candidato experimental de pronóstico (opcional).",
+          "condiciones": "Según la tarjeta de cada modelo.",
+          "url": "https://huggingface.co/NeoQuasar",
+          "ids": [
+            "kronos_pesos"
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Software",
+      "items": [
+        {
+          "nombre": "FastAPI",
+          "uso": "Servidor web local.",
+          "condiciones": "MIT",
+          "url": "https://fastapi.tiangolo.com",
+          "ids": [
+            "fastapi"
+          ],
+          "licencias": {
+            "fastapi": "MIT"
+          }
+        },
+        {
+          "nombre": "Uvicorn",
+          "uso": "Servidor ASGI.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://www.uvicorn.org",
+          "ids": [
+            "uvicorn"
+          ],
+          "licencias": {
+            "uvicorn": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "python-multipart",
+          "uso": "Carga de archivos.",
+          "condiciones": "Apache-2.0",
+          "url": "https://github.com/Kludex/python-multipart",
+          "ids": [
+            "python-multipart"
+          ],
+          "licencias": {
+            "python-multipart": "Apache-2.0"
+          }
+        },
+        {
+          "nombre": "HTTPX",
+          "uso": "Cliente HTTP de los adaptadores.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://www.python-httpx.org",
+          "ids": [
+            "httpx"
+          ],
+          "licencias": {
+            "httpx": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "websockets",
+          "uso": "Flujo en vivo de Alpaca.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://websockets.readthedocs.io",
+          "ids": [
+            "websockets"
+          ],
+          "licencias": {
+            "websockets": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "NumPy",
+          "uso": "Cálculo numérico.",
+          "condiciones": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+          "url": "https://numpy.org",
+          "ids": [
+            "numpy"
+          ],
+          "licencias": {
+            "numpy": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"
+          }
+        },
+        {
+          "nombre": "pandas",
+          "uso": "Series de precios.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://pandas.pydata.org",
+          "ids": [
+            "pandas"
+          ],
+          "licencias": {
+            "pandas": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "SciPy",
+          "uso": "Optimización (SLSQP), raíces y estadística.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://scipy.org",
+          "ids": [
+            "scipy"
+          ],
+          "licencias": {
+            "scipy": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "skfolio",
+          "uso": "Optimización de carteras de las propuestas.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://skfolio.org",
+          "ids": [
+            "skfolio"
+          ],
+          "licencias": {
+            "skfolio": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "scikit-learn",
+          "uso": "Ledoit-Wolf, calibración y modelos de investigación (dependencia directa).",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://scikit-learn.org",
+          "ids": [
+            "scikit-learn"
+          ],
+          "licencias": {
+            "scikit-learn": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "exchange_calendars",
+          "uso": "Calendarios de la BMV y NYSE.",
+          "condiciones": "Apache-2.0",
+          "url": "https://github.com/gerrymanoim/exchange_calendars",
+          "ids": [
+            "exchange-calendars"
+          ],
+          "licencias": {
+            "exchange-calendars": "Apache-2.0"
+          }
+        },
+        {
+          "nombre": "openpyxl",
+          "uso": "Libros de Excel de Markowitz.",
+          "condiciones": "MIT",
+          "url": "https://openpyxl.readthedocs.io",
+          "ids": [
+            "openpyxl"
+          ],
+          "licencias": {
+            "openpyxl": "MIT"
+          }
+        },
+        {
+          "nombre": "xlrd",
+          "uso": "Lectura de hojas .xls importadas.",
+          "condiciones": "BSD",
+          "url": "https://github.com/python-excel/xlrd",
+          "ids": [
+            "xlrd"
+          ],
+          "licencias": {
+            "xlrd": "BSD"
+          }
+        },
+        {
+          "nombre": "Pillow",
+          "uso": "Logo en los libros de Excel.",
+          "condiciones": "MIT-CMU",
+          "url": "https://python-pillow.org",
+          "ids": [
+            "pillow"
+          ],
+          "licencias": {
+            "pillow": "MIT-CMU"
+          }
+        },
+        {
+          "nombre": "pypdf",
+          "uso": "Lectura del PDF de fondos.",
+          "condiciones": "BSD-3-Clause",
+          "url": "https://pypdf.readthedocs.io",
+          "ids": [
+            "pypdf"
+          ],
+          "licencias": {
+            "pypdf": "BSD-3-Clause"
+          }
+        },
+        {
+          "nombre": "PyYAML",
+          "uso": "Configuración del Reto.",
+          "condiciones": "MIT",
+          "url": "https://pyyaml.org",
+          "ids": [
+            "pyyaml"
+          ],
+          "licencias": {
+            "pyyaml": "MIT"
+          }
+        },
+        {
+          "nombre": "Anthropic Python SDK",
+          "uso": "Cliente de Claude para el Asistente.",
+          "condiciones": "MIT",
+          "url": "https://github.com/anthropics/anthropic-sdk-python",
+          "ids": [
+            "anthropic"
+          ],
+          "licencias": {
+            "anthropic": "MIT"
+          }
+        },
+        {
+          "nombre": "Windows Runtime (winrt) para Python",
+          "uso": "Reconocimiento de texto local de las capturas del portal.",
+          "condiciones": "MIT",
+          "url": "https://github.com/pywinrt/pywinrt",
+          "ids": [
+            "winrt-runtime",
+            "winrt-windows-foundation",
+            "winrt-windows-foundation-collections",
+            "winrt-windows-globalization",
+            "winrt-windows-graphics-imaging",
+            "winrt-windows-media-ocr",
+            "winrt-windows-storage-streams"
+          ],
+          "licencias": {
+            "winrt-runtime": "MIT",
+            "winrt-windows-foundation": "MIT",
+            "winrt-windows-foundation-collections": "MIT",
+            "winrt-windows-globalization": "MIT",
+            "winrt-windows-graphics-imaging": "MIT",
+            "winrt-windows-media-ocr": "MIT",
+            "winrt-windows-storage-streams": "MIT"
+          }
+        },
+        {
+          "nombre": "ccxt",
+          "uso": "Acceso a exchanges de cripto.",
+          "condiciones": "MIT",
+          "url": "https://github.com/ccxt/ccxt",
+          "ids": [
+            "ccxt"
+          ],
+          "licencias": {
+            "ccxt": "MIT"
+          }
+        },
+        {
+          "nombre": "Kronos (shiyu-coder/Kronos)",
+          "uso": "Modelo fundacional de velas, candidato experimental.",
+          "condiciones": "MIT",
+          "url": "https://github.com/shiyu-coder/Kronos",
+          "ids": [
+            "kronos"
+          ],
+          "licencias": {
+            "kronos": "MIT"
+          }
+        },
+        {
+          "nombre": "PyTorch, einops, huggingface_hub, safetensors, tqdm",
+          "uso": "Dependencias opcionales del candidato Kronos.",
+          "condiciones": "BSD-3-Clause; MIT; Apache-2.0; MPL-2.0 AND MIT",
+          "url": "https://pytorch.org",
+          "ids": [
+            "torch",
+            "einops",
+            "huggingface_hub",
+            "safetensors",
+            "tqdm"
+          ],
+          "licencias": {
+            "torch": "BSD-3-Clause",
+            "einops": "MIT",
+            "huggingface_hub": "Apache-2.0",
+            "safetensors": "Apache-2.0",
+            "tqdm": "MPL-2.0 AND MIT"
+          }
+        },
+        {
+          "nombre": "backtesting.py",
+          "uso": "Laboratorio de bots (proyecto offline).",
+          "condiciones": "AGPL-3.0",
+          "url": "https://github.com/kernc/backtesting.py",
+          "ids": [
+            "backtesting.py"
+          ],
+          "licencias": {
+            "backtesting.py": "AGPL-3.0"
+          }
+        },
+        {
+          "nombre": "pytest, detect-secrets, pip-audit",
+          "uso": "Pruebas, búsqueda de secretos y auditoría de dependencias.",
+          "condiciones": "MIT; Apache-2.0",
+          "url": "https://docs.pytest.org",
+          "ids": [
+            "pytest",
+            "detect-secrets",
+            "pip-audit"
+          ],
+          "licencias": {
+            "pytest": "MIT",
+            "detect-secrets": "Apache-2.0",
+            "pip-audit": "Apache-2.0"
+          }
+        },
+        {
+          "nombre": "Hatchling y uv",
+          "uso": "Empaquetado y entorno.",
+          "condiciones": "MIT; MIT OR Apache-2.0",
+          "url": "https://docs.astral.sh/uv/",
+          "ids": [
+            "hatchling",
+            "uv"
+          ],
+          "licencias": {
+            "hatchling": "MIT",
+            "uv": "MIT OR Apache-2.0"
+          }
+        },
+        {
+          "nombre": "Wrangler",
+          "uso": "Despliegue del monitor en Cloudflare.",
+          "condiciones": "MIT OR Apache-2.0",
+          "url": "https://developers.cloudflare.com/workers/wrangler/",
+          "ids": [
+            "wrangler"
+          ],
+          "licencias": {
+            "wrangler": "MIT OR Apache-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "titulo": "Métodos y publicaciones",
+      "items": [
+        {
+          "nombre": "Markowitz, H. (1952). Portfolio Selection. The Journal of Finance, 7(1), 77–91.",
+          "uso": "Frontera eficiente y generador de portafolios.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1111/j.1540-6261.1952.tb01525.x",
+          "ids": [
+            "markowitz"
+          ]
+        },
+        {
+          "nombre": "Sharpe, W. F. (1966). Mutual Fund Performance. The Journal of Business, 39(1), 119–138.",
+          "uso": "Razón de Sharpe.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1086/294846",
+          "ids": [
+            "sharpe"
+          ]
+        },
+        {
+          "nombre": "Ledoit, O. y Wolf, M. (2004). A well-conditioned estimator for large-dimensional covariance matrices. Journal of Multivariate Analysis, 88(2), 365–411.",
+          "uso": "Covarianza con contracción.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1016/S0047-259X(03)00096-4",
+          "ids": [
+            "ledoit_wolf"
+          ]
+        },
+        {
+          "nombre": "DeMiguel, V., Garlappi, L. y Uppal, R. (2009). Optimal Versus Naive Diversification: How Inefficient is the 1/N Portfolio Strategy? The Review of Financial Studies, 22(5), 1915–1953.",
+          "uso": "1/N como referencia fuera de muestra.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1093/rfs/hhm075",
+          "ids": [
+            "1n"
+          ]
+        },
+        {
+          "nombre": "Black, F. y Scholes, M. (1973). The Pricing of Options and Corporate Liabilities. Journal of Political Economy, 81(3), 637–654.",
+          "uso": "Modelos de opciones y volatilidad implícita.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1086/260062",
+          "ids": [
+            "black_scholes"
+          ]
+        },
+        {
+          "nombre": "Merton, R. C. (1973). Theory of Rational Option Pricing. The Bell Journal of Economics and Management Science, 4(1), 141–183.",
+          "uso": "Extensión con dividendos (BSM).",
+          "condiciones": "",
+          "url": "https://doi.org/10.2307/3003143",
+          "ids": [
+            "merton"
+          ]
+        },
+        {
+          "nombre": "Heston, S. L. (1993). A Closed-Form Solution for Options with Stochastic Volatility. The Review of Financial Studies, 6(2), 327–343.",
+          "uso": "Modelo de Heston en Option Flow (código propio).",
+          "condiciones": "",
+          "url": "https://doi.org/10.1093/rfs/6.2.327",
+          "ids": [
+            "heston"
+          ]
+        },
+        {
+          "nombre": "Albrecher, H., Mayer, P., Schoutens, W. y Tistaert, J. (2007). The Little Heston Trap. Wilmott Magazine.",
+          "uso": "Forma estable de la función característica de Heston.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "heston_trap"
+          ]
+        },
+        {
+          "nombre": "Cui, Y., del Baño Rollin, S. y Germano, G. (2017). Full and fast calibration of the Heston stochastic volatility model. European Journal of Operational Research, 263(2), 625–638.",
+          "uso": "Calibración de Heston por mínimos cuadrados.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1016/j.ejor.2017.05.018",
+          "ids": [
+            "heston_calibracion"
+          ]
+        },
+        {
+          "nombre": "Holm, S. (1979). A Simple Sequentially Rejective Multiple Test Procedure. Scandinavian Journal of Statistics, 6(2), 65–70.",
+          "uso": "Corrección por pruebas múltiples en el Laboratorio y TSM.",
+          "condiciones": "",
+          "url": "https://www.jstor.org/stable/4615733",
+          "ids": [
+            "holm"
+          ]
+        },
+        {
+          "nombre": "Diebold, F. X. y Mariano, R. S. (1995). Comparing Predictive Accuracy. Journal of Business & Economic Statistics, 13(3), 253–263.",
+          "uso": "Comparación de pronósticos en Investigación y comparador de modelos.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1080/07350015.1995.10524599",
+          "ids": [
+            "diebold_mariano"
+          ]
+        },
+        {
+          "nombre": "Newey, W. K. y West, K. D. (1987). A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix. Econometrica, 55(3), 703–708.",
+          "uso": "Varianza robusta de la prueba de Diebold-Mariano.",
+          "condiciones": "",
+          "url": "https://doi.org/10.2307/1913610",
+          "ids": [
+            "newey_west"
+          ]
+        },
+        {
+          "nombre": "Brier, G. W. (1950). Verification of Forecasts Expressed in Terms of Probability. Monthly Weather Review, 78(1), 1–3.",
+          "uso": "Puntaje de Brier de pronósticos.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2",
+          "ids": [
+            "brier"
+          ]
+        },
+        {
+          "nombre": "Platt, J. (1999). Probabilistic Outputs for Support Vector Machines and Comparisons to Regularized Likelihood Methods. Advances in Large Margin Classifiers, MIT Press.",
+          "uso": "Calibración de probabilidades (Platt) junto con regresión isotónica.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "platt"
+          ]
+        },
+        {
+          "nombre": "Moskowitz, T. J., Ooi, Y. H. y Pedersen, L. H. (2012). Time series momentum. Journal of Financial Economics, 104(2), 228–250.",
+          "uso": "Investigación educativa TSM mensual.",
+          "condiciones": "",
+          "url": "https://doi.org/10.1016/j.jfineco.2011.11.003",
+          "ids": [
+            "tsm"
+          ]
+        },
+        {
+          "nombre": "Rockafellar, R. T. y Uryasev, S. (2000). Optimization of conditional value-at-risk. Journal of Risk, 2(3), 21–41.",
+          "uso": "CVaR en Riesgo.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "cvar"
+          ]
+        },
+        {
+          "nombre": "Walton, D. (2014). Know Your System! Turning Data Mining from Bias to Benefit through System Parameter Permutation. NAAIM.",
+          "uso": "SPP en Robustez.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "spp"
+          ]
+        },
+        {
+          "nombre": "Wilder, J. W. (1978). New Concepts in Technical Trading Systems. Trend Research.",
+          "uso": "RSI y SAR parabólico.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "wilder"
+          ]
+        },
+        {
+          "nombre": "Bollinger, J. (2001). Bollinger on Bollinger Bands. McGraw-Hill.",
+          "uso": "Bandas de Bollinger en Velas.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "bollinger"
+          ]
+        },
+        {
+          "nombre": "Appel, G. (2005). Technical Analysis: Power Tools for Active Investors. FT Prentice Hall.",
+          "uso": "MACD en Velas.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "macd"
+          ]
+        },
+        {
+          "nombre": "Lane, G. C. (1984). Lane's Stochastics. Technical Analysis of Stocks & Commodities, 2(3).",
+          "uso": "Oscilador estocástico en Velas.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "estocastico"
+          ]
+        },
+        {
+          "nombre": "Dalton, J. F., Jones, E. T. y Dalton, R. B. (1990). Mind Over Markets. Probus. Basado en el Market Profile de J. P. Steidlmayer (CBOT).",
+          "uso": "Perfil de volumen, TPO, POC, VAH y VAL en Order Flow.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "market_profile"
+          ]
+        },
+        {
+          "nombre": "GEX — exposición gamma por strike",
+          "uso": "Convención de mercado (gamma × OI × multiplicador × S² × 1 %), implementación propia en terminal/flujo/gex.py; la lectura firmada es una convención, no la posición conocida de los intermediarios.",
+          "condiciones": "",
+          "url": "",
+          "ids": [
+            "gex"
+          ]
+        },
+        {
+          "nombre": "Skylit — filtro de Option Flow (video)",
+          "uso": "Perfil experimental, parcial, del filtro de operaciones inusuales.",
+          "condiciones": "Criterios públicos de un video; no reproducción fiel.",
+          "url": "",
+          "ids": [
+            "skylit"
+          ]
+        }
+      ]
+    }
+  ]
+}

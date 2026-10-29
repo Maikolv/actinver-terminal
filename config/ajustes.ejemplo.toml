@@ -43,6 +43,11 @@ activo = true
 # OI fechado del cierre previo y size; no habilita OPRA ni una suscripción. Opt-in local.
 contratos_oi = false
 
+[flujo.gex_programado]
+# Opcional: OI de cierre previo (08:00–09:25 NY) y cadena a las 10:00 y 14:00 NY de los subyacentes SIC en cartera,
+# para que el GEX tenga OI conocido antes de la cadena. Requiere contratos_oi = true y claves Paper. false = apagado.
+activo = false
+
 [flujo.cripto]
 # Libro y operaciones públicos de un exchange de cripto vía ccxt (MIT). Fuera del Reto. false = apagado.
 activo = true

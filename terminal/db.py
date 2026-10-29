@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import json
 import sqlite3
+import time
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -250,6 +251,30 @@ def respaldo_diario(origen: Path | None = None, conservar: int = 14, horas: floa
     return respaldar(origen, conservar)
 
 
+VACUUM_DIAS = 30
+
+
+def vacuum_mensual(origen: Path | None = None, ahora: float | None = None) -> bool:
+    """VACUUM una vez al mes, solo justo después de un respaldo verificado (lo llama el motor). Recupera el espacio de
+    las filas reemplazadas por el flujo en vivo. Si la base está ocupada, se intenta en el siguiente respaldo."""
+    import time
+    origen = Path(origen or ruta_db())
+    marca = origen.parent / "respaldos" / ".ultimo_vacuum"
+    ahora = ahora or time.time()
+    if marca.exists() and ahora - marca.stat().st_mtime < VACUUM_DIAS * 86400:
+        return False
+    con = sqlite3.connect(str(origen), timeout=5)
+    try:
+        con.execute("VACUUM")
+    except sqlite3.OperationalError:
+        return False
+    finally:
+        con.close()
+    marca.parent.mkdir(parents=True, exist_ok=True)
+    marca.touch()
+    return True
+
+
 def conectar(ruta: Path | str | None = None) -> sqlite3.Connection:
     con = sqlite3.connect(str(ruta or ruta_db()), check_same_thread=False, timeout=30)
     con.row_factory = sqlite3.Row
@@ -265,6 +290,20 @@ def transaccion(con: sqlite3.Connection):
     except Exception:
         con.rollback()
         raise
+
+
+def escribir(con: sqlite3.Connection, sql: str, params=(), intentos: int = 4, espera_s: float = 2.0) -> None:
+    """Una escritura breve en su propia transacción. Ante «database is locked» (otro escritor pasó del busy timeout)
+    reintenta con espera creciente en lugar de perder el dato; otros errores se propagan."""
+    for n in range(intentos):
+        try:
+            with transaccion(con):
+                con.execute(sql, params)
+            return
+        except sqlite3.OperationalError as e:
+            if "locked" not in str(e) or n == intentos - 1:
+                raise
+            time.sleep(espera_s * (n + 1))
 
 
 def inicializar(con: sqlite3.Connection, ajustes=None) -> None:

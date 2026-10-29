@@ -11,7 +11,7 @@
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/app.js" defer></script>
-<link rel="stylesheet" href="/static/navegacion.css"><script type="module" src="/static/navegacion.mjs"></script></head>
+<link rel="stylesheet" href="/static/navegacion.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/guias.mjs"></script></head>
 <body>
 <a class="saltar" href="#principal">Saltar al contenido</a>
 <header class="cabecera">
@@ -449,6 +449,9 @@
 
   <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>
     <h1>Datos e instrumentos</h1>
+      <h2>Cobertura por sección</h2>
+      <p class="ayuda">Cada sección declara qué dato usa, su fuente, retraso y criterio de vigencia. Consulte la fecha de cada precio antes de usarlo.</p>
+      <div id="cobertura-secciones"></div>
     <div id="proveedores"></div>
     <h2>Fondos Actinver: hoja oficial de precios</h2>
     <p class="ayuda">La terminal lee la hoja pública «Reporte Diario» de actinver.com (PDF) una vez al día y asigna el precio por fondo y serie exactos, con la fecha de valuación que declara el documento (valor por unidad del día hábil anterior). Si la descarga falla, descargue el PDF en actinver.com/fondos («Hoja de precios y rendimientos») y súbalo aquí.</p>
@@ -525,6 +528,9 @@
       <p>Se disparan una sola vez al cumplirse la condición, esperan un periodo de enfriamiento antes de repetirse y no le notifican fuera del horario de la BMV. «Simular cambio» calcula el efecto de la acción sugerida sin enviar nada.</p>
       <h2>CFD y apalancamiento</h2>
       <p>Los CFD son contratos por diferencias con apalancamiento (<a href="https://www.dukascopy.com/swiss/spanish/cfd/what-are-cfds/" rel="noopener noreferrer" target="_blank">explicación de Dukascopy</a>). Quedan fuera de ambas carteras y del Reto.</p>
+      <h2>Referencias y créditos</h2>
+      <p class="ayuda">Fuentes de datos, servicios, software y publicaciones con que se construyó la terminal, con su uso y sus condiciones.</p>
+      <div id="referencias-lista"><p class="suave">Cargando referencias…</p></div>
       <h2>Limitaciones</h2>
       <ul>
         <li>Las emisoras del SIC se valoran con el cierre de su bolsa de origen convertido a pesos; el simulador puede diferir.</li>

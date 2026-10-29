@@ -271,3 +271,68 @@ Ver `docs/auditoria-2026-10-19.md`: 7 hallazgos (3 P1 corregidos, 2 P2 corregido
   con datos gratuitos (0 de 902 contratos completos). Auditoría `docs/auditoria-2026-10-28.md` y prompt
   `docs/prompt-pendientes-2026-10-28.md`.
 - Captura del 28-oct 14:30 (registro 24): valuación $963,453.14 (−3.65 %, +3.0 % frente al 27-oct), sin operaciones.
+
+## Pendientes de auditorías cerrados — 28-oct-2026 (noche)
+
+Ejecución del prompt `docs/prompt-pendientes-2026-10-28.md` (parte B), puntos 1 a 11:
+- Generador con el motor corriendo: 0.4–1.0 s medidos durante un ciclo real (ingesta, contexto, propuestas); la espera
+  de más de 2 min no se reprodujo. `/api/ranking` 0.1 s en tibio (19–42 s la primera vez tras arrancar).
+- Motor con inicio y etapas en la base, aviso «sin ciclo desde …», rotación de `data/terminal_*.log` (14 días),
+  `VACUUM` mensual, reintento ante «database is locked».
+- CETES 28 días de Banxico (SF43936, 6.22 %) como tasa inicial; GEX opción (a) con spot unido a ≤ 60 s y tarea
+  programada opcional; fuera de muestra frente a 1/N, Ledoit-Wolf y topes por moneda y sector; cola EODHD con
+  portafolios guardados y conteo de emisoras BMV sin cierre (31); proveedores con antigüedad del error; vela de 1 min
+  en vivo por SSE.
+- Hallazgo nuevo: `/api/estado` tarda 1–18 s durante el ciclo del motor (`mercado.cotizaciones` sobre 375 mil filas
+  con caché de disco fría); un índice cubriente no ayuda en tibio (0.25 → 0.2 s). Siguiente paso: caché por marca de
+  datos como la del Ranking.
+- No verificado: Excel abierto (sin autorización de control), ETF de bonos dibujados (TradingView dejó de enviar
+  datos), GEX de NVDA con mercado abierto.
+
+## Guías, referencias y Oficina — 29-oct-2026
+
+- Guía (qué es, cómo usarla, qué significa) al inicio de las 24 secciones y de las 3 páginas de área
+  (`web/static/guias.mjs`, prueba `tests/guias.test.mjs`).
+- Ayuda › Referencias y créditos: 77 entradas (datos, servicios, software con licencia, publicaciones); prueba de
+  cobertura de dependencias y proveedores (`tests/test_referencias.py`).
+- Oficina: consulta automática, última selección y `?simbolo=`, instrumentos con datos primero, accesos a Velas, Order
+  Flow, Option Flow (GEX) y Ranking; sin «Documentos de trabajo». Laboratorio de bots sin enlaces a prompts internos.
+- GEX visible en Option Flow; con la cadena guardada del 28-oct sigue no calculable hasta una cadena nueva con el
+  mercado abierto.
+- Prompts de pendientes para Claude Code y Codex: `docs/prompt-pendientes-2026-10-29.md`.
+
+## Caché, fuentes y Black-Litterman — 29-oct-2026
+
+- Estado: caché por marca de datos de Ranking, actualización en segundo plano y precalentamiento al arrancar.
+  Prueba tibia: menos de 1 s aunque la lectura simulada de cotizaciones tarde 1.2 s. El límite con motor real
+  y disco frío sigue pendiente de medición.
+- Datos y fuentes: tabla declarativa para 24 secciones; prueba de cobertura de navegación. scikit-learn directo y
+  licencias por paquete verificadas contra los metadatos instalados.
+- Mis portafolios: vistas anuales absolutas y relativas con confianza opcionales; Black-Litterman se aplica en el
+  cálculo y en cada tramo de la comparación fuera de muestra frente a 1/N. No se ha demostrado ventaja.
+- Verificación final: 717 pruebas Python aprobadas en 13 min 08 s, una advertencia de Starlette; Node 13/13.
+  `uv sync --offline` no completó la construcción local por falta de
+  `pluggy==1.7.0` en caché; las pruebas usaron el entorno instalado con `--no-sync`.
+- Pendiente de comprobar con red y entorno adecuado: GEX con mercado abierto, Excel abierto, widgets de
+  TradingView dibujados y la medición de `/api/estado` durante un ciclo real del motor.
+
+## Estado rápido, Ranking precalentado y sectores — 29-oct-2026 (madrugada, Claude Code)
+
+Trabajo repartido con Codex por decisión del usuario (Codex: cobertura por sección, Black-Litterman, guías).
+- `/api/estado` con caché de cotizaciones en segundo plano: 0.18 s en proceso; 0.75–1.2 s en el servidor con el motor
+  (pico de 3.2 s con la suite de Codex corriendo en la misma PC). Ranking precalentado: primera visita 0.36 s.
+- `config/sectores.csv`: 104 acciones de EE. UU. (SIC de la SEC), 14 ETF con sector en su nombre oficial y filas vacías
+  con motivo para ETF amplios y las 44 emisoras BMV (lista oficial protegida contra robots).
+- Licencias verificadas contra los metadatos instalados (NumPy corregida); scikit-learn declarada.
+- Pendiente: GEX de NVDA y MU con el mercado de EE. UU. abierto (desde las 07:30 CDMX) y verificación final cuando
+  Codex termine.
+
+## Verificación final tras Codex — 29-oct-2026, 03:50
+
+- 718 pruebas de Python y 13 de Node aprobadas. Las 24 pestañas cargan con su guía y sin cajas de error; todas las
+  peticiones de la carga final responden 200.
+- `/api/estado`: 0.02–0.06 s con el motor en espera; 0.03–0.35 s durante un recálculo de propuestas; 0.8–3 s solo
+  cuando coincidieron el ciclo del motor y el recorrido de las 24 pestañas.
+- Revisión de Black-Litterman (Codex): fórmula correcta; se agregó a la prueba fuera de muestra el aviso de que las
+  vistas de hoy aplicadas al pasado la favorecen.
+- Pendiente: GEX de NVDA y MU con el mercado de EE. UU. abierto (desde las 07:30 CDMX).
