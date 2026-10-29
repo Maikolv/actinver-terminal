@@ -336,3 +336,11 @@ Trabajo repartido con Codex por decisión del usuario (Codex: cobertura por secc
 - Revisión de Black-Litterman (Codex): fórmula correcta; se agregó a la prueba fuera de muestra el aviso de que las
   vistas de hoy aplicadas al pasado la favorecen.
 - Pendiente: GEX de NVDA y MU con el mercado de EE. UU. abierto (desde las 07:30 CDMX).
+
+## Cola de EODHD y aviso del motor — 29-oct-2026 (mañana)
+
+- 31 de 46 emisoras BMV sin cierre del 28-oct (6 desde el 5-oct): el cupo (18/día) se iba en 15 de cartera y
+  propuestas y en 3 emisoras que EODHD no actualiza. La cola ahora rota por último intento; el efecto empieza con el
+  cupo del 30-oct (el de hoy ya se usó). Con 3 consultas libres al día, ponerse al día toma cerca de 10 días.
+- Aviso del motor: no aparece durante un ciclo recién iniciado y usa la hora local. La terminal estuvo detenida de
+  04:01 a 08:04 por las verificaciones; por eso no hubo ciclos.

@@ -130,21 +130,34 @@ def registrar_cobertura(con, proveedor_descarga: str, instrumento_id: str, simbo
                  "fondo" if nombre == "actinver_pdf" else "local", None, "EOD", detalle[:300], ahora()))
 
 
+def _intento(con, iid: str, proveedor: str, barras: int, hoy: date) -> None:
+    with transaccion(con):
+        con.execute("INSERT OR REPLACE INTO intentos_precio VALUES (?,?,?,?)", (iid, hoy.isoformat(), proveedor, barras))
+
+
 def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = None,
                ids_propuesta: list[str] | None = None, reserva_nuevos: int = RESERVA_HISTORIA_NUEVA) -> list[dict]:
     """Orden de consulta con cupos limitados (EODHD 20/día, Tiingo por hora):
     0 cartera y captura del portal · 1 instrumentos de las propuestas · 2 los primeros `reserva_nuevos` nunca cargados
     (recuperación programada: sin esta reserva, las actualizaciones diarias agotan el cupo y nunca entran) ·
-    3 con datos pero atrasados (el más antiguo primero) · 4 el resto de los nunca cargados."""
+    3 con datos pero atrasados · 4 el resto de los nunca cargados.
+    En 2, 3 y 4 va primero el que lleva más tiempo sin INTENTARSE (no el de dato más viejo): una emisora que el
+    proveedor ya no actualiza dejaría de ceder el cupo y las demás nunca avanzarían. Un nunca cargado que se intentó
+    en los últimos 7 días sin datos pierde la reserva."""
     prio, prop = set(ids_prioritarios or []), set(ids_propuesta or [])
     ult = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, MAX(fecha) FROM precios GROUP BY instrumento_id")}
-    nuevos = sorted(i["id"] for i in instrs if i["id"] not in ult and i["id"] not in prio and i["id"] not in prop)
+    intentos = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, intento FROM intentos_precio")}
+    hace7 = (date.today() - timedelta(days=7)).isoformat()
+    nuevos = sorted(i["id"] for i in instrs if i["id"] not in ult and i["id"] not in prio and i["id"] not in prop
+                    and intentos.get(i["id"], "") < hace7)
     reservados = set(nuevos[:max(0, reserva_nuevos)])
 
     def clave(i):
         nivel = (0 if i["id"] in prio else 1 if i["id"] in prop else 2 if i["id"] in reservados
                  else 3 if i["id"] in ult else 4)
-        return (nivel, ult.get(i["id"]) or "", i["id"])
+        if nivel < 2:
+            return (nivel, ult.get(i["id"]) or "", "", i["id"])
+        return (nivel, intentos.get(i["id"], ""), ult.get(i["id"]) or "", i["id"])
     return sorted(instrs, key=clave)
 
 
@@ -181,7 +194,9 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
             except ErrorProveedor as e:
                 resumen[n]["errores"] += 1
                 mensajes[n].append(f"{ins['id']}: {e}")
+                _intento(con, ins["id"], n, 0, hoy)
                 continue
+            _intento(con, ins["id"], n, len(barras), hoy)
             ts = ahora()
             moneda = ins["moneda_referencia"] or "MXN"
             with transaccion(con):

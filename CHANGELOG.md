@@ -2,6 +2,15 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-29 (mañana) — la cola de EODHD ya no se atasca; aviso del motor corregido]
+
+### Corregido
+- **31 emisoras BMV sin cierre, algunas desde el 5-oct.** El cupo de EODHD (18 consultas al día) se gastaba siempre
+  en las mismas: 15 de cartera y propuestas y, con las 3 restantes, «el dato más viejo primero» (SMARTRC, TERRA,
+  LASITE), que EODHD no actualiza; nunca avanzaba a WALMEX, AMX, CEMEX, etc. Ahora la cola registra cada intento
+  (`intentos_precio`) y rota por el último intento; un nunca cargado sin datos en 7 días pierde su reserva.
+- El aviso «Motor sin ciclo» ya no sale mientras un ciclo recién iniciado está corriendo, y muestra la hora local.
+
 ## [2026-10-29 — caché de estado, procedencia por sección y vistas Black-Litterman]
 
 - `/api/estado` usa cotizaciones en caché por la marca del Ranking y las actualiza en segundo plano; el estado y el

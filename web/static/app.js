@@ -237,7 +237,7 @@ async function cargarEstado(previo) {
         chip("vencido", `${d.bmv_sin_cierre.n} emisoras BMV sin cierre del ${d.bmv_sin_cierre.sesion}`)) : "",
       h("span", { clase: "grupo" }, m.ultimo_ciclo ? `Motor: ${fechaLocal(m.ultimo_ciclo)} · ${m.recalculo}` : "Motor: en espera",
         m.en_curso && m.etapa ? ` · ciclo en curso: ${m.etapa} desde ${fechaLocal(m.ciclo_inicio)}` : "",
-        m.aviso ? chip("vencido", m.aviso) : ""),
+        m.aviso ? chip("vencido", m.sin_ciclo_desde ? `${m.aviso} desde ${fechaLocal(m.sin_ciclo_desde)}` : m.aviso) : ""),
       h("span", { clase: "grupo" }, textoVivo(d.tiempo_real), " · Operaciones reales: deshabilitadas"));
     if (m.ultimo_ciclo && estado.ultimoCiclo && m.ultimo_ciclo !== estado.ultimoCiclo) {
       await cargarPropuestas(); // el motor terminó un ciclo: refrescar sin recargar la página

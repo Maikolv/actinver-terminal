@@ -199,6 +199,12 @@ CREATE TABLE IF NOT EXISTS capitalizacion (
     estado TEXT NOT NULL, detalle TEXT, consultado_en TEXT NOT NULL, flotante_usd REAL, fecha_flotante TEXT
 );
 
+-- Último intento de descarga de precios por instrumento (con o sin datos nuevos): la cola de cupos rota por intento,
+-- no por la fecha del último dato, para que una emisora sin datos nuevos no ocupe el cupo todos los días.
+CREATE TABLE IF NOT EXISTS intentos_precio (
+    instrumento_id TEXT PRIMARY KEY, intento TEXT NOT NULL, proveedor TEXT NOT NULL, barras INTEGER NOT NULL
+);
+
 -- Portafolios creados por el usuario en el constructor (Markowitz). Solo simulación: no generan órdenes.
 CREATE TABLE IF NOT EXISTS portafolios_usuario (
     id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL, especificacion TEXT NOT NULL, resultado TEXT,

@@ -456,9 +456,13 @@ def estado_motor(con, ahora: datetime | None = None) -> dict:
     m = json.loads(f["valor"]) if f else {}
     ahora = ahora or datetime.now(UTC)
     ultimo = datetime.fromisoformat(m["ultimo_ciclo"]) if m.get("ultimo_ciclo") else None
-    if ((vigencia.mercado_abierto("XNYS", ahora) or vigencia.mercado_abierto("XMEX", ahora))
+    # Un ciclo que empezó hace menos de SIN_CICLO_H ya está atendiendo el atraso: no se avisa mientras corre
+    en_curso = m.get("en_curso") and m.get("ciclo_inicio") and \
+        (ahora - datetime.fromisoformat(m["ciclo_inicio"])).total_seconds() <= SIN_CICLO_H * 3600
+    if ((vigencia.mercado_abierto("XNYS", ahora) or vigencia.mercado_abierto("XMEX", ahora)) and not en_curso
             and (ultimo is None or (ahora - ultimo).total_seconds() > SIN_CICLO_H * 3600)):
-        m["aviso"] = f"Motor sin ciclo desde {ultimo.isoformat(timespec='minutes') if ultimo else 'que arrancó la terminal'}"
+        m["aviso"] = "Motor sin ciclo terminado" + ("" if ultimo else " desde que arrancó la terminal")
+        m["sin_ciclo_desde"] = m.get("ultimo_ciclo")
     return m
 
 

@@ -36,7 +36,11 @@ def test_un_ciclo_fallido_no_queda_en_curso(con, ajustes, monkeypatch):
 def test_aviso_sin_ciclo_con_mercado_abierto(con):
     abierto = datetime(2026, 10, 28, 17, 0, tzinfo=UTC)   # miércoles 13:00 en Nueva York
     servicios._marcar_motor(con, ultimo_ciclo=(abierto - timedelta(hours=3)).isoformat())
-    assert servicios.estado_motor(con, abierto)["aviso"].startswith("Motor sin ciclo desde")
+    m = servicios.estado_motor(con, abierto)
+    assert m["aviso"] == "Motor sin ciclo terminado" and m["sin_ciclo_desde"].startswith("2026-10-28T14:00")
+    servicios._marcar_motor(con, en_curso=True, ciclo_inicio=(abierto - timedelta(minutes=5)).isoformat())
+    assert "aviso" not in servicios.estado_motor(con, abierto)            # un ciclo recién iniciado ya lo atiende
+    servicios._marcar_motor(con, en_curso=False)
     servicios._marcar_motor(con, ultimo_ciclo=(abierto - timedelta(minutes=30)).isoformat())
     assert "aviso" not in servicios.estado_motor(con, abierto)
     cerrado = datetime(2026, 11, 1, 17, 0, tzinfo=UTC)    # domingo
@@ -98,3 +102,20 @@ def test_vacuum_mensual_una_vez_y_respeta_la_marca(tmp_path):
     assert db.vacuum_mensual(ruta) and (tmp_path / "respaldos" / ".ultimo_vacuum").exists()
     assert not db.vacuum_mensual(ruta)                                   # antes de 30 días no repite
     assert db.vacuum_mensual(ruta, ahora=time.time() + 31 * 86400)
+
+
+def test_cola_rota_por_intento_y_no_se_atasca_en_emisoras_sin_datos_nuevos(con):
+    from datetime import date
+    with db.transaccion(con):
+        for iid, f in (("BMV:TERRA", "2026-10-05"), ("BMV:WALMEX", "2026-10-07"), ("BMV:AMX", "2026-10-08")):
+            con.execute("INSERT INTO precios (instrumento_id, fecha, cierre, moneda, proveedor, tipo_dato, obtenido_en) "
+                        "VALUES (?, ?, 1, 'MXN', 'eodhd', 'cierre', 'x')", (iid, f))
+    instrs = [{"id": i} for i in ("BMV:TERRA", "BMV:WALMEX", "BMV:AMX", "BMV:SMARTRC", "BMV:GCC")]
+    hoy = date.today()
+    # Antes de intentar: el dato más viejo primero; el nunca cargado conserva su reserva
+    assert [i["id"] for i in ingesta.orden_cola(con, instrs, reserva_nuevos=1)][:2] == ["BMV:GCC", "BMV:TERRA"]
+    ingesta._intento(con, "BMV:TERRA", "eodhd", 0, hoy)       # el proveedor no trajo nada nuevo
+    ingesta._intento(con, "BMV:GCC", "eodhd", 0, hoy)         # nunca cargado y sin datos: pierde la reserva
+    orden = [i["id"] for i in ingesta.orden_cola(con, instrs, reserva_nuevos=1)]
+    assert orden[:3] == ["BMV:SMARTRC", "BMV:WALMEX", "BMV:AMX"]  # avanzan los que no se han intentado
+    assert orden.index("BMV:TERRA") > orden.index("BMV:AMX")
