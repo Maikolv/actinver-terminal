@@ -15,6 +15,12 @@ if(typeof document!=='undefined') {
     return [...(i?[' · ']:[]),b,' '+new Date().toLocaleTimeString('es-MX',{timeZone:z,hour:'2-digit',minute:'2-digit',hour12:false})];}));
   marcar();setInterval(marcar,30000);
   nav.querySelector('.nav-global__interior')?.append(reloj);
+  // Estado de sesión (NYSE, BMV) de /api/estado: texto + punto, no solo color. Cada minuto y solo con la página visible.
+  const sesion=document.createElement('span');sesion.className='nav-global__sesion';sesion.setAttribute('role','status');reloj.after(sesion);
+  const chip=(n,abierto)=>{const s=document.createElement('span');s.className=`sesion sesion--${abierto?'abierta':'cerrada'}`;s.textContent=`${n} ${abierto?'ABIERTA':'CERRADA'}`;return s;};
+  const pedirSesion=async()=>{if(document.hidden)return;try{const r=await fetch('/api/estado',{signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error();const e=await r.json();
+    sesion.replaceChildren(chip('NYSE',e.mercado_abierto?.NYSE),chip('BMV',e.mercado_abierto?.BMV));}catch{sesion.replaceChildren(Object.assign(document.createElement('span'),{className:'sesion',textContent:'SESIÓN SIN DATO'}));}};
+  pedirSesion();setInterval(pedirSesion,60000);document.addEventListener('visibilitychange',pedirSesion);
   const cinta=document.createElement('iframe');cinta.className='cinta-global';cinta.loading='lazy';
   cinta.title='Cinta de indicadores: índices, VIX, bono a 10 años, dólar, oro y petróleo (TradingView, con retraso)';
   cinta.src='/widget/cinta-macro?tema=dark';

@@ -20,7 +20,6 @@
     "autor": "nico66fx",
     "tema": "Procedimiento de backtesting MT5",
     "ideas": "Seleccionar bot, símbolo, temporalidad, ventana larga, modelado de ticks y revisar drawdown.",
-    "aplicacion": "Aplicar el protocolo a archivos históricos con contrato y costos explícitos; MT5 no se conecta a Lucid ni se considera sustituto del feed CME. No se pulsa Start. No identifica repo público.",
     "repositorios": [],
     "evidencia": {
       "descripcion": true,

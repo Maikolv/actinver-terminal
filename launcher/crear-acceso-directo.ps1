@@ -1,7 +1,10 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
+# Crea (o actualiza) en el Escritorio el acceso «Actinver Terminal» con el logo de la terminal. Si falta el iniciador,
+# lo compila. El iniciador enciende la terminal si no responde y abre http://127.0.0.1:8765 en el navegador.
 $repo = Split-Path -Parent $PSScriptRoot
 $exe = Join-Path $PSScriptRoot 'ActinverTerminal.exe'
-if (-not (Test-Path -LiteralPath $exe)) { throw 'Compile primero el iniciador con launcher/compilar.ps1.' }
+$icono = Join-Path $PSScriptRoot 'actinver-terminal.ico'
+if (-not (Test-Path -LiteralPath $exe)) { & (Join-Path $PSScriptRoot 'compilar.ps1') | Out-Null }
 $desktop = [Environment]::GetFolderPath('Desktop')
 $shortcutPath = Join-Path $desktop 'Actinver Terminal.lnk'
 $shell = New-Object -ComObject WScript.Shell
@@ -9,6 +12,6 @@ $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $exe
 $shortcut.WorkingDirectory = $repo
 $shortcut.Description = 'Abre la Terminal Actinver e inicia el servicio local si hace falta.'
-$shortcut.IconLocation = "$env:WINDIR\System32\shell32.dll,14"
+$shortcut.IconLocation = "$icono,0"
 $shortcut.Save()
 Write-Output $shortcutPath

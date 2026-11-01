@@ -469,3 +469,10 @@ tbody tr:hover td { background: var(--superficie-2); }
 @media print { main h1 { color: #000; border-color: #000; } }
 .nav-global__selector label { white-space: nowrap; flex: none; }
 .nav-global__selector select { min-width: 0; flex: 1 1 200px; }
+/* Barra de terminal: estado de sesión y línea de acento superior (identidad propia, densidad de terminal financiera) */
+.cabecera { border-top: 2px solid var(--acento-grafico); }
+.nav-global__sesion { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.sesion { font-size: .7rem; font-weight: 650; letter-spacing: .06em; padding: 2px 8px; border: 1px solid var(--borde-control); border-radius: var(--radio); color: var(--texto-2); }
+.sesion::before { content: "●"; margin-right: 5px; }
+.sesion--abierta { color: var(--positivo); border-color: color-mix(in srgb, var(--positivo) 60%, transparent); }
+.sesion--cerrada::before { color: var(--texto-2); }

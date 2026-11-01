@@ -1724,7 +1724,8 @@ WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", Fa
               "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
               "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
               "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
-              "cinta-macro": ("ticker-tape", False), "macro": ("market-quotes", False)}
+              "cinta-macro": ("ticker-tape", False), "macro": ("market-quotes", False),
+              "indices": ("symbol-overview", False), "tecnico-indice": ("technical-analysis", False)}
 MAPAS_TV = {"NASDAQ100", "SPX500"}
 FILTROS_TV = {"america", "mexico", "forex"}
 BASE_TV = {"isTransparent": True, "locale": "es", "width": "100%", "height": "100%"}  # transparente: toma el fondo de grafica.css
@@ -1759,6 +1760,15 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
                                           ("FX_IDC:USDMXN", "Dólar / peso")]),
             grupo("Energía", [("TVC:USOIL", "Petróleo WTI"), ("TVC:UKOIL", "Petróleo Brent"), ("CAPITALCOM:NATURALGAS", "Gas natural")]),
             grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")])]}
+    if tipo == "indices":  # gráfica comparada de índices y dólar (líneas), estilo panel de terminal
+        return {**BASE_TV, "symbols": [["S&P 500", "FOREXCOM:SPXUSD|1D"], ["Nasdaq 100", "FOREXCOM:NSXUSD|1D"],
+                                       ["Dow Jones", "FOREXCOM:DJI|1D"], ["Dólar DXY", "CAPITALCOM:DXY|1D"], ["USD/MXN", "FX_IDC:USDMXN|1D"]],
+                "chartOnly": False, "showVolume": False, "chartType": "area", "scalePosition": "right", "scaleMode": "Normal",
+                "lineColor": "rgba(243, 244, 246, 0.95)", "topColor": "rgba(243, 244, 246, 0.16)", "bottomColor": "rgba(243, 244, 246, 0)",  # neutro: el rojo se leería como pérdida
+                "lineWidth": 2, "fontFamily": "Segoe UI, system-ui, sans-serif", "valuesTracking": "1",
+                "dateRanges": ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]}
+    if tipo == "tecnico-indice":
+        return {**BASE_TV, "symbol": "FOREXCOM:SPXUSD", "interval": "1D", "showIntervalTabs": True, "displayMode": "multiple"}
     if tipo == "cinta-macro":
         return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
             {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),

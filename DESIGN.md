@@ -39,6 +39,9 @@ Mercado; |t| < 0.05 en escalas normalizadas) o sin dato. Una sola función (`col
 volatilidad implícita (alta en rojo), GEX y correlaciones (rojo: se mueven juntos); el texto conserva signo y cifra.
 Los mapas de calor de TradingView usan su propia escala rojo/verde con gris en el cero.
 
+**Sin Quantower.** La terminal es el único espacio de trabajo: sus equivalencias (TPO, footprint, libro, cinta, riesgo,
+alertas, backtesting) se documentan en `recursos/auction-market-theory.md`. Barra común con reloj y estado de sesión.
+
 **Sin cripto.** Retirado de la interfaz el 1-nov-2026: widgets, cotizaciones, cinta, panel de Mesa y selectores.
 
 ## Tokens

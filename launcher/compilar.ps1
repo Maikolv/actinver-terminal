@@ -5,7 +5,8 @@ if (-not (Test-Path -LiteralPath $compiler)) {
 }
 $source = Join-Path $PSScriptRoot 'ActinverTerminal.cs'
 $output = Join-Path $PSScriptRoot 'ActinverTerminal.exe'
-& $compiler '/nologo' '/target:winexe' "/out:$output" '/reference:System.dll' '/reference:System.Windows.Forms.dll' $source
+$icono = Join-Path $PSScriptRoot 'actinver-terminal.ico'  # mismo logo que la terminal (favicon.svg)
+& $compiler '/nologo' '/target:winexe' "/win32icon:$icono" "/out:$output" '/reference:System.dll' '/reference:System.Windows.Forms.dll' $source
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $output)) {
     throw 'No se pudo crear ActinverTerminal.exe.'
 }

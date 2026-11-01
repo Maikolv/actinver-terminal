@@ -50,3 +50,14 @@ for(const [id,e] of Object.entries(ESCENARIOS)){
   aplicar();
 }
 if(!$('fecha').value)$('fecha').value=new Date().toLocaleDateString('en-CA');
+
+// 04 · Python aplicado: ejemplo sintético precalculado con la función Python del proyecto (sin proveedores).
+fetch('jpm/resultado_sintetico.json').then(r=>{if(!r.ok)throw Error();return r.json();}).then(d=>{
+  if(d.tipo_dato!=='sintetico'||![d.rendimiento_tramo,d.caida_maxima,d.volatilidad_entre_observaciones].every(Number.isFinite))throw Error();
+  mostrar('python-resultado',`DATOS SINTÉTICOS · ${d.observaciones} observaciones
+Retorno del tramo: ${pct(d.rendimiento_tramo)}
+Caída máxima: ${pct(d.caida_maxima)}
+Volatilidad entre observaciones: ${pct(d.volatilidad_entre_observaciones)} (no anualizada)
+Fuente: ${d.fuente}
+${d.nota}`);
+}).catch(()=>mostrar('python-resultado','SIN DATO · ejemplo local no disponible; no se consulta ningún proveedor.',true));

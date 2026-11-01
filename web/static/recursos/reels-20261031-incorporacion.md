@@ -20,7 +20,7 @@ Aplicación: Diseño de investigación: señal → validación → riesgo → di
 
 Autor: nico66fx. Seleccionar bot, símbolo, temporalidad, ventana larga, modelado de ticks y revisar drawdown.
 
-Aplicación: Aplicar el protocolo a archivos históricos con contrato y costos explícitos; MT5 no se conecta a Lucid ni se considera sustituto del feed CME. No se pulsa Start. No identifica repo público.
+Aplicación: Aplicar el protocolo a archivos históricos con contrato y costos explícitos. No se pulsa Start. No identifica repo público.
 
 ### [DfHvgtrt-B_](https://www.instagram.com/p/DfHvgtrt-B_/) — Gamma scalping y volatilidad
 
@@ -106,11 +106,10 @@ Aplicación: TradingAgents, Qlib y FinRL ya estaban; ai-hedge-fund y FinGPT desc
 
 Los 23 tipos son 16 paneles externos, seis accesos al análisis completo y una calculadora manual; no son 23 fuentes nuevas ni 23 widgets React portados. La cotización, noticias, fundamentales y mapas externos no entran en los modelos. No se añade el polling de un segundo de OpenTerminal a Actinver. README upstream: https://github.com/ErTasselli/OpenTerminal advierte que los endpoints públicos son indicativos/retrasados, no execution-grade.
 
-## Futuros, Quantower y TradingView
+## Futuros y TradingView en la terminal
 
 - Calculadora de estudio NQ: tick 0.25, USD 20/punto; SL manual de invalidación, TP en R conservador hacia el tick, comisión y deslizamiento total. El presupuesto puede devolver cero contratos. No conoce margen, reglas de cuenta ni cotización actual y no constituye recomendación.
 - `mesa_riesgo_nq.pine`: indicador informativo de escenarios manuales para NQ/MNQ, sin `strategy`, alertas ni webhook. Copiado a ambos proyectos. Revisión estática realizada; compilación en Pine Editor pendiente, sin afirmarla.
-- Quantower: se incorporan manifiesto y guía de compatibilidad a `futuros-lab/quantower/integracion-20261031`. Los indicadores React y skills no son DLL de Quantower. Se reutilizan como referencia los cálculos puros ya existentes en FuturosLab.Nucleo/Riesgo.cs y NoiseBands.cs; no se alteran ni se despliegan estrategias.
 - Telegram: no se cambian credenciales, no se envían avisos de entrada ni se inicia el bot. La capa informativa puede reutilizar el cálculo solamente tras validar contrato concreto, feed, hora, costos e invalidación. No se envían ejemplos como si fueran señales actuales.
 - Mandato vigente: NO realizar ningún trade, tampoco demo, hasta autorización humana explícita posterior. Esta entrega no la concede. Adaptador, live y fondeada permanecen apagados; no hay diario verificable ni ventaja demostrada.
 
@@ -132,6 +131,5 @@ Los 23 tipos son 16 paneles externos, seis accesos al análisis completo y una c
 4. Probar disponibilidad real de los paneles externos con cada instrumento; un iframe HTTP 200 no garantiza que el proveedor tenga datos.
 5. Convertir una hipótesis NQ en especificación preregistrada con contrato, sesiones, datos, comisiones y slippage, antes de cualquier cálculo estadístico. Permutaciones, bootstrap y 10,000 trayectorias no demuestran 10,000 trades independientes.
 6. Ningún pendiente autoriza activar ejecución. Auditoría técnica y estadística debe conservar el estado sin ventaja demostrada mientras no haya evidencia suficiente.
-
 
 Nota de deduplicación: Caveman ya estaba como skill de Anthropic. Su clon adicional, creado durante esta entrega antes de detectar esa coincidencia, se archivó reversiblemente fuera de Desktop/Repos. Se reutiliza la skill previa y su estrella quedó verificada. El inventario conserva el incidente y la ruta del archivo; no se eliminaron recursos del usuario.

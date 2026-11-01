@@ -1958,18 +1958,22 @@ function panoramaTradingView() {
     h("h2", { texto: "Panorama de TradingView" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
     marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
     bloqueWidget("1 · Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
-    bloqueWidget("2 · Tasas, volatilidad (VIX), dólar, energía y metales", marcoWidget("macro", {}, 720, "Variables macro"), true),
-    bloqueWidget("3 · Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
-    bloqueWidget("4 · Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
-    bloqueWidget("5 · Mapa de calor de acciones por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
+    bloqueWidget("2 · Índices y dólar: gráfica comparada (S&P 500, Nasdaq 100, Dow Jones, DXY, USD/MXN)", marcoWidget("indices", {}, 480, "Gráfica comparada de índices y dólar"), true),
+    bloqueWidget("3 · Medidor técnico del S&P 500 (TradingView; no es una recomendación)", [
+      h("div", { clase: "aviso-caja", role: "note", texto: "Lo calcula TradingView con medias móviles y osciladores. No es una recomendación ni una predicción." }),
+      marcoWidget("tecnico-indice", {}, 460, "Medidor técnico del S&P 500")]),
+    bloqueWidget("4 · Tasas, volatilidad (VIX), dólar, energía y metales", marcoWidget("macro", {}, 720, "Variables macro"), true),
+    bloqueWidget("5 · Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
+    bloqueWidget("6 · Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
+    bloqueWidget("7 · Mapa de calor de acciones por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
       (x) => { mapa.src = urlWidget("mapa", { mapa: x }); }, "Índice"), mapa]),
-    bloqueWidget("6 · Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
-    bloqueWidget("7 · Filtro de acciones y divisas", [selectorSimple("america", [["america", "Acciones de EE. UU."], ["mexico", "Acciones de México"], ["forex", "Divisas"]],
+    bloqueWidget("8 · Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
+    bloqueWidget("9 · Filtro de acciones y divisas", [selectorSimple("america", [["america", "Acciones de EE. UU."], ["mexico", "Acciones de México"], ["forex", "Divisas"]],
       (x) => { filtro.src = urlWidget("filtro", { filtro: x }); }, "Mercado"), filtro]),
-    bloqueWidget("8 · Cotizaciones por grupo (índices, divisas, bonos en ETF, materias primas)", marcoWidget("cotizaciones", {}, 640, "Cotizaciones por grupo")),
-    bloqueWidget("9 · Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
-    bloqueWidget("10 · Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
-    bloqueWidget("11 · Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")));
+    bloqueWidget("10 · Cotizaciones por grupo (índices, divisas, bonos en ETF, materias primas)", marcoWidget("cotizaciones", {}, 640, "Cotizaciones por grupo")),
+    bloqueWidget("11 · Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
+    bloqueWidget("12 · Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
+    bloqueWidget("13 · Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")));
 }
 
 function fichaTradingView(simbolo) {
@@ -2245,11 +2249,11 @@ function pintarSubasta(d, procedencia) {
       { t: "Balance inicial", f: (s) => s.ib ? `${num(s.ib.bajo)} – ${num(s.ib.alto)}` : "Pendiente / incompleto" }
     ], d.sesiones, { caption: "AMT descriptivo con barras cerradas; no son órdenes de trading" })
       : h("p", { clase: "vacio", texto: "Sin barras intradía suficientes. Importe o actualice barras de 5 minutos en Velas." }),
-    h("details", {}, h("summary", { texto: "Cómo leerlo y usarlo en Quantower / TradingView" }),
+    h("details", {}, h("summary", { texto: "Cómo leerlo y usarlo en la terminal" }),
       h("p", { clase: "ayuda", texto: "Aceptación: dos cierres consecutivos fuera del valor previo. Rechazo: la última barra explora fuera y cierra dentro. Rotación: cierre dentro sin barrido. Son hipótesis, no evidencia de ventaja. La sesión es RTH 09:30–16:00 de Nueva York; no es la sesión Globex." }),
       h("a", { href: "/static/recursos/auction-market-theory.md", texto: "Guía, fuentes y límites del módulo" }),
       h("p", {}, h("a", { href: "/static/recursos/actinver_amt.pine", download: "actinver_amt.pine", texto: "Descargar indicador AMT para TradingView" })),
-      h("p", {}, h("a", { href: "/static/recursos/amt-proyectos-financieros.zip", download: "amt-proyectos-financieros.zip", texto: "Descargar fuentes, observador Quantower y prompt de Claude" }))));
+      h("p", {}, h("a", { href: "/static/recursos/amt-proyectos-financieros.zip", download: "amt-proyectos-financieros.zip", texto: "Descargar fuentes y pruebas del módulo AMT" }))));
 }
 
 function pintarTpo(d) {

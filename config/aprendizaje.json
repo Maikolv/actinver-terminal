@@ -152,8 +152,7 @@
       "estado": "Reglas visibles y caption revisados; resultados son del autor, no reproducidos localmente.",
       "conceptos": [
         "Comparar cierre mensual con3/6/12meses; elegir ventana solo en entrenamiento",
-        "Largo/efectivo; forex puede ir corto. Mantener un mes sin stop/target",
-        "No equivalente al momentum transversal diario existente ni compatible directamente con Lucid intradía"
+        "Largo/efectivo; forex puede ir corto. Mantener un mes sin stop/target"
       ],
       "ejercicio": "Separar entrenamiento/holdout y congelar parámetros. Faltan datos, rango medio y costes para reproducción fiel."
     },
@@ -243,19 +242,6 @@
         "MCP oficial documentado; integración autenticada pendiente, sin garantía de feed CME en tiempo real"
       ],
       "ejercicio": "Comparar el calendario externo con fuentes oficiales y registrar horario, zona temporal, cobertura y fecha de revisión."
-    },
-    {
-      "titulo": "Quantower — plataforma y configuración de práctica",
-      "captura": "Recurso de configuración solicitado",
-      "autor": "Quantower",
-      "url": "https://www.quantower.com/",
-      "estado": "Acceso externo y prompt local disponibles. Herramientas, conexiones, licencias y datos dependen de instalación y proveedor; no hay ejecución desde esta ficha.",
-      "conceptos": [
-        "ES/MES y NQ/MNQ",
-        "DOM, footprint y perfiles según datos contratados",
-        "Práctica y controles de riesgo"
-      ],
-      "ejercicio": "Abrir el prompt local de Quantower y verificar versión, conexión y permisos antes de configurar un simulador."
     },
     {
       "titulo": "TradingView — gráficos y configuración de práctica",
@@ -2133,16 +2119,6 @@
       "detalle": "58 credenciales del PDF depurado, para filtrar y actualizar condiciones."
     },
     {
-      "titulo": "Prompt de configuración Quantower para Claude",
-      "url": "/static/recursos/prompt-quantower-claude.md",
-      "detalle": "Configuración y práctica; no activa operaciones."
-    },
-    {
-      "titulo": "Prompt de configuración TradingView para Claude",
-      "url": "/static/recursos/prompt-tradingview-claude.md",
-      "detalle": "Plan, datos, contratos, plantillas, práctica y límites de automatización."
-    },
-    {
       "titulo": "Auditoría: cómo se utilizó el reel de la mini terminal",
       "url": "/static/recursos/auditoria-post-terminal-Dej_B7_MXrX-2026-10-18.md",
       "detalle": "Distingue catálogo y demos de integraciones reales: yfinance, SEC, FRED, noticias y FinBERT."
@@ -2165,12 +2141,7 @@
     {
       "titulo": "Repositorios del TikTok y compatibilidad de plataformas",
       "url": "/static/recursos/integracion-oficina-pixel.md",
-      "detalle": "Tres repositorios descargados, commits y licencias; estado de incorporación y límites de Quantower/TradingView."
-    },
-    {
-      "titulo": "Prompt para optimizar recursos con Claude Code",
-      "url": "/static/recursos/prompt-optimizacion-recursos-claude.md",
-      "detalle": "Medir y mejorar CPU, RAM, consultas, contexto y costes sin perder trazabilidad ni seguridad."
+      "detalle": "Tres repositorios descargados, commits y licencias; estado de incorporación y límites de TradingView."
     },
     {
       "titulo": "Prompt de auditoría técnica, estética y de utilidad",
@@ -2188,39 +2159,9 @@
       "detalle": "Repositorios exactos, descargas, procedencia y límites; sin ejecución automática."
     },
     {
-      "titulo": "Estrategia candidata Lucid Flex 50K y validación",
-      "url": "/static/recursos/lucid-flex50k-candidata-2026-10-20.md",
-      "detalle": "Hipótesis de investigación, riesgo y pruebas pendientes; sin ventaja demostrada."
-    },
-    {
-      "titulo": "Prompt de optimización integral para Claude",
-      "url": "/static/recursos/prompt-optimizacion-reels-2026-10-20.md",
-      "detalle": "Presupuestos medibles para terminal, Quantower, TradingView e IA."
-    },
-    {
-      "titulo": "NQ: investigación reproducible y límites del simulador",
-      "url": "/static/recursos/nq-investigacion-20261020.md",
-      "detalle": "5 sesiones conocidas, 0 trades en la comparación sin delta; sin ventaja demostrada. Guía, datos y pruebas separadas de forward."
-    },
-    {
-      "titulo": "Aportaciones de 45 fuentes: giros, repos y pruebas",
-      "url": "/static/recursos/integracion-20261025-aportaciones-y-prompts.pdf",
-      "detalle": "Contenido observado y pendientes; compatibilidad con Quantower/TradingView, replay y límites de demo."
-    },
-    {
-      "titulo": "Prompts por aportación y optimización",
-      "url": "/static/recursos/integracion-20261025-prompts-por-giro.md",
-      "detalle": "45 prompts de implementación; diferenciación entre propuesta, código y validación. Optimización en documento asociado."
-    },
-    {
       "titulo": "Tres reels: IA, plugins y herramientas TradingView",
       "url": "/static/recursos/incorporacion-20261028.md",
       "detalle": "Videos revisados; cinco repositorios y análisis offline de 6,901 barras. Sin órdenes."
-    },
-    {
-      "titulo": "Prompt de optimización medible — tres fuentes",
-      "url": "/static/recursos/prompt-optimizacion-20261028.md",
-      "detalle": "Reutilización de recursos, causalidad y optimización reproducible. Sin activar trades."
     }
   ],
   "reels_20261031": [
@@ -2245,7 +2186,6 @@
       "autor": "nico66fx",
       "tema": "Procedimiento de backtesting MT5",
       "ideas": "Seleccionar bot, símbolo, temporalidad, ventana larga, modelado de ticks y revisar drawdown.",
-      "aplicacion": "Aplicar el protocolo a archivos históricos con contrato y costos explícitos; MT5 no se conecta a Lucid ni se considera sustituto del feed CME. No se pulsa Start. No identifica repo público.",
       "repositorios": [],
       "evidencia": {
         "descripcion": true,

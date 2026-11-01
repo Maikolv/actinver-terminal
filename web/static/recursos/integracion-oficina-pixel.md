@@ -24,15 +24,12 @@ La vista reutiliza dos GET locales ya existentes: velas de siete días y operaci
 
 Gamma, Option Flow, TPO y validación de alfa permanecen en las herramientas existentes; esta oficina no fabrica esos datos ni los sustituye por votos de agentes. La siguiente fase, si se desea, es integrar un único servicio de análisis por demanda con esquema validado, presupuesto y trazabilidad; no está implementado como agente autónomo en esta entrega.
 
-## Quantower y TradingView
+## Actinver Terminal y TradingView
 
 | Plataforma | Incorporado ahora | Trabajo posterior necesario |
 |---|---|---|
 | Actinver-terminal | Oficina funcional de sólo lectura, informe y prompt de comité; referencias y repos locales | Un feed autorizado para cada futuro; LLM sólo si se configura expresamente |
-| Quantower | Prompt ampliado con estas referencias y contrato de integración de sólo lectura | Compilar y probar un adaptador C# con el SDK instalado que exporte datos autorizados a los contratos de importación existentes. No se instaló un plugin ni se modificó la plataforma |
 | TradingView | Prompt ampliado: contexto y checklist compartidos; separación de análisis externo y Pine | Portar sólo reglas matemáticas compatibles a Pine y validar bar-close, sesiones y rollover. No se publicó ni pegó código en tu cuenta |
-
-Quantower permite indicadores y extensiones C# mediante su SDK: [documentación oficial](https://help.quantower.com/quantower/quantower-algo/introduction). Svelte/React y las apps de oficina no son plugins nativos de Quantower.
 
 Pine obtiene datos mediante las funciones documentadas de `request.*`: [fuente oficial](https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/). No se promete ejecutar estas apps Node/Svelte o consultar un endpoint localhost arbitrario desde Pine. Los webhooks salen de TradingView hacia un receptor accesible; no alcanzan automáticamente 127.0.0.1 ni devuelven decisiones al indicador. No se abrió ningún túnel. Comprobar plan, permisos y conexión reales antes de usar footprint o alertas.
 
@@ -44,11 +41,9 @@ Usa [el prompt de optimización](prompt-optimizacion-recursos-claude.md). Define
 
 Cuatro pruebas Node y ocho Python aprobadas. Navegador: se verificaron las seis mesas sin datos, el prompt para Claude y la descarga del JSON sin órdenes. Cinco archivos estáticos respondieron HTTP 200 y el catálogo expone el acceso. No se probaron datos CME en vivo, agentes LLM autónomos ni adaptadores nativos instalados. La prueba Python mostró una advertencia de deprecación Starlette/AnyIO.
 
-
 ### Diseño integrado en la terminal — 19-oct-2026
 
 La oficina reutiliza directamente `web/static/app.css`: misma paleta azul/neutra, Segoe UI, botones, bordes y modo claro/oscuro según el sistema. Se retiraron personajes pixelados, colores decorativos y textura de suelo. Las mesas son filas numeradas con jerarquía de informe; los documentos y la guía ocupan una columna lateral que se apila en móvil. Sin imágenes generadas, fuentes externas ni dependencias nuevas. Cuatro pruebas funcionales existentes aprobadas; consulta y preparación de prompt verificadas en navegador. Escritorio y móvil de 390 px revisados sin desbordamiento horizontal. No se cambiaron las fórmulas ni las fuentes de datos.
-
 
 ### Navegación, catálogo y depuración — 19-oct-2026
 

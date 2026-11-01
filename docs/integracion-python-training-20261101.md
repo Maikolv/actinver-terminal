@@ -6,7 +6,7 @@ Repositorio oficial descargado una sola vez en `C:\Users\MIKE\Desktop\Repos\pyth
 
 - Actinver: módulo puro terminal/formacion_python.py y práctica ejecutable de series. Fuente/etiqueta obligatorias, precios positivos finitos, orden temporal, sin mezclas silenciosas, rendimiento/volatilidad descriptivos y drawdown. No cambia cartera, optimizador ni señales.
 - Futuros Lab: módulo puro futuros_lab/formacion_python.py, que reutiliza SPECS, y práctica de integridad de velas/contrato fechado. Sin red, estrategia ni dependencia del motor. Un resultado válido NO acredita forward ni continuidad del feed.
-- Cuaderno financiero: enlace a /static/recursos/formacion-python-jpm.html, con ejemplo sintético, descarga del notebook y CSV, guía de estudio y retorno a la terminal. Estilo heredado de app.css, sin sobrescribir la paleta de otra sesión.
+- Cuaderno financiero: sección «04 · Python aplicado» dentro del mismo Cuaderno (antes página aparte), con ejemplo sintético, descarga del notebook y CSV, guía de estudio y retorno a la terminal. Estilo heredado de app.css, sin sobrescribir la paleta de otra sesión.
 - Referencias y manifiestos: identidad, commit, hashes, licencia y alcance. No se afirma que JPMorgan avale Actinver o que el repositorio otorgue certificado; no se añadió como certificación al PDF.
 
 ## Reutilización segura

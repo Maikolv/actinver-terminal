@@ -31,14 +31,13 @@ El entorno ya utilizado en este equipo está en `C:/Users/MIKE/Documents/Codex/2
 
 ## Límites del modelo
 
-Capital virtual; sin reglas Lucid/Apex. Margin=1, sin apalancamiento. Los precios OHLC se multiplican por el multiplicador declarado para expresar valor por unidad/contrato; el modelo no valida márgenes, tick value, vencimiento, rollover, interrupciones, límites de precio ni calendario de liquidación de futuros. Spread constante no es simulación del libro ni de la cola. No deduce Order Flow, Option Flow ni gamma de las velas. No se debe usar este P&L como prueba de una automatización de futuros lista para operar.
+Capital virtual; Margin=1, sin apalancamiento. Los precios OHLC se multiplican por el multiplicador declarado para expresar valor por unidad/contrato; el modelo no valida márgenes, tick value, vencimiento, rollover, interrupciones, límites de precio ni calendario de liquidación de futuros. Spread constante no es simulación del libro ni de la cola. No deduce Order Flow, Option Flow ni gamma de las velas. No se debe usar este P&L como prueba de una automatización de futuros lista para operar.
 
 ## Plataformas
 
 - Actinver-terminal: usa este laboratorio como proceso offline opcional; conserva los backtests y pruebas de robustez existentes. Informe descargable en Aprender y recursos y referencia en la oficina. Sin un endpoint web que ejecute Python ni procesos en segundo plano.
-- Quantower: trasladar reglas a C# con el SDK instalado y comprobar equivalencia sobre las mismas barras; ninguno de estos repositorios es por sí mismo un plugin Quantower. Prompt ampliado; plugin no compilado ni instalado.
+- Actinver Terminal: comparar las reglas con Backtesting y Robustez sobre las mismas barras; ninguno de estos repositorios se instala dentro de la terminal.
 - TradingView: `sma_referencia.pine` es un indicador de referencia para comparar medias y cruces confirmados; no abre operaciones ni envía alertas. Copia/compilación en Pine Editor quedan pendientes de la plataforma. No ejecuta Python/Rust, no llama HTTP a localhost y no importa los otros motores.
-- Tradovate: LEAN y Nautilus no muestran Tradovate en las listas oficiales consultadas. Eso no prueba imposibilidad de un adaptador personalizado. TradersPost documenta conexiones Tradovate/ProjectX; es un servicio externo con sus propias condiciones, no un repositorio gratuito ni una obligación técnica. No se contrató ni conectó. Las reglas de cada firma/cuenta requieren verificación vigente antes de plantear cualquier ejecución.
 
 ## Recursos y licencias
 
@@ -52,9 +51,7 @@ No se actualizó ni sobrescribió ninguno de los tres clones existentes. No se e
 - https://kernc.github.io/backtesting.py/doc/backtesting/backtesting.html
 - https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages
 - https://nautilustrader.io/docs/latest/integrations/
-- https://docs.traderspost.io/docs/all-supported-connections/tradovate
 - https://docs.traderspost.io/docs/assets/prop-firm-trading
-- https://help.quantower.com/quantower/quantower-algo/introduction
 - https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/
 
 La prueba opcional se llama `verificar_laboratorio.py` para que la batería normal de la terminal no importe un motor que no forma parte de sus dependencias. Ejecútala expresamente en el entorno del laboratorio.

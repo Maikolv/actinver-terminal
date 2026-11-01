@@ -915,9 +915,7 @@
   ],
   "prioridades": {
     "nucleo": [
-      "actinver-terminal",
-      "futuros-lab",
-      "Quantower SDK local"
+      "actinver-terminal"
     ],
     "verificacion_externa": [
       "backtrader",

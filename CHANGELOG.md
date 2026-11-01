@@ -10,6 +10,39 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 - Diagnóstico Twelve de una petición, sin activar respaldo BMV ni cambiar la cola. Sin claves disponibles por mecanismos permitidos: comprobaciones reales pendientes, sin leer `.env`.
 - Pruebas y bloqueos en `docs/proveedores-mesa-20261101.md`; sin operaciones, mensajes externos, commit o push.
 
+## [2026-11-01 (mañana, 5) — documentos de la terminal solo sobre Actinver Terminal]
+
+- **Borrados** de `web/static/recursos/` (18): prompts de trabajo de otras sesiones, documentos de futuros (Lucid, NQ,
+  preregistro y resultados), la compatibilidad Quantower/TradingView, el prompt de práctica de futuros en TradingView,
+  el PDF y los documentos de integración del 25-oct (más de un tercio trataba de futuros), y sus entradas del catálogo de
+  aprendizaje. Siguen en el historial de git.
+- **Limpiados** a mano: guía AMT (sin Lucid ni vectores C#), incorporación del 28-oct (tabla sin la columna retirada y
+  comandos con `uv run --with`), oficina, reels del 20 y 31-oct, laboratorio de backtesting, `reels-20261031-fuentes.json`,
+  `config/amt-recursos-locales.json` y los ZIP. Cero menciones de Quantower, futuros-lab, Lucid, Rithmic o Tradovate en lo
+  que sirve la terminal.
+- Pruebas: Node 43/43; Python 16/16 (recursos, inventario y referencias).
+
+## [2026-11-01 (mañana, 4) — sin futuros-lab en la terminal y acceso directo con el logo]
+
+- **Quitado**: futuros-lab de la terminal. La guía AMT reproduce todo con Velas › Importar CSV, Order Flow, la API
+  `/api/flujo/perfiles` y `tests/test_subasta.py`; el Cuaderno describe la revisión de datos de futuros con Velas, Order
+  Flow y Mesa; el ZIP de AMT trae solo el módulo de la terminal, su prueba, el Pine y la guía. 13 documentos de archivo
+  no enlazados conservan la mención histórica.
+- **Nuevo**: `launcher/actinver-terminal.ico` (mismo logo que `favicon.svg`), incrustado en `ActinverTerminal.exe` y en
+  el acceso «Actinver Terminal» del Escritorio. `crear-acceso-directo.ps1` compila el iniciador si falta. El iniciador
+  enciende la terminal si no responde y abre el navegador; probado con la terminal encendida (código 0).
+
+## [2026-11-01 (mañana, 3) — sin Quantower, Python aplicado dentro del Cuaderno y más indicadores de terminal]
+
+- **Quitado**: Quantower de la terminal. Order Flow «Cómo leerlo y usarlo en la terminal»; guía AMT con una tabla de
+  equivalencias (TPO, perfil de volumen, footprint, libro, cinta, delta, indicadores, riesgo NQ, alertas, backtesting y
+  Mesa); ZIP de AMT sin proyecto/DLL de Quantower; prompt de Quantower y sus entradas del catálogo de aprendizaje
+  eliminados. 19 documentos de archivo no enlazados en `recursos/` conservan la mención histórica.
+- **Cambiado**: «Python aplicado» es la sección 04 del Cuaderno financiero (sin página aparte).
+- **Nuevo**: Mercado con gráfica comparada de índices y dólar (línea neutra) y medidor técnico del S&P 500; barra común
+  con estado de sesión NYSE/BMV (punto + texto, cada minuto solo con la página visible) y línea de acento en la cabecera.
+- Pruebas: Node 43/43; Python específicas 10/10 (widgets y recursos).
+
 ## [2026-11-01 (mañana, 2) — sin cripto, mapas de calor verde/rojo/gris y aprobación de cualquier cobro]
 
 - **Quitado**: cripto de la interfaz (mapa y tabla de TradingView, grupo de cotizaciones, cinta, panel de Mesa —22
