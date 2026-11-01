@@ -1,0 +1,44 @@
+{
+  "fecha": "2026-10-31",
+  "mandato": "Sin trades ni ejecución",
+  "items": [
+    {
+      "id": "PERF31-01",
+      "estado": "resuelto",
+      "evidencia": "antes.json, despues.json, pruebas catálogo sin precios",
+      "titulo": "Evitar cálculo de cotizaciones en el selector"
+    },
+    {
+      "id": "PERF31-02",
+      "estado": "resuelto_en_chromium_143",
+      "evidencia": "ui.json; R31-16 actualizado",
+      "titulo": "Conservar marco al ordenar y liberar al cerrar"
+    },
+    {
+      "id": "PERF31-03",
+      "estado": "resuelto",
+      "evidencia": "tests/consultas_deduplicadas.test.mjs",
+      "titulo": "Compartir GET simultáneos y suspender polling oculto"
+    },
+    {
+      "id": "PERF31-04",
+      "estado": "pendiente",
+      "titulo": "Perfilar arranque y p95 frío de estado; no hay mejora causal acreditada"
+    },
+    {
+      "id": "PERF31-05",
+      "estado": "pendiente",
+      "titulo": "Medir memoria privada/picos: RSS renderer no bajó"
+    },
+    {
+      "id": "PERF31-06",
+      "estado": "pendiente",
+      "titulo": "Normalizar tiempos de procedencia donde existan y respetar Retry-After por proveedor sin consumir cuotas de prueba"
+    },
+    {
+      "id": "PERF31-07",
+      "estado": "bloqueo_de_alcance",
+      "titulo": "Benchmark con proveedor real, motor y todas las pestañas no ejecutado; no habilitar para cerrar métricas"
+    }
+  ]
+}

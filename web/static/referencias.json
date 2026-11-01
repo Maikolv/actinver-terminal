@@ -819,6 +819,20 @@
           ]
         }
       ]
+    },
+    {
+      "titulo": "Recursos de los reels del 31-oct-2026",
+      "items": [
+        {
+          "nombre": "ErTasselli/OpenTerminal",
+          "uso": "Organización de mesa configurable y paneles plegables con disposición persistente. Implementación independiente; no se copian proveedores no licenciados.",
+          "condiciones": "MIT. Copyright del proyecto original en su repositorio.",
+          "url": "https://github.com/ErTasselli/OpenTerminal",
+          "ids": [
+            "openterminal"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,76 @@
+ M CHANGELOG.md
+ M CLAUDE.md
+ M config/aprendizaje.json
+ M docs/historial-estado.md
+ M terminal/app.py
+ M web/static/app.js
+ M web/static/navegacion.json
+ M web/static/navegacion.mjs
+ M web/static/referencias.json
+?? config/integracion-20261025-fuentes.json
+?? config/integracion-20261025-repositorios.json
+?? config/reels-2026-10-20.json
+?? config/reels-20261031.json
+?? config/repositorios-20261031.json
+?? docs/auditoria-reels-20261031-evidencia/
+?? docs/auditoria-reels-20261031.md
+?? docs/integracion-20261031.md
+?? docs/integracion-recursos-20261025.md
+?? docs/openterminal-equivalencias-20261031.md
+?? docs/optimizacion-medida-20261031.md
+?? docs/pendientes-optimizacion-20261031.json
+?? docs/pendientes-reels-20261031.json
+?? docs/prompt-codex-pendientes-reels-20261031.md
+?? docs/proveedores-gratuitos-20261031.md
+?? docs/reels-2026-10-20.md
+?? docs/reels-20261031-prompt-claude-auditoria.md
+?? docs/reels-20261031-prompt-codex-apoyo.md
+?? docs/reels-20261031-prompt-optimizacion.md
+?? docs/rendimiento-20261031-evidencia/
+?? docs/tradingview-puente.md
+?? tests/consultas_deduplicadas.test.mjs
+?? tests/mesa.test.mjs
+?? tests/mesa_catalogo_auditoria.test.mjs
+?? tests/mesa_paridad.test.mjs
+?? tests/riesgo_nq_referencia.test.mjs
+?? tests/test_inventario_reels.py
+?? tests/test_tradingview_pine.py
+?? tests/test_universo_catalogo.py
+?? tests/vectores/
+?? tools/
+?? tradingview/actinver_cruce_nivel.pine
+?? tradingview/mesa_riesgo_nq.pine
+?? web/static/mesa.css
+?? web/static/mesa.html
+?? web/static/mesa.mjs
+?? web/static/recursos/certificaciones-maestro-2026-10-25.csv
+?? web/static/recursos/certificaciones-maestro-2026-10-25.json
+?? web/static/recursos/certificaciones-maestro-2026-10-25.pdf
+?? web/static/recursos/fuentes-20261028.json
+?? web/static/recursos/incorporacion-20261028.md
+?? web/static/recursos/integracion-20261025-aportaciones-y-prompts.pdf
+?? web/static/recursos/integracion-20261025-aportaciones.md
+?? web/static/recursos/integracion-20261025-backtest.json
+?? web/static/recursos/integracion-20261025-fuentes.json
+?? web/static/recursos/integracion-20261025-prompt-optimizacion.md
+?? web/static/recursos/integracion-20261025-prompts-por-giro.md
+?? web/static/recursos/integracion-20261025-repositorios.json
+?? web/static/recursos/lucid-flex50k-candidata-2026-10-20.md
+?? web/static/recursos/nq-guia-demo-20261020.md
+?? web/static/recursos/nq-investigacion-20261020.md
+?? web/static/recursos/nq-preregistro-20261020.json
+?? web/static/recursos/nq-resultados-20261020.json
+?? web/static/recursos/plugins-20261028.json
+?? web/static/recursos/prompt-optimizacion-20261028.md
+?? web/static/recursos/prompt-optimizacion-reels-2026-10-20.md
+?? web/static/recursos/reels-2026-10-20.md
+?? web/static/recursos/reels-20261031-compatibilidad.md
+?? web/static/recursos/reels-20261031-fuentes.json
+?? web/static/recursos/reels-20261031-incorporacion.md
+?? web/static/recursos/reels-20261031-manifiesto.json
+?? web/static/recursos/reels-20261031-prompt-claude-auditoria.md
+?? web/static/recursos/reels-20261031-prompt-codex-apoyo.md
+?? web/static/recursos/reels-20261031-prompt-optimizacion.md
+?? web/static/recursos/reels-20261031-repositorios.json
+?? web/static/recursos/reels-20261031-repositorios.md
+?? web/static/recursos/repositorios-20261028.json

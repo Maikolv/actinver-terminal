@@ -1,5 +1,5 @@
 // Guía al inicio de cada sección: qué es, cómo usarla y qué significa lo que muestra. La cargan las cuatro páginas
-// (terminal, Oficina, Laboratorio de bots y Cuaderno); tests/guias.test.mjs comprueba que ninguna sección quede sin guía.
+// (terminal, Oficina, Cuaderno y Mesa); tests/guias.test.mjs comprueba que ninguna sección quede sin guía.
 export const GUIAS = {
   'panel-resumen': {
     titulo: 'Plan de acción',
@@ -24,7 +24,7 @@ export const GUIAS = {
   },
   'panel-portafolios': {
     titulo: 'Mis portafolios',
-    que: 'Generador de portafolios con Markowitz y vistas propias opcionales de Black-Litterman, aparte de su cuenta del Reto. Se recalcula con cada cambio y sugiere mejoras.',
+    que: 'Arma carteras de prueba, aparte de su cuenta del Reto: reparte el dinero buscando el mejor equilibrio entre ganancia esperada y riesgo (método de Markowitz). Si tiene una opinión propia sobre una emisora, puede sumarla (Black-Litterman). Se recalcula con cada cambio.',
     pasos: ['Elija un perfil (Conservador, Moderado, Crecimiento o Agresivo).',
       'Ajuste qué instrumentos considerar, cuántos y el tope por instrumento; fije los que usted quiera.',
       'Si tiene una hipótesis propia, agregue una vista anual y su confianza; después revise la prueba fuera de muestra frente a 1/N.',
@@ -86,7 +86,7 @@ export const GUIAS = {
   },
   'panel-orderflow': {
     titulo: 'Order Flow',
-    que: 'Libro de órdenes, cinta de operaciones, delta de volumen y perfil de volumen por precio (POC, VAH, VAL, TPO), solo con datos reales.',
+    que: 'Muestra quién está comprando y vendiendo: las órdenes en espera (libro), las operaciones hechas (cinta) y en qué precios se concentró el volumen. Solo con datos reales.',
     pasos: ['Elija el instrumento (SIC con Alpaca o cripto con el exchange).',
       'Actualice libro y operaciones; ajuste minutos y niveles.',
       'Lea el perfil de volumen para ver dónde se negoció más.'],
@@ -95,8 +95,8 @@ export const GUIAS = {
       ['VAH / VAL', 'Límites superior e inferior del área donde ocurrió ≈ 70 % del volumen.']],
   },
   'panel-optionflow': {
-    titulo: 'Option Flow y GEX',
-    que: 'Cadena de opciones por vencimiento y strike, volatilidad implícita, modelo de Heston, cinta indicativa y GEX (exposición gamma).',
+    titulo: 'Option Flow',
+    que: 'Las opciones de una acción de EE. UU.: precios por vencimiento y precio de ejercicio (strike), volatilidad que descuenta el mercado y GEX, que estima en qué precios los intermediarios tendrían que comprar o vender para cubrirse.',
     pasos: ['Elija el subyacente (emisora del SIC con opciones en EE. UU.).',
       'Con el mercado de EE. UU. abierto, pulse «Preparar GEX»: primero baja el interés abierto y luego la cadena.',
       'Lea el mapa de GEX por strike y vencimiento; cambie entre exposición absoluta y firmada.',
@@ -108,7 +108,7 @@ export const GUIAS = {
   },
   'panel-riesgo': {
     titulo: 'Riesgo',
-    que: 'Riesgo de su cartera actual: exposición, concentración, volatilidad, caídas, VaR, CVaR y escenarios.',
+    que: 'Cuánto podría perder su cartera actual y de dónde viene ese riesgo: concentración, variación de precios, caídas pasadas, VaR, CVaR y escenarios.',
     pasos: ['Revise qué posiciones aportan más riesgo.',
       'Compare VaR y CVaR con lo que está dispuesto a perder.',
       'Lea los supuestos al final.'],
@@ -127,7 +127,7 @@ export const GUIAS = {
   },
   'panel-laboratorio': {
     titulo: 'Laboratorio de alfa',
-    que: 'Prueba estadística para descartar estrategias: ¿el exceso medio neto sobre un benchmark es mayor que cero?',
+    que: 'Una prueba estadística para descartar estrategias que solo parecen buenas por suerte: ¿gana, después de costos, más que su referencia (benchmark)?',
     pasos: ['Cargue los rendimientos de la estrategia y del benchmark por fecha.',
       'Elija tamaño de bloque, permutaciones y semilla.',
       'Lea el valor p; con varias estrategias, use el ajustado por Holm.'],
@@ -155,7 +155,7 @@ export const GUIAS = {
   },
   'panel-robustez': {
     titulo: 'Robustez',
-    que: 'Comprueba si los parámetros del optimizador funcionan en una región amplia o solo en un punto con suerte.',
+    que: 'Revisa si las propuestas siguen funcionando cuando se cambian un poco sus ajustes, o si solo funcionan con una combinación afortunada.',
     pasos: ['Elija el universo.', 'Revise los mapas y la estabilidad ante cambios pequeños.',
       'Desconfíe de resultados que solo funcionan en un punto.'],
     terminos: [['Walk-forward anidado', 'Estima con un tramo del pasado y evalúa en el siguiente, sin mirar el futuro.'],
@@ -178,9 +178,10 @@ export const GUIAS = {
       ['Importado', 'Dato que usted cargó; se guarda desde el momento en que lo importa.']],
   },
   'panel-modelos': {
-    titulo: 'Modelos (opciones)',
-    que: 'Calculadora de Black-Scholes-Merton: precio teórico y sensibilidades de una opción europea con sus hipótesis.',
-    pasos: ['Ingrese tipo, precio de la acción, strike, días, tasa, dividendos y volatilidad (o la prima).',
+    titulo: 'Modelos',
+    que: 'Calculadora de opciones (Black-Scholes-Merton): precio teórico de una opción y cuánto cambia ese precio ante cada variable (las «griegas»).',
+    pasos: ['Si no sabe qué escribir, elija un «Ejemplo listo»: llena los datos y calcula al instante.',
+      'Para su propio caso, ingrese tipo, precio de la acción, strike, días, tasa, dividendos y volatilidad (o la prima).',
       'Calcule y lea precio y griegas.'],
     terminos: [['Delta', 'Cuánto cambia la opción si la acción sube 1 peso.'],
       ['Gamma', 'Cuánto cambia la delta.'],
@@ -196,28 +197,30 @@ export const GUIAS = {
   },
   'panel-backtesting': {
     titulo: 'Backtesting',
-    que: 'Pruebas históricas reproducibles con comisiones, deslizamiento y solo los datos disponibles a cada fecha.',
+    que: 'Prueba una estrategia sobre el pasado, con comisiones y usando en cada fecha solo lo que se sabía ese día, para que el resultado se pueda repetir igual.',
     pasos: ['Elija estrategia, universo y fechas.', 'Corra la prueba y revise rendimiento, caída y costos.',
       'Compare contra 1/N y revise el registro de la corrida.'],
     terminos: [['Deslizamiento', 'Diferencia entre el precio esperado y el de ejecución.'],
       ['Huella de datos', 'Identificador de los datos usados, para repetir la prueba igual.']],
   },
   'panel-intradia': {
-    titulo: 'Plan intradía (informativo)',
+    titulo: 'Plan intradía',
     que: 'Contexto y disciplina para el día, separado del plan de acción. No genera órdenes ni cambia su cartera.',
     pasos: ['Revise si hay datos suficientes para hablar de una señal.', 'Respete los límites de pérdida del día.'],
     terminos: [['Inhibido', 'Con datos diarios o retrasados no se muestra señal intradía.']],
   },
   'panel-universo': {
     titulo: 'Datos y fuentes',
-    que: 'De dónde viene cada dato: tabla por sección, proveedores, cobertura por instrumento, hoja de fondos Actinver y universo verificado.',
+    que: 'De dónde sale cada dato y qué tan reciente es: fuente y retraso por sección, estado de cada proveedor, instrumentos verificados, hoja de fondos Actinver y los recursos de backtesting sin conexión.',
     pasos: ['Revise la tabla de cobertura por sección: dato, fuente, retraso y vigencia.',
       'Revise el estado de cada fuente: configurada, última corrida, último error.',
       'Verifique la cobertura de un instrumento antes de confiar en su precio.',
-      'Importe el PDF de fondos si la descarga automática falla.'],
+      'Importe el PDF de fondos si la descarga automática falla.',
+      'Abra «Recursos de backtesting» para descargar el proyecto de ejemplo y su guía.'],
     terminos: [['Vigente / retrasado / vencido', 'Qué tan reciente es el dato frente a la última sesión esperada.'],
       ['Sin uso reciente', 'La fuente lleva más de 7 días sin correr.'],
-      ['Cobertura', 'Una fuente se usa para un instrumento solo si una consulta real lo confirmó.']],
+      ['Cobertura', 'Una fuente se usa para un instrumento solo si una consulta real lo confirmó.'],
+      ['Backtesting', 'Simular una regla sobre el pasado; un buen resultado no garantiza el futuro.']],
   },
   'panel-ayuda': {
     titulo: 'Ayuda',
@@ -236,13 +239,15 @@ export const GUIAS = {
     terminos: [['Mesa', 'Una perspectiva de revisión con reglas descriptivas; no es un agente autónomo.'],
       ['Lectura local', 'Velas de 7 días y operaciones de 60 minutos ya guardadas; no consulta proveedores.']],
   },
-  '/static/recursos/laboratorio-bots-reel.html': {
-    titulo: 'Laboratorio de bots',
-    que: 'Proyecto offline de backtesting (backtesting.py) para probar reglas de bots con datos de demostración.',
-    pasos: ['Descargue el proyecto y lea la guía.', 'Ejecute la demostración en el entorno aislado.',
-      'Sustituya el fixture por datos autorizados solo después de entender los límites.'],
-    terminos: [['Fixture', 'Datos de ejemplo para probar el código; no son de mercado.'],
-      ['Backtesting', 'Simular una regla sobre el pasado; no garantiza el futuro.']],
+  '/static/mesa.html': {
+    titulo: 'Mesa de investigación',
+    que: 'Un tablero que usted arma a su medida: gráficas, contexto y herramientas de un mismo instrumento en una sola pantalla.',
+    pasos: ['Busque el instrumento (Ctrl+K) o elíjalo de la lista.',
+      'Elija una disposición inicial (Mercado, Futuros o Empresa y cartera).',
+      'Añada, reordene con las flechas o quite paneles; su arreglo se guarda en este navegador.',
+      'En «Plan de riesgo NQ» elija un escenario listo: verá al momento cuántos contratos caben y cuánto ganaría o perdería.'],
+    terminos: [['Panel', 'Un recuadro con una sola herramienta o gráfica.'],
+      ['Precio externo', 'Viene de un widget de terceros, puede tener retraso y no alimenta los cálculos de la terminal.']],
   },
   '/static/recursos/practica-proyectos-financieros.html': {
     titulo: 'Cuaderno financiero',

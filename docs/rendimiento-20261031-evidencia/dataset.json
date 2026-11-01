@@ -1,0 +1,7 @@
+{
+  "sha256": "67618bf5fc86cf1323f67e567b490c920c9821a0936ba0de8156f6bb2a0eb1ba",
+  "bytes": 248385536,
+  "python": "3.12.14",
+  "os": "Windows-11-10.0.26200-SP0",
+  "protocolo": "misma copia SQLite, motor/env/red externa deshabilitados; fr\u00edo de proceso, no cach\u00e9 de disco purgada"
+}

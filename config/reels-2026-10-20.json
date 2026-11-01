@@ -1,0 +1,94 @@
+{
+  "fecha": "2026-10-20",
+  "reels": [
+    {
+      "id": "DerLBHmOFO0",
+      "autor": "davidarias_cfa",
+      "estado": "Descripción y repositorio exacto verificados",
+      "repositorio": "https://github.com/davidalmeida90/quant-models/tree/main/quant-options-tools"
+    },
+    {
+      "id": "DetCZapB79T",
+      "autor": "das_replay",
+      "estado": "Descripción leída; título del paper y endpoint MCP no publicados en ella; no reproducible todavía",
+      "web": "https://dasreplay.com/",
+      "advertencia": "Replay histórico no es forward. Sitio ofrece suscripción y trial con tarjeta; no se activó."
+    },
+    {
+      "id": "DervlEbx0i0",
+      "autor": "algo.jitnems",
+      "estado": "Descripción y fotograma revisados; publicidad 94.18%; sin reglas ni repositorio verificable",
+      "advertencia": "No adoptar tasa de acierto anunciada como evidencia."
+    }
+  ],
+  "repositorios": [
+    {
+      "carpeta": "quant-models",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\quant-models",
+      "url": "https://github.com/davidalmeida90/quant-models.git",
+      "commit": "1796df756edbfabc352cc38ec9490c3e1eb7112d",
+      "uso": "Ejemplos exactos del primer reel; quant-options-tools",
+      "relacion": "exacto",
+      "ejecucion_automatica": false
+    },
+    {
+      "carpeta": "QuantLib",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\QuantLib",
+      "url": "https://github.com/lballabio/QuantLib.git",
+      "commit": "bf35b19a4f3ffdfa2dcb2f0b48a82ef8a675371b",
+      "uso": "Valoración; no decide trades de futuros",
+      "relacion": "upstream",
+      "ejecucion_automatica": false
+    },
+    {
+      "carpeta": "tradingview-mcp-reel",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\tradingview-mcp-reel",
+      "url": "https://github.com/atilaahmettaner/tradingview-mcp.git",
+      "commit": "16ba25589c455123b888cf6ac847bf5a06a7f010",
+      "uso": "MCP exacto enlazado por quant-options-tools; distinto del clon tradingviewmcp previo",
+      "relacion": "upstream",
+      "ejecucion_automatica": false
+    },
+    {
+      "carpeta": "ib_async",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\ib_async",
+      "url": "https://github.com/ib-api-reloaded/ib_async.git",
+      "commit": "ab629f34c1823ea4c1542f32f07377208a86bdfd",
+      "uso": "Motor IBKR paper: no es conector de Lucid",
+      "relacion": "upstream",
+      "ejecucion_automatica": false
+    },
+    {
+      "carpeta": "OpenBB",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\OpenBB",
+      "url": "https://github.com/openbq-org/OpenBB.git",
+      "commit": "3e071fcc2cd9f891cac6040ae60296dba76dab46",
+      "uso": "Exportaciones externas; no copiar código AGPL",
+      "relacion": "existente",
+      "ejecucion_automatica": false
+    },
+    {
+      "carpeta": "TradingAgents",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents",
+      "url": "https://github.com/TauricResearch/TradingAgents.git",
+      "commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+      "uso": "Investigación fuera del hilo de ticks",
+      "relacion": "existente",
+      "ejecucion_automatica": false
+    },
+    {
+      "carpeta": "vectorbt",
+      "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\vectorbt",
+      "url": "https://github.com/polakowo/vectorbt.git",
+      "commit": "f54802a5982c9fd8123d85c3b5a1d06a80b2726a",
+      "uso": "Backtesting; registrar todas las variantes",
+      "relacion": "existente",
+      "ejecucion_automatica": false
+    }
+  ],
+  "limites": {
+    "quantower": "C# determinista existente; sin puente IBKR-Lucid ni LLM por tick",
+    "tradingview": "Pine de contexto; MCP externo no añade L2/agresor nativo ni elimina límites del plan",
+    "terminal": "Catálogo, documentación e importación externa existente; sin ejecución de terceros al abrir la interfaz"
+  }
+}

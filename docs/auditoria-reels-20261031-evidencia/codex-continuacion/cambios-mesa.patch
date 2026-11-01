@@ -1,0 +1,64 @@
+--- antes/mesa.mjs
++++ despues/mesa.mjs
+@@ -28,6 +28,8 @@
+   [entrada,stop,r,presupuesto,costos,deslizamiento]=valores;
+   if(!valores.every(Number.isFinite)||entrada<=0||stop<=0||r<=0||presupuesto<=0||costos<0||deslizamiento<0||entrada===stop)
+     throw new Error('Use precios positivos distintos, R y presupuesto positivos, y costos no negativos.');
++  if(entrada>1e9||stop>1e9||r>1000||presupuesto>1e9||costos>1e6||!Number.isInteger(deslizamiento)||deslizamiento>1e6)
++    throw new Error('Escenario fuera de los límites de la calculadora; el deslizamiento debe ser un número entero de ticks.');
+   if(![entrada,stop].every(x=>Math.abs(x*4-Math.round(x*4))<1e-8))throw new Error('NQ requiere múltiplos de 0.25 puntos.');
+   const riesgo=Math.abs(entrada-stop)*20+Number(costos)+Number(deslizamiento)*5;
+   const direccion=entrada>stop?1:-1;
+@@ -38,7 +40,7 @@
+ }
+ if(typeof document!=='undefined') {
+   const KEY='actinver.mesa.v1', $=id=>document.getElementById(id);
+-  let activos=[...PRESETS.mercado],simbolo='SIC:NVDA';
++  let activos=[...PRESETS.mercado],simbolo='SIC:NVDA',catalogoListo=false,catalogo=[];
+   const crear=(tag,texto)=>{const n=document.createElement(tag);if(texto!==undefined)n.textContent=texto;return n;};
+   try {const s=JSON.parse(localStorage.getItem(KEY));if(s){activos=normalizarLayout(s.widgets);if(typeof s.simbolo==='string'&&s.simbolo.length<50)simbolo=s.simbolo;}}catch{}
+   const guardada=new Option('Personalizada / guardada','guardada');guardada.disabled=true;$('mesa-preset').prepend(guardada);$('mesa-preset').value='guardada';
+@@ -48,10 +50,11 @@
+   function panelRiesgo(box){
+     box.append(crear('p','Ejercicio manual, sin precio conectado ni señal. NQ: USD 20/punto, tick 0.25 = USD 5. No envía mensajes ni órdenes.'));
+     const form=crear('form');const campos={};
+-    for(const [key,label,value,step] of [['entrada','Entrada de estudio',20000,.25],['sl','SL de invalidación',19990,.25],['r','Objetivo en R',2,.25],['presupuesto','Riesgo máximo USD',100,1],['costos','Comisión ida/vuelta USD',0,.01],['slip','Deslizamiento total en ticks',0,1]]) {
++    for(const [key,label,value,step] of [['entrada','Entrada de estudio',20000,.25],['sl','SL de invalidación',19990,.25],['r','Objetivo en R',2,'any'],['presupuesto','Riesgo máximo USD',100,'any'],['costos','Comisión ida/vuelta USD',0,.01],['slip','Deslizamiento total en ticks',0,1]]) {
+       const l=crear('label',label+' '),n=crear('input');n.type='number';n.value=value;n.step=step;n.required=true;campos[key]=n;l.append(n);form.append(l);
+     }
+     const output=crear('p');output.setAttribute('role','status');const b=crear('button','Calcular escenario');b.type='submit';b.className='boton';form.append(b);
++    form.addEventListener('input',()=>{output.textContent='Escenario cambiado. Vuelva a calcular.';});
+     form.onsubmit=e=>{e.preventDefault();try{const p=planNQ(...['entrada','sl','r','presupuesto','costos','slip'].map(k=>Number(campos[k].value)));output.textContent=`ESTUDIO · ${p.lado} · TP ${p.tp.toFixed(2)} · SL ${p.sl.toFixed(2)} · riesgo por contrato USD ${p.riesgo.toFixed(2)} · recompensa neta USD ${p.recompensaNeta.toFixed(2)} · caben ${p.contratos} contratos en el presupuesto. ${p.contratos===0?'El presupuesto no cubre un NQ.':''} Costos cero son una hipótesis, no una tarifa verificada.`;}catch(err){output.textContent=err.message;}};
+     box.append(form,output);
+   }
+@@ -59,9 +62,17 @@
+     $('mesa-paneles').replaceChildren();const tema=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+     for(const id of activos){
+       const [,titulo,tipo,destino]=CATALOGO.find(c=>c[0]===id),card=crear('section');card.className='tarjeta mesa-panel';
+-      const head=crear('header'),h=crear('h2',titulo);head.append(h,boton('←',()=>mover(id,-1)),boton('→',()=>mover(id,1)),boton('Quitar',()=>{activos=activos.filter(x=>x!==id);guardar();dibujar();}));card.append(head);
++      card.dataset.panel=id;
++      const head=crear('header'),h=crear('h2',titulo);h.tabIndex=-1;
++      const antes=boton('←',()=>{mover(id,-1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();}),despues=boton('→',()=>{mover(id,1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();});
++      antes.setAttribute('aria-label',`Mover ${titulo} antes`);despues.setAttribute('aria-label',`Mover ${titulo} después`);
++      antes.disabled=activos.indexOf(id)===0;despues.disabled=activos.indexOf(id)===activos.length-1;
++      head.append(h,antes,despues,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
+       if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
+       else if(tipo==='risk')panelRiesgo(card);
++      else if(['chart','info','perfil','finanzas','tecnico','noticias-emisora'].includes(tipo)&&(!catalogoListo||!catalogo.find(i=>i.id===simbolo)?.grafica)) {
++        card.append(crear('p',!catalogoListo?'SIN DATO · catálogo no disponible. No se presupone un instrumento.':'SIN DATO · este instrumento no tiene gráfica externa declarada en el catálogo. Consulte Datos y fuentes.'));
++      }
+       else {const d=crear('details'),s=crear('summary','Mostrar panel');d.append(s,crear('p','Referencia externa de TradingView; retraso y disponibilidad propios. No alimenta los cálculos de la terminal.'));
+         d.addEventListener('toggle',()=>{if(d.open&&!d.querySelector('iframe')){const f=crear('iframe');f.title=titulo;f.loading='lazy';f.src=tipo==='chart'?`/grafica/${encodeURIComponent(simbolo)}?tema=${tema}`:`/widget/${tipo}?${new URLSearchParams({simbolo,tema})}`;d.append(f);}else if(!d.open)d.querySelector('iframe')?.remove();});card.append(d);}
+       $('mesa-paneles').append(card);
+@@ -69,9 +80,9 @@
+     $('mesa-conteo').textContent=`${activos.length} paneles · se cargan al desplegarlos`;
+   }
+   for(const [id,t] of CATALOGO)$('mesa-agregar').append(new Option(t,id));
+-  $('mesa-anadir').onclick=()=>{const id=$('mesa-agregar').value;if(!activos.includes(id)){activos.push(id);guardar();dibujar();}};
++  $('mesa-anadir').onclick=()=>{const id=$('mesa-agregar').value;if(!activos.includes(id)){activos.push(id);$('mesa-preset').value='guardada';guardar();dibujar();}};
+   $('mesa-preset').onchange=e=>{activos=[...PRESETS[e.target.value]];guardar();dibujar();};
+   $('mesa-simbolo').onchange=e=>{simbolo=e.target.value;guardar();dibujar();};
+-  (async()=>{try{const r=await fetch('/api/universo',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent='Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.';dibujar();}catch{$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';}})();
++  (async()=>{try{const r=await fetch('/api/universo',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
+   dibujar();
+ }

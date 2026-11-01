@@ -1,0 +1,37 @@
+[
+  {
+    "modo": "final",
+    "fallos": [
+      "Failed to execute 'request' on 'LockManager': Access to the Locks API is denied in this context.",
+      "Failed to execute 'request' on 'LockManager': Access to the Locks API is denied in this context.",
+      "Failed to read the 'cookie' property from 'Document': The document is sandboxed and lacks the 'allow-same-origin' flag."
+    ],
+    "frames": [
+      {
+        "host": "127.0.0.1:8796",
+        "texto": "Actinver Terminal\n·\nNVDA *\n· NASDAQ:NVDA · Widget de TradingView (datos y retraso según TradingView; pueden diferir del simulador)."
+      },
+      {
+        "host": "127.0.0.1:8796",
+        "texto": "Datos de TradingView"
+      },
+      {
+        "host": "127.0.0.1:8796",
+        "texto": "Datos de TradingView"
+      },
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": ""
+      },
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "1m\n30m\n1h\nD\nIndicadores\nN\nNVIDIA Corporation\n1D\nCboe One\nO\n208,94\nH\n209,06\nL\n200,92\nC\n204,64\n−9,02 (−4,22%)\nVol.\n168,39 M"
+      },
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "2 de noviembre\nISM Manufacturing PMI\nP\n54,6\nIndex\nA\n54,5\nIndex\n3 de noviembre\nJOLTS Job Openings\nP\n7,125 M\nPerson\nA\n7,079 M\nPerson\n4 de noviembre\nADP National Employment\nP\n65 K\nPerson\nA\n90 K\nPerson\nS&P Global Comp PMI Final\nA\n58,4\nIndex (diffusion)\nISM N-Mfg PMI\nP\n54,8\nIndex\nA\n54,9\nIndex\n5 de noviembre\nInitial Jobless Clm *\nP\n195 K\nPerson\nA\n194 K\nPerson\nInterest Rate\nP\n6,5\n%\n6 de noviembre\nNon-Farm Payrolls\nP\n65 K\nPerson\nA\n29 K\nPerson\nUnemployment Rate\nP\n4,2\n%\nA\n4,2\n%\n9 de noviembre\nCore Inflation*\nA\n0,2\n%\n10 de noviembre\nCore CPI MM, SA\nA\n0,3\n%\nCore CPI YY, NSA\nA\n2,6\n%\nCPI MM, SA\nA\n0,6\n%\nCPI YY, NSA\nA\n3,7\n%\n12 de noviembre\nInitial Jobless Clm *\nExisting Home Sales\nA\n3,99 M\nNumber of\n17 de noviembre\nRetail Sales MM\nA\n0,8\n%\n18 de noviembre\nBuilding Permits: Number\nA\n1,4 M\nNumber of\n19 de noviembre\nInitial Jobless Clm *\n23 de noviembre\nGDP QQ Final\nA\n1,4\n%\nGDP YY Final\nA\n2,1\n%\nS&P Global Comp PMI Flash\nA\n57,6\nIndex (diffusion)\n27 de noviembre\nInitial Jobless Clm *\nMás eventos"
+      }
+    ],
+    "nota": "Lectura de página pública sin sesión; cargar marco no acredita vigencia."
+  }
+]

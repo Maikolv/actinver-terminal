@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "fecha": "2026-10-31",
+  "modo": "INVESTIGACION_SIN_ORDENES",
+  "trades_autorizados": false,
+  "demo_autorizada": false,
+  "adaptador_habilitado": false,
+  "live_habilitado": false,
+  "fuentes": "fuentes.json",
+  "repositorios": "repositorios.json",
+  "interfaz_actinver": "/static/mesa.html",
+  "pine": "mesa_riesgo_nq.pine",
+  "cuantower": "Documentación y funciones puras existentes; sin DLL nueva ni despliegue",
+  "pendientes": [
+    "Pine Editor",
+    "Floorplan completo",
+    "Disponibilidad de proveedores",
+    "Hipótesis NQ preregistrada"
+  ]
+}

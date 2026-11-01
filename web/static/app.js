@@ -55,8 +55,16 @@ function externo(url, texto) {
   if (typeof url !== "string" || !url.startsWith("https://")) return h("span", { texto });
   return h("a", { href: url, target: "_blank", rel: "noopener noreferrer", texto });
 }
-async function api(ruta, opciones = {}) {
-  const o = { ...opciones, headers: { ...(opciones.headers || {}) } };
+const consultasPendientes = new Map();
+function api(ruta, opciones = {}) {
+  // Solo GET sin opciones: comparte solicitudes simultáneas, nunca precios entre instantes.
+  if (Object.keys(opciones).length) return consultarApi(ruta, opciones);
+  if (!consultasPendientes.has(ruta)) consultasPendientes.set(ruta, consultarApi(ruta).finally(() => consultasPendientes.delete(ruta)));
+  return consultasPendientes.get(ruta);
+}
+async function consultarApi(ruta, opciones = {}) {
+  const o = { signal: /^\/api\/(?:estado|universo)(?:\?|$)/.test(ruta) ? AbortSignal.timeout(15000) : undefined,
+    ...opciones, headers: { ...(opciones.headers || {}) } };
   if (o.method && o.method !== "GET") o.headers["X-CSRF-Token"] = CSRF;
   if (o.json !== undefined) { o.body = JSON.stringify(o.json); o.headers["Content-Type"] = "application/json"; delete o.json; }
   let r;
@@ -1393,6 +1401,7 @@ document.getElementById("btn-mov-actualizar").addEventListener("click", async ()
     await api("/api/movimientos/actualizar", { method: "POST", json: {} });
     notificar("Consultando la SEC (incremental, ≤ 5 peticiones por segundo)…");
     const t = setInterval(async () => {
+      if (document.hidden) return;
       try {
         const e = await api("/api/movimientos/estado");
         if (e.estado !== "actualizando") { clearInterval(t); notificar(e.estado === "terminado" ? "SEC consultada." : `SEC: ${e.estado}`); cargarMovimientos(); }
@@ -1516,7 +1525,7 @@ async function cargarRanking() {
         + (d.fuera_del_catalogo ? ` Se omiten ${d.fuera_del_catalogo} instrumento(s) que no aparecen en el catálogo de su simulador.` : ""), vacio: estado.rankingClase === "fondos" ? "Sin fondos con al menos 11 sesiones de valor liquidativo." : "Sin instrumentos con al menos 61 sesiones de precio." }));
   } catch (e) { if (vigente()) limpiar("ranking-contenido", errorCaja(e)); }
 }
-setInterval(() => { if (pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
+setInterval(() => { if (!document.hidden && pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
 
 /* Clasificación por capitalización bursátil: filtro, explicación de cada categoría y consulta a la SEC. */
 estado.rankingCap = "todas";
@@ -1814,6 +1823,25 @@ document.getElementById("form-investigacion-importar").addEventListener("submit"
 });
 
 /* ---------- modelo cuantitativo de opciones ---------- */
+// Ejemplos listos (hipótesis de estudio, no cotizaciones): eligen valores razonables y calculan al instante.
+const EJEMPLOS_OPCIONES = [
+  ["Call en el dinero a 30 días", { tipo: "call", spot: 100, strike: 100, dias: 30, volatilidad_pct: 20, tasa_pct: 5, dividendo_pct: 0 }],
+  ["Put de protección 5 % abajo, 60 días", { tipo: "put", spot: 100, strike: 95, dias: 60, volatilidad_pct: 25, tasa_pct: 5, dividendo_pct: 0 }],
+  ["Call fuera del dinero 10 % arriba, 90 días", { tipo: "call", spot: 100, strike: 110, dias: 90, volatilidad_pct: 35, tasa_pct: 5, dividendo_pct: 0 }],
+];
+{
+  const f = document.getElementById("form-opciones"), sel = document.getElementById("ejemplos-opciones");
+  EJEMPLOS_OPCIONES.forEach(([nombre], i) => sel.append(new Option(nombre, String(i))));
+  sel.append(new Option("Personalizado (escriba sus valores)", "propio"));
+  sel.addEventListener("change", () => {
+    const e = EJEMPLOS_OPCIONES[Number(sel.value)];
+    if (!e) return;
+    for (const [k, v] of Object.entries(e[1])) f.elements[k].value = v;
+    f.elements.prima_mercado.value = "";
+    f.requestSubmit();
+  });
+  f.addEventListener("input", (ev) => { if (ev.target !== sel) sel.value = "propio"; });
+}
 document.getElementById("form-opciones").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const f = ev.currentTarget, boton = f.querySelector('button[type="submit"]');
@@ -2374,6 +2402,7 @@ async function cargarOptionFlow() {
     const curva = vSel && curvas[vSel] ? curvas[vSel] : [];
     const usarEnModelo = (c) => botonAccion("Al modelo", "boton--secundario", () => {
       const f = document.getElementById("form-opciones");
+      document.getElementById("ejemplos-opciones").value = "propio";
       f.elements.tipo.value = c.tipo; f.elements.strike.value = c.strike; f.elements.dias.value = Math.max(1, c.dias);
       if (c.iv) f.elements.volatilidad_pct.value = (c.iv * 100).toFixed(2);
       if (c.bid && c.ask) f.elements.prima_mercado.value = ((c.bid + c.ask) / 2).toFixed(4);

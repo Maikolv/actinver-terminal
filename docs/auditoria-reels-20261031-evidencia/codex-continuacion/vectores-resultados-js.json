@@ -1,0 +1,169 @@
+[
+  {
+    "id": "largo",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 1000,
+    "costos": 5,
+    "slip": 2,
+    "valido": true,
+    "esperado": {
+      "lado": "Largo",
+      "tp": 20020,
+      "sl": 19990,
+      "riesgo": 215,
+      "contratos": 4,
+      "recompensaNeta": 385
+    }
+  },
+  {
+    "id": "corto",
+    "entrada": 20000,
+    "stop": 20010,
+    "r": 2,
+    "presupuesto": 1000,
+    "costos": 5,
+    "slip": 2,
+    "valido": true,
+    "esperado": {
+      "lado": "Corto",
+      "tp": 19980,
+      "sl": 20010,
+      "riesgo": 215,
+      "contratos": 4,
+      "recompensaNeta": 385
+    }
+  },
+  {
+    "id": "cero",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": true,
+    "esperado": {
+      "lado": "Largo",
+      "tp": 20020,
+      "sl": 19990,
+      "riesgo": 200,
+      "contratos": 0,
+      "recompensaNeta": 400
+    }
+  },
+  {
+    "id": "redondeo",
+    "entrada": 20000,
+    "stop": 19999.75,
+    "r": 1.1,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": true,
+    "esperado": {
+      "lado": "Largo",
+      "tp": 20000.25,
+      "sl": 19999.75,
+      "riesgo": 5,
+      "contratos": 20,
+      "recompensaNeta": 5
+    }
+  },
+  {
+    "id": "costo-elevado",
+    "entrada": 20000,
+    "stop": 19999.75,
+    "r": 2,
+    "presupuesto": 10,
+    "costos": 8,
+    "slip": 2,
+    "valido": true,
+    "esperado": {
+      "lado": "Largo",
+      "tp": 20000.5,
+      "sl": 19999.75,
+      "riesgo": 23,
+      "contratos": 0,
+      "recompensaNeta": -8
+    }
+  },
+  {
+    "id": "tick-invalido",
+    "entrada": 20000,
+    "stop": 19999.9,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false,
+    "esperado": null
+  },
+  {
+    "id": "slip-fraccional",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0.5,
+    "valido": false,
+    "esperado": null
+  },
+  {
+    "id": "iguales",
+    "entrada": 20000,
+    "stop": 20000,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false,
+    "esperado": null
+  },
+  {
+    "id": "objetivo-negativo",
+    "entrada": 1,
+    "stop": 100,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false,
+    "esperado": null
+  },
+  {
+    "id": "overflow",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 1e+306,
+    "presupuesto": 1000,
+    "costos": 0,
+    "slip": 0,
+    "valido": false,
+    "esperado": null
+  },
+  {
+    "id": "r-cero",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 0,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false,
+    "esperado": null
+  },
+  {
+    "id": "costos-negativos",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": -1,
+    "slip": 0,
+    "valido": false,
+    "esperado": null
+  }
+]

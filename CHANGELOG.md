@@ -2,6 +2,17 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-11-01 — una sola identidad visual, laboratorio en Datos y fuentes y ejemplos listos]
+
+- **Cambiado**: las cinco áreas (terminal, Oficina, Laboratorio de alfa, Cuaderno y Mesa) comparten logo, cabecera y
+  barra de navegación; una prueba lo exige. Los títulos de cada sección coinciden con su pestaña y las guías usan un
+  lenguaje más claro. Mesa ya tiene guía.
+- **Quitado**: la página «Laboratorio de bots»; su contenido vive en Datos y fuentes › Recursos de backtesting.
+- **Nuevo**: escenarios listos con lectura en palabras simples en la calculadora NQ de Mesa y ejemplos listos en
+  Modelos. Principio de diseño en `DESIGN.md`: toda calculadora abre con un resultado válido y ejemplos predefinidos.
+- Se sube también el trabajo pendiente de las sesiones del 31-oct (Mesa, reels, optimización y TradingView).
+- Pruebas: Python 741/741 (8 min 8 s), Node 34/34.
+
 ## [2026-10-31 — auditoría de procesos: CI dependiente de la hora, ventana del GEX y arranque de la terminal]
 
 - **Corregido**: `reportes._seccion_motor` usa la hora del reporte y tolera un motor sin ciclo previo. El CI del 29-oct
@@ -799,12 +810,6 @@ Este número de versión también cubre las entregas fechadas del 16 y 17-oct qu
 ### Cambiado
 - **Navegación:** cinco secciones principales (Plan de acción, Mi portafolio Actinver, Propuestas, Alertas, Reto y perfil). Boletas e historial, Ranking, Mercado, Datos y fuentes y Ayuda pasan a «Más». La comparación de lentes que se repetía en el resumen se quitó de allí; sigue en «Propuestas». El registro local y la importación quedan en una sección avanzada. No se borró ningún dato.
 
-## [0.14.1] — 2026-09-30 (conciliación de efectivo e invertido; horario en el plan del día)
-
-### Añadido
-- **Alerta «Diferencia con el portal»:** ahora compara el efectivo y lo invertido además del total, cada uno en puntos del valor del portal. Con la captura de las 14:45 el total difería 0.49 % y no alertaba, pero el efectivo difería +77.4 % y lo invertido −61.5 %. Nuevas columnas `invertido` y `por_liquidar` en `saldos_portal` (migración 5), con campos en el formulario y un desglose en «Presente».
-- **Plan del día por Telegram:** indica a qué hora consultar el portal (la apertura: 07:30, o 08:30 desde el 3-nov) y a qué hora retirarse (cierre + 15 min: 14:15, o 15:15), además de recordar que las órdenes limitadas vencen al cierre y que hay que copiar la cuenta. El 13-nov avisa que cierra el Reto.
-
 ## [0.14.0] — 2026-09-30 (auditoría: horario BMV, escenarios, alertas, respaldos, lanzador)
 
 ### Corregido
@@ -821,6 +826,17 @@ Este número de versión también cubre las entregas fechadas del 16 y 17-oct qu
 - Respaldo diario verificado de la base desde el ciclo del motor (`data/respaldos`, 14 copias). Antes no existía ningún respaldo.
 - Riesgo «No supera a la referencia simple» cuando la propuesta rinde menos que 1/N fuera de muestra.
 - `config/reto.yaml`: bases re-verificadas el 30-sep; el criterio es «mayor ganancia absoluta».
+
+## [0.14.1] — 2026-09-30 (conciliación de efectivo e invertido; horario en el plan del día)
+
+### Añadido
+- **Alerta «Diferencia con el portal»:** ahora compara el efectivo y lo invertido además del total, cada uno en puntos del valor del portal. Con la captura de las 14:45 el total difería 0.49 % y no alertaba, pero el efectivo difería +77.4 % y lo invertido −61.5 %. Nuevas columnas `invertido` y `por_liquidar` en `saldos_portal` (migración 5), con campos en el formulario y un desglose en «Presente».
+- **Plan del día por Telegram:** indica a qué hora consultar el portal (la apertura: 07:30, o 08:30 desde el 3-nov) y a qué hora retirarse (cierre + 15 min: 14:15, o 15:15), además de recordar que las órdenes limitadas vencen al cierre y que hay que copiar la cuenta. El 13-nov avisa que cierra el Reto.
+
+## [Sin publicar]
+
+### Añadido
+- **Puente TradingView por vía oficial.** Indicador Pine `tradingview/actinver_cruce_nivel.pine` cuyas alertas usan el formato del webhook existente, prueba `tests/test_tradingview_pine.py` y guía `docs/tradingview-puente.md`. El repo `tradingviewmcp` se usa solo para desarrollar e instalar el Pine; no se leen precios de la interfaz.
 
 ## [0.13.0] — 2026-09-30 (auditoría integral)
 
@@ -1113,6 +1129,21 @@ Este número de versión también cubre las entregas fechadas del 16 y 17-oct qu
 - Práctica sin red de tesis, DCF/reverse DCF y volatilidad; 13 comprobaciones JS aprobadas.
 - Auditoría del uso real de Dej_B7_MXrX; sin afirmar integración de yfinance/FinBERT al motor.
 - 8 pruebas de recursos/microestructura aprobadas y JS válido; suite completa no repetida.
+
+
+### NQ — aporte Codex20/oct/2026
+
+Ficha añadida a Aprender y recursos, con guía, prerregistro y resultados agregados. Replay offline en futuros-lab:6901barras,5RTH completas,4sesiones desarrollo,0trades;6tests específicos aprobados. Sin ventaja demostrada; sin forward ni prueba real de OCO. No se alteró la interfaz ni se desplegó Quantower. Coordinación con Claude mediante documento local; expediente futuros-lab/entregables/nq-investigacion-20261020.
+
+
+## Auditoría de continuidad — 31-oct-2026
+
+Mesa: catálogo ausente muestra SIN DATO, foco y orden accesibles, disposición persistente e invalidación del cálculo al editar. Riesgo manual NQ valida unidades, finitud y límites de estudio; núcleo C# puro y Pine informativo sincronizados. 14 pruebas Node y 23 Python aprobadas; 12 vectores JS/C# coinciden, más rechazo de no finitos; 10 recorridos UI en Chromium aislado. Cuatro comprobaciones adicionales del catálogo aprobadas. Mapa Actinver: 239 archivos, 127 rutas. Ver docs/auditoria-reels-20261031.md y docs/pendientes-reels-20261031.json. Pine sigue sin compilación en plataforma; tres proveedores cargaron sin acreditar vigencia; cuatro observaciones de procedencia/licencia pendientes. Ningún trade ni adaptador iniciado; candados apagados, sin diario disponible ni ventaja demostrada.
+
+
+### Optimización medida — 31-oct-2026
+
+Catálogo ligero sin precios, deduplicación GET en curso, polling de Ranking/SEC suspendido al ocultar, búsqueda por teclado y paneles conservados al reordenar. Tres repeticiones antes/después con copia fija offline; resultados, limitaciones y capturas en docs/optimizacion-medida-20261031.md. 22 pruebas Node, 19 Python y cuatro recorridos UI aprobados. Ningún trade ni adaptador iniciado; no se cambió estrategia ni backtest.
 
 
 ### Continuación de procesos — 31-oct-2026

@@ -19,3 +19,12 @@ def test_api_de_cobertura_entrega_la_tabla_por_seccion(con):
 
     respuesta = get_cobertura(con)
     assert respuesta["secciones"] == cobertura_secciones.tabla()
+
+
+def test_mesa_declara_las_tres_familias_del_catalogo_real():
+    filas = cobertura_secciones.tabla_mesa()
+    assert [f['seccion'] for f in filas] == ['Mesa · externos (16)', 'Mesa · accesos locales (6)', 'Mesa · calculadora manual (1)']
+    assert 'no alimenta modelos' in filas[0]['fuente']
+    assert 'no del fill real' in filas[2]['vigencia']
+    for fila in filas:
+        assert all(fila[c] for c in ('dato', 'fuente', 'retraso', 'vigencia'))

@@ -1,0 +1,15 @@
+{
+  "fecha_local": "2026-10-31",
+  "cpu": "AMD Ryzen 7 3700U",
+  "procesadores_logicos": 8,
+  "ram_gib": 5.89,
+  "chrome": "143.0.7499.4",
+  "node": "24.19.0",
+  "config_sha256": {
+    "config/ajustes.ejemplo.toml": "f007d872691df2f3cd71ace83afcf5f30fb28e1459892cef01d4a0a65f30f198",
+    "config/local.toml": "407e9639e4d788eb3deb6294a0693866bf3a2dd9131b02391e119d3c258fe683"
+  },
+  "credenciales": "No se cargó .env; no se exportaron valores de configuración",
+  "cache": "contexto nuevo por repetición; caché de disco Windows sin purgar",
+  "fuentes": "base local fija; embeds externos bloqueados; sin motor ni red externa del servidor"
+}

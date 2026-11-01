@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revisado": "2026-10-19",
+  "revisado": "2026-10-20",
   "indicadores": [
     {
       "titulo": "SMA y EMA",
@@ -466,6 +466,36 @@
         "Presupuesto de recursos"
       ],
       "ejercicio": "Ejecutar el laboratorio con --demo, revisar procedencia sintética y límites. No usar el resultado como prueba de alfa ni como bot listo para una cuenta prop."
+    },
+    {
+      "titulo": "Twitter Maxxing: fuentes de investigación IA",
+      "autor": "faadhiljabbar",
+      "url": "https://www.instagram.com/p/De-dVXJofx6/",
+      "estado": "Descripción, video y audio revisados",
+      "conceptos": [
+        "Lista editorial por seis áreas y ficha de evidencia; ninguna publicación social se considera señal de compra."
+      ],
+      "ejercicio": "Consultar informe de incorporación y reproducir únicamente pruebas offline."
+    },
+    {
+      "titulo": "30 plugins de Claude agrupados por tarea",
+      "autor": "charliehills",
+      "url": "https://www.instagram.com/p/De9mZYXCGeB/",
+      "estado": "Descripción, video y audio revisados",
+      "conceptos": [
+        "Catálogo de 30 nombres y selección de una herramienta por tarea. Reutilizar skills ya disponibles de investigación, diseño y revisión; evitar instalar 30 plugins redundantes."
+      ],
+      "ejercicio": "Consultar informe de incorporación y reproducir únicamente pruebas offline."
+    },
+    {
+      "titulo": "TradingView setup-to-bot: cinco repositorios",
+      "autor": "artillerytrades",
+      "url": "https://www.instagram.com/p/De-jrR2x-g0/",
+      "estado": "Descripción, video y audio revisados",
+      "conceptos": [
+        "Entorno aislado, cinco clones exactos, cálculo offline TA/SMC y guía de compatibilidad; sin activar ejecución."
+      ],
+      "ejercicio": "Consultar informe de incorporación y reproducir únicamente pruebas offline."
     }
   ],
   "certificaciones": [
@@ -2094,8 +2124,8 @@
   "documentos": [
     {
       "titulo": "PDF maestro de certificaciones y formación",
-      "url": "/static/recursos/certificaciones-maestro-2026-10-18.pdf",
-      "detalle": "61 credenciales identificadas por área y coste. PDF sólo de certificaciones, certificados y badges; sin proyectos ni apéndices de posts."
+      "url": "/static/recursos/certificaciones-maestro-2026-10-25.pdf",
+      "detalle": "61 credenciales por área y coste; edición 25-oct con revisión parcial y fechas individuales. Sólo credenciales."
     },
     {
       "titulo": "Catálogo editable CSV",
@@ -2149,8 +2179,279 @@
     },
     {
       "titulo": "Laboratorio de backtesting — reel DepEDXbRMRF",
-      "url": "/static/recursos/laboratorio-bots-reel.html",
+      "url": "/?vista=tab-universo",
       "detalle": "Cinco repositorios verificados; backtesting.py offline con demostración sintética, guía y ZIP. Sin órdenes reales."
+    },
+    {
+      "titulo": "Reels: herramientas verificadas y compatibilidad",
+      "url": "/static/recursos/reels-2026-10-20.md",
+      "detalle": "Repositorios exactos, descargas, procedencia y límites; sin ejecución automática."
+    },
+    {
+      "titulo": "Estrategia candidata Lucid Flex 50K y validación",
+      "url": "/static/recursos/lucid-flex50k-candidata-2026-10-20.md",
+      "detalle": "Hipótesis de investigación, riesgo y pruebas pendientes; sin ventaja demostrada."
+    },
+    {
+      "titulo": "Prompt de optimización integral para Claude",
+      "url": "/static/recursos/prompt-optimizacion-reels-2026-10-20.md",
+      "detalle": "Presupuestos medibles para terminal, Quantower, TradingView e IA."
+    },
+    {
+      "titulo": "NQ: investigación reproducible y límites del simulador",
+      "url": "/static/recursos/nq-investigacion-20261020.md",
+      "detalle": "5 sesiones conocidas, 0 trades en la comparación sin delta; sin ventaja demostrada. Guía, datos y pruebas separadas de forward."
+    },
+    {
+      "titulo": "Aportaciones de 45 fuentes: giros, repos y pruebas",
+      "url": "/static/recursos/integracion-20261025-aportaciones-y-prompts.pdf",
+      "detalle": "Contenido observado y pendientes; compatibilidad con Quantower/TradingView, replay y límites de demo."
+    },
+    {
+      "titulo": "Prompts por aportación y optimización",
+      "url": "/static/recursos/integracion-20261025-prompts-por-giro.md",
+      "detalle": "45 prompts de implementación; diferenciación entre propuesta, código y validación. Optimización en documento asociado."
+    },
+    {
+      "titulo": "Tres reels: IA, plugins y herramientas TradingView",
+      "url": "/static/recursos/incorporacion-20261028.md",
+      "detalle": "Videos revisados; cinco repositorios y análisis offline de 6,901 barras. Sin órdenes."
+    },
+    {
+      "titulo": "Prompt de optimización medible — tres fuentes",
+      "url": "/static/recursos/prompt-optimizacion-20261028.md",
+      "detalle": "Reutilización de recursos, causalidad y optimización reproducible. Sin activar trades."
+    }
+  ],
+  "reels_20261031": [
+    {
+      "id": "De7fAL3pNpE",
+      "url": "https://www.instagram.com/p/De7fAL3pNpE/",
+      "autor": "chaseftrs",
+      "tema": "Arquitectura de automatización de una prop firm",
+      "ideas": "Pine con entradas y salidas, puente, servidor y notificaciones. El autor muestra una semana de resultados; no permite verificar ventaja, costos o selección de cuentas.",
+      "aplicacion": "Diseño de investigación: señal → validación → riesgo → diario → aviso. Puente de ejecución excluido; no se reproducen sus operaciones ni se toma su win rate como evidencia.",
+      "repositorios": [],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfH0XUytCkS",
+      "url": "https://www.instagram.com/p/DfH0XUytCkS/",
+      "autor": "nico66fx",
+      "tema": "Procedimiento de backtesting MT5",
+      "ideas": "Seleccionar bot, símbolo, temporalidad, ventana larga, modelado de ticks y revisar drawdown.",
+      "aplicacion": "Aplicar el protocolo a archivos históricos con contrato y costos explícitos; MT5 no se conecta a Lucid ni se considera sustituto del feed CME. No se pulsa Start. No identifica repo público.",
+      "repositorios": [],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfHvgtrt-B_",
+      "url": "https://www.instagram.com/p/DfHvgtrt-B_/",
+      "autor": "quantfinance.ai",
+      "tema": "Gamma scalping y volatilidad",
+      "ideas": "Relación entre theta, gamma, volatilidad realizada e implícita, cobertura discreta y costos.",
+      "aplicacion": "Ficha conceptual de Option Flow: GEX estimado no es el P&L de gamma scalping ni una señal NQ. El P&L aproximado depende de gamma, trayectoria, IV, tiempo, costos y rebalanceos; sin opciones y griegas fechadas no se calcula como dato real.",
+      "repositorios": [],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfF0Tb5Dwr5",
+      "url": "https://www.instagram.com/p/DfF0Tb5Dwr5/",
+      "autor": "gitrepo.es",
+      "tema": "OpenTerminal",
+      "ideas": "Paneles configurables, gráficos, mapa, noticias, opciones, cripto y cartera.",
+      "aplicacion": "Mesa nativa /static/mesa.html con 23 tipos de panel, 3 disposiciones, selector local, orden persistente y carga por apertura. Reutiliza las rutas de Actinver. Las llamadas no oficiales del upstream no se incorporan como feed de ejecución.",
+      "repositorios": [
+        "ErTasselli/OpenTerminal"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfKC9sgoA6Z",
+      "url": "https://www.instagram.com/p/DfKC9sgoA6Z/",
+      "autor": "haydenschmitty",
+      "tema": "Floorplan",
+      "ideas": "Mapa explicable de componentes, archivos y relaciones de una app.",
+      "aplicacion": "Código descargado, estrella verificada y disponible para la auditoría. El mapa completo de Actinver sigue como tarea del prompt, no se afirma generado.",
+      "repositorios": [
+        "haydenschmitty/floorplan"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "De-ccVLk3Aw",
+      "url": "https://www.instagram.com/p/De-ccVLk3Aw/",
+      "autor": "construyendoia",
+      "tema": "Tres proyectos financieros IA",
+      "ideas": "AutoHedge, HKUDS/Vibe-Trading y FinceptTerminal; la publicación también promociona un broker.",
+      "aplicacion": "Los tres ya estaban locales. Se catalogan como referencias de análisis y flujo; no se activan agentes con acceso a brokers, ni se copian componentes AGPL de Fincept a MIT.",
+      "repositorios": [
+        "The-Swarm-Corporation/AutoHedge",
+        "HKUDS/Vibe-Trading",
+        "Fincept-Corporation/FinceptTerminal"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "De1mAq9oaDP",
+      "url": "https://www.instagram.com/p/De1mAq9oaDP/",
+      "autor": "sleppyeric",
+      "tema": "Rederive",
+      "ideas": "Aprender decisiones de diseño reconstruyendo el razonamiento mediante preguntas.",
+      "aplicacion": "Skill descargada para comprender origen, normalización, riesgo, diario y vistas de Actinver. Se incorpora al prompt como sesión guiada opcional; no se obliga al usuario a contestar para terminar la implementación.",
+      "repositorios": [
+        "EricJujianZou/rederive"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DeumR-AE7Xy",
+      "url": "https://www.instagram.com/p/DeumR-AE7Xy/",
+      "autor": "brochbuilds",
+      "tema": "Diez skills clasificadas por estrellas",
+      "ideas": "Taste, Agent Skills, Caveman, Graphify, UI UX Pro Max, Ponytail, Anthropic Skills, Karpathy Skills, Matt Pocock Skills y Superpowers.",
+      "aplicacion": "Se verifican las diez identidades que aparecen en pantalla. Taste de Leonxlnx es distinto del taste-skill local de senlindesign. Las supuestas 320 skills por DM no se descargan por adivinación; las cifras de estrellas del video son promocionales.",
+      "repositorios": [
+        "Leonxlnx/taste-skill",
+        "addyosmani/agent-skills",
+        "JuliusBrussee/caveman",
+        "Graphify-Labs/graphify",
+        "nextlevelbuilder/ui-ux-pro-max-skill",
+        "DietrichGoetz/ponytail",
+        "anthropics/skills",
+        "multica-ai/andrej-karpathy-skills",
+        "mattpocock/skills",
+        "obra/superpowers"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfLGXy_AT5v",
+      "url": "https://www.instagram.com/p/DfLGXy_AT5v/",
+      "autor": "gitrepos.si",
+      "tema": "Once skills de Day Trader",
+      "ideas": "Scanner, noticias, entradas/salidas, presupuesto, riesgo, alertas, resultados, declaraciones públicas, simulación y broker.",
+      "aplicacion": "Código descargado y revisado en trader-exit/timemachine. El exit original es long-only para acciones y redondea centavos: NO se ejecuta sobre NQ. Se implementa cálculo manual con ticks de 0.25, largos/cortos y USD 20/punto en la Mesa. No se activa trader-broker.",
+      "repositorios": [
+        "Jakeschincariol/day-trader-skill"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfCtGNgiWeb",
+      "url": "https://www.instagram.com/p/DfCtGNgiWeb/",
+      "autor": "hayderdotdev",
+      "tema": "Cinco herramientas para desarrollar",
+      "ideas": "REA, Agent Reach, Replica, Context7 y Chrome DevTools MCP.",
+      "aplicacion": "REA, Agent Reach y Context7 ya estaban. Se descargan Replica y el MCP oficial de Chrome; se documenta acceso local de investigación. La nueva Mesa se prueba con Chromium aislado, sin acceder a sesiones del usuario.",
+      "repositorios": [
+        "Jakeschincariol/replica-skill",
+        "ChromeDevTools/chrome-devtools-mcp"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "De3LhlCgT9F",
+      "url": "https://www.instagram.com/p/De3LhlCgT9F/",
+      "autor": "awaltheaiman",
+      "tema": "ECC",
+      "ideas": "Colección de agentes, skills, comandos y hooks.",
+      "aplicacion": "ECC ya estaba local. Se reutiliza como recurso de revisión y pruebas; no se cargan todos los hooks ni se toman las cifras del reel como inventario actual.",
+      "repositorios": [
+        "affaan-m/ECC"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "DfBQ1AgOC1S",
+      "url": "https://www.instagram.com/p/DfBQ1AgOC1S/",
+      "autor": "heysansser",
+      "tema": "Treinta plugins por trabajo",
+      "ideas": "Mismo conjunto de nombres revisado el 28-oct, con recomendación de elegir una tarea y una herramienta.",
+      "aplicacion": "Se conserva catálogo previo y se añade la procedencia nueva. Los nombres sin URL inequívoca permanecen por resolver; no se instalan homónimos. Graphify y Karpathy quedan ahora identificados por el reel de las diez skills.",
+      "repositorios": [],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
+    },
+    {
+      "id": "Dep4K9exVQ2",
+      "url": "https://www.instagram.com/p/Dep4K9exVQ2/",
+      "autor": "artillerytrades",
+      "tema": "Cinco proyectos de trading IA",
+      "ideas": "TradingAgents, ai-hedge-fund, Qlib, FinGPT y FinRL.",
+      "aplicacion": "TradingAgents, Qlib y FinRL ya estaban; ai-hedge-fund y FinGPT descargados. Referencias para hipótesis y comparación fuera de muestra; sin descargar modelos grandes ni habilitar agentes de trading.",
+      "repositorios": [
+        "TauricResearch/TradingAgents",
+        "virattt/ai-hedge-fund",
+        "microsoft/qlib",
+        "AI4Finance-Foundation/FinGPT",
+        "AI4Finance-Foundation/FinRL"
+      ],
+      "evidencia": {
+        "descripcion": true,
+        "video": true,
+        "transcripcion": true
+      },
+      "estado": "Identificado mediante descripción y fotogramas; audio automático como apoyo, no autoridad técnica"
     }
   ]
 }

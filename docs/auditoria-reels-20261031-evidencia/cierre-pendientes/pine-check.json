@@ -1,0 +1,12 @@
+{
+  "fecha": "2026-11-01T03:35:31.578Z",
+  "sha256": "20ea20c98c5de16327e13abde33a64b04655dc5f4dcf853f34dcf9851a97b263",
+  "metodo": "pine_check: core.check existente, Guest; sin CDP ni cuenta",
+  "resultado": {
+    "success": true,
+    "compiled": true,
+    "error_count": 0,
+    "warning_count": 0,
+    "note": "Pine Script compiled successfully."
+  }
+}

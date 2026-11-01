@@ -1,0 +1,53 @@
+[
+  {
+    "id": "De-dVXJofx6",
+    "autor": "faadhiljabbar",
+    "tema": "Twitter Maxxing: fuentes de investigación IA",
+    "aplicacion": "Lista editorial por seis áreas y ficha de evidencia; ninguna publicación social se considera señal de compra.",
+    "repositorios": [],
+    "url": "https://www.instagram.com/p/De-dVXJofx6/",
+    "estado": "Descripción, video y audio revisados",
+    "evidencia": [
+      "De-dVXJofx6-reel.txt",
+      "De-dVXJofx6.mp4",
+      "De-dVXJofx6.transcripcion.txt"
+    ],
+    "limites": "Transcripción automática contrastada con fotogramas; cifras de estrellas publicitarias no auditadas."
+  },
+  {
+    "id": "De9mZYXCGeB",
+    "autor": "charliehills",
+    "tema": "30 plugins de Claude agrupados por tarea",
+    "aplicacion": "Catálogo de 30 nombres y selección de una herramienta por tarea. Reutilizar skills ya disponibles de investigación, diseño y revisión; evitar instalar 30 plugins redundantes.",
+    "repositorios": [],
+    "url": "https://www.instagram.com/p/De9mZYXCGeB/",
+    "estado": "Descripción, video y audio revisados",
+    "evidencia": [
+      "De9mZYXCGeB-reel.txt",
+      "De9mZYXCGeB.mp4",
+      "De9mZYXCGeB.transcripcion.txt"
+    ],
+    "limites": "Transcripción automática contrastada con fotogramas; cifras de estrellas publicitarias no auditadas."
+  },
+  {
+    "id": "De-jrR2x-g0",
+    "autor": "artillerytrades",
+    "tema": "TradingView setup-to-bot: cinco repositorios",
+    "aplicacion": "Entorno aislado, cinco clones exactos, cálculo offline TA/SMC y guía de compatibilidad; sin activar ejecución.",
+    "repositorios": [
+      "https://github.com/rongardF/tvdatafeed.git",
+      "https://github.com/bukosabino/ta.git",
+      "https://github.com/joshyattridge/smart-money-concepts.git",
+      "https://github.com/PyneSys/pynecore.git",
+      "https://github.com/robswc/tradingview-webhooks-bot.git"
+    ],
+    "url": "https://www.instagram.com/p/De-jrR2x-g0/",
+    "estado": "Descripción, video y audio revisados",
+    "evidencia": [
+      "De-jrR2x-g0-reel.txt",
+      "De-jrR2x-g0.mp4",
+      "De-jrR2x-g0.transcripcion.txt"
+    ],
+    "limites": "Transcripción automática contrastada con fotogramas; cifras de estrellas publicitarias no auditadas."
+  }
+]

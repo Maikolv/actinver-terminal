@@ -1,0 +1,7 @@
+ CHANGELOG.md                |  22 +++-
+ config/aprendizaje.json     | 307 +++++++++++++++++++++++++++++++++++++++++++-
+ docs/historial-estado.md    |   5 +
+ web/static/navegacion.json  |   4 +
+ web/static/navegacion.mjs   |   3 +
+ web/static/referencias.json |  14 ++
+ 6 files changed, 346 insertions(+), 9 deletions(-)

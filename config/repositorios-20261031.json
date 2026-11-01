@@ -1,0 +1,555 @@
+[
+  {
+    "nombre": "OpenTerminal",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\OpenTerminal",
+    "remote": "https://github.com/ErTasselli/OpenTerminal.git",
+    "github": "ErTasselli/OpenTerminal",
+    "commit": "aed097c680cd8ec1c391ae06966babe7d6d91fc6",
+    "estado": "descargado en esta entrega",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "floorplan",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\floorplan",
+    "remote": "https://github.com/haydenschmitty/floorplan.git",
+    "github": "haydenschmitty/floorplan",
+    "commit": "cec107540da3910c6d7a5fa6400fc9851bf4c15e",
+    "estado": "descargado en esta entrega",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "day-trader-skill",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\day-trader-skill",
+    "remote": "https://github.com/Jakeschincariol/day-trader-skill.git",
+    "github": "Jakeschincariol/day-trader-skill",
+    "commit": "3d0f4ef6986f4984b7c6bd46f7ff4f87744c3abd",
+    "estado": "descargado en esta entrega",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "rederive",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\rederive",
+    "remote": "https://github.com/EricJujianZou/rederive.git",
+    "github": "EricJujianZou/rederive",
+    "commit": "7f43edc0ee0e098e98f77b01187027238aba77c8",
+    "estado": "descargado en esta entrega",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "caveman",
+    "path": "C:/Users/MIKE/.codex/plugins/cache/claude-cowork/anthropic-skills/1.0.0/skills/caveman",
+    "remote": "https://github.com/JuliusBrussee/caveman.git",
+    "github": "JuliusBrussee/caveman",
+    "commit": "9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4",
+    "estado": "skill ya estaba local; reutilizada sin instalación",
+    "licencia_archivos": [],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "nota": "Se detectó tras descargar el clon. El clon creado en esta entrega se archivó de forma reversible en work/caveman-clon-redundante-20261031; no se eliminó ningún recurso previo.",
+    "tipo": "skill",
+    "sha256_skill": "b4bb6fe3bf3da222993ca0aee5e7c6f5368b182dd30ce1172e8f8e3280eb7052",
+    "licencia_origen_local": "C:/Users/MIKE/Documents/Codex/2026-10-16/tienes-total-facultad-sobre-mi-pc-2/work/caveman-clon-redundante-20261031/LICENSE",
+    "skill_origen_verificado": false,
+    "nota_procedencia": "La huella del SKILL.md instalado no coincide con los SKILL.md del clon archivado. No se infiere su licencia desde ese repositorio."
+  },
+  {
+    "nombre": "FinGPT",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\FinGPT",
+    "remote": "https://github.com/AI4Finance-Foundation/FinGPT.git",
+    "github": "AI4Finance-Foundation/FinGPT",
+    "commit": "ac5c5443fbeeafad801e7a3c188e4f24cfaad4d8",
+    "estado": "descargado en esta entrega",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "ai-hedge-fund",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ai-hedge-fund",
+    "remote": "https://github.com/virattt/ai-hedge-fund.git",
+    "github": "virattt/ai-hedge-fund",
+    "commit": "d3a2b6b2bc3579cf0f5bde9cebeea9754f1eae15",
+    "estado": "descargado en esta entrega",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "AutoHedge",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\AutoHedge",
+    "remote": "https://github.com/The-Swarm-Corporation/AutoHedge.git",
+    "github": "The-Swarm-Corporation/AutoHedge",
+    "commit": "c549c7950da112286e76725d49f6a25de8fa99bd",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "Vibe-Trading",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\Vibe-Trading",
+    "remote": "https://github.com/HKUDS/Vibe-Trading.git",
+    "github": "HKUDS/Vibe-Trading",
+    "commit": "b705d188b08013cc3fa904be72d40a41798181e8",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "FinceptTerminal",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\FinceptTerminal",
+    "remote": "https://github.com/Fincept-Corporation/FinceptTerminal.git",
+    "github": "Fincept-Corporation/FinceptTerminal",
+    "commit": "b7d850b49dc033bb133e6e5d2476444ac5c422b1",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "TradingAgents",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents",
+    "remote": "https://github.com/TauricResearch/TradingAgents.git",
+    "github": "TauricResearch/TradingAgents",
+    "commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "TradingAgents_TauricResearch",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents_TauricResearch",
+    "remote": "https://github.com/vongchu/TradingAgents_TauricResearch.git",
+    "github": "vongchu/TradingAgents_TauricResearch",
+    "commit": "01477f9afb7a47b849ed4c9259d3a9a4738d9fda",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "qlib",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\qlib",
+    "remote": "https://github.com/microsoft/qlib.git",
+    "github": "microsoft/qlib",
+    "commit": "54355232463878d2eebb91fe0ee5fa7fa1f5976c",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "FinRL",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\FinRL",
+    "remote": "https://github.com/AI4Finance-Foundation/FinRL.git",
+    "github": "AI4Finance-Foundation/FinRL",
+    "commit": "00f3596facd01cced5217d875d8c1fc413a31665",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "ECC",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ECC",
+    "remote": "https://github.com/affaan-m/ECC.git",
+    "github": "affaan-m/ECC",
+    "commit": "4eb71d92a39cab44ad40ac9d8a6a5ccb4029d6c2",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "rea",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\rea",
+    "remote": "https://github.com/morluto/rea.git",
+    "github": "morluto/rea",
+    "commit": "ae8051302b5834322fa00cfa31c968ae74ab6ed9",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "context7",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\context7",
+    "remote": "https://github.com/upstash/context7.git",
+    "github": "upstash/context7",
+    "commit": "522c4db4fa2e1e31f1b320f09fa8c8fab376987a",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "playwright-mcp",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\playwright-mcp",
+    "remote": "https://github.com/microsoft/playwright-mcp.git",
+    "github": "microsoft/playwright-mcp",
+    "commit": "b8b4183e099f136cbec0388a6088d4aa2f6b9685",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "superpowers",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\superpowers",
+    "remote": "https://github.com/obra/superpowers.git",
+    "github": "obra/superpowers",
+    "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "mattpocock-skills",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\mattpocock-skills",
+    "remote": "https://github.com/mattpocock/skills.git",
+    "github": "mattpocock/skills",
+    "commit": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "ponytail",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ponytail",
+    "remote": "https://github.com/DietrichGebert/ponytail.git",
+    "github": "DietrichGebert/ponytail",
+    "commit": "11082c488dee22d6eefd8d072a925dfc975ee12e",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "agents",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\agents",
+    "remote": "https://github.com/wshobson/agents.git",
+    "github": "wshobson/agents",
+    "commit": "46891e7e60da0e52baf1050b7b6391b64e84c6d9",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "Agent-Reach",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\Agent-Reach",
+    "remote": "https://github.com/Panniantong/Agent-Reach.git",
+    "github": "Panniantong/Agent-Reach",
+    "commit": "a19a171fa980a0785849596492e0af4db800c82f",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "last30days-skill",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\last30days-skill",
+    "remote": "https://github.com/mvanhorn/last30days-skill.git",
+    "github": "mvanhorn/last30days-skill",
+    "commit": "0341304f8ecb307ca0a939e48ecd002761ef23b2",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "gstack",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\gstack",
+    "remote": "https://github.com/garrytan/gstack.git",
+    "github": "garrytan/gstack",
+    "commit": "20eb6202fa8ea83a882e7c0463b722cd8a31af1e",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "ui-ux-pro-max-skill",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ui-ux-pro-max-skill",
+    "remote": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+    "github": "nextlevelbuilder/ui-ux-pro-max-skill",
+    "commit": "50d8a7de0900119855614541f15a1a616691eb33",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "taste-skill",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\taste-skill",
+    "remote": "https://github.com/senlindesign/taste-skill.git",
+    "github": "senlindesign/taste-skill",
+    "commit": "6dce223f2f5665d3636ca9a44ec3a7aa1322a9b8",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "impeccable",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\impeccable",
+    "remote": "https://github.com/pbakaus/impeccable.git",
+    "github": "pbakaus/impeccable",
+    "commit": "6af45ac9a5eb8792f033d3242f52e99812fd91fa",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "diagram-design",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\diagram-design",
+    "remote": "https://github.com/cathrynlavery/diagram-design.git",
+    "github": "cathrynlavery/diagram-design",
+    "commit": "246d6d71d752245403d2bf28d27f124192584d18",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "skills",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\skills",
+    "remote": "https://github.com/anthropics/skills.git",
+    "github": "anthropics/skills",
+    "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "humanizer",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\humanizer",
+    "remote": "https://github.com/blader/humanizer.git",
+    "github": "blader/humanizer",
+    "commit": "8c307f367c91bd974002f10f2be2965d642c13df",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "licencia_archivos": [
+      "LICENSE"
+    ],
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio"
+  },
+  {
+    "nombre": "replica-skill",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\replica-skill",
+    "remote": "https://github.com/Jakeschincariol/replica-skill.git",
+    "github": "Jakeschincariol/replica-skill",
+    "commit": "77c9436fb3d18c3d58169efb8caf4fe906b0dc51",
+    "estado": "descargado en esta entrega",
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "chrome-devtools-mcp",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\chrome-devtools-mcp",
+    "remote": "https://github.com/ChromeDevTools/chrome-devtools-mcp.git",
+    "github": "ChromeDevTools/chrome-devtools-mcp",
+    "commit": "8d009e854f8aa55b1ec31628e836d4d4731b8ec8",
+    "estado": "descargado en esta entrega",
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "graphify",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\graphify",
+    "remote": "https://github.com/Graphify-Labs/graphify.git",
+    "github": "Graphify-Labs/graphify",
+    "commit": "f5155badddaa3286c78a51653791131e9e2e4d29",
+    "estado": "descargado en esta entrega",
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_archivos": [
+      "LICENSE",
+      "LICENSE-MIT"
+    ]
+  },
+  {
+    "nombre": "andrej-karpathy-skills",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\andrej-karpathy-skills",
+    "remote": "https://github.com/multica-ai/andrej-karpathy-skills.git",
+    "github": "multica-ai/andrej-karpathy-skills",
+    "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+    "estado": "descargado en esta entrega",
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_archivos": []
+  },
+  {
+    "nombre": "taste-skill-Leonxlnx",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\taste-skill-Leonxlnx",
+    "remote": "https://github.com/Leonxlnx/taste-skill.git",
+    "github": "Leonxlnx/taste-skill",
+    "commit": "12af471f627f866411b4bd785b19646d3672784c",
+    "estado": "descargado en esta entrega",
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "addyosmani-agent-skills",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\addyosmani-agent-skills",
+    "remote": "https://github.com/addyosmani/agent-skills.git",
+    "github": "addyosmani/agent-skills",
+    "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+    "estado": "ya estaba local; no se descargó de nuevo",
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  }
+]

@@ -15,6 +15,13 @@ Formato inspirado en la colección `awesome-design-md` y en los criterios de `ha
 | Pronóstico | sección FUTURO con borde discontinuo y sello violeta «FUTURO · ESTIMACIONES»; rangos 10–90 %, nunca un solo número |
 | Ficticio | banda «DATOS SIMULADOS» y la marca «FICTICIO» en cada cotización |
 
+**Cualquier persona puede usar cualquier herramienta sin saber qué escribir.** Toda calculadora o formulario de
+cálculo abre con valores iniciales que ya producen un resultado válido, ofrece «Ejemplo listo» o «Escenario listo»
+con opciones predefinidas (más «Personalizado») y, cuando el resultado es técnico, lo acompaña de una lectura en
+palabras simples. Los ejemplos son hipótesis de estudio y se rotulan así; nunca se presentan como cotizaciones.
+Hoy: escenarios NQ en Mesa (`ESCENARIOS_NQ`), ejemplos de Modelos (`EJEMPLOS_OPCIONES`) y ejemplo sintético del
+Laboratorio de alfa. `tests/mesa.test.mjs` exige que cada escenario NQ calcule al menos un contrato.
+
 ## Tokens
 
 - **Colores:** definidos en `web/static/app.css` (`:root`) para modo claro y oscuro: `--vigente`, `--retrasado`, `--vencido`, `--sin-datos`, `--sintetico`.

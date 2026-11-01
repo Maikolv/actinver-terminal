@@ -1,0 +1,9 @@
+{
+  "web/static/mesa.mjs": "c59b3d8c80651d79f68f1784ab1d85898479d9cf4f471f2f9b2d8d1aedba97d4",
+  "web/static/mesa.html": "1074284907596bbcf283b4572296660f10e5581f19b13d203450ae5e7f59113b",
+  "web/static/mesa.css": "26d885b95f54c1ef192e819127a10e99cb6697234d5da3bef6db258577945514",
+  "tradingview/mesa_riesgo_nq.pine": "c020bd30cace118d705f8925233459cea1bef6f0e6665d1fb575156677c736d5",
+  "terminal/cobertura_secciones.py": "bb0da2a2537fd2a1253bf674934a90cda40f3bb67f48cde90bd214992e2b412b",
+  "terminal/app.py": "9590646b547d93ceb9566fa244138a60abfc8859eb2c3f380334837ca44911d3",
+  "web/static/app.js": "49a983e7c295b84e06126b0dbd2fb3bf21e36aaa9a9cc075415c2377eda7f886"
+}

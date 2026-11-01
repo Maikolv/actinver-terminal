@@ -1,5 +1,7 @@
 """Procedencia y temporalidad declaradas para cada sección de la terminal."""
 from __future__ import annotations
+import re
+from pathlib import Path
 
 # Clave = id de pestaña en navegacion.json. Una sección nueva exige una declaración aquí.
 # «Vigencia» describe el criterio visible, no promete que el dato esté actualizado.
@@ -33,4 +35,20 @@ SECCIONES = {
 
 def tabla() -> list[dict[str, str]]:
     return [{"seccion": clave, "dato": dato, "fuente": fuente, "retraso": retraso, "vigencia": vigencia}
-            for clave, (dato, fuente, retraso, vigencia) in SECCIONES.items()]
+            for clave, (dato, fuente, retraso, vigencia) in SECCIONES.items()] + tabla_mesa()
+
+
+def tabla_mesa() -> list[dict[str, str]]:
+    """Familias de Mesa derivadas de su catálogo real, sin mantener otra lista de paneles."""
+    src = (Path(__file__).resolve().parents[1] / "web/static/mesa.mjs").read_text(encoding="utf-8")
+    bloque = src.split("export const CATALOGO = [", 1)[1].split("];", 1)[0]
+    paneles = re.findall(r"\['([^']+)','([^']+)','([^']+)'", bloque)
+    familias = [
+        ("externos", lambda t: t not in ("link", "risk"), "TradingView externo, no alimenta modelos", "Propio del proveedor, puede ser indicativo o retrasado", "HTTP 200 solo verifica el marco; contenido y vigencia externos sin verificar"),
+        ("accesos locales", lambda t: t == "link", "Sección nativa y sus fuentes declaradas", "Hereda el retraso de la sección de destino", "No añade datos; comprobar fecha y estado en destino"),
+        ("calculadora manual", lambda t: t == "risk", "Entradas manuales de estudio, solo NQ", "No recibe cotizaciones", "Sin precio conectado ni señal; tope del escenario, no del fill real"),
+    ]
+    return [{"seccion": f"Mesa · {nombre} ({len(filas)})", "dato": ", ".join(f[1] for f in filas),
+             "fuente": fuente, "retraso": retraso, "vigencia": vigencia}
+            for nombre, filtro, fuente, retraso, vigencia in familias
+            for filas in [[f for f in paneles if filtro(f[2])]]]

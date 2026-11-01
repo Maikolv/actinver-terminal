@@ -1,0 +1,29 @@
+//@version=6
+indicator("Futuros Lab · Mesa de riesgo MANUAL", overlay=true)
+// Escenario educativo. No estrategia, alertas, webhook ni envío de órdenes.
+// La calculadora web Mesa cubre solo NQ; este indicador admite NQ y MNQ según el gráfico.
+entrada = input.float(20000, "Entrada de estudio", minval=0, maxval=1000000000, step=0.25)
+stop = input.float(19990, "SL de invalidación", minval=0, maxval=1000000000, step=0.25)
+objetivoR = input.float(2, "Objetivo R", minval=0, maxval=1000, step=0.25)
+presupuesto = input.float(100, "Presupuesto de riesgo USD", minval=0, maxval=1000000000)
+comision = input.float(0, "Comisión ida/vuelta por contrato USD (verifique)", minval=0, maxval=1000000)
+slip = input.int(0, "Deslizamiento total ticks", minval=0, maxval=1000000)
+esNQ = syminfo.type == "futures" and (syminfo.root == "NQ" or syminfo.root == "MNQ")
+tick = 0.25
+punto = syminfo.root == "MNQ" ? 2.0 : 20.0
+alineado = math.abs(entrada / tick - math.round(entrada / tick)) < 0.00000001 and math.abs(stop / tick - math.round(stop / tick)) < 0.00000001
+direccion = entrada > stop ? 1 : -1
+tp = entrada + direccion * math.floor(math.abs(entrada - stop) * objetivoR / tick + 0.00000001) * tick
+valido = esNQ and alineado and entrada > 0 and stop > 0 and objetivoR > 0 and presupuesto > 0 and entrada != stop and tp > 0 and tp != entrada
+riesgo = math.abs(entrada - stop) * punto + comision + slip * tick * punto
+cantidad = valido ? math.floor(presupuesto / riesgo) : 0
+plot(valido ? entrada : na, "Entrada manual", color.gray, 1)
+plot(valido ? stop : na, "SL manual", color.red, 2)
+plot(valido ? tp : na, "TP manual", color.teal, 2)
+var tabla = table.new(position.top_right, 1, 5)
+if barstate.islast
+    table.cell(tabla, 0, 0, "ESTUDIO MANUAL · SIN EJECUCIÓN", text_color=color.white, bgcolor=color.black)
+    table.cell(tabla, 0, 1, valido ? "TP " + str.tostring(tp) + " · SL " + str.tostring(stop) : "Use un futuro NQ/MNQ y precios válidos de 0.25", bgcolor=color.gray)
+    table.cell(tabla, 0, 2, valido ? "Riesgo USD " + str.tostring(riesgo) + " · caben " + str.tostring(cantidad) + " contratos" : "Sin escenario válido", bgcolor=color.gray)
+    table.cell(tabla, 0, 3, "No usa precios del gráfico. Costos cero = hipótesis.", bgcolor=color.gray)
+    table.cell(tabla, 0, 4, "Tope del escenario, no del fill real. Un gap o deslizamiento mayor puede superarlo.", bgcolor=color.gray)

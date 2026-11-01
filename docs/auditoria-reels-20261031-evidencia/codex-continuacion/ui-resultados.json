@@ -1,0 +1,51 @@
+{
+  "externalBlocked": true,
+  "results": [
+    {
+      "mode": "dark",
+      "width": 390,
+      "ok": true
+    },
+    {
+      "mode": "dark",
+      "width": 768,
+      "ok": true
+    },
+    {
+      "mode": "dark",
+      "width": 1440,
+      "ok": true
+    },
+    {
+      "mode": "light",
+      "width": 390,
+      "ok": true
+    },
+    {
+      "mode": "light",
+      "width": 768,
+      "ok": true
+    },
+    {
+      "mode": "light",
+      "width": 1440,
+      "ok": true
+    },
+    {
+      "kind": "empty",
+      "ok": true
+    },
+    {
+      "kind": "network",
+      "ok": true
+    },
+    {
+      "kind": "storage",
+      "ok": true
+    },
+    {
+      "kind": "unsupported",
+      "ok": true
+    }
+  ]
+}

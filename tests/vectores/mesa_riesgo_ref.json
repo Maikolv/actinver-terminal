@@ -1,0 +1,9406 @@
+{
+ "version": "1",
+ "semantica": "(la misma que mesa.mjs): precios múltiplos de 0.25; TP = entrada ± floor(dist/0.25 · R)·0.25 (hacia la entrada);\nriesgo = dist·USD/punto + comisión + deslizamiento_ticks·tick·USD/punto; contratos = floor(presupuesto / riesgo).",
+ "casos": [
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 215.0,
+    "contratos": 4,
+    "recompensa_neta": 385.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 20010,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19980.0,
+    "sl": 20010.0,
+    "riesgo": 215.0,
+    "contratos": 4,
+    "recompensa_neta": 385.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 200.0,
+    "contratos": 0,
+    "recompensa_neta": 400.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19999.75,
+   "r": 1.1,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20000.25,
+    "sl": 19999.75,
+    "riesgo": 5.0,
+    "contratos": 20,
+    "recompensa_neta": 5.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19999.75,
+   "r": 2,
+   "presupuesto": 10,
+   "costos": 8,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20000.5,
+    "sl": 19999.75,
+    "riesgo": 23.0,
+    "contratos": 0,
+    "recompensa_neta": -8.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19999.9,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0.5,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 20000,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1,
+   "stop": 100,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 1e+306,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 0,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": -1,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19999.75,
+   "r": 0.1,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19999.75,
+   "r": 0.25,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19999.75,
+   "r": 1,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20000.25,
+    "sl": 19999.75,
+    "riesgo": 5.0,
+    "contratos": 20,
+    "recompensa_neta": 5.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 215,
+   "costos": 5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 215.0,
+    "contratos": 1,
+    "recompensa_neta": 385.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 214.99,
+   "costos": 5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 215.0,
+    "contratos": 0,
+    "recompensa_neta": 385.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 5,
+   "slip": 1000001,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1000000000.0,
+   "stop": 999999990.0,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 1000000020.0,
+    "sl": 999999990.0,
+    "riesgo": 200.0,
+    "contratos": 5,
+    "recompensa_neta": 400.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1000000000.25,
+   "stop": 1000000000.0,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 1001,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 1000000001.0,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 0.25,
+   "stop": 10,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": 0,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20000,
+   "stop": -5,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 0.5,
+   "stop": 0.25,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 1.0,
+    "sl": 0.25,
+    "riesgo": 5.0,
+    "contratos": 20,
+    "recompensa_neta": 10.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 0.5,
+   "stop": 0.25,
+   "r": 0.25,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 26.0,
+    "contratos": 38,
+    "recompensa_neta": 34.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20000,
+   "stop": 20010,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19980.0,
+    "sl": 20010.0,
+    "riesgo": 26.0,
+    "contratos": 38,
+    "recompensa_neta": 34.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20000,
+   "stop": 19999.75,
+   "r": 1.1,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20000.25,
+    "sl": 19999.75,
+    "riesgo": 0.5,
+    "contratos": 200,
+    "recompensa_neta": 0.5
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 19,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 20.0,
+    "contratos": 0,
+    "recompensa_neta": 40.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20000,
+   "stop": 19990,
+   "r": 2,
+   "presupuesto": 20,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20020.0,
+    "sl": 19990.0,
+    "riesgo": 20.0,
+    "contratos": 1,
+    "recompensa_neta": 40.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 11019.0,
+   "stop": 11266.75,
+   "r": 2,
+   "presupuesto": 50,
+   "costos": 18.94,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10523.5,
+    "sl": 11266.75,
+    "riesgo": 523.44,
+    "contratos": 0,
+    "recompensa_neta": 963.06
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29594.0,
+   "stop": 30371.0,
+   "r": 1,
+   "presupuesto": 50,
+   "costos": 5.48,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28817.0,
+    "sl": 30371.0,
+    "riesgo": 15545.48,
+    "contratos": 0,
+    "recompensa_neta": 15534.52
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29609.75,
+   "stop": 28922.25,
+   "r": 0.5,
+   "presupuesto": 50,
+   "costos": 14.68,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29953.5,
+    "sl": 28922.25,
+    "riesgo": 13834.68,
+    "contratos": 0,
+    "recompensa_neta": 6790.32
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12915.75,
+   "stop": 12518.75,
+   "r": 0.5,
+   "presupuesto": 100,
+   "costos": 13.01,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13114.25,
+    "sl": 12518.75,
+    "riesgo": 7968.01,
+    "contratos": 0,
+    "recompensa_neta": 3941.99
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21024.75,
+   "stop": 21269.5,
+   "r": 3.95,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20058.0,
+    "sl": 21269.5,
+    "riesgo": 497.5,
+    "contratos": 0,
+    "recompensa_neta": 1925.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29094.75,
+   "stop": 29346.75,
+   "r": 5.01,
+   "presupuesto": 2012.34,
+   "costos": 2.63,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27832.25,
+    "sl": 29346.75,
+    "riesgo": 5127.63,
+    "contratos": 0,
+    "recompensa_neta": 25162.37
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7149.0,
+   "stop": 6162.25,
+   "r": 3,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 10109.25,
+    "sl": 6162.25,
+    "riesgo": 19800.0,
+    "contratos": 0,
+    "recompensa_neta": 59140.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23761.75,
+   "stop": 23606.5,
+   "r": 0.25,
+   "presupuesto": 3967.85,
+   "costos": 19.83,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23800.5,
+    "sl": 23606.5,
+    "riesgo": 3154.83,
+    "contratos": 1,
+    "recompensa_neta": 725.17
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 13169.75,
+   "stop": 13414.5,
+   "r": 7.22,
+   "presupuesto": 1452.39,
+   "costos": 19.64,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11402.75,
+    "sl": 13414.5,
+    "riesgo": 514.14,
+    "contratos": 2,
+    "recompensa_neta": 3509.36
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27847.5,
+   "stop": 27667.5,
+   "r": 0.25,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27892.5,
+    "sl": 27667.5,
+    "riesgo": 3600.0,
+    "contratos": 0,
+    "recompensa_neta": 900.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26091.0,
+   "stop": 26657.25,
+   "r": 2.75,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 24534.0,
+    "sl": 26657.25,
+    "riesgo": 11410.0,
+    "contratos": 0,
+    "recompensa_neta": 31055.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9565.75,
+   "stop": 9149.25,
+   "r": 2.75,
+   "presupuesto": 3531.75,
+   "costos": 11.98,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 10711.0,
+    "sl": 9149.25,
+    "riesgo": 8341.98,
+    "contratos": 0,
+    "recompensa_neta": 22893.02
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25876.5,
+   "stop": 25950.75,
+   "r": 3,
+   "presupuesto": 2495.41,
+   "costos": 25.29,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25653.75,
+    "sl": 25950.75,
+    "riesgo": 180.29,
+    "contratos": 13,
+    "recompensa_neta": 413.71
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26437.0,
+   "stop": 26760.0,
+   "r": 1.2,
+   "presupuesto": 10,
+   "costos": 16.42,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26049.5,
+    "sl": 26760.0,
+    "riesgo": 6476.42,
+    "contratos": 0,
+    "recompensa_neta": 7733.58
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11852.5,
+   "stop": 11607.0,
+   "r": 4.2,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12883.5,
+    "sl": 11607.0,
+    "riesgo": 4910.0,
+    "contratos": 0,
+    "recompensa_neta": 20620.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11398.5,
+   "stop": 12393.0,
+   "r": 0.5,
+   "presupuesto": 4138.16,
+   "costos": 7.43,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10901.25,
+    "sl": 12393.0,
+    "riesgo": 19897.43,
+    "contratos": 0,
+    "recompensa_neta": 9937.57
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24910.75,
+   "stop": 25493.75,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 20.21,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 23744.75,
+    "sl": 25493.75,
+    "riesgo": 1189.21,
+    "contratos": 0,
+    "recompensa_neta": 2308.79
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17547.25,
+   "stop": 16960.0,
+   "r": 9.73,
+   "presupuesto": 4550.55,
+   "costos": 13.76,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23261.0,
+    "sl": 16960.0,
+    "riesgo": 11823.76,
+    "contratos": 0,
+    "recompensa_neta": 114196.24
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17534.5,
+   "stop": 16703.5,
+   "r": 11.18,
+   "presupuesto": 1455.71,
+   "costos": 7.16,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 26825.0,
+    "sl": 16703.5,
+    "riesgo": 16627.16,
+    "contratos": 0,
+    "recompensa_neta": 185802.84
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23929.25,
+   "stop": 23627.75,
+   "r": 0.5,
+   "presupuesto": 2208.71,
+   "costos": 13.04,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24080.0,
+    "sl": 23627.75,
+    "riesgo": 6068.04,
+    "contratos": 0,
+    "recompensa_neta": 2976.96
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21456.75,
+   "stop": 21297.5,
+   "r": 0.97,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21611.0,
+    "sl": 21297.5,
+    "riesgo": 318.5,
+    "contratos": 15,
+    "recompensa_neta": 308.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11725.5,
+   "stop": 12585.5,
+   "r": 3,
+   "presupuesto": 3712.43,
+   "costos": 27.99,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9145.5,
+    "sl": 12585.5,
+    "riesgo": 17282.99,
+    "contratos": 0,
+    "recompensa_neta": 51517.01
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29081.5,
+   "stop": 28906.25,
+   "r": 1,
+   "presupuesto": 1000,
+   "costos": 15.0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29256.75,
+    "sl": 28906.25,
+    "riesgo": 3520.0,
+    "contratos": 0,
+    "recompensa_neta": 3490.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26466.25,
+   "stop": 25829.0,
+   "r": 13.65,
+   "presupuesto": 2851.77,
+   "costos": 7.91,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 35164.5,
+    "sl": 25829.0,
+    "riesgo": 12752.91,
+    "contratos": 0,
+    "recompensa_neta": 173957.09
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 8039.75,
+   "stop": 8322.0,
+   "r": 1.1,
+   "presupuesto": 100,
+   "costos": 28.3,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7729.5,
+    "sl": 8322.0,
+    "riesgo": 600.3,
+    "contratos": 0,
+    "recompensa_neta": 584.7
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12218.75,
+   "stop": 11686.0,
+   "r": 3,
+   "presupuesto": 500,
+   "costos": 9.36,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13817.0,
+    "sl": 11686.0,
+    "riesgo": 10719.36,
+    "contratos": 0,
+    "recompensa_neta": 31900.64
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9920.5,
+   "stop": 10039.0,
+   "r": 1.5,
+   "presupuesto": 10,
+   "costos": 25.31,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9742.75,
+    "sl": 10039.0,
+    "riesgo": 2395.31,
+    "contratos": 0,
+    "recompensa_neta": 3529.69
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20638.25,
+   "stop": 19977.0,
+   "r": 3,
+   "presupuesto": 1164.12,
+   "costos": 0,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22622.0,
+    "sl": 19977.0,
+    "riesgo": 13250.0,
+    "contratos": 0,
+    "recompensa_neta": 39650.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27962.25,
+   "stop": 28599.5,
+   "r": 0.5,
+   "presupuesto": 3531.0,
+   "costos": 11.22,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27643.75,
+    "sl": 28599.5,
+    "riesgo": 1286.22,
+    "contratos": 2,
+    "recompensa_neta": 625.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29321.75,
+   "stop": 30308.5,
+   "r": 1,
+   "presupuesto": 1673.5,
+   "costos": 29.31,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28335.0,
+    "sl": 30308.5,
+    "riesgo": 19764.31,
+    "contratos": 0,
+    "recompensa_neta": 19705.69
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3269.25,
+   "stop": 2548.25,
+   "r": 0.6,
+   "presupuesto": 10,
+   "costos": 0.2,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 3701.75,
+    "sl": 2548.25,
+    "riesgo": 14420.2,
+    "contratos": 0,
+    "recompensa_neta": 8649.8
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17153.25,
+   "stop": 16255.5,
+   "r": 3,
+   "presupuesto": 313.04,
+   "costos": 0,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19846.5,
+    "sl": 16255.5,
+    "riesgo": 17990.0,
+    "contratos": 0,
+    "recompensa_neta": 53830.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 1210.0,
+   "stop": 1186.5,
+   "r": 0.6,
+   "presupuesto": 5000,
+   "costos": 4.47,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 1224.0,
+    "sl": 1186.5,
+    "riesgo": 51.47,
+    "contratos": 97,
+    "recompensa_neta": 23.53
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16857.75,
+   "stop": 17758.25,
+   "r": 0.25,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16632.75,
+    "sl": 17758.25,
+    "riesgo": 18035.0,
+    "contratos": 0,
+    "recompensa_neta": 4475.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2928.5,
+   "stop": 3720.25,
+   "r": 4.2,
+   "presupuesto": 1000,
+   "costos": 19.58,
+   "slip": 13,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28309.0,
+   "stop": 29041.25,
+   "r": 4.2,
+   "presupuesto": 738.75,
+   "costos": 4.59,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25233.75,
+    "sl": 29041.25,
+    "riesgo": 14649.59,
+    "contratos": 0,
+    "recompensa_neta": 61500.41
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 17109.0,
+   "stop": 16410.25,
+   "r": 1.1,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 17877.5,
+    "sl": 16410.25,
+    "riesgo": 1407.5,
+    "contratos": 3,
+    "recompensa_neta": 1527.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9307.5,
+   "stop": 8593.25,
+   "r": 1,
+   "presupuesto": 500,
+   "costos": 19.7,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 10021.75,
+    "sl": 8593.25,
+    "riesgo": 14384.7,
+    "contratos": 0,
+    "recompensa_neta": 14185.3
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15958.25,
+   "stop": 15288.5,
+   "r": 1.1,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16694.75,
+    "sl": 15288.5,
+    "riesgo": 13445.0,
+    "contratos": 0,
+    "recompensa_neta": 14680.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8933.75,
+   "stop": 9915.5,
+   "r": 1.51,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7451.5,
+    "sl": 9915.5,
+    "riesgo": 19675.0,
+    "contratos": 0,
+    "recompensa_neta": 29605.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 14312.0,
+   "stop": 13405.5,
+   "r": 10.32,
+   "presupuesto": 3718.64,
+   "costos": 9.21,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23667.0,
+    "sl": 13405.5,
+    "riesgo": 1822.21,
+    "contratos": 2,
+    "recompensa_neta": 18700.79
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19461.5,
+   "stop": 20303.25,
+   "r": 5.8,
+   "presupuesto": 1000,
+   "costos": 6.64,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 14579.5,
+    "sl": 20303.25,
+    "riesgo": 16841.64,
+    "contratos": 0,
+    "recompensa_neta": 97633.36
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4716.75,
+   "stop": 5341.5,
+   "r": 2,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3467.25,
+    "sl": 5341.5,
+    "riesgo": 12495.0,
+    "contratos": 0,
+    "recompensa_neta": 24990.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11473.25,
+   "stop": 11355.0,
+   "r": 10.88,
+   "presupuesto": 198.59,
+   "costos": 23.12,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12759.75,
+    "sl": 11355.0,
+    "riesgo": 2488.12,
+    "contratos": 0,
+    "recompensa_neta": 25606.88
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 13916.5,
+   "stop": 12952.75,
+   "r": 1,
+   "presupuesto": 500,
+   "costos": 9.24,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14880.25,
+    "sl": 12952.75,
+    "riesgo": 1936.74,
+    "contratos": 0,
+    "recompensa_neta": 1918.26
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20485.5,
+   "stop": 19964.25,
+   "r": 3.3,
+   "presupuesto": 100,
+   "costos": 9.85,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22205.5,
+    "sl": 19964.25,
+    "riesgo": 10534.85,
+    "contratos": 0,
+    "recompensa_neta": 34290.15
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22401.25,
+   "stop": 22678.0,
+   "r": 0.7,
+   "presupuesto": 1631.01,
+   "costos": 5.35,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22207.75,
+    "sl": 22678.0,
+    "riesgo": 5550.35,
+    "contratos": 0,
+    "recompensa_neta": 3854.65
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22009.75,
+   "stop": 22657.75,
+   "r": 1.5,
+   "presupuesto": 4718.88,
+   "costos": 20.36,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21037.75,
+    "sl": 22657.75,
+    "riesgo": 12980.36,
+    "contratos": 0,
+    "recompensa_neta": 19419.64
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25660.75,
+   "stop": 25526.25,
+   "r": 4.2,
+   "presupuesto": 1000,
+   "costos": 24.22,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 26225.5,
+    "sl": 25526.25,
+    "riesgo": 293.22,
+    "contratos": 3,
+    "recompensa_neta": 1105.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12254.5,
+   "stop": 13150.5,
+   "r": 1.1,
+   "presupuesto": 100,
+   "costos": 9.55,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11269.0,
+    "sl": 13150.5,
+    "riesgo": 17929.55,
+    "contratos": 0,
+    "recompensa_neta": 19700.45
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10720.75,
+   "stop": 9948.5,
+   "r": 4.68,
+   "presupuesto": 500,
+   "costos": 20.75,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14334.75,
+    "sl": 9948.5,
+    "riesgo": 15560.75,
+    "contratos": 0,
+    "recompensa_neta": 72164.25
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8992.75,
+   "stop": 8329.75,
+   "r": 1.2,
+   "presupuesto": 500,
+   "costos": 18.72,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9788.25,
+    "sl": 8329.75,
+    "riesgo": 13278.72,
+    "contratos": 0,
+    "recompensa_neta": 15891.28
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 23746.0,
+   "stop": 24096.0,
+   "r": 1,
+   "presupuesto": 10,
+   "costos": 24.14,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 23396.0,
+    "sl": 24096.0,
+    "riesgo": 729.64,
+    "contratos": 0,
+    "recompensa_neta": 670.36
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1781.5,
+   "stop": 1004.0,
+   "r": 0.6,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 2248.0,
+    "sl": 1004.0,
+    "riesgo": 15550.0,
+    "contratos": 0,
+    "recompensa_neta": 9330.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9763.0,
+   "stop": 8859.25,
+   "r": 4.33,
+   "presupuesto": 4292.86,
+   "costos": 8.06,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13676.0,
+    "sl": 8859.25,
+    "riesgo": 18133.06,
+    "contratos": 0,
+    "recompensa_neta": 78201.94
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12179.0,
+   "stop": 11720.5,
+   "r": 1.1,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12683.25,
+    "sl": 11720.5,
+    "riesgo": 9235.0,
+    "contratos": 0,
+    "recompensa_neta": 10020.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 4093.5,
+   "stop": 3394.0,
+   "r": 2,
+   "presupuesto": 3225.04,
+   "costos": 23.18,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 5492.5,
+    "sl": 3394.0,
+    "riesgo": 1422.18,
+    "contratos": 2,
+    "recompensa_neta": 2774.82
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4607.75,
+   "stop": 4052.25,
+   "r": 1.2,
+   "presupuesto": 250,
+   "costos": 11.35,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 5274.25,
+    "sl": 4052.25,
+    "riesgo": 11166.35,
+    "contratos": 0,
+    "recompensa_neta": 13273.65
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14526.5,
+   "stop": 14875.25,
+   "r": 13.39,
+   "presupuesto": 1000,
+   "costos": 8.66,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9856.75,
+    "sl": 14875.25,
+    "riesgo": 7018.66,
+    "contratos": 0,
+    "recompensa_neta": 93351.34
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21654.75,
+   "stop": 21432.75,
+   "r": 0.7,
+   "presupuesto": 250,
+   "costos": 27.16,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21810.0,
+    "sl": 21432.75,
+    "riesgo": 4542.16,
+    "contratos": 0,
+    "recompensa_neta": 3002.84
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21812.5,
+   "stop": 21370.0,
+   "r": 0.7,
+   "presupuesto": 250,
+   "costos": 21.26,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22122.25,
+    "sl": 21370.0,
+    "riesgo": 916.26,
+    "contratos": 0,
+    "recompensa_neta": 588.24
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8146.5,
+   "stop": 8437.75,
+   "r": 3.3,
+   "presupuesto": 500,
+   "costos": 13.41,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7185.5,
+    "sl": 8437.75,
+    "riesgo": 5838.41,
+    "contratos": 0,
+    "recompensa_neta": 19206.59
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18334.25,
+   "stop": 18463.75,
+   "r": 2.75,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17978.25,
+    "sl": 18463.75,
+    "riesgo": 2625.0,
+    "contratos": 0,
+    "recompensa_neta": 7085.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19018.0,
+   "stop": 18258.5,
+   "r": 1.5,
+   "presupuesto": 2970.75,
+   "costos": 26.82,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20157.25,
+    "sl": 18258.5,
+    "riesgo": 15296.82,
+    "contratos": 0,
+    "recompensa_neta": 22678.18
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25439.0,
+   "stop": 25450.5,
+   "r": 1.1,
+   "presupuesto": 1638.02,
+   "costos": 19.7,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25426.5,
+    "sl": 25450.5,
+    "riesgo": 42.7,
+    "contratos": 38,
+    "recompensa_neta": 5.3
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20488.0,
+   "stop": 20750.5,
+   "r": 1.1,
+   "presupuesto": 5000,
+   "costos": 3.1,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20199.25,
+    "sl": 20750.5,
+    "riesgo": 5283.1,
+    "contratos": 0,
+    "recompensa_neta": 5741.9
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15647.75,
+   "stop": 15371.5,
+   "r": 2,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16200.25,
+    "sl": 15371.5,
+    "riesgo": 5525.0,
+    "contratos": 0,
+    "recompensa_neta": 11050.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7891.75,
+   "stop": 7921.25,
+   "r": 1,
+   "presupuesto": 100,
+   "costos": 26.92,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7862.25,
+    "sl": 7921.25,
+    "riesgo": 686.92,
+    "contratos": 0,
+    "recompensa_neta": 493.08
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 2497.75,
+   "stop": 1755.5,
+   "r": 13.98,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12874.25,
+    "sl": 1755.5,
+    "riesgo": 1484.5,
+    "contratos": 0,
+    "recompensa_neta": 20753.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5462.0,
+   "stop": 5020.0,
+   "r": 6.38,
+   "presupuesto": 4376.61,
+   "costos": 0,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8281.75,
+    "sl": 5020.0,
+    "riesgo": 8930.0,
+    "contratos": 0,
+    "recompensa_neta": 56305.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23777.5,
+   "stop": 22833.5,
+   "r": 11.42,
+   "presupuesto": 5000,
+   "costos": 13.72,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 34557.75,
+    "sl": 22833.5,
+    "riesgo": 18893.72,
+    "contratos": 0,
+    "recompensa_neta": 215591.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14068.25,
+   "stop": 14710.5,
+   "r": 0.25,
+   "presupuesto": 50,
+   "costos": 11.06,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13907.75,
+    "sl": 14710.5,
+    "riesgo": 12886.06,
+    "contratos": 0,
+    "recompensa_neta": 3168.94
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 18225.5,
+   "stop": 19108.75,
+   "r": 3,
+   "presupuesto": 4654.97,
+   "costos": 2.92,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15575.75,
+    "sl": 19108.75,
+    "riesgo": 1769.42,
+    "contratos": 2,
+    "recompensa_neta": 5296.58
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4810.5,
+   "stop": 4711.0,
+   "r": 1.5,
+   "presupuesto": 100,
+   "costos": 29.78,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 4959.75,
+    "sl": 4711.0,
+    "riesgo": 2114.78,
+    "contratos": 0,
+    "recompensa_neta": 2860.22
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28191.0,
+   "stop": 28223.0,
+   "r": 11.67,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27817.75,
+    "sl": 28223.0,
+    "riesgo": 640.0,
+    "contratos": 7,
+    "recompensa_neta": 7465.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19060.75,
+   "stop": 19213.5,
+   "r": 5.65,
+   "presupuesto": 2821.57,
+   "costos": 9.65,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18197.75,
+    "sl": 19213.5,
+    "riesgo": 3064.65,
+    "contratos": 0,
+    "recompensa_neta": 17250.35
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20060.5,
+   "stop": 21045.75,
+   "r": 4.2,
+   "presupuesto": 4986.3,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15922.5,
+    "sl": 21045.75,
+    "riesgo": 1970.5,
+    "contratos": 2,
+    "recompensa_neta": 8276.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26168.5,
+   "stop": 25247.0,
+   "r": 1.2,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27274.25,
+    "sl": 25247.0,
+    "riesgo": 18475.0,
+    "contratos": 0,
+    "recompensa_neta": 22070.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21812.75,
+   "stop": 21832.0,
+   "r": 12.7,
+   "presupuesto": 1000,
+   "costos": 19.92,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21568.5,
+    "sl": 21832.0,
+    "riesgo": 404.92,
+    "contratos": 2,
+    "recompensa_neta": 4865.08
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27130.75,
+   "stop": 27887.0,
+   "r": 1.2,
+   "presupuesto": 250,
+   "costos": 25.12,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26223.25,
+    "sl": 27887.0,
+    "riesgo": 15250.12,
+    "contratos": 0,
+    "recompensa_neta": 18024.88
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 15888.75,
+   "stop": 14953.25,
+   "r": 0.6,
+   "presupuesto": 3600.11,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16450.0,
+    "sl": 14953.25,
+    "riesgo": 1879.0,
+    "contratos": 1,
+    "recompensa_neta": 1114.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16665.5,
+   "stop": 16241.0,
+   "r": 14.38,
+   "presupuesto": 549.88,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22769.75,
+    "sl": 16241.0,
+    "riesgo": 8490.0,
+    "contratos": 0,
+    "recompensa_neta": 122085.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27459.25,
+   "stop": 28268.75,
+   "r": 1.1,
+   "presupuesto": 1000,
+   "costos": 7.14,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26569.0,
+    "sl": 28268.75,
+    "riesgo": 16197.14,
+    "contratos": 0,
+    "recompensa_neta": 17797.86
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15635.5,
+   "stop": 14643.0,
+   "r": 3.3,
+   "presupuesto": 50,
+   "costos": 23.27,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 18910.75,
+    "sl": 14643.0,
+    "riesgo": 19953.27,
+    "contratos": 0,
+    "recompensa_neta": 65401.73
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 26776.25,
+   "stop": 27712.5,
+   "r": 6.33,
+   "presupuesto": 5000,
+   "costos": 10.5,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20850.0,
+    "sl": 27712.5,
+    "riesgo": 1887.5,
+    "contratos": 2,
+    "recompensa_neta": 11837.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2056.0,
+   "stop": 1644.5,
+   "r": 9.88,
+   "presupuesto": 250,
+   "costos": 18.58,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 6121.5,
+    "sl": 1644.5,
+    "riesgo": 8248.58,
+    "contratos": 0,
+    "recompensa_neta": 81291.42
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18545.25,
+   "stop": 18700.75,
+   "r": 1,
+   "presupuesto": 500,
+   "costos": 9.14,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18389.75,
+    "sl": 18700.75,
+    "riesgo": 3139.14,
+    "contratos": 0,
+    "recompensa_neta": 3080.86
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26936.25,
+   "stop": 27353.0,
+   "r": 8.74,
+   "presupuesto": 10,
+   "costos": 5.48,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 23294.0,
+    "sl": 27353.0,
+    "riesgo": 8340.48,
+    "contratos": 0,
+    "recompensa_neta": 72839.52
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 19376.75,
+   "stop": 18975.75,
+   "r": 16.68,
+   "presupuesto": 3077.22,
+   "costos": 4.72,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 26065.25,
+    "sl": 18975.75,
+    "riesgo": 813.72,
+    "contratos": 3,
+    "recompensa_neta": 13365.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8539.75,
+   "stop": 8768.75,
+   "r": 1,
+   "presupuesto": 2240.78,
+   "costos": 13.18,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8310.75,
+    "sl": 8768.75,
+    "riesgo": 4678.18,
+    "contratos": 0,
+    "recompensa_neta": 4481.82
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29510.5,
+   "stop": 28764.75,
+   "r": 4.38,
+   "presupuesto": 1563.85,
+   "costos": 24.37,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 32776.75,
+    "sl": 28764.75,
+    "riesgo": 14984.37,
+    "contratos": 0,
+    "recompensa_neta": 65255.63
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3260.25,
+   "stop": 2320.25,
+   "r": 2.44,
+   "presupuesto": 5000,
+   "costos": 13.68,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 5553.75,
+    "sl": 2320.25,
+    "riesgo": 18843.68,
+    "contratos": 0,
+    "recompensa_neta": 45826.32
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 23980.75,
+   "stop": 24431.75,
+   "r": 13.18,
+   "presupuesto": 3231.88,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18036.75,
+    "sl": 24431.75,
+    "riesgo": 902.0,
+    "contratos": 3,
+    "recompensa_neta": 11888.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17293.25,
+   "stop": 17712.75,
+   "r": 3.3,
+   "presupuesto": 1106.27,
+   "costos": 8.7,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15909.0,
+    "sl": 17712.75,
+    "riesgo": 8453.7,
+    "contratos": 0,
+    "recompensa_neta": 27621.3
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9076.75,
+   "stop": 9783.5,
+   "r": 0.25,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8900.25,
+    "sl": 9783.5,
+    "riesgo": 14135.0,
+    "contratos": 0,
+    "recompensa_neta": 3530.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15070.5,
+   "stop": 15410.25,
+   "r": 1.5,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 14561.0,
+    "sl": 15410.25,
+    "riesgo": 6855.0,
+    "contratos": 0,
+    "recompensa_neta": 10130.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 29827.5,
+   "stop": 29727.75,
+   "r": 4.45,
+   "presupuesto": 5000,
+   "costos": 13.94,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 30271.25,
+    "sl": 29727.75,
+    "riesgo": 216.44,
+    "contratos": 23,
+    "recompensa_neta": 870.56
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21454.25,
+   "stop": 21179.75,
+   "r": 0.5,
+   "presupuesto": 536.35,
+   "costos": 18.66,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21591.5,
+    "sl": 21179.75,
+    "riesgo": 5508.66,
+    "contratos": 0,
+    "recompensa_neta": 2726.34
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2999.5,
+   "stop": 3845.0,
+   "r": 1.1,
+   "presupuesto": 3450.9,
+   "costos": 10.58,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2069.5,
+    "sl": 3845.0,
+    "riesgo": 16945.58,
+    "contratos": 0,
+    "recompensa_neta": 18564.42
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28567.75,
+   "stop": 28639.5,
+   "r": 0.25,
+   "presupuesto": 4403.14,
+   "costos": 0,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28550.0,
+    "sl": 28639.5,
+    "riesgo": 1520.0,
+    "contratos": 2,
+    "recompensa_neta": 270.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24479.0,
+   "stop": 24895.75,
+   "r": 0.25,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 24375.0,
+    "sl": 24895.75,
+    "riesgo": 833.5,
+    "contratos": 0,
+    "recompensa_neta": 208.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8930.75,
+   "stop": 9401.75,
+   "r": 3.3,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7376.5,
+    "sl": 9401.75,
+    "riesgo": 9505.0,
+    "contratos": 0,
+    "recompensa_neta": 31000.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8153.5,
+   "stop": 8366.75,
+   "r": 1.1,
+   "presupuesto": 250,
+   "costos": 28.92,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7919.0,
+    "sl": 8366.75,
+    "riesgo": 4348.92,
+    "contratos": 0,
+    "recompensa_neta": 4606.08
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23915.5,
+   "stop": 22925.25,
+   "r": 0.6,
+   "presupuesto": 5000,
+   "costos": 11.14,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24509.5,
+    "sl": 22925.25,
+    "riesgo": 19816.14,
+    "contratos": 0,
+    "recompensa_neta": 11868.86
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 2840.5,
+   "stop": 3803.0,
+   "r": 0.7,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2166.75,
+    "sl": 3803.0,
+    "riesgo": 1933.5,
+    "contratos": 0,
+    "recompensa_neta": 1339.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12576.0,
+   "stop": 13081.75,
+   "r": 3.3,
+   "presupuesto": 1019.26,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10907.25,
+    "sl": 13081.75,
+    "riesgo": 10115.0,
+    "contratos": 0,
+    "recompensa_neta": 33375.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 24608.0,
+   "stop": 25038.25,
+   "r": 4.94,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22482.75,
+    "sl": 25038.25,
+    "riesgo": 8605.0,
+    "contratos": 0,
+    "recompensa_neta": 42505.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5796.5,
+   "stop": 4980.75,
+   "r": 1,
+   "presupuesto": 2500.75,
+   "costos": 25.08,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 6612.25,
+    "sl": 4980.75,
+    "riesgo": 16340.08,
+    "contratos": 0,
+    "recompensa_neta": 16289.92
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 14307.75,
+   "stop": 13775.5,
+   "r": 3.3,
+   "presupuesto": 250,
+   "costos": 14.32,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16064.0,
+    "sl": 13775.5,
+    "riesgo": 1081.82,
+    "contratos": 0,
+    "recompensa_neta": 3495.18
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26576.75,
+   "stop": 26595.5,
+   "r": 0.25,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26572.25,
+    "sl": 26595.5,
+    "riesgo": 390.0,
+    "contratos": 0,
+    "recompensa_neta": 75.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20495.75,
+   "stop": 19750.75,
+   "r": 6.35,
+   "presupuesto": 500,
+   "costos": 4.21,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25226.5,
+    "sl": 19750.75,
+    "riesgo": 14904.21,
+    "contratos": 0,
+    "recompensa_neta": 94610.79
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19908.0,
+   "stop": 20741.5,
+   "r": 2.75,
+   "presupuesto": 318.65,
+   "costos": 26.13,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17616.0,
+    "sl": 20741.5,
+    "riesgo": 16696.13,
+    "contratos": 0,
+    "recompensa_neta": 45813.87
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27059.5,
+   "stop": 27631.25,
+   "r": 3,
+   "presupuesto": 2969.2,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25344.25,
+    "sl": 27631.25,
+    "riesgo": 1143.5,
+    "contratos": 2,
+    "recompensa_neta": 3430.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8076.75,
+   "stop": 8774.25,
+   "r": 3,
+   "presupuesto": 500,
+   "costos": 25.3,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5984.25,
+    "sl": 8774.25,
+    "riesgo": 13995.3,
+    "contratos": 0,
+    "recompensa_neta": 41804.7
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14072.5,
+   "stop": 14999.75,
+   "r": 1.1,
+   "presupuesto": 1306.04,
+   "costos": 29.64,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13052.75,
+    "sl": 14999.75,
+    "riesgo": 18574.64,
+    "contratos": 0,
+    "recompensa_neta": 20365.36
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21083.25,
+   "stop": 21156.5,
+   "r": 1,
+   "presupuesto": 1424.85,
+   "costos": 4.78,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21010.0,
+    "sl": 21156.5,
+    "riesgo": 1469.78,
+    "contratos": 0,
+    "recompensa_neta": 1460.22
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 8378.5,
+   "stop": 7923.25,
+   "r": 0.25,
+   "presupuesto": 3424.18,
+   "costos": 9.92,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8492.25,
+    "sl": 7923.25,
+    "riesgo": 920.42,
+    "contratos": 3,
+    "recompensa_neta": 217.58
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8885.5,
+   "stop": 9021.25,
+   "r": 2.75,
+   "presupuesto": 4496.21,
+   "costos": 7.22,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8512.25,
+    "sl": 9021.25,
+    "riesgo": 2722.22,
+    "contratos": 1,
+    "recompensa_neta": 7457.78
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20377.0,
+   "stop": 19654.75,
+   "r": 4.2,
+   "presupuesto": 50,
+   "costos": 25.4,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23410.25,
+    "sl": 19654.75,
+    "riesgo": 14530.4,
+    "contratos": 0,
+    "recompensa_neta": 60579.6
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28110.75,
+   "stop": 28212.25,
+   "r": 0.19,
+   "presupuesto": 4807.84,
+   "costos": 29.78,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28091.5,
+    "sl": 28212.25,
+    "riesgo": 2099.78,
+    "contratos": 2,
+    "recompensa_neta": 315.22
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 15875.0,
+   "stop": 16144.75,
+   "r": 3.3,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 14985.0,
+    "sl": 16144.75,
+    "riesgo": 547.5,
+    "contratos": 0,
+    "recompensa_neta": 1772.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27490.0,
+   "stop": 26830.25,
+   "r": 3,
+   "presupuesto": 36.36,
+   "costos": 28.43,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29469.25,
+    "sl": 26830.25,
+    "riesgo": 13318.43,
+    "contratos": 0,
+    "recompensa_neta": 39461.57
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15468.0,
+   "stop": 15143.25,
+   "r": 12.44,
+   "presupuesto": 3731.97,
+   "costos": 0,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19507.75,
+    "sl": 15143.25,
+    "riesgo": 6540.0,
+    "contratos": 0,
+    "recompensa_neta": 80750.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17556.0,
+   "stop": 18494.75,
+   "r": 2.97,
+   "presupuesto": 500,
+   "costos": 8.64,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 14768.0,
+    "sl": 18494.75,
+    "riesgo": 18813.64,
+    "contratos": 0,
+    "recompensa_neta": 55721.36
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 29727.25,
+   "stop": 29969.75,
+   "r": 3,
+   "presupuesto": 5000,
+   "costos": 12.43,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28999.75,
+    "sl": 29969.75,
+    "riesgo": 505.93,
+    "contratos": 9,
+    "recompensa_neta": 1434.07
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10534.0,
+   "stop": 10058.25,
+   "r": 2.75,
+   "presupuesto": 1000,
+   "costos": 0.43,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 11842.25,
+    "sl": 10058.25,
+    "riesgo": 9515.43,
+    "contratos": 0,
+    "recompensa_neta": 26164.57
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15081.25,
+   "stop": 16070.5,
+   "r": 0.11,
+   "presupuesto": 10,
+   "costos": 27.08,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 14972.5,
+    "sl": 16070.5,
+    "riesgo": 19852.08,
+    "contratos": 0,
+    "recompensa_neta": 2107.92
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13017.0,
+   "stop": 12978.0,
+   "r": 1.2,
+   "presupuesto": 500,
+   "costos": 4.76,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13063.75,
+    "sl": 12978.0,
+    "riesgo": 809.76,
+    "contratos": 0,
+    "recompensa_neta": 905.24
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 28396.25,
+   "stop": 28631.25,
+   "r": 3.3,
+   "presupuesto": 100,
+   "costos": 21.71,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27620.75,
+    "sl": 28631.25,
+    "riesgo": 491.71,
+    "contratos": 0,
+    "recompensa_neta": 1529.29
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22246.75,
+   "stop": 21375.0,
+   "r": 3,
+   "presupuesto": 2161.64,
+   "costos": 0,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24862.0,
+    "sl": 21375.0,
+    "riesgo": 17440.0,
+    "contratos": 0,
+    "recompensa_neta": 52300.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3398.25,
+   "stop": 3058.25,
+   "r": 3,
+   "presupuesto": 100,
+   "costos": 11.06,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 4418.25,
+    "sl": 3058.25,
+    "riesgo": 6811.06,
+    "contratos": 0,
+    "recompensa_neta": 20388.94
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8239.75,
+   "stop": 8333.25,
+   "r": 0.7,
+   "presupuesto": 1000,
+   "costos": 1.4,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8174.5,
+    "sl": 8333.25,
+    "riesgo": 1951.4,
+    "contratos": 0,
+    "recompensa_neta": 1223.6
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 14010.5,
+   "stop": 14079.75,
+   "r": 4.2,
+   "presupuesto": 4751.9,
+   "costos": 1.59,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13719.75,
+    "sl": 14079.75,
+    "riesgo": 142.59,
+    "contratos": 33,
+    "recompensa_neta": 577.41
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14579.25,
+   "stop": 15131.25,
+   "r": 1.2,
+   "presupuesto": 685.29,
+   "costos": 6.81,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13917.0,
+    "sl": 15131.25,
+    "riesgo": 11046.81,
+    "contratos": 0,
+    "recompensa_neta": 13238.19
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23904.5,
+   "stop": 23681.5,
+   "r": 1.5,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24239.0,
+    "sl": 23681.5,
+    "riesgo": 4465.0,
+    "contratos": 0,
+    "recompensa_neta": 6685.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8650.75,
+   "stop": 9011.0,
+   "r": 1.5,
+   "presupuesto": 4279.3,
+   "costos": 14.99,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8110.5,
+    "sl": 9011.0,
+    "riesgo": 7219.99,
+    "contratos": 0,
+    "recompensa_neta": 10790.01
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25640.25,
+   "stop": 25629.75,
+   "r": 1,
+   "presupuesto": 3734.63,
+   "costos": 11.33,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25650.75,
+    "sl": 25629.75,
+    "riesgo": 32.33,
+    "contratos": 115,
+    "recompensa_neta": 9.67
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4425.25,
+   "stop": 3902.0,
+   "r": 7.29,
+   "presupuesto": 2281.57,
+   "costos": 23.38,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8239.5,
+    "sl": 3902.0,
+    "riesgo": 10528.38,
+    "contratos": 0,
+    "recompensa_neta": 76221.62
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14133.25,
+   "stop": 13871.0,
+   "r": 1.2,
+   "presupuesto": 813.62,
+   "costos": 11.28,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14447.75,
+    "sl": 13871.0,
+    "riesgo": 5256.28,
+    "contratos": 0,
+    "recompensa_neta": 6278.72
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18398.25,
+   "stop": 18807.0,
+   "r": 1.1,
+   "presupuesto": 2404.94,
+   "costos": 28.38,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17948.75,
+    "sl": 18807.0,
+    "riesgo": 8203.38,
+    "contratos": 0,
+    "recompensa_neta": 8961.62
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25220.25,
+   "stop": 25886.5,
+   "r": 0.5,
+   "presupuesto": 4255.05,
+   "costos": 0,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 24887.25,
+    "sl": 25886.5,
+    "riesgo": 1342.5,
+    "contratos": 3,
+    "recompensa_neta": 656.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5959.75,
+   "stop": 6163.75,
+   "r": 3.3,
+   "presupuesto": 1446.15,
+   "costos": 23.1,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5286.75,
+    "sl": 6163.75,
+    "riesgo": 4183.1,
+    "contratos": 0,
+    "recompensa_neta": 13356.9
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5079.75,
+   "stop": 5820.25,
+   "r": 0.7,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 4561.5,
+    "sl": 5820.25,
+    "riesgo": 14810.0,
+    "contratos": 0,
+    "recompensa_neta": 10365.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2207.75,
+   "stop": 1894.25,
+   "r": 2,
+   "presupuesto": 1824.71,
+   "costos": 18.9,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 2834.75,
+    "sl": 1894.25,
+    "riesgo": 6343.9,
+    "contratos": 0,
+    "recompensa_neta": 12466.1
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 3957.25,
+   "stop": 4504.25,
+   "r": 3.3,
+   "presupuesto": 1340.98,
+   "costos": 15.58,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2152.25,
+    "sl": 4504.25,
+    "riesgo": 1109.58,
+    "contratos": 1,
+    "recompensa_neta": 3594.42
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22953.0,
+   "stop": 22367.75,
+   "r": 4.19,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25405.0,
+    "sl": 22367.75,
+    "riesgo": 11765.0,
+    "contratos": 0,
+    "recompensa_neta": 48980.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3818.75,
+   "stop": 4395.5,
+   "r": 1.5,
+   "presupuesto": 1000,
+   "costos": 20.28,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2953.75,
+    "sl": 4395.5,
+    "riesgo": 11555.28,
+    "contratos": 0,
+    "recompensa_neta": 17279.72
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29258.25,
+   "stop": 30097.0,
+   "r": 10.14,
+   "presupuesto": 3843.38,
+   "costos": 0,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20753.5,
+    "sl": 30097.0,
+    "riesgo": 16785.0,
+    "contratos": 0,
+    "recompensa_neta": 170085.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27025.25,
+   "stop": 26586.0,
+   "r": 2,
+   "presupuesto": 2981.47,
+   "costos": 0,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27903.75,
+    "sl": 26586.0,
+    "riesgo": 882.0,
+    "contratos": 3,
+    "recompensa_neta": 1753.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10659.25,
+   "stop": 10262.0,
+   "r": 11.14,
+   "presupuesto": 4403.98,
+   "costos": 5.16,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15084.5,
+    "sl": 10262.0,
+    "riesgo": 7955.16,
+    "contratos": 0,
+    "recompensa_neta": 88494.84
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26782.25,
+   "stop": 26433.5,
+   "r": 2.75,
+   "presupuesto": 10,
+   "costos": 19.13,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27741.25,
+    "sl": 26433.5,
+    "riesgo": 7024.13,
+    "contratos": 0,
+    "recompensa_neta": 19130.87
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11203.5,
+   "stop": 11926.5,
+   "r": 0.25,
+   "presupuesto": 4882.7,
+   "costos": 3.76,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11022.75,
+    "sl": 11926.5,
+    "riesgo": 14463.76,
+    "contratos": 0,
+    "recompensa_neta": 3611.24
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 17089.75,
+   "stop": 17711.0,
+   "r": 0.5,
+   "presupuesto": 250,
+   "costos": 0.29,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16779.25,
+    "sl": 17711.0,
+    "riesgo": 1250.29,
+    "contratos": 0,
+    "recompensa_neta": 613.21
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12822.0,
+   "stop": 13465.0,
+   "r": 2,
+   "presupuesto": 1875.03,
+   "costos": 28.91,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11536.0,
+    "sl": 13465.0,
+    "riesgo": 12908.91,
+    "contratos": 0,
+    "recompensa_neta": 25671.09
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23749.75,
+   "stop": 23028.0,
+   "r": 14.31,
+   "presupuesto": 250,
+   "costos": 22.09,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 34077.75,
+    "sl": 23028.0,
+    "riesgo": 14457.09,
+    "contratos": 0,
+    "recompensa_neta": 206537.91
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9133.75,
+   "stop": 10038.0,
+   "r": 3,
+   "presupuesto": 3162.07,
+   "costos": 16.92,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6421.0,
+    "sl": 10038.0,
+    "riesgo": 18111.92,
+    "contratos": 0,
+    "recompensa_neta": 54228.08
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 4495.0,
+   "stop": 3508.75,
+   "r": 4.2,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8637.25,
+    "sl": 3508.75,
+    "riesgo": 1975.5,
+    "contratos": 0,
+    "recompensa_neta": 8281.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11687.25,
+   "stop": 12256.0,
+   "r": 3.08,
+   "presupuesto": 5000,
+   "costos": 2.94,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9935.5,
+    "sl": 12256.0,
+    "riesgo": 11377.94,
+    "contratos": 0,
+    "recompensa_neta": 35032.06
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 24768.5,
+   "stop": 25498.75,
+   "r": 3.3,
+   "presupuesto": 10,
+   "costos": 8.54,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22358.75,
+    "sl": 25498.75,
+    "riesgo": 14613.54,
+    "contratos": 0,
+    "recompensa_neta": 48186.46
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19788.25,
+   "stop": 20078.75,
+   "r": 11.35,
+   "presupuesto": 744.56,
+   "costos": 27.16,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16491.25,
+    "sl": 20078.75,
+    "riesgo": 5922.16,
+    "contratos": 0,
+    "recompensa_neta": 65827.84
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 8154.75,
+   "stop": 9055.75,
+   "r": 0.6,
+   "presupuesto": 2068.64,
+   "costos": 8.4,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7614.25,
+    "sl": 9055.75,
+    "riesgo": 1817.4,
+    "contratos": 1,
+    "recompensa_neta": 1065.6
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4101.0,
+   "stop": 4207.5,
+   "r": 2.66,
+   "presupuesto": 3272.25,
+   "costos": 2.9,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3817.75,
+    "sl": 4207.5,
+    "riesgo": 2172.9,
+    "contratos": 1,
+    "recompensa_neta": 5622.1
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9205.75,
+   "stop": 9445.5,
+   "r": 1.1,
+   "presupuesto": 1000,
+   "costos": 29.69,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8942.25,
+    "sl": 9445.5,
+    "riesgo": 4884.69,
+    "contratos": 0,
+    "recompensa_neta": 5180.31
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2822.5,
+   "stop": 3203.75,
+   "r": 2,
+   "presupuesto": 1849.72,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2060.0,
+    "sl": 3203.75,
+    "riesgo": 7625.0,
+    "contratos": 0,
+    "recompensa_neta": 15250.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27806.75,
+   "stop": 27091.75,
+   "r": 1.5,
+   "presupuesto": 250,
+   "costos": 26.78,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28879.25,
+    "sl": 27091.75,
+    "riesgo": 1456.78,
+    "contratos": 0,
+    "recompensa_neta": 2118.22
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 24869.25,
+   "stop": 24962.75,
+   "r": 1.5,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 24729.0,
+    "sl": 24962.75,
+    "riesgo": 1870.0,
+    "contratos": 0,
+    "recompensa_neta": 2805.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22698.0,
+   "stop": 22259.5,
+   "r": 1.2,
+   "presupuesto": 50,
+   "costos": 2.23,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23224.0,
+    "sl": 22259.5,
+    "riesgo": 8857.23,
+    "contratos": 0,
+    "recompensa_neta": 10432.77
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6693.5,
+   "stop": 6558.25,
+   "r": 1.5,
+   "presupuesto": 50,
+   "costos": 26.66,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 6896.25,
+    "sl": 6558.25,
+    "riesgo": 2731.66,
+    "contratos": 0,
+    "recompensa_neta": 4028.34
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 18678.0,
+   "stop": 18326.75,
+   "r": 0.25,
+   "presupuesto": 3021.19,
+   "costos": 20.13,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 18765.75,
+    "sl": 18326.75,
+    "riesgo": 729.63,
+    "contratos": 4,
+    "recompensa_neta": 148.37
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7462.5,
+   "stop": 7450.0,
+   "r": 3,
+   "presupuesto": 4243.5,
+   "costos": 2.04,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7500.0,
+    "sl": 7450.0,
+    "riesgo": 252.04,
+    "contratos": 16,
+    "recompensa_neta": 747.96
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29717.75,
+   "stop": 29123.0,
+   "r": 0.7,
+   "presupuesto": 3438.02,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 30134.0,
+    "sl": 29123.0,
+    "riesgo": 11975.0,
+    "contratos": 0,
+    "recompensa_neta": 8245.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13115.0,
+   "stop": 12992.0,
+   "r": 0.25,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13145.75,
+    "sl": 12992.0,
+    "riesgo": 2500.0,
+    "contratos": 0,
+    "recompensa_neta": 575.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 22564.0,
+   "stop": 23181.5,
+   "r": 0.7,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22131.75,
+    "sl": 23181.5,
+    "riesgo": 1239.5,
+    "contratos": 0,
+    "recompensa_neta": 860.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1063.0,
+   "stop": 687.5,
+   "r": 3.3,
+   "presupuesto": 50,
+   "costos": 0.67,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 2302.0,
+    "sl": 687.5,
+    "riesgo": 7510.67,
+    "contratos": 0,
+    "recompensa_neta": 24779.33
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22460.0,
+   "stop": 21785.0,
+   "r": 1.5,
+   "presupuesto": 2837.22,
+   "costos": 20.85,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23472.5,
+    "sl": 21785.0,
+    "riesgo": 13520.85,
+    "contratos": 0,
+    "recompensa_neta": 20229.15
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27588.5,
+   "stop": 28101.5,
+   "r": 0.5,
+   "presupuesto": 1069.26,
+   "costos": 12.83,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27332.0,
+    "sl": 28101.5,
+    "riesgo": 10272.83,
+    "contratos": 0,
+    "recompensa_neta": 5117.17
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 6354.75,
+   "stop": 5694.75,
+   "r": 2,
+   "presupuesto": 3886.67,
+   "costos": 10.97,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7674.75,
+    "sl": 5694.75,
+    "riesgo": 1340.97,
+    "contratos": 2,
+    "recompensa_neta": 2619.03
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22554.75,
+   "stop": 22613.0,
+   "r": 8.33,
+   "presupuesto": 352.54,
+   "costos": 2.5,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22069.75,
+    "sl": 22613.0,
+    "riesgo": 1232.5,
+    "contratos": 0,
+    "recompensa_neta": 9632.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16017.5,
+   "stop": 16401.0,
+   "r": 2,
+   "presupuesto": 5000,
+   "costos": 18.37,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15250.5,
+    "sl": 16401.0,
+    "riesgo": 7688.37,
+    "contratos": 0,
+    "recompensa_neta": 15321.63
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29383.75,
+   "stop": 29648.25,
+   "r": 3,
+   "presupuesto": 2267.45,
+   "costos": 21.89,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28590.25,
+    "sl": 29648.25,
+    "riesgo": 5406.89,
+    "contratos": 0,
+    "recompensa_neta": 15753.11
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 7701.75,
+   "stop": 8566.0,
+   "r": 2.75,
+   "presupuesto": 1000,
+   "costos": 15.63,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5325.25,
+    "sl": 8566.0,
+    "riesgo": 1746.63,
+    "contratos": 0,
+    "recompensa_neta": 4734.87
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25974.75,
+   "stop": 26750.5,
+   "r": 8.14,
+   "presupuesto": 1413.94,
+   "costos": 10.3,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19660.25,
+    "sl": 26750.5,
+    "riesgo": 15525.3,
+    "contratos": 0,
+    "recompensa_neta": 126279.7
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28392.75,
+   "stop": 28420.75,
+   "r": 1.5,
+   "presupuesto": 50,
+   "costos": 22.73,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28350.75,
+    "sl": 28420.75,
+    "riesgo": 582.73,
+    "contratos": 0,
+    "recompensa_neta": 817.27
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6328.25,
+   "stop": 7217.0,
+   "r": 0.5,
+   "presupuesto": 1525.46,
+   "costos": 28.42,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5884.0,
+    "sl": 7217.0,
+    "riesgo": 17858.42,
+    "contratos": 0,
+    "recompensa_neta": 8801.58
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 9901.0,
+   "stop": 9979.5,
+   "r": 2,
+   "presupuesto": 2749.16,
+   "costos": 14.2,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9744.0,
+    "sl": 9979.5,
+    "riesgo": 171.2,
+    "contratos": 16,
+    "recompensa_neta": 299.8
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26939.5,
+   "stop": 26872.5,
+   "r": 0.5,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 26973.0,
+    "sl": 26872.5,
+    "riesgo": 1340.0,
+    "contratos": 0,
+    "recompensa_neta": 670.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22231.0,
+   "stop": 22424.5,
+   "r": 18.88,
+   "presupuesto": 500,
+   "costos": 29.83,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18577.75,
+    "sl": 22424.5,
+    "riesgo": 3899.83,
+    "contratos": 0,
+    "recompensa_neta": 73035.17
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5685.0,
+   "stop": 6037.25,
+   "r": 4.2,
+   "presupuesto": 500,
+   "costos": 5.43,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 4205.75,
+    "sl": 6037.25,
+    "riesgo": 7070.43,
+    "contratos": 0,
+    "recompensa_neta": 29559.57
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 13324.5,
+   "stop": 12616.5,
+   "r": 4.47,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16489.25,
+    "sl": 12616.5,
+    "riesgo": 1416.0,
+    "contratos": 3,
+    "recompensa_neta": 6329.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21552.0,
+   "stop": 21568.5,
+   "r": 8.22,
+   "presupuesto": 1000,
+   "costos": 22.42,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21416.5,
+    "sl": 21568.5,
+    "riesgo": 352.42,
+    "contratos": 2,
+    "recompensa_neta": 2687.58
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23042.0,
+   "stop": 23533.0,
+   "r": 1,
+   "presupuesto": 4729.18,
+   "costos": 1.27,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22551.0,
+    "sl": 23533.0,
+    "riesgo": 9891.27,
+    "contratos": 0,
+    "recompensa_neta": 9748.73
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9693.25,
+   "stop": 9470.75,
+   "r": 0.7,
+   "presupuesto": 50,
+   "costos": 11.14,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9849.0,
+    "sl": 9470.75,
+    "riesgo": 4491.14,
+    "contratos": 0,
+    "recompensa_neta": 3073.86
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 16833.75,
+   "stop": 17737.0,
+   "r": 2.0,
+   "presupuesto": 3489.78,
+   "costos": 0,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15027.25,
+    "sl": 17737.0,
+    "riesgo": 1808.5,
+    "contratos": 1,
+    "recompensa_neta": 3611.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3670.5,
+   "stop": 3406.5,
+   "r": 0.6,
+   "presupuesto": 5000,
+   "costos": 7.35,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 3828.75,
+    "sl": 3406.5,
+    "riesgo": 5287.35,
+    "contratos": 0,
+    "recompensa_neta": 3157.65
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8229.75,
+   "stop": 7799.25,
+   "r": 2,
+   "presupuesto": 5000,
+   "costos": 13.93,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9090.75,
+    "sl": 7799.25,
+    "riesgo": 8678.93,
+    "contratos": 0,
+    "recompensa_neta": 17151.07
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15488.0,
+   "stop": 14735.5,
+   "r": 0.25,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15676.0,
+    "sl": 14735.5,
+    "riesgo": 15050.0,
+    "contratos": 0,
+    "recompensa_neta": 3760.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 2225.5,
+   "stop": 1359.75,
+   "r": 16.35,
+   "presupuesto": 50,
+   "costos": 11.91,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16380.5,
+    "sl": 1359.75,
+    "riesgo": 1743.41,
+    "contratos": 0,
+    "recompensa_neta": 28298.09
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23835.75,
+   "stop": 23748.5,
+   "r": 4.2,
+   "presupuesto": 100,
+   "costos": 5.05,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24202.0,
+    "sl": 23748.5,
+    "riesgo": 1795.05,
+    "contratos": 0,
+    "recompensa_neta": 7274.95
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11577.5,
+   "stop": 12295.5,
+   "r": 1.73,
+   "presupuesto": 97.66,
+   "costos": 0,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10335.5,
+    "sl": 12295.5,
+    "riesgo": 14435.0,
+    "contratos": 0,
+    "recompensa_neta": 24765.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22025.25,
+   "stop": 21662.0,
+   "r": 18.94,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28905.0,
+    "sl": 21662.0,
+    "riesgo": 7265.0,
+    "contratos": 0,
+    "recompensa_neta": 137595.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 8610.25,
+   "stop": 8185.75,
+   "r": 0.7,
+   "presupuesto": 250,
+   "costos": 11.23,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8907.25,
+    "sl": 8185.75,
+    "riesgo": 860.23,
+    "contratos": 0,
+    "recompensa_neta": 582.77
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6123.75,
+   "stop": 6167.5,
+   "r": 4.2,
+   "presupuesto": 5000,
+   "costos": 5.87,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5940.0,
+    "sl": 6167.5,
+    "riesgo": 880.87,
+    "contratos": 5,
+    "recompensa_neta": 3669.13
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21914.0,
+   "stop": 21457.5,
+   "r": 7.16,
+   "presupuesto": 2211.43,
+   "costos": 2.09,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25182.5,
+    "sl": 21457.5,
+    "riesgo": 9147.09,
+    "contratos": 0,
+    "recompensa_neta": 65352.91
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25630.5,
+   "stop": 26548.5,
+   "r": 0.25,
+   "presupuesto": 3422.56,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25401.0,
+    "sl": 26548.5,
+    "riesgo": 18360.0,
+    "contratos": 0,
+    "recompensa_neta": 4590.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 12173.0,
+   "stop": 12039.25,
+   "r": 4.2,
+   "presupuesto": 250,
+   "costos": 21.86,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12734.75,
+    "sl": 12039.25,
+    "riesgo": 293.86,
+    "contratos": 0,
+    "recompensa_neta": 1097.14
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18745.5,
+   "stop": 18658.5,
+   "r": 12.65,
+   "presupuesto": 1516.36,
+   "costos": 0,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19846.0,
+    "sl": 18658.5,
+    "riesgo": 1765.0,
+    "contratos": 0,
+    "recompensa_neta": 21985.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28926.0,
+   "stop": 27941.25,
+   "r": 0.25,
+   "presupuesto": 10,
+   "costos": 2.23,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29172.0,
+    "sl": 27941.25,
+    "riesgo": 19702.23,
+    "contratos": 0,
+    "recompensa_neta": 4912.77
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6066.5,
+   "stop": 5963.25,
+   "r": 17.44,
+   "presupuesto": 1591.27,
+   "costos": 3.3,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7867.0,
+    "sl": 5963.25,
+    "riesgo": 2068.3,
+    "contratos": 0,
+    "recompensa_neta": 36006.7
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 19484.75,
+   "stop": 19504.75,
+   "r": 2.75,
+   "presupuesto": 10,
+   "costos": 7.74,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19429.75,
+    "sl": 19504.75,
+    "riesgo": 47.74,
+    "contratos": 0,
+    "recompensa_neta": 102.26
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13376.75,
+   "stop": 12773.5,
+   "r": 3,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15186.5,
+    "sl": 12773.5,
+    "riesgo": 12090.0,
+    "contratos": 0,
+    "recompensa_neta": 36170.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7233.75,
+   "stop": 6741.25,
+   "r": 3.3,
+   "presupuesto": 4945.01,
+   "costos": 20.57,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8859.0,
+    "sl": 6741.25,
+    "riesgo": 9960.57,
+    "contratos": 0,
+    "recompensa_neta": 32394.43
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25672.0,
+   "stop": 25976.25,
+   "r": 4.2,
+   "presupuesto": 100,
+   "costos": 27.74,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 24394.25,
+    "sl": 25976.25,
+    "riesgo": 6177.74,
+    "contratos": 0,
+    "recompensa_neta": 25462.26
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 7981.75,
+   "stop": 8206.0,
+   "r": 1.1,
+   "presupuesto": 1925.56,
+   "costos": 0.8,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7735.25,
+    "sl": 8206.0,
+    "riesgo": 458.3,
+    "contratos": 4,
+    "recompensa_neta": 483.2
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13205.25,
+   "stop": 12287.0,
+   "r": 3,
+   "presupuesto": 4467.51,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15960.0,
+    "sl": 12287.0,
+    "riesgo": 18365.0,
+    "contratos": 0,
+    "recompensa_neta": 55095.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2125.25,
+   "stop": 2838.75,
+   "r": 3,
+   "presupuesto": 50,
+   "costos": 12.5,
+   "slip": 2,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5201.0,
+   "stop": 5261.75,
+   "r": 17.1,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 4162.25,
+    "sl": 5261.75,
+    "riesgo": 1240.0,
+    "contratos": 0,
+    "recompensa_neta": 20750.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21099.75,
+   "stop": 21373.75,
+   "r": 0.7,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20908.0,
+    "sl": 21373.75,
+    "riesgo": 548.0,
+    "contratos": 0,
+    "recompensa_neta": 383.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12753.0,
+   "stop": 12783.25,
+   "r": 7.2,
+   "presupuesto": 4311.23,
+   "costos": 27.51,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 12535.25,
+    "sl": 12783.25,
+    "riesgo": 632.51,
+    "contratos": 6,
+    "recompensa_neta": 4327.49
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25931.25,
+   "stop": 26180.75,
+   "r": 0.5,
+   "presupuesto": 2690.35,
+   "costos": 21.56,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25806.5,
+    "sl": 26180.75,
+    "riesgo": 5091.56,
+    "contratos": 0,
+    "recompensa_neta": 2393.44
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12407.25,
+   "stop": 13398.0,
+   "r": 1.5,
+   "presupuesto": 500,
+   "costos": 28.15,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10921.25,
+    "sl": 13398.0,
+    "riesgo": 19908.15,
+    "contratos": 0,
+    "recompensa_neta": 29626.85
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 10490.0,
+   "stop": 9806.75,
+   "r": 3,
+   "presupuesto": 50,
+   "costos": 27.53,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12539.75,
+    "sl": 9806.75,
+    "riesgo": 1395.03,
+    "contratos": 0,
+    "recompensa_neta": 4070.97
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8817.0,
+   "stop": 9810.25,
+   "r": 0.5,
+   "presupuesto": 3885.89,
+   "costos": 6.94,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8320.5,
+    "sl": 9810.25,
+    "riesgo": 19871.94,
+    "contratos": 0,
+    "recompensa_neta": 9923.06
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8437.75,
+   "stop": 9188.5,
+   "r": 2,
+   "presupuesto": 10,
+   "costos": 20.25,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6936.25,
+    "sl": 9188.5,
+    "riesgo": 15090.25,
+    "contratos": 0,
+    "recompensa_neta": 29954.75
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27639.75,
+   "stop": 27315.25,
+   "r": 0.25,
+   "presupuesto": 2737.12,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27720.75,
+    "sl": 27315.25,
+    "riesgo": 6490.0,
+    "contratos": 0,
+    "recompensa_neta": 1620.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21046.25,
+   "stop": 20875.0,
+   "r": 4.2,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21765.5,
+    "sl": 20875.0,
+    "riesgo": 346.0,
+    "contratos": 2,
+    "recompensa_neta": 1435.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12648.5,
+   "stop": 12886.25,
+   "r": 3.3,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11864.0,
+    "sl": 12886.25,
+    "riesgo": 4835.0,
+    "contratos": 1,
+    "recompensa_neta": 15610.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2683.0,
+   "stop": 1758.0,
+   "r": 10.62,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12506.5,
+    "sl": 1758.0,
+    "riesgo": 18600.0,
+    "contratos": 0,
+    "recompensa_neta": 196370.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26972.75,
+   "stop": 27502.75,
+   "r": 1.24,
+   "presupuesto": 10,
+   "costos": 11.91,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26315.75,
+    "sl": 27502.75,
+    "riesgo": 10681.91,
+    "contratos": 0,
+    "recompensa_neta": 13058.09
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21178.0,
+   "stop": 20739.75,
+   "r": 1,
+   "presupuesto": 100,
+   "costos": 23.08,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21616.25,
+    "sl": 20739.75,
+    "riesgo": 907.08,
+    "contratos": 0,
+    "recompensa_neta": 845.92
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20034.5,
+   "stop": 20057.25,
+   "r": 1.1,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20009.5,
+    "sl": 20057.25,
+    "riesgo": 465.0,
+    "contratos": 0,
+    "recompensa_neta": 490.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16245.25,
+   "stop": 15789.25,
+   "r": 1.11,
+   "presupuesto": 5000,
+   "costos": 8.53,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16751.25,
+    "sl": 15789.25,
+    "riesgo": 9128.53,
+    "contratos": 0,
+    "recompensa_neta": 10111.47
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27735.5,
+   "stop": 28218.0,
+   "r": 0.5,
+   "presupuesto": 10,
+   "costos": 9.77,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27494.25,
+    "sl": 28218.0,
+    "riesgo": 9724.77,
+    "contratos": 0,
+    "recompensa_neta": 4750.23
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 11837.0,
+   "stop": 11033.75,
+   "r": 10.86,
+   "presupuesto": 1440.92,
+   "costos": 26.97,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20560.25,
+    "sl": 11033.75,
+    "riesgo": 1642.47,
+    "contratos": 0,
+    "recompensa_neta": 17410.53
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4271.75,
+   "stop": 4997.25,
+   "r": 3.3,
+   "presupuesto": 3310.37,
+   "costos": 11.58,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 1877.75,
+    "sl": 4997.25,
+    "riesgo": 14521.58,
+    "contratos": 0,
+    "recompensa_neta": 47868.42
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3236.25,
+   "stop": 3788.0,
+   "r": 3.3,
+   "presupuesto": 250,
+   "costos": 17.4,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 1415.5,
+    "sl": 3788.0,
+    "riesgo": 11122.4,
+    "contratos": 0,
+    "recompensa_neta": 36327.6
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3624.5,
+   "stop": 2985.5,
+   "r": 2.75,
+   "presupuesto": 500,
+   "costos": 11.46,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 5381.75,
+    "sl": 2985.5,
+    "riesgo": 12876.46,
+    "contratos": 0,
+    "recompensa_neta": 35048.54
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 11396.25,
+   "stop": 12236.75,
+   "r": 1,
+   "presupuesto": 250,
+   "costos": 21.11,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10555.75,
+    "sl": 12236.75,
+    "riesgo": 1702.11,
+    "contratos": 0,
+    "recompensa_neta": 1659.89
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17720.5,
+   "stop": 18141.0,
+   "r": 0.7,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17426.25,
+    "sl": 18141.0,
+    "riesgo": 8460.0,
+    "contratos": 0,
+    "recompensa_neta": 5835.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6899.0,
+   "stop": 6350.0,
+   "r": 0.5,
+   "presupuesto": 10,
+   "costos": 21.17,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7173.5,
+    "sl": 6350.0,
+    "riesgo": 11021.17,
+    "contratos": 0,
+    "recompensa_neta": 5448.83
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29630.0,
+   "stop": 29841.0,
+   "r": 0.6,
+   "presupuesto": 10,
+   "costos": 12.47,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 29503.5,
+    "sl": 29841.0,
+    "riesgo": 4232.47,
+    "contratos": 0,
+    "recompensa_neta": 2517.53
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 17127.5,
+   "stop": 16985.5,
+   "r": 1,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 17269.5,
+    "sl": 16985.5,
+    "riesgo": 284.0,
+    "contratos": 0,
+    "recompensa_neta": 284.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25285.75,
+   "stop": 24474.75,
+   "r": 9.79,
+   "presupuesto": 10,
+   "costos": 29.21,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 33225.25,
+    "sl": 24474.75,
+    "riesgo": 16249.21,
+    "contratos": 0,
+    "recompensa_neta": 158760.79
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7112.5,
+   "stop": 6933.0,
+   "r": 12.72,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9395.5,
+    "sl": 6933.0,
+    "riesgo": 3655.0,
+    "contratos": 0,
+    "recompensa_neta": 45595.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9720.75,
+   "stop": 9384.0,
+   "r": 13.13,
+   "presupuesto": 500,
+   "costos": 25.85,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14142.25,
+    "sl": 9384.0,
+    "riesgo": 6765.85,
+    "contratos": 0,
+    "recompensa_neta": 88399.15
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21482.0,
+   "stop": 22412.75,
+   "r": 2,
+   "presupuesto": 500,
+   "costos": 0.66,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19620.5,
+    "sl": 22412.75,
+    "riesgo": 1862.16,
+    "contratos": 0,
+    "recompensa_neta": 3722.34
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17217.25,
+   "stop": 18113.0,
+   "r": 6.92,
+   "presupuesto": 100,
+   "costos": 1.03,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11018.75,
+    "sl": 18113.0,
+    "riesgo": 17996.03,
+    "contratos": 0,
+    "recompensa_neta": 123888.97
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21858.0,
+   "stop": 22310.0,
+   "r": 0.12,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21804.0,
+    "sl": 22310.0,
+    "riesgo": 9120.0,
+    "contratos": 0,
+    "recompensa_neta": 1000.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6549.0,
+   "stop": 6058.75,
+   "r": 2.75,
+   "presupuesto": 500,
+   "costos": 11.58,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7897.0,
+    "sl": 6058.75,
+    "riesgo": 9816.58,
+    "contratos": 0,
+    "recompensa_neta": 26948.42
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 5535.25,
+   "stop": 6365.75,
+   "r": 2.22,
+   "presupuesto": 10,
+   "costos": 20.57,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3691.75,
+    "sl": 6365.75,
+    "riesgo": 1681.57,
+    "contratos": 0,
+    "recompensa_neta": 3666.43
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1352.0,
+   "stop": 387.75,
+   "r": 1.5,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 2798.25,
+    "sl": 387.75,
+    "riesgo": 19285.0,
+    "contratos": 0,
+    "recompensa_neta": 28925.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12935.75,
+   "stop": 12714.5,
+   "r": 4.2,
+   "presupuesto": 5000,
+   "costos": 24.75,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13865.0,
+    "sl": 12714.5,
+    "riesgo": 4509.75,
+    "contratos": 1,
+    "recompensa_neta": 18500.25
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5872.5,
+   "stop": 6119.75,
+   "r": 2,
+   "presupuesto": 3275.91,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5378.0,
+    "sl": 6119.75,
+    "riesgo": 4945.0,
+    "contratos": 0,
+    "recompensa_neta": 9890.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 2282.5,
+   "stop": 2250.0,
+   "r": 2,
+   "presupuesto": 500,
+   "costos": 9.29,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 2347.5,
+    "sl": 2250.0,
+    "riesgo": 74.29,
+    "contratos": 6,
+    "recompensa_neta": 120.71
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23075.75,
+   "stop": 24071.75,
+   "r": 0.5,
+   "presupuesto": 536.27,
+   "costos": 1.29,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22577.75,
+    "sl": 24071.75,
+    "riesgo": 19921.29,
+    "contratos": 0,
+    "recompensa_neta": 9958.71
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7161.25,
+   "stop": 7256.75,
+   "r": 4.2,
+   "presupuesto": 2695.03,
+   "costos": 15.61,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6760.25,
+    "sl": 7256.75,
+    "riesgo": 1980.61,
+    "contratos": 1,
+    "recompensa_neta": 7949.39
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20208.25,
+   "stop": 20346.75,
+   "r": 1,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20069.75,
+    "sl": 20346.75,
+    "riesgo": 2770.0,
+    "contratos": 0,
+    "recompensa_neta": 2770.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27970.25,
+   "stop": 27412.25,
+   "r": 1,
+   "presupuesto": 50,
+   "costos": 11.15,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28528.25,
+    "sl": 27412.25,
+    "riesgo": 1134.65,
+    "contratos": 0,
+    "recompensa_neta": 1097.35
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3900.0,
+   "stop": 4310.25,
+   "r": 14.19,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 16,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3205.25,
+   "stop": 3306.75,
+   "r": 1,
+   "presupuesto": 5000,
+   "costos": 25.96,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3103.75,
+    "sl": 3306.75,
+    "riesgo": 2115.96,
+    "contratos": 2,
+    "recompensa_neta": 1944.04
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17621.75,
+   "stop": 17722.5,
+   "r": 1,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17521.0,
+    "sl": 17722.5,
+    "riesgo": 2015.0,
+    "contratos": 0,
+    "recompensa_neta": 2015.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 18493.25,
+   "stop": 17649.75,
+   "r": 2.75,
+   "presupuesto": 2025.21,
+   "costos": 8.24,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20812.75,
+    "sl": 17649.75,
+    "riesgo": 1695.24,
+    "contratos": 1,
+    "recompensa_neta": 4630.76
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7160.5,
+   "stop": 6745.0,
+   "r": 4.2,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8905.5,
+    "sl": 6745.0,
+    "riesgo": 8310.0,
+    "contratos": 0,
+    "recompensa_neta": 34900.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12409.75,
+   "stop": 12183.0,
+   "r": 0.6,
+   "presupuesto": 250,
+   "costos": 4.8,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12545.75,
+    "sl": 12183.0,
+    "riesgo": 4539.8,
+    "contratos": 0,
+    "recompensa_neta": 2715.2
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17616.75,
+   "stop": 17936.25,
+   "r": 3.34,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16549.75,
+    "sl": 17936.25,
+    "riesgo": 6475.0,
+    "contratos": 0,
+    "recompensa_neta": 21255.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 13362.75,
+   "stop": 12569.5,
+   "r": 7.27,
+   "presupuesto": 2875.84,
+   "costos": 6.34,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19129.5,
+    "sl": 12569.5,
+    "riesgo": 1602.84,
+    "contratos": 1,
+    "recompensa_neta": 11517.16
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17691.25,
+   "stop": 18353.5,
+   "r": 16.48,
+   "presupuesto": 4219.97,
+   "costos": 0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6777.5,
+    "sl": 18353.5,
+    "riesgo": 13340.0,
+    "contratos": 0,
+    "recompensa_neta": 218180.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4306.0,
+   "stop": 4130.0,
+   "r": 18.07,
+   "presupuesto": 326.76,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7486.25,
+    "sl": 4130.0,
+    "riesgo": 3520.0,
+    "contratos": 0,
+    "recompensa_neta": 63605.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6593.5,
+   "stop": 7426.25,
+   "r": 0.25,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6385.5,
+    "sl": 7426.25,
+    "riesgo": 16695.0,
+    "contratos": 0,
+    "recompensa_neta": 4120.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 7357.25,
+   "stop": 8257.5,
+   "r": 2,
+   "presupuesto": 10,
+   "costos": 29.71,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5556.75,
+    "sl": 8257.5,
+    "riesgo": 1830.21,
+    "contratos": 0,
+    "recompensa_neta": 3571.29
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1837.5,
+   "stop": 1294.5,
+   "r": 5.63,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 4894.5,
+    "sl": 1294.5,
+    "riesgo": 10860.0,
+    "contratos": 0,
+    "recompensa_neta": 61140.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20943.25,
+   "stop": 21010.5,
+   "r": 3.3,
+   "presupuesto": 3103.33,
+   "costos": 24.81,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20721.5,
+    "sl": 21010.5,
+    "riesgo": 1369.81,
+    "contratos": 2,
+    "recompensa_neta": 4410.19
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29511.5,
+   "stop": 30343.5,
+   "r": 0.5,
+   "presupuesto": 100,
+   "costos": 21.17,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 29095.5,
+    "sl": 30343.5,
+    "riesgo": 16751.17,
+    "contratos": 0,
+    "recompensa_neta": 8208.83
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 6937.5,
+   "stop": 6698.5,
+   "r": 1.1,
+   "presupuesto": 250,
+   "costos": 17.48,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 7200.25,
+    "sl": 6698.5,
+    "riesgo": 499.48,
+    "contratos": 0,
+    "recompensa_neta": 504.02
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19157.25,
+   "stop": 19040.75,
+   "r": 14.7,
+   "presupuesto": 2524.45,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20869.75,
+    "sl": 19040.75,
+    "riesgo": 2330.0,
+    "contratos": 1,
+    "recompensa_neta": 34250.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27446.0,
+   "stop": 27580.5,
+   "r": 0.25,
+   "presupuesto": 10,
+   "costos": 16.89,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27412.5,
+    "sl": 27580.5,
+    "riesgo": 2706.89,
+    "contratos": 0,
+    "recompensa_neta": 653.11
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4773.25,
+   "stop": 5578.0,
+   "r": 1,
+   "presupuesto": 4466.39,
+   "costos": 22.8,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3968.5,
+    "sl": 5578.0,
+    "riesgo": 16117.8,
+    "contratos": 0,
+    "recompensa_neta": 16072.2
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 7555.5,
+   "stop": 7202.5,
+   "r": 3,
+   "presupuesto": 401.36,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8614.5,
+    "sl": 7202.5,
+    "riesgo": 706.0,
+    "contratos": 0,
+    "recompensa_neta": 2118.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17298.5,
+   "stop": 17584.75,
+   "r": 3.77,
+   "presupuesto": 4438.27,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16219.5,
+    "sl": 17584.75,
+    "riesgo": 5725.0,
+    "contratos": 0,
+    "recompensa_neta": 21580.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19310.5,
+   "stop": 19191.0,
+   "r": 1.1,
+   "presupuesto": 100,
+   "costos": 8.28,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19441.75,
+    "sl": 19191.0,
+    "riesgo": 2473.28,
+    "contratos": 0,
+    "recompensa_neta": 2541.72
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6902.0,
+   "stop": 7335.75,
+   "r": 1.1,
+   "presupuesto": 2528.6,
+   "costos": 8.28,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6425.0,
+    "sl": 7335.75,
+    "riesgo": 8763.28,
+    "contratos": 0,
+    "recompensa_neta": 9451.72
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 10708.75,
+   "stop": 10387.5,
+   "r": 0.6,
+   "presupuesto": 501.72,
+   "costos": 0.28,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 10901.5,
+    "sl": 10387.5,
+    "riesgo": 650.28,
+    "contratos": 0,
+    "recompensa_neta": 377.72
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18774.5,
+   "stop": 19226.75,
+   "r": 1.5,
+   "presupuesto": 4234.68,
+   "costos": 19.25,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18096.25,
+    "sl": 19226.75,
+    "riesgo": 9069.25,
+    "contratos": 0,
+    "recompensa_neta": 13540.75
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12435.5,
+   "stop": 11556.75,
+   "r": 1,
+   "presupuesto": 2393.99,
+   "costos": 24.74,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13314.25,
+    "sl": 11556.75,
+    "riesgo": 17604.74,
+    "contratos": 0,
+    "recompensa_neta": 17545.26
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3582.0,
+   "stop": 3881.5,
+   "r": 1.2,
+   "presupuesto": 4690.6,
+   "costos": 1.53,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3222.75,
+    "sl": 3881.5,
+    "riesgo": 6041.53,
+    "contratos": 0,
+    "recompensa_neta": 7133.47
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 9565.5,
+   "stop": 9658.5,
+   "r": 1.5,
+   "presupuesto": 1539.46,
+   "costos": 1.49,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9426.0,
+    "sl": 9658.5,
+    "riesgo": 187.49,
+    "contratos": 8,
+    "recompensa_neta": 277.51
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2956.5,
+   "stop": 3577.25,
+   "r": 0.7,
+   "presupuesto": 250,
+   "costos": 27.31,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2522.0,
+    "sl": 3577.25,
+    "riesgo": 12537.31,
+    "contratos": 0,
+    "recompensa_neta": 8567.69
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1776.75,
+   "stop": 1033.5,
+   "r": 18.98,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15883.5,
+    "sl": 1033.5,
+    "riesgo": 14865.0,
+    "contratos": 0,
+    "recompensa_neta": 282135.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14156.0,
+   "stop": 14128.75,
+   "r": 6.07,
+   "presupuesto": 500,
+   "costos": 23.99,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14321.25,
+    "sl": 14128.75,
+    "riesgo": 633.99,
+    "contratos": 0,
+    "recompensa_neta": 3216.01
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 13045.5,
+   "stop": 13475.5,
+   "r": 3,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11755.5,
+    "sl": 13475.5,
+    "riesgo": 860.0,
+    "contratos": 0,
+    "recompensa_neta": 2580.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14344.25,
+   "stop": 13926.25,
+   "r": 2.14,
+   "presupuesto": 3119.54,
+   "costos": 18.24,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15238.75,
+    "sl": 13926.25,
+    "riesgo": 8378.24,
+    "contratos": 0,
+    "recompensa_neta": 17871.76
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21385.75,
+   "stop": 22246.0,
+   "r": 3,
+   "presupuesto": 250,
+   "costos": 13.49,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18805.0,
+    "sl": 22246.0,
+    "riesgo": 17288.49,
+    "contratos": 0,
+    "recompensa_neta": 51531.51
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8177.25,
+   "stop": 8197.5,
+   "r": 3,
+   "presupuesto": 100,
+   "costos": 26.28,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8116.5,
+    "sl": 8197.5,
+    "riesgo": 431.28,
+    "contratos": 0,
+    "recompensa_neta": 1188.72
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 23882.25,
+   "stop": 23618.25,
+   "r": 6.75,
+   "presupuesto": 1466.74,
+   "costos": 16.8,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25664.25,
+    "sl": 23618.25,
+    "riesgo": 554.8,
+    "contratos": 2,
+    "recompensa_neta": 3537.2
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13349.25,
+   "stop": 13333.75,
+   "r": 0.51,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13357.0,
+    "sl": 13333.75,
+    "riesgo": 355.0,
+    "contratos": 0,
+    "recompensa_neta": 110.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14525.5,
+   "stop": 15473.0,
+   "r": 1,
+   "presupuesto": 10,
+   "costos": 26.62,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13578.0,
+    "sl": 15473.0,
+    "riesgo": 19061.62,
+    "contratos": 0,
+    "recompensa_neta": 18838.38
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13028.5,
+   "stop": 12377.75,
+   "r": 4.2,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15761.5,
+    "sl": 12377.75,
+    "riesgo": 13025.0,
+    "contratos": 0,
+    "recompensa_neta": 54650.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24951.75,
+   "stop": 24650.0,
+   "r": 12.27,
+   "presupuesto": 500,
+   "costos": 27.18,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28654.0,
+    "sl": 24650.0,
+    "riesgo": 630.68,
+    "contratos": 0,
+    "recompensa_neta": 7377.32
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2355.75,
+   "stop": 2169.5,
+   "r": 13.41,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 4853.25,
+    "sl": 2169.5,
+    "riesgo": 3725.0,
+    "contratos": 0,
+    "recompensa_neta": 49950.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15871.25,
+   "stop": 16186.25,
+   "r": 0.5,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15713.75,
+    "sl": 16186.25,
+    "riesgo": 6355.0,
+    "contratos": 0,
+    "recompensa_neta": 3095.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12980.75,
+   "stop": 13144.25,
+   "r": 10.27,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11301.75,
+    "sl": 13144.25,
+    "riesgo": 3270.0,
+    "contratos": 0,
+    "recompensa_neta": 33580.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 2504.5,
+   "stop": 2246.25,
+   "r": 3.3,
+   "presupuesto": 500,
+   "costos": 10.85,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 3356.5,
+    "sl": 2246.25,
+    "riesgo": 533.85,
+    "contratos": 0,
+    "recompensa_neta": 1686.65
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4038.25,
+   "stop": 4797.5,
+   "r": 1,
+   "presupuesto": 1150.22,
+   "costos": 25.97,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3279.0,
+    "sl": 4797.5,
+    "riesgo": 15265.97,
+    "contratos": 0,
+    "recompensa_neta": 15104.03
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16934.75,
+   "stop": 16422.5,
+   "r": 0.7,
+   "presupuesto": 1000,
+   "costos": 11.36,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 17293.25,
+    "sl": 16422.5,
+    "riesgo": 10266.36,
+    "contratos": 0,
+    "recompensa_neta": 7148.64
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20386.75,
+   "stop": 21069.75,
+   "r": 18.83,
+   "presupuesto": 501.05,
+   "costos": 14.09,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7526.0,
+    "sl": 21069.75,
+    "riesgo": 13674.09,
+    "contratos": 0,
+    "recompensa_neta": 257200.91
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 22851.0,
+   "stop": 23396.75,
+   "r": 0.6,
+   "presupuesto": 50,
+   "costos": 11.19,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22523.75,
+    "sl": 23396.75,
+    "riesgo": 1102.69,
+    "contratos": 0,
+    "recompensa_neta": 643.31
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6791.75,
+   "stop": 7318.5,
+   "r": 1.2,
+   "presupuesto": 180.94,
+   "costos": 22.32,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6159.75,
+    "sl": 7318.5,
+    "riesgo": 10557.32,
+    "contratos": 0,
+    "recompensa_neta": 12617.68
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9111.0,
+   "stop": 8734.0,
+   "r": 1,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9488.0,
+    "sl": 8734.0,
+    "riesgo": 7550.0,
+    "contratos": 0,
+    "recompensa_neta": 7530.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8563.25,
+   "stop": 8703.75,
+   "r": 2.75,
+   "presupuesto": 100,
+   "costos": 19.67,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8177.0,
+    "sl": 8703.75,
+    "riesgo": 2829.67,
+    "contratos": 0,
+    "recompensa_neta": 7705.33
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 3462.0,
+   "stop": 3464.75,
+   "r": 18.25,
+   "presupuesto": 1473.8,
+   "costos": 7.98,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3412.0,
+    "sl": 3464.75,
+    "riesgo": 13.48,
+    "contratos": 109,
+    "recompensa_neta": 92.02
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3540.0,
+   "stop": 4290.5,
+   "r": 0.25,
+   "presupuesto": 250,
+   "costos": 6.18,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3352.5,
+    "sl": 4290.5,
+    "riesgo": 15016.18,
+    "contratos": 0,
+    "recompensa_neta": 3743.82
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7406.75,
+   "stop": 7288.25,
+   "r": 7.07,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8244.5,
+    "sl": 7288.25,
+    "riesgo": 2410.0,
+    "contratos": 0,
+    "recompensa_neta": 16715.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17319.5,
+   "stop": 16831.0,
+   "r": 2.75,
+   "presupuesto": 2972.33,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 18662.75,
+    "sl": 16831.0,
+    "riesgo": 9770.0,
+    "contratos": 0,
+    "recompensa_neta": 26865.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 3168.25,
+   "stop": 3199.25,
+   "r": 1,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3137.25,
+    "sl": 3199.25,
+    "riesgo": 62.0,
+    "contratos": 8,
+    "recompensa_neta": 62.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28410.75,
+   "stop": 28428.5,
+   "r": 2.72,
+   "presupuesto": 1591.54,
+   "costos": 11.48,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28362.5,
+    "sl": 28428.5,
+    "riesgo": 401.48,
+    "contratos": 3,
+    "recompensa_neta": 918.52
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8575.75,
+   "stop": 7824.5,
+   "r": 11.23,
+   "presupuesto": 5000,
+   "costos": 23.37,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 17012.25,
+    "sl": 7824.5,
+    "riesgo": 15048.37,
+    "contratos": 0,
+    "recompensa_neta": 168706.63
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10716.5,
+   "stop": 10004.5,
+   "r": 1.1,
+   "presupuesto": 3897.05,
+   "costos": 0,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 11499.5,
+    "sl": 10004.5,
+    "riesgo": 14260.0,
+    "contratos": 0,
+    "recompensa_neta": 15640.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 28338.5,
+   "stop": 27888.0,
+   "r": 1.2,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28879.0,
+    "sl": 27888.0,
+    "riesgo": 901.0,
+    "contratos": 0,
+    "recompensa_neta": 1081.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21849.0,
+   "stop": 22323.25,
+   "r": 1,
+   "presupuesto": 3675.93,
+   "costos": 9.06,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21374.75,
+    "sl": 22323.25,
+    "riesgo": 9504.06,
+    "contratos": 0,
+    "recompensa_neta": 9465.94
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27193.25,
+   "stop": 27831.0,
+   "r": 2.75,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25439.5,
+    "sl": 27831.0,
+    "riesgo": 12755.0,
+    "contratos": 0,
+    "recompensa_neta": 35075.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20287.0,
+   "stop": 19691.5,
+   "r": 3.3,
+   "presupuesto": 500,
+   "costos": 8.14,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22252.0,
+    "sl": 19691.5,
+    "riesgo": 11923.14,
+    "contratos": 0,
+    "recompensa_neta": 39286.86
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 11626.75,
+   "stop": 12413.75,
+   "r": 1.5,
+   "presupuesto": 5000,
+   "costos": 12.13,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10446.25,
+    "sl": 12413.75,
+    "riesgo": 1586.13,
+    "contratos": 3,
+    "recompensa_neta": 2348.87
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20235.75,
+   "stop": 20144.0,
+   "r": 0.6,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20290.75,
+    "sl": 20144.0,
+    "riesgo": 1865.0,
+    "contratos": 0,
+    "recompensa_neta": 1070.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13636.75,
+   "stop": 13601.0,
+   "r": 9.98,
+   "presupuesto": 5000,
+   "costos": 22.2,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13993.5,
+    "sl": 13601.0,
+    "riesgo": 797.2,
+    "contratos": 6,
+    "recompensa_neta": 7052.8
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11157.25,
+   "stop": 11205.25,
+   "r": 1.1,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11104.5,
+    "sl": 11205.25,
+    "riesgo": 960.0,
+    "contratos": 0,
+    "recompensa_neta": 1055.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24092.75,
+   "stop": 23967.75,
+   "r": 3.3,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24505.25,
+    "sl": 23967.75,
+    "riesgo": 257.5,
+    "contratos": 0,
+    "recompensa_neta": 817.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27607.75,
+   "stop": 27404.25,
+   "r": 3.3,
+   "presupuesto": 2769.72,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28279.25,
+    "sl": 27404.25,
+    "riesgo": 4070.0,
+    "contratos": 0,
+    "recompensa_neta": 13430.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18590.25,
+   "stop": 19008.75,
+   "r": 3.96,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16933.0,
+    "sl": 19008.75,
+    "riesgo": 8465.0,
+    "contratos": 0,
+    "recompensa_neta": 33050.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20099.0,
+   "stop": 20768.25,
+   "r": 1.1,
+   "presupuesto": 50,
+   "costos": 2.63,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19363.0,
+    "sl": 20768.25,
+    "riesgo": 13387.63,
+    "contratos": 0,
+    "recompensa_neta": 14717.37
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27326.5,
+   "stop": 28157.25,
+   "r": 0.5,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26911.25,
+    "sl": 28157.25,
+    "riesgo": 1661.5,
+    "contratos": 0,
+    "recompensa_neta": 830.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16492.0,
+   "stop": 16052.5,
+   "r": 1.1,
+   "presupuesto": 50,
+   "costos": 2.11,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16975.25,
+    "sl": 16052.5,
+    "riesgo": 8792.11,
+    "contratos": 0,
+    "recompensa_neta": 9662.89
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13582.75,
+   "stop": 13988.75,
+   "r": 12.88,
+   "presupuesto": 4788.35,
+   "costos": 19.71,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8353.5,
+    "sl": 13988.75,
+    "riesgo": 8219.71,
+    "contratos": 0,
+    "recompensa_neta": 104485.29
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6637.5,
+   "stop": 6823.75,
+   "r": 4.2,
+   "presupuesto": 1551.48,
+   "costos": 0,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5855.25,
+    "sl": 6823.75,
+    "riesgo": 3750.0,
+    "contratos": 0,
+    "recompensa_neta": 15620.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 8539.5,
+   "stop": 7930.25,
+   "r": 1.2,
+   "presupuesto": 50,
+   "costos": 25.81,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9270.5,
+    "sl": 7930.25,
+    "riesgo": 1249.81,
+    "contratos": 0,
+    "recompensa_neta": 1430.69
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28723.75,
+   "stop": 29221.5,
+   "r": 0.6,
+   "presupuesto": 2301.28,
+   "costos": 1.71,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28425.25,
+    "sl": 29221.5,
+    "riesgo": 10006.71,
+    "contratos": 0,
+    "recompensa_neta": 5918.29
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25005.5,
+   "stop": 24202.25,
+   "r": 4.2,
+   "presupuesto": 100,
+   "costos": 28.42,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28379.0,
+    "sl": 24202.25,
+    "riesgo": 16113.42,
+    "contratos": 0,
+    "recompensa_neta": 67421.58
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4237.25,
+   "stop": 4213.25,
+   "r": 1.1,
+   "presupuesto": 2635.34,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 4263.5,
+    "sl": 4213.25,
+    "riesgo": 560.0,
+    "contratos": 4,
+    "recompensa_neta": 445.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 3103.75,
+   "stop": 3395.5,
+   "r": 4.2,
+   "presupuesto": 50,
+   "costos": 17.37,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 1878.5,
+    "sl": 3395.5,
+    "riesgo": 606.87,
+    "contratos": 0,
+    "recompensa_neta": 2427.13
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25031.5,
+   "stop": 25283.5,
+   "r": 2.75,
+   "presupuesto": 50,
+   "costos": 16.01,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 24338.5,
+    "sl": 25283.5,
+    "riesgo": 5071.01,
+    "contratos": 0,
+    "recompensa_neta": 13828.99
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15705.25,
+   "stop": 16301.5,
+   "r": 3.93,
+   "presupuesto": 500,
+   "costos": 11.77,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13362.0,
+    "sl": 16301.5,
+    "riesgo": 12011.77,
+    "contratos": 0,
+    "recompensa_neta": 46778.23
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17622.25,
+   "stop": 17250.0,
+   "r": 3.3,
+   "presupuesto": 2915.86,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 18850.5,
+    "sl": 17250.0,
+    "riesgo": 7445.0,
+    "contratos": 0,
+    "recompensa_neta": 24565.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 16212.75,
+   "stop": 16104.5,
+   "r": 0.7,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16288.5,
+    "sl": 16104.5,
+    "riesgo": 217.0,
+    "contratos": 0,
+    "recompensa_neta": 151.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9741.75,
+   "stop": 8760.5,
+   "r": 1.84,
+   "presupuesto": 3610.4,
+   "costos": 20.66,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 11547.25,
+    "sl": 8760.5,
+    "riesgo": 19645.66,
+    "contratos": 0,
+    "recompensa_neta": 36089.34
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4304.0,
+   "stop": 4424.75,
+   "r": 3.3,
+   "presupuesto": 3676.36,
+   "costos": 22.17,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3905.75,
+    "sl": 4424.75,
+    "riesgo": 2462.17,
+    "contratos": 1,
+    "recompensa_neta": 7917.83
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8622.25,
+   "stop": 8643.75,
+   "r": 3.3,
+   "presupuesto": 100,
+   "costos": 19.49,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8551.5,
+    "sl": 8643.75,
+    "riesgo": 449.49,
+    "contratos": 0,
+    "recompensa_neta": 1395.51
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 23440.75,
+   "stop": 24371.0,
+   "r": 14.11,
+   "presupuesto": 10,
+   "costos": 12.82,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10315.0,
+    "sl": 24371.0,
+    "riesgo": 1873.32,
+    "contratos": 0,
+    "recompensa_neta": 26238.68
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20557.75,
+   "stop": 20955.75,
+   "r": 4.42,
+   "presupuesto": 1404.36,
+   "costos": 13.78,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18798.75,
+    "sl": 20955.75,
+    "riesgo": 7973.78,
+    "contratos": 0,
+    "recompensa_neta": 35166.22
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12487.0,
+   "stop": 12268.5,
+   "r": 3,
+   "presupuesto": 50,
+   "costos": 2.06,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13142.5,
+    "sl": 12268.5,
+    "riesgo": 4472.06,
+    "contratos": 0,
+    "recompensa_neta": 13007.94
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 24344.5,
+   "stop": 25039.75,
+   "r": 2.75,
+   "presupuesto": 1000,
+   "costos": 9.83,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22432.75,
+    "sl": 25039.75,
+    "riesgo": 13914.83,
+    "contratos": 0,
+    "recompensa_neta": 38225.17
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 11568.0,
+   "stop": 11235.25,
+   "r": 0.5,
+   "presupuesto": 250,
+   "costos": 7.76,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 11734.25,
+    "sl": 11235.25,
+    "riesgo": 674.26,
+    "contratos": 0,
+    "recompensa_neta": 323.74
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9662.5,
+   "stop": 9468.25,
+   "r": 2.87,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 10219.75,
+    "sl": 9468.25,
+    "riesgo": 3955.0,
+    "contratos": 0,
+    "recompensa_neta": 11075.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1511.75,
+   "stop": 539.0,
+   "r": 0.5,
+   "presupuesto": 439.83,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 1998.0,
+    "sl": 539.0,
+    "riesgo": 19455.0,
+    "contratos": 0,
+    "recompensa_neta": 9725.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21111.5,
+   "stop": 20573.75,
+   "r": 1.5,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21918.0,
+    "sl": 20573.75,
+    "riesgo": 10755.0,
+    "contratos": 0,
+    "recompensa_neta": 16130.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25036.5,
+   "stop": 25001.5,
+   "r": 0.6,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25057.5,
+    "sl": 25001.5,
+    "riesgo": 79.5,
+    "contratos": 0,
+    "recompensa_neta": 32.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18364.5,
+   "stop": 18863.25,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 9.52,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17367.0,
+    "sl": 18863.25,
+    "riesgo": 9999.52,
+    "contratos": 0,
+    "recompensa_neta": 19925.48
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7081.25,
+   "stop": 6653.25,
+   "r": 4.2,
+   "presupuesto": 463.81,
+   "costos": 0,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8878.75,
+    "sl": 6653.25,
+    "riesgo": 8610.0,
+    "contratos": 0,
+    "recompensa_neta": 35900.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29083.5,
+   "stop": 29974.25,
+   "r": 1.2,
+   "presupuesto": 50,
+   "costos": 23.26,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28014.75,
+    "sl": 29974.25,
+    "riesgo": 17843.26,
+    "contratos": 0,
+    "recompensa_neta": 21346.74
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 26503.5,
+   "stop": 26273.25,
+   "r": 3,
+   "presupuesto": 3056.54,
+   "costos": 13.02,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27194.25,
+    "sl": 26273.25,
+    "riesgo": 475.52,
+    "contratos": 6,
+    "recompensa_neta": 1366.48
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29115.75,
+   "stop": 29637.5,
+   "r": 14.73,
+   "presupuesto": 50,
+   "costos": 26.72,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21430.5,
+    "sl": 29637.5,
+    "riesgo": 10546.72,
+    "contratos": 0,
+    "recompensa_neta": 153593.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23581.25,
+   "stop": 24357.75,
+   "r": 0.6,
+   "presupuesto": 3809.7,
+   "costos": 18.92,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 23115.5,
+    "sl": 24357.75,
+    "riesgo": 15633.92,
+    "contratos": 0,
+    "recompensa_neta": 9211.08
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8620.0,
+   "stop": 9580.0,
+   "r": 2,
+   "presupuesto": 250,
+   "costos": 17.56,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6700.0,
+    "sl": 9580.0,
+    "riesgo": 19242.56,
+    "contratos": 0,
+    "recompensa_neta": 38357.44
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 17767.5,
+   "stop": 18166.5,
+   "r": 11.19,
+   "presupuesto": 250,
+   "costos": 2.88,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13302.75,
+    "sl": 18166.5,
+    "riesgo": 809.38,
+    "contratos": 0,
+    "recompensa_neta": 8918.12
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17882.5,
+   "stop": 17583.25,
+   "r": 0.5,
+   "presupuesto": 4104.82,
+   "costos": 29.02,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 18032.0,
+    "sl": 17583.25,
+    "riesgo": 6014.02,
+    "contratos": 0,
+    "recompensa_neta": 2960.98
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25733.5,
+   "stop": 26654.75,
+   "r": 15.18,
+   "presupuesto": 500,
+   "costos": 16.69,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11749.0,
+    "sl": 26654.75,
+    "riesgo": 18441.69,
+    "contratos": 0,
+    "recompensa_neta": 279673.31
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5368.5,
+   "stop": 4652.75,
+   "r": 1.5,
+   "presupuesto": 10,
+   "costos": 19.06,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 6442.0,
+    "sl": 4652.75,
+    "riesgo": 14334.06,
+    "contratos": 0,
+    "recompensa_neta": 21450.94
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 3413.5,
+   "stop": 4032.0,
+   "r": 17.96,
+   "presupuesto": 4210.49,
+   "costos": 2.18,
+   "slip": 0,
+   "valido": false
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18708.25,
+   "stop": 19227.75,
+   "r": 17.65,
+   "presupuesto": 2459.94,
+   "costos": 29.53,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9539.25,
+    "sl": 19227.75,
+    "riesgo": 10514.53,
+    "contratos": 0,
+    "recompensa_neta": 183255.47
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20868.5,
+   "stop": 20592.0,
+   "r": 13.23,
+   "presupuesto": 5000,
+   "costos": 10.17,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24526.5,
+    "sl": 20592.0,
+    "riesgo": 5540.17,
+    "contratos": 0,
+    "recompensa_neta": 73149.83
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27689.5,
+   "stop": 28384.25,
+   "r": 0.67,
+   "presupuesto": 1000,
+   "costos": 15.55,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27224.25,
+    "sl": 28384.25,
+    "riesgo": 13910.55,
+    "contratos": 0,
+    "recompensa_neta": 9289.45
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 5991.5,
+   "stop": 5287.75,
+   "r": 0.25,
+   "presupuesto": 10,
+   "costos": 25.39,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 6167.25,
+    "sl": 5287.75,
+    "riesgo": 1438.89,
+    "contratos": 0,
+    "recompensa_neta": 320.11
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25046.5,
+   "stop": 24325.0,
+   "r": 1.1,
+   "presupuesto": 500,
+   "costos": 11.93,
+   "slip": 17,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25840.0,
+    "sl": 24325.0,
+    "riesgo": 14526.93,
+    "contratos": 0,
+    "recompensa_neta": 15773.07
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7905.75,
+   "stop": 6931.0,
+   "r": 1.1,
+   "presupuesto": 50,
+   "costos": 16.83,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8977.75,
+    "sl": 6931.0,
+    "riesgo": 19511.83,
+    "contratos": 0,
+    "recompensa_neta": 21423.17
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 23350.25,
+   "stop": 23946.25,
+   "r": 1.5,
+   "presupuesto": 2041.0,
+   "costos": 9.14,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22456.25,
+    "sl": 23946.25,
+    "riesgo": 11934.14,
+    "contratos": 0,
+    "recompensa_neta": 17865.86
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 1384.75,
+   "stop": 1463.5,
+   "r": 0.5,
+   "presupuesto": 500,
+   "costos": 19.46,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 1345.5,
+    "sl": 1463.5,
+    "riesgo": 176.96,
+    "contratos": 2,
+    "recompensa_neta": 59.04
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29433.25,
+   "stop": 29180.25,
+   "r": 0.6,
+   "presupuesto": 3113.05,
+   "costos": 11.71,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29585.0,
+    "sl": 29180.25,
+    "riesgo": 5166.71,
+    "contratos": 0,
+    "recompensa_neta": 2928.29
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5245.75,
+   "stop": 4266.25,
+   "r": 3,
+   "presupuesto": 10,
+   "costos": 27.23,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8184.25,
+    "sl": 4266.25,
+    "riesgo": 19617.23,
+    "contratos": 0,
+    "recompensa_neta": 58742.77
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14142.5,
+   "stop": 13720.25,
+   "r": 2.29,
+   "presupuesto": 50,
+   "costos": 14.66,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15109.25,
+    "sl": 13720.25,
+    "riesgo": 8459.66,
+    "contratos": 0,
+    "recompensa_neta": 19320.34
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 22335.0,
+   "stop": 22296.0,
+   "r": 2.75,
+   "presupuesto": 3631.43,
+   "costos": 13.75,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22442.25,
+    "sl": 22296.0,
+    "riesgo": 94.25,
+    "contratos": 38,
+    "recompensa_neta": 198.25
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26510.25,
+   "stop": 26587.5,
+   "r": 1.94,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26360.5,
+    "sl": 26587.5,
+    "riesgo": 1545.0,
+    "contratos": 0,
+    "recompensa_neta": 2995.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26293.75,
+   "stop": 26451.25,
+   "r": 1,
+   "presupuesto": 4083.41,
+   "costos": 7.41,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 26136.25,
+    "sl": 26451.25,
+    "riesgo": 3222.41,
+    "contratos": 1,
+    "recompensa_neta": 3077.59
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18409.25,
+   "stop": 18467.5,
+   "r": 0.25,
+   "presupuesto": 520.74,
+   "costos": 16.64,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18394.75,
+    "sl": 18467.5,
+    "riesgo": 1256.64,
+    "contratos": 0,
+    "recompensa_neta": 198.36
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 27865.5,
+   "stop": 27286.0,
+   "r": 3.3,
+   "presupuesto": 763.51,
+   "costos": 0,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29777.75,
+    "sl": 27286.0,
+    "riesgo": 1164.5,
+    "contratos": 0,
+    "recompensa_neta": 3819.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18796.0,
+   "stop": 19284.25,
+   "r": 16.48,
+   "presupuesto": 1000,
+   "costos": 25.81,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 10749.75,
+    "sl": 19284.25,
+    "riesgo": 9815.81,
+    "contratos": 0,
+    "recompensa_neta": 160874.19
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28476.5,
+   "stop": 29245.0,
+   "r": 13.42,
+   "presupuesto": 50,
+   "costos": 19.48,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 18163.25,
+    "sl": 29245.0,
+    "riesgo": 15389.48,
+    "contratos": 0,
+    "recompensa_neta": 206245.52
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28500.5,
+   "stop": 27502.25,
+   "r": 19.25,
+   "presupuesto": 1000,
+   "costos": 17.23,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 47716.75,
+    "sl": 27502.25,
+    "riesgo": 19992.23,
+    "contratos": 0,
+    "recompensa_neta": 384297.77
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 9143.0,
+   "stop": 8871.5,
+   "r": 0.5,
+   "presupuesto": 50,
+   "costos": 11.67,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9278.75,
+    "sl": 8871.5,
+    "riesgo": 554.67,
+    "contratos": 0,
+    "recompensa_neta": 259.83
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9869.75,
+   "stop": 10526.0,
+   "r": 2.75,
+   "presupuesto": 1000,
+   "costos": 21.9,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8065.25,
+    "sl": 10526.0,
+    "riesgo": 13146.9,
+    "contratos": 0,
+    "recompensa_neta": 36068.1
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26033.0,
+   "stop": 25371.75,
+   "r": 2.75,
+   "presupuesto": 5000,
+   "costos": 8.51,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27851.25,
+    "sl": 25371.75,
+    "riesgo": 13278.51,
+    "contratos": 0,
+    "recompensa_neta": 36311.49
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10017.0,
+   "stop": 10554.5,
+   "r": 11.43,
+   "presupuesto": 4559.77,
+   "costos": 3.42,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3873.5,
+    "sl": 10554.5,
+    "riesgo": 10818.42,
+    "contratos": 0,
+    "recompensa_neta": 122801.58
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 9027.0,
+   "stop": 8472.25,
+   "r": 0.25,
+   "presupuesto": 4978.96,
+   "costos": 0,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9165.5,
+    "sl": 8472.25,
+    "riesgo": 1115.5,
+    "contratos": 4,
+    "recompensa_neta": 271.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13097.5,
+   "stop": 13848.0,
+   "r": 0.5,
+   "presupuesto": 488.06,
+   "costos": 13.45,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 12722.25,
+    "sl": 13848.0,
+    "riesgo": 15023.45,
+    "contratos": 0,
+    "recompensa_neta": 7491.55
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17323.0,
+   "stop": 16900.0,
+   "r": 1.2,
+   "presupuesto": 583.95,
+   "costos": 22.79,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 17830.5,
+    "sl": 16900.0,
+    "riesgo": 8482.79,
+    "contratos": 0,
+    "recompensa_neta": 10127.21
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9420.25,
+   "stop": 9507.5,
+   "r": 17.86,
+   "presupuesto": 10,
+   "costos": 6.92,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7862.0,
+    "sl": 9507.5,
+    "riesgo": 1791.92,
+    "contratos": 0,
+    "recompensa_neta": 31118.08
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 14934.5,
+   "stop": 14406.0,
+   "r": 16.92,
+   "presupuesto": 2796.84,
+   "costos": 13.41,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23876.5,
+    "sl": 14406.0,
+    "riesgo": 1075.91,
+    "contratos": 2,
+    "recompensa_neta": 17865.09
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15627.75,
+   "stop": 15126.75,
+   "r": 10.54,
+   "presupuesto": 2979.54,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20908.25,
+    "sl": 15126.75,
+    "riesgo": 10100.0,
+    "contratos": 0,
+    "recompensa_neta": 105530.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29578.5,
+   "stop": 29180.0,
+   "r": 1,
+   "presupuesto": 4558.03,
+   "costos": 26.24,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29977.0,
+    "sl": 29180.0,
+    "riesgo": 7996.24,
+    "contratos": 0,
+    "recompensa_neta": 7943.76
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13201.75,
+   "stop": 12806.25,
+   "r": 0.6,
+   "presupuesto": 1265.89,
+   "costos": 0,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13439.0,
+    "sl": 12806.25,
+    "riesgo": 7920.0,
+    "contratos": 0,
+    "recompensa_neta": 4735.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 25695.25,
+   "stop": 25035.25,
+   "r": 10.08,
+   "presupuesto": 4000.82,
+   "costos": 5.85,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 32348.0,
+    "sl": 25035.25,
+    "riesgo": 1325.85,
+    "contratos": 3,
+    "recompensa_neta": 13299.65
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16793.5,
+   "stop": 16675.75,
+   "r": 1.2,
+   "presupuesto": 50,
+   "costos": 13.13,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16934.75,
+    "sl": 16675.75,
+    "riesgo": 2368.13,
+    "contratos": 0,
+    "recompensa_neta": 2811.87
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29425.5,
+   "stop": 29720.0,
+   "r": 3.15,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 28498.0,
+    "sl": 29720.0,
+    "riesgo": 5935.0,
+    "contratos": 0,
+    "recompensa_neta": 18505.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19567.25,
+   "stop": 19282.5,
+   "r": 1.2,
+   "presupuesto": 4497.13,
+   "costos": 15.81,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19908.75,
+    "sl": 19282.5,
+    "riesgo": 5775.81,
+    "contratos": 0,
+    "recompensa_neta": 6749.19
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 6879.75,
+   "stop": 6228.25,
+   "r": 2.99,
+   "presupuesto": 1193.9,
+   "costos": 0,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8827.5,
+    "sl": 6228.25,
+    "riesgo": 1305.0,
+    "contratos": 0,
+    "recompensa_neta": 3893.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26244.5,
+   "stop": 27239.0,
+   "r": 0.6,
+   "presupuesto": 250,
+   "costos": 16.28,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25648.0,
+    "sl": 27239.0,
+    "riesgo": 19961.28,
+    "contratos": 0,
+    "recompensa_neta": 11858.72
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22166.75,
+   "stop": 22176.75,
+   "r": 0.25,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22164.25,
+    "sl": 22176.75,
+    "riesgo": 205.0,
+    "contratos": 2,
+    "recompensa_neta": 45.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6216.5,
+   "stop": 5502.5,
+   "r": 3,
+   "presupuesto": 5000,
+   "costos": 0.21,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8358.5,
+    "sl": 5502.5,
+    "riesgo": 14290.21,
+    "contratos": 0,
+    "recompensa_neta": 42829.79
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24797.5,
+   "stop": 23814.25,
+   "r": 0.7,
+   "presupuesto": 4101.68,
+   "costos": 14.55,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 25485.75,
+    "sl": 23814.25,
+    "riesgo": 1983.05,
+    "contratos": 2,
+    "recompensa_neta": 1359.95
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12033.0,
+   "stop": 11126.5,
+   "r": 2.13,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13963.75,
+    "sl": 11126.5,
+    "riesgo": 18190.0,
+    "contratos": 0,
+    "recompensa_neta": 38555.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25441.5,
+   "stop": 24618.5,
+   "r": 2.75,
+   "presupuesto": 4066.7,
+   "costos": 14.1,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27704.75,
+    "sl": 24618.5,
+    "riesgo": 16474.1,
+    "contratos": 0,
+    "recompensa_neta": 45250.9
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13669.75,
+   "stop": 14516.0,
+   "r": 0.25,
+   "presupuesto": 884.78,
+   "costos": 0.82,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13458.25,
+    "sl": 14516.0,
+    "riesgo": 16995.82,
+    "contratos": 0,
+    "recompensa_neta": 4159.18
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 19990.25,
+   "stop": 20904.5,
+   "r": 18.58,
+   "presupuesto": 50,
+   "costos": 3.38,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3003.5,
+    "sl": 20904.5,
+    "riesgo": 1831.88,
+    "contratos": 0,
+    "recompensa_neta": 33970.12
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20622.75,
+   "stop": 21252.5,
+   "r": 2.15,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19269.0,
+    "sl": 21252.5,
+    "riesgo": 12595.0,
+    "contratos": 0,
+    "recompensa_neta": 27075.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12617.0,
+   "stop": 11717.25,
+   "r": 1.5,
+   "presupuesto": 10,
+   "costos": 9.74,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 13966.5,
+    "sl": 11717.25,
+    "riesgo": 18004.74,
+    "contratos": 0,
+    "recompensa_neta": 26980.26
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21992.75,
+   "stop": 22705.25,
+   "r": 1.2,
+   "presupuesto": 1192.3,
+   "costos": 0,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21137.75,
+    "sl": 22705.25,
+    "riesgo": 14315.0,
+    "contratos": 0,
+    "recompensa_neta": 17035.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 23448.25,
+   "stop": 24425.0,
+   "r": 2,
+   "presupuesto": 5000,
+   "costos": 1.87,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 21494.75,
+    "sl": 24425.0,
+    "riesgo": 1959.87,
+    "contratos": 2,
+    "recompensa_neta": 3900.63
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 26646.25,
+   "stop": 26568.75,
+   "r": 4.68,
+   "presupuesto": 5000,
+   "costos": 5.69,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27008.75,
+    "sl": 26568.75,
+    "riesgo": 1580.69,
+    "contratos": 3,
+    "recompensa_neta": 7219.31
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2988.25,
+   "stop": 2524.25,
+   "r": 0.7,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 3313.0,
+    "sl": 2524.25,
+    "riesgo": 9280.0,
+    "contratos": 0,
+    "recompensa_neta": 6495.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 9913.75,
+   "stop": 8981.0,
+   "r": 1.2,
+   "presupuesto": 353.4,
+   "costos": 0,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 11033.0,
+    "sl": 8981.0,
+    "riesgo": 18745.0,
+    "contratos": 0,
+    "recompensa_neta": 22295.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 22837.75,
+   "stop": 22126.25,
+   "r": 9.36,
+   "presupuesto": 10,
+   "costos": 2.39,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 29497.25,
+    "sl": 22126.25,
+    "riesgo": 1433.39,
+    "contratos": 0,
+    "recompensa_neta": 13308.61
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 7890.0,
+   "stop": 8281.5,
+   "r": 4.2,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6245.75,
+    "sl": 8281.5,
+    "riesgo": 7920.0,
+    "contratos": 0,
+    "recompensa_neta": 32795.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17003.75,
+   "stop": 16212.5,
+   "r": 2.98,
+   "presupuesto": 1000,
+   "costos": 11.24,
+   "slip": 5,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19361.5,
+    "sl": 16212.5,
+    "riesgo": 15861.24,
+    "contratos": 0,
+    "recompensa_neta": 47118.76
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 13175.0,
+   "stop": 12513.5,
+   "r": 13.74,
+   "presupuesto": 5000,
+   "costos": 11.73,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22264.0,
+    "sl": 12513.5,
+    "riesgo": 13316.73,
+    "contratos": 0,
+    "recompensa_neta": 181693.27
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 14538.0,
+   "stop": 14914.0,
+   "r": 8.15,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 11473.75,
+    "sl": 14914.0,
+    "riesgo": 752.5,
+    "contratos": 0,
+    "recompensa_neta": 6128.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18154.5,
+   "stop": 18896.0,
+   "r": 14.73,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7232.25,
+    "sl": 18896.0,
+    "riesgo": 14845.0,
+    "contratos": 0,
+    "recompensa_neta": 218430.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12441.5,
+   "stop": 11470.25,
+   "r": 11.15,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 23270.75,
+    "sl": 11470.25,
+    "riesgo": 19515.0,
+    "contratos": 0,
+    "recompensa_neta": 216495.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28405.5,
+   "stop": 29380.0,
+   "r": 7.96,
+   "presupuesto": 5000,
+   "costos": 15.88,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20648.5,
+    "sl": 29380.0,
+    "riesgo": 19515.88,
+    "contratos": 0,
+    "recompensa_neta": 155114.12
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 20094.5,
+   "stop": 19744.25,
+   "r": 1.2,
+   "presupuesto": 523.85,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20514.75,
+    "sl": 19744.25,
+    "riesgo": 700.5,
+    "contratos": 0,
+    "recompensa_neta": 840.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 20826.25,
+   "stop": 21822.75,
+   "r": 0.25,
+   "presupuesto": 50,
+   "costos": 21.61,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20577.25,
+    "sl": 21822.75,
+    "riesgo": 19951.61,
+    "contratos": 0,
+    "recompensa_neta": 4958.39
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12192.25,
+   "stop": 11462.0,
+   "r": 9.45,
+   "presupuesto": 10,
+   "costos": 22.58,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19093.0,
+    "sl": 11462.0,
+    "riesgo": 14677.58,
+    "contratos": 0,
+    "recompensa_neta": 137942.42
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19390.75,
+   "stop": 19760.5,
+   "r": 1,
+   "presupuesto": 1000,
+   "costos": 22.05,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19021.0,
+    "sl": 19760.5,
+    "riesgo": 7417.05,
+    "contratos": 0,
+    "recompensa_neta": 7372.95
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 7866.25,
+   "stop": 7128.25,
+   "r": 3,
+   "presupuesto": 250,
+   "costos": 1.78,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 10080.25,
+    "sl": 7128.25,
+    "riesgo": 1477.78,
+    "contratos": 0,
+    "recompensa_neta": 4426.22
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10938.0,
+   "stop": 11472.25,
+   "r": 3.3,
+   "presupuesto": 1634.05,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 9175.0,
+    "sl": 11472.25,
+    "riesgo": 10685.0,
+    "contratos": 0,
+    "recompensa_neta": 35260.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1368.75,
+   "stop": 1473.25,
+   "r": 2,
+   "presupuesto": 689.05,
+   "costos": 6.99,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 1159.75,
+    "sl": 1473.25,
+    "riesgo": 2096.99,
+    "contratos": 0,
+    "recompensa_neta": 4173.01
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 25217.25,
+   "stop": 25293.75,
+   "r": 0.7,
+   "presupuesto": 3256.06,
+   "costos": 9.39,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25163.75,
+    "sl": 25293.75,
+    "riesgo": 1539.39,
+    "contratos": 2,
+    "recompensa_neta": 1060.61
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 19607.75,
+   "stop": 19933.25,
+   "r": 5.9,
+   "presupuesto": 4287.12,
+   "costos": 22.1,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 17687.5,
+    "sl": 19933.25,
+    "riesgo": 676.6,
+    "contratos": 6,
+    "recompensa_neta": 3814.9
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 14997.75,
+   "stop": 15519.25,
+   "r": 2.75,
+   "presupuesto": 1000,
+   "costos": 27.01,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 13563.75,
+    "sl": 15519.25,
+    "riesgo": 10457.01,
+    "contratos": 0,
+    "recompensa_neta": 28652.99
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19426.75,
+   "stop": 19467.5,
+   "r": 2.75,
+   "presupuesto": 250,
+   "costos": 3.1,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 19314.75,
+    "sl": 19467.5,
+    "riesgo": 818.1,
+    "contratos": 0,
+    "recompensa_neta": 2236.9
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4996.5,
+   "stop": 5368.0,
+   "r": 7.65,
+   "presupuesto": 2868.42,
+   "costos": 2.36,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2154.75,
+    "sl": 5368.0,
+    "riesgo": 7437.36,
+    "contratos": 0,
+    "recompensa_neta": 56827.64
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24778.25,
+   "stop": 23793.5,
+   "r": 19.77,
+   "presupuesto": 100,
+   "costos": 14.72,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 44246.75,
+    "sl": 23793.5,
+    "riesgo": 1984.22,
+    "contratos": 0,
+    "recompensa_neta": 38922.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 2179.5,
+   "stop": 1369.0,
+   "r": 1.53,
+   "presupuesto": 100,
+   "costos": 12.18,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 3419.5,
+    "sl": 1369.0,
+    "riesgo": 16222.18,
+    "contratos": 0,
+    "recompensa_neta": 24787.82
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5267.5,
+   "stop": 5571.0,
+   "r": 3.3,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 4266.0,
+    "sl": 5571.0,
+    "riesgo": 6070.0,
+    "contratos": 0,
+    "recompensa_neta": 20030.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5056.25,
+   "stop": 5225.0,
+   "r": 6.75,
+   "presupuesto": 50,
+   "costos": 1.51,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3917.25,
+    "sl": 5225.0,
+    "riesgo": 3456.51,
+    "contratos": 0,
+    "recompensa_neta": 22698.49
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 13013.0,
+   "stop": 12328.75,
+   "r": 2.25,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 16,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14552.5,
+    "sl": 12328.75,
+    "riesgo": 1376.5,
+    "contratos": 0,
+    "recompensa_neta": 3071.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11175.0,
+   "stop": 11928.75,
+   "r": 4.2,
+   "presupuesto": 1618.96,
+   "costos": 0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8009.25,
+    "sl": 11928.75,
+    "riesgo": 15170.0,
+    "contratos": 0,
+    "recompensa_neta": 63220.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28394.5,
+   "stop": 28017.25,
+   "r": 0.7,
+   "presupuesto": 1415.94,
+   "costos": 9.69,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28658.5,
+    "sl": 28017.25,
+    "riesgo": 7554.69,
+    "contratos": 0,
+    "recompensa_neta": 5270.31
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4871.25,
+   "stop": 4473.75,
+   "r": 0.6,
+   "presupuesto": 613.53,
+   "costos": 7.86,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 5109.75,
+    "sl": 4473.75,
+    "riesgo": 8007.86,
+    "contratos": 0,
+    "recompensa_neta": 4712.14
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 16677.75,
+   "stop": 16694.0,
+   "r": 0.25,
+   "presupuesto": 592.29,
+   "costos": 0,
+   "slip": 7,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 16673.75,
+    "sl": 16694.0,
+    "riesgo": 36.0,
+    "contratos": 16,
+    "recompensa_neta": 4.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29085.75,
+   "stop": 29771.75,
+   "r": 2.5,
+   "presupuesto": 1000,
+   "costos": 0.72,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27370.75,
+    "sl": 29771.75,
+    "riesgo": 13785.72,
+    "contratos": 0,
+    "recompensa_neta": 34234.28
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 24762.5,
+   "stop": 24074.25,
+   "r": 2,
+   "presupuesto": 5000,
+   "costos": 22.44,
+   "slip": 1,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 26139.0,
+    "sl": 24074.25,
+    "riesgo": 13792.44,
+    "contratos": 0,
+    "recompensa_neta": 27502.56
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11586.5,
+   "stop": 11163.25,
+   "r": 1,
+   "presupuesto": 10,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12009.75,
+    "sl": 11163.25,
+    "riesgo": 8465.0,
+    "contratos": 0,
+    "recompensa_neta": 8465.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 6195.75,
+   "stop": 7157.5,
+   "r": 0.7,
+   "presupuesto": 4971.25,
+   "costos": 9.98,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5522.75,
+    "sl": 7157.5,
+    "riesgo": 1933.48,
+    "contratos": 2,
+    "recompensa_neta": 1336.02
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3294.0,
+   "stop": 2422.5,
+   "r": 15.96,
+   "presupuesto": 100,
+   "costos": 14.81,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 17203.0,
+    "sl": 2422.5,
+    "riesgo": 17459.81,
+    "contratos": 0,
+    "recompensa_neta": 278150.19
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3792.0,
+   "stop": 4790.75,
+   "r": 1.1,
+   "presupuesto": 4438.9,
+   "costos": 8.95,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2693.5,
+    "sl": 4790.75,
+    "riesgo": 19983.95,
+    "contratos": 0,
+    "recompensa_neta": 21961.05
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29423.25,
+   "stop": 30272.0,
+   "r": 2.75,
+   "presupuesto": 2152.24,
+   "costos": 0,
+   "slip": 15,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 27089.25,
+    "sl": 30272.0,
+    "riesgo": 17050.0,
+    "contratos": 0,
+    "recompensa_neta": 46605.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 1367.0,
+   "stop": 1804.0,
+   "r": 0.7,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 1061.25,
+    "sl": 1804.0,
+    "riesgo": 876.0,
+    "contratos": 5,
+    "recompensa_neta": 609.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21442.75,
+   "stop": 22393.75,
+   "r": 1.5,
+   "presupuesto": 3523.4,
+   "costos": 28.35,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 20016.25,
+    "sl": 22393.75,
+    "riesgo": 19143.35,
+    "contratos": 0,
+    "recompensa_neta": 28406.65
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21182.25,
+   "stop": 20882.25,
+   "r": 0.7,
+   "presupuesto": 50,
+   "costos": 26.0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21392.25,
+    "sl": 20882.25,
+    "riesgo": 6121.0,
+    "contratos": 0,
+    "recompensa_neta": 4079.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 28104.25,
+   "stop": 27265.5,
+   "r": 2.75,
+   "presupuesto": 2469.83,
+   "costos": 17.53,
+   "slip": 18,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 30410.75,
+    "sl": 27265.5,
+    "riesgo": 16882.53,
+    "contratos": 0,
+    "recompensa_neta": 46022.47
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 5604.75,
+   "stop": 5246.75,
+   "r": 11.4,
+   "presupuesto": 3399.65,
+   "costos": 19.28,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9685.75,
+    "sl": 5246.75,
+    "riesgo": 735.28,
+    "contratos": 4,
+    "recompensa_neta": 8142.72
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 29682.0,
+   "stop": 29263.5,
+   "r": 4.2,
+   "presupuesto": 1000,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 31439.5,
+    "sl": 29263.5,
+    "riesgo": 8370.0,
+    "contratos": 0,
+    "recompensa_neta": 35150.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10688.0,
+   "stop": 11349.25,
+   "r": 8.6,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 3,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5001.25,
+    "sl": 11349.25,
+    "riesgo": 13240.0,
+    "contratos": 0,
+    "recompensa_neta": 113720.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15126.25,
+   "stop": 14900.25,
+   "r": 0.7,
+   "presupuesto": 10,
+   "costos": 26.68,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15284.25,
+    "sl": 14900.25,
+    "riesgo": 4546.68,
+    "contratos": 0,
+    "recompensa_neta": 3133.32
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 7580.75,
+   "stop": 8173.5,
+   "r": 1.2,
+   "presupuesto": 3192.73,
+   "costos": 6.1,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6869.5,
+    "sl": 8173.5,
+    "riesgo": 1191.6,
+    "contratos": 2,
+    "recompensa_neta": 1416.4
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27631.5,
+   "stop": 26954.5,
+   "r": 1.2,
+   "presupuesto": 2758.02,
+   "costos": 0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 28443.75,
+    "sl": 26954.5,
+    "riesgo": 13635.0,
+    "contratos": 0,
+    "recompensa_neta": 16150.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21972.5,
+   "stop": 21308.0,
+   "r": 0.25,
+   "presupuesto": 10,
+   "costos": 20.5,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22138.5,
+    "sl": 21308.0,
+    "riesgo": 13320.5,
+    "contratos": 0,
+    "recompensa_neta": 3289.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17323.25,
+   "stop": 16678.5,
+   "r": 1.5,
+   "presupuesto": 4785.15,
+   "costos": 29.21,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 18290.25,
+    "sl": 16678.5,
+    "riesgo": 12924.21,
+    "contratos": 0,
+    "recompensa_neta": 19310.79
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 21440.75,
+   "stop": 20965.5,
+   "r": 1,
+   "presupuesto": 4941.92,
+   "costos": 4.52,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21916.0,
+    "sl": 20965.5,
+    "riesgo": 955.02,
+    "contratos": 5,
+    "recompensa_neta": 945.98
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15917.25,
+   "stop": 15611.25,
+   "r": 0.5,
+   "presupuesto": 250,
+   "costos": 3.66,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16070.25,
+    "sl": 15611.25,
+    "riesgo": 6123.66,
+    "contratos": 0,
+    "recompensa_neta": 3056.34
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6173.5,
+   "stop": 6324.25,
+   "r": 0.36,
+   "presupuesto": 4899.34,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6119.25,
+    "sl": 6324.25,
+    "riesgo": 3015.0,
+    "contratos": 1,
+    "recompensa_neta": 1085.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 11747.5,
+   "stop": 11157.0,
+   "r": 0.5,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12042.75,
+    "sl": 11157.0,
+    "riesgo": 11810.0,
+    "contratos": 0,
+    "recompensa_neta": 5905.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 15436.0,
+   "stop": 14873.0,
+   "r": 0.7,
+   "presupuesto": 500,
+   "costos": 22.16,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15830.0,
+    "sl": 14873.0,
+    "riesgo": 1148.16,
+    "contratos": 0,
+    "recompensa_neta": 765.84
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 19090.0,
+   "stop": 18973.5,
+   "r": 18.1,
+   "presupuesto": 100,
+   "costos": 26.99,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 21198.5,
+    "sl": 18973.5,
+    "riesgo": 2356.99,
+    "contratos": 0,
+    "recompensa_neta": 42143.01
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12980.0,
+   "stop": 13605.75,
+   "r": 10.86,
+   "presupuesto": 1000,
+   "costos": 27.59,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6184.5,
+    "sl": 13605.75,
+    "riesgo": 12542.59,
+    "contratos": 0,
+    "recompensa_neta": 135882.41
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18269.25,
+   "stop": 17274.75,
+   "r": 2,
+   "presupuesto": 850.61,
+   "costos": 0,
+   "slip": 4,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 20258.25,
+    "sl": 17274.75,
+    "riesgo": 19910.0,
+    "contratos": 0,
+    "recompensa_neta": 39760.0
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 10342.75,
+   "stop": 9713.25,
+   "r": 3,
+   "presupuesto": 3796.27,
+   "costos": 6.38,
+   "slip": 8,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12231.25,
+    "sl": 9713.25,
+    "riesgo": 1269.38,
+    "contratos": 2,
+    "recompensa_neta": 3766.62
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 6679.25,
+   "stop": 6748.25,
+   "r": 3.04,
+   "presupuesto": 100,
+   "costos": 0,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 6469.5,
+    "sl": 6748.25,
+    "riesgo": 1430.0,
+    "contratos": 0,
+    "recompensa_neta": 4145.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 18695.25,
+   "stop": 17885.25,
+   "r": 1.1,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 19,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19586.25,
+    "sl": 17885.25,
+    "riesgo": 16295.0,
+    "contratos": 0,
+    "recompensa_neta": 17725.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15656.25,
+   "stop": 15194.5,
+   "r": 0.5,
+   "presupuesto": 4950.67,
+   "costos": 22.25,
+   "slip": 2,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 15887.0,
+    "sl": 15194.5,
+    "riesgo": 9267.25,
+    "contratos": 0,
+    "recompensa_neta": 4582.75
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 4413.0,
+   "stop": 4532.5,
+   "r": 1,
+   "presupuesto": 163.91,
+   "costos": 17.02,
+   "slip": 10,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 4293.5,
+    "sl": 4532.5,
+    "riesgo": 261.02,
+    "contratos": 0,
+    "recompensa_neta": 216.98
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21334.25,
+   "stop": 20521.75,
+   "r": 1.2,
+   "presupuesto": 1437.42,
+   "costos": 7.1,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 22309.25,
+    "sl": 20521.75,
+    "riesgo": 16257.1,
+    "contratos": 0,
+    "recompensa_neta": 19492.9
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 10660.75,
+   "stop": 10273.75,
+   "r": 4.2,
+   "presupuesto": 5000,
+   "costos": 0,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12286.0,
+    "sl": 10273.75,
+    "riesgo": 7840.0,
+    "contratos": 0,
+    "recompensa_neta": 32405.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 1815.5,
+   "stop": 2056.75,
+   "r": 16.77,
+   "presupuesto": 5000,
+   "costos": 9.87,
+   "slip": 15,
+   "valido": false
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 8275.0,
+   "stop": 8315.5,
+   "r": 0.5,
+   "presupuesto": 3263.98,
+   "costos": 7.4,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 8254.75,
+    "sl": 8315.5,
+    "riesgo": 91.4,
+    "contratos": 35,
+    "recompensa_neta": 30.1
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27947.0,
+   "stop": 28487.75,
+   "r": 4.11,
+   "presupuesto": 954.15,
+   "costos": 17.8,
+   "slip": 6,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25724.75,
+    "sl": 28487.75,
+    "riesgo": 10862.8,
+    "contratos": 0,
+    "recompensa_neta": 44397.2
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 27206.5,
+   "stop": 27500.75,
+   "r": 6.54,
+   "presupuesto": 1746.03,
+   "costos": 27.01,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 25282.25,
+    "sl": 27500.75,
+    "riesgo": 5912.01,
+    "contratos": 0,
+    "recompensa_neta": 38457.99
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8875.5,
+   "stop": 9450.5,
+   "r": 2.75,
+   "presupuesto": 1000,
+   "costos": 12.76,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 7294.25,
+    "sl": 9450.5,
+    "riesgo": 11512.76,
+    "contratos": 0,
+    "recompensa_neta": 31612.24
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 24110.75,
+   "stop": 24011.75,
+   "r": 0.6,
+   "presupuesto": 4319.8,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24170.0,
+    "sl": 24011.75,
+    "riesgo": 198.0,
+    "contratos": 21,
+    "recompensa_neta": 118.5
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 17715.5,
+   "stop": 18696.25,
+   "r": 2,
+   "presupuesto": 1000,
+   "costos": 29.42,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 15754.0,
+    "sl": 18696.25,
+    "riesgo": 19644.42,
+    "contratos": 0,
+    "recompensa_neta": 39200.58
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 3464.25,
+   "stop": 3530.5,
+   "r": 0.5,
+   "presupuesto": 844.71,
+   "costos": 0,
+   "slip": 9,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 3431.25,
+    "sl": 3530.5,
+    "riesgo": 1370.0,
+    "contratos": 0,
+    "recompensa_neta": 615.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 4442.5,
+   "stop": 5247.0,
+   "r": 2.75,
+   "presupuesto": 4594.69,
+   "costos": 2.01,
+   "slip": 13,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 2230.25,
+    "sl": 5247.0,
+    "riesgo": 16157.01,
+    "contratos": 0,
+    "recompensa_neta": 44177.99
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 10640.75,
+   "stop": 9807.75,
+   "r": 4.2,
+   "presupuesto": 100,
+   "costos": 9.94,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 14139.25,
+    "sl": 9807.75,
+    "riesgo": 1675.94,
+    "contratos": 0,
+    "recompensa_neta": 6987.06
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22627.25,
+   "stop": 23357.25,
+   "r": 0.7,
+   "presupuesto": 250,
+   "costos": 8.38,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 22116.25,
+    "sl": 23357.25,
+    "riesgo": 14608.38,
+    "contratos": 0,
+    "recompensa_neta": 10211.62
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5741.5,
+   "stop": 5168.75,
+   "r": 4.2,
+   "presupuesto": 1992.17,
+   "costos": 8.2,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 8147.0,
+    "sl": 5168.75,
+    "riesgo": 11463.2,
+    "contratos": 0,
+    "recompensa_neta": 48101.8
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 21181.0,
+   "stop": 20901.5,
+   "r": 12.47,
+   "presupuesto": 1000,
+   "costos": 16.79,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24666.25,
+    "sl": 20901.5,
+    "riesgo": 5706.79,
+    "contratos": 0,
+    "recompensa_neta": 69588.21
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 19890.25,
+   "stop": 19874.5,
+   "r": 0.7,
+   "presupuesto": 4912.12,
+   "costos": 0.0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 19901.25,
+    "sl": 19874.5,
+    "riesgo": 31.5,
+    "contratos": 155,
+    "recompensa_neta": 22.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 8525.0,
+   "stop": 8007.0,
+   "r": 2.75,
+   "presupuesto": 1211.8,
+   "costos": 14.92,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 9949.5,
+    "sl": 8007.0,
+    "riesgo": 10374.92,
+    "contratos": 0,
+    "recompensa_neta": 28475.08
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 5354.75,
+   "stop": 5933.75,
+   "r": 0.25,
+   "presupuesto": 250,
+   "costos": 0,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Corto",
+    "tp": 5210.0,
+    "sl": 5933.75,
+    "riesgo": 11580.0,
+    "contratos": 0,
+    "recompensa_neta": 2895.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 16157.75,
+   "stop": 15725.75,
+   "r": 0.25,
+   "presupuesto": 250,
+   "costos": 2.82,
+   "slip": 20,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16265.75,
+    "sl": 15725.75,
+    "riesgo": 8742.82,
+    "contratos": 0,
+    "recompensa_neta": 2057.18
+   }
+  },
+  {
+   "raiz": "MNQ",
+   "entrada": 26588.0,
+   "stop": 26159.0,
+   "r": 2.27,
+   "presupuesto": 743.29,
+   "costos": 20.09,
+   "slip": 11,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 27561.75,
+    "sl": 26159.0,
+    "riesgo": 883.59,
+    "contratos": 0,
+    "recompensa_neta": 1921.91
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 12334.25,
+   "stop": 12129.75,
+   "r": 2.25,
+   "presupuesto": 2891.37,
+   "costos": 2.26,
+   "slip": 0,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 12794.25,
+    "sl": 12129.75,
+    "riesgo": 4092.26,
+    "contratos": 0,
+    "recompensa_neta": 9197.74
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 22690.75,
+   "stop": 22201.25,
+   "r": 3.3,
+   "presupuesto": 50,
+   "costos": 0,
+   "slip": 12,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 24306.0,
+    "sl": 22201.25,
+    "riesgo": 9850.0,
+    "contratos": 0,
+    "recompensa_neta": 32245.0
+   }
+  },
+  {
+   "raiz": "NQ",
+   "entrada": 15108.0,
+   "stop": 14688.25,
+   "r": 3.3,
+   "presupuesto": 500,
+   "costos": 0,
+   "slip": 14,
+   "valido": true,
+   "esperado": {
+    "lado": "Largo",
+    "tp": 16493.0,
+    "sl": 14688.25,
+    "riesgo": 8465.0,
+    "contratos": 0,
+    "recompensa_neta": 27630.0
+   }
+  }
+ ]
+}

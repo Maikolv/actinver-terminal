@@ -1,0 +1,20 @@
+//@version=6
+indicator("Actinver - Cruce de nivel (webhook)", overlay = true)
+
+// Alertas para el receptor oficial de la terminal (POST /webhook/tradingview).
+// El secreto NO va en este archivo: al crear la alerta, reemplace <SECRETO> en el
+// mensaje por el valor de TRADINGVIEW_WEBHOOK_SECRETO (ver docs/tradingview-puente.md).
+
+nivel = input.price(0.0, "Nivel de precio (0 = apagado)")
+
+subio = ta.crossover(close, nivel)
+bajo  = ta.crossunder(close, nivel)
+cruzaArriba = nivel > 0 and subio
+cruzaAbajo  = nivel > 0 and bajo
+
+plot(nivel > 0 ? nivel : na, "Nivel", color = color.orange, linewidth = 2)
+
+alertcondition(cruzaArriba, "Cruce al alza",
+  '{"secreto":"<SECRETO>","simbolo":"{{exchange}}:{{ticker}}","precio":{{close}},"hora":"{{timenow}}","alerta":"Cruce al alza"}')
+alertcondition(cruzaAbajo, "Cruce a la baja",
+  '{"secreto":"<SECRETO>","simbolo":"{{exchange}}:{{ticker}}","precio":{{close}},"hora":"{{timenow}}","alerta":"Cruce a la baja"}')

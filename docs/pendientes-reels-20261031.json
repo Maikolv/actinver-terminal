@@ -1,0 +1,206 @@
+{
+  "fecha_local": "2026-10-31",
+  "alcance": "Auditoría de Mesa y recursos; investigación sin órdenes",
+  "auditor": "Codex; no se atribuye una auditoría previa inexistente a Claude",
+  "items": [
+    {
+      "id": "R31-01",
+      "estado": "resuelto",
+      "prioridad": "P1",
+      "titulo": "Validación numérica",
+      "criterio_aceptacion": "Rechazar ticks fraccionales de slippage, no finitos, desbordamientos y objetivos inválidos.",
+      "evidencia": "mesa.mjs y PlanManualNQ.cs; 12 vectores, 3 no finitos y referencia exacta independiente.",
+      "siguiente_accion": "Mantener los vectores al cambiar unidades."
+    },
+    {
+      "id": "R31-02",
+      "estado": "compilado_en_servidor_tradingview; pendiente_visual",
+      "prioridad": "P1",
+      "titulo": "Paridad Pine",
+      "criterio_aceptacion": "Compilar en Pine Editor y comprobar los mismos escenarios.",
+      "evidencia": "docs/auditoria-reels-20261031-evidencia/cierre-pendientes/pine-check.json; nuevo SHA compilado con core.check de pine_check, sin cuenta ni CDP.",
+      "siguiente_accion": "Comprobar visualmente el indicador en NQZ2026/MNQZ2026 sin alertas ni estrategia; pasos en informe de cierre."
+    },
+    {
+      "id": "R31-03",
+      "estado": "resuelto",
+      "prioridad": "P1",
+      "titulo": "Catálogo y cobertura",
+      "criterio_aceptacion": "No construir gráficas de símbolo predeterminado si falta catálogo o cobertura.",
+      "evidencia": "UI: catálogo vacío, petición fallida e instrumento sin gráfica muestran SIN DATO.",
+      "siguiente_accion": "Conservar los casos de fallo en la prueba de navegador."
+    },
+    {
+      "id": "R31-04",
+      "estado": "resuelto",
+      "prioridad": "P2",
+      "titulo": "Disposición y accesibilidad",
+      "criterio_aceptacion": "Actualizar la disposición personalizada, etiquetar flechas y conservar foco al mover.",
+      "evidencia": "UI por teclado, recarga persistente, seis combinaciones de tema/tamaño y cero errores JS.",
+      "siguiente_accion": "Añadir/Quitar conserva estado personalizado; cambios de escenario invalidan el resultado anterior."
+    },
+    {
+      "id": "R31-05",
+      "estado": "resuelto",
+      "prioridad": "P2",
+      "titulo": "Carga diferida",
+      "criterio_aceptacion": "No crear marcos cerrados y retirarlos al plegar.",
+      "evidencia": "Prueba Chromium confirma creación y eliminación de iframe.",
+      "siguiente_accion": "Mantener cero peticiones de paneles cerrados."
+    },
+    {
+      "id": "R31-06",
+      "estado": "parcial",
+      "prioridad": "P2",
+      "titulo": "Proveedores",
+      "criterio_aceptacion": "Comprobar contenido y vigencia por panel e instrumento, no solo HTTP.",
+      "evidencia": "Tres widgets públicos cargaron en contexto sin sesión; cotizaciones mostró contenido, mapa y calendario no acreditan vigencia de precios.",
+      "siguiente_accion": "Comprobar los restantes y cada símbolo con procedencia, hora y retraso; conservar SIN DATO si no hay cobertura."
+    },
+    {
+      "id": "R31-07",
+      "estado": "resuelto_en_alcance",
+      "prioridad": "P2",
+      "titulo": "Floorplan Actinver",
+      "criterio_aceptacion": "Describir todos los archivos y rutas que detecta el escáner de Actinver.",
+      "evidencia": "239/239 archivos de código, 127/127 rutas y cero sin asignar. No analiza Pine ni acredita seguridad completa.",
+      "siguiente_accion": "Actualizar el mapa cuando cambie el código; los proyectos externos requieren mapas separados si se solicita su alcance completo."
+    },
+    {
+      "id": "R31-08",
+      "estado": "pendiente_fuente",
+      "prioridad": "P2",
+      "titulo": "Recursos sin identidad",
+      "criterio_aceptacion": "Confirmar propietario y URL antes de añadir un recurso con nombre ambiguo.",
+      "evidencia": "config/reels-20261031.json; no se inventaron los enlaces restantes ni se enviaron DMs.",
+      "siguiente_accion": "Obtener enlace público inequívoco o descripción/fotograma que identifique autor y repositorio."
+    },
+    {
+      "id": "R31-09",
+      "estado": "parcial",
+      "prioridad": "P2",
+      "titulo": "Inventario y licencias",
+      "criterio_aceptacion": "Distinguir skills instaladas y clones, con licencias comprobadas.",
+      "evidencia": "33 recursos sin observaciones; taste-skill, skills y andrej-karpathy-skills carecen de licencia inventariada verificable; Caveman instalado no coincide con la versión del clon archivado.",
+      "siguiente_accion": "Conservarlos como referencias de lectura; confirmar procedencia y licencia de la versión exacta antes de copiar contenidos."
+    },
+    {
+      "id": "R31-10",
+      "estado": "verificado_sin_aprobacion",
+      "prioridad": "P1",
+      "titulo": "Candados y evidencia",
+      "criterio_aceptacion": "Adaptador, live y fondeada apagados; no iniciar órdenes ni estrategias.",
+      "evidencia": "estado_demo.py: false/false/false, sin diario, incidentes no auditados, sin ventaja demostrada.",
+      "siguiente_accion": "Nada en esta auditoría autoriza trades, tampoco demo."
+    },
+    {
+      "id": "R31-11",
+      "estado": "pendiente_investigacion",
+      "prioridad": "P2",
+      "titulo": "Hipótesis NQ",
+      "criterio_aceptacion": "Regla y dataset preregistrados antes de inferencia estadística.",
+      "evidencia": "Los reels y el calculador manual no especifican una estrategia reproducible con ventaja.",
+      "siguiente_accion": "Definir contrato, horario, datos, costos y regla causal offline. Fuera de la corrección de la Mesa; no empezar estrategias."
+    },
+    {
+      "id": "R31-12",
+      "estado": "resuelto",
+      "prioridad": "P1",
+      "titulo": "Ruta Mesa → instrumento → Velas → retorno",
+      "criterio_aceptacion": "Desde la Mesa debe poder abrirse la pestaña Velas con el instrumento elegido y volver.",
+      "evidencia": "rutaVelas y prueba Node de codificación; recorrido terminal/Mesa/AMD/Velas/Mesa en ui.json. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Conservar regresiones; los bloqueos externos siguen vigentes."
+    },
+    {
+      "id": "R31-13",
+      "estado": "resuelto",
+      "prioridad": "P1",
+      "titulo": "Pérdida planeada frente a pérdida posible por gap",
+      "criterio_aceptacion": "El resultado del escenario manual debe decir que el riesgo es un tope del escenario, no del fill, y que un gap o deslizamiento mayor puede superarlo.",
+      "evidencia": "Aviso de tope del escenario y gap en salida JS y tabla Pine; pine-check.json: versión actual compilada, cero errores/advertencias. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Conservar regresiones; los bloqueos externos siguen vigentes."
+    },
+    {
+      "id": "R31-14",
+      "estado": "resuelto",
+      "prioridad": "P2",
+      "titulo": "MNQ en la calculadora de la Mesa",
+      "criterio_aceptacion": "Si el Pine admite MNQ (USD 2/punto) la Mesa y su prueba deben admitirlo o documentar que es solo NQ.",
+      "evidencia": "Decisión explícita: Mesa solo NQ, sin cambiar planNQ; Pine documenta que también admite MNQ; fórmulas y vectores intactos. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Conservar regresiones; los bloqueos externos siguen vigentes."
+    },
+    {
+      "id": "R31-15",
+      "estado": "resuelto",
+      "prioridad": "P2",
+      "titulo": "Copias del Pine desincronizadas",
+      "criterio_aceptacion": "Las copias de documentación de futuros-lab deben ser idénticas a la fuente de Actinver.",
+      "evidencia": "Tras los cambios de Codex las copias tenían sha256 8ec4876f… frente a c020bd30… de Actinver. Sincronizadas el 31-oct.",
+      "siguiente_accion": "Mantener tests/test_mesa_riesgo_paridad.py::test_las_tres_copias_del_pine_son_iguales; sincronizar tras cada cambio del Pine."
+    },
+    {
+      "id": "R31-16",
+      "estado": "resuelto",
+      "prioridad": "P2",
+      "titulo": "Añadir duplicado y paneles abiertos al reordenar",
+      "criterio_aceptacion": "Informar cuando el panel ya está en la mesa y conservar los paneles desplegados al mover o quitar otro.",
+      "evidencia": "Conserva paneles al ordenar, añadir/quitar y cambiar instrumento; una gráfica abierta y cero marcos cerrados en seis vistas. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Conservar regresiones; los bloqueos externos siguen vigentes."
+    },
+    {
+      "id": "R31-17",
+      "estado": "parcial",
+      "prioridad": "P2",
+      "titulo": "Marcos sin sandbox",
+      "criterio_aceptacion": "Evaluar sandbox y referrerpolicy en los iframes de /grafica y /widget sin rebajar la CSP.",
+      "evidencia": "Tres variantes públicas: sandbox rompe gráfica por cookies/Locks; no-referrer solo permite gráfica. Se conserva no-referrer en todos y sandbox solo calendario, con contenido visible pero avisos del proveedor. No se amplía allow-same-origin ni se rebaja CSP. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Ver informe de cierre; no considerar cobertura o aislamiento completos."
+    },
+    {
+      "id": "R31-18",
+      "estado": "resuelto",
+      "prioridad": "P2",
+      "titulo": "La Mesa no está en «Datos y fuentes»",
+      "criterio_aceptacion": "Declarar fuente, retraso y vigencia de los paneles de la Mesa generados desde el código.",
+      "evidencia": "tabla_mesa deriva 16/6/1 desde CATALOGO, incorpora tres filas a /api/cobertura; prueba específica en test_cobertura_secciones.py. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Conservar regresiones; los bloqueos externos siguen vigentes."
+    },
+    {
+      "id": "R31-19",
+      "estado": "parcial",
+      "prioridad": "P2",
+      "titulo": "Cobertura real por instrumento y panel",
+      "criterio_aceptacion": "Mostrar SIN DATO donde no exista cobertura y no confundir carga de marco con dato.",
+      "evidencia": "Interfaz resuelta: preflight GET abortable antes de iframe, 404/red/no cobertura muestran SIN DATO y alternativa; HTTP200 no acredita contenido de otro origen. Cobertura real por proveedor sigue pendiente. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
+      "siguiente_accion": "Ver informe de cierre; no considerar cobertura o aislamiento completos."
+    },
+    {
+      "id": "R31-20",
+      "estado": "no_comprobado",
+      "prioridad": "P2",
+      "titulo": "Estrellas de GitHub y pruebas de OpenTerminal",
+      "criterio_aceptacion": "Verificar el estado actual antes de afirmarlo.",
+      "evidencia": "«12 estrellas agregadas y 37 verificadas» y «13 pruebas / build de OpenTerminal» de docs/integracion-20261031.md no se reprodujeron: exigen sesión de GitHub o ejecutar el upstream.",
+      "siguiente_accion": "Reproducir con gh (solo lectura) y npm ci --ignore-scripts si el usuario lo autoriza."
+    },
+    {
+      "id": "R31-21",
+      "estado": "verificado",
+      "prioridad": "P1",
+      "titulo": "day-trader-skill no es apto para futuros; Time Machine no son 10 000 observaciones",
+      "criterio_aceptacion": "No ejecutar trader-exit sobre NQ ni leer Time Machine como evidencia estadística.",
+      "evidencia": "tests/test_day_trader_exit_no_apto_futuros.py (futuros-lab, offline): exit.compute solo admite largos, redondea a centavo y no a tick (acepta un SL de 19989.90 y deja un objetivo de 20022.03 más lejos que el 20022.00 de la Mesa) y rechaza riesgos < 0.05 % del precio (0.25 pts en NQ). Time Machine remuestrea barras de ≤ 60 días de 5 min (≈ 40 sesiones completas): las 10 000 repeticiones son dependientes y cuentan un gap como −1R.",
+      "siguiente_accion": "Mantener trader-broker desactivado; si se estudia el concepto, hacerlo sobre un contrato concreto con preregistro."
+    },
+    {
+      "id": "R31-22",
+      "estado": "registrado",
+      "prioridad": "P1",
+      "titulo": "Edición concurrente de dos agentes",
+      "criterio_aceptacion": "Dos agentes no deben editar los mismos archivos a la vez.",
+      "evidencia": "A las 19:50 un Codex empezó a modificar mesa.mjs, el Pine y los pendientes mientras Claude auditaba; docs/auditoria-reels-20261031-evidencia/COORDINACION.md documenta el reparto. Los cambios de Codex se conservaron y se revisaron; la línea base de Claude (hashes de las 19:49) permite ver qué cambió.",
+      "siguiente_accion": "Un solo agente por archivo; leer COORDINACION.md antes de editar."
+    }
+  ],
+  "verificacion_independiente_claude": "2026-10-31; ver anexo en docs/auditoria-reels-20261031.md"
+}

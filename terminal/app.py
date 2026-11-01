@@ -344,9 +344,10 @@ def estado(con=Depends(con_db)):
 
 
 @app.get("/api/universo")
-def get_universo(con=Depends(con_db)):
+def get_universo(con=Depends(con_db), solo_catalogo: bool = False):
     ins = mercado.instrumentos(con)
-    cot = mercado.cotizaciones(con, AJUSTES)
+    # El selector no necesita precios: evita consultar toda la historia y no crea un fallback.
+    cot = {} if solo_catalogo else mercado.cotizaciones(con, AJUSTES)
     sim = {r[0] for r in con.execute("SELECT id FROM universo_simulador")}
     filas = []
     for i, v in ins.items():

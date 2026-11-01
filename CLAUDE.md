@@ -40,7 +40,15 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado (18-oct-2026, v0.31.0, rama `main`)
+## Estado comprobado: actualización acotada del 31-oct-2026
+
+Procesos: `docs/continuacion-procesos-20261031.md`. Respaldo offline probado, reloj inyectado y aviso por emisora. Reasignación de proveedores no aplicada; GEX condicionado a evidencia posterior al 2-nov. Pruebas y límites en el informe, sin trades ni Telegram.
+
+Optimización offline medida: `docs/optimizacion-medida-20261031.md`. Catálogo ligero, búsqueda por teclado y paneles conservados; sin caché ni fallback de precios nuevo. Límites y resultados de tres repeticiones documentados.
+
+Auditoría de Mesa y riesgo manual: ver `docs/auditoria-reels-20261031.md` y pendientes por ID en `docs/pendientes-reels-20261031.json`. Catálogo, accesibilidad y validación corregidos; paridad JS/C# probada. Pine actual compilado en servidor (0 errores/advertencias), con comprobación visual pendiente; fuentes sin vigencia acreditada y licencias pendientes permanecen abiertos. Ningún trade permitido, tampoco demo; adaptador/live/fondeada apagados. Esta actualización no revalida el estado histórico de otros módulos.
+
+### Estado histórico (18-oct-2026, v0.31.0, rama `main`)
 
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.

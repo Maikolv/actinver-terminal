@@ -39,7 +39,7 @@
   <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
     <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
   </div>
-</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/laboratorio-bots-reel.html" aria-label="Laboratorio de bots"><span class="nav-global__texto-largo">Laboratorio de bots</span><span class="nav-global__texto-corto" aria-hidden="true">Bots</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
 
 <nav class="pestanas" aria-label="Secciones" data-grupo="cuenta">
   <div class="grupos-nav" role="group" aria-label="Tareas">
@@ -63,7 +63,7 @@
     <button role="tab" data-grupo="mercado" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
     <button role="tab" data-grupo="mercado" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
     <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
-    <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio</button>
+    <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio de alfa</button>
     <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
     <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
     <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
@@ -120,7 +120,7 @@
   </section>
 
   <section role="tabpanel" id="panel-tiempo" aria-labelledby="tab-tiempo" hidden>
-    <h1>Pasado · Presente · Futuro</h1>
+    <h1>Boletas e historial</h1>
     <p class="ayuda">Tres espacios separados: lo que ya ocurrió (con la hora en que se supo), lo observable ahora y lo que se estima. Un pronóstico nunca aparece como precio, y un precio externo nunca aparece como el precio o saldo de Actinver.</p>
     <section class="espacio espacio--pasado" aria-labelledby="h-pasado">
       <h2 id="h-pasado"><span class="sello">PASADO</span> Hechos observados</h2>
@@ -212,7 +212,7 @@
   </section>
 
   <section role="tabpanel" id="panel-ranking" aria-labelledby="tab-ranking" hidden>
-    <h1>Ranking de acciones, ETF y fondos</h1>
+    <h1>Ranking</h1>
     <p class="ayuda" id="ranking-aviso"></p>
     <div class="segmentado" role="radiogroup" aria-label="Clase de instrumento" id="selector-ranking-clase">
       <button type="button" role="radio" aria-checked="true" data-valor="acciones">Acciones</button>
@@ -230,7 +230,7 @@
   </section>
 
   <section role="tabpanel" id="panel-robustez" aria-labelledby="tab-robustez" hidden>
-    <h1>Robustez de las propuestas</h1>
+    <h1>Robustez</h1>
     <p class="ayuda">¿Los parámetros del optimizador funcionan en una región amplia o solo en un punto con suerte? Estabilidad
       ante cambios pequeños, Monte Carlo en cada combinación, mapas por pares (SPP) y walk-forward anidado. Es
       <strong>histórico fuera de muestra</strong> y <strong>simulación</strong> (remuestreo del pasado), no pronóstico ni garantía.
@@ -363,7 +363,7 @@
   </section>
 
   <section role="tabpanel" id="panel-velas" aria-labelledby="tab-velas" hidden>
-    <h1>Velas OHLCV</h1>
+    <h1>Velas</h1>
     <p class="ayuda">Velas japonesas solo con apertura, máximo, mínimo, cierre y volumen reales de un proveedor o de un CSV que usted importe. Los cierres diarios locales nunca se convierten en velas. Indicadores descriptivos; no son señales.</p>
     <div id="velas-contenido" aria-live="polite"></div>
   </section>
@@ -381,13 +381,13 @@
   </section>
 
   <section role="tabpanel" id="panel-riesgo" aria-labelledby="tab-riesgo" hidden>
-    <h1>Riesgo de la cartera</h1>
+    <h1>Riesgo</h1>
     <p class="ayuda">Exposición, concentración, volatilidad, caídas, VaR, CVaR y escenarios con los pesos actuales. Los supuestos se listan al final. Describe el riesgo con datos pasados; no es una recomendación.</p>
     <div id="riesgo-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-seguimiento" aria-labelledby="tab-seguimiento" hidden>
-    <h1>Seguimiento y comparación</h1>
+    <h1>Seguimiento</h1>
     <p class="ayuda">Lista de seguimiento con variaciones, RSI y noticias; ficha con noticias y estados financieros; comparación de instrumentos con correlación y beta.</p>
     <div id="seguimiento-contenido" aria-live="polite"></div>
   </section>
@@ -418,21 +418,22 @@
   </section>
 
   <section role="tabpanel" id="panel-laboratorio" aria-labelledby="tab-laboratorio" hidden>
-    <h1>Laboratorio de alfa: prueba de permutación</h1>
+    <h1>Laboratorio de alfa</h1>
     <p class="ayuda">Contrasta si el exceso medio NETO de una estrategia sobre su benchmark es mayor que cero, con permutación de signos por bloques. Un valor p pequeño no demuestra alfa: es un descarte estadístico bajo supuestos que se listan en el resultado.</p>
     <div id="laboratorio-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-intradia" aria-labelledby="tab-intradia" hidden>
-    <h1>Plan intradía defensivo (informativo)</h1>
+    <h1>Plan intradía</h1>
     <p class="ayuda">Separado del plan de acción. No genera órdenes ni modifica su cartera: muestra contexto, disciplina y si hay datos para hablar de una señal. Los datos diarios o retrasados la inhiben.</p>
     <div id="intradia-contenido" aria-live="polite"></div>
   </section>
 
   <section role="tabpanel" id="panel-modelos" aria-labelledby="tab-modelos" hidden>
-    <h1>Modelo de opciones</h1>
+    <h1>Modelos</h1>
     <p class="ayuda">Precio y sensibilidades teóricas Black-Scholes-Merton para una opción europea. Ingrese sus propias hipótesis; este cálculo no incorpora cotizaciones, Option Flow ni órdenes.</p>
     <form id="form-opciones" class="formulario formulario-modelos">
+      <label class="ancho">Ejemplo listo<select id="ejemplos-opciones"></select></label>
       <label>Tipo<select name="tipo"><option value="call">Call</option><option value="put">Put</option></select></label>
       <label>Precio subyacente<input name="spot" type="number" min="0.0001" step="any" value="100" required></label>
       <label>Precio de ejercicio<input name="strike" type="number" min="0.0001" step="any" value="100" required></label>
@@ -448,7 +449,7 @@
   </section>
 
   <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>
-    <h1>Datos e instrumentos</h1>
+    <h1>Datos y fuentes</h1>
       <h2>Cobertura por sección</h2>
       <p class="ayuda">Cada sección declara qué dato usa, su fuente, retraso y criterio de vigencia. Consulte la fecha de cada precio antes de usarlo.</p>
       <div id="cobertura-secciones"></div>
@@ -472,6 +473,24 @@
       <label>Vigencia<select id="filtro-vigencia"><option value="">Todas</option><option value="vigente">Vigente</option><option value="retrasado">Retrasado</option><option value="vencido">Vencido</option><option value="sin_datos">Sin datos</option><option value="sintetico">Sintético</option></select></label>
     </div>
     <div id="universo-tabla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    <details class="recursos-backtesting">
+      <summary>Recursos de backtesting (sin conexión)</summary>
+      <p class="ayuda">Un proyecto de ejemplo para probar reglas de compra y venta sobre datos pasados con backtesting.py. Funciona sin internet y con datos sintéticos (inventados para la prueba): no se conecta a ningún bróker, no envía órdenes y no demuestra que una estrategia gane.</p>
+      <ol>
+        <li>Descargue el proyecto y lea la guía de instalación.</li>
+        <li>Ejecute la demostración en su entorno aislado y revise el informe.</li>
+        <li>Solo después de entender sus límites, cambie los datos de ejemplo por datos con permiso de uso.</li>
+      </ol>
+      <p><a href="/static/recursos/laboratorio-reel-bots.zip">Descargar proyecto (ZIP)</a> · <a href="/static/recursos/reel-bots-guia.md">Guía de instalación y uso</a> · <a href="/static/recursos/reel-bots-demo.json">Informe de la demostración</a> · <a href="/static/recursos/sma-referencia-reel.pine">Indicador Pine de referencia</a></p>
+      <div class="tabla-contenedor"><table><caption>Motores de backtesting revisados</caption><thead><tr><th scope="col">Proyecto</th><th scope="col">Estado en este equipo</th><th scope="col">Para qué sirve y límites</th><th scope="col">Licencia</th></tr></thead><tbody>
+        <tr><th scope="row"><a href="https://github.com/kernc/backtesting.py" rel="noopener noreferrer" target="_blank">backtesting.py</a></th><td>Instalado en entorno aislado (0.6.5)</td><td>Motor del ejemplo; probado con datos sintéticos.</td><td>AGPL-3.0</td></tr>
+        <tr><th scope="row"><a href="https://github.com/QuantConnect/Lean" rel="noopener noreferrer" target="_blank">QuantConnect LEAN</a></th><td>Descargado, sin iniciar</td><td>Motor para varios tipos de activo (C#/Python); necesita compilar y datos propios.</td><td>Apache-2.0</td></tr>
+        <tr><th scope="row"><a href="https://github.com/freqtrade/freqtrade" rel="noopener noreferrer" target="_blank">Freqtrade</a></th><td>Solo revisado</td><td>Bot de cripto; útil como referencia de simulación sin dinero. No se conecta a futuros CME.</td><td>GPL-3.0</td></tr>
+        <tr><th scope="row"><a href="https://github.com/polakowo/vectorbt" rel="noopener noreferrer" target="_blank">vectorbt</a></th><td>Solo revisado</td><td>Prueba muchas combinaciones a la vez; no instalado.</td><td>Apache-2.0 con Commons Clause</td></tr>
+        <tr><th scope="row"><a href="https://github.com/nautechsystems/nautilus_trader" rel="noopener noreferrer" target="_blank">NautilusTrader</a></th><td>Solo revisado</td><td>Motor por eventos (Rust/Python); sin adaptadores activos.</td><td>LGPL-3.0</td></tr>
+      </tbody></table></div>
+      <p class="ayuda">Quantower y TradingView: las reglas pueden reescribirse en C# o Pine para compararlas; estos motores no se instalan como indicadores. TradersPost y Tradovate son servicios externos sin conectar. El ejemplo no modela márgenes ni cambios de contrato de futuros. Origen: <a href="https://www.instagram.com/p/DepEDXbRMRF/" rel="noopener noreferrer" target="_blank">publicación del 19-oct-2026</a>.</p>
+    </details>
   </section>
 
   <section role="tabpanel" id="panel-perfil" aria-labelledby="tab-perfil" hidden>

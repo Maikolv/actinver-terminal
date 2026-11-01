@@ -1,0 +1,42 @@
+[
+  {
+    "theme": "light",
+    "width": 390,
+    "keyboard": true,
+    "iframe_identity": true,
+    "iframe_reloads": 0,
+    "persistence": true,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "keyboard": true,
+    "iframe_identity": true,
+    "iframe_reloads": 0,
+    "persistence": true,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "keyboard": true,
+    "iframe_identity": true,
+    "iframe_reloads": 0,
+    "persistence": true,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "keyboard": true,
+    "iframe_identity": true,
+    "iframe_reloads": 0,
+    "persistence": true,
+    "overflow": false,
+    "errors": []
+  }
+]

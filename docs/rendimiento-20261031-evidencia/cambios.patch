@@ -1,0 +1,100 @@
+--- antes/app.py
++++ despues/app.py
+@@ -344,9 +344,10 @@
+ 
+ 
+ @app.get("/api/universo")
+-def get_universo(con=Depends(con_db)):
++def get_universo(con=Depends(con_db), solo_catalogo: bool = False):
+     ins = mercado.instrumentos(con)
+-    cot = mercado.cotizaciones(con, AJUSTES)
++    # El selector no necesita precios: evita consultar toda la historia y no crea un fallback.
++    cot = {} if solo_catalogo else mercado.cotizaciones(con, AJUSTES)
+     sim = {r[0] for r in con.execute("SELECT id FROM universo_simulador")}
+     filas = []
+     for i, v in ins.items():
+--- antes/app.js
++++ despues/app.js
+@@ -55,8 +55,16 @@
+   if (typeof url !== "string" || !url.startsWith("https://")) return h("span", { texto });
+   return h("a", { href: url, target: "_blank", rel: "noopener noreferrer", texto });
+ }
+-async function api(ruta, opciones = {}) {
+-  const o = { ...opciones, headers: { ...(opciones.headers || {}) } };
++const consultasPendientes = new Map();
++function api(ruta, opciones = {}) {
++  // Solo GET sin opciones: comparte solicitudes simultáneas, nunca precios entre instantes.
++  if (Object.keys(opciones).length) return consultarApi(ruta, opciones);
++  if (!consultasPendientes.has(ruta)) consultasPendientes.set(ruta, consultarApi(ruta).finally(() => consultasPendientes.delete(ruta)));
++  return consultasPendientes.get(ruta);
++}
++async function consultarApi(ruta, opciones = {}) {
++  const o = { signal: /^\/api\/(?:estado|universo)(?:\?|$)/.test(ruta) ? AbortSignal.timeout(15000) : undefined,
++    ...opciones, headers: { ...(opciones.headers || {}) } };
+   if (o.method && o.method !== "GET") o.headers["X-CSRF-Token"] = CSRF;
+   if (o.json !== undefined) { o.body = JSON.stringify(o.json); o.headers["Content-Type"] = "application/json"; delete o.json; }
+   let r;
+@@ -1393,6 +1401,7 @@
+     await api("/api/movimientos/actualizar", { method: "POST", json: {} });
+     notificar("Consultando la SEC (incremental, ≤ 5 peticiones por segundo)…");
+     const t = setInterval(async () => {
++      if (document.hidden) return;
+       try {
+         const e = await api("/api/movimientos/estado");
+         if (e.estado !== "actualizando") { clearInterval(t); notificar(e.estado === "terminado" ? "SEC consultada." : `SEC: ${e.estado}`); cargarMovimientos(); }
+@@ -1516,7 +1525,7 @@
+         + (d.fuera_del_catalogo ? ` Se omiten ${d.fuera_del_catalogo} instrumento(s) que no aparecen en el catálogo de su simulador.` : ""), vacio: estado.rankingClase === "fondos" ? "Sin fondos con al menos 11 sesiones de valor liquidativo." : "Sin instrumentos con al menos 61 sesiones de precio." }));
+   } catch (e) { if (vigente()) limpiar("ranking-contenido", errorCaja(e)); }
+ }
+-setInterval(() => { if (pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
++setInterval(() => { if (!document.hidden && pestanaVisible("panel-ranking")) cargarRanking(); }, 60000);
+ 
+ /* Clasificación por capitalización bursátil: filtro, explicación de cada categoría y consulta a la SEC. */
+ estado.rankingCap = "todas";
+--- antes/mesa.mjs
++++ despues/mesa.mjs
+@@ -59,10 +59,18 @@
+     box.append(form,output);
+   }
+   function dibujar(){
+-    $('mesa-paneles').replaceChildren();const tema=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
++    const anteriores=new Map([...$('mesa-paneles').children].map(n=>[n.dataset.panel,n]));
++    const tema=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+     for(const id of activos){
++      const anterior=anteriores.get(id);
++      if(anterior&&anterior.dataset.simbolo===simbolo&&anterior.dataset.tema===tema&&anterior.dataset.catalogo===String(catalogoListo)){
++        const cont=$('mesa-paneles'),destino=cont.children[activos.indexOf(id)]||null;
++        if(destino!==anterior){if(cont.moveBefore)cont.moveBefore(anterior,destino);else cont.insertBefore(anterior,destino);}
++        const flechas=anterior.querySelectorAll('header button');flechas[0].disabled=activos.indexOf(id)===0;flechas[1].disabled=activos.indexOf(id)===activos.length-1;
++        anteriores.delete(id);continue;
++      }
+       const [,titulo,tipo,destino]=CATALOGO.find(c=>c[0]===id),card=crear('section');card.className='tarjeta mesa-panel';
+-      card.dataset.panel=id;
++      card.dataset.panel=id;card.dataset.simbolo=simbolo;card.dataset.tema=tema;card.dataset.catalogo=String(catalogoListo);
+       const head=crear('header'),h=crear('h2',titulo);h.tabIndex=-1;
+       const antes=boton('←',()=>{mover(id,-1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();}),despues=boton('→',()=>{mover(id,1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();});
+       antes.setAttribute('aria-label',`Mover ${titulo} antes`);despues.setAttribute('aria-label',`Mover ${titulo} después`);
+@@ -77,12 +85,16 @@
+         d.addEventListener('toggle',()=>{if(d.open&&!d.querySelector('iframe')){const f=crear('iframe');f.title=titulo;f.loading='lazy';f.src=tipo==='chart'?`/grafica/${encodeURIComponent(simbolo)}?tema=${tema}`:`/widget/${tipo}?${new URLSearchParams({simbolo,tema})}`;d.append(f);}else if(!d.open)d.querySelector('iframe')?.remove();});card.append(d);}
+       $('mesa-paneles').append(card);
+     }
++    for(const n of anteriores.values())n.remove();
+     $('mesa-conteo').textContent=`${activos.length} paneles · se cargan al desplegarlos`;
+   }
+   for(const [id,t] of CATALOGO)$('mesa-agregar').append(new Option(t,id));
+-  $('mesa-anadir').onclick=()=>{const id=$('mesa-agregar').value;if(!activos.includes(id)){activos.push(id);$('mesa-preset').value='guardada';guardar();dibujar();}};
++  $('mesa-anadir').onclick=()=>{const id=$('mesa-agregar').value;if(!activos.includes(id)){activos.push(id);$('mesa-preset').value='guardada';guardar();dibujar();}else{$('mesa-estado').textContent='Ese panel ya está en la mesa.';}};
+   $('mesa-preset').onchange=e=>{activos=[...PRESETS[e.target.value]];guardar();dibujar();};
+   $('mesa-simbolo').onchange=e=>{simbolo=e.target.value;guardar();dibujar();};
+-  (async()=>{try{const r=await fetch('/api/universo',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
++  function filtrar(){const texto=$('mesa-buscar').value.trim().toLocaleLowerCase('es');const filas=catalogo.filter(i=>`${i.clave_operable} ${i.nombre}`.toLocaleLowerCase('es').includes(texto));$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));$('mesa-simbolo').value=simbolo;if(!filas.length)$('mesa-simbolo').append(new Option('Sin coincidencias',''));$('mesa-estado').textContent=`${filas.length} coincidencias; el instrumento activo no cambia hasta seleccionarlo.`;}
++  $('mesa-buscar').addEventListener('input',filtrar);
++  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('mesa-buscar').focus();}if(e.key==='Escape'&&e.target===$('mesa-buscar')){$('mesa-buscar').value='';filtrar();$('mesa-simbolo').focus();}});
++  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
+   dibujar();
+ }
+--- antes/mesa.html
++++ despues/mesa.html
+@@ -1,2 +1,2 @@
+ <!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mesa de investigación · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg"><link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/navegacion.css"><link rel="stylesheet" href="/static/mesa.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/mesa.mjs"></script></head><body><a class="saltar" href="#principal">Saltar al contenido</a><header class="cabecera"><a class="marca" href="/"><img src="/static/favicon.svg" width="26" height="26" alt="">Actinver Terminal</a></header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/laboratorio-bots-reel.html" aria-label="Laboratorio de bots"><span class="nav-global__texto-largo">Laboratorio de bots</span><span class="nav-global__texto-corto" aria-hidden="true">Bots</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+-<main id="principal"><h1>Mesa de investigación</h1><p>Organice gráficos, contexto y herramientas en una sola vista. Seleccione un instrumento del catálogo, elija una disposición y despliegue únicamente lo que vaya a consultar. Las flechas cambian el orden y «Quitar» retira un panel; su disposición se guarda en este navegador.</p><p class="aviso-caja">Solo investigación. Ningún panel envía órdenes. Los precios externos pueden ser retrasados o indicativos; no equivalen a un feed CME para NQ. Los escenarios manuales no son señales.</p><div class="mesa-controles"><label>Instrumento <select id="mesa-simbolo" disabled><option>Cargando catálogo…</option></select></label><label>Disposición <select id="mesa-preset"><option value="mercado">Mercado</option><option value="futuros">Investigación de futuros</option><option value="empresa">Empresa y cartera</option></select></label><label>Añadir panel <select id="mesa-agregar"></select></label><button class="boton boton--secundario" id="mesa-anadir" type="button">Añadir</button></div><p id="mesa-estado" role="status"></p><p id="mesa-conteo" class="ayuda"></p><div id="mesa-paneles" class="mesa-grid"></div><p class="ayuda">Organización inspirada en OpenTerminal de ErTasselli (MIT). Implementación propia con las fuentes y controles de Actinver. <a href="https://github.com/ErTasselli/OpenTerminal" rel="noopener noreferrer" target="_blank">Proyecto original</a> · <a href="/?vista=tab-ayuda">Referencias y créditos</a></p></main></body></html>+<main id="principal"><h1>Mesa de investigación</h1><p>Organice gráficos, contexto y herramientas en una sola vista. Seleccione un instrumento del catálogo, elija una disposición y despliegue únicamente lo que vaya a consultar. Las flechas cambian el orden y «Quitar» retira un panel; su disposición se guarda en este navegador.</p><p class="aviso-caja">Solo investigación. Ningún panel envía órdenes. Los precios externos pueden ser retrasados o indicativos; no equivalen a un feed CME para NQ. Los escenarios manuales no son señales.</p><div class="mesa-controles"><label>Buscar instrumento (Ctrl+K) <input id="mesa-buscar" type="search" placeholder="Clave o nombre" aria-label="Buscar instrumento del catálogo"></label><label>Instrumento <select id="mesa-simbolo" disabled><option>Cargando catálogo…</option></select></label><label>Disposición <select id="mesa-preset"><option value="mercado">Mercado</option><option value="futuros">Investigación de futuros</option><option value="empresa">Empresa y cartera</option></select></label><label>Añadir panel <select id="mesa-agregar"></select></label><button class="boton boton--secundario" id="mesa-anadir" type="button">Añadir</button></div><p id="mesa-estado" role="status"></p><p id="mesa-conteo" class="ayuda"></p><div id="mesa-paneles" class="mesa-grid"></div><p class="ayuda">Organización inspirada en OpenTerminal de ErTasselli (MIT). Implementación propia con las fuentes y controles de Actinver. <a href="https://github.com/ErTasselli/OpenTerminal" rel="noopener noreferrer" target="_blank">Proyecto original</a> · <a href="/?vista=tab-ayuda">Referencias y créditos</a></p></main></body></html>

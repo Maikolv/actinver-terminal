@@ -1,0 +1,84 @@
+[
+  {
+    "theme": "light",
+    "width": 390,
+    "errores": [],
+    "sandbox_grafica": false,
+    "referrerpolicy": true,
+    "preflight_404": true,
+    "preflight_red": true,
+    "sin_cobertura": "FONDO:ACTDUAL",
+    "abierto_al_cambiar_instrumento": true,
+    "iframes": 1,
+    "riesgo_gap": true
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "errores": [],
+    "sandbox_grafica": false,
+    "referrerpolicy": true,
+    "preflight_404": true,
+    "preflight_red": true,
+    "sin_cobertura": "FONDO:ACTDUAL",
+    "abierto_al_cambiar_instrumento": true,
+    "iframes": 1,
+    "riesgo_gap": true
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "errores": [],
+    "sandbox_grafica": false,
+    "referrerpolicy": true,
+    "preflight_404": true,
+    "preflight_red": true,
+    "sin_cobertura": "FONDO:ACTDUAL",
+    "abierto_al_cambiar_instrumento": true,
+    "iframes": 1,
+    "riesgo_gap": true
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "errores": [],
+    "sandbox_grafica": false,
+    "referrerpolicy": true,
+    "preflight_404": true,
+    "preflight_red": true,
+    "sin_cobertura": "FONDO:ACTDUAL",
+    "abierto_al_cambiar_instrumento": true,
+    "iframes": 1,
+    "riesgo_gap": true
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "errores": [],
+    "sandbox_grafica": false,
+    "referrerpolicy": true,
+    "preflight_404": true,
+    "preflight_red": true,
+    "sin_cobertura": "FONDO:ACTDUAL",
+    "abierto_al_cambiar_instrumento": true,
+    "iframes": 1,
+    "riesgo_gap": true
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "errores": [],
+    "sandbox_grafica": false,
+    "referrerpolicy": true,
+    "preflight_404": true,
+    "preflight_red": true,
+    "sin_cobertura": "FONDO:ACTDUAL",
+    "abierto_al_cambiar_instrumento": true,
+    "iframes": 1,
+    "riesgo_gap": true
+  },
+  {
+    "ruta_terminal_mesa_velas_retorno": true,
+    "instrumento": "SIC:AMD"
+  }
+]

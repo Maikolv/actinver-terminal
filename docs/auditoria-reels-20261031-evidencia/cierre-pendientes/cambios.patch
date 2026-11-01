@@ -1,0 +1,143 @@
+--- antes/web/static/mesa.mjs
++++ despues/web/static/mesa.mjs
+@@ -1,6 +1,6 @@
+ // Independent implementation inspired by ErTasselli/OpenTerminal (MIT).
+ export const CATALOGO = [
+-  ['grafica','Velas e indicadores','chart'], ['mapa','Mapa sectorial','mapa'],
++  ['grafica','Gráfica TradingView','chart'], ['mapa','Mapa sectorial','mapa'],
+   ['calendario','Calendario económico','calendario'], ['noticias','Noticias','noticias'],
+   ['filtro','Explorador de acciones','filtro'], ['resumen','Macro e índices','resumen'],
+   ['cotizaciones','Cotizaciones por grupo','cotizaciones'], ['destacados','Mayores movimientos','destacados'],
+@@ -14,11 +14,13 @@
+   ['asistente','Asistente de investigación','link','tab-asistente'],
+   ['insiders','Movimientos públicos','link','tab-movimientos'],
+   ['robustez','Backtesting y robustez','link','tab-robustez'],
+-  ['riesgo','Plan de riesgo NQ · cálculo manual','risk'],
++  ['riesgo','Plan de riesgo · solo NQ · cálculo manual','risk'],
+ ];
+ export const PRESETS = {mercado:['grafica','mapa','resumen','calendario'],
+   futuros:['grafica','calendario','orderflow','opciones','riesgo','robustez'],
+   empresa:['grafica','info','finanzas','noticias-emisora','insiders','cartera']};
++export const AVISO_RIESGO = 'El riesgo calculado es un tope del escenario, no del fill real: un gap o un deslizamiento mayor puede superarlo.';
++export function rutaVelas(simbolo){return '/?'+new URLSearchParams({vista:'tab-velas',simbolo});}
+ export function normalizarLayout(v) {
+   if(!Array.isArray(v))return [...PRESETS.mercado];
+   return [...new Set(v.filter(k=>CATALOGO.some(c=>c[0]===k)))].slice(0,CATALOGO.length);
+@@ -55,11 +57,12 @@
+     }
+     const output=crear('p');output.setAttribute('role','status');const b=crear('button','Calcular escenario');b.type='submit';b.className='boton';form.append(b);
+     form.addEventListener('input',()=>{output.textContent='Escenario cambiado. Vuelva a calcular.';});
+-    form.onsubmit=e=>{e.preventDefault();try{const p=planNQ(...['entrada','sl','r','presupuesto','costos','slip'].map(k=>Number(campos[k].value)));output.textContent=`ESTUDIO · ${p.lado} · TP ${p.tp.toFixed(2)} · SL ${p.sl.toFixed(2)} · riesgo por contrato USD ${p.riesgo.toFixed(2)} · recompensa neta USD ${p.recompensaNeta.toFixed(2)} · caben ${p.contratos} contratos en el presupuesto. ${p.contratos===0?'El presupuesto no cubre un NQ.':''} Costos cero son una hipótesis, no una tarifa verificada.`;}catch(err){output.textContent=err.message;}};
++    form.onsubmit=e=>{e.preventDefault();try{const p=planNQ(...['entrada','sl','r','presupuesto','costos','slip'].map(k=>Number(campos[k].value)));output.textContent=`ESTUDIO · ${p.lado} · TP ${p.tp.toFixed(2)} · SL ${p.sl.toFixed(2)} · riesgo por contrato USD ${p.riesgo.toFixed(2)} · recompensa neta USD ${p.recompensaNeta.toFixed(2)} · caben ${p.contratos} contratos en el presupuesto. ${p.contratos===0?'El presupuesto no cubre un NQ.':''} Costos cero son una hipótesis, no una tarifa verificada. ${AVISO_RIESGO}`;}catch(err){output.textContent=err.message;}};
+     box.append(form,output);
+   }
+   function dibujar(){
+     const anteriores=new Map([...$('mesa-paneles').children].map(n=>[n.dataset.panel,n]));
++    const abiertos=new Set([...anteriores].filter(([,n])=>n.querySelector('details')?.open).map(([id])=>id));
+     const tema=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+     for(const id of activos){
+       const anterior=anteriores.get(id);
+@@ -76,16 +79,37 @@
+       antes.setAttribute('aria-label',`Mover ${titulo} antes`);despues.setAttribute('aria-label',`Mover ${titulo} después`);
+       antes.disabled=activos.indexOf(id)===0;despues.disabled=activos.indexOf(id)===activos.length-1;
+       head.append(h,antes,despues,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
++      if(tipo==='chart'){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
+       if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
+       else if(tipo==='risk')panelRiesgo(card);
+       else if(['chart','info','perfil','finanzas','tecnico','noticias-emisora'].includes(tipo)&&(!catalogoListo||!catalogo.find(i=>i.id===simbolo)?.grafica)) {
+         card.append(crear('p',!catalogoListo?'SIN DATO · catálogo no disponible. No se presupone un instrumento.':'SIN DATO · este instrumento no tiene gráfica externa declarada en el catálogo. Consulte Datos y fuentes.'));
++        if(tipo!=='chart'){const a=crear('a','Consultar el instrumento en Velas');a.href=rutaVelas(simbolo);card.append(a);}
+       }
+-      else {const d=crear('details'),s=crear('summary','Mostrar panel');d.append(s,crear('p','Referencia externa de TradingView; retraso y disponibilidad propios. No alimenta los cálculos de la terminal.'));
+-        d.addEventListener('toggle',()=>{if(d.open&&!d.querySelector('iframe')){const f=crear('iframe');f.title=titulo;f.loading='lazy';f.src=tipo==='chart'?`/grafica/${encodeURIComponent(simbolo)}?tema=${tema}`:`/widget/${tipo}?${new URLSearchParams({simbolo,tema})}`;d.append(f);}else if(!d.open)d.querySelector('iframe')?.remove();});card.append(d);}
++      else {const d=crear('details'),s=crear('summary','Mostrar panel');d.append(s,crear('p','Referencia externa de TradingView; retraso y disponibilidad propios. No alimenta los cálculos de la terminal. HTTP 200 solo confirma que se sirve el marco: la terminal no puede verificar los datos de otro origen.'));
++        const aviso=crear('p');aviso.setAttribute('role','status');d.append(aviso);
++        const alternativa=crear('a','Alternativa local: '+(tipo==='chart'?'Velas':'Datos y fuentes'));alternativa.href=tipo==='chart'?rutaVelas(simbolo):'/?'+new URLSearchParams({vista:'tab-universo',simbolo});d.append(alternativa);
++        let control;
++        d.addEventListener('toggle',async()=>{
++          if(!d.open){control?.abort();control=null;d.querySelector('iframe')?.remove();aviso.textContent='';return;}
++          if(d.querySelector('iframe')||control)return;
++          const actual=new AbortController();control=actual;aviso.textContent='Comprobando disponibilidad del marco…';
++          const ruta=tipo==='chart'?`/grafica/${encodeURIComponent(simbolo)}?tema=${tema}`:`/widget/${tipo}?${new URLSearchParams({simbolo,tema})}`;
++          try{const r=await fetch(ruta,{signal:AbortSignal.any([actual.signal,AbortSignal.timeout(15000)])});
++            if(!d.open||!card.isConnected||actual.signal.aborted)return;
++            if(!r.ok){aviso.textContent=`SIN DATO · el servidor no ofrece este panel (HTTP ${r.status}). Use la alternativa local.`;return;}
++            if(!r.headers.get('content-type')?.includes('text/html')){aviso.textContent='SIN DATO · la respuesta no es un panel HTML.';return;}
++            const f=crear('iframe');f.title=titulo;f.loading='lazy';
++            // Sin allow-same-origin, la gráfica falla al consultar cookies/Locks API.
++            // Solo calendario tiene contenido visible comprobado con este sandbox.
++            if(tipo==='calendario')f.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');
++            f.referrerPolicy='no-referrer';f.src=ruta;d.append(f);aviso.textContent='Marco disponible; datos y vigencia externos sin verificar.';
++          }catch{if(d.open&&card.isConnected&&!actual.signal.aborted)aviso.textContent='SIN DATO · no se pudo consultar el panel. Use la alternativa local.';}
++          finally{if(control===actual)control=null;}
++        });card.append(d);if(abiertos.has(id))d.open=true;}
+       $('mesa-paneles').append(card);
+     }
+-    for(const n of anteriores.values())n.remove();
++    for(const n of anteriores.values()){const d=n.querySelector('details');if(d)d.open=false;n.remove();}
+     $('mesa-conteo').textContent=`${activos.length} paneles · se cargan al desplegarlos`;
+   }
+   for(const [id,t] of CATALOGO)$('mesa-agregar').append(new Option(t,id));
+--- antes/web/static/mesa.css
++++ despues/web/static/mesa.css
+@@ -1,4 +1,6 @@
+ .mesa-controles {display:flex; flex-wrap:wrap; gap:16px; align-items:end; margin:20px 0}
++.mesa-controles>label {flex:1 1 220px; min-width:0}
++.mesa-controles select,.mesa-controles input {width:100%; box-sizing:border-box}
+ .mesa-grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,450px),1fr)); gap:16px}
+ .mesa-panel {min-width:0; align-self:start}
+ .mesa-panel header {display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:12px}
+--- antes/tradingview/mesa_riesgo_nq.pine
++++ despues/tradingview/mesa_riesgo_nq.pine
+@@ -1,6 +1,7 @@
+ //@version=6
+ indicator("Futuros Lab · Mesa de riesgo MANUAL", overlay=true)
+ // Escenario educativo. No estrategia, alertas, webhook ni envío de órdenes.
++// La calculadora web Mesa cubre solo NQ; este indicador admite NQ y MNQ según el gráfico.
+ entrada = input.float(20000, "Entrada de estudio", minval=0, maxval=1000000000, step=0.25)
+ stop = input.float(19990, "SL de invalidación", minval=0, maxval=1000000000, step=0.25)
+ objetivoR = input.float(2, "Objetivo R", minval=0, maxval=1000, step=0.25)
+@@ -19,9 +20,10 @@
+ plot(valido ? entrada : na, "Entrada manual", color.gray, 1)
+ plot(valido ? stop : na, "SL manual", color.red, 2)
+ plot(valido ? tp : na, "TP manual", color.teal, 2)
+-var tabla = table.new(position.top_right, 1, 4)
++var tabla = table.new(position.top_right, 1, 5)
+ if barstate.islast
+     table.cell(tabla, 0, 0, "ESTUDIO MANUAL · SIN EJECUCIÓN", text_color=color.white, bgcolor=color.black)
+     table.cell(tabla, 0, 1, valido ? "TP " + str.tostring(tp) + " · SL " + str.tostring(stop) : "Use un futuro NQ/MNQ y precios válidos de 0.25", bgcolor=color.gray)
+     table.cell(tabla, 0, 2, valido ? "Riesgo USD " + str.tostring(riesgo) + " · caben " + str.tostring(cantidad) + " contratos" : "Sin escenario válido", bgcolor=color.gray)
+     table.cell(tabla, 0, 3, "No usa precios del gráfico. Costos cero = hipótesis.", bgcolor=color.gray)
++    table.cell(tabla, 0, 4, "Tope del escenario, no del fill real. Un gap o deslizamiento mayor puede superarlo.", bgcolor=color.gray)
+--- antes/terminal/cobertura_secciones.py
++++ despues/terminal/cobertura_secciones.py
+@@ -1,5 +1,7 @@
+ """Procedencia y temporalidad declaradas para cada sección de la terminal."""
+ from __future__ import annotations
++import re
++from pathlib import Path
+ 
+ # Clave = id de pestaña en navegacion.json. Una sección nueva exige una declaración aquí.
+ # «Vigencia» describe el criterio visible, no promete que el dato esté actualizado.
+@@ -33,4 +35,20 @@
+ 
+ def tabla() -> list[dict[str, str]]:
+     return [{"seccion": clave, "dato": dato, "fuente": fuente, "retraso": retraso, "vigencia": vigencia}
+-            for clave, (dato, fuente, retraso, vigencia) in SECCIONES.items()]
++            for clave, (dato, fuente, retraso, vigencia) in SECCIONES.items()] + tabla_mesa()
++
++
++def tabla_mesa() -> list[dict[str, str]]:
++    """Familias de Mesa derivadas de su catálogo real, sin mantener otra lista de paneles."""
++    src = (Path(__file__).resolve().parents[1] / "web/static/mesa.mjs").read_text(encoding="utf-8")
++    bloque = src.split("export const CATALOGO = [", 1)[1].split("];", 1)[0]
++    paneles = re.findall(r"\['([^']+)','([^']+)','([^']+)'", bloque)
++    familias = [
++        ("externos", lambda t: t not in ("link", "risk"), "TradingView externo, no alimenta modelos", "Propio del proveedor, puede ser indicativo o retrasado", "HTTP 200 solo verifica el marco; contenido y vigencia externos sin verificar"),
++        ("accesos locales", lambda t: t == "link", "Sección nativa y sus fuentes declaradas", "Hereda el retraso de la sección de destino", "No añade datos; comprobar fecha y estado en destino"),
++        ("calculadora manual", lambda t: t == "risk", "Entradas manuales de estudio, solo NQ", "No recibe cotizaciones", "Sin precio conectado ni señal; tope del escenario, no del fill real"),
++    ]
++    return [{"seccion": f"Mesa · {nombre} ({len(filas)})", "dato": ", ".join(f[1] for f in filas),
++             "fuente": fuente, "retraso": retraso, "vigencia": vigencia}
++            for nombre, filtro, fuente, retraso, vigencia in familias
++            for filas in [[f for f in paneles if filtro(f[2])]]]

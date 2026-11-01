@@ -1,0 +1,122 @@
+[
+  {
+    "id": "largo",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 1000,
+    "costos": 5,
+    "slip": 2,
+    "valido": true
+  },
+  {
+    "id": "corto",
+    "entrada": 20000,
+    "stop": 20010,
+    "r": 2,
+    "presupuesto": 1000,
+    "costos": 5,
+    "slip": 2,
+    "valido": true
+  },
+  {
+    "id": "cero",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": true
+  },
+  {
+    "id": "redondeo",
+    "entrada": 20000,
+    "stop": 19999.75,
+    "r": 1.1,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": true
+  },
+  {
+    "id": "costo-elevado",
+    "entrada": 20000,
+    "stop": 19999.75,
+    "r": 2,
+    "presupuesto": 10,
+    "costos": 8,
+    "slip": 2,
+    "valido": true
+  },
+  {
+    "id": "tick-invalido",
+    "entrada": 20000,
+    "stop": 19999.9,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false
+  },
+  {
+    "id": "slip-fraccional",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0.5,
+    "valido": false
+  },
+  {
+    "id": "iguales",
+    "entrada": 20000,
+    "stop": 20000,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false
+  },
+  {
+    "id": "objetivo-negativo",
+    "entrada": 1,
+    "stop": 100,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false
+  },
+  {
+    "id": "overflow",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 1e+306,
+    "presupuesto": 1000,
+    "costos": 0,
+    "slip": 0,
+    "valido": false
+  },
+  {
+    "id": "r-cero",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 0,
+    "presupuesto": 100,
+    "costos": 0,
+    "slip": 0,
+    "valido": false
+  },
+  {
+    "id": "costos-negativos",
+    "entrada": 20000,
+    "stop": 19990,
+    "r": 2,
+    "presupuesto": 100,
+    "costos": -1,
+    "slip": 0,
+    "valido": false
+  }
+]

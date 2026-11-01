@@ -261,6 +261,11 @@ patrones de secretos en los 20 archivos tocados.
 
 Ver `docs/auditoria-2026-10-19.md`: 7 hallazgos (3 P1 corregidos, 2 P2 corregidos, 2 P3), 13 controles duplicados retirados, `serie_historica` 12× más rápida con salida idéntica.
 
+
+### NQ — aporte Codex20/oct/2026
+
+Ficha añadida a Aprender y recursos, con guía, prerregistro y resultados agregados. Replay offline en futuros-lab:6901barras,5RTH completas,4sesiones desarrollo,0trades;6tests específicos aprobados. Sin ventaja demostrada; sin forward ni prueba real de OCO. No se alteró la interfaz ni se desplegó Quantower. Coordinación con Claude mediante documento local; expediente futuros-lab/entregables/nq-investigacion-20261020.
+
 ## Entrega y captura — 27 y 28-oct-2026
 
 - 27-oct: constructor de portafolios (Markowitz), capitalización bursátil en el Ranking y GEX con «Preparar GEX»
@@ -344,6 +349,16 @@ Trabajo repartido con Codex por decisión del usuario (Codex: cobertura por secc
   cupo del 30-oct (el de hoy ya se usó). Con 3 consultas libres al día, ponerse al día toma cerca de 10 días.
 - Aviso del motor: no aparece durante un ciclo recién iniciado y usa la hora local. La terminal estuvo detenida de
   04:01 a 08:04 por las verificaciones; por eso no hubo ciclos.
+
+
+## Auditoría de continuidad — 31-oct-2026
+
+Mesa: catálogo ausente muestra SIN DATO, foco y orden accesibles, disposición persistente e invalidación del cálculo al editar. Riesgo manual NQ valida unidades, finitud y límites de estudio; núcleo C# puro y Pine informativo sincronizados. 14 pruebas Node y 23 Python aprobadas; 12 vectores JS/C# coinciden, más rechazo de no finitos; 10 recorridos UI en Chromium aislado. Cuatro comprobaciones adicionales del catálogo aprobadas. Mapa Actinver: 239 archivos, 127 rutas. Ver docs/auditoria-reels-20261031.md y docs/pendientes-reels-20261031.json. Pine sigue sin compilación en plataforma; tres proveedores cargaron sin acreditar vigencia; cuatro observaciones de procedencia/licencia pendientes. Ningún trade ni adaptador iniciado; candados apagados, sin diario disponible ni ventaja demostrada.
+
+
+### Optimización medida — 31-oct-2026
+
+Catálogo ligero sin precios, deduplicación GET en curso, polling de Ranking/SEC suspendido al ocultar, búsqueda por teclado y paneles conservados al reordenar. Tres repeticiones antes/después con copia fija offline; resultados, limitaciones y capturas en docs/optimizacion-medida-20261031.md. 22 pruebas Node, 19 Python y cuatro recorridos UI aprobados. Ningún trade ni adaptador iniciado; no se cambió estrategia ni backtest.
 
 ## Auditoría de procesos — 31-oct-2026
 

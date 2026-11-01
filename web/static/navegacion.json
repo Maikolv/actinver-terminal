@@ -13,12 +13,12 @@
       "url": "/?vista=tab-laboratorio"
     },
     {
-      "titulo": "Laboratorio de bots",
-      "url": "/static/recursos/laboratorio-bots-reel.html"
-    },
-    {
       "titulo": "Cuaderno financiero",
       "url": "/static/recursos/practica-proyectos-financieros.html"
+    },
+    {
+      "titulo": "Mesa de investigación",
+      "url": "/static/mesa.html"
     }
   ],
   "secciones": [
@@ -71,7 +71,7 @@
       "url": "/?vista=tab-asistente"
     },
     {
-      "titulo": "Laboratorio",
+      "titulo": "Laboratorio de alfa",
       "url": "/?vista=tab-laboratorio"
     },
     {
