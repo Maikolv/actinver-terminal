@@ -23,6 +23,9 @@ URL_CONTRATOS_PAPER = "https://paper-api.alpaca.markets/v2/options/contracts"
 URL_DATOS = "https://data.alpaca.markets"
 RETRASO_SIP_S = 16 * 60
 VENTANA_SPOT_S = 60  # máxima distancia entre la cotización de un contrato y el spot que se le une
+# Días de vencimiento de la cadena; los contratos Paper (OI) usan la misma ventana para que sus 3 páginas cubran la
+# cadena completa en vez de gastarse en vencimientos que el GEX nunca usa.
+DIAS_CADENA = 60
 LIC_ALPACA = "Alpaca Market Data, plan gratuito: uso personal, sin redistribución"
 OCC = re.compile(r"^([A-Z.]{1,6})(\d{6})([CP])(\d{8})$")
 
@@ -89,7 +92,7 @@ class Alpaca:
             raise FuenteNoDisponible("faltan credenciales específicas ALPACA_PAPER_API_KEY_ID/ALPACA_PAPER_API_SECRET_KEY para Paper")
         hoy = datetime.now(UTC).date()
         params = {"underlying_symbols": subyacente, "limit": limite, "status": "active",
-                  "expiration_date_gte": hoy.isoformat(), "expiration_date_lte": (hoy + timedelta(days=183)).isoformat()}
+                  "expiration_date_gte": hoy.isoformat(), "expiration_date_lte": (hoy + timedelta(days=DIAS_CADENA)).isoformat()}
         cli = self.cliente or httpx.Client(timeout=15)
         out, tokens, parcial = [], set(), False
         try:
@@ -217,7 +220,7 @@ class Alpaca:
             nota="Solo el primer nivel de IEX (≈ 2–3 % del volumen de EE. UU.); no es la profundidad del mercado. "
                  "Retraso medido con la hora de la cotización.")
 
-    def cadena(self, subyacente: str, spot: float | None, tasa: float | None, dias: int = 60,
+    def cadena(self, subyacente: str, spot: float | None, tasa: float | None, dias: int = DIAS_CADENA,
                rango: float = 0.30, paginas: int = 3) -> tuple[list[ContratoOpcion], Procedencia]:
         hoy = datetime.now(UTC).date()
         params = {"feed": "indicative", "limit": 1000, "expiration_date_gte": hoy.isoformat(),

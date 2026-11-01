@@ -1,0 +1,8 @@
+{
+  "terminal/ingesta.py": "45680c17f0f12a4c48768c60d4f94993cf8318dfe1ca6df809b2fc1fea24caff",
+  "terminal/db.py": "428b7bd95b894d23c8c3241a6a9f689254bbec6395ff416bca1463285084e507",
+  "terminal/reportes.py": "7f4687f0ebba1620280e2d51b32be22039d96e5312e4ed091412ffce07f3b491",
+  "terminal/servicios.py": "643c09b3784850bb4699f625970eca6378d2ff28ee448d5d6cc7516a0d9ee2da",
+  "terminal/bot_telegram.py": "1a5feff527eda5a2779b911788e916ebfcf25998cfa902c09bf3c792345fae0c",
+  "terminal/mensaje_simple.py": "ac2cf276d21aab19d2c0449cb3483938773cb5e4635cfb00835e8191942bce0f"
+}

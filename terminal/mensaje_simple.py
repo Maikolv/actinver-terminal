@@ -83,7 +83,8 @@ def _horario(sesion: date) -> str:
 
 def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ahora_local: pd.Timestamp,
               sesion: date | None = None, sesiones_restantes: int | None = None, riesgo_aceptado: dict | None = None,
-              concentracion: dict | None = None, precios_al: date | None = None) -> str:
+              concentracion: dict | None = None, precios_al: date | None = None,
+              precios_atrasados: list[dict] | None = None) -> str:
     """Texto del plan del día. `plan` es la salida de plan_accion.calcular; `propuesta`, la de referencia.
     `concentracion`: {"clave", "peso"} de la emisora con más peso; `precios_al`: fecha del precio más viejo de las
     posiciones cuando es anterior a la última sesión cerrada (la valuación todavía no trae el cierre del día)."""
@@ -106,7 +107,10 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
              + (f" (según tu captura del {hora:%d-%m %H:%M})." if hora is not None else "."))
     if hora is not None and (ahora_local - hora) > pd.Timedelta(days=3):
         L.append("⚠️ Esa captura es vieja: si compraste o vendiste después, mándame una nueva antes de seguir.")
-    if precios_al is not None:
+    if precios_atrasados:
+        detalle = '; '.join(f"{_nombre(p['clave'])}: {p['fecha'] or 'sin fecha disponible'}" for p in precios_atrasados)
+        L.append(f"⏳ Ojo: precios atrasados en la valuación: {detalle}. No corresponden al último cierre de su mercado.")
+    elif precios_al is not None:
         L.append(f"⏳ Ojo: la valuación usa precios del {precios_al:%d-%m}; los del último cierre aún no se descargan. "
                  "Escribe /plan en unos minutos.")
     acc = plan["acciones"]
@@ -221,9 +225,11 @@ def texto(con: sqlite3.Connection, ajustes, propuesta: dict | None = None, carte
         quedan = reto.sesiones_restantes(local.to_pydatetime()) if reto.activo() else None
     except Exception:  # noqa: BLE001
         quedan = None
-    conc, precios_al = _cartera_riesgo(con, ajustes, cartera, ahora)
+    cartera = cartera or servicios.cartera_actual(con, ajustes)
+    conc, _ = _cartera_riesgo(con, ajustes, cartera, ahora)
+    atrasados = precios_atrasados(con, cartera, ahora)
     return construir(plan, propuesta, eventos_macro(con, ahora), local, sesion or resumen.sesion_objetivo(ahora), quedan,
-                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"), concentracion=conc, precios_al=precios_al)
+                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"), concentracion=conc, precios_atrasados=atrasados)
 
 
 def _cartera_riesgo(con, ajustes, cartera: dict | None, ahora: datetime) -> tuple[dict | None, date | None]:
@@ -249,3 +255,21 @@ def decision(con: sqlite3.Connection, clave: str) -> dict | None:
     import json
     f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='decisiones_usuario'").fetchone()
     return (json.loads(f[0]) if f else {}).get(clave)
+
+
+def precios_atrasados(con, cartera: dict, ahora: datetime) -> list[dict]:
+    """Nombra posiciones con cierre anterior al esperado; no inventa fecha donde falte."""
+    from . import mercado, vigencia
+    meta = mercado.instrumentos(con)
+    out = []
+    for p in cartera.get('posiciones') or []:
+        iid = p['instrumento_id']
+        fecha = (p.get('fecha_precio') or '')[:10]
+        ultima = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(meta.get(iid, {})), ahora)
+        try:
+            observada = date.fromisoformat(fecha) if fecha else None
+        except ValueError:
+            observada, fecha = None, ''
+        if observada is None or observada < ultima:
+            out.append({'clave': p.get('clave_operable') or iid, 'fecha': fecha or None})
+    return out

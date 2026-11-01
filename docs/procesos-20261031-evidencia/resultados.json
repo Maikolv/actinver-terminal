@@ -1,0 +1,23 @@
+{
+  "python_completa": {
+    "aprobadas": 738,
+    "fallas": 0,
+    "advertencias": 1,
+    "segundos": 466.93,
+    "log": "pytest-completa.txt"
+  },
+  "regresiones_mensajes_procesos_bot": {
+    "aprobadas": 32,
+    "fallas": 0,
+    "nota": "Incluye tres casos añadidos tras iniciar la suite completa; no se suman sin descontar duplicados."
+  },
+  "node": {
+    "aprobadas": 31,
+    "fallas": 0
+  },
+  "worker": {
+    "aprobadas": 19,
+    "fallas": 0
+  },
+  "modo": "fixtures temporales y HTTP MockTransport; sockets externos bloqueados durante suite completa; sin notificaciones reales"
+}

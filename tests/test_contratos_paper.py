@@ -36,6 +36,15 @@ def test_solo_paper_get_y_normalizacion_sin_inventar():
     assert proc.feed == "contracts-paper"
 
 
+def test_ventana_de_contratos_igual_a_la_cadena():
+    """Las 3 páginas de OI deben cubrir los vencimientos de la cadena, no 6 meses que el GEX no usa (MU: 29 % de cobertura)."""
+    llamadas = []
+    with cliente({"option_contracts": []}, llamadas) as cli:
+        Alpaca(CFG, ENV, cli).contratos_opciones("MU")
+        Alpaca(CFG, {**ENV, "ALPACA_API_KEY_ID": "k", "ALPACA_API_SECRET_KEY": "s"}, cli).cadena("MU", None, None)
+    assert {r.url.params["expiration_date_lte"] for r in llamadas} == {llamadas[1].url.params["expiration_date_lte"]}
+
+
 def test_apagado_no_red_y_solo_rangos_acotados():
     llamadas = []
     with cliente({}, llamadas) as cli:

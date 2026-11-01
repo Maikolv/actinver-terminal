@@ -1,0 +1,9 @@
+{
+  "terminal/ingesta.py": "cb21d43a9b83500eff7936296feaecbe48f7d8bfbbca4352108f0ede6879e80c",
+  "terminal/db.py": "cf31bcf17f599119481ede13ac7127b2411aff6d425694ea0b1c504c2d9aa25b",
+  "terminal/reportes.py": "163147c7bc4203ba6c30b4759f4a1118d5f73c488a323dfd17a3c9d35499fb9b",
+  "terminal/bot_telegram.py": "e145f0cbca74a6798bda0790b864c088c0d9c954d47dfb217750bd279bc61cd8",
+  "terminal/mensaje_simple.py": "9be1c1c81c2848abe1c06ee3ffaaaa1e2ba4c55778ac20496e69e017ba7ab059",
+  "tests/test_procesos_20261031.py": "73e694e6e7a083dbbf163b1a996477bfc9a2031b85cbf2a2fe4b695f793080d6",
+  "config/propuesta-proveedores-20261031.toml": "f1077c4ad04df4728732cd9663116605345d7b4a0f41bc9c1e860f913dae8763"
+}

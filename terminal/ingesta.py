@@ -8,7 +8,7 @@ from datetime import UTC, date, datetime, timedelta
 from . import vigencia
 from .adaptadores import CLASES, FX_USDMXN, ErrorProveedor, LimiteAlcanzado
 from .config import Ajustes, credencial, secreto
-from .db import ahora, transaccion
+from .db import ahora as ahora_db, transaccion
 
 log = logging.getLogger("terminal.ingesta")
 
@@ -69,7 +69,7 @@ def _ultima_fecha(con, tabla: str, clave_col: str, clave: str, proveedor: str) -
 
 def _registrar(con, proveedor: str, inicio: str, estado: str, registros: int, mensaje: str) -> None:
     con.execute("INSERT INTO ingestas (proveedor, inicio, fin, estado, registros, mensaje) VALUES (?,?,?,?,?,?)",
-                (proveedor, inicio, ahora(), estado, registros, mensaje[:500]))
+                (proveedor, inicio, ahora_db(), estado, registros, mensaje[:500]))
     con.commit()
 
 
@@ -87,7 +87,7 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
         a = adaptadores[n]
         if not a.configurado():
             continue
-        inicio = ahora()
+        inicio = ahora_db()
         ult = _ultima_fecha(con, "fx", "par", "USDMXN", n)
         desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA + 30)
         if desde > hoy:
@@ -101,7 +101,7 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
         except ErrorProveedor as e:
             _registrar(con, n, inicio, "error", 0, str(e))
             continue
-        ts = ahora()
+        ts = ahora_db()
         with transaccion(con):
             con.executemany("INSERT OR REPLACE INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
                             [(b.fecha, b.cierre, n, "fx", ts) for b in barras])
@@ -127,16 +127,19 @@ def registrar_cobertura(con, proveedor_descarga: str, instrumento_id: str, simbo
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (nombre, instrumento_id, simbolo, "verificado", "MXN",
                  "Fondos Actinver" if nombre == "actinver_pdf" else "BMV",
-                 "fondo" if nombre == "actinver_pdf" else "local", None, "EOD", detalle[:300], ahora()))
+                 "fondo" if nombre == "actinver_pdf" else "local", None, "EOD", detalle[:300], ahora_db()))
 
 
 def _intento(con, iid: str, proveedor: str, barras: int, hoy: date) -> None:
     with transaccion(con):
         con.execute("INSERT OR REPLACE INTO intentos_precio VALUES (?,?,?,?)", (iid, hoy.isoformat(), proveedor, barras))
+        con.execute("INSERT INTO intentos_precio_historial (instrumento_id, intento, proveedor, barras) VALUES (?,?,?,?)",
+                    (iid, hoy.isoformat(), proveedor, barras))
 
 
 def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = None,
-               ids_propuesta: list[str] | None = None, reserva_nuevos: int = RESERVA_HISTORIA_NUEVA) -> list[dict]:
+               ids_propuesta: list[str] | None = None, reserva_nuevos: int = RESERVA_HISTORIA_NUEVA,
+               ahora: datetime | None = None) -> list[dict]:
     """Orden de consulta con cupos limitados (EODHD 20/día, Tiingo por hora):
     0 cartera y captura del portal · 1 instrumentos de las propuestas · 2 los primeros `reserva_nuevos` nunca cargados
     (recuperación programada: sin esta reserva, las actualizaciones diarias agotan el cupo y nunca entran) ·
@@ -147,7 +150,7 @@ def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = Non
     prio, prop = set(ids_prioritarios or []), set(ids_propuesta or [])
     ult = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, MAX(fecha) FROM precios GROUP BY instrumento_id")}
     intentos = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, intento FROM intentos_precio")}
-    hace7 = (date.today() - timedelta(days=7)).isoformat()
+    hace7 = ((ahora or datetime.now(UTC)).date() - timedelta(days=7)).isoformat()
     nuevos = sorted(i["id"] for i in instrs if i["id"] not in ult and i["id"] not in prio and i["id"] not in prop
                     and intentos.get(i["id"], "") < hace7)
     reservados = set(nuevos[:max(0, reserva_nuevos)])
@@ -162,15 +165,18 @@ def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = Non
 
 
 def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | None = None,
-                       hoy: date | None = None, ids_propuesta: list[str] | None = None) -> dict:
-    hoy = hoy or date.today()
+                       hoy: date | None = None, ids_propuesta: list[str] | None = None,
+                       ahora: datetime | None = None) -> dict:
+    instante = ahora or datetime.now(UTC)
+    hoy = hoy or instante.date()
     instrs = orden_cola(con, [dict(r) for r in con.execute("SELECT * FROM instrumentos WHERE estado='activo'")],
-                        ids_prioritarios, ids_propuesta)
+                        ids_prioritarios, ids_propuesta, ahora=instante)
     resumen = {n: {"registros": 0, "errores": 0, "omitidos_limite": 0, "al_dia": 0} for n in ORDEN_PRECIOS}
     agotados: set[str] = set()
-    inicios = {n: ahora() for n in ORDEN_PRECIOS}
+    inicios = {n: ahora_db() for n in ORDEN_PRECIOS}
     mensajes: dict[str, list[str]] = {n: [] for n in ORDEN_PRECIOS}
     for ins in instrs:
+        respaldo = False
         for n in ORDEN_PRECIOS:
             a = adaptadores[n]
             if not a.configurado() or not a.soporta(ins):
@@ -179,11 +185,13 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                 resumen[n]["omitidos_limite"] += 1
                 continue  # cupo agotado: se prueba la siguiente fuente que cubra el instrumento
             ult = _ultima_fecha(con, "precios", "instrumento_id", ins["id"], n)
-            esperada = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(ins))
+            esperada = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(ins), instante)
             if ult and ult >= esperada:
                 resumen[n]["al_dia"] += 1
                 break
             desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA)
+            if respaldo:
+                desde = max(desde, esperada)  # recuperar el cierre faltante, no cinco años por cada respaldo
             try:
                 barras = a.historico(ins, desde, hoy)
             except LimiteAlcanzado as e:
@@ -195,9 +203,17 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                 resumen[n]["errores"] += 1
                 mensajes[n].append(f"{ins['id']}: {e}")
                 _intento(con, ins["id"], n, 0, hoy)
+                if respaldo:
+                    break  # un solo proveedor de respaldo, también si falla
                 continue
             _intento(con, ins["id"], n, len(barras), hoy)
-            ts = ahora()
+            if not barras and not respaldo and ins['id'] in (ids_prioritarios or []):
+                codigo = vigencia.codigo_calendario(ins)
+                cierre = vigencia.cierre_de_sesion(codigo, hoy) or vigencia.cierre_de_sesion(codigo, esperada)
+                if cierre is not None and instante >= cierre:
+                    respaldo = True
+                    continue  # siguiente fuente configurada que soporte el instrumento; no cambia la prioridad global
+            ts = ahora_db()
             moneda = ins["moneda_referencia"] or "MXN"
             with transaccion(con):
                 con.executemany(
@@ -236,7 +252,7 @@ def actualizar_contexto(con, ajustes: Ajustes, ids_cartera: list[str], cliente=N
     for nombre, fn in (("forexfactory", lambda: fw.actualizar_macro(con, prov, cliente)),
                        ("seekingalpha_rss", lambda: fw.actualizar_noticias(con, prov, cartera, cliente)),
                        ("sec_edgar", lambda: _movimientos(con, ajustes))):
-        inicio = ahora()
+        inicio = ahora_db()
         try:
             r = fn()
         except Exception as e:  # noqa: BLE001 - una fuente caída no debe detener el motor
@@ -263,7 +279,7 @@ def _movimientos(con, ajustes: Ajustes) -> dict:
 def actualizar_fondos(con, ajustes: Ajustes, cliente=None) -> dict:
     """Hoja oficial de precios de los fondos Actinver (PDF público), a lo sumo cada 3 h hasta tener la valuación."""
     from . import fondos_actinver as fa
-    inicio = ahora()
+    inicio = ahora_db()
     try:
         r = fa.actualizar(con, ajustes, cliente=cliente)
     except Exception as e:  # noqa: BLE001 - un fallo de esta fuente nunca detiene el ciclo (precios y propuestas siguen)
@@ -284,7 +300,7 @@ def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = 
         n = 0
         if forzar_demo or not hay:
             n = demo.generar(con, semilla=ajustes["optimizacion"]["semilla"])
-            _registrar(con, "demo_sintetico", ahora(), "ok", n, "datos sintéticos regenerados (modo demostración)")
+            _registrar(con, "demo_sintetico", ahora_db(), "ok", n, "datos sintéticos regenerados (modo demostración)")
         out = {"modo": "demo", "registros": n, "nuevos": n}
     else:
         ad = construir_adaptadores(con, ajustes, cliente=cliente)

@@ -75,10 +75,10 @@ def _ahora() -> datetime:
     return datetime.now(UTC)
 
 
-def texto_plan(con, ajustes) -> str:
+def texto_plan(con, ajustes, ahora: datetime | None = None) -> str:
     """Plan del día en lenguaje sencillo (solo qué hacer). El completo: /completo."""
     from . import mensaje_simple
-    return mensaje_simple.texto(con, ajustes, ahora=_ahora())
+    return mensaje_simple.texto(con, ajustes, ahora=ahora or _ahora())
 
 
 def texto_plan_completo(con, ajustes) -> str:

@@ -1,0 +1,120 @@
+{
+  "medido_en": "2026-11-01T05:06:09.941446+00:00",
+  "base": "SQLite original en mode=ro, transacción consistente; sin consultas remotas",
+  "sic_activos": 143,
+  "soporte_declarado_alpaca": 143,
+  "con_barras_alpaca_observadas": 143,
+  "sin_historia_alpaca": 0,
+  "limites_configurados_sin_credenciales": {
+    "tiingo": {
+      "activo": true,
+      "peticiones_por_hora": 45,
+      "peticiones_por_dia": 900
+    },
+    "alpaca": {
+      "activo": true,
+      "feed_historico": "sip",
+      "peticiones_por_dia": 5000
+    }
+  },
+  "uso_registrado": [
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-11-01T03",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-30T20",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T20",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T08",
+      "peticiones": 8
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T07",
+      "peticiones": 22
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T06",
+      "peticiones": 2
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T05",
+      "peticiones": 24
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T04",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T03",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-29T02",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-28T20",
+      "peticiones": 45
+    },
+    {
+      "proveedor": "tiingo",
+      "ventana": "h:2026-10-28T01",
+      "peticiones": 8
+    }
+  ],
+  "ultimas_ingestas": [
+    {
+      "proveedor": "alpaca",
+      "inicio": "2026-11-01T03:58:39+00:00",
+      "registros": 0,
+      "omitidos_limite": 0
+    },
+    {
+      "proveedor": "tiingo",
+      "inicio": "2026-11-01T03:58:39+00:00",
+      "registros": 46,
+      "omitidos_limite": 98
+    },
+    {
+      "proveedor": "alpaca",
+      "inicio": "2026-10-30T20:09:42+00:00",
+      "registros": 98,
+      "omitidos_limite": 0
+    },
+    {
+      "proveedor": "tiingo",
+      "inicio": "2026-10-30T20:09:42+00:00",
+      "registros": 26,
+      "omitidos_limite": 98
+    },
+    {
+      "proveedor": "alpaca",
+      "inicio": "2026-10-29T20:59:05+00:00",
+      "registros": 44,
+      "omitidos_limite": 0
+    },
+    {
+      "proveedor": "tiingo",
+      "inicio": "2026-10-29T20:59:05+00:00",
+      "registros": 0,
+      "omitidos_limite": 142
+    }
+  ]
+}

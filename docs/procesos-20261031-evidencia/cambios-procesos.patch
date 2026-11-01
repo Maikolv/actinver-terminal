@@ -1,0 +1,453 @@
+--- antes/terminal/ingesta.py
++++ despues/terminal/ingesta.py
+@@ -8,7 +8,7 @@
+ from . import vigencia
+ from .adaptadores import CLASES, FX_USDMXN, ErrorProveedor, LimiteAlcanzado
+ from .config import Ajustes, credencial, secreto
+-from .db import ahora, transaccion
++from .db import ahora as ahora_db, transaccion
+ 
+ log = logging.getLogger("terminal.ingesta")
+ 
+@@ -69,7 +69,7 @@
+ 
+ def _registrar(con, proveedor: str, inicio: str, estado: str, registros: int, mensaje: str) -> None:
+     con.execute("INSERT INTO ingestas (proveedor, inicio, fin, estado, registros, mensaje) VALUES (?,?,?,?,?,?)",
+-                (proveedor, inicio, ahora(), estado, registros, mensaje[:500]))
++                (proveedor, inicio, ahora_db(), estado, registros, mensaje[:500]))
+     con.commit()
+ 
+ 
+@@ -87,7 +87,7 @@
+         a = adaptadores[n]
+         if not a.configurado():
+             continue
+-        inicio = ahora()
++        inicio = ahora_db()
+         ult = _ultima_fecha(con, "fx", "par", "USDMXN", n)
+         desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA + 30)
+         if desde > hoy:
+@@ -101,7 +101,7 @@
+         except ErrorProveedor as e:
+             _registrar(con, n, inicio, "error", 0, str(e))
+             continue
+-        ts = ahora()
++        ts = ahora_db()
+         with transaccion(con):
+             con.executemany("INSERT OR REPLACE INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
+                             [(b.fecha, b.cierre, n, "fx", ts) for b in barras])
+@@ -127,16 +127,19 @@
+                 "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                 (nombre, instrumento_id, simbolo, "verificado", "MXN",
+                  "Fondos Actinver" if nombre == "actinver_pdf" else "BMV",
+-                 "fondo" if nombre == "actinver_pdf" else "local", None, "EOD", detalle[:300], ahora()))
++                 "fondo" if nombre == "actinver_pdf" else "local", None, "EOD", detalle[:300], ahora_db()))
+ 
+ 
+ def _intento(con, iid: str, proveedor: str, barras: int, hoy: date) -> None:
+     with transaccion(con):
+         con.execute("INSERT OR REPLACE INTO intentos_precio VALUES (?,?,?,?)", (iid, hoy.isoformat(), proveedor, barras))
++        con.execute("INSERT INTO intentos_precio_historial (instrumento_id, intento, proveedor, barras) VALUES (?,?,?,?)",
++                    (iid, hoy.isoformat(), proveedor, barras))
+ 
+ 
+ def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = None,
+-               ids_propuesta: list[str] | None = None, reserva_nuevos: int = RESERVA_HISTORIA_NUEVA) -> list[dict]:
++               ids_propuesta: list[str] | None = None, reserva_nuevos: int = RESERVA_HISTORIA_NUEVA,
++               ahora: datetime | None = None) -> list[dict]:
+     """Orden de consulta con cupos limitados (EODHD 20/día, Tiingo por hora):
+     0 cartera y captura del portal · 1 instrumentos de las propuestas · 2 los primeros `reserva_nuevos` nunca cargados
+     (recuperación programada: sin esta reserva, las actualizaciones diarias agotan el cupo y nunca entran) ·
+@@ -147,7 +150,7 @@
+     prio, prop = set(ids_prioritarios or []), set(ids_propuesta or [])
+     ult = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, MAX(fecha) FROM precios GROUP BY instrumento_id")}
+     intentos = {r[0]: r[1] for r in con.execute("SELECT instrumento_id, intento FROM intentos_precio")}
+-    hace7 = (date.today() - timedelta(days=7)).isoformat()
++    hace7 = ((ahora or datetime.now(UTC)).date() - timedelta(days=7)).isoformat()
+     nuevos = sorted(i["id"] for i in instrs if i["id"] not in ult and i["id"] not in prio and i["id"] not in prop
+                     and intentos.get(i["id"], "") < hace7)
+     reservados = set(nuevos[:max(0, reserva_nuevos)])
+@@ -162,15 +165,18 @@
+ 
+ 
+ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | None = None,
+-                       hoy: date | None = None, ids_propuesta: list[str] | None = None) -> dict:
+-    hoy = hoy or date.today()
++                       hoy: date | None = None, ids_propuesta: list[str] | None = None,
++                       ahora: datetime | None = None) -> dict:
++    instante = ahora or datetime.now(UTC)
++    hoy = hoy or instante.date()
+     instrs = orden_cola(con, [dict(r) for r in con.execute("SELECT * FROM instrumentos WHERE estado='activo'")],
+-                        ids_prioritarios, ids_propuesta)
++                        ids_prioritarios, ids_propuesta, ahora=instante)
+     resumen = {n: {"registros": 0, "errores": 0, "omitidos_limite": 0, "al_dia": 0} for n in ORDEN_PRECIOS}
+     agotados: set[str] = set()
+-    inicios = {n: ahora() for n in ORDEN_PRECIOS}
++    inicios = {n: ahora_db() for n in ORDEN_PRECIOS}
+     mensajes: dict[str, list[str]] = {n: [] for n in ORDEN_PRECIOS}
+     for ins in instrs:
++        respaldo = False
+         for n in ORDEN_PRECIOS:
+             a = adaptadores[n]
+             if not a.configurado() or not a.soporta(ins):
+@@ -179,11 +185,13 @@
+                 resumen[n]["omitidos_limite"] += 1
+                 continue  # cupo agotado: se prueba la siguiente fuente que cubra el instrumento
+             ult = _ultima_fecha(con, "precios", "instrumento_id", ins["id"], n)
+-            esperada = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(ins))
++            esperada = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(ins), instante)
+             if ult and ult >= esperada:
+                 resumen[n]["al_dia"] += 1
+                 break
+             desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA)
++            if respaldo:
++                desde = max(desde, esperada)  # recuperar el cierre faltante, no cinco años por cada respaldo
+             try:
+                 barras = a.historico(ins, desde, hoy)
+             except LimiteAlcanzado as e:
+@@ -195,9 +203,17 @@
+                 resumen[n]["errores"] += 1
+                 mensajes[n].append(f"{ins['id']}: {e}")
+                 _intento(con, ins["id"], n, 0, hoy)
++                if respaldo:
++                    break  # un solo proveedor de respaldo, también si falla
+                 continue
+             _intento(con, ins["id"], n, len(barras), hoy)
+-            ts = ahora()
++            if not barras and not respaldo and ins['id'] in (ids_prioritarios or []):
++                codigo = vigencia.codigo_calendario(ins)
++                cierre = vigencia.cierre_de_sesion(codigo, hoy) or vigencia.cierre_de_sesion(codigo, esperada)
++                if cierre is not None and instante >= cierre:
++                    respaldo = True
++                    continue  # siguiente fuente configurada que soporte el instrumento; no cambia la prioridad global
++            ts = ahora_db()
+             moneda = ins["moneda_referencia"] or "MXN"
+             with transaccion(con):
+                 con.executemany(
+@@ -236,7 +252,7 @@
+     for nombre, fn in (("forexfactory", lambda: fw.actualizar_macro(con, prov, cliente)),
+                        ("seekingalpha_rss", lambda: fw.actualizar_noticias(con, prov, cartera, cliente)),
+                        ("sec_edgar", lambda: _movimientos(con, ajustes))):
+-        inicio = ahora()
++        inicio = ahora_db()
+         try:
+             r = fn()
+         except Exception as e:  # noqa: BLE001 - una fuente caída no debe detener el motor
+@@ -263,7 +279,7 @@
+ def actualizar_fondos(con, ajustes: Ajustes, cliente=None) -> dict:
+     """Hoja oficial de precios de los fondos Actinver (PDF público), a lo sumo cada 3 h hasta tener la valuación."""
+     from . import fondos_actinver as fa
+-    inicio = ahora()
++    inicio = ahora_db()
+     try:
+         r = fa.actualizar(con, ajustes, cliente=cliente)
+     except Exception as e:  # noqa: BLE001 - un fallo de esta fuente nunca detiene el ciclo (precios y propuestas siguen)
+@@ -284,7 +300,7 @@
+         n = 0
+         if forzar_demo or not hay:
+             n = demo.generar(con, semilla=ajustes["optimizacion"]["semilla"])
+-            _registrar(con, "demo_sintetico", ahora(), "ok", n, "datos sintéticos regenerados (modo demostración)")
++            _registrar(con, "demo_sintetico", ahora_db(), "ok", n, "datos sintéticos regenerados (modo demostración)")
+         out = {"modo": "demo", "registros": n, "nuevos": n}
+     else:
+         ad = construir_adaptadores(con, ajustes, cliente=cliente)
+--- antes/terminal/db.py
++++ despues/terminal/db.py
+@@ -203,6 +203,12 @@
+ -- no por la fecha del último dato, para que una emisora sin datos nuevos no ocupe el cupo todos los días.
+ CREATE TABLE IF NOT EXISTS intentos_precio (
+     instrumento_id TEXT PRIMARY KEY, intento TEXT NOT NULL, proveedor TEXT NOT NULL, barras INTEGER NOT NULL
++);
++
++-- Historial de intentos: conserva la fuente vacía y el respaldo; la tabla anterior sigue siendo la cola.
++CREATE TABLE IF NOT EXISTS intentos_precio_historial (
++    id INTEGER PRIMARY KEY AUTOINCREMENT, instrumento_id TEXT NOT NULL, intento TEXT NOT NULL,
++    proveedor TEXT NOT NULL, barras INTEGER NOT NULL
+ );
+ 
+ -- Portafolios creados por el usuario en el constructor (Markowitz). Solo simulación: no generan órdenes.
+--- antes/terminal/reportes.py
++++ despues/terminal/reportes.py
+@@ -34,8 +34,8 @@
+         return iso or "s/d"
+ 
+ 
+-def _seccion_reto() -> list[str]:
+-    r = reto.resumen()
++def _seccion_reto(ahora: datetime) -> list[str]:
++    r = reto.resumen(ahora)
+     if not r.get("activo"):
+         return []
+     f = r.get("fechas") or {}
+@@ -99,9 +99,9 @@
+     return out + [""]
+ 
+ 
+-def _seccion_alertas(con: sqlite3.Connection, horas: int) -> list[str]:
+-    desde = (datetime.now(UTC) - timedelta(hours=horas)).isoformat()
+-    filas = [a for a in alertas.listar(con, 500) if a["ts"] >= desde]
++def _seccion_alertas(con: sqlite3.Connection, horas: int, ahora: datetime) -> list[str]:
++    desde = (ahora - timedelta(hours=horas)).isoformat()
++    filas = [a for a in alertas.listar(con, 500) if desde <= a["ts"] <= ahora.isoformat()]
+     out = [f"## Alertas de las últimas {horas} h ({len(filas)})"]
+     if not filas:
+         return out + ["Ninguna.", ""]
+@@ -132,18 +132,18 @@
+             f"{m.get('nuevos_datos')}) · fuentes de contexto → {ctx}", ""]
+ 
+ 
+-def _seccion_movimientos(con, ajustes: Ajustes) -> list[str]:
++def _seccion_movimientos(con, ajustes: Ajustes, ahora: datetime) -> list[str]:
+     from .movimientos import servicio
+     try:
+-        return servicio.texto_reporte(con, ajustes)
++        return servicio.texto_reporte(con, ajustes, ahora_dt=ahora)
+     except Exception:  # noqa: BLE001 - el reporte nunca se detiene por esta fuente
+         return ["## Movimientos públicos (SEC EDGAR)", "No se pudo construir esta sección (ver registro de errores).", ""]
+ 
+ 
+-def _seccion_pronostico(con, ajustes: Ajustes, props: dict, cart: dict) -> list[str]:
++def _seccion_pronostico(con, ajustes: Ajustes, props: dict, cart: dict, ahora: datetime) -> list[str]:
+     from .investigacion import reto_pronostico
+     try:
+-        r = reto_pronostico.construir(con, ajustes, props=props, cart=cart)
++        r = reto_pronostico.construir(con, ajustes, props=props, cart=cart, ahora=ahora)
+     except Exception:  # noqa: BLE001 - el reporte nunca se detiene por la investigación
+         return ["## Pronóstico", "No se pudo construir el pronóstico (ver registro de errores).", ""]
+     return ["## Pronóstico (ESTIMACIÓN, no cotización)", "", "```", reto_pronostico.texto(r), "```", ""]
+@@ -162,13 +162,13 @@
+     out = [f"# {TIPOS[tipo]} — {_hora_mx(ahora.isoformat())} (CDMX)", "",
+            f"_Generado por la terminal local · modo: {modo}. Solo informa; no envía órdenes. Los rendimientos pasados "
+            "no garantizan resultados futuros._", ""]
+-    out += _seccion_reto() + _seccion_motor(con, ahora) + _seccion_cartera(cart)
++    out += _seccion_reto(ahora) + _seccion_motor(con, ahora) + _seccion_cartera(cart)
+     if semanal:
+         out += _seccion_seguimiento(servicios.seguimiento(con, ajustes))
+     out += _seccion_propuestas(props, detalle=tipo != "cierre")
+-    out += _seccion_pronostico(con, ajustes, props, cart)
+-    out += _seccion_movimientos(con, ajustes)
+-    out += _seccion_alertas(con, 24 * 7 if semanal else 24)
++    out += _seccion_pronostico(con, ajustes, props, cart, ahora)
++    out += _seccion_movimientos(con, ajustes, ahora)
++    out += _seccion_alertas(con, 24 * 7 if semanal else 24, ahora)
+     return "\n".join(out).rstrip() + "\n"
+ 
+ 
+--- antes/terminal/bot_telegram.py
++++ despues/terminal/bot_telegram.py
+@@ -75,10 +75,10 @@
+     return datetime.now(UTC)
+ 
+ 
+-def texto_plan(con, ajustes) -> str:
++def texto_plan(con, ajustes, ahora: datetime | None = None) -> str:
+     """Plan del día en lenguaje sencillo (solo qué hacer). El completo: /completo."""
+     from . import mensaje_simple
+-    return mensaje_simple.texto(con, ajustes, ahora=_ahora())
++    return mensaje_simple.texto(con, ajustes, ahora=ahora or _ahora())
+ 
+ 
+ def texto_plan_completo(con, ajustes) -> str:
+--- antes/terminal/mensaje_simple.py
++++ despues/terminal/mensaje_simple.py
+@@ -83,7 +83,8 @@
+ 
+ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ahora_local: pd.Timestamp,
+               sesion: date | None = None, sesiones_restantes: int | None = None, riesgo_aceptado: dict | None = None,
+-              concentracion: dict | None = None, precios_al: date | None = None) -> str:
++              concentracion: dict | None = None, precios_al: date | None = None,
++              precios_atrasados: list[dict] | None = None) -> str:
+     """Texto del plan del día. `plan` es la salida de plan_accion.calcular; `propuesta`, la de referencia.
+     `concentracion`: {"clave", "peso"} de la emisora con más peso; `precios_al`: fecha del precio más viejo de las
+     posiciones cuando es anterior a la última sesión cerrada (la valuación todavía no trae el cierre del día)."""
+@@ -106,7 +107,10 @@
+              + (f" (según tu captura del {hora:%d-%m %H:%M})." if hora is not None else "."))
+     if hora is not None and (ahora_local - hora) > pd.Timedelta(days=3):
+         L.append("⚠️ Esa captura es vieja: si compraste o vendiste después, mándame una nueva antes de seguir.")
+-    if precios_al is not None:
++    if precios_atrasados:
++        detalle = '; '.join(f"{_nombre(p['clave'])}: {p['fecha'] or 'sin fecha disponible'}" for p in precios_atrasados)
++        L.append(f"⏳ Ojo: precios atrasados en la valuación: {detalle}. No corresponden al último cierre de su mercado.")
++    elif precios_al is not None:
+         L.append(f"⏳ Ojo: la valuación usa precios del {precios_al:%d-%m}; los del último cierre aún no se descargan. "
+                  "Escribe /plan en unos minutos.")
+     acc = plan["acciones"]
+@@ -221,9 +225,11 @@
+         quedan = reto.sesiones_restantes(local.to_pydatetime()) if reto.activo() else None
+     except Exception:  # noqa: BLE001
+         quedan = None
+-    conc, precios_al = _cartera_riesgo(con, ajustes, cartera, ahora)
++    cartera = cartera or servicios.cartera_actual(con, ajustes)
++    conc, _ = _cartera_riesgo(con, ajustes, cartera, ahora)
++    atrasados = precios_atrasados(con, cartera, ahora)
+     return construir(plan, propuesta, eventos_macro(con, ahora), local, sesion or resumen.sesion_objetivo(ahora), quedan,
+-                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"), concentracion=conc, precios_al=precios_al)
++                     riesgo_aceptado=decision(con, "acepta_riesgo_cola"), concentracion=conc, precios_atrasados=atrasados)
+ 
+ 
+ def _cartera_riesgo(con, ajustes, cartera: dict | None, ahora: datetime) -> tuple[dict | None, date | None]:
+@@ -249,3 +255,21 @@
+     import json
+     f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='decisiones_usuario'").fetchone()
+     return (json.loads(f[0]) if f else {}).get(clave)
++
++
++def precios_atrasados(con, cartera: dict, ahora: datetime) -> list[dict]:
++    """Nombra posiciones con cierre anterior al esperado; no inventa fecha donde falte."""
++    from . import mercado, vigencia
++    meta = mercado.instrumentos(con)
++    out = []
++    for p in cartera.get('posiciones') or []:
++        iid = p['instrumento_id']
++        fecha = (p.get('fecha_precio') or '')[:10]
++        ultima = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(meta.get(iid, {})), ahora)
++        try:
++            observada = date.fromisoformat(fecha) if fecha else None
++        except ValueError:
++            observada, fecha = None, ''
++        if observada is None or observada < ultima:
++            out.append({'clave': p.get('clave_operable') or iid, 'fecha': fecha or None})
++    return out
+--- antes/tests/test_procesos_20261031.py
++++ despues/tests/test_procesos_20261031.py
+@@ -0,0 +1,131 @@
++"""Regresiones offline: respaldo acotado, reloj inyectado y procedencia del plan."""
++from datetime import UTC, datetime, timedelta
++
++import httpx
++import pytest
++
++from terminal import bot_telegram, ingesta, mensaje_simple, reportes, servicios
++from terminal.adaptadores.base import Adaptador
++from terminal.adaptadores.proveedores import Alpaca, Tiingo
++
++CERRADO = datetime(2026, 10, 30, 22, tzinfo=UTC)
++ABIERTO = datetime(2026, 10, 30, 17, tzinfo=UTC)
++
++
++def proveedores(con, barras=True, cuota=10):
++    llamadas = []
++    def respuesta(r):
++        llamadas.append(r.url.host)
++        if r.url.host == 'api.tiingo.com':
++            return httpx.Response(200, json=[])
++        assert r.url.host == 'data.alpaca.markets'  # ningún endpoint de operaciones
++        assert r.url.params['start'] == '2026-10-30'
++        return httpx.Response(200, json={'bars': [{'t': '2026-10-30T04:00:00Z', 'c': 150, 'v': 4}] if barras else []})
++    cliente = httpx.Client(transport=httpx.MockTransport(respuesta))
++    ads = {n: Adaptador(con, {'activo': False}, cliente=cliente) for n in ingesta.ORDEN_PRECIOS}
++    ads['tiingo'] = Tiingo(con, {}, 'ficticia-de-prueba', cliente=cliente)
++    ads['alpaca'] = Alpaca(con, {'peticiones_por_dia': cuota}, 'ficticia-de-prueba', secreto='ficticio', cliente=cliente)
++    con.execute("UPDATE instrumentos SET estado='inactivo' WHERE id!='SIC:AMD'")
++    con.commit()
++    return ads, llamadas
++
++
++@pytest.mark.parametrize('momento,prioritaria,esperadas', [(CERRADO,True,3), (ABIERTO,True,1), (CERRADO,False,1)])
++def test_respaldo_solo_cartera_despues_del_cierre(con, momento, prioritaria, esperadas):
++    ads, llamadas = proveedores(con)
++    ingesta.actualizar_precios(con, ads, ['SIC:AMD'] if prioritaria else [], ahora=momento)
++    assert len(llamadas) == esperadas
++    filas = list(con.execute('SELECT proveedor,barras FROM intentos_precio_historial ORDER BY id'))
++    if esperadas == 3:
++        assert [tuple(f) for f in filas] == [('tiingo',0),('alpaca',1)]
++        p = con.execute("SELECT proveedor,fecha,tipo_dato FROM precios WHERE instrumento_id='SIC:AMD'").fetchone()
++        assert tuple(p) == ('alpaca','2026-10-30','cierre')
++        assert con.execute("SELECT proveedor FROM intentos_precio WHERE instrumento_id='SIC:AMD'").fetchone()[0]=='alpaca'
++    else:
++        assert len(filas)==1 and not con.execute('SELECT 1 FROM precios').fetchone()
++
++
++def test_respaldo_no_reintenta_otra_fuente_si_devuelve_cero(con):
++    ads,llamadas=proveedores(con,barras=False)
++    ingesta.actualizar_precios(con,ads,['SIC:AMD'],ahora=CERRADO)
++    assert llamadas==['api.tiingo.com','data.alpaca.markets']
++    assert con.execute('SELECT COUNT(*) FROM intentos_precio_historial').fetchone()[0]==2
++
++
++def test_respaldo_respeta_cupo_sin_llamada_http(con):
++    ads,llamadas=proveedores(con,cuota=0)
++    r=ingesta.actualizar_precios(con,ads,['SIC:AMD'],ahora=CERRADO)
++    assert llamadas==['api.tiingo.com'] and r['alpaca']['omitidos_limite']==1
++
++
++def test_error_del_respaldo_no_dispara_un_tercer_proveedor(con,monkeypatch):
++    from terminal.adaptadores.base import ErrorProveedor
++    ads,llamadas=proveedores(con)
++    def error(*a):raise ErrorProveedor('sin datos de respaldo')
++    monkeypatch.setattr(ads['alpaca'],'historico',error)
++    tercero=ads['barchart']
++    monkeypatch.setattr(tercero,'configurado',lambda:True)
++    monkeypatch.setattr(tercero,'soporta',lambda ins:True)
++    monkeypatch.setattr(tercero,'historico',lambda *a:pytest.fail('No se permite un tercer intento'))
++    ingesta.actualizar_precios(con,ads,['SIC:AMD'],ahora=CERRADO)
++    assert llamadas==['api.tiingo.com']
++    assert [tuple(f) for f in con.execute('SELECT proveedor,barras FROM intentos_precio_historial ORDER BY id')]==[('tiingo',0),('alpaca',0)]
++
++
++def test_cola_usa_fecha_inyectada_y_no_dia_del_ci(con):
++    con.execute("INSERT INTO intentos_precio VALUES ('BMV:GCC','2026-10-29','eodhd',0)");con.commit()
++    filas=[{'id':'BMV:GCC'},{'id':'BMV:VESTA'}]
++    assert ingesta.orden_cola(con,filas,reserva_nuevos=1,ahora=CERRADO)[0]['id']=='BMV:VESTA'
++    assert ingesta.orden_cola(con,filas,reserva_nuevos=1,ahora=CERRADO+timedelta(days=10))[0]['id']=='BMV:GCC'
++
++
++@pytest.mark.parametrize('momento,hay_aviso',[(ABIERTO,True),(CERRADO,False)])
++def test_reportes_y_motor_no_dependen_de_hora_real(con,ajustes,momento,hay_aviso,monkeypatch):
++    assert ('aviso' in servicios.estado_motor(con,momento)) is hay_aviso
++    recibido=[]
++    monkeypatch.setattr(reportes,'_seccion_pronostico',lambda c,a,p,cart,t: recibido.append(t) or [])
++    for tipo in ('preapertura','cierre','semanal'):
++        texto=reportes.generar(con,ajustes,tipo,ahora=momento)
++        assert 'Aún no ha corrido ningún ciclo' in texto
++    assert recibido==[momento]*3
++
++
++def test_alertas_del_reporte_no_miran_hora_real_ni_futuro(con,monkeypatch):
++    def alerta(hora,titulo):return dict(ts=hora.isoformat(),severidad='info',titulo=titulo,motivo='prueba',fuente='offline')
++    monkeypatch.setattr(reportes.alertas,'listar',lambda *a:[alerta(ABIERTO-timedelta(hours=1),'incluida'),alerta(ABIERTO+timedelta(hours=1),'futura')])
++    texto='\n'.join(reportes._seccion_alertas(con,24,ABIERTO))
++    assert 'incluida' in texto and 'futura' not in texto
++
++
++def test_plan_nombra_solo_precios_atrasados_y_fecha(con):
++    cart={'posiciones':[{'instrumento_id':'SIC:AMD','clave_operable':'AMD *','fecha_precio':'2026-10-29'}, {'instrumento_id':'SIC:MU','clave_operable':'MU *','fecha_precio':'2026-10-30'}]}
++    filas=mensaje_simple.precios_atrasados(con,cart,CERRADO)
++    assert filas==[{'clave':'AMD *','fecha':'2026-10-29'}]
++    plan={'cuenta':dict(confirmada=True,valor_total=100,efectivo=100),'acciones':[],'reglas':dict(errores=[])}
++    propuesta={'escenarios':{'central_p50':0,'adverso_p10':0}}
++    import pandas as pd
++    texto=mensaje_simple.construir(plan,propuesta,[],pd.Timestamp(CERRADO).tz_convert(mensaje_simple.ZONA),precios_atrasados=filas)
++    assert 'AMD: 2026-10-29' in texto and 'MU:' not in texto
++
++
++def test_texto_plan_propaga_el_reloj_sin_enviar(con,ajustes,monkeypatch):
++    recibido=[]
++    monkeypatch.setattr(mensaje_simple,'texto',lambda c,a,ahora:recibido.append(ahora) or 'texto local')
++    assert bot_telegram.texto_plan(con,ajustes,ahora=CERRADO)=='texto local'
++    assert recibido==[CERRADO]
++
++
++@pytest.mark.parametrize('momento,fecha,espera_aviso',[(CERRADO,'2026-10-29',True), (datetime(2026,11,2,20,30,tzinfo=UTC),'2026-10-30',False)])
++def test_texto_completo_de_plan_respeta_el_cierre_de_cada_mercado(con,ajustes,momento,fecha,espera_aviso):
++    cart={'posiciones':[{'instrumento_id':'SIC:AMD','clave_operable':'AMD *','peso':1,'fecha_precio':fecha}]}
++    plan={'cuenta':dict(confirmada=True,valor_total=100,efectivo=100),'acciones':[],'reglas':dict(errores=[])}
++    propuesta={'escenarios':{'central_p50':0,'adverso_p10':0}}
++    texto=mensaje_simple.texto(con,ajustes,propuesta=propuesta,cartera=cart,plan=plan,ahora=momento)
++    assert ('precios atrasados en la valuación' in texto) is espera_aviso
++    assert 'la valuación usa precios del' not in texto
++    if espera_aviso:assert 'AMD: 2026-10-29' in texto
++
++
++def test_precio_sin_fecha_valida_se_nombra_sin_fabricarla(con):
++    filas=mensaje_simple.precios_atrasados(con,{'posiciones':[{'instrumento_id':'SIC:AMD','fecha_precio':'malformada'}]},CERRADO)
++    assert filas==[{'clave':'SIC:AMD','fecha':None}]
+--- antes/config/propuesta-proveedores-20261031.toml
++++ despues/config/propuesta-proveedores-20261031.toml
+@@ -0,0 +1,6 @@
++# PROPUESTA NO APLICADA. Este archivo no se carga.
++# Requiere primero guardia por minuto y validación de continuidad/ajustes.
++# En config/local.toml, dentro de la sección existente [proveedores.tiingo]:
++# activo = false
++# Atención: desactiva Tiingo para TODOS los instrumentos, no solo SIC.
++# La alternativa siguiente de ORDEN_PRECIOS ya es Alpaca; no cambiar cuotas.

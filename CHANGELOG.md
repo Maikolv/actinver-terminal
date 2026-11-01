@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-10-31 — auditoría de procesos: CI dependiente de la hora, ventana del GEX y arranque de la terminal]
+
+- **Corregido**: `reportes._seccion_motor` usa la hora del reporte y tolera un motor sin ciclo previo. El CI del 29-oct
+  falló (4 pruebas, `KeyError: 'ultimo_ciclo'`) solo porque corrió con el mercado abierto; la prueba ahora fija ese caso.
+- **Corregido**: los contratos Paper (OI) piden la misma ventana de vencimientos que la cadena (`DIAS_CADENA = 60`); antes
+  pedían 183 días con tope de 3 páginas y MU solo usaba 957 de 3,294 contratos (29 %). Prueba nueva en
+  `tests/test_contratos_paper.py`.
+- **Nuevo**: `scripts/arranque-al-iniciar-sesion.ps1` (lo ejecuta el usuario; `-Quitar` lo revierte). El 30-oct la
+  terminal estuvo apagada: sin ciclo, avisos ni respaldo.
+- AMD sin cierre del 30-oct por Tiingo (0 barras); recuperado con `terminal actualizar`. 26 emisoras BMV siguen sin el
+  cierre del 30-oct por la cuota de EODHD.
+- Pruebas: Python 725/725 (10 min 7 s), Node 31/31, worker 19/19. Pendientes y prompt de Codex en
+  ese mismo documento.
+
 ## [2026-10-29 (mañana) — la cola de EODHD ya no se atasca; aviso del motor corregido]
 
 ### Corregido
@@ -1099,3 +1113,8 @@ Este número de versión también cubre las entregas fechadas del 16 y 17-oct qu
 - Práctica sin red de tesis, DCF/reverse DCF y volatilidad; 13 comprobaciones JS aprobadas.
 - Auditoría del uso real de Dej_B7_MXrX; sin afirmar integración de yfinance/FinBERT al motor.
 - 8 pruebas de recursos/microestructura aprobadas y JS válido; suite completa no repetida.
+
+
+### Continuación de procesos — 31-oct-2026
+
+Respaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.

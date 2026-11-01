@@ -34,8 +34,8 @@ def _hora_mx(iso: str) -> str:
         return iso or "s/d"
 
 
-def _seccion_reto() -> list[str]:
-    r = reto.resumen()
+def _seccion_reto(ahora: datetime) -> list[str]:
+    r = reto.resumen(ahora)
     if not r.get("activo"):
         return []
     f = r.get("fechas") or {}
@@ -99,9 +99,9 @@ def _seccion_propuestas(props: dict, detalle: bool) -> list[str]:
     return out + [""]
 
 
-def _seccion_alertas(con: sqlite3.Connection, horas: int) -> list[str]:
-    desde = (datetime.now(UTC) - timedelta(hours=horas)).isoformat()
-    filas = [a for a in alertas.listar(con, 500) if a["ts"] >= desde]
+def _seccion_alertas(con: sqlite3.Connection, horas: int, ahora: datetime) -> list[str]:
+    desde = (ahora - timedelta(hours=horas)).isoformat()
+    filas = [a for a in alertas.listar(con, 500) if desde <= a["ts"] <= ahora.isoformat()]
     out = [f"## Alertas de las últimas {horas} h ({len(filas)})"]
     if not filas:
         return out + ["Ninguna.", ""]
@@ -122,27 +122,28 @@ def _seccion_seguimiento(seg: dict) -> list[str]:
     return out + [""]
 
 
-def _seccion_motor(con) -> list[str]:
-    m = servicios.estado_motor(con)
-    if not m:
+def _seccion_motor(con, ahora: datetime) -> list[str]:
+    m = servicios.estado_motor(con, ahora)
+    # Con el mercado abierto y sin ciclo previo, estado_motor trae solo el aviso: no hay «último ciclo» que mostrar
+    if not m.get("ultimo_ciclo"):
         return ["## Motor automático", "Aún no ha corrido ningún ciclo: los datos pueden no estar actualizados.", ""]
     ctx = ", ".join(f"{k}: {v}" for k, v in (m.get("contexto") or {}).items()) or "s/d"
     return ["## Motor automático", f"- Último ciclo: {_hora_mx(m['ultimo_ciclo'])} (recálculo: {m.get('recalculo')}; datos nuevos: "
             f"{m.get('nuevos_datos')}) · fuentes de contexto → {ctx}", ""]
 
 
-def _seccion_movimientos(con, ajustes: Ajustes) -> list[str]:
+def _seccion_movimientos(con, ajustes: Ajustes, ahora: datetime) -> list[str]:
     from .movimientos import servicio
     try:
-        return servicio.texto_reporte(con, ajustes)
+        return servicio.texto_reporte(con, ajustes, ahora_dt=ahora)
     except Exception:  # noqa: BLE001 - el reporte nunca se detiene por esta fuente
         return ["## Movimientos públicos (SEC EDGAR)", "No se pudo construir esta sección (ver registro de errores).", ""]
 
 
-def _seccion_pronostico(con, ajustes: Ajustes, props: dict, cart: dict) -> list[str]:
+def _seccion_pronostico(con, ajustes: Ajustes, props: dict, cart: dict, ahora: datetime) -> list[str]:
     from .investigacion import reto_pronostico
     try:
-        r = reto_pronostico.construir(con, ajustes, props=props, cart=cart)
+        r = reto_pronostico.construir(con, ajustes, props=props, cart=cart, ahora=ahora)
     except Exception:  # noqa: BLE001 - el reporte nunca se detiene por la investigación
         return ["## Pronóstico", "No se pudo construir el pronóstico (ver registro de errores).", ""]
     return ["## Pronóstico (ESTIMACIÓN, no cotización)", "", "```", reto_pronostico.texto(r), "```", ""]
@@ -161,13 +162,13 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, tipo: str, ahora: datetim
     out = [f"# {TIPOS[tipo]} — {_hora_mx(ahora.isoformat())} (CDMX)", "",
            f"_Generado por la terminal local · modo: {modo}. Solo informa; no envía órdenes. Los rendimientos pasados "
            "no garantizan resultados futuros._", ""]
-    out += _seccion_reto() + _seccion_motor(con) + _seccion_cartera(cart)
+    out += _seccion_reto(ahora) + _seccion_motor(con, ahora) + _seccion_cartera(cart)
     if semanal:
         out += _seccion_seguimiento(servicios.seguimiento(con, ajustes))
     out += _seccion_propuestas(props, detalle=tipo != "cierre")
-    out += _seccion_pronostico(con, ajustes, props, cart)
-    out += _seccion_movimientos(con, ajustes)
-    out += _seccion_alertas(con, 24 * 7 if semanal else 24)
+    out += _seccion_pronostico(con, ajustes, props, cart, ahora)
+    out += _seccion_movimientos(con, ajustes, ahora)
+    out += _seccion_alertas(con, 24 * 7 if semanal else 24, ahora)
     return "\n".join(out).rstrip() + "\n"
 
 

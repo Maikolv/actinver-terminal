@@ -1,0 +1,42 @@
+{
+  "fecha_local": "2026-10-31",
+  "items": [
+    {
+      "id": "PROC31-01",
+      "estado": "resuelto_offline",
+      "titulo": "Respaldo acotado e historial de intentos",
+      "evidencia": "tests/test_procesos_20261031.py; cambios-procesos.patch",
+      "limite": "Sin verificación con proveedor real"
+    },
+    {
+      "id": "PROC31-02",
+      "estado": "propuesta_no_aplicada",
+      "titulo": "143 SIC medidos; reasignación solo propuesta",
+      "evidencia": "propuesta-proveedores-sic-20261031.md y medicion-proveedores.json"
+    },
+    {
+      "id": "PROC31-03",
+      "estado": "resuelto_en_alcance",
+      "titulo": "Hora inyectada en cola y secciones de reporte; motor preservado",
+      "evidencia": "pruebas parametrizadas abierto/cerrado"
+    },
+    {
+      "id": "PROC31-04",
+      "estado": "resuelto_offline",
+      "titulo": "Plan nombra emisoras, fechas y mercado correspondiente",
+      "evidencia": "32 regresiones de procesos/mensajes/bot; ningún envío"
+    },
+    {
+      "id": "PROC31-05",
+      "estado": "pendiente_condicionado_fecha",
+      "titulo": "GEX: esperar observación posterior al 2-nov y cobertura MU <50 %",
+      "evidencia": "No se modificó flujo, 60 s ni anti-fuga"
+    },
+    {
+      "id": "PROC31-06",
+      "estado": "verificado",
+      "titulo": "Suite 738, regresiones 32, Node31, worker19",
+      "evidencia": "procesos-20261031-evidencia/resultados.json"
+    }
+  ]
+}

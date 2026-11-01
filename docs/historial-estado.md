@@ -344,3 +344,12 @@ Trabajo repartido con Codex por decisión del usuario (Codex: cobertura por secc
   cupo del 30-oct (el de hoy ya se usó). Con 3 consultas libres al día, ponerse al día toma cerca de 10 días.
 - Aviso del motor: no aparece durante un ciclo recién iniciado y usa la hora local. La terminal estuvo detenida de
   04:01 a 08:04 por las verificaciones; por eso no hubo ciclos.
+
+## Auditoría de procesos — 31-oct-2026
+
+CI del 29-oct roto por la hora (reportes) y GEX con ventana de OI desalineada: ambos corregidos con prueba. Terminal apagada el 30-oct; script de arranque al iniciar sesión para que lo ejecute el usuario. Detalle y prompt de Codex: `docs/auditoria-procesos-2026-10-31.md`.
+
+
+### Continuación de procesos — 31-oct-2026
+
+Respaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.

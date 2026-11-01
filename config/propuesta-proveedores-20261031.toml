@@ -1,0 +1,6 @@
+# PROPUESTA NO APLICADA. Este archivo no se carga.
+# Requiere primero guardia por minuto y validación de continuidad/ajustes.
+# En config/local.toml, dentro de la sección existente [proveedores.tiingo]:
+# activo = false
+# Atención: desactiva Tiingo para TODOS los instrumentos, no solo SIC.
+# La alternativa siguiente de ORDEN_PRECIOS ya es Alpaca; no cambiar cuotas.

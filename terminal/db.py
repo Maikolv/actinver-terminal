@@ -205,6 +205,12 @@ CREATE TABLE IF NOT EXISTS intentos_precio (
     instrumento_id TEXT PRIMARY KEY, intento TEXT NOT NULL, proveedor TEXT NOT NULL, barras INTEGER NOT NULL
 );
 
+-- Historial de intentos: conserva la fuente vacía y el respaldo; la tabla anterior sigue siendo la cola.
+CREATE TABLE IF NOT EXISTS intentos_precio_historial (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, instrumento_id TEXT NOT NULL, intento TEXT NOT NULL,
+    proveedor TEXT NOT NULL, barras INTEGER NOT NULL
+);
+
 -- Portafolios creados por el usuario en el constructor (Markowitz). Solo simulación: no generan órdenes.
 CREATE TABLE IF NOT EXISTS portafolios_usuario (
     id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT NOT NULL, especificacion TEXT NOT NULL, resultado TEXT,
