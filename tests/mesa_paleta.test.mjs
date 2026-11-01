@@ -36,7 +36,7 @@ test('rango temporal recorta sin inventar puntos', () => {
 test('tamaños guardados: migran disposiciones viejas y descartan ids o valores desconocidos', () => {
   assert.deepEqual(normalizarTamanos(undefined),{});
   assert.deepEqual(normalizarTamanos({info:'ancho',mapa:'gigante','https://x':'ancho'}),{info:'ancho'});
-  assert.equal(CATALOGO.length,23);
+  assert.equal(CATALOGO.length,22);
 });
 
 test('consultas simultáneas a la misma ruta comparten una sola petición y no quedan en caché', async () => {

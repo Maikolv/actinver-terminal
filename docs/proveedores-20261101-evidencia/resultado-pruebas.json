@@ -1,0 +1,26 @@
+{
+  "fecha_local": "2026-11-01",
+  "python_completa": {
+    "comando": "uv run --offline --frozen pytest tests -q",
+    "aprobadas": 783, "fallidas": 3, "advertencias": 1, "segundos": 1283.84,
+    "fallos": ["tests/test_bot_telegram.py::test_sin_credencial_no_se_activa_claude",
+      "tests/test_cobertura_secciones.py::test_mesa_declara_las_tres_familias_del_catalogo_real",
+      "tests/test_flujo.py::test_cripto_libro_y_operaciones_con_lado"],
+    "limite": "Otra sesión modificó código y pruebas durante la ejecución; no es una instantánea inmutable del estado final."
+  },
+  "python_final_especifica": {
+    "comando": "uv run --offline --frozen python docs/proveedores-20261101-evidencia/pruebas_sin_red.py tests/test_proveedores_mesa.py tests/test_mesa_datos.py tests/test_centro_investigacion.py tests/test_referencias.py -q",
+    "aprobadas": 67, "fallidas": 0, "advertencias": 1, "segundos": 52.59,
+    "red": "Conexiones y resolución DNS externas bloqueadas; MockTransport y loopback permitidos."
+  },
+  "fallos_aislados_repetidos": {
+    "aprobadas": 2, "fallidas": 1, "advertencias": 1, "segundos": 23.61,
+    "persistente": "tests/test_cobertura_secciones.py::test_mesa_declara_las_tres_familias_del_catalogo_real",
+    "detalle": "Espera 16 externos; tabla actual declara 15. No se modificó cobertura ni su prueba en esta entrega.",
+    "red": "Bloqueada por pruebas_sin_red.py; no se enviaron mensajes."
+  },
+  "node": {"aprobadas": 43, "fallidas": 0, "omitidas": 0, "duracion_ms": 1943.6912},
+  "worker": {"aprobadas": 19, "fallidas": 0, "omitidas": 0, "duracion_ms": 1053.4905},
+  "recursos": "Windows reportó recursos insuficientes al iniciar PowerShell; se usó PowerShell del sistema. No se detuvieron procesos ajenos.",
+  "sin_commit_push_operaciones_mensajes": true
+}

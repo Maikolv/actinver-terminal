@@ -46,6 +46,7 @@ class FredMacro(ContextoAPI):
     SERIES = {
         "DGS10": ("%", "Tasa del Tesoro de EE. UU. a 10 años"),
         "DGS2": ("%", "Tasa del Tesoro de EE. UU. a 2 años"),
+        "DGS30": ("%", "Tasa del Tesoro de EE. UU. a 30 años"),
         "FEDFUNDS": ("%", "Tasa efectiva de fondos federales"),
         "INDPRO": ("índice 2017=100", "Producción industrial de EE. UU."),
     }
@@ -220,4 +221,7 @@ class BLS(ContextoAPI):
         return out
 
 
-CONECTORES = {"alpha_vantage": AlphaVantage, "fred_macro": FredMacro, "coingecko": CoinGecko, "eia": EIA, "bls": BLS}
+from .proveedores_mesa import AlphaCalendario, BanxicoSIE, SECResultados
+
+CONECTORES = {"alpha_vantage": AlphaVantage, "fred_macro": FredMacro, "coingecko": CoinGecko, "eia": EIA, "bls": BLS,
+              "banxico_sie": BanxicoSIE, "alpha_calendario": AlphaCalendario, "sec_resultados": SECResultados}

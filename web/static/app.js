@@ -120,7 +120,7 @@ function turno(clave) { const n = (turnos[clave] = (turnos[clave] || 0) + 1); re
 /* ---------- pestañas (teclado: flechas, Inicio, Fin) ---------- */
 const CARGAS = {
   "tab-resumen": () => pintarResumen(), "tab-propuestas": () => pintarDetalle(), "tab-alertas": () => cargarAlertas(), "tab-cartera": () => cargarCartera(), "tab-mercado": () => cargarMercado(),
-  "tab-universo": () => { cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
+  "tab-universo": () => { cargarCostos(); cargarUniverso(); cargarCobertura(); }, "tab-tiempo": () => cargarTiempo(),
   "tab-investigacion": () => cargarCentroInvestigacion(),
   "tab-ranking": () => cargarRanking(), "tab-perfil": () => { cargarReto(); cargarPerfil(); },
   "tab-portafolios": () => cargarPortafolios(),
@@ -905,6 +905,7 @@ let visualSeleccion = null;
 
 function intensidadMapa(v) {
   if (v === null || v === undefined) return "sin-dato";
+  if (Math.abs(v) < .0025) return "plano";  // ±0.25 %: sin cambio relevante, gris
   const nivel = Math.abs(v) >= .04 ? 3 : Math.abs(v) >= .015 ? 2 : 1;
   return `${v >= 0 ? "sube" : "baja"}-${nivel}`;
 }
@@ -958,9 +959,9 @@ function pintarMapaMercado() {
   h("span", { texto: c.variacion == null ? "—" : `${c.variacion > 0 ? "+" : ""}${pct(c.variacion)}` }),
   h("small", { texto: c.fecha })));
   const escala = h("div", { clase: "escala-mapa", "aria-label": "Escala de colores" }, h("span", { clase: "suave", texto: "Escala:" }),
-    ...[["baja-3", "≤ −4 %"], ["baja-2", "−4 a −1.5 %"], ["baja-1", "−1.5 a 0 %"], ["sube-1", "0 a 1.5 %"], ["sube-2", "1.5 a 4 %"], ["sube-3", "≥ 4 %"], ["sin-dato", "sin dato"]]
+    ...[["baja-3", "≤ −4 %"], ["baja-2", "−4 a −1.5 %"], ["baja-1", "−1.5 a −0.25 %"], ["plano", "±0.25 %"], ["sube-1", "0.25 a 1.5 %"], ["sube-2", "1.5 a 4 %"], ["sube-3", "≥ 4 %"], ["sin-dato", "sin dato"]]
       .map(([k, t]) => h("span", { clase: `mercado-tile--${k}`, texto: t })),
-    h("span", { clase: "suave", texto: "(azul sube, naranja baja; también se indica el signo)" }));
+    h("span", { clase: "suave", texto: "(verde sube, rojo baja, gris sin cambio o sin dato; también se indica el signo)" }));
   limpiar("mercado-visualizaciones", h("h2", { texto: "Mapa de calor de cierres" }),
     visuales.modo === "sintetico" ? h("div", { clase: "aviso-caja", texto: "DATOS SINTÉTICOS de demostración: no son precios reales." }) : null,
     h("p", { clase: "ayuda", texto: `${visuales.metodo} ${visuales.nota}` }),
@@ -1423,13 +1424,19 @@ const NOMBRE_PARAM = { aversion: "λ aversión", tope: "Tope por activo", histor
 const PARES_ROB = ["aversion|tope", "aversion|historia", "tope|historia"];
 const MOTIVOS_ROB = { exceso_vs_1N: "no supera a 1/N", prob_perdida: "prob. de pérdida > 45 %",
   caida_p5: "caída p5 < −20 %", estabilidad: "inestable (S < 0.6)", no_pico_aislado: "pico aislado" };
+// Mapas de calor de la terminal: verde = positivo o mejor, rojo = negativo o peor, gris = neutro o sin dato.
+// t va de −1 a 1; |t| < 0.05 se considera neutro. El texto de la celda conserva el signo: el color no es la única señal.
+function colorCalor(t) {
+  if (t === null || t === undefined || !Number.isFinite(t) || Math.abs(t) < 0.05) return "color-mix(in srgb, var(--texto-2) 22%, transparent)";
+  return `color-mix(in srgb, var(${t > 0 ? "--positivo" : "--negativo"}) ${Math.round(18 + 52 * Math.min(1, Math.abs(t)))}%, transparent)`;
+}
 function celdaColor(v, lo, hi, invertir, texto) {
   // el color se asigna por la propiedad style (la política CSP bloquea el atributo style en línea)
   const td = h("td", { clase: "num" }, texto);
   if (!vacio(v) && hi !== lo) {
     let t = (v - lo) / (hi - lo);
     if (invertir) t = 1 - t;
-    td.style.backgroundColor = `hsl(${Math.round(10 + 110 * t)} 55% 42% / 0.55)`;
+    td.style.backgroundColor = colorCalor(2 * t - 1);
   }
   return td;
 }
@@ -1822,6 +1829,25 @@ document.getElementById("form-investigacion-importar").addEventListener("submit"
   finally { ocupado([b], false); }
 });
 
+/* ---------- Servicios con costo (terminal/costos.py): nada de pago se usa sin tu aprobación ---------- */
+async function cargarCostos() {
+  try {
+    const d = await api("/api/costos");
+    const decidir = (s, decision) => botonAccion(decision === "aprobado" ? "Aprobar cargo" : "Desistir", decision === "aprobado" ? "boton--secundario" : "boton--secundario", async (b) => {
+      if (decision === "aprobado" && !window.confirm(`¿Aprobar ${s.nombre}? Puede generar cargos (${s.cobro}).`)) return;
+      ocupado([b], true);
+      try { await api("/api/costos", { method: "POST", json: { servicio: s.id, decision } }); notificar(`${s.nombre}: ${decision}.`); cargarCostos(); }
+      catch (e) { notificar(e.message); } finally { ocupado([b], false); }
+    });
+    const pendientes = d.servicios.filter((s) => s.requiere_decision);
+    limpiar("costos-servicios",
+      pendientes.length ? h("div", { clase: "aviso-caja", role: "alert", texto: `Hay ${pendientes.length} servicio(s) que cobran esperando tu decisión. No se usarán hasta que los apruebes.` }) : null,
+      tabla([{ t: "Servicio", f: (s) => s.nombre }, { t: "Cómo cobra", f: (s) => s.cobro }, { t: "Estado", f: (s) => s.estado },
+        { t: "Decisión", f: (s) => (s.puede_decidir && s.detectado ? h("span", {}, decidir(s, "aprobado"), " ", decidir(s, "desistido")) : "—") },
+        { t: "Nota", f: (s) => s.nota || "" }], d.servicios, { caption: d.nota }));
+  } catch (e) { limpiar("costos-servicios", errorCaja(e)); }
+}
+
 /* ---------- modelo cuantitativo de opciones ---------- */
 // Ejemplos listos (hipótesis de estudio, no cotizaciones): eligen valores razonables y calculan al instante.
 const EJEMPLOS_OPCIONES = [
@@ -1889,13 +1915,12 @@ async function estadoFlujo(forzar) {
   return flujo.estado;
 }
 
-function selectorSimbolo(valor, alCambiar, { incluirCripto = true, etiqueta = "Instrumento" } = {}) {
+function selectorSimbolo(valor, alCambiar, { etiqueta = "Instrumento" } = {}) {
   const c = flujo.estado.catalogo;
   const sel = h("select", { "aria-label": etiqueta, onchange: (e) => alCambiar(e.target.value) },
     h("option", { value: "" }, "Elija un instrumento…"),
     c.con_datos.length ? h("optgroup", { label: "Con datos guardados" }, c.con_datos.map((x) => h("option", { value: x }, x))) : null,
-    h("optgroup", { label: "SIC (precio de origen en EE. UU., USD)" }, c.sic.map((x) => h("option", { value: x.id }, `${x.clave} · ${x.origen}`))),
-    incluirCripto && c.cripto.length ? h("optgroup", { label: "Cripto (fuera del Reto)" }, c.cripto.map((x) => h("option", { value: x.id }, x.id))) : null);
+    h("optgroup", { label: "SIC (precio de origen en EE. UU., USD)" }, c.sic.map((x) => h("option", { value: x.id }, `${x.clave} · ${x.origen}`))));
   sel.value = valor;
   return h("label", {}, `${etiqueta} `, sel);
 }
@@ -1915,7 +1940,7 @@ function graficaTradingView(v) {
 // Widgets gratuitos de TradingView en marcos aislados (/widget/...). Solo muestran; no alimentan cálculos.
 const AVISO_TV = "Datos de TradingView: EE. UU. con la cotización gratuita de Cboe en USD; las emisoras de la BMV no están disponibles en estos widgets gratuitos. Pueden diferir del simulador del Reto. Solo informa.";
 // Los widgets y la gráfica de TradingView siguen el modo claro/oscuro del sistema, igual que la terminal.
-const TEMA_TV = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+const TEMA_TV = "dark";  // los widgets de terceros siempre en negro, en cualquier modo de la terminal
 const urlWidget = (tipo, params = {}) => `/widget/${tipo}?${new URLSearchParams({ ...params, tema: TEMA_TV })}`;
 function marcoWidget(tipo, params, alto, titulo) {
   const m = h("iframe", { clase: "widget-tv", title: titulo, loading: "lazy", src: urlWidget(tipo, params) });
@@ -1933,7 +1958,7 @@ function panoramaTradingView() {
     h("h2", { texto: "Panorama de TradingView" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
     marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
     bloqueWidget("1 · Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
-    bloqueWidget("2 · Tasas, volatilidad (VIX), dólar, energía, metales y cripto", marcoWidget("macro", {}, 620, "Variables macro"), true),
+    bloqueWidget("2 · Tasas, volatilidad (VIX), dólar, energía y metales", marcoWidget("macro", {}, 720, "Variables macro"), true),
     bloqueWidget("3 · Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
     bloqueWidget("4 · Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
     bloqueWidget("5 · Mapa de calor de acciones por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
@@ -1941,12 +1966,10 @@ function panoramaTradingView() {
     bloqueWidget("6 · Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
     bloqueWidget("7 · Filtro de acciones y divisas", [selectorSimple("america", [["america", "Acciones de EE. UU."], ["mexico", "Acciones de México"], ["forex", "Divisas"]],
       (x) => { filtro.src = urlWidget("filtro", { filtro: x }); }, "Mercado"), filtro]),
-    bloqueWidget("8 · Cotizaciones por grupo (índices, divisas, bonos en ETF, materias primas)", marcoWidget("cotizaciones", {}, 520, "Cotizaciones por grupo")),
+    bloqueWidget("8 · Cotizaciones por grupo (índices, divisas, bonos en ETF, materias primas)", marcoWidget("cotizaciones", {}, 640, "Cotizaciones por grupo")),
     bloqueWidget("9 · Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
     bloqueWidget("10 · Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
-    bloqueWidget("11 · Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")),
-    bloqueWidget("12 · Criptomonedas: mapa de calor (fuera del Reto)", marcoWidget("mapa-cripto", {}, 520, "Mapa de calor de criptomonedas")),
-    bloqueWidget("13 · Criptomonedas: tabla del mercado (fuera del Reto)", marcoWidget("cripto-mercado", {}, 520, "Mercado de criptomonedas")));
+    bloqueWidget("11 · Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")));
 }
 
 function fichaTradingView(simbolo) {
@@ -2145,7 +2168,7 @@ async function cargarVelas() {
       selectorSimple(v.dias, [5, 30, 90, 180, 365].map((d) => [d, `${d} días`]), (x) => { v.dias = Number(x); cargarVelas(); }, "Rango"),
       ...casillas, botonAct);
     if (!v.simbolo) {
-      limpiar("velas-contenido", controles, h("p", { clase: "vacio", texto: "Elija un instrumento. Proveedores: Alpaca (SIC: OHLCV del consolidado SIP con ≥ 15 min de retraso) y cripto (exchange público). Para la BMV importe un CSV." }), formImportar("velas", cargarVelas), formImportarExterno("", cargarVelas));
+      limpiar("velas-contenido", controles, h("p", { clase: "vacio", texto: "Elija un instrumento. Proveedor: Alpaca (SIC: OHLCV del consolidado SIP con ≥ 15 min de retraso). Para la BMV importe un CSV." }), formImportar("velas", cargarVelas), formImportarExterno("", cargarVelas));
       return;
     }
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
@@ -2258,7 +2281,7 @@ async function cargarOrderFlow() {
       botonAccion("Actualizar operaciones", "boton--secundario", async (b) => { if (await pedirActualizacion("operaciones", o.simbolo, {}, b)) cargarOrderFlow(); }));
     const provs = h("p", { clase: "ayuda", texto: `Fuentes: ${flujo.estado.proveedores.map((p) => `${p.nombre} — ${p.configurado ? "disponible" : "no configurado"}`).join(" · ")}. No disponible gratuitamente: ${flujo.estado.no_disponible.join("; ")}.` });
     if (!o.simbolo) {
-      limpiar("orderflow-contenido", controles, provs, h("p", { clase: "vacio", texto: "Elija un instrumento. Con datos públicos reales: cripto (libro por niveles y operaciones con lado del agresor). SIC: solo el mejor bid/ask de IEX y operaciones SIP con retraso, sin lado." }),
+      limpiar("orderflow-contenido", controles, provs, h("p", { clase: "vacio", texto: "Elija un instrumento. SIC: solo el mejor bid/ask de IEX y operaciones SIP con retraso, sin lado del agresor. Para libro completo importe un CSV con datos que tenga derecho a usar." }),
         formImportar("libro", cargarOrderFlow), formImportar("operaciones", cargarOrderFlow));
       return;
     }
@@ -2347,7 +2370,7 @@ function superficieTabla(curvas) {
     if (!cerca.length) return "—";
     const iv = cerca.reduce((a, p) => a + p.iv, 0) / cerca.length;
     const marca = h("span", { clase: "celda-iv", texto: pct(iv) });  // color por CSSOM (la CSP bloquea style en línea)
-    if (hi > lo) marca.style.backgroundColor = `color-mix(in srgb, var(--serie-2) ${Math.round(15 + 60 * (iv - lo) / (hi - lo))}%, transparent)`;
+    if (hi > lo) marca.style.backgroundColor = colorCalor(1 - 2 * (iv - lo) / (hi - lo));  // volatilidad alta en rojo, baja en verde
     return marca;
   } }))], vencs, { caption: "Superficie de volatilidad implícita (promedio de calls y puts alrededor de cada strike)" });
 }
@@ -2388,7 +2411,7 @@ async function cargarOptionFlow() {
       i.addEventListener("change", () => { F[k] = i.value; cargarOptionFlow(); });
       return h("label", {}, `${t} `, i);
     };
-    const sim = selectorSimbolo(o.subyacente, (x) => { o.subyacente = x; o.filtros = {}; cargarOptionFlow(); }, { incluirCripto: false, etiqueta: "Subyacente" });
+    const sim = selectorSimbolo(o.subyacente, (x) => { o.subyacente = x; o.filtros = {}; cargarOptionFlow(); }, { etiqueta: "Subyacente" });
     const botonAct = botonAccion("Actualizar cadena desde proveedor", "boton--primario", async (b) => { if (await pedirActualizacion("opciones", o.subyacente, {}, b)) cargarOptionFlow(); });
     if (!o.subyacente) {
       limpiar("optionflow-contenido", h("div", { clase: "fila-controles" }, sim, botonAct),
@@ -2637,7 +2660,7 @@ async function cargarSeguimiento() {
 function pintarComparacion(d) {
   const ids = d.correlacion.ids;
   const clave = (i) => (d.metricas.find((m) => m.id === i) || {}).clave || i;
-  const corr = (v) => { const s = h("span", { clase: "celda-iv", texto: num(v) }); s.style.backgroundColor = `color-mix(in srgb, var(--serie-1) ${Math.round(Math.abs(v) * 60)}%, transparent)`; return s; };
+  const corr = (v) => { const s = h("span", { clase: "celda-iv", texto: num(v) }); s.style.backgroundColor = colorCalor(-v); return s; };
   document.getElementById("comparacion").replaceChildren(
     h("p", { clase: "ayuda", texto: `${d.desde} a ${d.hasta} · ${d.sesiones} sesiones comunes. ${d.nota}` }),
     grafica(ids.map((i, k) => ({ nombre: clave(i), color: PALETA[k % PALETA.length], datos: d.serie.fechas.map((f, j) => ({ x: f, y: d.serie[i][j] })) })),
@@ -2764,8 +2787,7 @@ function pintarGex(d) {
       if (!z) return "—";
       const x = valor(z), marca = h("span", { clase: "celda-gex", texto: fmtCompacto.format(x),
         title: `Strike ${num(k)} · ${v}: calls ${fmtCompacto.format(z.calls)}, puts ${fmtCompacto.format(z.puts)} ${d.moneda} por 1 %; ${z.n} contrato(s)` });
-      const color = firmada && x < 0 ? "var(--vela-baja)" : firmada ? "var(--vela-sube)" : "var(--serie-2)";
-      marca.style.backgroundColor = `color-mix(in srgb, ${color} ${Math.round(12 + 70 * Math.abs(x) / mx)}%, transparent)`;
+      marca.style.backgroundColor = colorCalor(x / mx);  // firmada: verde positiva, roja negativa; absoluta: verde por magnitud
       return marca;
     } }))];
     cont.replaceChildren(...[
@@ -3270,7 +3292,7 @@ function pintarResultadoPf(r) {
   const ids = r.correlacion.ids, clave = (id) => (r.activos.find((a) => a.id === id) || {}).clave || id;
   const corr = tabla([{ t: "", f: (i) => h("strong", { texto: clave(ids[i]) }) }, ...ids.map((id, j) => ({ t: clave(id), num: true, f: (i) => {
     const v = r.correlacion.matriz[i][j], el = h("span", { clase: "celda-iv", texto: v.toFixed(2) });
-    el.style.backgroundColor = `color-mix(in srgb, var(${v >= 0 ? "--negativo" : "--positivo"}) ${Math.round(Math.abs(v) * 55)}%, transparent)`;
+    el.style.backgroundColor = colorCalor(-v);  // rojo: se mueven juntos; verde: se compensan; gris: casi sin relación
     return el;
   } }))], ids.map((_, i) => i), { caption: "Correlación de rendimientos diarios (rojo = se mueven juntos; verde = se compensan)" });
   return h("section", { clase: "tarjeta" },

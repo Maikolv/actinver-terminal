@@ -42,7 +42,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado: actualización acotada del 31-oct-2026
 
-Terminal profesional (1-nov): sistema negro/gris/blanco con rojo de identidad y contraste medido (`DESIGN.md`); Mesa con paleta de comandos, franja de Seguimiento, cuadrícula reordenable/ancha con migración, y Ficha, Noticias, Macro/resumen y Calendario nativos de solo lectura (`terminal/mesa_datos.py`). Resultados empresariales BLOQUEADOS (sin fuente); Excel de Markowitz rediseñado sin cambios numéricos, revisión visual en Excel pendiente. Ver `docs/terminal-pro-20261101.md`.
+Terminal profesional (1-nov): sistema negro/gris/blanco con rojo de identidad y contraste medido (`DESIGN.md`); Mesa con paleta de comandos, franja de Seguimiento, cuadrícula reordenable/ancha con migración, y Ficha, Noticias, Macro/resumen y Calendario nativos de solo lectura (`terminal/mesa_datos.py`). DGS30 incluido en FRED; conectores opcionales Banxico/SEC/Alpha apagados, sin acceso real acreditado. Calendario distingue publicación SEC, estimación, BPA y revisión; campos sin fuente siguen SIN DATO. Evidencia y bloqueos: `docs/proveedores-mesa-20261101.md`. Excel de Markowitz rediseñado sin cambios numéricos, revisión visual en Excel pendiente. Ver `docs/terminal-pro-20261101.md`.
 
 Procesos: `docs/continuacion-procesos-20261031.md`. Respaldo offline probado, reloj inyectado y aviso por emisora. Reasignación de proveedores no aplicada; GEX condicionado a evidencia posterior al 2-nov. Pruebas y límites en el informe, sin trades ni Telegram.
 

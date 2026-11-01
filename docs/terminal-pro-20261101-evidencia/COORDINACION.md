@@ -18,3 +18,6 @@ Antes de cada escritura en un archivo compartido Claude compara su hash con la l
 
 ## Registro
 - 01-nov-2026 02:51 · Claude: escribe este documento y la línea base. Revisión en 127.0.0.1 con `TERMINAL_SIN_MOTOR=1`.
+- 01-nov-2026 04:15 · Claude: detecta a Codex activo (proveedores_mesa.py, mesa_resultados.py, app.py, mesa_datos.py,
+  mesa.mjs, centro_*). Claude no edita esos archivos salvo una inserción puntual en app.py (rutas /api/costos) y
+  trabaja en terminal/costos.py (nuevo), alertas.py, bot_telegram.py, app.js, index.html y pruebas propias.

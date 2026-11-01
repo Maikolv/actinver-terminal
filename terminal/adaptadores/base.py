@@ -79,13 +79,15 @@ class Adaptador:
         raise NotImplementedError
 
     # --- límites de peticiones ---------------------------------------------------------------
-    def _ventanas(self) -> list[tuple[str, int]]:
-        ahora = datetime.now(UTC)
+    def _ventanas(self, ahora=None) -> list[tuple[str, int]]:
+        ahora = ahora or datetime.now(UTC)
         out = []
         if "peticiones_por_dia" in self.ajustes:
             out.append((f"d:{ahora:%Y-%m-%d}", int(self.ajustes["peticiones_por_dia"])))
         if "peticiones_por_hora" in self.ajustes:
             out.append((f"h:{ahora:%Y-%m-%dT%H}", int(self.ajustes["peticiones_por_hora"])))
+        if "peticiones_por_minuto" in self.ajustes:
+            out.append((f"m:{ahora:%Y-%m-%dT%H:%M}", int(self.ajustes["peticiones_por_minuto"])))
         return out
 
     def peticiones_restantes(self) -> int | None:

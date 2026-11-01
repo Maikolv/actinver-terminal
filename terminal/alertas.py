@@ -680,6 +680,11 @@ def ficha_revision(a: dict) -> dict:
     }
 
 
+def _reglas_costos(con) -> list[Condicion]:
+    from .costos import reglas_costos  # import diferido: costos.py importa Condicion de este módulo
+    return reglas_costos(con)
+
+
 def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, notificar: bool = True,
             ahora_dt: datetime | None = None) -> list[dict]:
     cfg = ajustes["alertas"]
@@ -697,7 +702,7 @@ def evaluar(con: sqlite3.Connection, ajustes, cartera: dict, propuestas: dict, n
              + reglas_evento_corporativo(con, cfg, ids, ahora_dt) + reglas_modelo(con, cfg)
              + reglas_webhook(con, ahora_dt) + reglas_tesis(con, cartera)
              + reglas_portal(con, ahora_dt) + reglas_plan_propuesta(cartera, propuestas)
-             + reglas_movimientos(con, ajustes, ahora_dt))
+             + reglas_movimientos(con, ajustes, ahora_dt) + _reglas_costos(con))
     if cfg.get("exigir_precio_confiable", True):
         from . import cotizaciones
         provs = cotizaciones.construir(con, ajustes.es_demo)

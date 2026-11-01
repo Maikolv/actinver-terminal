@@ -1,6 +1,6 @@
 /* Páginas aisladas de los widgets de TradingView: mismos colores y logo que la terminal (app.css), en claro u oscuro. */
-html, body { margin: 0; height: 100%; font: 14px/1.4 "Segoe UI", system-ui, sans-serif; }
-body.tema-oscuro { background: #121419; color: #f3f4f6; --borde: #343942; --acento: #f06a6a; }
+html, body { margin: 0; height: 100%; font: 14px/1.4 "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif; }
+body.tema-oscuro { background: #090a0c; color: #f3f4f6; --borde: #343942; --acento: #f06a6a; }
 body.tema-claro { background: #ffffff; color: #111318; --borde: #d4d4d0; --acento: #b42626; }
 header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--borde); }
 a { color: var(--acento); }
@@ -13,3 +13,15 @@ a { color: var(--acento); }
 .sin-cabecera .tradingview-widget-container__widget { height: calc(100% - 22px); }
 .tradingview-widget-copyright { font-size: 11px; padding: 2px 6px; }
 body.sin-cabecera { overflow: hidden; }
+/* El widget reserva 32 px bajo su marco para el rótulo «Datos de TradingView»; el rótulo medía 36 y se cortaba. */
+.tradingview-widget-copyright { height: 32px !important; line-height: 32px !important; padding: 0 !important; box-sizing: border-box; overflow: hidden; font-size: 12px !important; }
+.tradingview-widget-container iframe { display: block; }
+/* Widgets que crean un div __widget al 100 %: el rótulo se sumaba debajo y desbordaba. Columna flexible: el widget
+   toma el resto y el rótulo su alto fijo, así contenido = marco y el ajuste de alto no entra en bucle. */
+.tradingview-widget-container { display: flex; flex-direction: column; }
+.tradingview-widget-container__widget { flex: 1 1 auto; min-height: 0; height: auto; }
+.tradingview-widget-copyright { flex: none; }
+/* Páginas con cabecera (gráfica): la cabecera mide lo que mida y la gráfica toma el resto, sin restar 40 px fijos. */
+body:not(.sin-cabecera) { display: flex; flex-direction: column; }
+body:not(.sin-cabecera) > header { flex: none; }
+body:not(.sin-cabecera) > .tradingview-widget-container { flex: 1 1 auto; min-height: 0; height: auto; }

@@ -29,6 +29,10 @@ DEFAULTS = {
     "coingecko": {"intervalo_horas": 1, "peticiones_por_dia": 24},
     "eia": {"intervalo_horas": 24, "peticiones_por_dia": 12},
     "bls": {"intervalo_horas": 24, "peticiones_por_dia": 4},
+    "banxico_sie": {"activo": False, "intervalo_horas": 24, "peticiones_por_dia": 20, "peticiones_por_minuto": 8},
+    "alpha_calendario": {"activo": False, "plan_verificado": False, "intervalo_horas": 24,
+                         "peticiones_por_dia": 25, "peticiones_por_minuto": 1},
+    "sec_resultados": {"activo": False, "intervalo_horas": 24, "peticiones_por_dia": 20, "peticiones_por_minuto": 5},
 }
 
 

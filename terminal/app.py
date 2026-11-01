@@ -1505,6 +1505,22 @@ def get_riesgo(ventana: int = 252, horizonte: int | None = None, con=Depends(con
     return riesgo.calcular(con, AJUSTES, max(60, min(ventana, 1260)), horizonte if horizonte and 1 <= horizonte <= 252 else None)
 
 
+@app.get("/api/costos")
+def get_costos(con=Depends(con_db)):
+    """Servicios que podrían cobrar y su estado; ninguno de pago se usa sin aprobación (terminal/costos.py)."""
+    from . import costos
+    return costos.estado(con)
+
+
+@app.post("/api/costos")
+def post_costos(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import costos
+    try:
+        return costos.decidir(con, str(cuerpo.get("servicio", "")), str(cuerpo.get("decision", "")))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
 @app.get("/api/lista-seguimiento")
 def get_lista_seguimiento(con=Depends(con_db)):
     from . import seguimiento
@@ -1535,9 +1551,9 @@ def mesa_resumen(con=Depends(con_db)):
 
 
 @app.get("/api/mesa/resultados")
-def mesa_resultados():
-    from . import mesa_datos
-    return mesa_datos.CONTRATO_RESULTADOS
+def mesa_resultados(con=Depends(con_db)):
+    from .mesa_resultados import calendario
+    return calendario(con)
 
 
 @app.post("/api/lista-seguimiento")
@@ -1708,8 +1724,7 @@ WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", Fa
               "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
               "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
               "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
-              "mapa-cripto": ("crypto-coins-heatmap", False), "cinta-macro": ("ticker-tape", False),
-              "macro": ("market-quotes", False), "cripto-mercado": ("crypto-mkt-screener", False)}
+              "cinta-macro": ("ticker-tape", False), "macro": ("market-quotes", False)}
 MAPAS_TV = {"NASDAQ100", "SPX500"}
 FILTROS_TV = {"america", "mexico", "forex"}
 BASE_TV = {"isTransparent": True, "locale": "es", "width": "100%", "height": "100%"}  # transparente: toma el fondo de grafica.css
@@ -1743,16 +1758,13 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
             grupo("Volatilidad y dólar", [("CAPITALCOM:VIX", "VIX · volatilidad S&P 500"), ("CAPITALCOM:DXY", "Índice dólar (DXY)"),
                                           ("FX_IDC:USDMXN", "Dólar / peso")]),
             grupo("Energía", [("TVC:USOIL", "Petróleo WTI"), ("TVC:UKOIL", "Petróleo Brent"), ("CAPITALCOM:NATURALGAS", "Gas natural")]),
-            grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")]),
-            grupo("Cripto (fuera del Reto)", [("BITSTAMP:BTCUSD", "Bitcoin"), ("BITSTAMP:ETHUSD", "Ether")])]}
+            grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")])]}
     if tipo == "cinta-macro":
         return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
             {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),
                                                     ("FOREXCOM:DJI", "Dow Jones"), ("CAPITALCOM:VIX", "VIX"), ("FRED:DGS10", "Bono EE. UU. 10a %"),
                                                     ("CAPITALCOM:DXY", "Dólar DXY"), ("FX_IDC:USDMXN", "USD/MXN"), ("FX_IDC:EURMXN", "EUR/MXN"),
-                                                    ("TVC:GOLD", "Oro"), ("TVC:USOIL", "WTI"), ("BITSTAMP:BTCUSD", "Bitcoin")]]}
-    if tipo == "cripto-mercado":
-        return {**BASE_TV, "defaultColumn": "overview", "screener_type": "crypto_mkt", "displayCurrency": "USD"}
+                                                    ("TVC:GOLD", "Oro"), ("TVC:USOIL", "WTI")]]}
     if tipo == "destacados":
         return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}
     if tipo == "mapa-etf":
@@ -1760,9 +1772,6 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
                 "hasTopBar": False, "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
     if tipo in ("divisas", "mapa-divisas"):
         return {**BASE_TV, "currencies": DIVISAS_TV}
-    if tipo == "mapa-cripto":
-        return {**BASE_TV, "dataSource": "Crypto", "blockSize": "market_cap_calc", "blockColor": "change", "hasTopBar": False,
-                "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
     if tipo == "cinta":
         sims = _simbolos_cartera(con) or ["NASDAQ:NDX"]
         return {**BASE_TV, "symbols": [{"proName": s, "title": s.split(":")[1]} for s in sims], "showSymbolLogo": True,

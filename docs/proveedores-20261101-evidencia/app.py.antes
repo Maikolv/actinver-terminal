@@ -1,0 +1,1895 @@
+"""Servidor local (FastAPI). Solo informa y simula: no existe ninguna ruta que envíe órdenes."""
+from __future__ import annotations
+
+import asyncio
+import html
+import json
+import logging
+import os
+import re
+import threading
+import time
+from contextlib import asynccontextmanager
+from datetime import date
+
+from fastapi import Body, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
+from fastapi.staticfiles import StaticFiles
+
+from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, notificador, reto,
+               registro, servicios, tiempo_real, vigencia, webhook_tv)
+from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
+from .seguridad import TOKEN_CSRF, Seguridad
+
+logging.getLogger("httpx").setLevel(logging.WARNING)  # evita registrar URLs con credenciales
+log = logging.getLogger("terminal")
+WEB = RAIZ / "web"
+AJUSTES = cargar_ajustes()
+
+RIESGOS = ("conservador", "moderado", "agresivo")
+ESCENARIOS = ("base", "adverso", "favorable")
+
+
+def con_db():
+    con = db.conectar()
+    try:
+        yield con
+    finally:
+        con.close()
+
+
+def disparar_motor(forzar: bool = True) -> None:
+    """Recalcula en segundo plano tras un cambio (operación, importación, perfil). No bloquea la respuesta."""
+    if os.environ.get("TERMINAL_SIN_MOTOR"):
+        return
+    threading.Thread(target=servicios.ciclo_seguro, args=(AJUSTES, forzar), daemon=True).start()
+
+
+FLUJO: tiempo_real.FlujoVivo | None = None  # precios en vivo de EE. UU. (Alpaca IEX); None si el motor está apagado
+
+
+def _gex_programado() -> None:
+    """OI antes de la apertura y cadena 10:00/14:00 NY de los subyacentes SIC en cartera (opcional, apagado)."""
+    if not ((AJUSTES.get("flujo") or {}).get("gex_programado") or {}).get("activo"):
+        return
+    from .flujo import servicio as flujo_servicio
+    con = db.conectar()
+    try:
+        subyacentes = [p["instrumento_id"] for p in servicios.cartera_actual(con, AJUSTES)["posiciones"]
+                       if p["instrumento_id"].startswith("SIC:")]
+        flujo_servicio.gex_programado(con, AJUSTES, subyacentes)
+    except Exception:  # noqa: BLE001 - la tarea opcional nunca detiene el motor
+        log.exception("GEX programado")
+    finally:
+        con.close()
+
+
+def _programador(stop: threading.Event) -> None:
+    """Motor automático: adquiere datos (respetando límites), recalcula si hay datos nuevos y evalúa alertas.
+    Entre ciclos completos, si el flujo en vivo trae precios que se movieron, recalcula sin consultar proveedores."""
+    import time
+
+    from . import portal
+    prog = AJUSTES["programacion"]
+    siguiente = time.monotonic() + 5  # primer ciclo pocos segundos después de arrancar
+    captura = portal.ultima_captura_id()
+    vigilancia = time.monotonic() + 60
+    while not stop.wait(15):
+        servicios.resumen_seguro(AJUSTES)  # plan del día por Telegram a primera hora (una vez por sesión)
+        ahora = time.monotonic()
+        nueva = portal.ultima_captura_id()
+        if nueva != captura:  # captura nueva del portal: descargar ya los cierres del día, sin esperar al ciclo horario
+            captura, siguiente = nueva, ahora
+        if ahora >= siguiente:
+            if servicios.ciclo_seguro(AJUSTES) is not None and FLUJO:
+                FLUJO.marcar_recalculo()
+            abierto = vigencia.mercado_abierto("XMEX") or vigencia.mercado_abierto("XNYS")
+            siguiente = time.monotonic() + int(prog["revisar_cada_min"] if abierto else prog["fuera_horario_min"]) * 60
+        elif FLUJO and FLUJO.debe_recalcular():
+            if servicios.ciclo_seguro(AJUSTES, forzar=True, en_vivo=True) is not None:
+                FLUJO.marcar_recalculo()
+        _gex_programado()
+        if time.monotonic() >= vigilancia:  # pérdida del día con precios en vivo, cada `vigilar_perdida_min`
+            vigilancia = time.monotonic() + int(prog.get("vigilar_perdida_min", 2)) * 60
+            if vigencia.mercado_abierto("XNYS") or vigencia.mercado_abierto("XMEX"):
+                try:
+                    alertas.vigilar_perdida(AJUSTES)
+                except Exception:  # noqa: BLE001 - una falla de la vigilancia no detiene el motor
+                    log.exception("vigilancia de pérdida del día")
+
+
+def precalentar() -> None:
+    """Prepara el estado y el Ranking en segundo plano, sin bloquear el inicio."""
+    from . import ranking
+    con = db.conectar()
+    try:
+        cotizaciones_estado(con, [i for i, v in mercado.instrumentos(con).items() if v["estado"] == "activo"])
+        ranking.calcular_cache(con, AJUSTES)
+    except Exception:  # noqa: BLE001 - precalentar nunca impide arrancar
+        log.exception("precalentar cachés")
+    finally:
+        con.close()
+
+
+@asynccontextmanager
+async def vida(app: FastAPI):
+    con = db.conectar()
+    db.inicializar(con)
+    if AJUSTES.es_demo and not con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone():
+        ingesta.actualizar_todo(con, AJUSTES)
+    con.close()
+    global FLUJO
+    stop = threading.Event()
+    if not os.environ.get("TERMINAL_SIN_MOTOR"):
+        threading.Thread(target=precalentar, daemon=True).start()
+    if AJUSTES["app"].get("actualizacion_automatica") and not os.environ.get("TERMINAL_SIN_MOTOR"):
+        FLUJO = tiempo_real.FlujoVivo(AJUSTES)
+        FLUJO.iniciar()
+        threading.Thread(target=_programador, args=(stop,), daemon=True).start()
+    bot = None
+    if not os.environ.get("TERMINAL_SIN_MOTOR"):
+        from .bot_telegram import BotTelegram
+        bot = BotTelegram(AJUSTES)
+        bot.iniciar()  # solo si TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID están en .env
+    nube_sync = None
+    if not os.environ.get("TERMINAL_SIN_MOTOR"):
+        from .nube import Sincronizador
+        nube_sync = Sincronizador(AJUSTES)
+        nube_sync.iniciar()  # solo si CLOUD_ALERTS_URL y CLOUD_ALERTS_SECRET están en .env
+    yield
+    stop.set()
+    if nube_sync:
+        nube_sync.detener()
+    if bot:
+        bot.detener()
+    if FLUJO:
+        FLUJO.detener()
+
+
+app = FastAPI(title="Actinver Terminal", version=__version__, docs_url=None, redoc_url=None, openapi_url=None,
+              lifespan=vida)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(Seguridad)
+
+
+@app.exception_handler(cartera.ErrorValidacion)
+async def _err_val(_: Request, e: cartera.ErrorValidacion):
+    return JSONResponse({"error": "Datos no válidos", "errores": e.errores}, status_code=422)
+
+
+@app.exception_handler(importar.ErrorArchivo)
+async def _err_arch(_: Request, e: importar.ErrorArchivo):
+    return JSONResponse({"error": str(e)}, status_code=422)
+
+
+@app.exception_handler(Exception)
+async def _err(_: Request, e: Exception):
+    log.exception("error no controlado")
+    return JSONResponse({"error": "Error interno; revise data/logs/terminal.log"}, status_code=500)
+
+
+def _ocupado():
+    return HTTPException(409, "Hay una actualización o cálculo en curso; intente en unos segundos")
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Perfil y Reto
+def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
+    e, out = [], {}
+    riesgo = str(p.get("riesgo", "")).strip().lower()
+    if riesgo not in RIESGOS:
+        e.append("riesgo: conservador, moderado o agresivo")
+    out["riesgo"] = riesgo
+
+    def num(campo, lo, hi, etiqueta):
+        try:
+            v = float(str(p.get(campo, "")).replace(",", ""))
+        except ValueError:
+            e.append(f"{campo}: {etiqueta}")
+            return None
+        if not lo <= v <= hi:
+            e.append(f"{campo}: {etiqueta}")
+        return v
+
+    out["horizonte_anios"] = num("horizonte_anios", 0.02, 40, "entre 0.02 y 40 años")
+    out["horizonte_reto"] = bool(p.get("horizonte_reto", True))
+    out["capital"] = num("capital", 0, 1e10, "entre 0 y 10 000 millones")
+    out["max_peso_activo"] = num("max_peso_activo", 0.02, 1, "entre 0.02 y 1 (2 % a 100 %)")
+    out["max_exposicion_usd"] = num("max_exposicion_usd", 0, 1, "entre 0 y 1")
+    esc = str(p.get("escenario", "base")).lower()
+    if esc not in ESCENARIOS:
+        e.append("escenario: base, adverso o favorable")
+    out["escenario"] = esc
+    out["incluir_etf_por_confirmar"] = bool(p.get("incluir_etf_por_confirmar", True))
+    mercado_acc = str(p.get("mercado_acciones", "ambos")).lower()
+    if mercado_acc not in ("ambos", "nacionales", "extranjeras"):
+        e.append("mercado_acciones: ambos, nacionales o extranjeras")
+    out["mercado_acciones"] = mercado_acc
+    criterio = str(p.get("criterio_plan", "puntuacion")).lower()
+    if criterio not in ("puntuacion", "plusvalia", "ganancia"):
+        e.append("criterio_plan: puntuacion, plusvalia o ganancia")
+    out["criterio_plan"] = criterio
+    excl = p.get("excluir") or []
+    if not isinstance(excl, list) or len(excl) > 300 or any(str(x) not in ids_validos for x in excl):
+        e.append("excluir: lista de identificadores del universo")
+    out["excluir"] = [str(x) for x in excl] if isinstance(excl, list) else []
+    if e:
+        raise cartera.ErrorValidacion(e)
+    return out
+
+
+@app.get("/api/perfil")
+def get_perfil(con=Depends(con_db)):
+    from .optimizador import perfil_efectivo
+    p = servicios.perfil_actual(con, AJUSTES)
+    return {"perfil": p, "perfil_efectivo": perfil_efectivo(p), "perfiles": AJUSTES["perfiles"],
+            "puntuacion": AJUSTES["puntuacion"], "costos": AJUSTES["costos"], "optimizacion": AJUSTES["optimizacion"],
+            "alertas": AJUSTES["alertas"]}
+
+
+@app.put("/api/perfil")
+def put_perfil(cuerpo: dict = Body(...), con=Depends(con_db)):
+    p = validar_perfil(cuerpo if isinstance(cuerpo, dict) else {}, set(mercado.instrumentos(con)))
+    antes = servicios.perfil_actual(con, AJUSTES)
+    with db.transaccion(con):
+        con.execute("INSERT INTO ajustes_usuario VALUES ('perfil', ?, ?) ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor,"
+                    " actualizado_en=excluded.actualizado_en", (json.dumps(p), db.ahora()))
+        db.auditar(con, "perfil", "perfil", "cambio", antes=antes, despues=p)
+    disparar_motor()
+    return {"perfil": p}
+
+
+@app.get("/api/reto")
+def get_reto(con=Depends(con_db)):
+    r = reto.resumen()
+    if r.get("activo"):
+        hechas = {f["id"]: bool(f["hecha"]) for f in con.execute("SELECT id, hecha FROM tareas_reto")}
+        r["tareas"] = [{**t, "hecha": hechas.get(t["id"], False)} for t in r["tareas"]]
+        r["universo_simulador"] = int(con.execute("SELECT COUNT(*) FROM universo_simulador").fetchone()[0])
+    r["version_reglas"] = registro.estado_reglas(con)
+    return r
+
+
+@app.post("/api/reto/reglas/{version}/revisada")
+def reglas_revisadas(version: int, con=Depends(con_db)):
+    registro.marcar_reglas_revisadas(con, version)
+    db.auditar(con, "reglas", version, "revisada")
+    con.commit()
+    return registro.estado_reglas(con)
+
+
+@app.put("/api/reto/tareas/{tid}")
+def put_tarea(tid: str, cuerpo: dict = Body(...), con=Depends(con_db)):
+    if tid not in {t["id"] for t in reto.config().get("tareas", [])}:
+        raise HTTPException(404, "Tarea no encontrada")
+    with db.transaccion(con):
+        con.execute("INSERT INTO tareas_reto VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET hecha=excluded.hecha, "
+                    "actualizado_en=excluded.actualizado_en", (tid, int(bool(cuerpo.get("hecha"))), db.ahora()))
+    return {"id": tid, "hecha": bool(cuerpo.get("hecha"))}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Estado de datos, universo y motor
+# Caché de cotizaciones SOLO para la barra de estado (conteos de vigencia): con el motor corriendo,
+# mercado.cotizaciones tarda de 1 a 18 s. Se responde con el cálculo anterior y se recalcula en segundo plano si
+# cambiaron los datos (marca de ranking._marca) o pasó COT_FRESCA_S; nunca con más de COT_MAX_S de antigüedad.
+COT_FRESCA_S, COT_MAX_S = 60, 600
+_COT: dict = {}
+_COT_REFRESCO = threading.Lock()
+
+
+def _calcular_cot(ruta: str, ids: list[str]) -> None:
+    from . import ranking
+    c = db.conectar(ruta)
+    try:
+        marca, inicio = ranking._marca(c), time.monotonic()
+        _COT[(ruta, tuple(ids))] = (inicio, marca, mercado.cotizaciones(c, AJUSTES, ids))
+    finally:
+        c.close()
+
+
+def _refrescar_cot(ruta: str, ids: list[str]) -> None:
+    if not _COT_REFRESCO.acquire(blocking=False):
+        return  # ya hay un recálculo en curso
+
+    def tarea():
+        try:
+            _calcular_cot(ruta, ids)
+        except Exception:  # noqa: BLE001 - la barra de estado conserva el cálculo anterior
+            log.exception("cotizaciones de la barra de estado")
+        finally:
+            _COT_REFRESCO.release()
+    threading.Thread(target=tarea, daemon=True).start()
+
+
+def cotizaciones_estado(con, ids: list[str]) -> tuple[dict, int]:
+    """(cotizaciones, antigüedad en s) para /api/estado."""
+    from . import ranking
+    ruta = con.execute("PRAGMA database_list").fetchone()[2]
+    previo, ahora = _COT.get((ruta, tuple(ids))), time.monotonic()
+    if previo and ahora - previo[0] < COT_MAX_S:
+        # con el motor escribiendo a cada rato, a lo sumo un recálculo cada 15 s aunque la marca cambie
+        if ahora - previo[0] > COT_FRESCA_S or (ahora - previo[0] > 15 and previo[1] != ranking._marca(con)):
+            _refrescar_cot(ruta, ids)
+        return previo[2], round(ahora - previo[0])
+    _calcular_cot(ruta, ids)
+    return _COT[(ruta, tuple(ids))][2], 0
+
+
+@app.get("/api/estado")
+def estado(con=Depends(con_db)):
+    ins = mercado.instrumentos(con)
+    activos = [i for i, v in ins.items() if v["estado"] == "activo"]
+    cot, cot_hace_s = cotizaciones_estado(con, activos)
+    conteo: dict[str, int] = {}
+    for q in cot.values():
+        conteo[q["estado"]] = conteo.get(q["estado"], 0) + 1
+    sesion_bmv = vigencia.ultima_sesion_cerrada("XMEX").isoformat()
+    sin_cierre = sorted(i for i in activos if i.startswith("BMV:") and (cot.get(i, {}).get("fecha") or "")[:10] < sesion_bmv)
+    return {
+        "version": __version__, "modo": AJUSTES.modo, "hoy": date.today().isoformat(),
+        "ultima_sesion": {"NYSE": vigencia.ultima_sesion_cerrada("XNYS").isoformat(),
+                          "BMV": vigencia.ultima_sesion_cerrada("XMEX").isoformat()},
+        "mercado_abierto": {"NYSE": vigencia.mercado_abierto("XNYS"), "BMV": vigencia.mercado_abierto("XMEX")},
+        "fx": mercado.ultimo_fx(con, AJUSTES), "vigencia": conteo, "instrumentos_activos": len(activos),
+        "instrumentos_total": len(ins), "proveedores": ingesta.estado_proveedores(con, AJUSTES),
+        "motor": servicios.estado_motor(con), "alertas_pendientes": alertas.pendientes(con),
+        "tiempo_real": FLUJO.resumen() if FLUJO else {"activo": False, "modo": "apagado",
+                                                        "mensaje": "Motor automático desactivado"},
+        "notificaciones": notificador.configurados(), "operaciones_reales": False,
+        "bmv_sin_cierre": {"n": len(sin_cierre), "sesion": sesion_bmv, "ejemplos": [ins[i]["clave_operable"] for i in sin_cierre[:8]]},
+        "vigencia_hace_s": cot_hace_s,
+    }
+
+
+@app.get("/api/universo")
+def get_universo(con=Depends(con_db), solo_catalogo: bool = False):
+    ins = mercado.instrumentos(con)
+    # El selector no necesita precios: evita consultar toda la historia y no crea un fallback.
+    cot = {} if solo_catalogo else mercado.cotizaciones(con, AJUSTES)
+    sim = {r[0] for r in con.execute("SELECT id FROM universo_simulador")}
+    filas = []
+    for i, v in ins.items():
+        q = cot.get(i, {})
+        filas.append({k: v[k] for k in ("id", "clave_operable", "nombre", "clase", "categoria", "mercado_operable",
+                                         "moneda_operable", "bolsa_referencia", "moneda_referencia",
+                                         "zona_horaria_referencia", "estado", "secciones_pdf", "fuente_verificacion",
+                                         "detalle_verificacion", "fecha_verificacion")}
+                     | {k: q.get(k) for k in ("precio", "moneda", "precio_mxn", "fecha", "proveedor", "tipo_dato",
+                                              "retraso_horas", "sesiones_atraso", "etiqueta", "nota")}
+                     | {"vigencia": q.get("estado"), "en_simulador": (i in sim) if sim else None,
+                        "grafica": simbolo_tradingview(v)})
+    return {"instrumentos": filas}
+
+
+@app.post("/api/datos/actualizar")
+def actualizar(con=Depends(con_db)):
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        return {"resultado": servicios.ciclo(con, AJUSTES)}
+    finally:
+        servicios.bloqueo.release()
+
+
+@app.post("/api/modelos/opciones")
+def calcular_opcion(cuerpo: dict = Body(...)):
+    """Calcula una opción hipotética con entradas manuales; no consulta el mercado."""
+    from . import modelos_opciones
+
+    try:
+        return modelos_opciones.calcular(cuerpo)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/modo")
+def cambiar_modo(cuerpo: dict = Body(...)):
+    """Cambia entre datos reales y demostración sin reiniciar. Cada modo usa su propia base de datos.
+    Al pasar a real se consulta de inmediato a los proveedores configurados para traer datos vigentes."""
+    modo = str((cuerpo or {}).get("modo", ""))
+    if modo not in MODOS:
+        raise cartera.ErrorValidacion(["modo: use «real» o «demo»"])
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        fijar_modo(modo)
+        con = db.conectar()
+        try:
+            db.inicializar(con)
+            if modo == "demo":
+                hay = con.execute("SELECT 1 FROM precios WHERE proveedor='demo_sintetico' LIMIT 1").fetchone()
+                resultado = None if hay else ingesta.actualizar_todo(con, AJUSTES)
+            else:
+                prio = [p["instrumento_id"] for p in servicios.cartera_actual(con, AJUSTES)["posiciones"]]
+                resultado = ingesta.actualizar_todo(con, AJUSTES, prio)
+            db.auditar(con, "modo", modo, "cambio")
+            con.commit()
+        finally:
+            con.close()
+    finally:
+        servicios.bloqueo.release()
+    disparar_motor()
+    return {"modo": modo, "actualizacion": resultado}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Cartera y operaciones
+@app.get("/api/cartera")
+def get_cartera(con=Depends(con_db)):
+    return servicios.seguimiento(con, AJUSTES)
+
+
+@app.get("/api/transacciones")
+def get_tx(anuladas: bool = False, con=Depends(con_db)):
+    return {"transacciones": cartera.listar(con, incluir_anuladas=anuladas)}
+
+
+@app.post("/api/transacciones")
+def post_tx(cuerpo: dict = Body(...), con=Depends(con_db)):
+    t = cartera.validar(cuerpo if isinstance(cuerpo, dict) else {}, mercado.instrumentos(con))
+    with db.transaccion(con):
+        tid = cartera.registrar(con, t, "manual", ocurrencia=int(con.execute("SELECT COUNT(*) FROM transacciones").fetchone()[0]) + 1)
+    disparar_motor()
+    return {"id": tid, "transaccion": t}
+
+
+@app.post("/api/transacciones/{tid}/anular")
+def anular_tx(tid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    cartera.anular(con, tid, str((cuerpo or {}).get("motivo", ""))[:200])
+    disparar_motor()
+    return {"ok": True}
+
+
+@app.post("/api/transacciones/{tid}/corregir")
+def corregir_tx(tid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    if not isinstance(cuerpo, dict):
+        raise cartera.ErrorValidacion(["Cuerpo no válido"])
+    nuevos = {k: cuerpo[k] for k in cartera.CAMPOS if k in cuerpo}
+    nid = cartera.corregir(con, tid, nuevos, mercado.instrumentos(con), str(cuerpo.get("motivo", ""))[:200])
+    disparar_motor()
+    return {"id": nid}
+
+
+@app.get("/api/auditoria")
+def get_auditoria(limite: int = 200, con=Depends(con_db)):
+    filas = con.execute("SELECT * FROM auditoria ORDER BY id DESC LIMIT ?", (max(1, min(limite, 1000)),))
+    return {"eventos": [dict(f) for f in filas]}
+
+
+@app.post("/api/fondos/hoja")
+async def post_hoja_fondos(archivo: UploadFile | None = File(None), confirmar: str = Form("si"), con=Depends(con_db)):
+    """Hoja oficial de precios de los fondos Actinver: PDF subido por el participante o, sin archivo, la descarga
+    pública de actinver.com. Solo asigna fondo y serie exactos con la fecha de valuación del documento."""
+    from . import fondos_actinver as fa
+    try:
+        if archivo is not None:
+            contenido = await archivo.read(5_000_001)
+            if len(contenido) > 5_000_000:
+                raise cartera.ErrorValidacion(["El PDF excede 5 MB."])
+            rep = fa.importar(con, contenido, archivo.filename or "hoja.pdf", confirmar=confirmar == "si")
+        else:
+            rep = fa.actualizar(con, AJUSTES)
+    except fa.ErrorHoja as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    if rep.get("confirmado") or rep.get("estado") == "ok":
+        disparar_motor()
+    return rep
+
+
+@app.post("/api/importar")
+async def post_importar(archivo: UploadFile = File(...), tipo: str = Form(...), confirmar: str = Form("no"),
+                        con=Depends(con_db)):
+    contenido = await archivo.read(importar.MAX_BYTES + 1)
+    rep = importar.importar(con, contenido, archivo.filename or "", tipo, mercado.instrumentos(con),
+                            confirmar=confirmar == "si")
+    if rep.get("confirmado"):
+        disparar_motor()
+    return rep
+
+
+@app.get("/api/plantilla/{tipo}")
+def plantilla(tipo: str):
+    from . import importar_contexto
+    if tipo not in importar.COLUMNAS and tipo not in importar_contexto.COLUMNAS:
+        raise HTTPException(404, "Plantilla no encontrada")
+    return PlainTextResponse(importar.plantilla(tipo), media_type="text/csv; charset=utf-8",
+                             headers={"Content-Disposition": f'attachment; filename="plantilla_{tipo}.csv"'})
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Propuestas, alertas y simulación
+@app.get("/api/propuestas")
+def get_propuestas(con=Depends(con_db)):
+    perfil = servicios.perfil_actual(con, AJUSTES)
+    return servicios.respuesta_propuestas(servicios.propuestas_guardadas(con, AJUSTES, perfil))
+
+
+@app.post("/api/propuestas/calcular")
+def calcular(con=Depends(con_db)):
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        props = servicios.calcular_propuestas(con, AJUSTES)
+        alertas.evaluar(con, AJUSTES, servicios.cartera_actual(con, AJUSTES), props)
+        return servicios.respuesta_propuestas(props)
+    finally:
+        servicios.bloqueo.release()
+
+
+@app.get("/api/alertas")
+def get_alertas(limite: int = 200, con=Depends(con_db)):
+    return {"alertas": alertas.listar(con, limite), "pendientes": alertas.pendientes(con),
+            "configuracion": AJUSTES["alertas"]}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# PASADO / PRESENTE / FUTURO
+@app.get("/api/pasado")
+def get_pasado(con=Depends(con_db)):
+    return espacios.pasado(con, AJUSTES)
+
+
+@app.get("/api/presente")
+def get_presente(con=Depends(con_db)):
+    return espacios.presente(con, AJUSTES)
+
+
+@app.get("/api/robustez")
+def get_robustez(tipo: str = "acciones"):
+    from .robustez import informe
+    if tipo not in ("acciones", "mixta"):
+        raise HTTPException(400, "tipo: acciones o mixta")
+    r = informe.ultimo(tipo)
+    return r or {"estado": "sin_corrida", "mensaje": "Aún no hay corrida del protocolo. Ejecute: uv run terminal robustez"}
+
+
+@app.get("/api/futuro")
+def get_futuro(con=Depends(con_db)):
+    return espacios.futuro(con, AJUSTES)
+
+
+INVESTIGACION = {"estado": "inactivo", "inicio": None, "fin": None, "resultado": None}
+_bloqueo_inv = threading.Lock()
+
+
+def _investigar(horizontes: list[int]) -> None:
+    from .investigacion import reto_pronostico
+    con = db.conectar()
+    try:
+        INVESTIGACION["resultado"] = [{k: v for k, v in r.items() if not k.startswith("_")}
+                                      for r in reto_pronostico.emitir_todo(con, AJUSTES.es_demo, horizontes)]
+        INVESTIGACION["estado"] = "terminado"
+    except Exception as e:  # noqa: BLE001
+        log.exception("fallo en investigación")
+        INVESTIGACION.update(estado="error", resultado=type(e).__name__)
+    finally:
+        INVESTIGACION["fin"] = db.ahora()
+        con.close()
+        _bloqueo_inv.release()
+
+
+@app.post("/api/investigacion/calcular")
+def calcular_investigacion(cuerpo: dict = Body(default={})):
+    """Corre el experimento (walk-forward → validación → prueba) y emite pronósticos a 1 y 5 sesiones y al cierre del
+    Reto. En segundo plano (unos minutos)."""
+    horizontes = [int(h) for h in ((cuerpo or {}).get("horizontes") or AJUSTES.get("investigacion", {}).get("horizontes", [1, 5]))
+                  if 1 <= int(h) <= 20][:3]
+    if not _bloqueo_inv.acquire(blocking=False):
+        raise _ocupado()
+    INVESTIGACION.update(estado="calculando", inicio=db.ahora(), fin=None, resultado=None)
+    threading.Thread(target=_investigar, args=(horizontes,), daemon=True).start()
+    return {"estado": "calculando", "horizontes": horizontes}
+
+
+@app.get("/api/investigacion/estado")
+def estado_investigacion():
+    return INVESTIGACION
+
+
+@app.get("/api/movimientos")
+def get_movimientos(emisora: str | None = None, gestor: str | None = None, tipo: str | None = None, desde: str | None = None,
+                    hasta: str | None = None, con=Depends(con_db)):
+    """Movimientos públicos (SEC EDGAR: Form 4 y 13F) con evidencia original, fechas separadas y su relación con su
+    cartera, propuestas, seguimiento y catálogo del simulador. Contexto de investigación: no crea órdenes."""
+    from .movimientos import servicio
+    for f in (desde, hasta):
+        if f and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", f):
+            raise cartera.ErrorValidacion(["Fecha inválida (use AAAA-MM-DD)."])
+    return servicio.listar(con, AJUSTES, emisora=emisora or None, gestor=gestor or None, tipo=tipo or None,
+                           desde=desde or None, hasta=hasta or None)
+
+
+MOVIMIENTOS = {"estado": "inactivo", "resultado": None}
+
+
+@app.post("/api/movimientos/actualizar")
+def actualizar_movimientos():
+    """Consulta la SEC ahora (incremental, ≤ 5 peticiones/s). En segundo plano."""
+    from .movimientos import servicio
+
+    def correr():
+        c = db.conectar()
+        try:
+            MOVIMIENTOS.update(estado="terminado", resultado=servicio.actualizar(c, AJUSTES, forzar=True))
+        except Exception as e:  # noqa: BLE001
+            log.exception("movimientos públicos")
+            MOVIMIENTOS.update(estado="error", resultado=type(e).__name__)
+        finally:
+            c.close()
+    MOVIMIENTOS.update(estado="actualizando", resultado=None)
+    threading.Thread(target=correr, daemon=True).start()
+    return MOVIMIENTOS
+
+
+@app.get("/api/movimientos/estado")
+def estado_movimientos():
+    return MOVIMIENTOS
+
+
+@app.post("/api/seguimiento")
+def agregar_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
+    iid = str(cuerpo.get("instrumento_id") or "").strip().upper()
+    if not con.execute("SELECT 1 FROM instrumentos WHERE id=?", (iid,)).fetchone():
+        raise cartera.ErrorValidacion([f"Instrumento desconocido: {iid or '—'}"])
+    with db.transaccion(con):
+        con.execute("INSERT OR IGNORE INTO seguimiento (instrumento_id, agregado_en, nota) VALUES (?,?,?)",
+                    (iid, db.ahora(), str(cuerpo.get("nota") or "")[:200]))
+    return {"ok": True}
+
+
+@app.delete("/api/seguimiento/{iid}")
+def quitar_seguimiento(iid: str, con=Depends(con_db)):
+    with db.transaccion(con):
+        con.execute("DELETE FROM seguimiento WHERE instrumento_id=?", (iid.upper(),))
+    return {"ok": True}
+
+
+@app.get("/api/nube/estado")
+def get_nube_estado(con=Depends(con_db)):
+    """Monitor de alertas en la nube: activo o inactivo, última sincronización y ejecución, próxima revisión y motivos
+    de las alertas suspendidas. No devuelve secretos."""
+    from . import nube
+    return nube.estado(con, AJUSTES)
+
+
+@app.post("/api/nube/sincronizar")
+def nube_sincronizar(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    """Envía ahora la carga mínima firmada. prueba=true pide a la nube un aviso de prueba, que solo sale cuando la
+    terminal deja de sincronizar (así se comprueba que el aviso viene de la nube)."""
+    from . import nube
+    return nube.sincronizar(con, AJUSTES, prueba=bool(cuerpo.get("prueba")))
+
+
+@app.get("/api/pronostico")
+def get_pronostico(con=Depends(con_db)):
+    from .investigacion import reto_pronostico
+    r = reto_pronostico.construir(con, AJUSTES)
+    return {**r, "texto": reto_pronostico.texto(r)}
+
+
+@app.post("/api/pronostico/telegram")
+def pronostico_telegram(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    """Envía el resumen del pronóstico por Telegram (o solo lo devuelve con enviar=false). No envía órdenes."""
+    from . import notificador
+    from .investigacion import reto_pronostico
+    texto = reto_pronostico.texto(reto_pronostico.construir(con, AJUSTES))
+    if cuerpo.get("enviar", True) is False:
+        return {"resultado": None, "texto": texto}
+    cfg = {**AJUSTES["alertas"], "notificar_escritorio": False, "notificar_telegram": True, "notificar_correo": False}
+    return {"resultado": notificador.enviar("🔮 Pronóstico (estimación)", texto, cfg, detalle=texto), "texto": texto}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Cobertura por símbolo, saldo del portal y webhook de TradingView
+@app.get("/api/cobertura")
+def get_cobertura(con=Depends(con_db)):
+    from . import cobertura_secciones
+    provs = cotizaciones.construir(con, AJUSTES.es_demo)
+    return {"secciones": cobertura_secciones.tabla(), "tabla": cotizaciones.tabla_cobertura(con, provs), "proveedores": [p.estado() for p in provs.values()],
+            "latencias": cotizaciones.latencias_medidas(con),
+            "catalogo_simulador_importado": bool(con.execute("SELECT 1 FROM universo_simulador LIMIT 1").fetchone()),
+            "webhook_tradingview": {"configurado": webhook_tv.TradingViewAlertReceiver(con).configurado(),
+                                    "plantilla": webhook_tv.plantilla_mensaje()}}
+
+
+@app.post("/api/cobertura/verificar")
+def verificar_cobertura(con=Depends(con_db)):
+    provs = cotizaciones.construir(con, AJUSTES.es_demo)
+    filas = cotizaciones.verificar_cobertura(con, provs, cotizaciones.catalogo(con))
+    conteo: dict[str, dict[str, int]] = {}
+    for f in filas:
+        conteo.setdefault(f["proveedor"], {}).setdefault(f["estado"], 0)
+        conteo[f["proveedor"]][f["estado"]] += 1
+    return {"resumen": conteo}
+
+
+@app.get("/api/estado-informacion")
+def get_estado_informacion(con=Depends(con_db)):
+    """Qué está confirmado, estimado, vencido o falta, con la acción concreta (para personas no técnicas)."""
+    from . import estado_info
+    return estado_info.calcular(con, AJUSTES)
+
+
+@app.get("/api/plan-accion")
+def get_plan_accion(con=Depends(con_db)):
+    """Plan de acción por instrumento (comprar, vender, mantener o decisión pendiente), el mismo que resume Telegram."""
+    from . import plan_accion, resumen
+    perfil = servicios.perfil_actual(con, AJUSTES)
+    props = servicios.propuestas_guardadas(con, AJUSTES, perfil)
+    ref = resumen.propuesta_referencia(props)
+    plan = plan_accion.calcular(con, AJUSTES, propuesta=ref)
+    plan["propuestas_texto"] = resumen.bloque_propuestas(props, ref) if ref else []
+    return plan
+
+
+@app.get("/api/aprendizaje")
+def get_aprendizaje():
+    from . import aprendizaje
+    return aprendizaje.catalogo(AJUSTES.es_demo)
+
+
+@app.get("/api/variacion-dia")
+def variacion_dia(con=Depends(con_db)):
+    """Cartera de hoy frente al cierre anterior con precios en vivo del SIC; umbrales de los avisos de pérdida."""
+    from datetime import UTC, datetime
+    cart = servicios.cartera_actual(con, AJUSTES)
+    ids = sorted({p["instrumento_id"] for p in cart.get("posiciones", [])})
+    precios = mercado.precios_mxn(con, AJUSTES, ids, ajustados="splits") if ids else None
+    v = alertas.variacion_dia(cart, precios if precios is not None else __import__("pandas").DataFrame(), datetime.now(UTC))
+    cfg = AJUSTES["alertas"]
+    return {**v, "umbrales": {"cartera": float(cfg.get("perdida_dia_cartera_pct", 0.005)),
+                              "posicion": float(cfg.get("perdida_dia_posicion_pct", 0.01))},
+            "nota": "Precios del SIC en vivo por IEX (una sola bolsa) × FIX; la BMV no tiene fuente gratuita en vivo. "
+                    "Los avisos llegan a Telegram por escalón; la terminal no compra ni vende."}
+
+
+@app.get("/api/plan-intradia")
+def get_plan_intradia(perdida_dia_mxn: float | None = None, con=Depends(con_db)):
+    """Plan intradía defensivo e INFORMATIVO, separado del plan de acción: sin órdenes ni cambios en la cartera."""
+    from . import plan_intradia
+    if perdida_dia_mxn is not None and not (0 <= perdida_dia_mxn <= 1e10):
+        raise HTTPException(422, "perdida_dia_mxn: número entre 0 y 10 000 millones (pérdida positiva)")
+    return plan_intradia.calcular(con, AJUSTES, perdida_dia_mxn)
+
+
+@app.get("/api/portal/captura")
+def get_captura_portal(con=Depends(con_db)):
+    """Última captura del portal del Reto (la que el participante pegó), con sus cambios frente a la anterior."""
+    from . import portal
+    c = portal.captura(con)
+    if not c:
+        return {"captura": None, "cambios": [], "vigente": False,
+                "aviso": "Sin captura del portal: «Mi portafolio Actinver» muestra el registro local de la terminal."}
+    return {"captura": c, "cambios": portal.cambios(portal.anterior(con, c), c),
+            "vigente": servicios.captura_vigente(con) is not None, "fuente": portal.FUENTE}
+
+
+@app.post("/api/portal/captura")
+def post_captura_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Vista previa o registro de lo que el participante copió de su cuenta del Reto (la terminal no entra al portal)."""
+    from . import portal
+
+    def num(k):
+        v = cuerpo.get(k)
+        if v in (None, ""):
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            raise cartera.ErrorValidacion([f"{k}: número"]) from None
+    try:
+        r = portal.guardar(con, str(cuerpo.get("texto") or ""), str(cuerpo.get("hora_portal") or ""),
+                           mercado.instrumentos(con), efectivo=num("efectivo"), valor_portafolio=num("valor_portafolio"),
+                           confirmar=bool(cuerpo.get("confirmar")), por_liquidar=num("por_liquidar"))
+    except portal.ErrorCaptura as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    if r.get("confirmado"):
+        disparar_motor()
+    else:  # vista previa: qué cambiaría frente a la última captura y frente al registro local
+        r["diferencias"] = portal.diferencias(con, AJUSTES, r)
+    return r
+
+
+@app.post("/api/portal/capturas-imagen")
+async def post_capturas_imagen(imagenes: list[UploadFile] = File(...), con=Depends(con_db)):
+    """Capturas de pantalla del portafolio → texto para la vista previa. OCR de Windows en esta PC; las imágenes se
+    procesan en memoria y no se guardan. No registra nada: el participante revisa y confirma en la vista previa."""
+    from starlette.concurrency import run_in_threadpool
+    from . import ocr_portal
+    if not 1 <= len(imagenes) <= ocr_portal.MAX_IMAGENES:
+        raise cartera.ErrorValidacion([f"Suba entre 1 y {ocr_portal.MAX_IMAGENES} capturas."])
+    ins = mercado.instrumentos(con)
+    resultados, avisos = [], []
+    for n, im in enumerate(imagenes, 1):
+        data = await im.read(ocr_portal.LIMITE_BYTES + 1)
+        try:
+            resultados.append(await run_in_threadpool(ocr_portal.leer_captura, data, ins))
+        except ocr_portal.ErrorImagen as e:
+            avisos.append(f"Captura {n}: {e}")
+        except ocr_portal.OcrNoDisponible as e:
+            raise HTTPException(status_code=501, detail=str(e)) from None
+    out = ocr_portal.texto_para_captura(resultados)
+    out.update(avisos=avisos + out["avisos"], imagenes=len(resultados))
+    return out
+
+
+@app.post("/api/saldo-portal")
+def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """El participante copia a mano el valor y el efectivo que muestra el portal (la terminal no entra al portal)."""
+    errores = []
+    try:
+        valor = float(cuerpo.get("valor_portafolio"))
+        if not (0 < valor < 1e10):
+            raise ValueError
+    except (TypeError, ValueError):
+        errores.append("valor_portafolio: número positivo")
+        valor = 0
+    montos = {}
+    for campo in ("efectivo", "invertido", "por_liquidar"):  # opcionales: poder de compra, inversiones, por liquidar
+        v = cuerpo.get(campo)
+        try:
+            montos[campo] = None if v in (None, "") else float(v)
+        except (TypeError, ValueError):
+            errores.append(f"{campo}: número")
+    hora = str(cuerpo.get("hora_portal") or db.ahora())[:40]
+    if errores:
+        raise cartera.ErrorValidacion(errores)
+    cur = con.execute("INSERT INTO saldos_portal (capturado_en, hora_portal, etapa, valor_portafolio, efectivo, invertido, "
+                      "por_liquidar, nota) VALUES (?,?,?,?,?,?,?,?)",
+                      (db.ahora(), hora, reto.etapa_operativa(), valor, montos["efectivo"], montos["invertido"],
+                       montos["por_liquidar"], str(cuerpo.get("nota") or "")[:200]))
+    db.auditar(con, "saldo_portal", cur.lastrowid, "alta", despues={"valor": valor, **montos, "hora": hora})
+    con.commit()
+    disparar_motor(False)
+    return {"id": cur.lastrowid}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Órdenes pendientes (solo referencia) y bitácora de decisiones humanas
+@app.get("/api/pendientes-portal")
+def get_ordenes(todas: bool = False, con=Depends(con_db)):
+    return {"ordenes": registro.ordenes(con, not todas),
+            "nota": "Referencia de órdenes capturadas por usted en el portal. No cambian posiciones ni efectivo: solo una "
+                    "operación CONFIRMADA registrada en «Mi portafolio Actinver» lo hace. La terminal no envía órdenes."}
+
+
+@app.post("/api/pendientes-portal")
+def post_orden(cuerpo: dict = Body(...), con=Depends(con_db)):
+    iid = str(cuerpo.get("instrumento_id") or "")
+    if iid not in mercado.instrumentos(con):
+        raise cartera.ErrorValidacion(["instrumento_id: no está en el universo"])
+    try:
+        oid = registro.registrar_orden_pendiente(con, iid, str(cuerpo.get("lado")), str(cuerpo.get("tipo_orden", "limitada")),
+                                                 float(cuerpo.get("cantidad") or 0),
+                                                 float(cuerpo["precio_limite"]) if cuerpo.get("precio_limite") else None,
+                                                 str(cuerpo.get("nota") or ""))
+    except (TypeError, ValueError):
+        raise cartera.ErrorValidacion(["lado compra/venta, tipo mercado/limitada y cantidad positiva"]) from None
+    return {"id": oid}
+
+
+@app.post("/api/pendientes-portal/{oid}")
+def cerrar_orden(oid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    try:
+        registro.cerrar_orden(con, oid, str(cuerpo.get("estado")), cuerpo.get("transaccion_id"))
+    except ValueError:
+        raise cartera.ErrorValidacion(["estado: ejecutada, cancelada o expirada"]) from None
+    return {"ok": True}
+
+
+@app.get("/api/bitacora")
+def get_bitacora(con=Depends(con_db)):
+    return {"entradas": registro.bitacora(con)}
+
+
+@app.post("/api/bitacora")
+def post_bitacora(cuerpo: dict = Body(...), con=Depends(con_db)):
+    tipo = str(cuerpo.get("tipo") or "tesis")
+    if tipo not in ("tesis", "entrada", "salida", "revision", "error", "leccion"):
+        raise cartera.ErrorValidacion(["tipo: tesis, entrada, salida, revision, error o leccion"])
+    fuentes = [str(f)[:300] for f in (cuerpo.get("fuentes") or []) if str(f).startswith("https://")][:10]
+    try:
+        i = registro.registrar_decision(con, tipo, str(cuerpo.get("decision_humana") or ""), cuerpo.get("instrumento_id") or None,
+                                        str(cuerpo.get("tesis") or ""), fuentes, cuerpo.get("alerta_id"),
+                                        cuerpo.get("transaccion_id"), str(cuerpo.get("resultado") or ""))
+    except ValueError as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    return {"id": i}
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Boletas de decisión (para captura MANUAL en el portal; nunca se envían)
+@app.get("/api/boletas")
+def get_boletas(con=Depends(con_db)):
+    from . import boleta
+    return {"boletas": boleta.listar(con, AJUSTES, recalcular_vigentes=True),
+            "aviso": "Cada boleta vigente se recalculó justo ahora. Una boleta no es una orden: usted la captura en el portal."}
+
+
+@app.post("/api/boletas/generar")
+def generar_boletas(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    from . import boleta
+    clave = str((cuerpo or {}).get("propuesta") or "acciones_ajuste")
+    try:
+        return {"resultado": boleta.generar(con, AJUSTES, clave)}
+    except ValueError as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+
+
+@app.post("/api/boletas/telegram")
+def boletas_telegram(cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    """Boletas por Telegram desde la terminal. generar=true crea antes las del plan del día (reemplaza las vigentes);
+    enviar=false solo devuelve el texto (vista previa). Nada de esto envía órdenes al portal."""
+    from . import boleta
+    if cuerpo.get("generar"):
+        try:
+            boleta.generar(con, AJUSTES, boleta.PLAN_DEL_DIA)
+        except ValueError as e:
+            raise cartera.ErrorValidacion([f"No se generaron boletas: {e}"]) from None
+    lista = boleta.listar(con, AJUSTES, recalcular_vigentes=True)
+    vig = [b for b in lista if b.get("estado") == "vigente"]
+    conteo = {"listas": sum(1 for b in vig if b["tipo"] in ("considerar compra", "considerar venta") and b.get("cantidad")),
+              "condicionales": sum(1 for b in vig if b.get("referencia_condicional")),
+              "por_investigar": sum(1 for b in vig if b["tipo"] == "investigar" and not b.get("referencia_condicional"))}
+    texto = boleta.texto_telegram(lista)
+    if cuerpo.get("enviar", True) is False:
+        return {"resultado": None, "texto": texto, "conteo": conteo}
+    from . import notificador
+    cfg = {**AJUSTES["alertas"], "notificar_escritorio": False, "notificar_telegram": True, "notificar_correo": False}
+    return {"resultado": notificador.enviar("🧾 Boletas para capturar", texto, cfg, detalle=texto), "texto": texto,
+            "conteo": conteo}
+
+
+@app.post("/api/boletas/{bid}/recalcular")
+def recalcular_boleta(bid: int, con=Depends(con_db)):
+    from . import boleta
+    try:
+        return boleta.recalcular(con, AJUSTES, bid)
+    except ValueError as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+
+
+@app.post("/api/boletas/{bid}/descartar")
+def descartar_boleta(bid: int, cuerpo: dict = Body(default={}), con=Depends(con_db)):
+    from . import boleta
+    boleta.descartar(con, bid, str((cuerpo or {}).get("motivo") or ""))
+    return {"ok": True}
+
+
+@app.post("/api/boletas/{bid}/ejecutada")
+def boleta_ejecutada(bid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    """El participante declara la ejecución CONFIRMADA en el portal (folio, cantidad y precio reales)."""
+    from . import boleta
+    try:
+        tid = boleta.marcar_ejecutada(con, bid, str(cuerpo.get("folio") or ""), str(cuerpo.get("fecha") or ""),
+                                      float(cuerpo.get("cantidad") or 0), float(cuerpo.get("precio") or 0),
+                                      cuerpo.get("comision"), cuerpo.get("impuesto"))
+    except (ValueError, TypeError) as e:
+        errores = getattr(e, "errores", None) or [str(e)]
+        raise cartera.ErrorValidacion(errores) from None
+    disparar_motor()
+    return {"transaccion_id": tid}
+
+
+@app.get("/api/ranking")
+def get_ranking(mercado_filtro: str = "ambos", clase: str = "acciones", con=Depends(con_db)):
+    from . import ranking
+    if mercado_filtro not in ("ambos", "nacionales", "extranjeras"):
+        raise cartera.ErrorValidacion(["mercado_filtro: ambos, nacionales o extranjeras"])
+    if clase not in ranking.CLASES:
+        raise cartera.ErrorValidacion(["clase: acciones, etf o fondos"])
+    return ranking.calcular_cache(con, AJUSTES, mercado_filtro, clase)
+
+
+@app.get("/api/capitalizacion")
+def get_capitalizacion(con=Depends(con_db)):
+    from . import capitalizacion
+    return {**capitalizacion.guia(), "estados": dict(con.execute("SELECT estado, COUNT(*) FROM capitalizacion GROUP BY estado").fetchall())}
+
+
+@app.post("/api/capitalizacion/actualizar")
+def post_capitalizacion(con=Depends(con_db)):
+    """Acciones en circulación: SEC (emisoras de EE. UU.) y config/capitalizacion_bmv.csv (BMV)."""
+    from . import capitalizacion
+    return capitalizacion.actualizar(con, AJUSTES)
+
+
+# ---------- constructor de portafolios del usuario (Markowitz; solo simulación) ----------
+XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+def _markowitz(fn, *args):
+    from . import markowitz
+    try:
+        return fn(*args)
+    except markowitz.ErrorPortafolio as e:
+        raise cartera.ErrorValidacion([str(e)]) from None
+    except KeyError:
+        raise HTTPException(404, "Portafolio no encontrado") from None
+
+
+def _xlsx(datos: bytes, nombre: str) -> Response:
+    return Response(datos, media_type=XLSX, headers={"Content-Disposition": f'attachment; filename="{nombre}"'})
+
+
+@app.get("/api/portafolios")
+def get_portafolios(con=Depends(con_db)):
+    from . import markowitz
+    resumen = [{"id": p["id"], "nombre": p["nombre"], "actualizado_en": p["actualizado_en"], "especificacion": p["especificacion"],
+                **({k: p["resultado"].get(k) for k in ("metricas", "metodo_nombre", "objetivo_nombre", "calculado_en")}
+                   | {"n_activos": sum(1 for a in p["resultado"]["activos"] if a["peso"] >= 0.005)} if p["resultado"] else {})}
+               for p in markowitz.listar(con)]
+    return {"portafolios": resumen, "objetivos": markowitz.OBJETIVOS, "metodos": markowitz.METODOS,
+            "ventanas": markowitz.VENTANAS, "aviso": markowitz.AVISO, "tasa_libre": markowitz.tasa_libre(con, AJUSTES),
+            "covarianzas": markowitz.COVARIANZAS}
+
+
+@app.get("/api/portafolios/sugerir")
+def get_sugerir_portafolio(objetivo: str = "crecimiento", n: int = 8, mercado_filtro: str = "ambos", clase: str = "acciones",
+                           caps: str = "", con=Depends(con_db)):
+    from . import capitalizacion, markowitz, ranking
+    if mercado_filtro not in ("ambos", "nacionales", "extranjeras") or clase not in ranking.CLASES:
+        raise cartera.ErrorValidacion(["mercado_filtro o clase inválidos"])
+    lista = [c for c in caps.split(",") if c]
+    if any(c not in {k for k, *_ in capitalizacion.CATEGORIAS} for c in lista):
+        raise cartera.ErrorValidacion(["caps: mega, large, mid, small o micro"])
+    return _markowitz(markowitz.sugerir, con, AJUSTES, objetivo, n, mercado_filtro, clase, lista)
+
+
+@app.post("/api/portafolios/calcular")
+def post_calcular_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import markowitz
+    return _markowitz(markowitz.calcular, con, AJUSTES, cuerpo)
+
+
+@app.post("/api/portafolios/generar")
+def post_generar_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Generador de propuestas: especificaciones del usuario + instrumentos y consejos de la terminal (solo simula)."""
+    from . import markowitz
+    return _markowitz(markowitz.generar, con, AJUSTES, cuerpo)
+
+
+@app.post("/api/portafolios")
+def post_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import markowitz
+    return _markowitz(markowitz.guardar, con, AJUSTES, cuerpo)
+
+
+@app.get("/api/portafolios/excel")
+def get_portafolios_excel(con=Depends(con_db)):
+    from . import excel_markowitz, markowitz
+    todos = markowitz.listar(con)
+    if not todos:
+        raise cartera.ErrorValidacion(["Aún no hay portafolios guardados; descargue la plantilla o guarde uno primero."])
+    return _xlsx(_markowitz(excel_markowitz.libro, con, AJUSTES, todos), "portafolios_markowitz.xlsx")
+
+
+@app.get("/api/markowitz/plantilla.xlsx")
+def get_plantilla_markowitz():
+    from . import excel_markowitz
+    return _xlsx(excel_markowitz.plantilla(), "plantilla_markowitz.xlsx")
+
+
+@app.get("/api/portafolios/{pid}")
+def get_portafolio(pid: int, con=Depends(con_db)):
+    from . import markowitz
+    p = _markowitz(markowitz.obtener, con, pid)
+    return {"id": p["id"], **(p["resultado"] or {}), "especificacion": p["especificacion"]}
+
+
+@app.put("/api/portafolios/{pid}")
+def put_portafolio(pid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import markowitz
+    return _markowitz(markowitz.guardar, con, AJUSTES, cuerpo, pid)
+
+
+@app.delete("/api/portafolios/{pid}")
+def delete_portafolio(pid: int, con=Depends(con_db)):
+    from . import markowitz
+    if not markowitz.eliminar(con, pid):
+        raise HTTPException(404, "Portafolio no encontrado")
+    return {"eliminado": pid}
+
+
+@app.get("/api/portafolios/{pid}/excel")
+def get_portafolio_excel(pid: int, con=Depends(con_db)):
+    from . import excel_markowitz, markowitz
+    p = _markowitz(markowitz.obtener, con, pid)
+    return _xlsx(_markowitz(excel_markowitz.libro, con, AJUSTES, [p]), f"portafolio_{pid}_markowitz.xlsx")
+
+
+@app.post("/webhook/tradingview")
+async def webhook_tradingview(request: Request):
+    cuerpo = await request.body()
+    con = db.conectar()
+    try:
+        r = webhook_tv.TradingViewAlertReceiver(con, verificar_ip=bool(os.environ.get("TRADINGVIEW_VERIFICAR_IP"))).recibir(
+            cuerpo, request.client.host if request.client else None)
+    except webhook_tv.WebhookRechazado as e:
+        return JSONResponse({"error": str(e)}, status_code=e.codigo)
+    finally:
+        con.close()
+    if not r.get("duplicado"):
+        disparar_motor(False)
+    return r
+
+
+@app.post("/api/resumen/muestra")
+def muestra_resumen(con=Depends(con_db)):
+    """Envía ahora por Telegram una MUESTRA del plan del día con los datos actuales (no cuenta como el envío diario)."""
+    from . import resumen
+    perfil = servicios.perfil_actual(con, AJUSTES)
+    return resumen.enviar_muestra(con, AJUSTES, servicios.cartera_actual(con, AJUSTES),
+                                  servicios.propuestas_guardadas(con, AJUSTES, perfil))
+
+
+@app.post("/api/notificaciones/prueba")
+def probar_notificaciones():
+    """Envía un aviso de prueba por los canales configurados (escritorio, Telegram, correo)."""
+    cfg = {**AJUSTES["alertas"], "notificar_telegram": True}
+    texto = ("Si recibe este mensaje, los avisos de la terminal llegan a este canal. "
+             "Solo informativo: las órdenes se capturan a mano en el simulador del Reto.")
+    ejemplo = [{"severidad": "info", "titulo": "PRUEBA — así se ve una alerta de la terminal",
+                "motivo": "Cambio detectado: (ejemplo) Efectivo 1,000,000.00 → 912,250.00. " + texto,
+                "accion": "Nada que hacer: es una prueba de entrega.", "fuente": "prueba de canales de la terminal",
+                "ts": db.ahora()}]
+    return {"resultado": notificador.enviar("Actinver Terminal — prueba de avisos", texto, cfg,
+                                            detalle=notificador.detalle(ejemplo))}
+
+
+@app.post("/api/alertas/{aid}")
+def marcar_alerta(aid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    try:
+        alertas.marcar(con, aid, str(cuerpo.get("estado", "")))
+    except ValueError:
+        raise cartera.ErrorValidacion(["estado: vista, descartada o nueva"]) from None
+    return {"ok": True}
+
+
+@app.post("/api/simular")
+def post_simular(cuerpo: dict = Body(...), con=Depends(con_db)):
+    cambios = cuerpo.get("cambios") if isinstance(cuerpo, dict) else None
+    if not isinstance(cambios, list) or not 0 < len(cambios) <= 100:
+        raise cartera.ErrorValidacion(["cambios: lista de 1 a 100 elementos {id, monto}"])
+    limpios = []
+    for c in cambios:
+        try:
+            monto = float(c["monto"])
+            if abs(monto) > 1e10:
+                raise ValueError
+            limpios.append({"id": str(c["id"])[:40], "monto": monto})
+        except (KeyError, TypeError, ValueError):
+            raise cartera.ErrorValidacion(["cambios: cada elemento requiere id y monto numérico"]) from None
+    return servicios.simular(con, AJUSTES, limpios)
+
+
+@app.get("/api/mercado")
+def get_mercado(con=Depends(con_db)):
+    ids = [p["instrumento_id"] for p in servicios.cartera_actual(con, AJUSTES)["posiciones"]]
+    marcas = ",".join("?" * len(ids)) or "''"
+    macro = [dict(r) for r in con.execute("SELECT * FROM eventos_macro WHERE impacto IN ('High','Medium') AND "
+                                          "pais IN ('USD','MXN') ORDER BY fecha LIMIT 60")]
+    noticias = [dict(r) for r in con.execute(f"SELECT * FROM noticias WHERE instrumento_id IN ({marcas}) "  # noqa: S608
+                                             "ORDER BY publicado DESC LIMIT 60", ids)]
+    insiders = [dict(r) for r in con.execute(f"SELECT * FROM insiders WHERE instrumento_id IN ({marcas}) "  # noqa: S608
+                                             "ORDER BY fecha DESC LIMIT 60", ids)]
+    return {"macro": macro, "noticias": noticias, "insiders": insiders, "cartera": ids,
+            "fuentes": {"macro": "ForexFactory (feed de exportación)", "noticias": "Seeking Alpha (RSS)",
+                        "insiders": "SEC EDGAR Formulario 4"}}
+
+
+# Velas OHLCV, Order Flow y Option Flow: solo lectura y simulación (terminal/flujo). Sin rutas de órdenes.
+@app.get("/api/flujo/estado")
+def flujo_estado(con=Depends(con_db)):
+    from .flujo import servicio
+    return {**servicio.estado(con, AJUSTES), "catalogo": servicio.catalogo(con, AJUSTES)}
+
+
+@app.get("/api/flujo/velas")
+def flujo_velas(simbolo: str, intervalo: str = "1Day", dias: int = 180, con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        r = servicio.velas(con, AJUSTES, simbolo, intervalo, max(1, min(dias, 3650)))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    ins = mercado.instrumentos(con).get(simbolo)
+    r["grafica"] = bool(ins and simbolo_tradingview(ins))  # hay widget de TradingView para incrustar en Velas
+    return r
+
+
+@app.get("/api/flujo/libro-operaciones")
+def flujo_orderflow(simbolo: str, minutos: int = 240, niveles: int = 20, con=Depends(con_db)):
+    from .flujo import servicio
+    return servicio.orderflow(con, AJUSTES, simbolo, max(1, min(minutos, 10080)), max(1, min(niveles, 200)))
+
+
+@app.get("/api/flujo/perfiles")
+def flujo_perfiles(simbolo: str, intervalo: str = "5Min", dias: int = 7, paso_precio: float = .25, con=Depends(con_db)):
+    from datetime import UTC, datetime, timedelta
+    from .flujo import almacen, calculos, servicio, subasta
+    import math
+    if not math.isfinite(paso_precio) or not .000001 <= paso_precio <= 100000:
+        raise HTTPException(422, "Paso de precio fuera de rango")
+    if intervalo not in ("1Min", "5Min", "15Min"):
+        raise HTTPException(422, "TPO requiere barras de 1, 5 o 15 minutos")
+    desde = (datetime.now(UTC) - timedelta(days=max(1, min(dias, 30)))).isoformat()
+    barras = almacen.barras(con, simbolo, intervalo, desde, demo=AJUSTES.es_demo)
+    # Una procedencia por cálculo: no unir feeds ni importar rangos incompatibles.
+    if barras:
+        clave = (barras[-1]["fuente"], barras[-1]["feed"], barras[-1]["calidad"])
+        barras = [b for b in barras if (b["fuente"], b["feed"], b["calidad"]) == clave]
+    cripto = servicio.es_cripto(simbolo)
+    origen = servicio.origen_eeuu(con, simbolo)
+    if not cripto and not origen:
+        return {"zona_horaria": "sin configurar", "apertura": "—", "cierre": "—", "periodo_minutos": 30,
+                "sesiones": [], "procedencia": [], "intervalo": intervalo,
+                "nota": "Sin sesión de origen verificada para este símbolo; no se supone un horario para el CSV."}
+    zona = "America/Mexico_City" if cripto else "America/New_York"
+    try:
+        amt = subasta.analizar(barras, paso=paso_precio, zona=zona,
+                              apertura="00:00" if cripto else "09:30",
+                              cierre="24:00" if cripto else "16:00")
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    return {**calculos.perfil_tpo(barras, zona_horaria=zona,
+                                apertura="00:00" if cripto else "09:30",
+                                cierre="24:00" if cripto else "16:00"),
+            "procedencia": servicio._procedencia(barras), "intervalo": intervalo, "subasta": amt}
+
+
+@app.get("/api/flujo/optionflow")
+def flujo_optionflow(subyacente: str, vencimiento: str = "", tipo: str = "", strike_min: str = "", strike_max: str = "",
+                     volumen_min: str = "", oi_min: str = "", delta_abs_max: str = "", ratio_oi: str = "",
+                     percentil: str = "", vol_inusual_min: str = "", con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.optionflow(con, AJUSTES, subyacente, {k: v for k, v in locals().items()
+                                                               if k not in ("con", "subyacente", "servicio")})
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/gex")
+def flujo_gex(subyacente: str, con=Depends(con_db)):
+    from .flujo import servicio
+    return servicio.gex(con, AJUSTES, subyacente)
+
+
+VIVO_CADA_S, VIVO_EVENTOS = 2.0, 900  # ~30 min por conexión; EventSource se reconecta solo
+
+
+@app.get("/api/flujo/vela-viva")
+async def flujo_vela_viva(request: Request, simbolo: str):
+    """SSE: vela de 1 minuto en curso del flujo IEX. Solo se transmite; no se escribe ninguna vela en la base."""
+    async def eventos():
+        for _ in range(VIVO_EVENTOS):
+            if await request.is_disconnected():
+                break
+            v = FLUJO.vela_viva(simbolo) if FLUJO else None
+            dato = v or {"simbolo": simbolo, "sin_vela": True,
+                         "modo": FLUJO.resumen()["modo"] if FLUJO else "apagado"}
+            yield f"data: {json.dumps(dato)}\n\n"
+            await asyncio.sleep(VIVO_CADA_S)
+    return StreamingResponse(eventos(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
+
+
+@app.post("/api/flujo/actualizar")
+def flujo_actualizar(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.actualizar(con, AJUSTES, str(cuerpo.get("tipo", "")), str(cuerpo.get("simbolo", "")),
+                                   str(cuerpo.get("intervalo") or "1Day"), max(1, min(int(cuerpo.get("dias") or 180), 3650)),
+                                   contratos=cuerpo.get("contratos"))
+    except (ValueError, TypeError) as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/flujo/importar/{tipo}")
+async def flujo_importar(tipo: str, archivo: UploadFile = File(...), con=Depends(con_db)):
+    from .flujo import importar_csv
+    contenido = await archivo.read(importar_csv.MAX_BYTES + 1)
+    try:
+        return importar_csv.importar(con, tipo, contenido)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/flujo/heston")
+def flujo_heston(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.heston(con, AJUSTES, str(cuerpo.get("subyacente", "")))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/hftbacktest")
+def flujo_hftbacktest(simbolo: str, con=Depends(con_db)):
+    """Descarga libro y operaciones guardados en el formato de eventos de hftbacktest (.npz, llave «data»)."""
+    import io
+
+    import numpy as np
+
+    from .flujo import externos, servicio
+    if not servicio.activo(AJUSTES, "hftbacktest"):
+        raise HTTPException(409, "exportación a hftbacktest desactivada en [flujo.hftbacktest]")
+    arr, info = externos.eventos_hftbacktest(con, simbolo, demo=AJUSTES.es_demo)
+    if not len(arr):
+        raise HTTPException(404, "sin libro ni operaciones guardados para este símbolo")
+    buf = io.BytesIO()
+    np.savez_compressed(buf, data=arr)
+    nombre = "".join(ch if ch.isalnum() else "_" for ch in simbolo)
+    return Response(buf.getvalue(), media_type="application/octet-stream",
+                    headers={"Content-Disposition": f'attachment; filename="{nombre}_hftbacktest.npz"',
+                             "X-Eventos": str(info["eventos"])})
+
+
+@app.post("/api/flujo/importar-externo")
+async def flujo_importar_externo(archivo: UploadFile = File(...), simbolo: str = Form(...), mercado: str = Form(...),
+                                 intervalo: str = Form("1Day"), fuente: str = Form(...), licencia: str = Form(...),
+                                 zona: str = Form("America/Mexico_City"), con=Depends(con_db)):
+    from .flujo import externos, importar_csv, servicio
+    if not servicio.activo(AJUSTES, "externos"):
+        raise HTTPException(409, "importación de formatos externos desactivada en [flujo.externos]")
+    contenido = await archivo.read(importar_csv.MAX_BYTES + 1)
+    try:
+        return externos.importar_velas_externas(con, contenido, simbolo.strip().upper(), mercado.strip(), intervalo,
+                                                fuente.strip(), licencia.strip(), zona.strip())
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/laboratorio/permutacion")
+def laboratorio_permutacion(cuerpo: dict = Body(...)):
+    """Prueba de permutación de signos por bloques del exceso medio neto (laboratorio.py). Solo cálculo: no guarda ni opera."""
+    from . import laboratorio
+    try:
+        if cuerpo.get("csv") is not None:
+            bench, ests = laboratorio.leer_csv(str(cuerpo["csv"]))
+        else:
+            bench, ests = cuerpo.get("benchmark"), cuerpo.get("estrategias")
+        return laboratorio.permutacion(bench, ests, cuerpo.get("bloque"), cuerpo.get("B", 5000), cuerpo.get("semilla", 12345),
+                                       cuerpo.get("alpha", 0.05), cuerpo.get("hipotesis_exploradas"))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/laboratorio/preregistro")
+def laboratorio_preregistro(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import laboratorio
+    try:
+        return laboratorio.preregistrar(con, cuerpo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/laboratorio/experimentos")
+def laboratorio_experimentos(con=Depends(con_db)):
+    from . import laboratorio
+    return {"experimentos": laboratorio.experimentos(con)}
+
+
+@app.post("/api/laboratorio/experimentos/{eid}/evaluar")
+def laboratorio_evaluar(eid: int, cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Exploración + holdout de un solo uso con los parámetros preregistrados. Solo cálculo: no opera."""
+    from . import laboratorio
+    try:
+        if cuerpo.get("csv") is not None:
+            bench, ests = laboratorio.leer_csv(str(cuerpo["csv"]))
+        else:
+            bench, ests = cuerpo.get("benchmark"), cuerpo.get("estrategias")
+        return laboratorio.evaluar(con, eid, bench, ests)
+    except LookupError as e:
+        raise HTTPException(404, str(e)) from None
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/laboratorio/experimentos/{eid}/exportar")
+def laboratorio_exportar(eid: int, con=Depends(con_db)):
+    from . import laboratorio
+    try:
+        d = laboratorio.exportar(con, eid)
+    except LookupError as e:
+        raise HTTPException(404, str(e)) from None
+    return Response(json.dumps(d, ensure_ascii=False, indent=2), media_type="application/json; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="experimento_{eid}.json"'})
+
+
+@app.post("/api/flujo/skylit")
+def flujo_skylit(cuerpo: dict = Body(...)):
+    """Perfil EXPERIMENTAL del filtro de Option Flow descrito en un video (Skylit) sobre un CSV de operaciones de opciones.
+    No guarda datos, no es una regla validada ni una recomendación."""
+    from .flujo import skylit
+    try:
+        return skylit.evaluar_csv(str(cuerpo.get("csv") or ""))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/skylit")
+def flujo_skylit_guardado(subyacente: str, con=Depends(con_db)):
+    from .flujo import servicio
+    try:
+        return servicio.skylit_guardado(con, AJUSTES, subyacente)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/flujo/skylit/plantilla")
+def flujo_skylit_plantilla():
+    from .flujo import skylit
+    return PlainTextResponse(skylit.plantilla(), media_type="text/csv; charset=utf-8",
+                             headers={"Content-Disposition": 'attachment; filename="plantilla_skylit.csv"'})
+
+
+@app.get("/api/investigacion/tsm")
+def tsm_listar(con=Depends(con_db)):
+    """Investigación educativa de momentum mensual (tsm_mensual.py): separada de la estrategia activa; no opera."""
+    from . import tsm_mensual
+    return {"experimentos": tsm_mensual.experimentos(con), "mercados_defecto": tsm_mensual.MERCADOS_DEFECTO,
+            "lookbacks": list(tsm_mensual.LOOKBACKS), "pendientes_del_autor": tsm_mensual.PENDIENTES_DEL_AUTOR,
+            "version": tsm_mensual.VERSION}
+
+
+@app.post("/api/investigacion/tsm/preregistro")
+def tsm_preregistro(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import tsm_mensual
+    try:
+        return tsm_mensual.preregistrar(con, cuerpo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/investigacion/tsm/{eid}/evaluar")
+def tsm_evaluar(eid: int, con=Depends(con_db)):
+    from . import tsm_mensual
+    if AJUSTES.es_demo:
+        raise HTTPException(409, "la historia externa es real: no se usa en modo demo")
+    try:
+        return tsm_mensual.evaluar(con, eid, tsm_mensual.historia())
+    except LookupError as e:
+        raise HTTPException(404, str(e)) from None
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/investigacion/anomalias")
+def anomalias_volumen(simbolo: str, intervalo: str = "1Day", ventana: int = 20, umbral: float = 2.0, h: int = 1,
+                      con=Depends(con_db)):
+    """Anomalías de volumen propias sobre barras CERRADAS guardadas (anomalias.py). Descriptivo; no es señal."""
+    from . import anomalias
+    from .flujo import almacen, contratos
+    if intervalo not in contratos.INTERVALOS:
+        raise HTTPException(422, "intervalo inválido")
+    bs = almacen.barras(con, simbolo.strip().upper(), intervalo, demo=AJUSTES.es_demo)
+    if not bs:
+        raise HTTPException(404, "sin barras guardadas para ese símbolo e intervalo")
+    from datetime import UTC, datetime, timedelta
+    ahora = datetime.now(UTC)
+    for b in bs:   # una barra cuyo intervalo no terminó no está cerrada
+        b["cerrada"] = datetime.fromisoformat(b["inicio"]) + timedelta(seconds=contratos.INTERVALOS[intervalo]) <= ahora
+    try:
+        return {**anomalias.evaluar(bs, ventana, umbral, h), "procedencia": {k: bs[-1].get(k) for k in ("fuente", "feed", "calidad", "retraso_s")}}
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+_ASISTENTE: dict = {}
+
+
+@app.post("/api/asistente")
+def asistente_preguntar(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Asistente dentro de la terminal (asistente.py): datos, documentación y notas del usuario. No opera ni asesora."""
+    from . import asistente, bot_telegram
+    if "chatbot" not in _ASISTENTE:
+        _ASISTENTE["chatbot"] = bot_telegram.Chatbot(AJUSTES)
+    try:
+        return asistente.responder(con, AJUSTES, str((cuerpo or {}).get("texto", "")), _ASISTENTE["chatbot"])
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/asistente/notas")
+def asistente_notas(con=Depends(con_db)):
+    from . import asistente
+    return {"notas": asistente.notas(con)}
+
+
+# Etapa 3: riesgo, seguimiento, comparación y backtesting (solo análisis y simulación).
+@app.get("/api/riesgo")
+def get_riesgo(ventana: int = 252, horizonte: int | None = None, con=Depends(con_db)):
+    from . import riesgo
+    return riesgo.calcular(con, AJUSTES, max(60, min(ventana, 1260)), horizonte if horizonte and 1 <= horizonte <= 252 else None)
+
+
+@app.get("/api/lista-seguimiento")
+def get_lista_seguimiento(con=Depends(con_db)):
+    from . import seguimiento
+    return seguimiento.lista(con, AJUSTES)
+
+
+# Paneles nativos de la Mesa: solo lectura de lo guardado (terminal/mesa_datos.py); ninguna consulta a proveedores.
+@app.get("/api/mesa/noticias")
+def mesa_noticias(simbolo: str = "", limite: int = 40, con=Depends(con_db)):
+    from . import mesa_datos
+    if simbolo and not re.fullmatch(r"[A-Z]{2,5}:[A-Z0-9.&*\- ]{1,30}", simbolo):
+        raise HTTPException(422, "símbolo inválido")
+    return mesa_datos.noticias(con, simbolo, limite)
+
+
+@app.get("/api/mesa/macro")
+def mesa_macro(con=Depends(con_db)):
+    from . import mesa_datos
+    return mesa_datos.macro(con, AJUSTES)
+
+
+@app.get("/api/mesa/resumen")
+def mesa_resumen(con=Depends(con_db)):
+    from . import mesa_datos
+    ins = mercado.instrumentos(con)
+    cot, _ = cotizaciones_estado(con, [i for i, v in ins.items() if v["estado"] == "activo"])
+    return mesa_datos.resumen(con, AJUSTES, cot=cot)
+
+
+@app.get("/api/mesa/resultados")
+def mesa_resultados():
+    from . import mesa_datos
+    return mesa_datos.CONTRATO_RESULTADOS
+
+
+@app.post("/api/lista-seguimiento")
+def post_lista_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import seguimiento
+    try:
+        if cuerpo.get("quitar"):
+            seguimiento.quitar(con, str(cuerpo.get("id", "")))
+        else:
+            seguimiento.agregar(con, str(cuerpo.get("id", "")), str(cuerpo.get("nota") or ""))
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    return seguimiento.lista(con, AJUSTES)
+
+
+@app.get("/api/comparar")
+def get_comparar(ids: str, ventana: int = 252, referencia: str = "BMV:NAFTRAC", con=Depends(con_db)):
+    from . import seguimiento
+    try:
+        return seguimiento.comparar(con, AJUSTES, [x.strip() for x in ids.split(",")], max(30, min(ventana, 1260)), referencia)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/ficha/{iid}")
+def get_ficha(iid: str, con=Depends(con_db)):
+    from . import seguimiento
+    try:
+        return seguimiento.ficha(con, AJUSTES, iid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+
+
+@app.get("/api/backtests")
+def get_backtests(con=Depends(con_db)):
+    from . import backtest
+    return {"estrategias": backtest.ESTRATEGIAS, "limites": backtest.LIMITES, "historial": backtest.historial(con)}
+
+
+@app.post("/api/backtests")
+def post_backtest(cuerpo: dict = Body(...), con=Depends(con_db)):
+    from . import backtest
+    try:
+        ids = cuerpo.get("ids") or []
+        if not isinstance(ids, list):
+            raise ValueError("ids debe ser una lista")
+        return backtest.ejecutar(con, AJUSTES, [str(x) for x in ids], str(cuerpo.get("estrategia", "")),
+                                 cuerpo.get("parametros") or {}, cuerpo.get("desde") or None, cuerpo.get("hasta") or None,
+                                 float(cuerpo.get("deslizamiento_pb", 5)))
+    except (ValueError, TypeError) as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.get("/api/backtests/{bid}")
+def get_backtest(bid: int, con=Depends(con_db)):
+    from . import backtest
+    try:
+        return backtest.obtener(con, bid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+
+
+@app.get("/api/backtests/{bid}/exportar")
+def exportar_backtest(bid: int, con=Depends(con_db)):
+    from . import backtest
+    try:
+        contenido = backtest.exportar_csv(con, bid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+    return PlainTextResponse(contenido, media_type="text/csv",
+                             headers={"Content-Disposition": f'attachment; filename="backtest-{bid}.csv"'})
+
+
+@app.get("/api/flujo/plantilla/{tipo}")
+def flujo_plantilla(tipo: str):
+    from .flujo import importar_csv
+    if tipo not in importar_csv.COLUMNAS:
+        raise HTTPException(404, "plantilla desconocida")
+    return PlainTextResponse(importar_csv.plantilla(tipo), media_type="text/csv",
+                             headers={"Content-Disposition": f'attachment; filename="plantilla-{tipo}.csv"'})
+
+
+@app.get("/api/visualizaciones/mercado")
+def mapa_mercado(ventana: int = 1, con=Depends(con_db)):
+    from . import visualizaciones
+    try:
+        datos = visualizaciones.mapa(con, AJUSTES, ventana)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    ins = mercado.instrumentos(con)
+    for celda in datos["celdas"]:
+        celda["grafica"] = bool(simbolo_tradingview(ins.get(celda["id"])))
+    return datos
+
+
+@app.get("/api/visualizaciones/serie/{iid}")
+def serie_mercado(iid: str, con=Depends(con_db)):
+    from . import visualizaciones
+    try:
+        return visualizaciones.serie(con, AJUSTES, iid)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from None
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Gráfica: widget oficial de TradingView en una página aislada con su propia CSP
+BOLSA_TV = {"NASDAQ": "NASDAQ", "NYSE": "NYSE", "NYSE Arca": "AMEX", "NYSE American": "AMEX", "Cboe BZX": "CBOE",
+            "BMV": "BMV"}
+
+
+def simbolo_tradingview(ins: dict) -> str | None:
+    if ins.get("clase", "").startswith("fondo") or ins.get("estado") not in ("activo",):
+        return None
+    if ins.get("mercado_operable") == "BMV":
+        return f"BMV:{ins['clave'].replace('&', '')}{(ins.get('serie') or '').replace('*', '').replace(' ', '')}"
+    pref = BOLSA_TV.get(ins.get("bolsa_referencia") or "")
+    return f"{pref}:{ins['listado_referencia']}" if pref and ins.get("listado_referencia") else None
+
+
+CSP_GRAFICA = ("default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; "
+               "frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; "
+               "img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'")
+INTERVALOS_TV = {"1", "5", "15", "60", "D"}  # minutos de TradingView; «D» = diario
+TEMAS_TV = {"dark", "light"}  # el navegador pide el mismo modo claro/oscuro que usa la terminal
+LOGO_SVG = ('<svg class="marca__logo" aria-hidden="true" width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" '
+            'rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg>')
+
+
+def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "") -> str:
+    """Página aislada para un widget de TradingView, con el logo y los colores de la terminal."""
+    clase = ("tema-claro" if tema == "light" else "tema-oscuro") + ("" if cabecera else " sin-cabecera")
+    barra = (f'<header><a class="marca" href="/" target="_top">{LOGO_SVG}<span>Actinver Terminal</span></a> {cabecera}</header>'
+             if cabecera else "")
+    return f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>{html.escape(titulo)} · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/grafica.css"></head><body class="{clase}">
+{barra}
+{cuerpo}
+</body></html>"""
+
+
+@app.get("/grafica/{iid}", response_class=HTMLResponse)
+def grafica(iid: str, intervalo: str = "D", tema: str = "dark", con=Depends(con_db)):
+    ins = mercado.instrumentos(con).get(iid)
+    sim = simbolo_tradingview(ins) if ins else None
+    if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
+        raise HTTPException(404, "Instrumento sin gráfica disponible")
+    if intervalo not in INTERVALOS_TV or tema not in TEMAS_TV:
+        raise HTTPException(422, "intervalo o tema inválido")
+    cfg = json.dumps({"autosize": True, "symbol": sim, "interval": intervalo, "timezone": "America/Mexico_City",
+                      "theme": tema, "style": "1", "locale": "es", "allow_symbol_change": False,
+                      "support_host": "https://www.tradingview.com"})
+    cuerpo = f"""<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{cfg}</script></div>"""
+    pagina = _pagina_tv(f"Gráfica {sim}", tema, cuerpo,
+                        f"· <strong>{html.escape(ins['clave_operable'])}</strong> · {html.escape(sim)} · Widget de TradingView "
+                        "(datos y retraso según TradingView; pueden diferir del simulador).")
+    # Se incrusta en la pestaña Velas: solo el mismo origen puede enmarcarla.
+    return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
+
+
+# Widgets gratuitos de TradingView (sin cuenta). Solo muestran: nada de lo que dibujan entra en cálculos ni se guarda.
+# Cada tipo: (script de TradingView, ¿necesita símbolo?). La configuración se arma aquí con valores de listas cerradas.
+WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", False), "mapa": ("stock-heatmap", False),
+              "calendario": ("events", False), "filtro": ("screener", False), "noticias": ("timeline", False),
+              "info": ("symbol-info", True), "panorama": ("symbol-overview", True), "perfil": ("symbol-profile", True),
+              "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
+              "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
+              "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
+              "cinta-macro": ("ticker-tape", False), "macro": ("market-quotes", False)}
+MAPAS_TV = {"NASDAQ100", "SPX500"}
+FILTROS_TV = {"america", "mexico", "forex"}
+BASE_TV = {"isTransparent": True, "locale": "es", "width": "100%", "height": "100%"}  # transparente: toma el fondo de grafica.css
+DIVISAS_TV = ["USD", "MXN", "EUR", "JPY", "GBP", "CAD", "CNY"]
+
+
+def _simbolos_cartera(con) -> list[str]:
+    """Símbolos de TradingView de las posiciones de la última captura del portal (para la cinta)."""
+    from . import portal
+    cid = portal.ultima_captura_id()
+    ins = mercado.instrumentos(con)
+    ids = [r[0] for r in con.execute("SELECT instrumento_id FROM posiciones_portal WHERE captura_id=?", (cid,))] if cid else []
+    # Sin BMV: los widgets gratuitos muestran error con sus símbolos (comprobado el 25-oct-2026).
+    return [s for s in (simbolo_tradingview(ins[i]) for i in ids if i in ins) if s and not s.startswith("BMV:")]
+
+
+def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> dict:
+    if tipo == "cotizaciones":
+        grupo = lambda t, ss: {"name": t, "symbols": [{"name": s, "displayName": d} for s, d in ss]}  # noqa: E731
+        return {**BASE_TV, "showSymbolLogo": True, "symbolsGroups": [
+            grupo("Índices", [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"), ("FOREXCOM:DJI", "Dow Jones"),
+                              ("INDEX:NKY", "Nikkei 225"), ("INDEX:DEU40", "DAX")]),
+            grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso"), ("FX_IDC:EURMXN", "Euro / peso"), ("FX:EURUSD", "Euro / dólar")]),
+            grupo("Bonos de EE. UU. (ETF, precio)", [("NASDAQ:SHY", "SHY · Tesoro 1–3 años"), ("NASDAQ:IEF", "IEF · Tesoro 7–10 años"), ("NASDAQ:TLT", "TLT · Tesoro 20+ años")]),
+            grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:USOIL", "Petróleo WTI"), ("TVC:SILVER", "Plata")])]}
+    if tipo == "macro":
+        grupo = lambda t, ss: {"name": t, "symbols": [{"name": s, "displayName": d} for s, d in ss]}  # noqa: E731
+        return {**BASE_TV, "showSymbolLogo": True, "symbolsGroups": [
+            grupo("Tasas de EE. UU. (FRED, cierre diario o mensual)", [("FRED:DGS2", "Bono 2 años %"), ("FRED:DGS10", "Bono 10 años %"),
+                                     ("FRED:DGS30", "Bono 30 años %"), ("FRED:FEDFUNDS", "Fondos federales % (mensual)")]),
+            grupo("Volatilidad y dólar", [("CAPITALCOM:VIX", "VIX · volatilidad S&P 500"), ("CAPITALCOM:DXY", "Índice dólar (DXY)"),
+                                          ("FX_IDC:USDMXN", "Dólar / peso")]),
+            grupo("Energía", [("TVC:USOIL", "Petróleo WTI"), ("TVC:UKOIL", "Petróleo Brent"), ("CAPITALCOM:NATURALGAS", "Gas natural")]),
+            grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")])]}
+    if tipo == "cinta-macro":
+        return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
+            {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),
+                                                    ("FOREXCOM:DJI", "Dow Jones"), ("CAPITALCOM:VIX", "VIX"), ("FRED:DGS10", "Bono EE. UU. 10a %"),
+                                                    ("CAPITALCOM:DXY", "Dólar DXY"), ("FX_IDC:USDMXN", "USD/MXN"), ("FX_IDC:EURMXN", "EUR/MXN"),
+                                                    ("TVC:GOLD", "Oro"), ("TVC:USOIL", "WTI")]]}
+    if tipo == "destacados":
+        return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}
+    if tipo == "mapa-etf":
+        return {**BASE_TV, "dataSource": "AllUSEtf", "blockSize": "aum", "blockColor": "change", "grouping": "asset_class",
+                "hasTopBar": False, "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
+    if tipo in ("divisas", "mapa-divisas"):
+        return {**BASE_TV, "currencies": DIVISAS_TV}
+    if tipo == "cinta":
+        sims = _simbolos_cartera(con) or ["NASDAQ:NDX"]
+        return {**BASE_TV, "symbols": [{"proName": s, "title": s.split(":")[1]} for s in sims], "showSymbolLogo": True,
+                "displayMode": "adaptive"}
+    if tipo == "resumen":
+        grupo = lambda t, ss: {"title": t, "symbols": [{"s": s, "d": d} for s, d in ss]}  # noqa: E731
+        return {**BASE_TV, "dateRange": "1D", "showChart": True, "showSymbolLogo": True, "tabs": [
+            grupo("Índices", [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"), ("FOREXCOM:DJI", "Dow Jones")]),
+            grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso")]),
+            grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("TVC:USOIL", "Petróleo WTI")])]}
+    if tipo == "mapa":
+        return {**BASE_TV, "dataSource": mapa, "grouping": "sector", "blockSize": "market_cap_basic", "blockColor": "change",
+                "hasTopBar": False, "isZoomEnabled": True, "hasSymbolTooltip": True, "symbolUrl": ""}
+    if tipo == "calendario":
+        return {**BASE_TV, "importanceFilter": "0,1", "countryFilter": "us,mx"}
+    if tipo == "filtro":
+        return {**BASE_TV, "market": filtro, "defaultColumn": "overview", "defaultScreen": "most_capitalized", "showToolbar": True}
+    if tipo == "noticias":
+        return {**BASE_TV, "feedMode": "market", "market": "stock", "displayMode": "regular"}
+    if tipo == "noticias-emisora":
+        return {**BASE_TV, "feedMode": "symbol", "symbol": sim, "displayMode": "regular"}
+    if tipo == "panorama":
+        return {**BASE_TV, "symbols": [[sim.split(":")[1], f"{sim}|1D"]], "chartOnly": False, "autosize": True}
+    if tipo == "tecnico":
+        return {**BASE_TV, "symbol": sim, "interval": "1D", "showIntervalTabs": True, "displayMode": "single"}
+    return {**BASE_TV, "symbol": sim}  # info, perfil, finanzas
+
+
+@app.get("/widget/{tipo}", response_class=HTMLResponse)
+def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", filtro: str = "america", tema: str = "dark",
+                       con=Depends(con_db)):
+    if tipo not in WIDGETS_TV or mapa not in MAPAS_TV or filtro not in FILTROS_TV or tema not in TEMAS_TV:
+        raise HTTPException(422, "widget inválido")
+    script, con_simbolo = WIDGETS_TV[tipo]
+    sim = None
+    if con_simbolo:
+        ins = mercado.instrumentos(con).get(simbolo)
+        sim = simbolo_tradingview(ins) if ins else None
+        if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
+            raise HTTPException(404, "Instrumento sin widget disponible")
+    # `</` se escapa para que ningún valor cierre la etiqueta <script> donde va la configuración.
+    config = {**_config_widget(tipo, sim, con, mapa, filtro), "colorTheme": tema}
+    cfg = json.dumps(config, ensure_ascii=False).replace("</", "<\\/")
+    pagina = _pagina_tv("Widget de TradingView", tema, f"""<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">Datos de TradingView</a></div>
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-{script}.js" async>{cfg}</script></div>""")
+    return HTMLResponse(pagina, headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Interfaz
+@app.get("/", response_class=HTMLResponse)
+def index():
+    demo = AJUSTES.es_demo  # se decide en el servidor para que la cabecera no se desplace al cargar
+    reemplazos = {"__CSRF__": TOKEN_CSRF, "__OCULTO_DEMO__": "" if demo else "hidden",
+                  "__DESTINO__": "real" if demo else "demo", "__CLASE_MODO__": "boton--real" if demo else "",
+                  "__TEXTO_MODO__": "Usar datos reales y vigentes" if demo else "Ver demostración"}
+    pagina = (WEB / "index.html").read_text(encoding="utf-8")
+    for k, v in reemplazos.items():
+        pagina = pagina.replace(k, v)
+    return HTMLResponse(pagina)
+
+
+@app.get("/salud")
+def salud():
+    return {"ok": True}
+
+
+@app.get("/robots.txt", response_class=PlainTextResponse)
+def robots():
+    return "User-agent: *\nDisallow: /\n"  # herramienta privada: nada debe indexarse
+
+
+app.mount("/static", StaticFiles(directory=WEB / "static"), name="static")
+
+
+@app.exception_handler(404)
+async def no_encontrado(request: Request, _):
+    if request.url.path.startswith("/api/"):
+        return JSONResponse({"error": "Ruta no encontrada"}, status_code=404)
+    return HTMLResponse((WEB / "404.html").read_text(encoding="utf-8"), status_code=404)
+
+# Centro de investigación: APIs oficiales y registros manuales, aislados del motor de propuestas.
+@app.get("/api/centro-investigacion")
+def get_centro_investigacion(simbolo: str = "", con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    try:
+        return centro.resumen(con, AJUSTES, simbolo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+
+
+@app.post("/api/centro-investigacion/actualizar")
+def actualizar_centro_investigacion(con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        return centro.actualizar(con, AJUSTES)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    finally:
+        servicios.bloqueo.release()
+
+
+@app.post("/api/centro-investigacion/importar")
+async def importar_centro_investigacion(archivo: UploadFile = File(...), con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    if AJUSTES.es_demo:
+        raise HTTPException(409, "Cambie a modo real para importar investigación")
+    contenido = await archivo.read(centro.MAX_CSV + 1)
+    if not servicios.bloqueo.acquire(blocking=False):
+        raise _ocupado()
+    try:
+        return centro.importar_csv(con, contenido)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    finally:
+        servicios.bloqueo.release()
+
+
+@app.get("/api/centro-investigacion/plantilla")
+def plantilla_centro_investigacion():
+    from . import centro_investigacion as centro
+    return PlainTextResponse(centro.plantilla(), media_type="text/csv",
+                             headers={"Content-Disposition": 'attachment; filename="investigacion-plantilla.csv"'})
+
+
+@app.get("/api/centro-investigacion/exportar")
+def exportar_centro_investigacion(simbolo: str = "", con=Depends(con_db)):
+    from . import centro_investigacion as centro
+    try:
+        contenido = centro.exportar(con, simbolo)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from None
+    return PlainTextResponse(contenido, media_type="text/csv",
+                             headers={"Content-Disposition": 'attachment; filename="investigacion.csv"'})

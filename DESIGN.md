@@ -34,6 +34,13 @@ pérdida = color + signo «−» + ▼; error y antigüedad = chip con texto («
 siempre lleva «+» y ▲ en verde: la paleta roja no la convierte en pérdida. Los enlaces son blancos con subrayado rojo
 (no rojos) para no competir con las pérdidas.
 
+**Mapas de calor: verde, rojo y gris.** Verde = positivo o mejor, rojo = negativo o peor, gris = neutro (±0.25 % en
+Mercado; |t| < 0.05 en escalas normalizadas) o sin dato. Una sola función (`colorCalor` en `app.js`) para Robustez,
+volatilidad implícita (alta en rojo), GEX y correlaciones (rojo: se mueven juntos); el texto conserva signo y cifra.
+Los mapas de calor de TradingView usan su propia escala rojo/verde con gris en el cero.
+
+**Sin cripto.** Retirado de la interfaz el 1-nov-2026: widgets, cotizaciones, cinta, panel de Mesa y selectores.
+
 ## Tokens
 
 Centralizados en `web/static/app.css` (`:root`, oscuro en `prefers-color-scheme: dark` y `[data-theme="dark"]`).
@@ -59,13 +66,17 @@ Rechazado tras medir: `#d94848` como texto sobre superficie (4.36) y elevada (3.
 
 - **Estados de dato:** `--vigente`, `--retrasado`, `--vencido`, `--sin-datos`, `--sintetico` siguen distintos entre sí
   y del acento; FUTURO conserva el violeta y el borde discontinuo.
-- **Widgets de terceros (TradingView):** solo admiten `colorTheme` claro/oscuro e `isTransparent`. La terminal pide
+- **Widgets de terceros (TradingView):** siempre en tema oscuro (negro), en cualquier modo de la terminal. Nunca se
+  cortan: `navegacion.mjs` mide el contenido de cada marco `/widget` o `/grafica` (mismo origen) y lo agranda hasta
+  mostrarlo completo (tope 2000 px); el rótulo del proveedor cabe en sus 32 px. Solo admiten `colorTheme` e `isTransparent`. La terminal pide
   transparencia para que tomen el fondo de `grafica.css`; sus colores internos (velas, textos, logos) los decide el
   proveedor y **no** se pueden recolorear desde Actinver.
 - **Excel de Markowitz:** banda negra con título blanco y borde rojo, encabezados gris oscuro con texto blanco, cuerpo
   blanco (imprime legible). Entrada = relleno muy claro + **borde rojo punteado**; resultado = gris + **negritas + doble
   línea**: se distinguen por forma, no solo por color. Sin macros ni vínculos externos.
-- **Tipografía:** interfaz con Segoe UI y cifras con Consolas (`--mono`); sin fuentes externas.
+- **Tipografía:** una sola familia en toda la terminal, Mesa, Oficina, Cuaderno, páginas de widgets y Excel: Segoe UI (con
+  respaldo del sistema). `--mono` apunta a la misma familia; las cifras se alinean con `font-variant-numeric: tabular-nums`.
+  Sin fuentes externas. Excepción: el texto DENTRO de los widgets de TradingView usa la fuente del proveedor.
 - **Cuadrícula:** gutter de 16 px; tres cortes: ≤ 720 px, 721–1024 px y > 1024 px.
 
 ## Componentes

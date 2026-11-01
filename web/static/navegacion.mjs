@@ -16,9 +16,25 @@ if(typeof document!=='undefined') {
   marcar();setInterval(marcar,30000);
   nav.querySelector('.nav-global__interior')?.append(reloj);
   const cinta=document.createElement('iframe');cinta.className='cinta-global';cinta.loading='lazy';
-  cinta.title='Cinta de indicadores: índices, VIX, bono a 10 años, dólar, oro, petróleo y bitcoin (TradingView, con retraso)';
-  cinta.src=`/widget/cinta-macro?tema=${matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}`;
+  cinta.title='Cinta de indicadores: índices, VIX, bono a 10 años, dólar, oro y petróleo (TradingView, con retraso)';
+  cinta.src='/widget/cinta-macro?tema=dark';
   nav.after(cinta);
+  // Ningún widget cortado: los marcos /widget y /grafica son del mismo origen, así que se mide su contenido real y el
+  // marco crece hasta mostrarlo completo (nunca baja de su alto configurado). El contenido de TradingView vive en un
+  // iframe interno de otro origen: aquí solo se ajusta el contenedor.
+  const ajustar=(f)=>{
+    const doc=f.contentDocument;if(!doc?.documentElement)return;
+    // Se compara con el alto INTERIOR (clientHeight): el borde del marco no cuenta, así no hay bucle de crecimiento.
+    const minimo=Number(f.dataset.altoMin||(f.dataset.altoMin=String(f.clientHeight||0)));
+    const medir=()=>{const contenido=Math.max(doc.documentElement.scrollHeight,doc.body?.scrollHeight||0);
+      if(contenido>f.clientHeight&&contenido>minimo){const borde=f.offsetHeight-f.clientHeight;f.style.height=`${Math.min(2000,Math.ceil(contenido+borde))}px`;}};  // tope: nunca crece sin límite
+    medir();try{new ResizeObserver(medir).observe(doc.documentElement);if(doc.body)new ResizeObserver(medir).observe(doc.body);}catch{/* sin ResizeObserver: queda el alto medido */}
+    doc.querySelectorAll('iframe').forEach(i=>new ResizeObserver(medir).observe(i));
+    new MutationObserver(()=>{doc.querySelectorAll('iframe').forEach(i=>{if(!i.dataset.observado){i.dataset.observado='1';new ResizeObserver(medir).observe(i);}});medir();}).observe(doc.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['style','height']});
+  };
+  const vigilar=(f)=>{if(f.dataset.ajuste||!/^\/(widget|grafica)\//.test(new URL(f.src||'about:blank',location.href).pathname))return;f.dataset.ajuste='1';f.addEventListener('load',()=>ajustar(f));if(f.contentDocument?.readyState==='complete')ajustar(f);};
+  document.querySelectorAll('iframe').forEach(vigilar);
+  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==='IFRAME')vigilar(n);else n.querySelectorAll?.('iframe').forEach(vigilar);}))).observe(document.body,{childList:true,subtree:true});
   function actualizar() {
     const tab=document.querySelector('[role="tab"][aria-selected="true"]');
     const actual=location.pathname==='/' ? '/?vista='+(tab?.id || new URLSearchParams(location.search).get('vista') || 'tab-resumen') : location.pathname;

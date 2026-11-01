@@ -64,4 +64,8 @@ def test_sin_credencial_no_se_activa_claude(ajustes, monkeypatch, tmp_path):
     monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
     assert not bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "local"
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-prueba")
-    assert bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "claude"
+    # Con credencial pero SIN aprobación del cobro, no se usa Claude (cobra por uso): ningún cargo sin aprobar.
+    monkeypatch.setattr(bt, "costo_aprobado", lambda s: False)
+    assert bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "local"
+    monkeypatch.setattr(bt, "costo_aprobado", lambda s: s == "claude_api")
+    assert bt.Chatbot(ajustes).motor() == "claude"

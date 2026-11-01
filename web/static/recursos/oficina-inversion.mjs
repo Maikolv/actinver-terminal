@@ -35,7 +35,7 @@ export function instrumentosDelCatalogo(universo = {}, flujo = {}) {
   for (const i of universo.instrumentos || []) {
     if (i.estado !== 'inactivo') agregar(i.id, `${i.clave_operable || i.id} — ${i.nombre || i.id}`, 'Catálogo de la terminal');
   }
-  for (const i of [...(flujo.sic || []), ...(flujo.cripto || [])]) agregar(i.id, i.clave || i.id, 'Otros instrumentos de flujo');
+  for (const i of flujo.sic || []) agregar(i.id, i.clave || i.id, 'Otros instrumentos de flujo');
   for (const id of flujo.con_datos || []) {
     agregar(id, id, 'Símbolos importados');
     if (filas.has(id)) filas.get(id).conDatos = true;

@@ -1,4 +1,4 @@
-// Auditoría del catálogo de la Mesa: lo que la documentación promete (23 tipos = 16 externos + 6 accesos + 1 calculadora)
+// Auditoría del catálogo de la Mesa: lo que la documentación promete (22 tipos = 15 externos + 6 accesos + 1 calculadora; cripto retirado el 1-nov)
 // debe coincidir con el código, con las pestañas reales de index.html y con los widgets que sirve terminal/app.py.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,11 +13,11 @@ const pestanas = new Set([...html.matchAll(/<button[^>]*role="tab"[^>]*id="([^"]
 const widgetsServidor = new Set([...app.slice(app.indexOf('WIDGETS_TV = {'), app.indexOf('MAPAS_TV'))
   .matchAll(/"([a-z-]+)":\s*\("/g)].map(m => m[1]));
 
-test('23 tipos: 16 externos, 6 accesos y la calculadora manual', () => {
+test('22 tipos: 15 externos, 6 accesos y la calculadora manual', () => {
   const por = t => CATALOGO.filter(c => c[2] === t);
   const externos = CATALOGO.filter(c => !['link', 'risk'].includes(c[2]));
-  assert.equal(CATALOGO.length, 23);
-  assert.equal(externos.length, 16);
+  assert.equal(CATALOGO.length, 22);
+  assert.equal(externos.length, 15);
   assert.equal(por('link').length, 6);
   assert.equal(por('risk').length, 1);
 });

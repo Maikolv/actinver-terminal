@@ -167,3 +167,23 @@ otros campos del filtro. Una cadena actual o una vela no reconstruyen esos datos
 permanente que complete todos los campos de Skylit. No se verificó una licencia gratuita de automatización o redistribución que amplíe los accesos descritos; las muestras y los créditos no equivalen a esa licencia. Se conserva el filtro parcial con faltantes visibles, como
 indicó el usuario. Contratos Paper puede aportar OI y multiplicador, sin eliminar otros faltantes ni realizar
 transacciones reales. Esta revisión no demuestra que no exista solución en ningún otro proveedor.
+
+## 9. Mesa: brechas F1–F6 (1-nov-2026)
+
+Implementación y evidencia: `docs/proveedores-mesa-20261101.md` y
+`docs/proveedores-20261101-evidencia/`. Pruebas HTTP simuladas no acreditan acceso real al plan.
+No se leyó `.env`. No había credenciales ni identificación SEC en las variables permitidas.
+Los tres conectores nuevos están **apagados por defecto**; SIN DATO cuando falta evidencia.
+
+| ID | API oficial y dato | Estado y autenticación | Cupo y disponibilidad | Límites y pendientes |
+|---|---|---|---|---|
+| F2 | [FRED DGS30](https://fred.stlouisfed.org/series/DGS30), [API](https://fred.stlouisfed.org/docs/api/fred/series_observations.html): Treasury 30 años, diario, porcentaje | DGS30 añadido junto a DGS2/DGS10; FRED_API_KEY existente. Identidad documentada oficialmente; descarga autenticada no comprobada | Cinco solicitudes por ciclo, antes cuatro; conserva cupo local existente. Publicación diaria, no cotización intradía | Conocimiento desde descarga, periodo y huella; no presume licencia de redistribución |
+| F3 | [Banxico SIE](https://www.banxico.org.mx/SieAPIRest/service/v1/): tasa objetivo | SF61745 citado en documentación oficial; **no confirmado por GET de metadatos**: HTTP 400 sin token. BANXICO_TOKEN, cabecera Bmx-Token | Política local, no cuota oficial acreditada: 20/día y 8/min; catálogo y datos, una petición cada uno; sin reintentos, Retry-After persistente | Verifica título/identidad antes de pedir datos. Disponible desde descarga, nunca desde periodo histórico; apagado |
+| F6 | [Banxico SIE](https://www.banxico.org.mx/SieAPIRest/service/v1/): bono M 10 años | Mismo conector/credencial que F3; **ID no confirmado**, no adivinado | Comparte cupos de F3; publicación histórica, no rendimiento vigente | Exige título bono M/tasa fija y 10 años; rechaza UDIBONOS u otro plazo. Falta catálogo y GET oficial; SIN DATO |
+| F4 | [Banxico SIE](https://www.banxico.org.mx/SieAPIRest/service/v1/): INPC, índice mensual | Ruta optativa con BANXICO_TOKEN; **ID no confirmado**. SP1 dio HTTP 400 sin token; no se configura. No requiere credencial nueva INEGI | Comparte cupos de F3; periodo mensual separado del conocimiento | Exige título completo del índice; variación no sustituye nivel. Apagado hasta identificar serie en catálogo y confirmar por API; no se solicita token |
+| F1a | [SEC submissions](https://www.sec.gov/search-filings/edgar-application-programming-interfaces): publicación de 8-K/8-K-A Item 2.02 | Reutiliza ClienteSEC y SEC_USER_AGENT, identificación con contacto, no clave API. Verifica símbolo/CIK en respuesta | Cliente existente 5/s; política local adicional 5/min y 20/día; una consulta/CIK. Cero consultas reales por faltar identificación | Aceptación EDGAR no prueba hora del anuncio ni BPA. SIN DATO en campos no estructurados; reacción exige anuncio verificado; apagado |
+| F1b | [Alpha Vantage EARNINGS_CALENDAR](https://www.alphavantage.co/documentation/#earnings-calendar): fecha prevista, estimación BPA y moneda | ALPHAVANTAGE_API_KEY; apagado, plan_verificado=false. **Cero consultas reales**; inclusión en plan gratuito no acreditada | Techo local 25/día compartido con alpha_vantage; calendario 1/min, CSV de 3 meses, actualización diaria | Guarda conocimiento y todas las revisiones; excluye previsión posterior al anuncio. No entrega por sí solo BPA realizado/revisión/hora. Prueba autenticada única pendiente |
+| F5 | [Twelve Data XMEX](https://twelvedata.com/exchanges/XMEX), [precios](https://twelvedata.com/pricing): cierres BMV | Diagnóstico manual de una petición a símbolo verificado con TWELVEDATA_API_KEY. **Cero consultas reales**; no se modifica cola/configuración productiva | Basic anunciado 8 créditos/min y 800/día; diagnóstico conserva menor cupo local de 700/día y 8/min; EOD | Ficha XMEX indica Pro+/Venture+ y GMEXICOB de prueba. Una excepción no prueba cobertura gratuita general ni nivel de la cuenta. Sin acceso acreditado no se activa respaldo |
+
+La documentación es evidencia del contrato y condiciones anunciadas, no de los permisos de una cuenta.
+Ninguna fuente de esta tabla sustituye ticks/DOM CME; gratis no implica licencia de redistribución.

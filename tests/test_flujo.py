@@ -157,6 +157,8 @@ class ExchangeFalso:
 
 
 def test_cripto_libro_y_operaciones_con_lado(con, ajustes):
+    # Cripto está apagado por defecto desde el 1-nov-2026 (retirado de la interfaz); el conector se prueba encendido.
+    ajustes.datos["flujo"]["cripto"]["activo"] = True
     assert servicio.actualizar(con, ajustes, "libro", "BITSO:BTC/MXN", exchange=ExchangeFalso())["estado"] == "ok"
     assert servicio.actualizar(con, ajustes, "operaciones", "BITSO:BTC/MXN", exchange=ExchangeFalso())["estado"] == "ok"
     o = servicio.orderflow(con, ajustes, "BITSO:BTC/MXN")

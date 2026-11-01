@@ -1,0 +1,70 @@
+[
+  {
+    "archivo": "terminal/centro_conectores.py",
+    "lineas_diff": 19
+  },
+  {
+    "archivo": "terminal/centro_investigacion.py",
+    "lineas_diff": 13
+  },
+  {
+    "archivo": "terminal/mesa_datos.py",
+    "lineas_diff": 40
+  },
+  {
+    "archivo": "terminal/app.py",
+    "lineas_diff": 15
+  },
+  {
+    "archivo": "web/static/mesa.mjs",
+    "lineas_diff": 18
+  },
+  {
+    "archivo": "web/static/referencias.json",
+    "lineas_diff": 41
+  },
+  {
+    "archivo": "config/fuentes_investigacion.json",
+    "lineas_diff": 10
+  },
+  {
+    "archivo": "terminal/adaptadores/base.py",
+    "lineas_diff": 20
+  },
+  {
+    "archivo": "tests/test_centro_investigacion.py",
+    "lineas_diff": 20
+  },
+  {
+    "archivo": "docs/proveedores-gratuitos.md",
+    "lineas_diff": 26
+  },
+  {
+    "archivo": "docs/pendientes-terminal-pro-20261101.json",
+    "lineas_diff": 20
+  },
+  {
+    "archivo": "CLAUDE.md",
+    "lineas_diff": 11
+  },
+  {
+    "archivo": "terminal/proveedores_mesa.py",
+    "lineas_diff": 240
+  },
+  {
+    "archivo": "terminal/mesa_resultados.py",
+    "lineas_diff": 109
+  },
+  {
+    "archivo": "tests/test_proveedores_mesa.py",
+    "lineas_diff": 236
+  },
+  {
+    "archivo": "docs/proveedores-mesa-20261101.md",
+    "lineas_diff": 141
+  },
+  {
+    "archivo": "CHANGELOG.md",
+    "lineas_diff": 17
+  }
+]

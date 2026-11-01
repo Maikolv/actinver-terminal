@@ -1,0 +1,23 @@
+warning: Failed to set cwd to temp dir
+.F.                                                                      [100%]
+================================== FAILURES ===================================
+____________ test_mesa_declara_las_tres_familias_del_catalogo_real ____________
+
+    def test_mesa_declara_las_tres_familias_del_catalogo_real():
+        filas = cobertura_secciones.tabla_mesa()
+>       assert [f['seccion'] for f in filas] == ['Mesa � externos (16)', 'Mesa � accesos locales (6)', 'Mesa � calculadora manual (1)']
+E       AssertionError: assert ['Mesa � exte...a manual (1)'] == ['Mesa � exte...a manual (1)']
+E         
+E         At index 0 diff: 'Mesa � externos (15)' != 'Mesa � externos (16)'
+E         Use -v to get more diff
+
+tests\test_cobertura_secciones.py:26: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_cobertura_secciones.py::test_mesa_declara_las_tres_familias_del_catalogo_real
+1 failed, 2 passed, 1 warning in 23.61s

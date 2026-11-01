@@ -27,7 +27,7 @@
   --radio: 4px;
   --espacio: 16px;
   --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, ui-monospace, monospace;
+  --mono: var(--fuente);  /* una sola familia en toda la terminal; cifras alineadas con tabular-nums */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -52,6 +52,8 @@
 }
 
 * { box-sizing: border-box; }
+input, select, textarea, button { font-family: inherit; }
+code, kbd, pre, samp { font-family: var(--fuente); }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.5 var(--fuente); font-variant-numeric: tabular-nums; }
 h1 { font-size: 1.35rem; margin: 0 0 12px; font-weight: 650; }
@@ -347,12 +349,14 @@ td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: a
 .perfil-volumen { display: grid; gap: 3px; margin: 8px 0 14px; max-width: 720px; }
 .perfil-fila { display: grid; grid-template-columns: 190px 1fr 110px; gap: 8px; align-items: center; font-size: .82rem; }
 .celda-iv { display: inline-block; min-width: 4.5em; padding: 1px 4px; border-radius: 3px; }
-.mercado-tile--sube-1 { background: color-mix(in srgb, var(--vela-sube) 14%, var(--superficie)); }
-.mercado-tile--sube-2 { background: color-mix(in srgb, var(--vela-sube) 28%, var(--superficie)); }
-.mercado-tile--sube-3 { background: color-mix(in srgb, var(--vela-sube) 45%, var(--superficie)); }
-.mercado-tile--baja-1 { background: color-mix(in srgb, var(--vela-baja) 14%, var(--superficie)); }
-.mercado-tile--baja-2 { background: color-mix(in srgb, var(--vela-baja) 28%, var(--superficie)); }
-.mercado-tile--baja-3 { background: color-mix(in srgb, var(--vela-baja) 45%, var(--superficie)); }
+/* Mapas de calor: verde sube, rojo baja, gris sin cambio o sin dato (DESIGN.md) */
+.mercado-tile--sube-1 { background: color-mix(in srgb, var(--positivo) 16%, var(--superficie)); }
+.mercado-tile--sube-2 { background: color-mix(in srgb, var(--positivo) 30%, var(--superficie)); }
+.mercado-tile--sube-3 { background: color-mix(in srgb, var(--positivo) 46%, var(--superficie)); }
+.mercado-tile--baja-1 { background: color-mix(in srgb, var(--negativo) 16%, var(--superficie)); }
+.mercado-tile--baja-2 { background: color-mix(in srgb, var(--negativo) 30%, var(--superficie)); }
+.mercado-tile--baja-3 { background: color-mix(in srgb, var(--negativo) 46%, var(--superficie)); }
+.mercado-tile--plano, .mercado-tile--sin-dato { background: color-mix(in srgb, var(--texto-2) 18%, var(--superficie)); }
 .mercado-tile[aria-pressed="true"] { outline: 3px solid var(--foco); outline-offset: 1px; }
 .escala-mapa { display: flex; gap: 4px; align-items: center; font-size: .78rem; flex-wrap: wrap; }
 .escala-mapa span { padding: 2px 6px; border-radius: 3px; }
@@ -366,7 +370,7 @@ select[multiple] { min-width: 230px; }
 .accesos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 .accesos .boton { flex: 1 1 150px; min-height: 44px; }
 .celda-gex { display: inline-block; min-width: 3.6em; padding: 1px 4px; border-radius: 3px; text-align: right; }
-.area-csv { width: 100%; font-family: ui-monospace, Consolas, monospace; font-size: .85rem; box-sizing: border-box; }
+.area-csv { width: 100%; font-family: var(--fuente); font-size: .85rem; box-sizing: border-box; }
 .campo-bloque { display: block; margin: .5rem 0; }
 .campo-bloque input, .campo-bloque textarea { display: block; width: 100%; max-width: 48rem; box-sizing: border-box; }
 

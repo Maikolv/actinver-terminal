@@ -143,7 +143,7 @@ def test_fred_conserva_periodos_y_ignora_ausentes(con):
     cli = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={"observations": [
         {"date": "2026-10-09", "value": "4.2"}, {"date": "2026-10-08", "value": "."}]})))
     filas = FredMacro(con, {}, "clave", cli).consultar(AHORA)
-    assert len(filas) == 4 and all(f["periodo"] == "2026-10-09" for f in filas)
+    assert len(filas) == 5 and all(f["periodo"] == "2026-10-09" for f in filas)
 
 
 def test_eia_v2_seriesid(con):
@@ -173,7 +173,7 @@ def test_api_local_protegida_y_catalogo_completo(con):
     try:
         with TestClient(app, base_url="http://127.0.0.1:8765") as c:
             d = c.get("/api/centro-investigacion").json()
-            assert len(d["fuentes"]) == 16 and sum(f["conector"] for f in d["fuentes"]) == 5
+            assert len(d["fuentes"]) == 19 and sum(f["conector"] for f in d["fuentes"]) == 8
             assert next(f for f in d["fuentes"] if f["id"] == "ssrn")["estado"] == "consulta_manual"
             assert c.post("/api/centro-investigacion/actualizar", json={}).status_code == 403
             r = c.post("/api/centro-investigacion/importar", headers={"X-CSRF-Token": TOKEN_CSRF},

@@ -1,0 +1,20 @@
+ M CHANGELOG.md
+ M DESIGN.md
+ M config/ajustes.ejemplo.toml
+ M terminal/app.py
+ M terminal/bot_telegram.py
+ M tests/mesa_catalogo_auditoria.test.mjs
+ M tests/mesa_paleta.test.mjs
+ M tests/mesa_pendientes.test.mjs
+ M web/static/app.css
+ M web/static/app.js
+ M web/static/grafica.css
+ M web/static/guias.mjs
+ M web/static/mesa.mjs
+ M web/static/navegacion.css
+ M web/static/navegacion.mjs
+ M web/static/recursos/oficina-inversion.mjs
+ M web/static/recursos/practica-proyectos-financieros.js
+?? docs/prompt-codex-proveedores-20261101.md
+?? docs/proveedores-20261101-evidencia/
+?? tests/estetica.test.mjs

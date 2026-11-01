@@ -5,7 +5,7 @@ export const CATALOGO = [
   ['filtro','Explorador de acciones','filtro'], ['resumen','Macro e índices','resumen'],
   ['cotizaciones','Cotizaciones por grupo','cotizaciones'], ['destacados','Mayores movimientos','destacados'],
   ['mapa-etf','Mapa de ETF','mapa-etf'], ['divisas','Divisas','divisas'],
-  ['mapa-cripto','Cripto · fuera del Reto','mapa-cripto'], ['info','Ficha de cotización','info'],
+  ['info','Ficha de cotización','info'],
   ['perfil','Perfil de empresa','perfil'], ['finanzas','Fundamentales','finanzas'],
   ['tecnico','Resumen técnico externo','tecnico'], ['noticias-emisora','Noticias del instrumento','noticias-emisora'],
   ['opciones','Cadena, GEX y gamma','link','tab-optionflow'],
@@ -186,7 +186,14 @@ if(typeof document!=='undefined') {
         r.eventos_alto_impacto_7d.length?el('ul',{clase:'mesa-lista'},r.eventos_alto_impacto_7d.map(e=>el('li',{},el('strong',{},`${e.fecha.slice(0,16).replace('T',' ')} · ${e.pais}`),` ${e.titulo}`,
           el('span',{clase:'mesa-meta'},` · pronóstico ${e.pronostico||'s/d'} · previo ${e.previo||'s/d'} · ${e.fuente}`)))):el('p',{clase:'sin-dato'},'SIN DATO · sin eventos de alto impacto guardados para los próximos 7 días.'),
         el('p',{clase:'mesa-procedencia'},'Eventos económicos de EE. UU. y México (alto impacto), hora de la fuente.'),
-        el('p',{clase:'aviso-caja'},`Resultados de empresas: ${c.estado.toUpperCase()}. ${c.motivo} Siguiente acción: ${c.siguiente_accion}`));
+        el('p',{clase:'aviso-caja'},`Resultados de empresas: ${c.estado.toUpperCase()}. ${c.motivo} Siguiente acción: ${c.siguiente_accion}`),
+        ...(c.resultados||[]).map(x=>el('section',{clase:'tarjeta'},
+          el('h3',{},`${x.simbolo} · ${x.fecha_reporte||'Anuncio sin fecha confirmada'}`),
+          el('p',{clase:'mesa-procedencia'},x.fecha_publicacion_sec?`Publicado en SEC: ${x.fecha_publicacion_sec}. No equivale a la hora del anuncio.`:'Fecha prevista, no anuncio confirmado.'),
+          el('ul',{},...[['estimacion_bpa','Estimación'],['reportado_bpa','BPA reportado'],['revisado_bpa','Revisión posterior']].map(([k,t])=>el('li',{},x[k]?`${t}: ${fmt(x[k].valor)} ${x[k].unidad||''} · ${x[k].fuente} · ${x[k].origen} · conocido desde ${x[k].disponible_desde}`:`${t}: SIN DATO`))),
+          x.estimacion_bpa&&!x.estimacion_antes_anuncio_confirmada?el('p',{clase:'mesa-procedencia'},'No se ha confirmado que esta estimación anteceda al anuncio. No se calcula sorpresa.'):null,
+          x.estimacion_posterior_no_utilizada?el('p',{clase:'aviso-caja'},'Se excluyó una estimación conocida después del anuncio.'):null,
+          el('p',{clase:'mesa-procedencia'},x.reaccion.reaccion==null?`Reacción: SIN DATO · ${x.reaccion.motivo||'sin cierres suficientes'}`:`Reacción histórica: ${fmt(x.reaccion.reaccion*100)}% · ${x.reaccion.base} → ${x.reaccion.fin} · ${x.reaccion.fuente_cierres}`))));
     }catch(e){fallo(caja,e);}
   }
   const NATIVOS={info:(c,sim)=>nativoFicha(c,sim),noticias:c=>nativoNoticias(c,''),'noticias-emisora':(c,sim)=>nativoNoticias(c,sim),resumen:c=>nativoMacro(c),calendario:c=>nativoCalendario(c)};
@@ -207,7 +214,7 @@ if(typeof document!=='undefined') {
   function dibujar(){
     const anteriores=new Map([...$('mesa-paneles').children].map(n=>[n.dataset.panel,n]));
     const abiertos=new Set([...anteriores].filter(([,n])=>n.querySelector('details')?.open).map(([id])=>id));
-    const tema=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    const tema='dark';  // widgets externos siempre en negro
     for(const id of activos){
       const anterior=anteriores.get(id);
       if(anterior&&anterior.dataset.simbolo===simbolo&&anterior.dataset.tema===tema&&anterior.dataset.catalogo===String(catalogoListo)){

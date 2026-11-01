@@ -1,12 +1,12 @@
 {
   "fecha_local": "2026-11-01",
   "items": [
-    {"id": "TP01-01", "estado": "bloqueado", "titulo": "Calendario de resultados empresariales e historia de reacción",
-     "evidencia": "terminal/mesa_datos.py CONTRATO_RESULTADOS y reaccion_resultados; tests/test_mesa_datos.py (sin fuga, offline)",
-     "siguiente_accion": "Usuario: elegir y autorizar un proveedor con licencia de fechas, hora, estimación, dato reportado y revisión; luego importar con este contrato."},
+    {"id": "TP01-01", "estado": "parcial", "titulo": "Calendario de resultados empresariales e historia de reacción",
+     "evidencia": "terminal/proveedores_mesa.py, terminal/mesa_resultados.py y tests/test_proveedores_mesa.py; docs/proveedores-mesa-20261101.md. SEC/Alpha apagados: sin identificación/clave disponible ni prueba real de plan; BPA realizado, revisión y anuncio siguen SIN DATO.",
+     "siguiente_accion": "Confirmar identificación SEC/CIK y permiso Alpha con una prueba única; fuente estructurada licenciada para anuncio y BPA. Solo campos con observaciones quedan parciales; no tratar aceptación SEC como anuncio."},
     {"id": "TP01-02", "estado": "parcial", "titulo": "Macro de México y bono a 30 años",
-     "evidencia": "/api/mesa/macro devuelve SIN DATO con requisito para DGS30, tasa objetivo Banxico (SF61745) e INPC",
-     "siguiente_accion": "Agregar DGS30 a centro_conectores.py (FRED ya autorizado); conectores Banxico/INEGI requieren decisión y BANXICO_TOKEN."},
+     "evidencia": "DGS30 agregado a FredMacro; requisito desaparece con observación. Banxico optativo con GET de identidad previo a datos. SF61745 documentado pero HTTP 400 sin token; bono M 10 años e INPC sin ID confirmado. Pruebas MockTransport; docs/proveedores-mesa-20261101.md.",
+     "siguiente_accion": "Validar metadatos oficiales con credencial existente disponible por mecanismo autorizado; confirmar IDs de bono e INPC antes de habilitar. Mantener SIN DATO y conector apagado mientras falte evidencia."},
     {"id": "TP01-03", "estado": "pendiente", "titulo": "Revisión visual del Excel de Markowitz en Excel",
      "evidencia": "docs/terminal-pro-20261101-evidencia/excel/; Excel 2013 rechazó la automatización (RPC_E_CALL_REJECTED)",
      "siguiente_accion": "Usuario: abrir plantilla-sintetico-despues.xlsx y libro-sintetico-despues.xlsx y confirmar lectura e impresión."},

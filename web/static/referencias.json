@@ -1,6 +1,38 @@
 {
   "aviso": "Recursos citados en la construcción de Actinver Terminal. Cada fuente de datos se usa según sus condiciones; las marcas pertenecen a sus dueños. tests/test_referencias.py comprueba que toda dependencia del proyecto y todo proveedor de datos del código aparezcan aquí.",
   "grupos": [
+{
+  "titulo": "Conectores opcionales de Mesa (1-nov-2026)",
+  "items": [
+    {
+      "nombre": "Banxico SIE (validación de identidad previa)",
+      "uso": "Tasa objetivo, bono M10 e INPC únicamente con código/título confirmados por GET. Apagado por defecto.",
+      "condiciones": "Solo consulta oficial; sin redistribución implícita. Deshabilitado por defecto, acceso real no verificado.",
+      "url": "https://www.banxico.org.mx/SieAPIRest/service/v1/",
+      "ids": [
+        "banxico_sie"
+      ]
+    },
+    {
+      "nombre": "Alpha Vantage — calendario de resultados",
+      "uso": "Estimaciones conocidas desde la descarga; sin hora confirmada. Apagado hasta verificar el plan.",
+      "condiciones": "Solo consulta oficial; sin redistribución implícita. Deshabilitado por defecto, acceso real no verificado.",
+      "url": "https://www.alphavantage.co/documentation/",
+      "ids": [
+        "alpha_calendario"
+      ]
+    },
+    {
+      "nombre": "SEC EDGAR — 8-K Item 2.02",
+      "uso": "Fecha de publicación del 8-K, no hora del anuncio ni BPA estructurado. Apagado por defecto.",
+      "condiciones": "Solo consulta oficial; sin redistribución implícita. Deshabilitado por defecto, acceso real no verificado.",
+      "url": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+      "ids": [
+        "sec_resultados"
+      ]
+    }
+  ]
+},
     {
       "titulo": "Formación Python aplicada",
       "items": [

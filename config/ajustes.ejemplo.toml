@@ -49,8 +49,9 @@ contratos_oi = false
 activo = false
 
 [flujo.cripto]
-# Libro y operaciones públicos de un exchange de cripto vía ccxt (MIT). Fuera del Reto. false = apagado.
-activo = true
+# Libro y operaciones públicos de un exchange de cripto vía ccxt (MIT). Retirado de la interfaz el 1-nov-2026:
+# apagado por defecto; el conector se conserva solo para sus pruebas.
+activo = false
 exchange = "bitso"                   # bitso (MXN), kraken, coinbase… cualquier id de ccxt con datos públicos
 pares = ["BTC/MXN", "ETH/MXN", "SOL/MXN", "XRP/MXN"]
 niveles = 50

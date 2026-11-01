@@ -1,0 +1,33 @@
+{
+  "fecha_local": "2026-11-01",
+  "fred": {"serie": "DGS30", "identidad_documental_confirmada": true,
+    "url": "https://fred.stlouisfed.org/series/DGS30", "unidad": "%", "frecuencia": "diaria",
+    "descarga_api_autenticada_comprobada": false},
+  "sec": {"llamadas_datos": 0, "motivo": "Sin identificación SEC_USER_AGENT disponible; no se inventa contacto"},
+  "documentacion_oficial": ["https://www.banxico.org.mx/SieAPIRest/service/v1/",
+    "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+    "https://www.alphavantage.co/documentation/#earnings-calendar", "https://www.alphavantage.co/support/",
+    "https://twelvedata.com/exchanges/XMEX", "https://twelvedata.com/pricing"],
+  "banxico": [
+    {
+      "serie": "SF61745",
+      "http": 400,
+      "titulo_confirmado": false,
+      "sin_token": true
+    },
+    {
+      "serie": "SP1",
+      "http": 400,
+      "titulo_confirmado": false,
+      "sin_token": true
+    }
+  ],
+  "alpha_vantage": {
+    "llamadas": 0,
+    "motivo": "Sin clave en variables permitidas; no se lee .env"
+  },
+  "twelve_data": {
+    "llamadas": 0,
+    "motivo": "Sin clave en variables permitidas; no se lee .env"
+  }
+}

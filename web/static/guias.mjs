@@ -66,7 +66,7 @@ export const GUIAS = {
   },
   'panel-mercado': {
     titulo: 'Mercado',
-    que: 'Panorama con widgets gratuitos de TradingView, numerados de lo general a lo particular: índices, tasas de bonos, VIX, dólar, energía, metales, calendario, noticias, mapas de calor, filtros, ETF, divisas y cripto. Son datos de TradingView, con su retraso; no alimentan ningún cálculo de la terminal.',
+    que: 'Panorama con widgets gratuitos de TradingView, numerados de lo general a lo particular: índices, tasas de bonos, VIX, dólar, energía, metales, calendario, noticias, mapas de calor, filtros, ETF y divisas. Son datos de TradingView, con su retraso; no alimentan ningún cálculo de la terminal.',
     pasos: ['Abra las secciones plegables que le interesen.',
       'Use la cinta y el resumen para el contexto del día; el calendario, para eventos que mueven precios.',
       'Para una emisora, ábrala en Velas.'],
@@ -77,7 +77,7 @@ export const GUIAS = {
     titulo: 'Velas',
     que: 'Gráfica de velas con apertura, máximo, mínimo, cierre y volumen reales, con indicadores descriptivos.',
     pasos: ['Elija el instrumento, el intervalo y el rango.',
-      'Pulse «Actualizar desde proveedor» si quiere datos nuevos (Alpaca para el SIC; cripto con el exchange).',
+      'Pulse «Actualizar desde proveedor» si quiere datos nuevos (Alpaca para el SIC).',
       'Active indicadores (medias, Bollinger, VWAP, MACD, estocástico).',
       'En intervalo de 1 minuto, con el flujo IEX activo, la última vela se actualiza en vivo.'],
     terminos: [['OHLCV', 'Apertura, máximo, mínimo, cierre y volumen de cada periodo.'],
@@ -87,7 +87,7 @@ export const GUIAS = {
   'panel-orderflow': {
     titulo: 'Order Flow',
     que: 'Muestra quién está comprando y vendiendo: las órdenes en espera (libro), las operaciones hechas (cinta) y en qué precios se concentró el volumen. Solo con datos reales.',
-    pasos: ['Elija el instrumento (SIC con Alpaca o cripto con el exchange).',
+    pasos: ['Elija el instrumento (SIC con Alpaca o un CSV importado).',
       'Actualice libro y operaciones; ajuste minutos y niveles.',
       'Lea el perfil de volumen para ver dónde se negoció más.'],
     terminos: [['Delta', 'Compras agresivas menos ventas agresivas; solo si la fuente informa el lado.'],

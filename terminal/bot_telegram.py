@@ -265,6 +265,20 @@ def credencial_claude() -> bool:
     return (Path.home() / ".config" / "anthropic").exists()
 
 
+def costo_aprobado(servicio: str) -> bool:
+    """¿El usuario aprobó un servicio que cobra? Por defecto NO: ningún cargo sin aprobación expresa."""
+    try:
+        from . import db
+        con = db.conectar()
+        try:
+            f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave=?", (f"costo_{servicio}",)).fetchone()
+        finally:
+            con.close()
+        return bool(f) and f[0] == "aprobado"
+    except Exception:  # noqa: BLE001 - ante cualquier duda, no se usa el servicio de pago
+        return False
+
+
 class Chatbot:
     """Respuestas a preguntas libres. El cliente de Claude es opcional e inyectable (pruebas)."""
 
@@ -278,7 +292,9 @@ class Chatbot:
     def _cliente_claude(self):
         if not self._claude_probado:
             self._claude_probado = True
-            if not credencial_claude():
+            # La API de Claude cobra por uso: sin aprobación expresa del usuario (ajustes_usuario 'costo_claude_api' =
+            # 'aprobado') no se usa aunque haya credencial; se responde con Ollama o el motor local, que no cobran.
+            if not credencial_claude() or not costo_aprobado("claude_api"):
                 self._claude = None
                 return None
             try:

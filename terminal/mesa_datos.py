@@ -29,12 +29,16 @@ SERIES_MACRO = [
     ("fred_macro", "INDPRO", "mensual", "Actividad"),
     ("eia", "WTI", "semanal", "Energía"),
     ("eia", "BRENT", "semanal", "Energía"),
+    ("banxico_sie", "BANXICO_OBJETIVO", "según publicación", "México"),
+    ("banxico_sie", "BANXICO_BONO10", "según publicación", "México"),
+    ("banxico_sie", "INPC", "mensual", "México"),
 ]
 # Requisito cuando una serie no tiene observaciones guardadas (no se activa nada desde aquí).
 REQUISITO = {
-    "DGS30": "Agregar DGS30 a la lista de series FRED de terminal/centro_conectores.py; hoy no se descarga.",
-    "BANXICO_OBJETIVO": "Serie de tasa objetivo de Banxico (SIE SF61745) sin conector; requiere BANXICO_TOKEN y conector nuevo.",
-    "INPC": "Inflación de México (INEGI o Banxico SIE SP30578) sin conector autorizado en la terminal.",
+    "DGS30": "FRED DGS30 incluido en el conector; requiere observaciones descargadas con clave y actualización explícita.",
+    "BANXICO_OBJETIVO": "Banxico SIE apagado: confirmar título de SF61745 por GET antes de descargar; requiere token existente.",
+    "BANXICO_BONO10": "SIN DATO: código de bono M a 10 años sin confirmar; no se inventa el ID.",
+    "INPC": "Conector SIE apagado; ID del INPC pendiente de confirmación por GET oficial. No se presupone un código.",
 }
 
 
@@ -99,16 +103,13 @@ def macro(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = No
             continue
         filas.append({"serie": serie, "titulo": o["titulo"], "valor": o["valor"], "unidad": o["unidad"],
                       "periodo": o["periodo"], "frecuencia": frecuencia, "fuente": fuente, "grupo": grupo,
-                      "ingesta": o["disponible_desde"], "url": o["url"]})
+                      "ingesta": o["disponible_desde"], "url": o["url"], "estado": "PUBLICACIÓN · NO COTIZACIÓN"})
     fx = mercado.ultimo_fx(con, ajustes)
     filas.insert(0, {"serie": "USDMXN", "titulo": "Dólar / peso (FIX o referencia)", "valor": fx.get("valor"),
                      "unidad": "MXN por USD", "periodo": fx.get("fecha"), "frecuencia": "diaria (hábil)",
                      "fuente": fx.get("proveedor"), "grupo": "Tipo de cambio", "ingesta": fx.get("obtenido_en"),
                      "estado": None if fx.get("valor") is not None else SIN_DATO})
     filas.append(_cetes(con))
-    for k in ("BANXICO_OBJETIVO", "INPC"):
-        filas.append({"serie": k, "titulo": {"BANXICO_OBJETIVO": "Tasa objetivo Banxico", "INPC": "Inflación México (INPC)"}[k],
-                      "valor": None, "estado": SIN_DATO, "grupo": "México", "frecuencia": "—", "requisito": REQUISITO[k]})
     periodos = sorted({f["periodo"][:10] for f in filas if f.get("periodo")})
     curva = [f for f in filas if f["grupo"] == "Curva de EE. UU." and f.get("valor") is not None]
     fechas_curva = {f["periodo"] for f in curva}

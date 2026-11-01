@@ -2,6 +2,39 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-11-01 — conectores opcionales de Mesa, sin activar proveedores]
+
+- DGS30 agregado al conector FRED; el requisito desaparece con observaciones disponibles al corte.
+- Banxico SIE optativo valida identidad antes de solicitar datos; bono M10 e INPC sin ID confirmado siguen SIN DATO.
+- Calendario de investigación con publicación SEC separada del anuncio, estimaciones versionadas y tres campos BPA distintos; conectores SEC/Alpha apagados por defecto. Sin permiso de plan comprobado.
+- Diagnóstico Twelve de una petición, sin activar respaldo BMV ni cambiar la cola. Sin claves disponibles por mecanismos permitidos: comprobaciones reales pendientes, sin leer `.env`.
+- Pruebas y bloqueos en `docs/proveedores-mesa-20261101.md`; sin operaciones, mensajes externos, commit o push.
+
+## [2026-11-01 (mañana, 2) — sin cripto, mapas de calor verde/rojo/gris y aprobación de cualquier cobro]
+
+- **Quitado**: cripto de la interfaz (mapa y tabla de TradingView, grupo de cotizaciones, cinta, panel de Mesa —22
+  tipos—, selectores de Velas/Order Flow, guías y Cuaderno). `flujo.cripto.activo = false` por defecto; el conector se
+  conserva solo para sus pruebas.
+- **Cambiado**: mapas de calor propios en verde (positivo), rojo (negativo) y gris (neutro o sin dato) con `colorCalor`.
+- **Nuevo**: `terminal/costos.py` y Datos y fuentes › «Servicios con costo». Ningún servicio que cobre se usa sin
+  aprobación: la API de Claude (pago por uso) queda sin usar aunque haya credencial, se alerta (escritorio y Telegram)
+  y se aprueba o desiste con botones (POST con CSRF). Revisión del 1-nov: nada cobra hoy (todo en planes gratuitos,
+  Asistente en motor local, Cloudflare Free sin tarjeta).
+- Pruebas: específicas 17/17 (costos, bot, alertas) y 22/22 (bot, flujo); Node 43/43. Suite completa en evidencia.
+
+## [2026-11-01 (mañana) — widgets siempre negros, una sola tipografía, ningún widget cortado y proveedores para Codex]
+
+- **Cambiado**: los widgets de TradingView se piden siempre en tema oscuro (negro), en cualquier modo de la terminal.
+- **Cambiado**: una sola familia tipográfica (Segoe UI) en terminal, Mesa, Oficina, Cuaderno, Formación, widgets y Excel;
+  las cifras se alinean con números tabulares.
+- **Corregido**: widgets cortados. El rótulo «Datos de TradingView» medía 36 px en un hueco de 32; la gráfica perdía 22 px
+  por una cabecera de 62 px con 40 fijos; la ficha «info» necesitaba 211 px y tenía 190; la cinta, 116 y tenía 76. Ahora
+  `navegacion.mjs` agranda cada marco hasta su contenido (tope 2000 px) y los tableros de cotizaciones caben completos.
+  Medido en 22 marcos: contenido = alto interior, sin corte ni bucle.
+- **Nuevo**: `docs/prompt-codex-proveedores-20261101.md` con proveedores gratuitos (FRED, Banxico SIE, INEGI, SEC EDGAR,
+  Alpha Vantage, Finnhub, Twelve Data), prompt para Codex y lista de pago por calidad/precio.
+- Pruebas: Node 43/43; Python específicas 20/20 (grafica, mesa, formación). Suite completa no repetida.
+
 ## [2026-11-01 (madrugada) — terminal profesional negro/gris/rojo, Mesa con funciones de OpenTerminal y Excel con la misma identidad]
 
 - **Cambiado**: sistema visual único con tokens medidos (WCAG AA) en `DESIGN.md`: negro y grises, texto blanco, rojo de

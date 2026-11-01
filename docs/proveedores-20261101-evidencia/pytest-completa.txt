@@ -1,0 +1,70 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+........................................................................ [  9%]
+.....F.........................................................F........ [ 18%]
+........................................................................ [ 27%]
+........................................................................ [ 36%]
+......................F................................................. [ 45%]
+........................................................................ [ 54%]
+........................................................................ [ 64%]
+........................................................................ [ 73%]
+........................................................................ [ 82%]
+........................................................................ [ 91%]
+..................................................................       [100%]
+================================== FAILURES ===================================
+___________________ test_sin_credencial_no_se_activa_claude ___________________
+
+ajustes = Ajustes(datos={'app': {'modo': 'real', 'host': '127.0.0.1', 'puerto': 8765, 'moneda_base': 'MXN', 'indice_referencia':...miento_ajustado': 0.25, 'riesgo': 0.2, 'diversificacion': 0.15, 'liquidez': 0.1, 'costos': 0.1, 'calidad_datos': 0.2}})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002661DA50080>
+tmp_path = WindowsPath('C:/Users/MIKE/AppData/Local/Temp/pytest-of-MIKE/pytest-549/test_sin_credencial_no_se_acti0')
+
+    def test_sin_credencial_no_se_activa_claude(ajustes, monkeypatch, tmp_path):
+        for v in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_PROFILE", "OLLAMA_URL"):
+            monkeypatch.delenv(v, raising=False)
+        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
+        assert not bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "local"
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-prueba")
+>       assert bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "claude"
+E       AssertionError: assert (True and 'local' == 'claude'
+E        +  where True = <function credencial_claude at 0x0000026607046700>()
+E        +    where <function credencial_claude at 0x0000026607046700> = bt.credencial_claude
+E         
+E         - claude
+E         + local)
+
+tests\test_bot_telegram.py:67: AssertionError
+____________ test_mesa_declara_las_tres_familias_del_catalogo_real ____________
+
+    def test_mesa_declara_las_tres_familias_del_catalogo_real():
+        filas = cobertura_secciones.tabla_mesa()
+>       assert [f['seccion'] for f in filas] == ['Mesa � externos (16)', 'Mesa � accesos locales (6)', 'Mesa � calculadora manual (1)']
+E       AssertionError: assert ['Mesa � exte...a manual (1)'] == ['Mesa � exte...a manual (1)']
+E         
+E         At index 0 diff: 'Mesa � externos (15)' != 'Mesa � externos (16)'
+E         Use -v to get more diff
+
+tests\test_cobertura_secciones.py:26: AssertionError
+__________________ test_cripto_libro_y_operaciones_con_lado ___________________
+
+con = <sqlite3.Connection object at 0x0000026624D71300>
+ajustes = Ajustes(datos={'app': {'modo': 'real', 'host': '127.0.0.1', 'puerto': 8765, 'moneda_base': 'MXN', 'indice_referencia':...miento_ajustado': 0.25, 'riesgo': 0.2, 'diversificacion': 0.15, 'liquidez': 0.1, 'costos': 0.1, 'calidad_datos': 0.2}})
+
+    def test_cripto_libro_y_operaciones_con_lado(con, ajustes):
+>       assert servicio.actualizar(con, ajustes, "libro", "BITSO:BTC/MXN", exchange=ExchangeFalso())["estado"] == "ok"
+E       AssertionError: assert 'sin_fuente' == 'ok'
+E         
+E         - ok
+E         + sin_fuente
+
+tests\test_flujo.py:160: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_bot_telegram.py::test_sin_credencial_no_se_activa_claude - ...
+FAILED tests/test_cobertura_secciones.py::test_mesa_declara_las_tres_familias_del_catalogo_real
+FAILED tests/test_flujo.py::test_cripto_libro_y_operaciones_con_lado - Assert...
+3 failed, 783 passed, 1 warning in 1283.84s (0:21:23)
