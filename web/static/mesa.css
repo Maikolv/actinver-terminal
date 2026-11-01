@@ -9,3 +9,39 @@
 .mesa-panel form {display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
 .mesa-panel input {width:100%;box-sizing:border-box}
 .mesa-panel summary {cursor:pointer; padding:12px 0}
+/* Paleta, contenido nativo, gráfica y cuadrícula configurable (tokens de app.css) */
+.mesa-paleta-caja {position:relative; flex:1 1 260px; min-width:0}
+#mesa-paleta {position:absolute; z-index:6; left:0; right:0; top:100%; margin:2px 0 0; padding:4px 0; list-style:none; max-height:320px; overflow:auto;
+  background:var(--superficie-2); border:1px solid var(--borde-control); border-radius:var(--radio)}
+#mesa-paleta li {padding:6px 10px; cursor:pointer; font-size:.88rem; border-left:3px solid transparent}
+#mesa-paleta li[aria-selected="true"] {background:var(--acento-fondo); border-left-color:var(--acento-grafico); font-weight:650}
+#mesa-paleta li::before {font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; color:var(--texto-2); margin-right:8px}
+#mesa-paleta li[data-tipo="instrumento"]::before {content:"INSTR"} #mesa-paleta li[data-tipo="seccion"]::before {content:"IR"}
+#mesa-paleta li[data-tipo="panel"]::before {content:"PANEL"} #mesa-paleta li[data-tipo="disposicion"]::before {content:"DISP"}
+.mesa-mas {margin:0; padding:6px 10px} .mesa-mas[open] {display:flex; flex-wrap:wrap; gap:8px; align-items:end}
+.mesa-seguimiento-caja {margin:0 0 16px}
+.mesa-seguimiento caption {text-align:left; font-size:.8rem; color:var(--texto-2); padding:4px 0}
+.mesa-panel--ancho {grid-column:1 / -1}
+.mesa-panel--arrastrando {opacity:.55; outline:2px dashed var(--borde-control)}
+.mesa-asa {cursor:grab; color:var(--texto-2); padding:0 4px; font-size:1.1rem; user-select:none}
+.mesa-panel header .boton[aria-pressed="true"] {border-color:var(--acento-grafico); box-shadow:inset 0 -2px 0 var(--acento-grafico)}
+.mesa-nativo {margin:0 0 10px}
+.mesa-nativo__titulo {font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--texto-2); margin:6px 0}
+.mesa-procedencia {font-size:.78rem; color:var(--texto-2); margin:6px 0 0}
+.mesa-meta {color:var(--texto-2); font-size:.78rem}
+.mesa-lista {margin:0; padding-left:1.1em; display:grid; gap:6px; font-size:.88rem}
+.mesa-kpis {display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:2px 12px; margin:0 0 8px}
+.mesa-kpis dt {font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--texto-2)}
+.mesa-kpis dd {margin:0 0 6px; font-family:var(--mono); font-size:1rem}
+.sube {color:var(--positivo)} .baja {color:var(--negativo)}
+.mesa-controles-grafica {display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; font-size:.85rem; margin-bottom:6px}
+.mesa-controles-grafica select {width:auto}
+.mesa-grafica {display:block; width:100%; height:auto; font:11px var(--mono)}
+.mesa-grafica text {fill:var(--texto-2)}
+.mesa-grafica .rejilla {stroke:var(--borde); stroke-width:1}
+.mesa-grafica .linea {fill:none; stroke:var(--serie-1); stroke-width:1.6}
+.mesa-grafica .sma {fill:none; stroke:var(--serie-2); stroke-width:1.2; stroke-dasharray:4 3}
+.mesa-grafica .volumen {fill:var(--borde-control)}
+.mesa-grafica line.sube {stroke:var(--vela-sube)} .mesa-grafica line.baja {stroke:var(--vela-baja)}
+.mesa-grafica rect.sube {fill:var(--vela-sube)} .mesa-grafica rect.baja {fill:var(--superficie); stroke:var(--vela-baja); stroke-width:1}
+@media (max-width:600px) {.mesa-grid {grid-template-columns:minmax(0,1fr)} .mesa-panel header {gap:4px} .mesa-panel header .boton {padding:6px 8px; min-height:36px}}

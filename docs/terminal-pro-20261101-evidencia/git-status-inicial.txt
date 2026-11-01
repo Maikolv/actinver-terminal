@@ -1,0 +1,30 @@
+ M CHANGELOG.md
+ M CLAUDE.md
+ M DESIGN.md
+ M docs/historial-estado.md
+ M terminal/app.py
+ M terminal/cobertura_secciones.py
+ M tests/guias.test.mjs
+ M web/index.html
+ M web/static/app.css
+ M web/static/app.js
+ M web/static/guias.mjs
+ M web/static/mesa.html
+ M web/static/navegacion.json
+ M web/static/navegacion.mjs
+ M web/static/recursos/oficina-inversion.html
+ M web/static/recursos/practica-proyectos-financieros.css
+ M web/static/recursos/practica-proyectos-financieros.html
+ M web/static/recursos/practica-proyectos-financieros.js
+ M web/static/referencias.json
+?? config/formacion-python-jpm.json
+?? docs/formacion-python-jpm-ejecucion.json
+?? docs/formacion-python-jpm-evidencia/
+?? docs/integracion-python-training-20261101.md
+?? docs/terminal-pro-20261101-evidencia/
+?? terminal/formacion_python.py
+?? tests/test_formacion_python_jpm.py
+?? web/static/recursos/formacion-python-jpm.css
+?? web/static/recursos/formacion-python-jpm.html
+?? web/static/recursos/formacion-python-jpm.mjs
+?? web/static/recursos/jpm/

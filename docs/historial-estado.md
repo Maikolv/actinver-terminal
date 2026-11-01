@@ -368,3 +368,13 @@ CI del 29-oct roto por la hora (reportes) y GEX con ventana de OI desalineada: a
 ### Continuación de procesos — 31-oct-2026
 
 Respaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.
+
+
+### Formación Python JPMorgan — 1-nov-2026
+
+Clon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuaderno enlaza prácticas originales de series y validación de velas de futuros; dos notebooks ejecutados offline, 21 pruebas específicas, cinco de referencias y nueve Node aprobadas. Seis vistas de navegador y caso SIN DATO comprobados. Sin instalar el entorno upstream ni modificar modelos, estrategia, proveedores o candados. Informe: docs/integracion-python-training-20261101.md. No es certificación ni aval del banco.
+
+
+## Terminal profesional y Mesa — 1-nov-2026 (madrugada)
+
+Sistema negro/gris/blanco con rojo de identidad y contraste medido; Mesa con paleta, Seguimiento, cuadrícula configurable y paneles nativos (ficha, noticias, macro/resumen, calendario) de solo lectura; Excel de Markowitz con la misma identidad sin cambios numéricos. Resultados empresariales bloqueados por falta de fuente. Python 762/762, Node 40/40. Ver docs/terminal-pro-20261101.md.

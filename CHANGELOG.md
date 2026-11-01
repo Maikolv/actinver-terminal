@@ -2,6 +2,21 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## [2026-11-01 (madrugada) — terminal profesional negro/gris/rojo, Mesa con funciones de OpenTerminal y Excel con la misma identidad]
+
+- **Cambiado**: sistema visual único con tokens medidos (WCAG AA) en `DESIGN.md`: negro y grises, texto blanco, rojo de
+  identidad (texto, sólido y gráfico separados), enlaces blancos con subrayado rojo, variaciones con signo y flecha.
+  Logo, favicon, widgets (transparentes) y Excel de Markowitz con el mismo rojo.
+- **Nuevo en Mesa**: paleta de comandos (instrumentos, secciones, paneles, disposiciones), franja de Seguimiento con la
+  misma lista, «Ancho» y arrastre con equivalente por teclado, disposiciones con nombre y migración de las anteriores;
+  Ficha con gráfica nativa (línea/velas/volumen/SMA/rango), noticias deduplicadas, panel macro y resumen fechado, y
+  calendario económico. Backend de solo lectura `terminal/mesa_datos.py` y rutas `/api/mesa/*`.
+- **Bloqueado**: resultados empresariales (sin fuente autorizada; contrato y cálculo sin fuga listos y probados).
+- **Excel**: 0 cambios en fórmulas, números y formatos (comparación celda por celda); revisión en Excel pendiente.
+- **Antes, el mismo día**: se quitó el Laboratorio de alfa de la interfaz, pestañas ordenadas por grupo, botones con
+  nombres consistentes, opciones precargadas en el Cuaderno y widgets macro y cripto.
+- Pruebas: Python 762/762 (10 min 19 s), Node 40/40. Detalle: `docs/terminal-pro-20261101.md`.
+
 ## [2026-11-01 — una sola identidad visual, laboratorio en Datos y fuentes y ejemplos listos]
 
 - **Cambiado**: las cinco áreas (terminal, Oficina, Laboratorio de alfa, Cuaderno y Mesa) comparten logo, cabecera y
@@ -1149,3 +1164,8 @@ Catálogo ligero sin precios, deduplicación GET en curso, polling de Ranking/SE
 ### Continuación de procesos — 31-oct-2026
 
 Respaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.
+
+
+### Formación Python JPMorgan — 1-nov-2026
+
+Clon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuaderno enlaza prácticas originales de series y validación de velas de futuros; dos notebooks ejecutados offline, 21 pruebas específicas, cinco de referencias y nueve Node aprobadas. Seis vistas de navegador y caso SIN DATO comprobados. Sin instalar el entorno upstream ni modificar modelos, estrategia, proveedores o candados. Informe: docs/integracion-python-training-20261101.md. No es certificación ni aval del banco.

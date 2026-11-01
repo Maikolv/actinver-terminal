@@ -1,0 +1,1080 @@
+diff --git a/DESIGN.md b/DESIGN.md
+index 6c60c3b..28c86ac 100644
+--- a/DESIGN.md
++++ b/DESIGN.md
+@@ -19,13 +19,52 @@ Formato inspirado en la colección `awesome-design-md` y en los criterios de `ha
+ cálculo abre con valores iniciales que ya producen un resultado válido, ofrece «Ejemplo listo» o «Escenario listo»
+ con opciones predefinidas (más «Personalizado») y, cuando el resultado es técnico, lo acompaña de una lectura en
+ palabras simples. Los ejemplos son hipótesis de estudio y se rotulan así; nunca se presentan como cotizaciones.
+-Hoy: escenarios NQ en Mesa (`ESCENARIOS_NQ`), ejemplos de Modelos (`EJEMPLOS_OPCIONES`) y ejemplo sintético del
+-Laboratorio de alfa. `tests/mesa.test.mjs` exige que cada escenario NQ calcule al menos un contrato.
++Hoy: escenarios NQ en Mesa (`ESCENARIOS_NQ`), ejemplos de Modelos (`EJEMPLOS_OPCIONES`) y, en el Cuaderno, una lista
++de opciones precargadas junto a cada campo de texto (`PRECARGAS`) más escenarios listos de valoración y volatilidad. `tests/mesa.test.mjs` exige que cada escenario NQ calcule al menos un contrato.
++
++**Estética de terminal profesional (1-nov-2026).** Negro y grises para fondos, blanco y grises claros para texto y
++cifras, rojo como acento de identidad y selección. Alta densidad: títulos y encabezados de tabla en monoespaciado y
++mayúsculas, filas compactas alternadas, bordes finos. Referencia de densidad y organización: terminales financieras
++profesionales (tipo Bloomberg), con identidad propia: no se usa su marca, logotipo, textos, recursos ni código.
++Paleta de partida inspirada en OpenTerminal (ErTasselli, MIT). El tema oscuro es la referencia; el claro conserva los
++mismos roles.
++
++**El rojo nunca es la única señal.** Selección = borde/subrayado rojo + negritas + `aria-selected`/`aria-pressed`;
++pérdida = color + signo «−» + ▼; error y antigüedad = chip con texto («vencido», «SIN DATO») + color. Una ganancia
++siempre lleva «+» y ▲ en verde: la paleta roja no la convierte en pérdida. Los enlaces son blancos con subrayado rojo
++(no rojos) para no competir con las pérdidas.
+ 
+ ## Tokens
+ 
+-- **Colores:** definidos en `web/static/app.css` (`:root`) para modo claro y oscuro: `--vigente`, `--retrasado`, `--vencido`, `--sin-datos`, `--sintetico`.
+-- **Contraste mínimo:** 5.24:1 en claro y 6.1:1 en oscuro. Accesibilidad 100 en Lighthouse.
++Centralizados en `web/static/app.css` (`:root`, oscuro en `prefers-color-scheme: dark` y `[data-theme="dark"]`).
++Contraste medido con la fórmula WCAG 2.x (script en `docs/terminal-pro-20261101.md`).
++
++| Token | Oscuro | Claro | Uso | Contraste medido |
++|---|---|---|---|---|
++| `--fondo` | `#090a0c` | `#f5f5f4` | página | — |
++| `--superficie` | `#121419` | `#ffffff` | tarjetas, cabecera | — |
++| `--superficie-2` | `#1b1e24` | `#ecece9` | elevada, encabezados de tabla | — |
++| `--texto` | `#f3f4f6` | `#111318` | texto y cifras | 18.0 / 16.7 / 15.2 (oscuro: fondo/superficie/elevada); 17.0–18.6 (claro) |
++| `--texto-2` | `#b4bac4` | `#4a505a` | texto secundario | 10.2 / 9.4 / 8.6; claro 6.9–8.1 |
++| `--borde` | `#343942` | `#d4d4d0` | separadores decorativos | 1.4–1.7 (decorativo, no transmite información) |
++| `--borde-control` | `#6b7280` | `#6e747e` | límite de campos y botones secundarios | 3.45–4.10; claro 3.98–4.71 (≥ 3:1) |
++| `--acento-grafico` | `#d94848` | `#b42626` | marca, bordes de selección, barras | 4.69 / 4.36 / 3.95 (≥ 3:1 gráfico) |
++| `--acento` | `#f06a6a` | `#b42626` | texto rojo (selección) | 6.58 / 6.12 / 5.55; claro 5.47–6.47 |
++| `--acento-solido` | `#b42626` | `#b42626` | fondo de botón primario con texto blanco | blanco sobre él 6.47; lleva borde `--acento-grafico` |
++| `--positivo` / `--negativo` | `#4cc38a` / `#f2777a` | `#1d6b3a` / `#a3261c` | variaciones, siempre con signo y flecha | ≥ 6.1 en oscuro; ≥ 5.5 en claro |
++| `--marca` | `#d94848` | `#d94848` | logo, favicon y Excel | trazo blanco sobre rojo 4.22 (≥ 3:1 gráfico) |
++
++Rechazado tras medir: `#d94848` como texto sobre superficie (4.36) y elevada (3.95) no llega a 4.5:1; blanco sobre
++`#d94848` (4.22) tampoco. Por eso el rojo se divide en tres tokens (texto, sólido y gráfico).
++
++- **Estados de dato:** `--vigente`, `--retrasado`, `--vencido`, `--sin-datos`, `--sintetico` siguen distintos entre sí
++  y del acento; FUTURO conserva el violeta y el borde discontinuo.
++- **Widgets de terceros (TradingView):** solo admiten `colorTheme` claro/oscuro e `isTransparent`. La terminal pide
++  transparencia para que tomen el fondo de `grafica.css`; sus colores internos (velas, textos, logos) los decide el
++  proveedor y **no** se pueden recolorear desde Actinver.
++- **Excel de Markowitz:** banda negra con título blanco y borde rojo, encabezados gris oscuro con texto blanco, cuerpo
++  blanco (imprime legible). Entrada = relleno muy claro + **borde rojo punteado**; resultado = gris + **negritas + doble
++  línea**: se distinguen por forma, no solo por color. Sin macros ni vínculos externos.
+ - **Tipografía:** interfaz con Segoe UI y cifras con Consolas (`--mono`); sin fuentes externas.
+ - **Cuadrícula:** gutter de 16 px; tres cortes: ≤ 720 px, 721–1024 px y > 1024 px.
+ 
+@@ -38,3 +77,6 @@ Laboratorio de alfa. `tests/mesa.test.mjs` exige que cada escenario NQ calcule a
+ ## Accesibilidad
+ 
+ Pestañas con ARIA y navegación con teclado (flechas, Inicio, Fin). Todo el contenido dinámico se crea con `textContent`, nunca como HTML.
++Foco visible blanco (oscuro) o casi negro (claro) de 3 px. `prefers-reduced-motion` desactiva animaciones y transiciones.
++Mesa: paleta con `role="combobox"`/`listbox`, Ctrl/Cmd+K, ↑ ↓, Enter y Escape; reordenar con ← → (equivalente del
++arrastre con el asa ⠿) y «Ancho» con `aria-pressed`.
+diff --git a/terminal/app.py b/terminal/app.py
+index fa84ec9..12eb302 100644
+--- a/terminal/app.py
++++ b/terminal/app.py
+@@ -1511,6 +1511,35 @@ def get_lista_seguimiento(con=Depends(con_db)):
+     return seguimiento.lista(con, AJUSTES)
+ 
+ 
++# Paneles nativos de la Mesa: solo lectura de lo guardado (terminal/mesa_datos.py); ninguna consulta a proveedores.
++@app.get("/api/mesa/noticias")
++def mesa_noticias(simbolo: str = "", limite: int = 40, con=Depends(con_db)):
++    from . import mesa_datos
++    if simbolo and not re.fullmatch(r"[A-Z]{2,5}:[A-Z0-9.&*\- ]{1,30}", simbolo):
++        raise HTTPException(422, "símbolo inválido")
++    return mesa_datos.noticias(con, simbolo, limite)
++
++
++@app.get("/api/mesa/macro")
++def mesa_macro(con=Depends(con_db)):
++    from . import mesa_datos
++    return mesa_datos.macro(con, AJUSTES)
++
++
++@app.get("/api/mesa/resumen")
++def mesa_resumen(con=Depends(con_db)):
++    from . import mesa_datos
++    ins = mercado.instrumentos(con)
++    cot, _ = cotizaciones_estado(con, [i for i, v in ins.items() if v["estado"] == "activo"])
++    return mesa_datos.resumen(con, AJUSTES, cot=cot)
++
++
++@app.get("/api/mesa/resultados")
++def mesa_resultados():
++    from . import mesa_datos
++    return mesa_datos.CONTRATO_RESULTADOS
++
++
+ @app.post("/api/lista-seguimiento")
+ def post_lista_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
+     from . import seguimiento
+@@ -1679,10 +1708,11 @@ WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", Fa
+               "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
+               "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
+               "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
+-              "mapa-cripto": ("crypto-coins-heatmap", False)}
++              "mapa-cripto": ("crypto-coins-heatmap", False), "cinta-macro": ("ticker-tape", False),
++              "macro": ("market-quotes", False), "cripto-mercado": ("crypto-mkt-screener", False)}
+ MAPAS_TV = {"NASDAQ100", "SPX500"}
+-FILTROS_TV = {"america", "mexico"}
+-BASE_TV = {"isTransparent": False, "locale": "es", "width": "100%", "height": "100%"}
++FILTROS_TV = {"america", "mexico", "forex"}
++BASE_TV = {"isTransparent": True, "locale": "es", "width": "100%", "height": "100%"}  # transparente: toma el fondo de grafica.css
+ DIVISAS_TV = ["USD", "MXN", "EUR", "JPY", "GBP", "CAD", "CNY"]
+ 
+ 
+@@ -1705,6 +1735,24 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
+             grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso"), ("FX_IDC:EURMXN", "Euro / peso"), ("FX:EURUSD", "Euro / dólar")]),
+             grupo("Bonos de EE. UU. (ETF, precio)", [("NASDAQ:SHY", "SHY · Tesoro 1–3 años"), ("NASDAQ:IEF", "IEF · Tesoro 7–10 años"), ("NASDAQ:TLT", "TLT · Tesoro 20+ años")]),
+             grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:USOIL", "Petróleo WTI"), ("TVC:SILVER", "Plata")])]}
++    if tipo == "macro":
++        grupo = lambda t, ss: {"name": t, "symbols": [{"name": s, "displayName": d} for s, d in ss]}  # noqa: E731
++        return {**BASE_TV, "showSymbolLogo": True, "symbolsGroups": [
++            grupo("Tasas de EE. UU. (FRED, cierre diario o mensual)", [("FRED:DGS2", "Bono 2 años %"), ("FRED:DGS10", "Bono 10 años %"),
++                                     ("FRED:DGS30", "Bono 30 años %"), ("FRED:FEDFUNDS", "Fondos federales % (mensual)")]),
++            grupo("Volatilidad y dólar", [("CAPITALCOM:VIX", "VIX · volatilidad S&P 500"), ("CAPITALCOM:DXY", "Índice dólar (DXY)"),
++                                          ("FX_IDC:USDMXN", "Dólar / peso")]),
++            grupo("Energía", [("TVC:USOIL", "Petróleo WTI"), ("TVC:UKOIL", "Petróleo Brent"), ("CAPITALCOM:NATURALGAS", "Gas natural")]),
++            grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")]),
++            grupo("Cripto (fuera del Reto)", [("BITSTAMP:BTCUSD", "Bitcoin"), ("BITSTAMP:ETHUSD", "Ether")])]}
++    if tipo == "cinta-macro":
++        return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
++            {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),
++                                                    ("FOREXCOM:DJI", "Dow Jones"), ("CAPITALCOM:VIX", "VIX"), ("FRED:DGS10", "Bono EE. UU. 10a %"),
++                                                    ("CAPITALCOM:DXY", "Dólar DXY"), ("FX_IDC:USDMXN", "USD/MXN"), ("FX_IDC:EURMXN", "EUR/MXN"),
++                                                    ("TVC:GOLD", "Oro"), ("TVC:USOIL", "WTI"), ("BITSTAMP:BTCUSD", "Bitcoin")]]}
++    if tipo == "cripto-mercado":
++        return {**BASE_TV, "defaultColumn": "overview", "screener_type": "crypto_mkt", "displayCurrency": "USD"}
+     if tipo == "destacados":
+         return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}
+     if tipo == "mapa-etf":
+diff --git a/terminal/excel_markowitz.py b/terminal/excel_markowitz.py
+index 74e9378..1a49a7a 100644
+--- a/terminal/excel_markowitz.py
++++ b/terminal/excel_markowitz.py
+@@ -25,18 +25,24 @@ from openpyxl.utils import get_column_letter as L
+ 
+ from . import markowitz
+ 
+-# Colores de la terminal (modo claro de app.css) para que el libro se vea como la terminal.
+-MARCA, TEXTO, TEXTO_2, BORDE = "1F5F8B", "1C1D1F", "55585E", "D9D6CF"
+-SUPERFICIE_2, POSITIVO, POSITIVO_FONDO, SERIE_2 = "EFEDE8", "1D6B3A", "E3F1E7", "B0600F"
++# Identidad de la terminal (DESIGN.md): banda negra con texto blanco, encabezados gris oscuro, cuerpo blanco para que
++# imprima legible, y rojo solo como acento. Entradas y resultados se distinguen por FORMA (borde punteado / doble
++# línea y negritas), no solo por color. Contraste: blanco sobre NEGRO 17:1, blanco sobre GRIS_CAB 15:1, ROJO_TEXTO 6.5:1.
++MARCA, TEXTO, TEXTO_2, BORDE = "D94848", "111318", "4A505A", "C9CBD0"
++NEGRO, GRIS_CAB, ROJO_TEXTO, GRIS_RESULTADO = "121419", "1B1E24", "B42626", "ECECE9"
++POSITIVO, SERIE_1, SERIE_2 = "1D6B3A", "1F5F8B", "B0600F"
+ FUENTE = "Segoe UI"
+ NEGRITA = Font(name=FUENTE, bold=True, color=TEXTO)
+-TITULO = Font(name=FUENTE, bold=True, size=15, color=TEXTO)
+-SECCION = Font(name=FUENTE, bold=True, size=12, color=MARCA)
++TITULO = Font(name=FUENTE, bold=True, size=15, color="FFFFFF")
++SECCION = Font(name=FUENTE, bold=True, size=12, color=ROJO_TEXTO)
+ SUAVE = Font(name=FUENTE, size=10, color=TEXTO_2)
+-CABECERA = PatternFill("solid", fgColor=SUPERFICIE_2)
+-ENTRADA = PatternFill("solid", fgColor="E3EEF6")      # celdas que el usuario puede cambiar (azul claro)
+-RESULTADO = PatternFill("solid", fgColor=POSITIVO_FONDO)
++FUENTE_CAB = Font(name=FUENTE, bold=True, color="FFFFFF")
++BANDA = PatternFill("solid", fgColor=NEGRO)
++CABECERA = PatternFill("solid", fgColor=GRIS_CAB)
++ENTRADA = PatternFill("solid", fgColor="FFF5F5")      # editable: relleno muy claro + borde rojo punteado
++RESULTADO = PatternFill("solid", fgColor=GRIS_RESULTADO)  # resultado: gris claro + negritas + doble línea inferior
+ LINEA = Side(style="thin", color=BORDE)
++PUNTEADA = Side(style="dashed", color=ROJO_TEXTO)
+ PCT, NUM = "0.00%", "#,##0.00"
+ # Ejercicio de Acelera: E(r) y σ anuales; correlaciones derivadas de las covarianzas diarias del mismo archivo
+ ACELERA = (["IPC", "SP500", "Treasury MXN"], [0.11, 0.16, 0.09], [0.18, 0.17, 0.10],
+@@ -46,7 +52,7 @@ AVISO = "Simulación educativa con datos históricos: no es pronóstico ni recom
+ 
+ @lru_cache(maxsize=1)
+ def _logo_png(px: int = 96) -> bytes:
+-    """El mismo logo que web/static/favicon.svg (cuadro azul con línea de precio blanca), en PNG."""
++    """El mismo logo que web/static/favicon.svg (cuadro rojo con línea de precio blanca), en PNG."""
+     from PIL import Image, ImageDraw
+     k = px / 32
+     im = Image.new("RGBA", (px, px), (0, 0, 0, 0))
+@@ -73,7 +79,8 @@ def _encabezado(ws, titulo: str, columnas: int, subtitulo: str | None = None) ->
+     ws["A1"].font = TITULO
+     ws["A1"].alignment = Alignment(vertical="center", indent=3)
+     for c in range(1, columnas + 1):
+-        ws.cell(1, c).border = Border(bottom=Side(style="medium", color=MARCA))
++        ws.cell(1, c).fill = BANDA
++        ws.cell(1, c).border = Border(bottom=Side(style="thick", color=MARCA))
+     if subtitulo:
+         ws["A2"] = subtitulo
+         ws["A2"].font = SUAVE
+@@ -81,15 +88,20 @@ def _encabezado(ws, titulo: str, columnas: int, subtitulo: str | None = None) ->
+ 
+ 
+ def _cabecera(celda) -> None:
+-    celda.font, celda.fill, celda.border = NEGRITA, CABECERA, Border(bottom=LINEA)
++    celda.font, celda.fill, celda.border = FUENTE_CAB, CABECERA, Border(bottom=Side(style="thin", color=MARCA))
+ 
+ 
+ def _entrada(celda, formato: str | None = None) -> None:
+-    celda.fill, celda.border = ENTRADA, Border(left=LINEA, right=LINEA, top=LINEA, bottom=LINEA)
++    celda.fill, celda.border = ENTRADA, Border(left=PUNTEADA, right=PUNTEADA, top=PUNTEADA, bottom=PUNTEADA)
+     if formato:
+         celda.number_format = formato
+ 
+ 
++def _resultado(celda) -> None:
++    celda.fill, celda.font = RESULTADO, Font(name=FUENTE, bold=True, color=TEXTO)
++    celda.border = Border(top=LINEA, bottom=Side(style="double", color=TEXTO))
++
++
+ def _fuente_terminal(wb: Workbook) -> None:
+     """Segoe UI en todo el libro (openpyxl deja Calibri en las celdas sin formato)."""
+     for ws in wb.worksheets:
+@@ -121,13 +133,15 @@ def _guia(wb: Workbook, titulo: str, bloques: list[tuple[str, list[str]]]) -> No
+             ws.row_dimensions[fila].height = 15 * max(1, -(-len(paso) // 115))
+             fila += 1
+         fila += 1
+-    ejemplo = [("Azul claro", ENTRADA, "usted escribe aquí"), ("Blanco", None, "fórmula: no la borre"),
+-               ("Verde", RESULTADO, "resultado principal")]
++    ejemplo = [("Borde rojo punteado", ENTRADA, "usted escribe aquí"), ("Sin borde", None, "fórmula: no la borre"),
++               ("Gris, negritas y doble línea", RESULTADO, "resultado principal")]
+     ws.cell(fila, 1, "Colores del libro").font = SECCION
+     for k, (nombre, relleno, uso) in enumerate(ejemplo, start=fila + 1):
+         c = ws.cell(k, 2, f"{nombre}: {uso}")
+-        if relleno:
+-            c.fill = relleno
++        if relleno is ENTRADA:
++            _entrada(c)
++        elif relleno is RESULTADO:
++            _resultado(c)
+     ws.freeze_panes = "A4"
+ 
+ 
+@@ -176,7 +190,7 @@ def _resultados(ws, fila: int, n: int, f_e: int, c_e: str, c_w: str, f_cov: int,
+         c = ws.cell(r0 + k, 2, f)
+         c.number_format = fmt
+         if et in principales:
+-            c.fill, c.font = RESULTADO, Font(name=FUENTE, bold=True, color=POSITIVO)
++            _resultado(c)
+         celdas[et] = f"B{r0 + k}"
+     celdas["pesos"] = cw
+     return celdas
+@@ -216,9 +230,9 @@ def _frontera(ws, fila: int, res: dict, ancla: str) -> None:
+     g.title, g.style, g.height, g.width = "Frontera eficiente", 13, 9, 18
+     g.x_axis.title, g.y_axis.title = "Riesgo σ (anual)", "Rendimiento esperado (anual)"
+     for xs, ys, nombre, color, marcador, linea in [
+-        (Reference(ws, min_col=1, min_row=fila + 2, max_row=fila + 1 + nf), Reference(ws, min_col=2, min_row=fila + 2, max_row=fila + 1 + nf), "Frontera", MARCA, None, True),
++        (Reference(ws, min_col=1, min_row=fila + 2, max_row=fila + 1 + nf), Reference(ws, min_col=2, min_row=fila + 2, max_row=fila + 1 + nf), "Frontera", TEXTO, None, True),
+         (Reference(ws, min_col=5, min_row=fila + 2, max_row=fila + 1 + na), Reference(ws, min_col=6, min_row=fila + 2, max_row=fila + 1 + na), "Activos", TEXTO_2, "circle", False),
+-        (Reference(ws, min_col=8, min_row=fila + 2), Reference(ws, min_col=9, min_row=fila + 2), "Elegido", SERIE_2, "diamond", False)]:
++        (Reference(ws, min_col=8, min_row=fila + 2), Reference(ws, min_col=9, min_row=fila + 2), "Elegido", MARCA, "diamond", False)]:
+         se = Series(ys, xs, title=nombre)
+         _colorear(se, color, marcador, linea)
+         g.series.append(se)
+@@ -261,7 +275,7 @@ def _hoja_historica(wb: Workbook, prefijo: str, nombres: list[str], precios: pd.
+ 
+     ws = wb.create_sheet(f"{prefijo}Modelo"[:31])
+     _encabezado(ws, f"Modelo de Markowitz · {res['especificacion']['nombre'] if res else 'plantilla con sus datos'}", n + 9,
+-                "Celdas azul claro: usted escribe. Verde: resultado principal. " + AVISO)
++                "Borde rojo punteado: usted escribe. Gris con negritas y doble línea: resultado principal. " + AVISO)
+     for k, (et, v, fmt) in enumerate([("Tasa libre de riesgo r_f", rf, PCT), ("Aversión al riesgo A", aversion, "0.0"),
+                                       ("Peso máximo por activo", peso_max, PCT), ("Peso mínimo por activo", peso_min, PCT)]):
+         ws.cell(3 + k, 1, et).font = NEGRITA
+@@ -304,7 +318,7 @@ def _hoja_parametrica(wb: Workbook) -> dict:
+     n = len(nombres)
+     ws = wb.create_sheet("Paramétrico Acelera")
+     _encabezado(ws, "Ejercicio del Taller de Portafolios (Acelera)", 8,
+-                "Matriz de covarianzas armada con correlaciones. Celdas azul claro: usted escribe. " + AVISO)
++                "Matriz de covarianzas armada con correlaciones. Borde rojo punteado: usted escribe. " + AVISO)
+     ws["A3"], ws["B3"] = "Tasa libre de riesgo r_f", 0.07
+     ws["A4"], ws["B4"] = "Aversión al riesgo A", 4
+     ws["A3"].font = ws["A4"].font = NEGRITA
+@@ -320,7 +334,7 @@ def _hoja_parametrica(wb: Workbook) -> dict:
+             _entrada(ws.cell(r, col, v), PCT)
+         ws.cell(r, 4, f'=IFERROR((B{r}-$B$3)/C{r},"")').number_format = "0.000"
+     f_rho = f_e + n + 2
+-    ws.cell(f_rho - 1, 1, "Correlaciones ρ (cambie el triángulo azul; el otro se copia)").font = SECCION
++    ws.cell(f_rho - 1, 1, "Correlaciones ρ (cambie el triángulo de borde punteado; el otro se copia)").font = SECCION
+     fr, cr = _matriz(ws, f_rho, 1, nombres, lambda i, j: 1 if i == j else (rho[i][j] if j > i else f"={L(2 + i)}{f_rho + 1 + j}"))
+     for i in range(n):
+         for j in range(i + 1, n):
+@@ -350,7 +364,7 @@ def _hoja_parametrica(wb: Workbook) -> dict:
+     g.title, g.style, g.height, g.width = "Dos activos: efecto de la correlación", 13, 9, 16
+     g.x_axis.title, g.y_axis.title = "σ_p", "E(r_p)"
+     ys = Reference(ws, min_col=4, min_row=f2 + 3, max_row=f2 + 13)
+-    for col, nm, color in ((3, "ρ elegida", MARCA), (5, "ρ=+1", "A3261C"), (6, "ρ=0", SERIE_2), (7, "ρ=−1", POSITIVO)):
++    for col, nm, color in ((3, "ρ elegida", MARCA), (5, "ρ=+1", TEXTO_2), (6, "ρ=0", SERIE_2), (7, "ρ=−1", SERIE_1)):
+         se = Series(ys, Reference(ws, min_col=col, min_row=f2 + 3, max_row=f2 + 13), title=nm)
+         _colorear(se, color)
+         g.series.append(se)
+@@ -372,7 +386,7 @@ def _pasos_solver(h: dict) -> list[str]:
+         "menor riesgo.",
+         f"Cambiando las celdas de variables: {pesos}.",
+         f"Restricciones (botón Agregar): {h['Suma de pesos (debe ser 100 %)']} = 1  ·  {pesos} <= $B$5  ·  {pesos} >= $B$6.",
+-        "Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». Los resultados verdes se actualizan solos.",
++        "Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». Los resultados en gris con doble línea se actualizan solos.",
+     ]
+ 
+ 
+@@ -397,7 +411,7 @@ def plantilla() -> bytes:
+             "10 conservador).",
+             f"B{f_e}:C{f_e + n - 1}: rendimiento esperado y riesgo (σ) anual de cada activo. E{f_e}:E{f_e + n - 1}: los pesos "
+             "(deben sumar 100 %).",
+-            f"{p['rho']}: correlaciones entre activos (triángulo azul; el resto se copia solo).",
++            f"{p['rho']}: correlaciones entre activos (triángulo de borde punteado; el resto se copia solo).",
+             f"Lea el resultado: rendimiento {p['E(r_p) anual']}, riesgo {p['σ_p anual']} y Sharpe {p['Sharpe']}. Más abajo, la "
+             "tabla y la gráfica de dos activos muestran cómo la correlación baja el riesgo."]),
+         ("Opción B · Con sus precios (hojas «Histórico Datos» e «Histórico Modelo»)", [
+@@ -460,7 +474,7 @@ def libro(con, ajustes, portafolios: list[dict]) -> bytes:
+             "«Resumen»: los portafolios lado a lado (rendimiento, riesgo y Sharpe enlazados a sus hojas).",
+             "Por cada portafolio, «P# Datos» (precios en MXN y rendimientos diarios) y «P# Modelo» (estadísticos, covarianzas, "
+             "correlaciones, pesos, resultados, frontera eficiente y gráfica).",
+-            "Los pesos en azul claro son los que calculó la terminal. Cámbielos para explorar: todo se recalcula."]),
++            "Los pesos con borde rojo punteado son los que calculó la terminal. Cámbielos para explorar: todo se recalcula."]),
+         ("Dónde está cada cosa", [f"«{nombre}» → hoja «{c['hoja']}»: pesos {c['pesos']} · rendimiento {c['E(r_p) anual']} · riesgo "
+                                   f"{c['σ_p anual']} · Sharpe {c['Sharpe']} · suma de pesos {c['Suma de pesos (debe ser 100 %)']}."
+                                   for nombre, c in hojas]),
+diff --git a/web/static/app.css b/web/static/app.css
+index 92796b6..2d2eea5 100644
+--- a/web/static/app.css
++++ b/web/static/app.css
+@@ -1,25 +1,30 @@
+ /* Terminal de portafolios — estilos. Sin fuentes externas; tokens con modo claro/oscuro. */
+ :root {
+-  --fondo: #f6f5f2;
++  /* Claro: mismos roles que el oscuro (referencia principal). Contraste medido en DESIGN.md. */
++  --fondo: #f5f5f4;
+   --superficie: #ffffff;
+-  --superficie-2: #efede8;
+-  --texto: #1c1d1f;
+-  --texto-2: #55585e;
+-  --borde: #d9d6cf;
+-  --acento: #1f5f8b;
++  --superficie-2: #ecece9;
++  --texto: #111318;
++  --texto-2: #4a505a;
++  --borde: #d4d4d0;          /* decorativo */
++  --borde-control: #6e747e;  /* límites de controles: ≥ 3:1 */
++  --acento: #b42626;         /* rojo para texto (enlaces subrayados, selección) */
++  --acento-solido: #b42626;  /* rojo de fondo con texto blanco 6.5:1 */
++  --acento-grafico: #b42626; /* bordes, marcas y barras de identidad */
++  --acento-fondo: #fbe9e9;
+   --acento-texto: #ffffff;
+   --positivo: #1d6b3a;
+   --negativo: #a3261c;
+   --vigente: #1d6b3a;   --vigente-fondo: #e3f1e7;
+   --retrasado: #8a5a00; --retrasado-fondo: #fbf0d9;
+   --vencido: #a3261c;   --vencido-fondo: #f8e3e0;
+-  --sin-datos: #50545a; --sin-datos-fondo: #e9e8e4;
++  --sin-datos: #4a505a; --sin-datos-fondo: #e9e8e4;
+   --sintetico: #5a3d8a; --sintetico-fondo: #ece6f6;
+   --serie-1: #1f5f8b;
+   --serie-2: #b0600f;
+-  --foco: #1f5f8b;
+-  --marca: #1f5f8b;        /* color fijo del logo: igual en claro, oscuro, favicon y Excel */
+-  --radio: 6px;
++  --foco: #111318;
++  --marca: #d94848;        /* color fijo del logo: igual en claro, oscuro, favicon y Excel */
++  --radio: 4px;
+   --espacio: 16px;
+   --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+   --mono: Consolas, "Cascadia Mono", "SF Mono", Menlo, ui-monospace, monospace;
+@@ -27,21 +32,23 @@
+ }
+ @media (prefers-color-scheme: dark) {
+   :root:not([data-theme="light"]) {
+-    --fondo: #141517; --superficie: #1c1e21; --superficie-2: #25282c; --texto: #e8e6e1; --texto-2: #a6a9ae;
+-    --borde: #34373c; --acento: #6fb0dd; --acento-texto: #0f1215; --positivo: #6cc28c; --negativo: #f08a7e;
+-    --vigente: #6cc28c; --vigente-fondo: #1d3326; --retrasado: #e5b454; --retrasado-fondo: #3a2f16;
+-    --vencido: #f08a7e; --vencido-fondo: #3e1f1b; --sin-datos: #b3b6bb; --sin-datos-fondo: #2b2e32;
+-    --sintetico: #c3a8f0; --sintetico-fondo: #2e2540; --serie-1: #6fb0dd; --serie-2: #e5a15a; --foco: #9ccbee;
++    --fondo: #090a0c; --superficie: #121419; --superficie-2: #1b1e24; --texto: #f3f4f6; --texto-2: #b4bac4;
++    --borde: #343942; --borde-control: #6b7280; --acento: #f06a6a; --acento-solido: #b42626; --acento-grafico: #d94848;
++    --acento-fondo: #2a1416; --acento-texto: #ffffff; --positivo: #4cc38a; --negativo: #f2777a;
++    --vigente: #4cc38a; --vigente-fondo: #12291d; --retrasado: #e5b454; --retrasado-fondo: #33290f;
++    --vencido: #f2777a; --vencido-fondo: #3a1719; --sin-datos: #b4bac4; --sin-datos-fondo: #23262d;
++    --sintetico: #c3a8f0; --sintetico-fondo: #2b2340; --serie-1: #6fb0dd; --serie-2: #e5a15a; --foco: #f3f4f6;
+     color-scheme: dark;
+   }
+ }
+ :root[data-theme="dark"] {
+-  --fondo: #141517; --superficie: #1c1e21; --superficie-2: #25282c; --texto: #e8e6e1; --texto-2: #a6a9ae;
+-  --borde: #34373c; --acento: #6fb0dd; --acento-texto: #0f1215; --positivo: #6cc28c; --negativo: #f08a7e;
+-  --vigente: #6cc28c; --vigente-fondo: #1d3326; --retrasado: #e5b454; --retrasado-fondo: #3a2f16;
+-  --vencido: #f08a7e; --vencido-fondo: #3e1f1b; --sin-datos: #b3b6bb; --sin-datos-fondo: #2b2e32;
+-  --sintetico: #c3a8f0; --sintetico-fondo: #2e2540; --serie-1: #6fb0dd; --serie-2: #e5a15a; --foco: #9ccbee;
+-  color-scheme: dark;
++  --fondo: #090a0c; --superficie: #121419; --superficie-2: #1b1e24; --texto: #f3f4f6; --texto-2: #b4bac4;
++    --borde: #343942; --borde-control: #6b7280; --acento: #f06a6a; --acento-solido: #b42626; --acento-grafico: #d94848;
++    --acento-fondo: #2a1416; --acento-texto: #ffffff; --positivo: #4cc38a; --negativo: #f2777a;
++    --vigente: #4cc38a; --vigente-fondo: #12291d; --retrasado: #e5b454; --retrasado-fondo: #33290f;
++    --vencido: #f2777a; --vencido-fondo: #3a1719; --sin-datos: #b4bac4; --sin-datos-fondo: #23262d;
++    --sintetico: #c3a8f0; --sintetico-fondo: #2b2340; --serie-1: #6fb0dd; --serie-2: #e5a15a; --foco: #f3f4f6;
++    color-scheme: dark;
+ }
+ 
+ * { box-sizing: border-box; }
+@@ -51,10 +58,11 @@ h1 { font-size: 1.35rem; margin: 0 0 12px; font-weight: 650; }
+ h2 { font-size: 1.05rem; margin: 28px 0 10px; font-weight: 650; }
+ h3 { font-size: .95rem; margin: 18px 0 8px; font-weight: 650; }
+ p { margin: 0 0 10px; }
+-a { color: var(--acento); }
++a { color: var(--texto); text-decoration-color: var(--acento-grafico); text-decoration-thickness: 1px; }
++a:hover { text-decoration-thickness: 2px; }
+ :focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+ .oculto-visual { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+-.saltar { position: absolute; left: -999px; top: 0; background: var(--acento); color: var(--acento-texto); padding: 8px 12px; z-index: 10; }
++.saltar { position: absolute; left: -999px; top: 0; background: var(--acento-solido); color: var(--acento-texto); padding: 8px 12px; z-index: 10; }
+ .saltar:focus { left: 8px; top: 8px; }
+ 
+ /* Cabecera */
+@@ -75,10 +83,10 @@ a { color: var(--acento); }
+ 
+ /* Botones */
+ .boton { font: inherit; font-weight: 600; border-radius: var(--radio); padding: 9px 14px; min-height: 40px; cursor: pointer; border: 1px solid transparent; }
+-.boton--primario { background: var(--acento); color: var(--acento-texto); }
++.boton--primario { background: var(--acento-solido); color: var(--acento-texto); border-color: var(--acento-grafico); }
+ .boton--secundario { background: transparent; color: var(--texto); border-color: var(--borde); }
+ .boton--real { border-color: var(--vigente); color: var(--vigente); background: var(--vigente-fondo); }
+-.boton--texto { background: none; border: none; color: var(--acento); padding: 4px 6px; min-height: 32px; text-decoration: underline; }
++.boton--texto { background: none; border: none; color: var(--texto); text-decoration-color: var(--acento-grafico); padding: 4px 6px; min-height: 32px; text-decoration: underline; }
+ .boton[disabled] { opacity: .55; cursor: progress; }
+ 
+ /* Pestañas: dos filas alineadas con la cabecera (ancho máx. 1280 px): grupos por tarea arriba; pestañas del grupo
+@@ -89,11 +97,11 @@ a { color: var(--acento); }
+ .grupos-nav button { font: inherit; font-size: .92rem; font-weight: 600; white-space: nowrap; min-height: 40px; padding: 8px 16px; border-radius: 999px;
+   border: 1px solid var(--borde); background: none; color: var(--texto-2); cursor: pointer; }
+ .grupos-nav button:hover { color: var(--texto); border-color: var(--texto-2); }
+-.grupos-nav button[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--superficie); }
++.grupos-nav button[aria-pressed="true"] { background: var(--acento-fondo); border-color: var(--acento-grafico); color: var(--texto); box-shadow: inset 0 -2px 0 var(--acento-grafico); }
+ .pestanas [role="tablist"] { display: flex; gap: 2px; flex: 1 1 12rem; min-width: 0;   /* base > 0: nunca cabe junto a los grupos, siempre baja a la 2.ª fila */ overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+ .pestanas [role="tab"] { font: inherit; background: none; border: none; border-bottom: 3px solid transparent; padding: 11px 14px; color: var(--texto-2); cursor: pointer; white-space: nowrap; min-height: 44px; }
+ .pestanas [role="tab"]:hover { color: var(--texto); }
+-.pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento); font-weight: 600; }
++.pestanas [role="tab"][aria-selected="true"] { color: var(--texto); border-bottom-color: var(--acento-grafico); font-weight: 650; }
+ .desplazar-pestanas { flex: none; font: inherit; font-size: 1.1rem; width: 36px; min-height: 40px; border: 1px solid var(--borde); border-radius: var(--radio);
+   background: var(--superficie); color: var(--texto); cursor: pointer; }
+ .desplazar-pestanas[hidden] { display: none; }
+@@ -105,7 +113,7 @@ a { color: var(--acento); }
+ details.tarjeta > summary { cursor: pointer; font-weight: 600; }
+ .zona-capturas { display: grid; gap: 4px; border: 2px dashed var(--borde); border-radius: var(--radio); padding: 16px; margin: 10px 0;
+   cursor: pointer; background: var(--superficie); }
+-.zona-capturas:hover, .zona-capturas:focus-visible, .zona-capturas.encima { border-color: var(--acento); outline: none; }
++.zona-capturas:hover, .zona-capturas:focus-visible, .zona-capturas.encima { border-color: var(--acento-grafico); outline: none; }
+ 
+ main { max-width: 1280px; margin: 0 auto; padding: 20px var(--espacio) 96px; min-height: 100vh; }
+ #resumen-contenido { min-height: 60vh; }
+@@ -115,7 +123,7 @@ main:focus { outline: none; }
+ .rejilla { display: grid; gap: var(--espacio); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+ .tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: var(--espacio); min-width: 0; }
+ .tarjeta h2, .tarjeta h3 { margin-top: 0; }
+-.tarjeta--destacada { border-color: var(--acento); }
++.tarjeta--destacada { border-color: var(--acento-grafico); }
+ .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 8px 0 4px; }
+ .kpi .etiqueta { font-size: .8rem; color: var(--texto-2); display: block; }
+ .kpi .valor { font-size: 1.2rem; font-weight: 650; }
+@@ -156,7 +164,7 @@ tr:last-child td { border-bottom: none; }
+ .barras { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+ .barras li { display: grid; grid-template-columns: minmax(90px, 36%) 1fr 52px; gap: 8px; align-items: center; font-size: .86rem; }
+ .barra { height: 10px; background: var(--superficie-2); border-radius: 3px; overflow: hidden; }
+-.barra > span { display: block; height: 100%; background: var(--acento); }
++.barra > span { display: block; height: 100%; background: var(--serie-1); }
+ .nombre-corto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ 
+ /* Criterios de puntuación */
+@@ -181,7 +189,7 @@ input[aria-invalid="true"] { border-color: var(--vencido); }
+ .segmentado-campo label { border: 1px solid var(--borde); border-radius: var(--radio); padding: 8px 12px; display: flex; gap: 6px; align-items: center; cursor: pointer; background: var(--fondo); }
+ .segmentado { display: inline-flex; border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; margin-bottom: 16px; max-width: 100%; }
+ .segmentado button { font: inherit; background: var(--superficie); border: none; padding: 9px 14px; cursor: pointer; color: var(--texto-2); min-height: 40px; }
+-.segmentado button[aria-checked="true"] { background: var(--acento); color: var(--acento-texto); font-weight: 600; }
++.segmentado button[aria-checked="true"] { background: var(--acento-solido); color: var(--acento-texto); font-weight: 650; }
+ .filtros { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+ 
+ details { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 10px 14px; margin-top: 12px; }
+@@ -209,12 +217,12 @@ td.num, th.num, .kpi .valor, .puntuacion .numero, .cifra, .barras .num { font-fa
+ @keyframes pulso { from { opacity: .55; } to { opacity: 1; } }
+ 
+ /* Contador de alertas y tarjetas de alerta: el único elemento que destaca por color */
+-.contador { display: inline-block; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--vencido); color: var(--acento-texto); font-size: .75rem; font-weight: 700; margin-left: 4px; }
++.contador { display: inline-block; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--acento-solido); color: var(--acento-texto); font-size: .75rem; font-weight: 700; margin-left: 4px; }
+ .alertas { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+ .alerta { background: var(--superficie); border: 1px solid var(--borde); border-left: 4px solid var(--sin-datos); border-radius: var(--radio); padding: 12px 14px; }
+ .alerta--critica { border-left-color: var(--vencido); }
+ .alerta--aviso { border-left-color: var(--retrasado); }
+-.alerta--info { border-left-color: var(--acento); }
++.alerta--info { border-left-color: var(--serie-1); }
+ .alerta--vista { opacity: .7; }
+ .alerta h3 { margin: 0 0 4px; font-size: .95rem; }
+ .alerta .meta { color: var(--texto-2); font-size: .8rem; margin-bottom: 6px; }
+@@ -311,7 +319,7 @@ td.col-corta, th.col-corta { min-width: 9rem; max-width: 16rem; overflow-wrap: a
+ .mercado-tile strong { font-size: .88rem; overflow-wrap: anywhere; }
+ .mercado-tile span { font-family: var(--mono); font-size: 1.08rem; font-weight: 700; }
+ .mercado-tile small { font-size: .72rem; opacity: .85; }
+-.mercado-tile:hover, .mercado-tile:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
++.mercado-tile:hover, .mercado-tile:focus-visible { outline: 2px solid var(--foco); outline-offset: 1px; }
+ .mercado-tile--sube-1 { background: color-mix(in srgb, var(--vigente) 12%, var(--superficie)); }
+ .mercado-tile--sube-2 { background: color-mix(in srgb, var(--vigente) 25%, var(--superficie)); }
+ .mercado-tile--sube-3 { background: color-mix(in srgb, var(--vigente) 40%, var(--superficie)); }
+@@ -422,3 +430,38 @@ a.boton { text-decoration: none; display: inline-flex; align-items: center; }
+ .referencias__grupo > summary { cursor: pointer; font-weight: 600; }
+ .referencias__lista { padding-left: 1.2em; }
+ .referencias__lista li { margin: 4px 0; overflow-wrap: anywhere; }
++
++/* ---------- Capa de terminal profesional (compartida por todas las áreas) ----------
++   Densidad y legibilidad de terminal financiera con identidad propia: negro y grises, texto blanco, rojo como acento.
++   Paleta de partida inspirada en OpenTerminal (ErTasselli, MIT); ningún recurso de marcas de terceros. */
++:root { --rejilla: color-mix(in srgb, var(--borde) 60%, transparent); }
++main h1, .cuaderno-intro h1 { font-family: var(--mono); font-size: 1.1rem; letter-spacing: .06em; text-transform: uppercase; color: var(--texto);
++  border-left: 3px solid var(--acento-grafico); padding-left: 10px; }
++main h2 { font-family: var(--mono); font-size: .86rem; letter-spacing: .05em; text-transform: uppercase; color: var(--texto);
++  border-bottom: 1px solid var(--rejilla); padding-bottom: 4px; }
++.tarjeta h2, .guia h2 { border-bottom: 0; }
++.pestanas [role="tab"] { font-size: .86rem; letter-spacing: .02em; }
++.grupos-nav button { font-family: var(--mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; border-radius: var(--radio); }
++input, select, textarea { border-color: var(--borde-control); }
++a { text-underline-offset: 2px; }
++th { font-family: var(--mono); font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; }
++th, td { padding: 5px 9px; }
++tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--superficie-2) 45%, transparent); }
++tbody tr:hover td { background: var(--superficie-2); }
++.kpi .etiqueta { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
++.boton { border-radius: var(--radio); }
++.boton--secundario { border-color: var(--borde-control); }
++.guia { border-left-color: var(--acento-grafico); border-radius: var(--radio); }
++.widget-tv { border-radius: var(--radio); background: var(--superficie); }
++.nav-global__reloj { font-family: var(--mono); font-size: .78rem; color: var(--texto-2); white-space: nowrap; letter-spacing: .03em; }
++.nav-global__reloj b { color: var(--texto); font-weight: 650; }
++.cinta-global { display: block; width: 100%; height: 76px; border: 0; border-bottom: 1px solid var(--borde); background: var(--superficie); }
++.sin-dato { font-family: var(--mono); font-size: .8rem; color: var(--sin-datos); }
++* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
++::-webkit-scrollbar { width: 8px; height: 8px; }
++::-webkit-scrollbar-thumb { background: var(--borde); }
++::-webkit-scrollbar-thumb:hover { background: var(--borde-control); }
++@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
++@media print { main h1 { color: #000; border-color: #000; } }
++.nav-global__selector label { white-space: nowrap; flex: none; }
++.nav-global__selector select { min-width: 0; flex: 1 1 200px; }
+diff --git a/web/static/favicon.svg b/web/static/favicon.svg
+index 4ea7e16..cbde000 100644
+--- a/web/static/favicon.svg
++++ b/web/static/favicon.svg
+@@ -1 +1 @@
+-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#1f5f8b"/><path d="M6 25h20M8 20l5-6 4 3 7-9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#d94848"/><path d="M6 25h20M8 20l5-6 4 3 7-9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+diff --git a/web/static/grafica.css b/web/static/grafica.css
+index fd00bf5..6717599 100644
+--- a/web/static/grafica.css
++++ b/web/static/grafica.css
+@@ -1,11 +1,11 @@
+ /* Páginas aisladas de los widgets de TradingView: mismos colores y logo que la terminal (app.css), en claro u oscuro. */
+ html, body { margin: 0; height: 100%; font: 14px/1.4 "Segoe UI", system-ui, sans-serif; }
+-body.tema-oscuro { background: #141517; color: #e8e6e1; --borde: #34373c; --acento: #6fb0dd; }
+-body.tema-claro { background: #f6f5f2; color: #1c1d1f; --borde: #d9d6cf; --acento: #1f5f8b; }
++body.tema-oscuro { background: #121419; color: #f3f4f6; --borde: #343942; --acento: #f06a6a; }
++body.tema-claro { background: #ffffff; color: #111318; --borde: #d4d4d0; --acento: #b42626; }
+ header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--borde); }
+ a { color: var(--acento); }
+ .marca { display: inline-flex; align-items: center; gap: 6px; font-weight: 650; color: inherit; text-decoration: none; }
+-.marca__logo rect { fill: #1f5f8b; }
++.marca__logo rect { fill: #d94848; }
+ .marca__logo path { fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+ .tradingview-widget-container { height: calc(100% - 40px); width: 100%; }
+ .tradingview-widget-container__widget { height: 100%; width: 100%; }
+diff --git a/web/static/mesa.css b/web/static/mesa.css
+index 270027d..82b9bbb 100644
+--- a/web/static/mesa.css
++++ b/web/static/mesa.css
+@@ -9,3 +9,39 @@
+ .mesa-panel form {display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+ .mesa-panel input {width:100%;box-sizing:border-box}
+ .mesa-panel summary {cursor:pointer; padding:12px 0}
++/* Paleta, contenido nativo, gráfica y cuadrícula configurable (tokens de app.css) */
++.mesa-paleta-caja {position:relative; flex:1 1 260px; min-width:0}
++#mesa-paleta {position:absolute; z-index:6; left:0; right:0; top:100%; margin:2px 0 0; padding:4px 0; list-style:none; max-height:320px; overflow:auto;
++  background:var(--superficie-2); border:1px solid var(--borde-control); border-radius:var(--radio)}
++#mesa-paleta li {padding:6px 10px; cursor:pointer; font-size:.88rem; border-left:3px solid transparent}
++#mesa-paleta li[aria-selected="true"] {background:var(--acento-fondo); border-left-color:var(--acento-grafico); font-weight:650}
++#mesa-paleta li::before {font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; color:var(--texto-2); margin-right:8px}
++#mesa-paleta li[data-tipo="instrumento"]::before {content:"INSTR"} #mesa-paleta li[data-tipo="seccion"]::before {content:"IR"}
++#mesa-paleta li[data-tipo="panel"]::before {content:"PANEL"} #mesa-paleta li[data-tipo="disposicion"]::before {content:"DISP"}
++.mesa-mas {margin:0; padding:6px 10px} .mesa-mas[open] {display:flex; flex-wrap:wrap; gap:8px; align-items:end}
++.mesa-seguimiento-caja {margin:0 0 16px}
++.mesa-seguimiento caption {text-align:left; font-size:.8rem; color:var(--texto-2); padding:4px 0}
++.mesa-panel--ancho {grid-column:1 / -1}
++.mesa-panel--arrastrando {opacity:.55; outline:2px dashed var(--borde-control)}
++.mesa-asa {cursor:grab; color:var(--texto-2); padding:0 4px; font-size:1.1rem; user-select:none}
++.mesa-panel header .boton[aria-pressed="true"] {border-color:var(--acento-grafico); box-shadow:inset 0 -2px 0 var(--acento-grafico)}
++.mesa-nativo {margin:0 0 10px}
++.mesa-nativo__titulo {font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--texto-2); margin:6px 0}
++.mesa-procedencia {font-size:.78rem; color:var(--texto-2); margin:6px 0 0}
++.mesa-meta {color:var(--texto-2); font-size:.78rem}
++.mesa-lista {margin:0; padding-left:1.1em; display:grid; gap:6px; font-size:.88rem}
++.mesa-kpis {display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:2px 12px; margin:0 0 8px}
++.mesa-kpis dt {font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--texto-2)}
++.mesa-kpis dd {margin:0 0 6px; font-family:var(--mono); font-size:1rem}
++.sube {color:var(--positivo)} .baja {color:var(--negativo)}
++.mesa-controles-grafica {display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; font-size:.85rem; margin-bottom:6px}
++.mesa-controles-grafica select {width:auto}
++.mesa-grafica {display:block; width:100%; height:auto; font:11px var(--mono)}
++.mesa-grafica text {fill:var(--texto-2)}
++.mesa-grafica .rejilla {stroke:var(--borde); stroke-width:1}
++.mesa-grafica .linea {fill:none; stroke:var(--serie-1); stroke-width:1.6}
++.mesa-grafica .sma {fill:none; stroke:var(--serie-2); stroke-width:1.2; stroke-dasharray:4 3}
++.mesa-grafica .volumen {fill:var(--borde-control)}
++.mesa-grafica line.sube {stroke:var(--vela-sube)} .mesa-grafica line.baja {stroke:var(--vela-baja)}
++.mesa-grafica rect.sube {fill:var(--vela-sube)} .mesa-grafica rect.baja {fill:var(--superficie); stroke:var(--vela-baja); stroke-width:1}
++@media (max-width:600px) {.mesa-grid {grid-template-columns:minmax(0,1fr)} .mesa-panel header {gap:4px} .mesa-panel header .boton {padding:6px 8px; min-height:36px}}
+diff --git a/web/static/mesa.html b/web/static/mesa.html
+index 63f5920..49bf348 100644
+--- a/web/static/mesa.html
++++ b/web/static/mesa.html
+@@ -1,2 +1,2 @@
+-<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mesa de investigación · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/navegacion.css"><link rel="stylesheet" href="/static/mesa.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/guias.mjs"></script><script type="module" src="/static/mesa.mjs"></script></head><body><a class="saltar" href="#principal">Saltar al contenido</a><header class="cabecera"><div class="cabecera__fila"><a class="marca" href="/" aria-label="Actinver Terminal, inicio"><svg class="marca__logo" aria-hidden="true" width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg><span>Actinver Terminal</span></a><div class="acciones-cabecera"><span class="chip chip--sin_datos">Solo investigación</span></div></div></header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+-<main id="principal" tabindex="-1"><h1>Mesa de investigación</h1><p>Organice gráficos, contexto y herramientas en una sola vista. Seleccione un instrumento del catálogo, elija una disposición y despliegue únicamente lo que vaya a consultar. Las flechas cambian el orden y «Quitar» retira un panel; su disposición se guarda en este navegador.</p><p class="aviso-caja">Solo investigación. Ningún panel envía órdenes. Los precios externos pueden ser retrasados o indicativos; no equivalen a un feed CME para NQ. Los escenarios manuales no son señales.</p><div class="mesa-controles"><label>Buscar instrumento (Ctrl+K) <input id="mesa-buscar" type="search" placeholder="Clave o nombre" aria-label="Buscar instrumento del catálogo"></label><label>Instrumento <select id="mesa-simbolo" disabled><option>Cargando catálogo…</option></select></label><label>Disposición <select id="mesa-preset"><option value="mercado">Mercado</option><option value="futuros">Investigación de futuros</option><option value="empresa">Empresa y cartera</option></select></label><label>Añadir panel <select id="mesa-agregar"></select></label><button class="boton boton--secundario" id="mesa-anadir" type="button">Añadir</button></div><p id="mesa-estado" role="status"></p><p id="mesa-conteo" class="ayuda"></p><div id="mesa-paneles" class="mesa-grid"></div><p class="ayuda">Organización inspirada en OpenTerminal de ErTasselli (MIT). Implementación propia con las fuentes y controles de Actinver. <a href="https://github.com/ErTasselli/OpenTerminal" rel="noopener noreferrer" target="_blank">Proyecto original</a> · <a href="/?vista=tab-ayuda">Referencias y créditos</a></p></main></body></html>
+\ No newline at end of file
++<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mesa de investigación · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/navegacion.css"><link rel="stylesheet" href="/static/mesa.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/guias.mjs"></script><script type="module" src="/static/mesa.mjs"></script></head><body><a class="saltar" href="#principal">Saltar al contenido</a><header class="cabecera"><div class="cabecera__fila"><a class="marca" href="/" aria-label="Actinver Terminal, inicio"><svg class="marca__logo" aria-hidden="true" width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg><span>Actinver Terminal</span></a><div class="acciones-cabecera"><span class="chip chip--sin_datos">Solo investigación</span></div></div></header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
++<main id="principal" tabindex="-1"><h1>Mesa de investigación</h1><p>Organice gráficos, contexto y herramientas en una sola vista. Seleccione un instrumento del catálogo, elija una disposición y despliegue únicamente lo que vaya a consultar. Las flechas o el asa ⠿ cambian el orden, «Ancho» ocupa toda la fila y «Quitar» retira un panel; su disposición se guarda en este navegador.</p><p class="aviso-caja">Solo investigación. Ningún panel envía órdenes. Los precios externos pueden ser retrasados o indicativos; no equivalen a un feed CME para NQ. Los escenarios manuales no son señales.</p><div class="mesa-controles"><div class="mesa-paleta-caja"><label>Buscar o ir a… (Ctrl+K) <input id="mesa-buscar" type="search" placeholder="Instrumento, sección, panel o disposición" aria-label="Buscar instrumentos, secciones, paneles o disposiciones" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="mesa-paleta" autocomplete="off"></label><ul id="mesa-paleta" role="listbox" aria-label="Resultados" hidden></ul></div><label>Instrumento <select id="mesa-simbolo" disabled><option>Cargando catálogo…</option></select></label><label>Disposición <select id="mesa-preset"><option value="mercado">Mercado</option><option value="futuros">Investigación de futuros</option><option value="empresa">Empresa y cartera</option></select></label><label>Añadir panel <select id="mesa-agregar"></select></label><button class="boton boton--secundario" id="mesa-anadir" type="button">Añadir</button><details class="mesa-mas"><summary>Guardar disposición</summary><label>Nombre <input id="mesa-nombre" maxlength="40" placeholder="p. ej. Mañana NQ"></label><button class="boton boton--secundario" id="mesa-guardar" type="button">Guardar</button></details></div><section id="mesa-seguimiento" class="mesa-seguimiento-caja" aria-label="Seguimiento" aria-live="polite"></section><p id="mesa-estado" role="status"></p><p id="mesa-conteo" class="ayuda"></p><div id="mesa-paneles" class="mesa-grid"></div><p class="ayuda">Organización inspirada en OpenTerminal de ErTasselli (MIT). Implementación propia con las fuentes y controles de Actinver. <a href="https://github.com/ErTasselli/OpenTerminal" rel="noopener noreferrer" target="_blank">Proyecto original</a> · <a href="/?vista=tab-ayuda">Referencias y créditos</a></p></main></body></html>
+\ No newline at end of file
+diff --git a/web/static/mesa.mjs b/web/static/mesa.mjs
+index fdf890e..9c5e63c 100644
+--- a/web/static/mesa.mjs
++++ b/web/static/mesa.mjs
+@@ -21,6 +21,30 @@ export const PRESETS = {mercado:['grafica','mapa','resumen','calendario'],
+   empresa:['grafica','info','finanzas','noticias-emisora','insiders','cartera']};
+ export const AVISO_RIESGO = 'El riesgo calculado es un tope del escenario, no del fill real: un gap o un deslizamiento mayor puede superarlo.';
+ export function rutaVelas(simbolo){return '/?'+new URLSearchParams({vista:'tab-velas',simbolo});}
++// GET compartido: una sola petición en curso por ruta (los paneles que piden lo mismo esperan la misma respuesta).
++// No es caché: al terminar se olvida, así nunca se sirve un dato viejo en lugar de uno fresco.
++const enCurso=new Map();
++export function obtener(ruta,ms=15000){
++  if(!enCurso.has(ruta))enCurso.set(ruta,fetch(ruta,{signal:AbortSignal.timeout(ms)}).then(async r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json();}).finally(()=>enCurso.delete(ruta)));
++  return enCurso.get(ruta);
++}
++// Variación con signo y flecha: el color nunca es la única señal (+ ▲ sube, − ▼ baja).
++export function signo(x,dec=2){if(x===null||x===undefined||!Number.isFinite(x))return 'SIN DATO';const v=(Math.abs(x)*100).toFixed(dec);return x>0?`+${v} % ▲`:x<0?`−${v} % ▼`:`0.${'0'.repeat(dec)} % =`;}
++export const RANGOS={'1M':21,'3M':63,'6M':126,'Todo':Infinity};
++export function recortar(puntos,rango){const n=RANGOS[rango]??Infinity;return Number.isFinite(n)?puntos.slice(-n):[...puntos];}
++// Tamaños guardados por panel. Disposiciones anteriores (sin «tamanos») migran a «normal».
++export function normalizarTamanos(t){const ids=new Set(CATALOGO.map(c=>c[0]));return Object.fromEntries(Object.entries(t&&typeof t==='object'?t:{}).filter(([k,v])=>ids.has(k)&&v==='ancho'));}
++// Paleta: un solo buscador para instrumentos, secciones, paneles y disposiciones. Nunca ejecuta acciones financieras.
++export function buscarPaleta(texto,{catalogo=[],secciones=[],activos=[]}={}){
++  const q=(texto||'').trim().toLocaleLowerCase('es');if(!q)return [];
++  const tiene=s=>s.toLocaleLowerCase('es').includes(q),out=[];
++  for(const i of catalogo.filter(i=>tiene(`${i.clave_operable} ${i.nombre}`)).slice(0,8))out.push({tipo:'instrumento',etiqueta:`${i.clave_operable} · ${i.nombre}`,valor:i.id});
++  for(const s of secciones.filter(s=>tiene(s.titulo)).slice(0,6))out.push({tipo:'seccion',etiqueta:`Ir a ${s.titulo}`,valor:s.url});
++  for(const [id,t] of CATALOGO.filter(c=>tiene(c[1])).slice(0,6))out.push({tipo:'panel',etiqueta:`${activos.includes(id)?'Enfocar':'Añadir'} panel: ${t}`,valor:id});
++  for(const [k,n] of Object.entries(NOMBRES_PRESET).filter(([,n])=>tiene(n)||tiene('disposición')))out.push({tipo:'disposicion',etiqueta:`Disposición: ${n}`,valor:k});
++  return out;
++}
++export const NOMBRES_PRESET={mercado:'Mercado',futuros:'Investigación de futuros',empresa:'Empresa y cartera'};
+ export function normalizarLayout(v) {
+   if(!Array.isArray(v))return [...PRESETS.mercado];
+   return [...new Set(v.filter(k=>CATALOGO.some(c=>c[0]===k)))].slice(0,CATALOGO.length);
+@@ -55,11 +79,20 @@ export function planNQ(entrada,stop,r,presupuesto,costos=0,deslizamiento=0) {
+ }
+ if(typeof document!=='undefined') {
+   const KEY='actinver.mesa.v1', $=id=>document.getElementById(id);
+-  let activos=[...PRESETS.mercado],simbolo='SIC:NVDA',catalogoListo=false,catalogo=[];
++  let activos=[...PRESETS.mercado],simbolo='SIC:NVDA',catalogoListo=false,catalogo=[],tamanos={},guardadas={};
+   const crear=(tag,texto)=>{const n=document.createElement(tag);if(texto!==undefined)n.textContent=texto;return n;};
+-  try {const s=JSON.parse(localStorage.getItem(KEY));if(s){activos=normalizarLayout(s.widgets);if(typeof s.simbolo==='string'&&s.simbolo.length<50)simbolo=s.simbolo;}}catch{}
+-  const guardada=new Option('Personalizada / guardada','guardada');guardada.disabled=true;$('mesa-preset').prepend(guardada);$('mesa-preset').value='guardada';
+-  function guardar(){try{localStorage.setItem(KEY,JSON.stringify({widgets:activos,simbolo}));}catch{$('mesa-estado').textContent='Su navegador no permite guardar la disposición.';}}
++  // Misma clave v1: las disposiciones anteriores ({widgets, simbolo}) se leen igual y ganan tamaños y nombres al guardar.
++  try {const s=JSON.parse(localStorage.getItem(KEY));if(s){activos=normalizarLayout(s.widgets);if(typeof s.simbolo==='string'&&s.simbolo.length<50)simbolo=s.simbolo;tamanos=normalizarTamanos(s.tamanos);
++    for(const [n,g] of Object.entries(s.guardadas&&typeof s.guardadas==='object'?s.guardadas:{}).slice(0,20))if(typeof n==='string'&&n.length<=40)guardadas[n]={widgets:normalizarLayout(g?.widgets),tamanos:normalizarTamanos(g?.tamanos)};}}catch{}
++  const guardada=new Option('Personalizada / guardada','guardada');guardada.disabled=true;$('mesa-preset').prepend(guardada);
++  function opcionesGuardadas(){$('mesa-preset').querySelectorAll('[data-guardada]').forEach(o=>o.remove());for(const n of Object.keys(guardadas)){const o=new Option(`Guardada: ${n}`,'g:'+n);o.dataset.guardada='1';$('mesa-preset').append(o);}}
++  opcionesGuardadas();$('mesa-preset').value='guardada';
++  function guardar(){try{localStorage.setItem(KEY,JSON.stringify({widgets:activos,simbolo,tamanos,guardadas}));}catch{$('mesa-estado').textContent='Su navegador no permite guardar la disposición.';}}
++  function aplicarDisposicion(valor){
++    if(valor.startsWith('g:')){const g=guardadas[valor.slice(2)];if(!g)return;activos=[...g.widgets];tamanos={...g.tamanos};}
++    else if(PRESETS[valor]){activos=[...PRESETS[valor]];tamanos={};}else return;
++    $('mesa-preset').value=valor;guardar();dibujar();
++  }
+   function mover(id,delta){const i=activos.indexOf(id),j=i+delta;if(j<0||j>=activos.length)return;[activos[i],activos[j]]=[activos[j],activos[i]];$('mesa-preset').value='guardada';guardar();dibujar();}
+   function boton(t,fn){const b=crear('button',t);b.type='button';b.className='boton boton--secundario';b.onclick=fn;return b;}
+   function panelRiesgo(box){
+@@ -79,6 +112,98 @@ if(typeof document!=='undefined') {
+     form.onsubmit=e=>{e.preventDefault();calcular();};
+     box.append(form,simple,output);calcular();
+   }
++  // ---------- Contenido nativo: lee rutas locales de solo lectura y declara fuente, fecha y SIN DATO ----------
++  const el=(tag,attrs={},...hijos)=>{const n=document.createElement(tag);for(const [k,v] of Object.entries(attrs))if(v!==undefined&&v!==null&&v!==false)(k==='clase'?n.className=v:n.setAttribute(k,v));n.append(...hijos.flat().filter(x=>x!==null&&x!==undefined&&x!==false));return n;};
++  const fmt=(x,dec=2)=>x===null||x===undefined||!Number.isFinite(Number(x))?'SIN DATO':Number(x).toLocaleString('es-MX',{minimumFractionDigits:dec,maximumFractionDigits:dec});
++  const fecha=s=>s?String(s).slice(0,10):'s/f';
++  const nativo=(titulo,...hijos)=>el('div',{clase:'mesa-nativo'},el('p',{clase:'mesa-nativo__titulo'},titulo),...hijos);
++  const fallo=(caja,e)=>caja.replaceChildren(el('p',{clase:'sin-dato'},`SIN DATO · no se pudo consultar la terminal (${e.message}).`));
++  const svgNS='http://www.w3.org/2000/svg',s=(tag,a={})=>{const n=document.createElementNS(svgNS,tag);for(const [k,v] of Object.entries(a))n.setAttribute(k,v);return n;};
++  function graficaSvg(puntos,{velas=false,sma=true,volumen=true}){
++    const W=640,H=200,HV=volumen?48:0,m={i:52,d:8,s:8,b:18},n=puntos.length;
++    const hi=puntos.map(p=>velas?p.maximo:p.cierre),lo=puntos.map(p=>velas?p.minimo:p.cierre);
++    const max=Math.max(...hi),min=Math.min(...lo),rango=max-min||1,X=i=>m.i+(n<2?0:i*(W-m.i-m.d)/(n-1)),Y=v=>m.s+(max-v)*(H-m.s-m.b)/rango;
++    const g=s('svg',{viewBox:`0 0 ${W} ${H+HV}`,class:'mesa-grafica',role:'img','aria-label':`Gráfica de ${n} sesiones; mínimo ${fmt(min)}, máximo ${fmt(max)}`});
++    for(const v of [min,(min+max)/2,max]){g.append(s('line',{x1:m.i,x2:W-m.d,y1:Y(v),y2:Y(v),class:'rejilla'}));const t=s('text',{x:m.i-6,y:Y(v)+4,'text-anchor':'end'});t.textContent=fmt(v);g.append(t);}
++    if(velas){const w=Math.max(1,(W-m.i-m.d)/Math.max(n,1)*.6);puntos.forEach((p,i)=>{const sube=p.cierre>=p.apertura;g.append(s('line',{x1:X(i),x2:X(i),y1:Y(p.maximo),y2:Y(p.minimo),class:sube?'sube':'baja'}),
++      s('rect',{x:X(i)-w/2,y:Y(Math.max(p.apertura,p.cierre)),width:w,height:Math.max(1,Math.abs(Y(p.apertura)-Y(p.cierre))),class:sube?'sube':'baja hueca'}));});}
++    else g.append(s('polyline',{points:puntos.map((p,i)=>`${X(i)},${Y(p.cierre)}`).join(' '),class:'linea'}));
++    if(sma&&puntos.some(p=>p.media_20!=null))g.append(s('polyline',{points:puntos.map((p,i)=>p.media_20==null?null:`${X(i)},${Y(p.media_20)}`).filter(Boolean).join(' '),class:'sma'}));
++    if(volumen){const vmax=Math.max(...puntos.map(p=>p.volumen||0))||1;puntos.forEach((p,i)=>{const h=(p.volumen||0)/vmax*(HV-8);g.append(s('rect',{x:X(i)-1,y:H+HV-h,width:2,height:h,class:'volumen'}));});}
++    [0,n-1].forEach((i,j)=>{if(puntos[i]){const t=s('text',{x:X(i),y:H-2,'text-anchor':j?'end':'start'});t.textContent=fecha(puntos[i].fecha||puntos[i].inicio);g.append(t);}});
++    return g;
++  }
++  async function nativoFicha(caja,sim){
++    try{
++      const [v,serie]=await Promise.all([obtener('/api/flujo/velas?'+new URLSearchParams({simbolo:sim,intervalo:'1Day',dias:'180'})),obtener('/api/visualizaciones/serie/'+encodeURIComponent(sim)).catch(()=>null)]);
++      const barras=v.barras||[],puntos=serie?.puntos||[];
++      if(!barras.length&&!puntos.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'SIN DATO · no hay velas ni cierres guardados para este instrumento.'));return;}
++      const ult=puntos.at(-1),prev=puntos.at(-2);
++      const rep=el('select',{'aria-label':'Representación'},new Option('Línea de cierres','linea'),...(barras.length?[new Option('Velas OHLCV','velas')]:[]));
++      const rango=el('select',{'aria-label':'Rango temporal'},...Object.keys(RANGOS).map(k=>new Option(k,k)));rango.value='3M';
++      const cSma=el('input',{type:'checkbox','aria-label':'Media móvil de 20 sesiones'}),cVol=el('input',{type:'checkbox','aria-label':'Volumen'});cSma.checked=cVol.checked=true;
++      const fig=el('div',{clase:'mesa-grafica-caja'});
++      const pintar=()=>{const velas=rep.value==='velas',base=velas?barras.map(b=>({...b,fecha:b.inicio})):puntos;fig.replaceChildren(graficaSvg(recortar(base,rango.value),{velas,sma:cSma.checked&&!velas,volumen:cVol.checked}));};
++      [rep,rango,cSma,cVol].forEach(x=>x.addEventListener('change',pintar));
++      caja.replaceChildren(
++        el('dl',{clase:'mesa-kpis'},el('dt',{},'Último cierre'),el('dd',{},ult?`${fmt(ult.cierre)} ${serie.moneda||''}`:'SIN DATO'),
++          el('dt',{},'Variación 1 sesión'),el('dd',{clase:ult&&prev?(ult.cierre>prev.cierre?'sube':ult.cierre<prev.cierre?'baja':''):''},ult&&prev?signo(ult.cierre/prev.cierre-1):'SIN DATO'),
++          el('dt',{},'Fecha'),el('dd',{},fecha(serie?.fecha)),el('dt',{},'RSI 14'),el('dd',{},fmt(ult?.rsi_14,1))),
++        el('div',{clase:'mesa-controles-grafica'},el('label',{},'Ver ',rep),el('label',{},'Rango ',rango),el('label',{clase:'casilla'},cSma,' SMA 20'),el('label',{clase:'casilla'},cVol,' Volumen')),fig,
++        el('p',{clase:'mesa-procedencia'},`${sim} · intervalo diario · ${barras.length?`velas: ${(v.procedencia||[]).map(p=>p.fuente||p).join(', ')||'proveedor'}; `:''}cierres: ${serie?.proveedor||'SIN DATO'}, ${serie?.moneda||''}, ajustados solo por splits · ingesta ${fecha(serie?.obtenido_en)} · ${serie?.modo==='sintetico'?'SINTÉTICO':'histórico, no es cotización en vivo'}.`));
++      pintar();
++    }catch(e){fallo(caja,e);}
++  }
++  async function nativoNoticias(caja,sim){
++    try{
++      const r=await obtener('/api/mesa/noticias?'+new URLSearchParams(sim?{simbolo:sim,limite:'12'}:{limite:'15'}));
++      if(!r.noticias.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'SIN DATO · no hay titulares guardados'+(sim?' de este instrumento.':'.')));return;}
++      caja.replaceChildren(el('ul',{clase:'mesa-lista'},r.noticias.map(n=>el('li',{},el('a',{href:n.enlace,rel:'noopener noreferrer',target:'_blank'},n.titulo),
++        el('span',{clase:'mesa-meta'},` ${n.fuente} · publicado ${fecha(n.publicado)} · ingesta ${fecha(n.ingesta)}${n.instrumentos.length>1?` · también ${n.instrumentos.length-1} emisora(s)`:''}`)))),
++        el('p',{clase:'mesa-procedencia'},r.nota));
++    }catch(e){fallo(caja,e);}
++  }
++  async function nativoMacro(caja){
++    try{
++      const [m,r]=await Promise.all([obtener('/api/mesa/macro'),obtener('/api/mesa/resumen')]);
++      const grupos=[...new Set(m.series.map(x=>x.grupo))];
++      caja.replaceChildren(
++        el('p',{clase:'mesa-nativo__titulo'},`Resumen del corte ${r.corte.replace('T',' ').slice(0,16)} UTC · última sesión NYSE ${r.ultima_sesion.NYSE}, BMV ${r.ultima_sesion.BMV}`),
++        el('p',{},`Datos: ${r.datos.instrumentos} instrumentos (${Object.entries(r.datos.por_estado).map(([k,v])=>`${v} ${k}`).join(', ')}) · ${r.titulares_24h} titulares en 24 h · ${r.eventos_alto_impacto_7d.length} eventos de alto impacto en 7 días.`),
++        el('div',{clase:'tabla-contenedor'},el('table',{},el('caption',{},'Tasas, inflación y contexto (última observación conocida)'),
++          el('thead',{},el('tr',{},...['Serie','Valor','Periodo','Frecuencia','Fuente'].map(t=>el('th',{scope:'col'},t)))),
++          el('tbody',{},grupos.flatMap(gname=>[el('tr',{},el('th',{scope:'rowgroup',colspan:'5'},gname)),...m.series.filter(x=>x.grupo===gname).map(x=>el('tr',{},
++            el('th',{scope:'row'},x.titulo||x.serie),el('td',{clase:'num'},x.valor==null?'SIN DATO':`${fmt(x.valor)} ${x.unidad||''}`),el('td',{},x.periodo||'—'),el('td',{},x.frecuencia||'—'),
++            el('td',{},x.valor==null?(x.requisito||'Sin observaciones'):(x.fuente||'—'))))])))),
++        m.curva.aviso?el('p',{clase:'aviso-caja'},m.curva.aviso):null, m.aviso?el('p',{clase:'mesa-procedencia'},m.aviso):null,
++        el('p',{clase:'mesa-procedencia'},`${m.nota} ${r.nota}`));
++    }catch(e){fallo(caja,e);}
++  }
++  async function nativoCalendario(caja){
++    try{
++      const [r,c]=await Promise.all([obtener('/api/mesa/resumen'),obtener('/api/mesa/resultados')]);
++      caja.replaceChildren(
++        r.eventos_alto_impacto_7d.length?el('ul',{clase:'mesa-lista'},r.eventos_alto_impacto_7d.map(e=>el('li',{},el('strong',{},`${e.fecha.slice(0,16).replace('T',' ')} · ${e.pais}`),` ${e.titulo}`,
++          el('span',{clase:'mesa-meta'},` · pronóstico ${e.pronostico||'s/d'} · previo ${e.previo||'s/d'} · ${e.fuente}`)))):el('p',{clase:'sin-dato'},'SIN DATO · sin eventos de alto impacto guardados para los próximos 7 días.'),
++        el('p',{clase:'mesa-procedencia'},'Eventos económicos de EE. UU. y México (alto impacto), hora de la fuente.'),
++        el('p',{clase:'aviso-caja'},`Resultados de empresas: ${c.estado.toUpperCase()}. ${c.motivo} Siguiente acción: ${c.siguiente_accion}`));
++    }catch(e){fallo(caja,e);}
++  }
++  const NATIVOS={info:(c,sim)=>nativoFicha(c,sim),noticias:c=>nativoNoticias(c,''),'noticias-emisora':(c,sim)=>nativoNoticias(c,sim),resumen:c=>nativoMacro(c),calendario:c=>nativoCalendario(c)};
++  async function pintarSeguimiento(){
++    const caja=$('mesa-seguimiento');if(!caja)return;
++    try{
++      const r=await obtener('/api/lista-seguimiento');
++      if(!r.instrumentos.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'Seguimiento: SIN DATO · su lista está vacía. '),el('a',{href:'/?vista=tab-seguimiento'},'Agregar instrumentos en Seguimiento'));return;}
++      caja.replaceChildren(el('div',{clase:'tabla-contenedor'},el('table',{clase:'mesa-seguimiento'},el('caption',{},'Seguimiento · misma lista que la sección Seguimiento. Seleccione una fila para usar ese instrumento.'),
++        el('thead',{},el('tr',{},...['Instrumento','Último (MXN)','Var. 1 sesión','Fecha','Proveedor','Estado'].map(t=>el('th',{scope:'col'},t)))),
++        el('tbody',{},r.instrumentos.map(f=>{const valida=f.ultimo_mxn!=null&&f.vigencia&&f.vigencia!=='sin_datos';const v=valida?f.variacion?.[1]:null;
++          const b=el('button',{type:'button',clase:'boton boton--texto','aria-pressed':String(f.instrumento_id===simbolo)},f.clave);
++          b.addEventListener('click',()=>{if(!catalogo.some(i=>i.id===f.instrumento_id)){$('mesa-estado').textContent='SIN DATO · el instrumento no está en el catálogo activo.';return;}simbolo=f.instrumento_id;$('mesa-simbolo').value=simbolo;guardar();dibujar();pintarSeguimiento();});
++          return el('tr',{},el('th',{scope:'row'},b),el('td',{clase:'num'},fmt(f.ultimo_mxn)),el('td',{clase:'num '+(v>0?'sube':v<0?'baja':'')},signo(v)),el('td',{},f.fecha||'SIN DATO'),el('td',{},f.proveedor||'SIN DATO'),el('td',{},f.vigencia||'SIN DATO'));})))),
++        el('p',{clase:'mesa-procedencia'},r.nota));
++    }catch(e){fallo(caja,e);}
++  }
+   function dibujar(){
+     const anteriores=new Map([...$('mesa-paneles').children].map(n=>[n.dataset.panel,n]));
+     const abiertos=new Set([...anteriores].filter(([,n])=>n.querySelector('details')?.open).map(([id])=>id));
+@@ -97,7 +222,17 @@ if(typeof document!=='undefined') {
+       const antes=boton('←',()=>{mover(id,-1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();}),despues=boton('→',()=>{mover(id,1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();});
+       antes.setAttribute('aria-label',`Mover ${titulo} antes`);despues.setAttribute('aria-label',`Mover ${titulo} después`);
+       antes.disabled=activos.indexOf(id)===0;despues.disabled=activos.indexOf(id)===activos.length-1;
+-      head.append(h,antes,despues,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
++      const ancho=boton('Ancho',()=>{const on=!tamanos[id];if(on)tamanos[id]='ancho';else delete tamanos[id];card.classList.toggle('mesa-panel--ancho',on);ancho.setAttribute('aria-pressed',String(on));$('mesa-preset').value='guardada';guardar();});
++      ancho.setAttribute('aria-pressed',String(!!tamanos[id]));ancho.setAttribute('aria-label',`Ocupar todo el ancho: ${titulo}`);card.classList.toggle('mesa-panel--ancho',!!tamanos[id]);
++      // Arrastre con el ratón; ← y → son el equivalente por teclado. El nodo se mueve, no se recrea: conserva lo abierto y lo escrito.
++      const asa=crear('span','⠿');asa.className='mesa-asa';asa.draggable=true;asa.title='Arrastrar para reordenar (con teclado use ← y →)';asa.setAttribute('aria-hidden','true');
++      asa.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/x-mesa-panel',id);e.dataTransfer.effectAllowed='move';card.classList.add('mesa-panel--arrastrando');});
++      asa.addEventListener('dragend',()=>card.classList.remove('mesa-panel--arrastrando'));
++      card.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/x-mesa-panel'))e.preventDefault();});
++      card.addEventListener('drop',e=>{const origen=e.dataTransfer.getData('text/x-mesa-panel');if(!origen||origen===id)return;e.preventDefault();
++        activos=activos.filter(x=>x!==origen);activos.splice(activos.indexOf(id),0,origen);$('mesa-preset').value='guardada';guardar();dibujar();});
++      head.append(asa,h,antes,despues,ancho,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
++      if(NATIVOS[id]&&catalogoListo){const caja=el('div',{clase:'mesa-nativo','aria-live':'polite'},el('p',{clase:'mesa-procedencia'},'Cargando datos locales…'));card.append(el('p',{clase:'mesa-nativo__titulo'},'Datos de la terminal'),caja);NATIVOS[id](caja,simbolo);}
+       if(tipo==='chart'){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
+       if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
+       else if(tipo==='risk')panelRiesgo(card);
+@@ -133,11 +268,40 @@ if(typeof document!=='undefined') {
+   }
+   for(const [id,t] of CATALOGO)$('mesa-agregar').append(new Option(t,id));
+   $('mesa-anadir').onclick=()=>{const id=$('mesa-agregar').value;if(!activos.includes(id)){activos.push(id);$('mesa-preset').value='guardada';guardar();dibujar();}else{$('mesa-estado').textContent='Ese panel ya está en la mesa.';}};
+-  $('mesa-preset').onchange=e=>{activos=[...PRESETS[e.target.value]];guardar();dibujar();};
++  $('mesa-preset').onchange=e=>aplicarDisposicion(e.target.value);
++  $('mesa-guardar').onclick=()=>{const n=$('mesa-nombre').value.trim().slice(0,40);if(!n){$('mesa-estado').textContent='Escriba un nombre para la disposición.';$('mesa-nombre').focus();return;}
++    guardadas[n]={widgets:[...activos],tamanos:{...tamanos}};opcionesGuardadas();$('mesa-preset').value='g:'+n;guardar();$('mesa-estado').textContent=`Disposición «${n}» guardada en este navegador.`;};
+   $('mesa-simbolo').onchange=e=>{simbolo=e.target.value;guardar();dibujar();};
+   function filtrar(){const texto=$('mesa-buscar').value.trim().toLocaleLowerCase('es');const filas=catalogo.filter(i=>`${i.clave_operable} ${i.nombre}`.toLocaleLowerCase('es').includes(texto));$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));$('mesa-simbolo').value=simbolo;if(!filas.length)$('mesa-simbolo').append(new Option('Sin coincidencias',''));$('mesa-estado').textContent=`${filas.length} coincidencias; el instrumento activo no cambia hasta seleccionarlo.`;}
+-  $('mesa-buscar').addEventListener('input',filtrar);
+-  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('mesa-buscar').focus();}if(e.key==='Escape'&&e.target===$('mesa-buscar')){$('mesa-buscar').value='';filtrar();$('mesa-simbolo').focus();}});
+-  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
++  // Paleta de comandos sobre el mismo buscador (no hay otro catálogo): instrumentos, secciones, paneles y disposiciones.
++  let secciones=[],resultados=[],activo=-1;
++  let pedidas=false;  // las secciones se piden al primer uso de la paleta: la barra común ya cargó el mismo archivo
++  const lista=$('mesa-paleta'),buscador=$('mesa-buscar');
++  function pintarPaleta(){
++    resultados=buscarPaleta(buscador.value,{catalogo,secciones:secciones.map(s=>({...s,titulo:s.titulo})),activos:[...activos,...Object.keys(guardadas).map(n=>'g:'+n)]});
++    for(const [n] of Object.entries(guardadas))if(n.toLocaleLowerCase('es').includes(buscador.value.trim().toLocaleLowerCase('es')))resultados.push({tipo:'disposicion',etiqueta:`Disposición guardada: ${n}`,valor:'g:'+n});
++    activo=resultados.length?0:-1;
++    lista.replaceChildren(...resultados.map((r,i)=>{const o=crear('li',r.etiqueta);o.id='paleta-'+i;o.setAttribute('role','option');o.dataset.tipo=r.tipo;o.setAttribute('aria-selected',String(i===activo));o.addEventListener('mousedown',e=>{e.preventDefault();ejecutar(i);});return o;}));
++    lista.hidden=!resultados.length;buscador.setAttribute('aria-expanded',String(!lista.hidden));
++    if(activo>=0)buscador.setAttribute('aria-activedescendant','paleta-'+activo);else buscador.removeAttribute('aria-activedescendant');
++  }
++  function marcar(i){activo=i;[...lista.children].forEach((o,j)=>o.setAttribute('aria-selected',String(j===i)));buscador.setAttribute('aria-activedescendant','paleta-'+i);lista.children[i]?.scrollIntoView({block:'nearest'});}
++  function cerrarPaleta(){lista.hidden=true;buscador.setAttribute('aria-expanded','false');buscador.removeAttribute('aria-activedescendant');}
++  function ejecutar(i){
++    const r=resultados[i];if(!r)return;cerrarPaleta();
++    if(r.tipo==='instrumento'){simbolo=r.valor;buscador.value='';filtrar();$('mesa-simbolo').value=simbolo;guardar();dibujar();$('mesa-estado').textContent=`Instrumento activo: ${r.etiqueta}.`;}
++    else if(r.tipo==='seccion')location.assign(r.valor);
++    else if(r.tipo==='panel'){if(!activos.includes(r.valor)){activos.push(r.valor);$('mesa-preset').value='guardada';guardar();dibujar();}buscador.value='';filtrar();const h=document.querySelector(`[data-panel="${r.valor}"] h2`);h?.scrollIntoView({block:'center'});h?.focus();}
++    else if(r.tipo==='disposicion'){buscador.value='';filtrar();aplicarDisposicion(r.valor);}
++  }
++  buscador.addEventListener('input',()=>{filtrar();pintarPaleta();if(!pedidas){pedidas=true;obtener('/static/navegacion.json').then(d=>{secciones=[...d.areas,...d.secciones];if(buscador.value)pintarPaleta();}).catch(()=>{pedidas=false;});}});
++  buscador.addEventListener('blur',()=>setTimeout(cerrarPaleta,150));
++  buscador.addEventListener('keydown',e=>{
++    if(e.key==='ArrowDown'&&resultados.length){e.preventDefault();marcar((activo+1)%resultados.length);}
++    else if(e.key==='ArrowUp'&&resultados.length){e.preventDefault();marcar((activo-1+resultados.length)%resultados.length);}
++    else if(e.key==='Enter'&&activo>=0&&!lista.hidden){e.preventDefault();ejecutar(activo);}
++  });
++  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();buscador.focus();buscador.select();}if(e.key==='Escape'&&e.target===buscador){if(!lista.hidden){cerrarPaleta();return;}buscador.value='';filtrar();$('mesa-simbolo').focus();}});
++  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();pintarSeguimiento();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
+   dibujar();
+ }
+diff --git a/web/static/navegacion.css b/web/static/navegacion.css
+index 6fe809d..69475f3 100644
+--- a/web/static/navegacion.css
++++ b/web/static/navegacion.css
+@@ -3,12 +3,12 @@ nav.nav-global{display:block;margin:0;border-bottom:1px solid var(--borde,#d9d6c
+ .nav-global__interior{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;gap:12px 24px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+ .nav-global__accesos{display:flex;gap:6px;flex-wrap:wrap}
+ .nav-global a{display:inline-flex;align-items:center;min-height:38px;padding:8px 10px;border:1px solid var(--borde,#d9d6cf);border-radius:6px;color:inherit;text-decoration:none;font-size:13px;white-space:nowrap}
+-.nav-global a:hover,.nav-global a[aria-current]{color:var(--acento,#1f5f8b);border-color:var(--acento,#1f5f8b)}
++.nav-global a:hover{border-color:var(--borde-control)}.nav-global a[aria-current]{color:var(--texto);border-color:var(--acento-grafico);box-shadow:inset 0 -2px 0 var(--acento-grafico);font-weight:650}
+ .nav-global a[aria-current]{font-weight:600}
+ .nav-global__selector{display:flex;align-items:center;gap:10px;flex:0 1 360px;min-width:0}
+ .nav-global label{font-size:12px;color:var(--texto-2,var(--suave,#55585e));white-space:nowrap;margin:0}
+ .nav-global select{display:block;min-height:38px;width:100%;min-width:0;max-width:100%;padding:7px 8px;border:1px solid var(--borde,#d9d6cf);border-radius:6px;background:var(--fondo,#f6f5f2);color:inherit;font:13px "Segoe UI",system-ui,sans-serif;margin:0}
+-.nav-global :focus-visible{outline:3px solid var(--foco,var(--acento,#1f5f8b));outline-offset:2px}
++.nav-global :focus-visible{outline:3px solid var(--foco);outline-offset:2px}
+ .nav-global__texto-corto{display:none}
+ @media(max-width:700px){.nav-global__interior{gap:10px}.nav-global__selector{flex-basis:100%}.nav-global__accesos{width:100%;flex-wrap:nowrap;gap:4px}.nav-global a{flex:1 1 0;min-width:0;justify-content:center;font-size:12px;padding:7px 5px}.nav-global__texto-largo{display:none}.nav-global__texto-corto{display:inline}}
+ @media print{nav.nav-global{display:none}}
+diff --git a/terminal/mesa_datos.py b/terminal/mesa_datos.py
+new file mode 100644
+index 0000000..345ce6f
+--- /dev/null
++++ b/terminal/mesa_datos.py
+@@ -0,0 +1,200 @@
++"""Paneles nativos de la Mesa: noticias, macro, resumen fechado y contrato del calendario de resultados.
++
++Solo LEEN lo que la terminal ya guardó con sus conectores autorizados; ninguna función consulta proveedores, pide
++credenciales ni escribe en la base. Cada cifra sale con su fuente, su fecha y su corte. Lo que falta se declara
++SIN DATO con el requisito exacto, nunca se rellena.
++"""
++from __future__ import annotations
++
++import json
++import re
++import sqlite3
++import unicodedata
++from datetime import UTC, date, datetime, timedelta
++
++from . import centro_investigacion, mercado
++from .config import Ajustes
++
++SIN_DATO = "SIN DATO"
++
++# Series macro del panel: (fuente, serie, frecuencia declarada, grupo). La frecuencia es la de la publicación oficial.
++SERIES_MACRO = [
++    ("fred_macro", "DGS2", "diaria (hábil)", "Curva de EE. UU."),
++    ("fred_macro", "DGS10", "diaria (hábil)", "Curva de EE. UU."),
++    ("fred_macro", "DGS30", "diaria (hábil)", "Curva de EE. UU."),
++    ("fred_macro", "FEDFUNDS", "mensual", "Tasas de política"),
++    ("bls", "CPI_YOY", "mensual", "Inflación y empleo"),
++    ("bls", "LNS14000000", "mensual", "Inflación y empleo"),
++    ("bls", "CES0000000001", "mensual", "Inflación y empleo"),
++    ("fred_macro", "INDPRO", "mensual", "Actividad"),
++    ("eia", "WTI", "semanal", "Energía"),
++    ("eia", "BRENT", "semanal", "Energía"),
++]
++# Requisito cuando una serie no tiene observaciones guardadas (no se activa nada desde aquí).
++REQUISITO = {
++    "DGS30": "Agregar DGS30 a la lista de series FRED de terminal/centro_conectores.py; hoy no se descarga.",
++    "BANXICO_OBJETIVO": "Serie de tasa objetivo de Banxico (SIE SF61745) sin conector; requiere BANXICO_TOKEN y conector nuevo.",
++    "INPC": "Inflación de México (INEGI o Banxico SIE SP30578) sin conector autorizado en la terminal.",
++}
++
++
++def _norm(texto: str) -> str:
++    s = unicodedata.normalize("NFKD", (texto or "").lower())
++    return re.sub(r"[^a-z0-9]+", " ", "".join(c for c in s if not unicodedata.combining(c))).strip()
++
++
++def noticias(con: sqlite3.Connection, simbolo: str = "", limite: int = 40) -> dict:
++    """Titulares deduplicados por enlace y por título normalizado. Sin cuerpo del artículo ni sentimiento."""
++    limite = max(1, min(int(limite), 100))
++    if simbolo:
++        filas = con.execute("SELECT * FROM noticias WHERE instrumento_id=? ORDER BY publicado DESC LIMIT 400", (simbolo,))
++    else:
++        filas = con.execute("SELECT * FROM noticias ORDER BY publicado DESC LIMIT 1500")
++    vistos, out = set(), []
++    for f in filas:
++        claves = {k for k in (("u", (f["enlace"] or "").split("?")[0]), ("t", _norm(f["titulo"]))) if k[1]}
++        if claves & vistos:
++            for o in out:  # el mismo artículo citado por otra emisora: se suma la emisora, no se repite la fila
++                if o["enlace"] == f["enlace"] or _norm(o["titulo"]) == _norm(f["titulo"]):
++                    if f["instrumento_id"] and f["instrumento_id"] not in o["instrumentos"]:
++                        o["instrumentos"].append(f["instrumento_id"])
++                    break
++            continue
++        vistos |= claves
++        out.append({"titulo": f["titulo"], "enlace": f["enlace"], "fuente": f["fuente"],
++                    "publicado": f["publicado"], "ingesta": f["obtenido_en"],
++                    "instrumentos": [f["instrumento_id"]] if f["instrumento_id"] else []})
++        if len(out) >= limite:
++            break
++    return {"simbolo": simbolo or None, "noticias": out,
++            "nota": "Titulares de los feeds RSS configurados. «Publicado» lo declara la fuente; «ingesta» es cuándo los "
++                    "guardó la terminal (la fuente no informa una hora de disponibilidad distinta). Se muestra solo el "
++                    "título y el enlace al original; no se copia el artículo ni se calcula sentimiento."}
++
++
++def _cetes(con: sqlite3.Connection) -> dict:
++    f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='cetes28'").fetchone()
++    if not f:
++        return {"serie": "CETES28", "titulo": "CETES 28 días", "valor": None, "estado": SIN_DATO, "grupo": "Tasas de política", "frecuencia": "semanal",
++                "requisito": "Se guarda al abrir Mis portafolios con BANXICO_TOKEN configurado."}
++    d = json.loads(f[0])
++    return {"serie": "CETES28", "titulo": "CETES 28 días (subasta)", "valor": None if d.get("valor") is None else d["valor"] * 100,
++            "unidad": "%", "periodo": d.get("fecha"), "frecuencia": "semanal", "fuente": d.get("fuente"),
++            "ingesta": d.get("consultado_en"), "grupo": "Tasas de política", "aviso": d.get("aviso")}
++
++
++def macro(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = None) -> dict:
++    """Última observación conocida al corte de cada serie, con periodo, frecuencia y fuente."""
++    ahora = ahora or datetime.now(UTC)
++    obs = centro_investigacion.observaciones(con, "", ahora)
++    ultima: dict[tuple[str, str], dict] = {}
++    for o in obs:  # ordenadas por periodo descendente: la primera de cada serie es la más reciente
++        ultima.setdefault((o["fuente"], o["serie"]), o)
++    filas = []
++    for fuente, serie, frecuencia, grupo in SERIES_MACRO:
++        o = ultima.get((fuente, serie))
++        if not o:
++            filas.append({"serie": serie, "fuente": fuente, "grupo": grupo, "frecuencia": frecuencia, "valor": None,
++                          "estado": SIN_DATO, "requisito": REQUISITO.get(serie, "Sin observaciones guardadas de esta serie.")})
++            continue
++        filas.append({"serie": serie, "titulo": o["titulo"], "valor": o["valor"], "unidad": o["unidad"],
++                      "periodo": o["periodo"], "frecuencia": frecuencia, "fuente": fuente, "grupo": grupo,
++                      "ingesta": o["disponible_desde"], "url": o["url"]})
++    fx = mercado.ultimo_fx(con, ajustes)
++    filas.insert(0, {"serie": "USDMXN", "titulo": "Dólar / peso (FIX o referencia)", "valor": fx.get("valor"),
++                     "unidad": "MXN por USD", "periodo": fx.get("fecha"), "frecuencia": "diaria (hábil)",
++                     "fuente": fx.get("proveedor"), "grupo": "Tipo de cambio", "ingesta": fx.get("obtenido_en"),
++                     "estado": None if fx.get("valor") is not None else SIN_DATO})
++    filas.append(_cetes(con))
++    for k in ("BANXICO_OBJETIVO", "INPC"):
++        filas.append({"serie": k, "titulo": {"BANXICO_OBJETIVO": "Tasa objetivo Banxico", "INPC": "Inflación México (INPC)"}[k],
++                      "valor": None, "estado": SIN_DATO, "grupo": "México", "frecuencia": "—", "requisito": REQUISITO[k]})
++    periodos = sorted({f["periodo"][:10] for f in filas if f.get("periodo")})
++    curva = [f for f in filas if f["grupo"] == "Curva de EE. UU." and f.get("valor") is not None]
++    fechas_curva = {f["periodo"] for f in curva}
++    return {"corte": ahora.isoformat(timespec="seconds"), "series": filas,
++            "curva": {"puntos": [{"plazo": f["serie"].replace("DGS", "") + " años", "valor": f["valor"], "periodo": f["periodo"]} for f in curva],
++                      "aviso": None if len(fechas_curva) <= 1 else "Los plazos tienen fechas distintas: no es una curva de un mismo día."},
++            "aviso": ("Las series tienen periodos distintos (" + ", ".join([periodos[0], periodos[-1]]) + "); no se comparan como "
++                      "si fueran del mismo día.") if len(periodos) > 1 else None,
++            "nota": "Solo lectura de lo descargado por los conectores (FRED, BLS, EIA, Banxico). No consulta proveedores."}
++
++
++def resumen(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = None, cot: dict | None = None) -> dict:
++    """Resumen fechado y trazable del corte local: sin explicaciones causales ni cotizaciones «actuales»."""
++    ahora = ahora or datetime.now(UTC)
++    from . import vigencia
++    cot = mercado.cotizaciones(con, ajustes) if cot is None else cot  # la API pasa la caché de /api/estado
++    conteo: dict[str, int] = {}
++    for c in cot.values():
++        e = c.get("estado") or "sin_datos"
++        conteo[e] = conteo.get(e, 0) + 1
++    hoy = ahora.date()
++    eventos = [dict(r) for r in con.execute(
++        "SELECT fecha, pais, titulo, impacto, pronostico, previo, fuente FROM eventos_macro WHERE impacto='High' AND "
++        "pais IN ('USD','MXN') AND substr(fecha,1,10) BETWEEN ? AND ? ORDER BY fecha LIMIT 12",
++        (hoy.isoformat(), (hoy + timedelta(days=7)).isoformat()))]
++    n_noticias = con.execute("SELECT COUNT(DISTINCT lower(titulo)) FROM noticias WHERE publicado >= ?",
++                             ((ahora - timedelta(hours=24)).isoformat(),)).fetchone()[0]
++    m = macro(con, ajustes, ahora)
++    clave = {s["serie"]: s for s in m["series"]}
++    cifras = []
++    for k in ("USDMXN", "DGS10", "CETES28", "CPI_YOY", "WTI"):
++        s = clave.get(k)
++        if s and s.get("valor") is not None:
++            cifras.append({"serie": k, "titulo": s.get("titulo"), "valor": s["valor"], "unidad": s.get("unidad"),
++                           "periodo": s.get("periodo"), "fuente": s.get("fuente")})
++    return {"corte": ahora.isoformat(timespec="seconds"),
++            "ultima_sesion": {"NYSE": vigencia.ultima_sesion_cerrada("XNYS", ahora).isoformat(),
++                              "BMV": vigencia.ultima_sesion_cerrada("XMEX", ahora).isoformat()},
++            "datos": {"instrumentos": len(cot), "por_estado": conteo},
++            "cifras": cifras, "eventos_alto_impacto_7d": eventos, "titulares_24h": n_noticias,
++            "fuentes": {"cifras": "Panel macro (FRED, BLS, EIA, Banxico)", "eventos": "ForexFactory (feed de exportación)",
++                        "titulares": "Seeking Alpha (RSS)", "estado de datos": "Precios guardados y su vigencia"},
++            "nota": "Resumen de lo que la terminal tiene guardado a la hora de corte. No explica causas, no pronostica y "
++                    "no es una cotización actual: cada cifra lleva su periodo y su fuente."}
++
++
++# ---------------------------------------------------------------------------------------------------------------
++# Calendario de resultados: CONTRATO DE DATOS y cálculo puro de la reacción. La parte real está BLOQUEADA: ninguna
++# fuente autorizada de la terminal entrega fechas de reporte, estimaciones y cifras reportadas con su hora.
++CONTRATO_RESULTADOS = {
++    "estado": "bloqueado",
++    "motivo": "Sin fuente autorizada de calendario de resultados (fecha, hora antes/después de la apertura, estimación, "
++              "dato reportado y revisión). El widget de TradingView solo muestra eventos económicos.",
++    "campos": {
++        "simbolo": "id del instrumento (SIC:XXX o BMV:XXX)",
++        "fecha_reporte": "AAAA-MM-DD del anuncio",
++        "momento": "'antes' de la apertura o 'despues' del cierre (hora de la bolsa de origen)",
++        "estimacion_bpa": "consenso antes del anuncio, con su fecha de corte (no se usa la revisada después)",
++        "reportado_bpa": "cifra publicada por la empresa",
++        "revisado_bpa": "cifra revisada posteriormente, si existe, con fecha de revisión",
++        "fuente": "proveedor y licencia", "disponible_desde": "instante en que el dato pudo conocerse",
++    },
++    "siguiente_accion": "Elegir y autorizar un proveedor con licencia para estos campos; luego conectar import CSV con este contrato.",
++}
++
++
++def reaccion_resultados(cierres: list[tuple[str, float]], fecha_reporte: str, momento: str, sesiones: int = 1) -> dict:
++    """Reacción del precio al reporte sin fuga temporal.
++
++    Base: el último cierre CONOCIDO antes del anuncio (el día previo si se publicó antes de la apertura; el mismo día
++    si fue después del cierre). Reacción: el cierre `sesiones` sesiones después de la base. Solo usa cierres con
++    fecha posterior a la base para la reacción y nunca fechas anteriores para el resultado.
++    """
++    if momento not in ("antes", "despues"):
++        raise ValueError("momento debe ser 'antes' o 'despues'")
++    if sesiones < 1:
++        raise ValueError("sesiones ≥ 1")
++    fr = date.fromisoformat(fecha_reporte)
++    serie = sorted((date.fromisoformat(f), float(c)) for f, c in cierres)
++    previos = [x for x in serie if (x[0] < fr if momento == "antes" else x[0] <= fr)]
++    if not previos:
++        return {"estado": SIN_DATO, "motivo": "sin cierre previo al anuncio"}
++    base = previos[-1]
++    posteriores = [x for x in serie if x[0] > base[0]]
++    if len(posteriores) < sesiones:
++        return {"estado": SIN_DATO, "motivo": f"faltan {sesiones - len(posteriores)} sesiones posteriores", "base": base[0].isoformat()}
++    fin = posteriores[sesiones - 1]
++    return {"base": base[0].isoformat(), "cierre_base": base[1], "fin": fin[0].isoformat(), "cierre_fin": fin[1],
++            "reaccion": fin[1] / base[1] - 1, "sesiones": sesiones}

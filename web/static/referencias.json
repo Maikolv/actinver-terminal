@@ -2,6 +2,20 @@
   "aviso": "Recursos citados en la construcción de Actinver Terminal. Cada fuente de datos se usa según sus condiciones; las marcas pertenecen a sus dueños. tests/test_referencias.py comprueba que toda dependencia del proyecto y todo proveedor de datos del código aparezcan aquí.",
   "grupos": [
     {
+      "titulo": "Formación Python aplicada",
+      "items": [
+        {
+          "nombre": "JPMorgan Chase — python-training",
+          "uso": "Curso de referencia y prácticas propias offline de series y validación de velas. No se ejecuta su integración de APIs ni habilita trading.",
+          "condiciones": "Apache-2.0 para el software original; código integrado propio. Sin aval ni certificado verificado. Datos de terceros con derechos separados.",
+          "url": "https://github.com/jpmorganchase/python-training",
+          "ids": [
+            "jpmorgan-python-training"
+          ]
+        }
+      ]
+    },
+    {
       "titulo": "Fuentes de datos",
       "items": [
         {

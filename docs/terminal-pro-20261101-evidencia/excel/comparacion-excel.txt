@@ -1,0 +1,19 @@
+== plantilla hojas iguales: True | nombres definidos iguales: True
+celdas o propiedades distintas: 8 | en fórmulas: 0 | en números: 0 | formatos numéricos cambiados: 0
+   ('Guía', 'B10', ['C13:D14: correlaciones entre activos (triángulo azul; el resto se copia solo).', 'General'], ['C13:D14: correlaciones entre activos (triángulo de borde punteado; el resto se copia solo).', 'General'])
+   ('Guía', 'B26', ['Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». Los resultados verdes se actualizan solos.', 'General'], ['Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». L
+   ('Guía', 'B34', ['Azul claro: usted escribe aquí', 'General'], ['Borde rojo punteado: usted escribe aquí', 'General'])
+   ('Guía', 'B35', ['Blanco: fórmula: no la borre', 'General'], ['Sin borde: fórmula: no la borre', 'General'])
+   ('Guía', 'B36', ['Verde: resultado principal', 'General'], ['Gris, negritas y doble línea: resultado principal', 'General'])
+   ('Paramétrico Acelera', 'A11', ['Correlaciones ρ (cambie el triángulo azul; el otro se copia)', 'General'], ['Correlaciones ρ (cambie el triángulo de borde punteado; el otro se copia)', 'General'])
+   ('Paramétrico Acelera', 'A2', ['Matriz de covarianzas armada con correlaciones. Celdas azul claro: usted escribe. Simulación educativa con datos históricos: no es pronóstico ni recomendación. La terminal no envía órdenes.', 'General'], ['Ma
+   ('Histórico Modelo', 'A2', ['Celdas azul claro: usted escribe. Verde: resultado principal. Simulación educativa con datos históricos: no es pronóstico ni recomendación. La terminal no envía órdenes.', 'General'], ['Borde rojo punteado: uste
+== libro hojas iguales: True | nombres definidos iguales: True
+celdas o propiedades distintas: 7 | en fórmulas: 0 | en números: 0 | formatos numéricos cambiados: 0
+   ('Guía', 'B19', ['Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». Los resultados verdes se actualizan solos.', 'General'], ['Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». L
+   ('Guía', 'B27', ['Azul claro: usted escribe aquí', 'General'], ['Borde rojo punteado: usted escribe aquí', 'General'])
+   ('Guía', 'B28', ['Blanco: fórmula: no la borre', 'General'], ['Sin borde: fórmula: no la borre', 'General'])
+   ('Guía', 'B29', ['Verde: resultado principal', 'General'], ['Gris, negritas y doble línea: resultado principal', 'General'])
+   ('Guía', 'B7', ['Los pesos en azul claro son los que calculó la terminal. Cámbielos para explorar: todo se recalcula.', 'General'], ['Los pesos con borde rojo punteado son los que calculó la terminal. Cámbielos para explorar: todo se recalc
+   ('P1 Modelo', 'A2', ['Celdas azul claro: usted escribe. Verde: resultado principal. Simulación educativa con datos históricos: no es pronóstico ni recomendación. La terminal no envía órdenes.', 'General'], ['Borde rojo punteado: usted escri
+   ('P2 Modelo', 'A2', ['Celdas azul claro: usted escribe. Verde: resultado principal. Simulación educativa con datos históricos: no es pronóstico ni recomendación. La terminal no envía órdenes.', 'General'], ['Borde rojo punteado: usted escri

@@ -1,0 +1,74 @@
+{
+  "fecha_local": "2026-11-01",
+  "repositorio": "https://github.com/jpmorganchase/python-training",
+  "ruta_local": "C:\\Users\\MIKE\\Desktop\\Repos\\python-training",
+  "commit": "0c536090508181dcfcd64fbcfbfa507cda2db93c",
+  "licencia": "Apache-2.0",
+  "licencia_sha256": "024d2eb385d368609a7f3b017c302ca5ceef4fbb83e6f845ca377d753c2720b4",
+  "material_upstream": "clon intacto; no se ejecutaron sus notebooks ni se instalaron dependencias",
+  "codigo_integrado": "implementaciones propias offline; no se copia código de los notebooks",
+  "notebooks": [
+    {
+      "archivo": "0_best_practices.ipynb",
+      "titulo": "Best Practices for Scientific Computing",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/0_best_practices.ipynb",
+      "sha256": "5133b1218258e8853a1b60c96866bb86df0ed3522c148e6a03378ae1c9382917"
+    },
+    {
+      "archivo": "1_basic.ipynb",
+      "titulo": "Getting started with Jupyter",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/1_basic.ipynb",
+      "sha256": "e560bde49ce0d7b9cba9f333ef504522320a3adc99405bbde3f217dfa1489456"
+    },
+    {
+      "archivo": "2_straddle.ipynb",
+      "titulo": "Example #1 - pricing a straddle",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/2_straddle.ipynb",
+      "sha256": "182ae8b130cffdf17b4b483716452b7d94b8ea4814aafe8402f9d675bff65c9d"
+    },
+    {
+      "archivo": "3_flights.ipynb",
+      "titulo": "Example #2 - Working with files",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/3_flights.ipynb",
+      "sha256": "218aae839dcde2828631bf666c4945b503ce32407668f36854ca6783bf2a9657"
+    },
+    {
+      "archivo": "4_webapi.ipynb",
+      "titulo": "Accessing data from a web API",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/4_webapi.ipynb",
+      "sha256": "72c0e035772ea7836b853a7c45538afa40455d802505382809562959e727eff0"
+    },
+    {
+      "archivo": "5_website.ipynb",
+      "titulo": "Accessing data from a website",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/5_website.ipynb",
+      "sha256": "69029e2e06640d265bb44490c6a3ba140395de556a34fa70842dcad4c00f722d"
+    },
+    {
+      "archivo": "6_financial_data.ipynb",
+      "titulo": "6_financial_data",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/6_financial_data.ipynb",
+      "sha256": "c4ab77a16741adb296d021a1135fa066e74e0f392c0715b90b143cdf3b0b9a94"
+    },
+    {
+      "archivo": "7_advanced_plotting.ipynb",
+      "titulo": "Advanced Plotting: Beyond matplotlib",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/7_advanced_plotting.ipynb",
+      "sha256": "871b33356a284fd452fb0bf9370da336460fb22dbb660839f95ea3062e6703da"
+    },
+    {
+      "archivo": "8_altman_z_double_prime.ipynb",
+      "titulo": "Using Financial Data Example #1: Calculating Altman Z\" Score",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/8_altman_z_double_prime.ipynb",
+      "sha256": "9baa882b566b0f9ddacdd93bbb6007ad8e60821a78aae8e21079a38e47e0ad22"
+    },
+    {
+      "archivo": "9_3d_plotting.ipynb",
+      "titulo": "9_3d_plotting",
+      "url": "https://github.com/jpmorganchase/python-training/tree/0c536090508181dcfcd64fbcfbfa507cda2db93c/notebooks/9_3d_plotting.ipynb",
+      "sha256": "567f9595d35ae15f234502c14218dde746e80c9b2b02fbdef2e9ae27af76cc1d"
+    }
+  ],
+  "certificacion": "No se verificó emisión de certificado; no se añade al PDF maestro de certificaciones.",
+  "restricciones": "Sin red, órdenes, broker, bot o cambios de estrategia durante la práctica."
+}

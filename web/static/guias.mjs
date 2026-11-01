@@ -66,7 +66,7 @@ export const GUIAS = {
   },
   'panel-mercado': {
     titulo: 'Mercado',
-    que: 'Panorama con widgets gratuitos de TradingView: índices, divisas, mapas de calor, calendario y noticias. Son datos de TradingView, con su retraso; no alimentan ningún cálculo de la terminal.',
+    que: 'Panorama con widgets gratuitos de TradingView, numerados de lo general a lo particular: índices, tasas de bonos, VIX, dólar, energía, metales, calendario, noticias, mapas de calor, filtros, ETF, divisas y cripto. Son datos de TradingView, con su retraso; no alimentan ningún cálculo de la terminal.',
     pasos: ['Abra las secciones plegables que le interesen.',
       'Use la cinta y el resumen para el contexto del día; el calendario, para eventos que mueven precios.',
       'Para una emisora, ábrala en Velas.'],
@@ -124,16 +124,6 @@ export const GUIAS = {
       'Verifique las cifras importantes en su sección.'],
     terminos: [['Motor', 'Quién responde: Claude, Ollama o el motor local.'],
       ['Sin asesoría', 'No da recomendaciones personalizadas ni envía órdenes.']],
-  },
-  'panel-laboratorio': {
-    titulo: 'Laboratorio de alfa',
-    que: 'Una prueba estadística para descartar estrategias que solo parecen buenas por suerte: ¿gana, después de costos, más que su referencia (benchmark)?',
-    pasos: ['Cargue los rendimientos de la estrategia y del benchmark por fecha.',
-      'Elija tamaño de bloque, permutaciones y semilla.',
-      'Lea el valor p; con varias estrategias, use el ajustado por Holm.'],
-    terminos: [['Valor p', 'Probabilidad de ver un resultado así de bueno por azar; pequeño no demuestra alfa.'],
-      ['Permutación por bloques', 'Cambia el signo de bloques completos para conservar la dependencia entre días.'],
-      ['Holm', 'Corrección por probar varias estrategias a la vez.']],
   },
   'panel-tiempo': {
     titulo: 'Boletas e historial',
@@ -252,8 +242,8 @@ export const GUIAS = {
   '/static/recursos/practica-proyectos-financieros.html': {
     titulo: 'Cuaderno financiero',
     que: 'Práctica guiada sin conexión: tesis de inversión, valoración por DCF y DCF inverso, y volatilidad, con ejemplos sintéticos.',
-    pasos: ['Escriba su tesis y qué la invalidaría.', 'Pruebe la valoración y el crecimiento implícito.',
-      'Mida la volatilidad sin confundirla con una señal.'],
+    pasos: ['Escriba su tesis y qué la invalidaría, o elija una opción precargada en la lista de cada campo.', 'Elija un escenario listo de valoración (calcula solo) o escriba sus supuestos.',
+      'Elija una serie de precios sintética o pegue la suya y mida la volatilidad sin confundirla con una señal.'],
     terminos: [['DCF', 'Valor presente de los flujos futuros descontados.'],
       ['DCF inverso', 'Qué crecimiento supone el precio actual.']],
   },

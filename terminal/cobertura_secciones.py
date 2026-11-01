@@ -18,7 +18,6 @@ SECCIONES = {
     "tab-optionflow": ("Cadena y GEX indicativo", "Alpaca opciones y contratos Paper de solo lectura", "Cadena indicativa; OI de cierre previo", "Spot de misma referencia a ≤ 60 s o sin GEX"),
     "tab-riesgo": ("VaR y exposición", "Posiciones manuales y cierres guardados", "Cierres diarios", "Ventana histórica y precios fechados"),
     "tab-asistente": ("Respuestas sobre datos locales", "Base local y notas del usuario; modelo opcional", "Hereda fecha de cada dato", "No genera cotización vigente"),
-    "tab-laboratorio": ("Experimentos de robustez", "Series históricas guardadas", "Cierres históricos", "Holdout y fechas declarados"),
     "tab-tiempo": ("Operaciones y boletas", "Registro manual local y captura del Reto", "Según fecha de registro", "Estado de ejecución declarado"),
     "tab-ranking": ("Clasificación del universo", "Cierres guardados, SEC y capitalización BMV disponible", "Cierres diarios; caché fechada", "Tipo y estado por fila"),
     "tab-robustez": ("Pruebas fuera de muestra", "Series históricas guardadas", "Cierres históricos", "Tramo intacto y costos visibles"),

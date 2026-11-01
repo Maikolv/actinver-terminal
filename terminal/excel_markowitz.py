@@ -25,18 +25,24 @@ from openpyxl.utils import get_column_letter as L
 
 from . import markowitz
 
-# Colores de la terminal (modo claro de app.css) para que el libro se vea como la terminal.
-MARCA, TEXTO, TEXTO_2, BORDE = "1F5F8B", "1C1D1F", "55585E", "D9D6CF"
-SUPERFICIE_2, POSITIVO, POSITIVO_FONDO, SERIE_2 = "EFEDE8", "1D6B3A", "E3F1E7", "B0600F"
+# Identidad de la terminal (DESIGN.md): banda negra con texto blanco, encabezados gris oscuro, cuerpo blanco para que
+# imprima legible, y rojo solo como acento. Entradas y resultados se distinguen por FORMA (borde punteado / doble
+# línea y negritas), no solo por color. Contraste: blanco sobre NEGRO 17:1, blanco sobre GRIS_CAB 15:1, ROJO_TEXTO 6.5:1.
+MARCA, TEXTO, TEXTO_2, BORDE = "D94848", "111318", "4A505A", "C9CBD0"
+NEGRO, GRIS_CAB, ROJO_TEXTO, GRIS_RESULTADO = "121419", "1B1E24", "B42626", "ECECE9"
+POSITIVO, SERIE_1, SERIE_2 = "1D6B3A", "1F5F8B", "B0600F"
 FUENTE = "Segoe UI"
 NEGRITA = Font(name=FUENTE, bold=True, color=TEXTO)
-TITULO = Font(name=FUENTE, bold=True, size=15, color=TEXTO)
-SECCION = Font(name=FUENTE, bold=True, size=12, color=MARCA)
+TITULO = Font(name=FUENTE, bold=True, size=15, color="FFFFFF")
+SECCION = Font(name=FUENTE, bold=True, size=12, color=ROJO_TEXTO)
 SUAVE = Font(name=FUENTE, size=10, color=TEXTO_2)
-CABECERA = PatternFill("solid", fgColor=SUPERFICIE_2)
-ENTRADA = PatternFill("solid", fgColor="E3EEF6")      # celdas que el usuario puede cambiar (azul claro)
-RESULTADO = PatternFill("solid", fgColor=POSITIVO_FONDO)
+FUENTE_CAB = Font(name=FUENTE, bold=True, color="FFFFFF")
+BANDA = PatternFill("solid", fgColor=NEGRO)
+CABECERA = PatternFill("solid", fgColor=GRIS_CAB)
+ENTRADA = PatternFill("solid", fgColor="FFF5F5")      # editable: relleno muy claro + borde rojo punteado
+RESULTADO = PatternFill("solid", fgColor=GRIS_RESULTADO)  # resultado: gris claro + negritas + doble línea inferior
 LINEA = Side(style="thin", color=BORDE)
+PUNTEADA = Side(style="dashed", color=ROJO_TEXTO)
 PCT, NUM = "0.00%", "#,##0.00"
 # Ejercicio de Acelera: E(r) y σ anuales; correlaciones derivadas de las covarianzas diarias del mismo archivo
 ACELERA = (["IPC", "SP500", "Treasury MXN"], [0.11, 0.16, 0.09], [0.18, 0.17, 0.10],
@@ -46,7 +52,7 @@ AVISO = "Simulación educativa con datos históricos: no es pronóstico ni recom
 
 @lru_cache(maxsize=1)
 def _logo_png(px: int = 96) -> bytes:
-    """El mismo logo que web/static/favicon.svg (cuadro azul con línea de precio blanca), en PNG."""
+    """El mismo logo que web/static/favicon.svg (cuadro rojo con línea de precio blanca), en PNG."""
     from PIL import Image, ImageDraw
     k = px / 32
     im = Image.new("RGBA", (px, px), (0, 0, 0, 0))
@@ -73,7 +79,8 @@ def _encabezado(ws, titulo: str, columnas: int, subtitulo: str | None = None) ->
     ws["A1"].font = TITULO
     ws["A1"].alignment = Alignment(vertical="center", indent=3)
     for c in range(1, columnas + 1):
-        ws.cell(1, c).border = Border(bottom=Side(style="medium", color=MARCA))
+        ws.cell(1, c).fill = BANDA
+        ws.cell(1, c).border = Border(bottom=Side(style="thick", color=MARCA))
     if subtitulo:
         ws["A2"] = subtitulo
         ws["A2"].font = SUAVE
@@ -81,13 +88,18 @@ def _encabezado(ws, titulo: str, columnas: int, subtitulo: str | None = None) ->
 
 
 def _cabecera(celda) -> None:
-    celda.font, celda.fill, celda.border = NEGRITA, CABECERA, Border(bottom=LINEA)
+    celda.font, celda.fill, celda.border = FUENTE_CAB, CABECERA, Border(bottom=Side(style="thin", color=MARCA))
 
 
 def _entrada(celda, formato: str | None = None) -> None:
-    celda.fill, celda.border = ENTRADA, Border(left=LINEA, right=LINEA, top=LINEA, bottom=LINEA)
+    celda.fill, celda.border = ENTRADA, Border(left=PUNTEADA, right=PUNTEADA, top=PUNTEADA, bottom=PUNTEADA)
     if formato:
         celda.number_format = formato
+
+
+def _resultado(celda) -> None:
+    celda.fill, celda.font = RESULTADO, Font(name=FUENTE, bold=True, color=TEXTO)
+    celda.border = Border(top=LINEA, bottom=Side(style="double", color=TEXTO))
 
 
 def _fuente_terminal(wb: Workbook) -> None:
@@ -121,13 +133,15 @@ def _guia(wb: Workbook, titulo: str, bloques: list[tuple[str, list[str]]]) -> No
             ws.row_dimensions[fila].height = 15 * max(1, -(-len(paso) // 115))
             fila += 1
         fila += 1
-    ejemplo = [("Azul claro", ENTRADA, "usted escribe aquí"), ("Blanco", None, "fórmula: no la borre"),
-               ("Verde", RESULTADO, "resultado principal")]
+    ejemplo = [("Borde rojo punteado", ENTRADA, "usted escribe aquí"), ("Sin borde", None, "fórmula: no la borre"),
+               ("Gris, negritas y doble línea", RESULTADO, "resultado principal")]
     ws.cell(fila, 1, "Colores del libro").font = SECCION
     for k, (nombre, relleno, uso) in enumerate(ejemplo, start=fila + 1):
         c = ws.cell(k, 2, f"{nombre}: {uso}")
-        if relleno:
-            c.fill = relleno
+        if relleno is ENTRADA:
+            _entrada(c)
+        elif relleno is RESULTADO:
+            _resultado(c)
     ws.freeze_panes = "A4"
 
 
@@ -176,7 +190,7 @@ def _resultados(ws, fila: int, n: int, f_e: int, c_e: str, c_w: str, f_cov: int,
         c = ws.cell(r0 + k, 2, f)
         c.number_format = fmt
         if et in principales:
-            c.fill, c.font = RESULTADO, Font(name=FUENTE, bold=True, color=POSITIVO)
+            _resultado(c)
         celdas[et] = f"B{r0 + k}"
     celdas["pesos"] = cw
     return celdas
@@ -216,9 +230,9 @@ def _frontera(ws, fila: int, res: dict, ancla: str) -> None:
     g.title, g.style, g.height, g.width = "Frontera eficiente", 13, 9, 18
     g.x_axis.title, g.y_axis.title = "Riesgo σ (anual)", "Rendimiento esperado (anual)"
     for xs, ys, nombre, color, marcador, linea in [
-        (Reference(ws, min_col=1, min_row=fila + 2, max_row=fila + 1 + nf), Reference(ws, min_col=2, min_row=fila + 2, max_row=fila + 1 + nf), "Frontera", MARCA, None, True),
+        (Reference(ws, min_col=1, min_row=fila + 2, max_row=fila + 1 + nf), Reference(ws, min_col=2, min_row=fila + 2, max_row=fila + 1 + nf), "Frontera", TEXTO, None, True),
         (Reference(ws, min_col=5, min_row=fila + 2, max_row=fila + 1 + na), Reference(ws, min_col=6, min_row=fila + 2, max_row=fila + 1 + na), "Activos", TEXTO_2, "circle", False),
-        (Reference(ws, min_col=8, min_row=fila + 2), Reference(ws, min_col=9, min_row=fila + 2), "Elegido", SERIE_2, "diamond", False)]:
+        (Reference(ws, min_col=8, min_row=fila + 2), Reference(ws, min_col=9, min_row=fila + 2), "Elegido", MARCA, "diamond", False)]:
         se = Series(ys, xs, title=nombre)
         _colorear(se, color, marcador, linea)
         g.series.append(se)
@@ -261,7 +275,7 @@ def _hoja_historica(wb: Workbook, prefijo: str, nombres: list[str], precios: pd.
 
     ws = wb.create_sheet(f"{prefijo}Modelo"[:31])
     _encabezado(ws, f"Modelo de Markowitz · {res['especificacion']['nombre'] if res else 'plantilla con sus datos'}", n + 9,
-                "Celdas azul claro: usted escribe. Verde: resultado principal. " + AVISO)
+                "Borde rojo punteado: usted escribe. Gris con negritas y doble línea: resultado principal. " + AVISO)
     for k, (et, v, fmt) in enumerate([("Tasa libre de riesgo r_f", rf, PCT), ("Aversión al riesgo A", aversion, "0.0"),
                                       ("Peso máximo por activo", peso_max, PCT), ("Peso mínimo por activo", peso_min, PCT)]):
         ws.cell(3 + k, 1, et).font = NEGRITA
@@ -304,7 +318,7 @@ def _hoja_parametrica(wb: Workbook) -> dict:
     n = len(nombres)
     ws = wb.create_sheet("Paramétrico Acelera")
     _encabezado(ws, "Ejercicio del Taller de Portafolios (Acelera)", 8,
-                "Matriz de covarianzas armada con correlaciones. Celdas azul claro: usted escribe. " + AVISO)
+                "Matriz de covarianzas armada con correlaciones. Borde rojo punteado: usted escribe. " + AVISO)
     ws["A3"], ws["B3"] = "Tasa libre de riesgo r_f", 0.07
     ws["A4"], ws["B4"] = "Aversión al riesgo A", 4
     ws["A3"].font = ws["A4"].font = NEGRITA
@@ -320,7 +334,7 @@ def _hoja_parametrica(wb: Workbook) -> dict:
             _entrada(ws.cell(r, col, v), PCT)
         ws.cell(r, 4, f'=IFERROR((B{r}-$B$3)/C{r},"")').number_format = "0.000"
     f_rho = f_e + n + 2
-    ws.cell(f_rho - 1, 1, "Correlaciones ρ (cambie el triángulo azul; el otro se copia)").font = SECCION
+    ws.cell(f_rho - 1, 1, "Correlaciones ρ (cambie el triángulo de borde punteado; el otro se copia)").font = SECCION
     fr, cr = _matriz(ws, f_rho, 1, nombres, lambda i, j: 1 if i == j else (rho[i][j] if j > i else f"={L(2 + i)}{f_rho + 1 + j}"))
     for i in range(n):
         for j in range(i + 1, n):
@@ -350,7 +364,7 @@ def _hoja_parametrica(wb: Workbook) -> dict:
     g.title, g.style, g.height, g.width = "Dos activos: efecto de la correlación", 13, 9, 16
     g.x_axis.title, g.y_axis.title = "σ_p", "E(r_p)"
     ys = Reference(ws, min_col=4, min_row=f2 + 3, max_row=f2 + 13)
-    for col, nm, color in ((3, "ρ elegida", MARCA), (5, "ρ=+1", "A3261C"), (6, "ρ=0", SERIE_2), (7, "ρ=−1", POSITIVO)):
+    for col, nm, color in ((3, "ρ elegida", MARCA), (5, "ρ=+1", TEXTO_2), (6, "ρ=0", SERIE_2), (7, "ρ=−1", SERIE_1)):
         se = Series(ys, Reference(ws, min_col=col, min_row=f2 + 3, max_row=f2 + 13), title=nm)
         _colorear(se, color)
         g.series.append(se)
@@ -372,7 +386,7 @@ def _pasos_solver(h: dict) -> list[str]:
         "menor riesgo.",
         f"Cambiando las celdas de variables: {pesos}.",
         f"Restricciones (botón Agregar): {h['Suma de pesos (debe ser 100 %)']} = 1  ·  {pesos} <= $B$5  ·  {pesos} >= $B$6.",
-        "Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». Los resultados verdes se actualizan solos.",
+        "Método de resolución: GRG Nonlinear → Resolver → «Conservar solución de Solver». Los resultados en gris con doble línea se actualizan solos.",
     ]
 
 
@@ -397,7 +411,7 @@ def plantilla() -> bytes:
             "10 conservador).",
             f"B{f_e}:C{f_e + n - 1}: rendimiento esperado y riesgo (σ) anual de cada activo. E{f_e}:E{f_e + n - 1}: los pesos "
             "(deben sumar 100 %).",
-            f"{p['rho']}: correlaciones entre activos (triángulo azul; el resto se copia solo).",
+            f"{p['rho']}: correlaciones entre activos (triángulo de borde punteado; el resto se copia solo).",
             f"Lea el resultado: rendimiento {p['E(r_p) anual']}, riesgo {p['σ_p anual']} y Sharpe {p['Sharpe']}. Más abajo, la "
             "tabla y la gráfica de dos activos muestran cómo la correlación baja el riesgo."]),
         ("Opción B · Con sus precios (hojas «Histórico Datos» e «Histórico Modelo»)", [
@@ -460,7 +474,7 @@ def libro(con, ajustes, portafolios: list[dict]) -> bytes:
             "«Resumen»: los portafolios lado a lado (rendimiento, riesgo y Sharpe enlazados a sus hojas).",
             "Por cada portafolio, «P# Datos» (precios en MXN y rendimientos diarios) y «P# Modelo» (estadísticos, covarianzas, "
             "correlaciones, pesos, resultados, frontera eficiente y gráfica).",
-            "Los pesos en azul claro son los que calculó la terminal. Cámbielos para explorar: todo se recalcula."]),
+            "Los pesos con borde rojo punteado son los que calculó la terminal. Cámbielos para explorar: todo se recalcula."]),
         ("Dónde está cada cosa", [f"«{nombre}» → hoja «{c['hoja']}»: pesos {c['pesos']} · rendimiento {c['E(r_p) anual']} · riesgo "
                                   f"{c['σ_p anual']} · Sharpe {c['Sharpe']} · suma de pesos {c['Suma de pesos (debe ser 100 %)']}."
                                   for nombre, c in hojas]),

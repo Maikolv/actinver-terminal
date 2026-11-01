@@ -1,0 +1,26 @@
+{
+  "fecha_local": "2026-11-01",
+  "items": [
+    {"id": "TP01-01", "estado": "bloqueado", "titulo": "Calendario de resultados empresariales e historia de reacción",
+     "evidencia": "terminal/mesa_datos.py CONTRATO_RESULTADOS y reaccion_resultados; tests/test_mesa_datos.py (sin fuga, offline)",
+     "siguiente_accion": "Usuario: elegir y autorizar un proveedor con licencia de fechas, hora, estimación, dato reportado y revisión; luego importar con este contrato."},
+    {"id": "TP01-02", "estado": "parcial", "titulo": "Macro de México y bono a 30 años",
+     "evidencia": "/api/mesa/macro devuelve SIN DATO con requisito para DGS30, tasa objetivo Banxico (SF61745) e INPC",
+     "siguiente_accion": "Agregar DGS30 a centro_conectores.py (FRED ya autorizado); conectores Banxico/INEGI requieren decisión y BANXICO_TOKEN."},
+    {"id": "TP01-03", "estado": "pendiente", "titulo": "Revisión visual del Excel de Markowitz en Excel",
+     "evidencia": "docs/terminal-pro-20261101-evidencia/excel/; Excel 2013 rechazó la automatización (RPC_E_CALL_REJECTED)",
+     "siguiente_accion": "Usuario: abrir plantilla-sintetico-despues.xlsx y libro-sintetico-despues.xlsx y confirmar lectura e impresión."},
+    {"id": "TP01-04", "estado": "parcial", "titulo": "Redimensionar alto de paneles por arrastre",
+     "evidencia": "Mesa ofrece ancho de fila completa y reordenar por arrastre/teclado; iframes con resize vertical nativo",
+     "siguiente_accion": "Evaluar alto persistente por panel con controles de teclado si el uso lo pide; sin bibliotecas nuevas."},
+    {"id": "TP01-05", "estado": "pendiente", "titulo": "Paleta de comandos en la terminal principal",
+     "evidencia": "La paleta vive en Mesa; la cabecera principal conserva su barra de comandos (/INV, símbolo)",
+     "siguiente_accion": "Unificar en un módulo compartido sin duplicar buscadores: la barra principal podría reutilizar buscarPaleta()."},
+    {"id": "TP01-06", "estado": "limitacion_externa", "titulo": "Colores internos de los widgets de TradingView",
+     "evidencia": "Solo colorTheme e isTransparent; documentado en DESIGN.md",
+     "siguiente_accion": "Ninguna desde Actinver."},
+    {"id": "TP01-07", "estado": "pendiente", "titulo": "Agregar instrumentos a Seguimiento desde Mesa",
+     "evidencia": "Mesa no recibe token CSRF; la franja es de solo lectura y enlaza a la sección Seguimiento",
+     "siguiente_accion": "Si se quiere, servir mesa.html con el token CSRF del servidor (como index.html) sin relajar controles."}
+  ]
+}

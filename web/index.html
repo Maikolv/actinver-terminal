@@ -39,7 +39,7 @@
   <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
     <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
   </div>
-</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
 
 <nav class="pestanas" aria-label="Secciones" data-grupo="cuenta">
   <div class="grupos-nav" role="group" aria-label="Tareas">
@@ -53,26 +53,25 @@
   <div role="tablist" id="lista-pestanas">
     <button role="tab" data-grupo="cuenta" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
     <button role="tab" data-grupo="cuenta" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio Actinver</button>
-    <button role="tab" data-grupo="cuenta" id="tab-portafolios" aria-controls="panel-portafolios" aria-selected="false" tabindex="-1">Mis portafolios</button>
-    <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
+    <button role="tab" data-grupo="cuenta" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
+    <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
     <button role="tab" data-grupo="cuenta" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
     <button role="tab" data-grupo="cuenta" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
+    <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
+    <button role="tab" data-grupo="decidir" id="tab-portafolios" aria-controls="panel-portafolios" aria-selected="false" tabindex="-1">Mis portafolios</button>
+    <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+    <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
+    <button role="tab" data-grupo="decidir" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
+    <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
+    <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
     <button role="tab" data-grupo="mercado" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
     <button role="tab" data-grupo="mercado" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
     <button role="tab" data-grupo="mercado" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
     <button role="tab" data-grupo="mercado" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
-    <button role="tab" data-grupo="mercado" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
-    <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
-    <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio de alfa</button>
-    <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
-    <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
-    <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
+    <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
     <button role="tab" data-grupo="mercado" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
     <button role="tab" data-grupo="investigar" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
-    <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
-    <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
-    <button role="tab" data-grupo="decidir" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
-    <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
+    <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
     <button role="tab" data-grupo="sistema" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
     <button role="tab" data-grupo="sistema" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
   </div>
@@ -85,7 +84,7 @@
     <nav class="accesos" aria-label="Accesos frecuentes">
       <button type="button" class="boton boton--secundario" data-ir="tab-asistente">Preguntar al asistente</button>
       <button type="button" class="boton boton--secundario" data-ir="tab-portafolios">Generar un portafolio</button>
-      <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía (informativo)</button>
+      <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía</button>
     </nav>
     <div id="resumen-contenido">
       <div class="rejilla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
@@ -112,8 +111,8 @@
       </div>
       <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-mercado-propuesta" hidden>
         <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
-        <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales</button>
-        <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales (BMV)</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras (SIC)</button>
       </div>
     </div>
     <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
@@ -220,9 +219,9 @@
       <button type="button" role="radio" aria-checked="false" data-valor="fondos">Fondos</button>
     </div>
     <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-ranking">
-      <button type="button" role="radio" aria-checked="true" data-valor="ambos">Todas</button>
-      <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Nacionales (BMV)</button>
-      <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Extranjeras (SIC)</button>
+      <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales (BMV)</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras (SIC)</button>
     </div>
     <p class="suave" id="ranking-hora"></p>
     <div id="ranking-capitalizacion"></div>
@@ -412,16 +411,10 @@
       <button type="button" class="boton boton--secundario" data-pregunta="/plan">Plan de hoy</button>
       <button type="button" class="boton boton--secundario" data-pregunta="/cartera">Mi cartera</button>
       <button type="button" class="boton boton--secundario" data-pregunta="/estado">Estado de los datos</button>
-      <button type="button" class="boton boton--secundario" data-pregunta="¿Cómo funciona el preregistro del Laboratorio?">¿Cómo funciona el Laboratorio?</button>
       <button type="button" class="boton boton--secundario" data-pregunta="/notas">Mis notas</button>
     </div>
   </section>
 
-  <section role="tabpanel" id="panel-laboratorio" aria-labelledby="tab-laboratorio" hidden>
-    <h1>Laboratorio de alfa</h1>
-    <p class="ayuda">Contrasta si el exceso medio NETO de una estrategia sobre su benchmark es mayor que cero, con permutación de signos por bloques. Un valor p pequeño no demuestra alfa: es un descarte estadístico bajo supuestos que se listan en el resultado.</p>
-    <div id="laboratorio-contenido" aria-live="polite"></div>
-  </section>
 
   <section role="tabpanel" id="panel-intradia" aria-labelledby="tab-intradia" hidden>
     <h1>Plan intradía</h1>

@@ -9,10 +9,6 @@
       "url": "/static/recursos/oficina-inversion.html"
     },
     {
-      "titulo": "Laboratorio de alfa",
-      "url": "/?vista=tab-laboratorio"
-    },
-    {
       "titulo": "Cuaderno financiero",
       "url": "/static/recursos/practica-proyectos-financieros.html"
     },
@@ -31,12 +27,12 @@
       "url": "/?vista=tab-cartera"
     },
     {
-      "titulo": "Mis portafolios",
-      "url": "/?vista=tab-portafolios"
+      "titulo": "Riesgo",
+      "url": "/?vista=tab-riesgo"
     },
     {
-      "titulo": "Propuestas",
-      "url": "/?vista=tab-propuestas"
+      "titulo": "Boletas e historial",
+      "url": "/?vista=tab-tiempo"
     },
     {
       "titulo": "Alertas",
@@ -45,6 +41,34 @@
     {
       "titulo": "Reto y perfil",
       "url": "/?vista=tab-perfil"
+    },
+    {
+      "titulo": "Propuestas",
+      "url": "/?vista=tab-propuestas"
+    },
+    {
+      "titulo": "Mis portafolios",
+      "url": "/?vista=tab-portafolios"
+    },
+    {
+      "titulo": "Ranking",
+      "url": "/?vista=tab-ranking"
+    },
+    {
+      "titulo": "Robustez",
+      "url": "/?vista=tab-robustez"
+    },
+    {
+      "titulo": "Backtesting",
+      "url": "/?vista=tab-backtesting"
+    },
+    {
+      "titulo": "Modelos",
+      "url": "/?vista=tab-modelos"
+    },
+    {
+      "titulo": "Plan intradía",
+      "url": "/?vista=tab-intradia"
     },
     {
       "titulo": "Mercado",
@@ -63,28 +87,8 @@
       "url": "/?vista=tab-optionflow"
     },
     {
-      "titulo": "Riesgo",
-      "url": "/?vista=tab-riesgo"
-    },
-    {
-      "titulo": "Asistente",
-      "url": "/?vista=tab-asistente"
-    },
-    {
-      "titulo": "Laboratorio de alfa",
-      "url": "/?vista=tab-laboratorio"
-    },
-    {
-      "titulo": "Boletas e historial",
-      "url": "/?vista=tab-tiempo"
-    },
-    {
-      "titulo": "Ranking",
-      "url": "/?vista=tab-ranking"
-    },
-    {
-      "titulo": "Robustez",
-      "url": "/?vista=tab-robustez"
+      "titulo": "Seguimiento",
+      "url": "/?vista=tab-seguimiento"
     },
     {
       "titulo": "Movimientos públicos",
@@ -95,20 +99,8 @@
       "url": "/?vista=tab-investigacion"
     },
     {
-      "titulo": "Modelos",
-      "url": "/?vista=tab-modelos"
-    },
-    {
-      "titulo": "Seguimiento",
-      "url": "/?vista=tab-seguimiento"
-    },
-    {
-      "titulo": "Backtesting",
-      "url": "/?vista=tab-backtesting"
-    },
-    {
-      "titulo": "Plan intradía",
-      "url": "/?vista=tab-intradia"
+      "titulo": "Asistente",
+      "url": "/?vista=tab-asistente"
     },
     {
       "titulo": "Datos y fuentes",

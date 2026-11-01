@@ -1,0 +1,47 @@
+[
+  {
+    "theme": "light",
+    "width": 390,
+    "errors": [],
+    "overflow": false,
+    "notebook": true
+  },
+  {
+    "theme": "light",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "notebook": true
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "notebook": true
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "errors": [],
+    "overflow": false,
+    "notebook": true
+  },
+  {
+    "theme": "dark",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "notebook": true
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "notebook": true
+  },
+  {
+    "fallo_dato_local": "SIN DATO sin proveedor alternativo"
+  }
+]

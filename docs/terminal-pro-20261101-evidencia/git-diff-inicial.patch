@@ -1,0 +1,778 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index eceb544..59966cc 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1149,3 +1149,8 @@ Catálogo ligero sin precios, deduplicación GET en curso, polling de Ranking/SE
+ ### Continuación de procesos — 31-oct-2026
+ 
+ Respaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.
++
++
++### Formación Python JPMorgan — 1-nov-2026
++
++Clon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuaderno enlaza prácticas originales de series y validación de velas de futuros; dos notebooks ejecutados offline, 21 pruebas específicas, cinco de referencias y nueve Node aprobadas. Seis vistas de navegador y caso SIN DATO comprobados. Sin instalar el entorno upstream ni modificar modelos, estrategia, proveedores o candados. Informe: docs/integracion-python-training-20261101.md. No es certificación ni aval del banco.
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 958104f..4eb8502 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -212,3 +212,8 @@ Navegación común: `web/static/navegacion.{json,mjs,css}` y selector de las 24
+ ### NQ — aporte Codex20/oct/2026
+ 
+ Ficha añadida a Aprender y recursos, con guía, prerregistro y resultados agregados. Replay offline en futuros-lab:6901barras,5RTH completas,4sesiones desarrollo,0trades;6tests específicos aprobados. Sin ventaja demostrada; sin forward ni prueba real de OCO. No se alteró la interfaz ni se desplegó Quantower. Coordinación con Claude mediante documento local; expediente futuros-lab/entregables/nq-investigacion-20261020.
++
++
++### Formación Python — 1-nov-2026
++
++Curso python-training de JPMorgan clonado y fijado; prácticas propias offline accesibles desde Cuaderno. Ver docs/integracion-python-training-20261101.md. No cambia modelos ni ejecución; no instalar ni ejecutar automáticamente notebooks upstream con APIs.
+diff --git a/DESIGN.md b/DESIGN.md
+index 6c60c3b..7cf6e94 100644
+--- a/DESIGN.md
++++ b/DESIGN.md
+@@ -19,8 +19,12 @@ Formato inspirado en la colección `awesome-design-md` y en los criterios de `ha
+ cálculo abre con valores iniciales que ya producen un resultado válido, ofrece «Ejemplo listo» o «Escenario listo»
+ con opciones predefinidas (más «Personalizado») y, cuando el resultado es técnico, lo acompaña de una lectura en
+ palabras simples. Los ejemplos son hipótesis de estudio y se rotulan así; nunca se presentan como cotizaciones.
+-Hoy: escenarios NQ en Mesa (`ESCENARIOS_NQ`), ejemplos de Modelos (`EJEMPLOS_OPCIONES`) y ejemplo sintético del
+-Laboratorio de alfa. `tests/mesa.test.mjs` exige que cada escenario NQ calcule al menos un contrato.
++Hoy: escenarios NQ en Mesa (`ESCENARIOS_NQ`), ejemplos de Modelos (`EJEMPLOS_OPCIONES`) y, en el Cuaderno, una lista
++de opciones precargadas junto a cada campo de texto (`PRECARGAS`) más escenarios listos de valoración y volatilidad. `tests/mesa.test.mjs` exige que cada escenario NQ calcule al menos un contrato.
++
++**Estética de terminal profesional.** Títulos en monoespaciado, mayúsculas y ámbar (`--ambar`), tablas densas con
++encabezados monoespaciados, fondo casi negro en modo oscuro, reloj de plazas y cinta macro en la barra común. Paleta
++inspirada en OpenTerminal (MIT); el logo conserva `--marca`.
+ 
+ ## Tokens
+ 
+diff --git a/docs/historial-estado.md b/docs/historial-estado.md
+index 2ad1a15..c7eaca6 100644
+--- a/docs/historial-estado.md
++++ b/docs/historial-estado.md
+@@ -368,3 +368,8 @@ CI del 29-oct roto por la hora (reportes) y GEX con ventana de OI desalineada: a
+ ### Continuación de procesos — 31-oct-2026
+ 
+ Respaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.
++
++
++### Formación Python JPMorgan — 1-nov-2026
++
++Clon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuaderno enlaza prácticas originales de series y validación de velas de futuros; dos notebooks ejecutados offline, 21 pruebas específicas, cinco de referencias y nueve Node aprobadas. Seis vistas de navegador y caso SIN DATO comprobados. Sin instalar el entorno upstream ni modificar modelos, estrategia, proveedores o candados. Informe: docs/integracion-python-training-20261101.md. No es certificación ni aval del banco.
+diff --git a/terminal/app.py b/terminal/app.py
+index fa84ec9..0b3a0ae 100644
+--- a/terminal/app.py
++++ b/terminal/app.py
+@@ -1679,9 +1679,10 @@ WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", Fa
+               "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
+               "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
+               "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
+-              "mapa-cripto": ("crypto-coins-heatmap", False)}
++              "mapa-cripto": ("crypto-coins-heatmap", False), "cinta-macro": ("ticker-tape", False),
++              "macro": ("market-quotes", False), "cripto-mercado": ("crypto-mkt-screener", False)}
+ MAPAS_TV = {"NASDAQ100", "SPX500"}
+-FILTROS_TV = {"america", "mexico"}
++FILTROS_TV = {"america", "mexico", "forex"}
+ BASE_TV = {"isTransparent": False, "locale": "es", "width": "100%", "height": "100%"}
+ DIVISAS_TV = ["USD", "MXN", "EUR", "JPY", "GBP", "CAD", "CNY"]
+ 
+@@ -1705,6 +1706,24 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
+             grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso"), ("FX_IDC:EURMXN", "Euro / peso"), ("FX:EURUSD", "Euro / dólar")]),
+             grupo("Bonos de EE. UU. (ETF, precio)", [("NASDAQ:SHY", "SHY · Tesoro 1–3 años"), ("NASDAQ:IEF", "IEF · Tesoro 7–10 años"), ("NASDAQ:TLT", "TLT · Tesoro 20+ años")]),
+             grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:USOIL", "Petróleo WTI"), ("TVC:SILVER", "Plata")])]}
++    if tipo == "macro":
++        grupo = lambda t, ss: {"name": t, "symbols": [{"name": s, "displayName": d} for s, d in ss]}  # noqa: E731
++        return {**BASE_TV, "showSymbolLogo": True, "symbolsGroups": [
++            grupo("Tasas de EE. UU. (FRED, cierre diario o mensual)", [("FRED:DGS2", "Bono 2 años %"), ("FRED:DGS10", "Bono 10 años %"),
++                                     ("FRED:DGS30", "Bono 30 años %"), ("FRED:FEDFUNDS", "Fondos federales % (mensual)")]),
++            grupo("Volatilidad y dólar", [("CAPITALCOM:VIX", "VIX · volatilidad S&P 500"), ("CAPITALCOM:DXY", "Índice dólar (DXY)"),
++                                          ("FX_IDC:USDMXN", "Dólar / peso")]),
++            grupo("Energía", [("TVC:USOIL", "Petróleo WTI"), ("TVC:UKOIL", "Petróleo Brent"), ("CAPITALCOM:NATURALGAS", "Gas natural")]),
++            grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")]),
++            grupo("Cripto (fuera del Reto)", [("BITSTAMP:BTCUSD", "Bitcoin"), ("BITSTAMP:ETHUSD", "Ether")])]}
++    if tipo == "cinta-macro":
++        return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
++            {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),
++                                                    ("FOREXCOM:DJI", "Dow Jones"), ("CAPITALCOM:VIX", "VIX"), ("FRED:DGS10", "Bono EE. UU. 10a %"),
++                                                    ("CAPITALCOM:DXY", "Dólar DXY"), ("FX_IDC:USDMXN", "USD/MXN"), ("FX_IDC:EURMXN", "EUR/MXN"),
++                                                    ("TVC:GOLD", "Oro"), ("TVC:USOIL", "WTI"), ("BITSTAMP:BTCUSD", "Bitcoin")]]}
++    if tipo == "cripto-mercado":
++        return {**BASE_TV, "defaultColumn": "overview", "screener_type": "crypto_mkt", "displayCurrency": "USD"}
+     if tipo == "destacados":
+         return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}
+     if tipo == "mapa-etf":
+diff --git a/terminal/cobertura_secciones.py b/terminal/cobertura_secciones.py
+index c46756b..464972f 100644
+--- a/terminal/cobertura_secciones.py
++++ b/terminal/cobertura_secciones.py
+@@ -18,7 +18,6 @@ SECCIONES = {
+     "tab-optionflow": ("Cadena y GEX indicativo", "Alpaca opciones y contratos Paper de solo lectura", "Cadena indicativa; OI de cierre previo", "Spot de misma referencia a ≤ 60 s o sin GEX"),
+     "tab-riesgo": ("VaR y exposición", "Posiciones manuales y cierres guardados", "Cierres diarios", "Ventana histórica y precios fechados"),
+     "tab-asistente": ("Respuestas sobre datos locales", "Base local y notas del usuario; modelo opcional", "Hereda fecha de cada dato", "No genera cotización vigente"),
+-    "tab-laboratorio": ("Experimentos de robustez", "Series históricas guardadas", "Cierres históricos", "Holdout y fechas declarados"),
+     "tab-tiempo": ("Operaciones y boletas", "Registro manual local y captura del Reto", "Según fecha de registro", "Estado de ejecución declarado"),
+     "tab-ranking": ("Clasificación del universo", "Cierres guardados, SEC y capitalización BMV disponible", "Cierres diarios; caché fechada", "Tipo y estado por fila"),
+     "tab-robustez": ("Pruebas fuera de muestra", "Series históricas guardadas", "Cierres históricos", "Tramo intacto y costos visibles"),
+diff --git a/tests/guias.test.mjs b/tests/guias.test.mjs
+index 54bdada..a6d6bb5 100644
+--- a/tests/guias.test.mjs
++++ b/tests/guias.test.mjs
+@@ -10,7 +10,7 @@ const PAGINAS = ['web/static/recursos/oficina-inversion.html', 'web/static/recur
+ 
+ test('cada sección de la terminal tiene guía completa, sin excepción', () => {
+   const paneles = [...leer('web/index.html').matchAll(/role="tabpanel" id="([^"]+)"/g)].map((m) => m[1]);
+-  assert.ok(paneles.length >= 24);
++  assert.ok(paneles.length >= 23);
+   for (const p of paneles) {
+     const g = GUIAS[p];
+     assert.ok(g, `sin guía: ${p}`);
+diff --git a/web/index.html b/web/index.html
+index 289c364..bee9eb0 100644
+--- a/web/index.html
++++ b/web/index.html
+@@ -39,7 +39,7 @@
+   <div class="aviso-demo" id="aviso-demo" __OCULTO_DEMO__>
+     <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
+   </div>
+-</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
++</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+ 
+ <nav class="pestanas" aria-label="Secciones" data-grupo="cuenta">
+   <div class="grupos-nav" role="group" aria-label="Tareas">
+@@ -53,26 +53,25 @@
+   <div role="tablist" id="lista-pestanas">
+     <button role="tab" data-grupo="cuenta" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
+     <button role="tab" data-grupo="cuenta" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio Actinver</button>
+-    <button role="tab" data-grupo="cuenta" id="tab-portafolios" aria-controls="panel-portafolios" aria-selected="false" tabindex="-1">Mis portafolios</button>
+-    <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
++    <button role="tab" data-grupo="cuenta" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
++    <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
+     <button role="tab" data-grupo="cuenta" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
+     <button role="tab" data-grupo="cuenta" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Reto y perfil</button>
++    <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
++    <button role="tab" data-grupo="decidir" id="tab-portafolios" aria-controls="panel-portafolios" aria-selected="false" tabindex="-1">Mis portafolios</button>
++    <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
++    <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
++    <button role="tab" data-grupo="decidir" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
++    <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
++    <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
+     <button role="tab" data-grupo="mercado" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
+     <button role="tab" data-grupo="mercado" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
+     <button role="tab" data-grupo="mercado" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
+     <button role="tab" data-grupo="mercado" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
+-    <button role="tab" data-grupo="mercado" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
+-    <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
+-    <button role="tab" data-grupo="investigar" id="tab-laboratorio" aria-controls="panel-laboratorio" aria-selected="false" tabindex="-1">Laboratorio de alfa</button>
+-    <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
+-    <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+-    <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
++    <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
+     <button role="tab" data-grupo="mercado" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
+     <button role="tab" data-grupo="investigar" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
+-    <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
+-    <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
+-    <button role="tab" data-grupo="decidir" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
+-    <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
++    <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
+     <button role="tab" data-grupo="sistema" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
+     <button role="tab" data-grupo="sistema" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
+   </div>
+@@ -85,7 +84,7 @@
+     <nav class="accesos" aria-label="Accesos frecuentes">
+       <button type="button" class="boton boton--secundario" data-ir="tab-asistente">Preguntar al asistente</button>
+       <button type="button" class="boton boton--secundario" data-ir="tab-portafolios">Generar un portafolio</button>
+-      <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía (informativo)</button>
++      <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía</button>
+     </nav>
+     <div id="resumen-contenido">
+       <div class="rejilla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+@@ -112,8 +111,8 @@
+       </div>
+       <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-mercado-propuesta" hidden>
+         <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
+-        <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales</button>
+-        <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras</button>
++        <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales (BMV)</button>
++        <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras (SIC)</button>
+       </div>
+     </div>
+     <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+@@ -220,9 +219,9 @@
+       <button type="button" role="radio" aria-checked="false" data-valor="fondos">Fondos</button>
+     </div>
+     <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-ranking">
+-      <button type="button" role="radio" aria-checked="true" data-valor="ambos">Todas</button>
+-      <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Nacionales (BMV)</button>
+-      <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Extranjeras (SIC)</button>
++      <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
++      <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales (BMV)</button>
++      <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras (SIC)</button>
+     </div>
+     <p class="suave" id="ranking-hora"></p>
+     <div id="ranking-capitalizacion"></div>
+@@ -412,16 +411,10 @@
+       <button type="button" class="boton boton--secundario" data-pregunta="/plan">Plan de hoy</button>
+       <button type="button" class="boton boton--secundario" data-pregunta="/cartera">Mi cartera</button>
+       <button type="button" class="boton boton--secundario" data-pregunta="/estado">Estado de los datos</button>
+-      <button type="button" class="boton boton--secundario" data-pregunta="¿Cómo funciona el preregistro del Laboratorio?">¿Cómo funciona el Laboratorio?</button>
+       <button type="button" class="boton boton--secundario" data-pregunta="/notas">Mis notas</button>
+     </div>
+   </section>
+ 
+-  <section role="tabpanel" id="panel-laboratorio" aria-labelledby="tab-laboratorio" hidden>
+-    <h1>Laboratorio de alfa</h1>
+-    <p class="ayuda">Contrasta si el exceso medio NETO de una estrategia sobre su benchmark es mayor que cero, con permutación de signos por bloques. Un valor p pequeño no demuestra alfa: es un descarte estadístico bajo supuestos que se listan en el resultado.</p>
+-    <div id="laboratorio-contenido" aria-live="polite"></div>
+-  </section>
+ 
+   <section role="tabpanel" id="panel-intradia" aria-labelledby="tab-intradia" hidden>
+     <h1>Plan intradía</h1>
+diff --git a/web/static/app.css b/web/static/app.css
+index 92796b6..8f14209 100644
+--- a/web/static/app.css
++++ b/web/static/app.css
+@@ -422,3 +422,37 @@ a.boton { text-decoration: none; display: inline-flex; align-items: center; }
+ .referencias__grupo > summary { cursor: pointer; font-weight: 600; }
+ .referencias__lista { padding-left: 1.2em; }
+ .referencias__lista li { margin: 4px 0; overflow-wrap: anywhere; }
++
++/* ---------- Capa de terminal profesional (compartida por todas las áreas) ----------
++   Inspirada en la paleta de OpenTerminal (ErTasselli, MIT): fondo casi negro, acento ámbar para títulos y datos en
++   monoespaciado. El logo conserva --marca. Contraste ámbar: oscuro 9.8:1 sobre #0b0c0e; claro 5.1:1 sobre #f6f5f2. */
++:root { --ambar: #9a5700; --radio: 4px; --rejilla: color-mix(in srgb, var(--borde) 55%, transparent); }
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) { --fondo: #0b0c0e; --superficie: #111317; --superficie-2: #181b20; --borde: #272b32; --ambar: #ff9f1a; }
++}
++:root[data-theme="dark"] { --fondo: #0b0c0e; --superficie: #111317; --superficie-2: #181b20; --borde: #272b32; --ambar: #ff9f1a; }
++
++main h1, .cuaderno-intro h1 { font-family: var(--mono); font-size: 1.15rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ambar);
++  border-left: 3px solid var(--ambar); padding-left: 10px; }
++main h2 { font-family: var(--mono); font-size: .9rem; letter-spacing: .05em; text-transform: uppercase; color: var(--texto);
++  border-bottom: 1px solid var(--rejilla); padding-bottom: 4px; }
++.tarjeta h2, .guia h2 { border-bottom: 0; }
++.pestanas [role="tab"] { font-size: .88rem; letter-spacing: .02em; }
++.pestanas [role="tab"][aria-selected="true"] { border-bottom-color: var(--ambar); color: var(--ambar); }
++.grupos-nav button { font-family: var(--mono); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; border-radius: var(--radio); }
++th { font-family: var(--mono); font-size: .74rem; letter-spacing: .05em; text-transform: uppercase; }
++th, td { padding: 6px 10px; }
++tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--superficie-2) 45%, transparent); }
++tbody tr:hover td { background: var(--superficie-2); }
++.kpi .etiqueta { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
++.boton { border-radius: var(--radio); }
++.guia { border-left-color: var(--ambar); border-radius: var(--radio); }
++.widget-tv { border-radius: var(--radio); background: var(--superficie); }
++.nav-global__reloj { font-family: var(--mono); font-size: .78rem; color: var(--texto-2); white-space: nowrap; letter-spacing: .03em; }
++.nav-global__reloj b { color: var(--ambar); font-weight: 600; }
++.cinta-global { display: block; width: 100%; height: 76px; border: 0; border-bottom: 1px solid var(--borde); background: var(--superficie); }
++* { scrollbar-width: thin; scrollbar-color: var(--borde) transparent; }
++::-webkit-scrollbar { width: 8px; height: 8px; }
++::-webkit-scrollbar-thumb { background: var(--borde); }
++::-webkit-scrollbar-thumb:hover { background: var(--ambar); }
++@media print { main h1 { color: #000; border-color: #000; } }
+diff --git a/web/static/app.js b/web/static/app.js
+index 4487922..e280686 100644
+--- a/web/static/app.js
++++ b/web/static/app.js
+@@ -1932,19 +1932,21 @@ function panoramaTradingView() {
+   return h("section", { "aria-label": "Panorama de TradingView" },
+     h("h2", { texto: "Panorama de TradingView" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
+     marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
+-    bloqueWidget("Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
+-    bloqueWidget("Mapa de calor por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
++    bloqueWidget("1 · Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
++    bloqueWidget("2 · Tasas, volatilidad (VIX), dólar, energía, metales y cripto", marcoWidget("macro", {}, 620, "Variables macro"), true),
++    bloqueWidget("3 · Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
++    bloqueWidget("4 · Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
++    bloqueWidget("5 · Mapa de calor de acciones por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
+       (x) => { mapa.src = urlWidget("mapa", { mapa: x }); }, "Índice"), mapa]),
+-    bloqueWidget("Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
+-    bloqueWidget("Filtro de acciones", [selectorSimple("america", [["america", "EE. UU."], ["mexico", "México"]],
++    bloqueWidget("6 · Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
++    bloqueWidget("7 · Filtro de acciones y divisas", [selectorSimple("america", [["america", "Acciones de EE. UU."], ["mexico", "Acciones de México"], ["forex", "Divisas"]],
+       (x) => { filtro.src = urlWidget("filtro", { filtro: x }); }, "Mercado"), filtro]),
+-    bloqueWidget("Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
+-    bloqueWidget("Cotizaciones por grupo (índices, dólar y euro, bonos de EE. UU., materias primas)", marcoWidget("cotizaciones", {}, 520, "Cotizaciones por grupo")),
+-    bloqueWidget("Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
+-    bloqueWidget("Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
+-    bloqueWidget("Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
+-    bloqueWidget("Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")),
+-    bloqueWidget("Criptomonedas: mapa de calor (fuera del Reto)", marcoWidget("mapa-cripto", {}, 520, "Mapa de calor de criptomonedas")));
++    bloqueWidget("8 · Cotizaciones por grupo (índices, divisas, bonos en ETF, materias primas)", marcoWidget("cotizaciones", {}, 520, "Cotizaciones por grupo")),
++    bloqueWidget("9 · Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
++    bloqueWidget("10 · Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
++    bloqueWidget("11 · Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")),
++    bloqueWidget("12 · Criptomonedas: mapa de calor (fuera del Reto)", marcoWidget("mapa-cripto", {}, 520, "Mapa de calor de criptomonedas")),
++    bloqueWidget("13 · Criptomonedas: tabla del mercado (fuera del Reto)", marcoWidget("cripto-mercado", {}, 520, "Mercado de criptomonedas")));
+ }
+ 
+ function fichaTradingView(simbolo) {
+@@ -2670,7 +2672,7 @@ async function cargarBacktesting() {
+         h("div", { clase: "formulario" },
+           selectorSimple(B.estrategia, Object.entries(meta.estrategias).map(([k, e]) => [k, `${e.nombre} · v${e.version}`]), (x) => { B.estrategia = x; B.parametros = {}; cargarBacktesting(); }, "Estrategia"),
+           ...params, fecha("desde", "Desde"), fecha("hasta", "Hasta"), h("label", {}, "Deslizamiento (pb) ", desl),
+-          botonAccion("Correr backtest", "boton--primario", async (b) => {
++          botonAccion("Calcular backtest", "boton--primario", async (b) => {
+             ocupado([b], true);
+             try { pintarBacktest(await api("/api/backtests", { method: "POST", json: B })); cargarHistorialBt(); }
+             catch (e) { document.getElementById("backtest-resultado").replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+@@ -2780,60 +2782,6 @@ function pintarGex(d) {
+   return h("div", {}, encabezado, avisoOi, cont);
+ }
+ 
+-/* ---------- Laboratorio de alfa: permutación de signos por bloques ---------- */
+-const lab = { ejemplo: null };
+-function ejemploSintetico() {  // datos INVENTADOS con semilla fija (mulberry32 + Box-Muller); no son rendimientos de nadie
+-  let a = 20261016;
+-  const u = () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+-  const z = () => Math.sqrt(-2 * Math.log(u() || 1e-12)) * Math.cos(2 * Math.PI * u());
+-  const filas = ["benchmark,estrategia_sin_exceso_sintetica,estrategia_con_exceso_sintetica"];
+-  for (let i = 0; i < 160; i++) {
+-    const b = 0.0004 + 0.01 * z();
+-    filas.push([b, b + 0.006 * z(), b + 0.0012 + 0.006 * z()].map((x) => x.toFixed(6)).join(","));
+-  }
+-  return filas.join("\n");
+-}
+-function cargarLaboratorio() {
+-  const ta = h("textarea", { rows: 9, spellcheck: "false", "aria-label": "Rendimientos netos emparejados en CSV", clase: "area-csv", placeholder: "benchmark,mi_estrategia\n0.0042,0.0051\n-0.0031,-0.0012" });
+-  ta.value = lab.ejemplo || "";
+-  const archivo = h("input", { type: "file", accept: ".csv,text/csv", "aria-label": "Archivo CSV de rendimientos" });
+-  archivo.addEventListener("change", async () => { if (archivo.files[0]) { ta.value = await archivo.files[0].text(); lab.ejemplo = null; } });
+-  const campo = (etq, nombre, valor, extra = {}) => h("label", {}, `${etq} `, h("input", { type: "number", name: nombre, value: valor, step: "any", ...extra }));
+-  const salida = h("div", { "aria-live": "polite" });
+-  const ejemplo = botonAccion("Cargar ejemplo SINTÉTICO", "boton--secundario", () => { lab.ejemplo = ejemploSintetico(); ta.value = lab.ejemplo; salida.replaceChildren(); });
+-  const form = h("form", { clase: "tarjeta" },
+-    h("p", { clase: "ayuda", texto: "Pegue o cargue un CSV con encabezado: una columna «benchmark» (o «referencia»), una o más columnas de estrategia y, opcionalmente, «fecha». Rendimientos simples NETOS de costos, en decimal (0.01 = 1 %), emparejados por fecha. Máx. 5 000 filas y 20 estrategias." }),
+-    h("div", { clase: "fila-controles" }, archivo, ejemplo), ta,
+-    h("div", { clase: "fila-controles" }, campo("Bloque (vacío = automático)", "bloque", "", { min: 1, step: 1 }), campo("Volteos B", "B", 5000, { min: 199, max: 20000, step: 1 }),
+-      campo("Semilla", "semilla", 12345, { min: 0, step: 1 }), campo("Nivel α", "alpha", 0.05, { min: 0.001, max: 0.49 }),
+-      campo("Hipótesis exploradas (≥ estrategias)", "exploradas", "", { min: 1, step: 1 })),
+-    h("button", { type: "submit", clase: "boton boton--primario", texto: "Ejecutar prueba" }));
+-  form.addEventListener("submit", async (ev) => {
+-    ev.preventDefault();
+-    const boton = form.querySelector('button[type="submit"]'), f = form.elements;
+-    ocupado([boton], true);
+-    try {
+-      const r = await api("/api/laboratorio/permutacion", { method: "POST", json: { csv: ta.value, bloque: f.bloque.value || null, B: Number(f.B.value), semilla: Number(f.semilla.value),
+-        alpha: Number(f.alpha.value), hipotesis_exploradas: f.exploradas.value || null } });
+-      salida.replaceChildren(pintarPermutacion(r, lab.ejemplo !== null && ta.value === lab.ejemplo));
+-    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([boton], false); }
+-  });
+-  limpiar("laboratorio-contenido", h("div", { clase: "aviso-caja", role: "note", texto: "Preregistre hipótesis y variantes antes de mirar resultados; valide con walk-forward con purga/embargo y un holdout; use solo rendimientos netos de costos. Un p < 0.05 aislado no es alfa probado." }), form, salida);
+-  seccionPreregistro(ta, form).then((x) => document.getElementById("laboratorio-contenido").append(x));
+-}
+-function pintarPermutacion(r, sintetico) {
+-  return h("div", { clase: "tarjeta" },
+-    sintetico ? h("p", {}, chip("sintetico", "DATOS SINTÉTICOS"), " Ejemplo inventado para ver cómo funciona la prueba; no son rendimientos reales de ninguna estrategia.") : null,
+-    h("h2", { texto: "Resultado" }),
+-    h("p", { clase: "ayuda", texto: `${r.hipotesis}. Estadístico: ${r.estadistico}. Método: ${r.metodo}.` }),
+-    h("div", { clase: "kpis" }, kpi("Observaciones", String(r.n)), kpi("Bloque / bloques", `${r.bloque} / ${r.bloques}`), kpi("Volteos B", String(r.B)),
+-      kpi("Semilla", String(r.semilla)), kpi("p mínimo posible", num(r.p_minimo)), kpi("Familia (Holm)", `${r.familia} → ${r.familia_total_holm}`)),
+-    tabla([{ t: "Estrategia", f: (x) => x.estrategia }, { t: "Exceso medio por periodo", f: (x) => `${(x.exceso_medio * 100).toFixed(3)} %`, num: true },
+-      { t: "p", f: (x) => num(x.p), num: true }, { t: "p Holm", f: (x) => num(x.p_holm), num: true },
+-      { t: `Holm ≤ ${num(r.alpha)}`, f: (x) => (x.supera_alpha_holm ? "Sí" : "No") }, { t: "Lectura", f: (x) => x.lectura }], r.resultados, { caption: "Hipótesis unilateral: exceso medio neto > 0" }),
+-    h("h3", { texto: "Advertencias y supuestos" }), h("ul", {}, r.advertencias.map((a) => h("li", { texto: a }))),
+-    h("p", { clase: "ayuda", texto: `Huella sha256 de entradas y parámetros (reproducibilidad): ${r.huella_sha256}` }));
+-}
+ 
+ /* ---------- Plan intradía defensivo (informativo) ---------- */
+ const intradia = { perdida: "" };
+@@ -2932,53 +2880,6 @@ function seccionSkylit() {
+     h("div", { clase: "fila-controles" }, archivo, h("a", { href: "/api/flujo/skylit/plantilla", clase: "boton boton--secundario", texto: "Descargar plantilla" }), boton), ta, salida);
+ }
+ 
+-/* ---------- Laboratorio: preregistro y holdout de un solo uso ---------- */
+-async function seccionPreregistro(taCsv, formParams) {
+-  const t = (n, etq, max, filas = 1) => h("label", { clase: "campo-bloque" }, `${etq} `, filas > 1 ? h("textarea", { name: n, rows: filas, maxlength: max }) : h("input", { name: n, maxlength: max }));
+-  const salida = h("div", { "aria-live": "polite" });
+-  const lista = h("div", {});
+-  const form = h("form", { clase: "tarjeta" }, h("h2", { texto: "1. Preregistro (antes de mirar resultados)" }),
+-    h("p", { clase: "ayuda", texto: "Fija hipótesis, estrategias, costos, fuentes, cómo se estimaron los parámetros (walk-forward), holdout y embargo. Usa B, semilla, α, bloque e hipótesis exploradas del formulario de arriba. Queda guardado con huella sha256 y fecha." }),
+-    t("nombre", "Nombre", 80), t("hipotesis", "Hipótesis", 600, 2), t("benchmark", "Benchmark", 120), t("costos", "Costos incluidos", 400, 2),
+-    t("fuentes", "Fuentes y licencia de los datos", 600, 2), t("walk_forward", "Walk-forward y purga usados para generar los rendimientos", 600, 2),
+-    t("estrategias", "Estrategias (nombres de columna, separados por coma)", 400),
+-    h("div", { clase: "fila-controles" }, h("label", {}, "Holdout (fracción final) ", h("input", { type: "number", name: "holdout", value: 0.3, min: 0.1, max: 0.5, step: 0.05 })),
+-      h("label", {}, "Embargo (observaciones) ", h("input", { type: "number", name: "embargo", value: 5, min: 0, max: 250, step: 1 }))),
+-    h("button", { type: "submit", clase: "boton boton--primario", texto: "Guardar preregistro" }));
+-  const pintarEvaluacion = (r) => salida.replaceChildren(h("div", { clase: "tarjeta" },
+-    r.holdout_ya_usado ? h("div", { clase: "aviso-caja", role: "status", texto: r.aviso_reuso }) : null,
+-    h("div", { clase: "kpis" }, kpi("Exploración", String(r.tramos.exploracion)), kpi("Embargo", String(r.tramos.embargo)), kpi("Holdout", String(r.tramos.holdout))),
+-    h("p", { clase: "ayuda", texto: r.lectura }), h("h3", { texto: "Holdout (confirmatorio)" }), pintarPermutacion(r.holdout, false),
+-    h("h3", { texto: "Exploración (descriptiva)" }), pintarPermutacion(r.exploracion, false),
+-    h("p", { clase: "ayuda", texto: `Huella del preregistro: ${r.huella_preregistro}` })));
+-  const pintarLista = async () => {
+-    const d = await api("/api/laboratorio/experimentos");
+-    lista.replaceChildren(h("h2", { texto: "2. Evaluar con el CSV de arriba (el holdout se usa una sola vez)" }),
+-      tabla([{ t: "#", f: (x) => x.id, num: true }, { t: "Nombre", f: (x) => x.nombre }, { t: "Preregistrado", f: (x) => horaCdmx(x.creado_en) },
+-        { t: "Holdout", f: (x) => (x.evaluado_en ? `usado ${horaCdmx(x.evaluado_en)}` : "sin usar") },
+-        { t: "", f: (x) => h("span", {}, botonAccion(x.evaluado_en ? "Ver resultado" : "Evaluar", "boton--secundario", async (b) => {
+-          ocupado([b], true);
+-          try { pintarEvaluacion(await api(`/api/laboratorio/experimentos/${x.id}/evaluar`, { method: "POST", json: { csv: taCsv.value } })); pintarLista(); }
+-          catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+-        }), " ", h("a", { href: `/api/laboratorio/experimentos/${x.id}/exportar`, clase: "boton boton--texto", texto: "Exportar JSON" })) }],
+-      d.experimentos, { vacio: "Sin preregistros." }));
+-  };
+-  form.addEventListener("submit", async (ev) => {
+-    ev.preventDefault();
+-    const f = form.elements, p = formParams.elements, b = form.querySelector('button[type="submit"]');
+-    ocupado([b], true);
+-    try {
+-      const r = await api("/api/laboratorio/preregistro", { method: "POST", json: { nombre: f.nombre.value, hipotesis: f.hipotesis.value, benchmark: f.benchmark.value,
+-        costos: f.costos.value, fuentes: f.fuentes.value, walk_forward: f.walk_forward.value, estrategias: f.estrategias.value.split(",").map((s) => s.trim()).filter(Boolean),
+-        holdout: Number(f.holdout.value), embargo: Number(f.embargo.value), B: Number(p.B.value), semilla: Number(p.semilla.value), alpha: Number(p.alpha.value),
+-        bloque: p.bloque.value || null, exploradas: p.exploradas.value || null } });
+-      notificar(`Preregistro #${r.id} guardado (huella ${r.huella_preregistro.slice(0, 12)}…).`);
+-      pintarLista();
+-    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
+-  });
+-  try { await pintarLista(); } catch (e) { lista.replaceChildren(errorCaja(e)); }
+-  return h("div", {}, form, h("div", { clase: "tarjeta" }, lista), salida);
+-}
+ /* ---------- Asistente (terminal/asistente.py): datos, documentación y notas del usuario ---------- */
+ const asistenteUI = { mensajes: [] };
+ const NOMBRE_MOTOR = { claude: "Claude", ollama: "Ollama (local)", local: "respuestas locales", documentacion: "documentación y notas", comando: "comando", notas: "notas" };
+@@ -3019,9 +2920,8 @@ document.getElementById("asistente-texto").addEventListener("keydown", (ev) => {
+ document.querySelectorAll("[data-pregunta]").forEach((b) => b.addEventListener("click", () => preguntarAsistente(b.dataset.pregunta)));
+ CARGAS["tab-asistente"] = () => { pintarAsistente(); document.getElementById("asistente-texto").focus(); };
+ ATAJOS.ASI = "tab-asistente";
+-CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
+ CARGAS["tab-intradia"] = () => cargarIntradia();
+-Object.assign(ATAJOS, { LAB: "tab-laboratorio", INT: "tab-intradia", GEX: "tab-optionflow" });
++Object.assign(ATAJOS, { INT: "tab-intradia", GEX: "tab-optionflow" });
+ 
+ /* Microestructura sin inventar datos. */
+ function pintarMicroestructura(d) {
+diff --git a/web/static/guias.mjs b/web/static/guias.mjs
+index 8da39ed..a7852c4 100644
+--- a/web/static/guias.mjs
++++ b/web/static/guias.mjs
+@@ -66,7 +66,7 @@ export const GUIAS = {
+   },
+   'panel-mercado': {
+     titulo: 'Mercado',
+-    que: 'Panorama con widgets gratuitos de TradingView: índices, divisas, mapas de calor, calendario y noticias. Son datos de TradingView, con su retraso; no alimentan ningún cálculo de la terminal.',
++    que: 'Panorama con widgets gratuitos de TradingView, numerados de lo general a lo particular: índices, tasas de bonos, VIX, dólar, energía, metales, calendario, noticias, mapas de calor, filtros, ETF, divisas y cripto. Son datos de TradingView, con su retraso; no alimentan ningún cálculo de la terminal.',
+     pasos: ['Abra las secciones plegables que le interesen.',
+       'Use la cinta y el resumen para el contexto del día; el calendario, para eventos que mueven precios.',
+       'Para una emisora, ábrala en Velas.'],
+@@ -125,16 +125,6 @@ export const GUIAS = {
+     terminos: [['Motor', 'Quién responde: Claude, Ollama o el motor local.'],
+       ['Sin asesoría', 'No da recomendaciones personalizadas ni envía órdenes.']],
+   },
+-  'panel-laboratorio': {
+-    titulo: 'Laboratorio de alfa',
+-    que: 'Una prueba estadística para descartar estrategias que solo parecen buenas por suerte: ¿gana, después de costos, más que su referencia (benchmark)?',
+-    pasos: ['Cargue los rendimientos de la estrategia y del benchmark por fecha.',
+-      'Elija tamaño de bloque, permutaciones y semilla.',
+-      'Lea el valor p; con varias estrategias, use el ajustado por Holm.'],
+-    terminos: [['Valor p', 'Probabilidad de ver un resultado así de bueno por azar; pequeño no demuestra alfa.'],
+-      ['Permutación por bloques', 'Cambia el signo de bloques completos para conservar la dependencia entre días.'],
+-      ['Holm', 'Corrección por probar varias estrategias a la vez.']],
+-  },
+   'panel-tiempo': {
+     titulo: 'Boletas e historial',
+     que: 'Pasado, presente y futuro separados: hechos observados, boletas listas para capturar a mano y escenarios estimados.',
+@@ -252,8 +242,8 @@ export const GUIAS = {
+   '/static/recursos/practica-proyectos-financieros.html': {
+     titulo: 'Cuaderno financiero',
+     que: 'Práctica guiada sin conexión: tesis de inversión, valoración por DCF y DCF inverso, y volatilidad, con ejemplos sintéticos.',
+-    pasos: ['Escriba su tesis y qué la invalidaría.', 'Pruebe la valoración y el crecimiento implícito.',
+-      'Mida la volatilidad sin confundirla con una señal.'],
++    pasos: ['Escriba su tesis y qué la invalidaría, o elija una opción precargada en la lista de cada campo.', 'Elija un escenario listo de valoración (calcula solo) o escriba sus supuestos.',
++      'Elija una serie de precios sintética o pegue la suya y mida la volatilidad sin confundirla con una señal.'],
+     terminos: [['DCF', 'Valor presente de los flujos futuros descontados.'],
+       ['DCF inverso', 'Qué crecimiento supone el precio actual.']],
+   },
+diff --git a/web/static/mesa.html b/web/static/mesa.html
+index 63f5920..2fb769c 100644
+--- a/web/static/mesa.html
++++ b/web/static/mesa.html
+@@ -1,2 +1,2 @@
+-<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mesa de investigación · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/navegacion.css"><link rel="stylesheet" href="/static/mesa.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/guias.mjs"></script><script type="module" src="/static/mesa.mjs"></script></head><body><a class="saltar" href="#principal">Saltar al contenido</a><header class="cabecera"><div class="cabecera__fila"><a class="marca" href="/" aria-label="Actinver Terminal, inicio"><svg class="marca__logo" aria-hidden="true" width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg><span>Actinver Terminal</span></a><div class="acciones-cabecera"><span class="chip chip--sin_datos">Solo investigación</span></div></div></header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
++<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mesa de investigación · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/navegacion.css"><link rel="stylesheet" href="/static/mesa.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/guias.mjs"></script><script type="module" src="/static/mesa.mjs"></script></head><body><a class="saltar" href="#principal">Saltar al contenido</a><header class="cabecera"><div class="cabecera__fila"><a class="marca" href="/" aria-label="Actinver Terminal, inicio"><svg class="marca__logo" aria-hidden="true" width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg><span>Actinver Terminal</span></a><div class="acciones-cabecera"><span class="chip chip--sin_datos">Solo investigación</span></div></div></header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+ <main id="principal" tabindex="-1"><h1>Mesa de investigación</h1><p>Organice gráficos, contexto y herramientas en una sola vista. Seleccione un instrumento del catálogo, elija una disposición y despliegue únicamente lo que vaya a consultar. Las flechas cambian el orden y «Quitar» retira un panel; su disposición se guarda en este navegador.</p><p class="aviso-caja">Solo investigación. Ningún panel envía órdenes. Los precios externos pueden ser retrasados o indicativos; no equivalen a un feed CME para NQ. Los escenarios manuales no son señales.</p><div class="mesa-controles"><label>Buscar instrumento (Ctrl+K) <input id="mesa-buscar" type="search" placeholder="Clave o nombre" aria-label="Buscar instrumento del catálogo"></label><label>Instrumento <select id="mesa-simbolo" disabled><option>Cargando catálogo…</option></select></label><label>Disposición <select id="mesa-preset"><option value="mercado">Mercado</option><option value="futuros">Investigación de futuros</option><option value="empresa">Empresa y cartera</option></select></label><label>Añadir panel <select id="mesa-agregar"></select></label><button class="boton boton--secundario" id="mesa-anadir" type="button">Añadir</button></div><p id="mesa-estado" role="status"></p><p id="mesa-conteo" class="ayuda"></p><div id="mesa-paneles" class="mesa-grid"></div><p class="ayuda">Organización inspirada en OpenTerminal de ErTasselli (MIT). Implementación propia con las fuentes y controles de Actinver. <a href="https://github.com/ErTasselli/OpenTerminal" rel="noopener noreferrer" target="_blank">Proyecto original</a> · <a href="/?vista=tab-ayuda">Referencias y créditos</a></p></main></body></html>
+\ No newline at end of file
+diff --git a/web/static/navegacion.json b/web/static/navegacion.json
+index 6055877..7df4016 100644
+--- a/web/static/navegacion.json
++++ b/web/static/navegacion.json
+@@ -8,10 +8,6 @@
+       "titulo": "Oficina de inversión",
+       "url": "/static/recursos/oficina-inversion.html"
+     },
+-    {
+-      "titulo": "Laboratorio de alfa",
+-      "url": "/?vista=tab-laboratorio"
+-    },
+     {
+       "titulo": "Cuaderno financiero",
+       "url": "/static/recursos/practica-proyectos-financieros.html"
+@@ -31,12 +27,12 @@
+       "url": "/?vista=tab-cartera"
+     },
+     {
+-      "titulo": "Mis portafolios",
+-      "url": "/?vista=tab-portafolios"
++      "titulo": "Riesgo",
++      "url": "/?vista=tab-riesgo"
+     },
+     {
+-      "titulo": "Propuestas",
+-      "url": "/?vista=tab-propuestas"
++      "titulo": "Boletas e historial",
++      "url": "/?vista=tab-tiempo"
+     },
+     {
+       "titulo": "Alertas",
+@@ -47,68 +43,64 @@
+       "url": "/?vista=tab-perfil"
+     },
+     {
+-      "titulo": "Mercado",
+-      "url": "/?vista=tab-mercado"
+-    },
+-    {
+-      "titulo": "Velas",
+-      "url": "/?vista=tab-velas"
+-    },
+-    {
+-      "titulo": "Order Flow",
+-      "url": "/?vista=tab-orderflow"
++      "titulo": "Propuestas",
++      "url": "/?vista=tab-propuestas"
+     },
+     {
+-      "titulo": "Option Flow",
+-      "url": "/?vista=tab-optionflow"
++      "titulo": "Mis portafolios",
++      "url": "/?vista=tab-portafolios"
+     },
+     {
+-      "titulo": "Riesgo",
+-      "url": "/?vista=tab-riesgo"
++      "titulo": "Ranking",
++      "url": "/?vista=tab-ranking"
+     },
+     {
+-      "titulo": "Asistente",
+-      "url": "/?vista=tab-asistente"
++      "titulo": "Robustez",
++      "url": "/?vista=tab-robustez"
+     },
+     {
+-      "titulo": "Laboratorio de alfa",
+-      "url": "/?vista=tab-laboratorio"
++      "titulo": "Backtesting",
++      "url": "/?vista=tab-backtesting"
+     },
+     {
+-      "titulo": "Boletas e historial",
+-      "url": "/?vista=tab-tiempo"
++      "titulo": "Modelos",
++      "url": "/?vista=tab-modelos"
+     },
+     {
+-      "titulo": "Ranking",
+-      "url": "/?vista=tab-ranking"
++      "titulo": "Plan intradía",
++      "url": "/?vista=tab-intradia"
+     },
+     {
+-      "titulo": "Robustez",
+-      "url": "/?vista=tab-robustez"
++      "titulo": "Mercado",
++      "url": "/?vista=tab-mercado"
+     },
+     {
+-      "titulo": "Movimientos públicos",
+-      "url": "/?vista=tab-movimientos"
++      "titulo": "Velas",
++      "url": "/?vista=tab-velas"
+     },
+     {
+-      "titulo": "Investigación",
+-      "url": "/?vista=tab-investigacion"
++      "titulo": "Order Flow",
++      "url": "/?vista=tab-orderflow"
+     },
+     {
+-      "titulo": "Modelos",
+-      "url": "/?vista=tab-modelos"
++      "titulo": "Option Flow",
++      "url": "/?vista=tab-optionflow"
+     },
+     {
+       "titulo": "Seguimiento",
+       "url": "/?vista=tab-seguimiento"
+     },
+     {
+-      "titulo": "Backtesting",
+-      "url": "/?vista=tab-backtesting"
++      "titulo": "Movimientos públicos",
++      "url": "/?vista=tab-movimientos"
+     },
+     {
+-      "titulo": "Plan intradía",
+-      "url": "/?vista=tab-intradia"
++      "titulo": "Investigación",
++      "url": "/?vista=tab-investigacion"
++    },
++    {
++      "titulo": "Asistente",
++      "url": "/?vista=tab-asistente"
+     },
+     {
+       "titulo": "Datos y fuentes",
+diff --git a/web/static/navegacion.mjs b/web/static/navegacion.mjs
+index e478d0c..3b79ccd 100644
+--- a/web/static/navegacion.mjs
++++ b/web/static/navegacion.mjs
+@@ -8,12 +8,23 @@ export function destinoLocal(valor, origen) {
+ if(typeof document!=='undefined') {
+   const nav=document.querySelector('.nav-global');
+   const selector=document.getElementById('destino-global');
++  // Reloj de plazas y cinta de indicadores macro (TradingView, con su retraso): la misma barra en todas las áreas.
++  const reloj=document.createElement('span');reloj.className='nav-global__reloj';reloj.setAttribute('aria-label','Hora en Ciudad de México, Nueva York y Londres');
++  const plazas=[['CDMX','America/Mexico_City'],['NY','America/New_York'],['LDN','Europe/London']];
++  const marcar=()=>reloj.replaceChildren(...plazas.flatMap(([n,z],i)=>{const b=document.createElement('b');b.textContent=n;
++    return [...(i?[' · ']:[]),b,' '+new Date().toLocaleTimeString('es-MX',{timeZone:z,hour:'2-digit',minute:'2-digit',hour12:false})];}));
++  marcar();setInterval(marcar,30000);
++  nav.querySelector('.nav-global__interior')?.append(reloj);
++  const cinta=document.createElement('iframe');cinta.className='cinta-global';cinta.loading='lazy';
++  cinta.title='Cinta de indicadores: índices, VIX, bono a 10 años, dólar, oro, petróleo y bitcoin (TradingView, con retraso)';
++  cinta.src=`/widget/cinta-macro?tema=${matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}`;
++  nav.after(cinta);
+   function actualizar() {
+     const tab=document.querySelector('[role="tab"][aria-selected="true"]');
+     const actual=location.pathname==='/' ? '/?vista='+(tab?.id || new URLSearchParams(location.search).get('vista') || 'tab-resumen') : location.pathname;
+     selector.value=[...selector.options].some(o=>o.value===actual)?actual:location.pathname;
+     for(const enlace of nav.querySelectorAll('a')) {
+-      const activa=enlace.getAttribute('href')===actual || (enlace.getAttribute('href')==='/' && location.pathname==='/' && actual!=='/?vista=tab-laboratorio');
++      const activa=enlace.getAttribute('href')===actual || (enlace.getAttribute('href')==='/' && location.pathname==='/');
+       if(activa)enlace.setAttribute('aria-current','page');else enlace.removeAttribute('aria-current');
+     }
+   }
+diff --git a/web/static/recursos/oficina-inversion.html b/web/static/recursos/oficina-inversion.html
+index ffa9ff0..ce1a260 100644
+--- a/web/static/recursos/oficina-inversion.html
++++ b/web/static/recursos/oficina-inversion.html
+@@ -4,7 +4,7 @@
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="robots" content="noindex, nofollow">
+-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
++<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; frame-src 'self'; base-uri 'none'; form-action 'none'">
+ <title>Oficina de inversión · Actinver Terminal</title>
+ <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+ <link rel="stylesheet" href="/static/app.css">
+@@ -20,7 +20,7 @@
+     </a>
+     <div class="acciones-cabecera"><span class="chip chip--sin_datos">Sólo lectura</span></div>
+   </div>
+-</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
++</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+ <main id="principal" tabindex="-1">
+   <div class="oficina-titulo"><div><p class="oficina-contexto">Investigación</p><h1>Oficina de inversión</h1><p class="ayuda">Una revisión del instrumento desde datos, análisis y riesgo.</p></div></div>
+   <form id="consulta" class="formulario oficina-consulta">
+diff --git a/web/static/recursos/practica-proyectos-financieros.css b/web/static/recursos/practica-proyectos-financieros.css
+index 53cefc3..f90b544 100644
+--- a/web/static/recursos/practica-proyectos-financieros.css
++++ b/web/static/recursos/practica-proyectos-financieros.css
+@@ -24,3 +24,7 @@
+ .cuaderno-pie { border-top: 1px solid var(--borde); margin-top: 24px; padding-top: 16px; color: var(--texto-2); font-size: .85rem; }
+ @media (max-width:600px) { .cuaderno .grid { grid-template-columns: 1fr; } .cuaderno .acciones .boton { width: 100%; } }
+ @media print { .cuaderno { --fondo: white; --superficie: white; --superficie-2: white; --texto: black; --texto-2: #333; --borde: #999; } .cuaderno nav, .cuaderno button, .cuaderno .saltar { display: none; } .cuaderno main { padding: 16px 0; } .cuaderno-seccion { break-inside: avoid; } }
++.cuaderno .precarga { margin-top: 4px; font: inherit; font-weight: 400; font-size: .85rem; min-height: 36px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); padding: 6px 8px; max-width: 100%; }
++.cuaderno .escenario { min-width: min(100%, 320px); }
++.cuaderno .escenario select { min-height: 40px; font: inherit; }
++.cuaderno textarea, .cuaderno input { font-weight: 400; }
+diff --git a/web/static/recursos/practica-proyectos-financieros.html b/web/static/recursos/practica-proyectos-financieros.html
+index 418fe07..f05fea0 100644
+--- a/web/static/recursos/practica-proyectos-financieros.html
++++ b/web/static/recursos/practica-proyectos-financieros.html
+@@ -10,14 +10,14 @@
+     </a>
+     <div class="acciones-cabecera"><span class="chip chip--sin_datos">Práctica local</span></div>
+   </div>
+-</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/?vista=tab-laboratorio" aria-label="Laboratorio de alfa"><span class="nav-global__texto-largo">Laboratorio de alfa</span><span class="nav-global__texto-corto" aria-hidden="true">Alfa</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav><main id="principal" tabindex="-1">
+-<header class="cuaderno-intro"><p class="cuaderno-contexto">Investigación</p><h1>Cuaderno financiero</h1><h2>De una idea a una hipótesis comprobable.</h2><p>Un cuaderno para redactar una tesis, explorar una valoración y medir variación de precios. Todo se calcula en este navegador. No envía información, no guarda lo escrito y no conecta una cuenta.</p><nav class="cuaderno-secciones" aria-label="Secciones del cuaderno"><a href="#tesis">01 · Tesis</a><a href="#valoracion">02 · Valoración</a><a href="#riesgo">03 · Volatilidad</a></nav><p><small>Ejercicios educativos: no son cotizaciones, recomendaciones ni evidencia de alfa. Al cerrar o recargar, se pierde lo escrito. Puedes imprimir la página para conservar tus notas.</small></p></header>
+-<section class="tarjeta cuaderno-seccion" id="tesis"><span class="numero">01 / TESIS DE INVESTIGACIÓN</span><h2>Escribe qué podría hacerte cambiar de opinión.</h2><div class="grid"><label>Proyecto o empresa hipotética<input id="empresa" placeholder="Nombre de tu investigación"></label><label>Fecha de revisión<input id="fecha" type="date"></label><label>Tesis y mecanismo económico<textarea id="tesis-texto" placeholder="Creo que… porque… El mecanismo sería…"></textarea></label><label>Evidencia en contra y condición de invalidación<textarea id="contra" placeholder="Mi tesis dejaría de sostenerse si…"></textarea></label><label class="ancho">Fuentes, fechas y próxima comprobación<textarea id="fuentes" placeholder="Fuente y enlace; fecha de publicación; qué afirmación respalda; próximo dato que revisarás."></textarea></label></div><p class="nota">Una tesis defendible explica tanto la evidencia favorable como la que la contradice. Distingue el dato observado de tu supuesto y de tu conclusión.</p></section>
++</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav><main id="principal" tabindex="-1">
++<header class="cuaderno-intro"><p class="cuaderno-contexto">Investigación</p><h1>Cuaderno financiero</h1><h2>De una idea a una hipótesis comprobable.</h2><p>Un cuaderno para redactar una tesis, explorar una valoración y medir variación de precios. Todo se calcula en este navegador. No envía información, no guarda lo escrito y no conecta una cuenta.</p><nav class="cuaderno-secciones" aria-label="Secciones del cuaderno"><a href="#tesis">01 · Tesis</a><a href="#valoracion">02 · Valoración</a><a href="#riesgo">03 · Volatilidad</a><a href="formacion-python-jpm.html">04 · Python aplicado</a></nav><p><small>Ejercicios educativos: no son cotizaciones, recomendaciones ni evidencia de alfa. Al cerrar o recargar, se pierde lo escrito. Puedes imprimir la página para conservar tus notas.</small></p></header>
++<section class="tarjeta cuaderno-seccion" id="tesis"><span class="numero">01 / TESIS DE INVESTIGACIÓN</span><h2>Escribe qué podría hacerte cambiar de opinión.</h2><p>Cada campo tiene una lista de opciones precargadas: elige una y se escribe sola; después puedes editarla. Si el campo ya tiene texto, la opción se agrega en una línea nueva.</p><div class="grid"><label>Proyecto o empresa hipotética<input id="empresa" placeholder="Nombre de tu investigación"></label><label>Fecha de revisión<input id="fecha" type="date"></label><label>Tesis y mecanismo económico<textarea id="tesis-texto" placeholder="Creo que… porque… El mecanismo sería…"></textarea></label><label>Evidencia en contra y condición de invalidación<textarea id="contra" placeholder="Mi tesis dejaría de sostenerse si…"></textarea></label><label class="ancho">Fuentes, fechas y próxima comprobación<textarea id="fuentes" placeholder="Fuente y enlace; fecha de publicación; qué afirmación respalda; próximo dato que revisarás."></textarea></label></div><p class="nota">Una tesis defendible explica tanto la evidencia favorable como la que la contradice. Distingue el dato observado de tu supuesto y de tu conclusión.</p></section>
+ <section class="tarjeta cuaderno-seccion" id="valoracion"><span class="numero">02 / DCF Y CRECIMIENTO IMPLÍCITO</span><h2>¿Qué crecimiento supone esta valoración?</h2><p>Modelo sencillo de cinco años: flujo libre para la empresa (FCFF), crecimiento anual constante y valor terminal perpetuo. Todos los flujos y el valor empresarial (EV) deben usar la misma moneda y escala. El EV no es el precio de una acción; aquí no se modelan deuda, caja ni acciones.</p>
+-<form id="dcf-form" novalidate><div class="grid"><label>FCFF base, año 0<input id="fcf" type="number" step="any" inputmode="decimal" required></label><label>Crecimiento anual, años 1–5 (%)<input id="crecimiento" type="number" step="any" inputmode="decimal" required></label><label>Tasa de descuento, WACC (%)<input id="descuento" type="number" step="any" inputmode="decimal" required></label><label>Crecimiento perpetuo terminal (%)<input id="terminal" type="number" step="any" inputmode="decimal" required></label><label>Valor empresarial objetivo (EV)<input id="objetivo" type="number" step="any" inputmode="decimal" required></label></div><div class="acciones"><button class="boton boton--primario" type="submit">Calcular valoración</button><button type="button" class="boton boton--secundario" id="ejemplo-dcf">Cargar ejemplo sintético</button></div></form>
+-<div id="dcf-resultado" class="resultado" role="status" aria-live="polite" aria-atomic="true">Introduce tus supuestos o carga el ejemplo sintético.</div><small>Reverse DCF: busca por bisección el crecimiento anual de los cinco años entre −90% y +200%. Sólo resuelve si los extremos encierran el objetivo. Bajo estas hipótesis y flujos positivos, el EV aumenta monótonamente con ese crecimiento. Este intervalo y este modelo pueden ser inadecuados para una empresa real.</small><details><summary>Ver las ecuaciones</summary><p>FCFFₜ = FCFF₀ × (1 + crecimiento)ᵗ.<br>EV = Σₜ₌₁⁵ FCFFₜ / (1 + WACC)ᵗ + [FCFF₅ × (1 + crecimiento terminal) / (WACC − crecimiento terminal)] / (1 + WACC)⁵.</p><p>La tasa de descuento debe ser mayor que el crecimiento terminal. El modelo no estima WACC, impuestos, reinversión ni retorno sobre el capital; son supuestos del ejercicio.</p></details></section>
++<form id="dcf-form" novalidate><div class="grid"><label>FCFF base, año 0<input id="fcf" type="number" step="any" inputmode="decimal" required></label><label>Crecimiento anual, años 1–5 (%)<input id="crecimiento" type="number" step="any" inputmode="decimal" required></label><label>Tasa de descuento, WACC (%)<input id="descuento" type="number" step="any" inputmode="decimal" required></label><label>Crecimiento perpetuo terminal (%)<input id="terminal" type="number" step="any" inputmode="decimal" required></label><label>Valor empresarial objetivo (EV)<input id="objetivo" type="number" step="any" inputmode="decimal" required></label></div><div class="acciones"><button class="boton boton--primario" type="submit">Calcular valoración</button><label class="escenario">Escenario listo<select id="escenario-dcf"></select></label></div></form>
++<div id="dcf-resultado" class="resultado" role="status" aria-live="polite" aria-atomic="true">Elige un escenario listo o escribe tus supuestos.</div><small>Reverse DCF: busca por bisección el crecimiento anual de los cinco años entre −90% y +200%. Sólo resuelve si los extremos encierran el objetivo. Bajo estas hipótesis y flujos positivos, el EV aumenta monótonamente con ese crecimiento. Este intervalo y este modelo pueden ser inadecuados para una empresa real.</small><details><summary>Ver las ecuaciones</summary><p>FCFFₜ = FCFF₀ × (1 + crecimiento)ᵗ.<br>EV = Σₜ₌₁⁵ FCFFₜ / (1 + WACC)ᵗ + [FCFF₅ × (1 + crecimiento terminal) / (WACC − crecimiento terminal)] / (1 + WACC)⁵.</p><p>La tasa de descuento debe ser mayor que el crecimiento terminal. El modelo no estima WACC, impuestos, reinversión ni retorno sobre el capital; son supuestos del ejercicio.</p></details></section>
+ <section class="tarjeta cuaderno-seccion" id="riesgo"><span class="numero">03 / VARIACIÓN DE LOS PRECIOS</span><h2>Mide la variación, sin confundirla con una señal.</h2><p>Pega cierres positivos en orden cronológico, separados por espacios, punto y coma o saltos de línea. Usa punto para decimales y no uses separadores de miles. Un cierre por sesión; la anualización supone intervalos homogéneos.</p>
+-<form id="vol-form" novalidate><label>Cierres manuales<textarea id="cierres" placeholder="100&#10;101&#10;99&#10;102" aria-describedby="retornos-nota" required></textarea></label><div class="grid"><label>Sesiones por año<input id="sesiones" type="number" value="252" min="1" max="10000" step="1" required></label><label>Lambda EWMA<input id="lambda" type="number" value="0.94" min="0" max="0.999999" step="any" required></label></div><div class="acciones"><button class="boton boton--primario" type="submit">Calcular volatilidad</button><button type="button" class="boton boton--secundario" id="ejemplo-vol">Cargar ejemplo sintético</button></div></form>
++<form id="vol-form" novalidate><label>Cierres manuales<textarea id="cierres" placeholder="100&#10;101&#10;99&#10;102" aria-describedby="retornos-nota" required></textarea></label><div class="grid"><label>Sesiones por año<input id="sesiones" type="number" value="252" min="1" max="10000" step="1" required></label><label>Lambda EWMA<input id="lambda" type="number" value="0.94" min="0" max="0.999999" step="any" required></label></div><div class="acciones"><button class="boton boton--primario" type="submit">Calcular volatilidad</button><label class="escenario">Escenario listo<select id="escenario-vol"></select></label></div></form>
+ <div id="vol-resultado" class="resultado" role="status" aria-live="polite" aria-atomic="true">Se requieren al menos tres cierres para obtener dos retornos.</div><small id="retornos-nota">Log-retorno: ln(cierreₜ / cierreₜ₋₁). Desviación muestral: resta la media y divide la suma de cuadrados entre n−1. Volatilidad anualizada: desviación × √sesiones. EWMA supone media cero: v₁ = retorno₁²; vₜ = λvₜ₋₁ + (1−λ)retornoₜ²; muestra el último estado × √sesiones. No es el mismo estimador que la desviación muestral.</small><p class="nota">Más volatilidad significa mayor dispersión, no una dirección de compra o venta. Un resultado de cero puede aparecer con precios constantes; precios con un crecimiento exactamente constante tienen desviación muestral de retornos cercana a cero, aunque su EWMA de media cero sea positiva. No se estima alfa ni se pronostica rentabilidad.</p></section>
+ <footer class="cuaderno-pie"><p>Notas inspiradas en proyectos financieros y métodos de investigación. Las cifras de ejemplo son inventadas y están identificadas como tales.</p><a href="#principal">Volver al inicio</a></footer>
+ <script defer src="practica-proyectos-financieros.js"></script></main></body></html>
+diff --git a/web/static/recursos/practica-proyectos-financieros.js b/web/static/recursos/practica-proyectos-financieros.js
+index d303d47..aaaab71 100644
+--- a/web/static/recursos/practica-proyectos-financieros.js
++++ b/web/static/recursos/practica-proyectos-financieros.js
+@@ -16,6 +16,37 @@ const $=id=>document.getElementById(id), numero=id=>{const v=$(id).value.trim();
+ const fmt=x=>new Intl.NumberFormat('es-MX',{maximumFractionDigits:2}).format(x),pct=x=>`${fmt(x*100)}%`;
+ function mostrar(id,texto,error=false){$(id).textContent=texto;$(id).classList.toggle('error',error);}
+ $('dcf-form').addEventListener('submit',e=>{e.preventDefault();try{const f=numero('fcf'),g=numero('crecimiento')/100,r=numero('descuento')/100,t=numero('terminal')/100,o=numero('objetivo');const d=Finanzas.dcf(f,g,r,t),rev=Finanzas.reverse(f,r,t,o);mostrar('dcf-resultado',`EV estimado: ${fmt(d.ev)} unidades monetarias\nValor presente de los cinco flujos: ${fmt(d.flujos)}\nValor presente terminal: ${fmt(d.terminal)} (${pct(d.terminal/d.ev)} del EV)\n${rev.enRango?`Crecimiento anual implícito en el EV objetivo: ${pct(rev.crecimiento)}`:`Sin solución en el rango de crecimiento −90% a +200%. En este modelo, el EV en los extremos es ${fmt(rev.minimo)} y ${fmt(rev.maximo)}.`}\nResultado hipotético; no corresponde a precio por acción.`);}catch(err){mostrar('dcf-resultado',err.message,true);}});
+-$('ejemplo-dcf').addEventListener('click',()=>{[['fcf',100],['crecimiento',5],['descuento',10],['terminal',2],['objetivo',1500]].forEach(([id,v])=>$(id).value=v);mostrar('dcf-resultado','Ejemplo sintético cargado: flujos y EV en unidades monetarias inventadas. Pulsa Calcular valoración.');});
+ $('vol-form').addEventListener('submit',e=>{e.preventDefault();try{const v=Finanzas.volatilidad(Finanzas.parsear($('cierres').value),numero('sesiones'),numero('lambda'));mostrar('vol-resultado',`${v.n} log-retornos\nDesviación muestral anualizada: ${pct(v.muestral)}\nVolatilidad EWMA anualizada, último estado: ${pct(v.ewma)}\nMedia de log-retornos por sesión: ${pct(v.media)}\nNo es una señal ni un rendimiento esperado.`);}catch(err){mostrar('vol-resultado',err.message,true);}});
+-$('ejemplo-vol').addEventListener('click',()=>{$('cierres').value='100\n101\n99\n102\n101\n103';$('sesiones').value=252;$('lambda').value=.94;mostrar('vol-resultado','Ejemplo sintético cargado: seis cierres inventados. Pulsa Calcular volatilidad.');});
++
++// Opciones precargadas: cualquiera puede llenar el cuaderno eligiendo en vez de escribir. Todo es hipotético y sintético.
++const PRECARGAS={
++  empresa:['Empresa madura de consumo básico (hipotética)','Banco mexicano (hipotético)','Fabricante de semiconductores (hipotético)','Cadena de autoservicio en México (hipotética)','Fibra inmobiliaria industrial (hipotética)','Minera de cobre y plata (hipotética)'],
++  'tesis-texto':['Creo que las ventas crecerán más que el sector porque la demanda de su producto aumenta y tiene capacidad para atenderla. El mecanismo sería: más volumen con costos fijos estables → mayor margen operativo.','Creo que el margen operativo mejorará porque está bajando costos (eficiencias, mejores compras). El mecanismo sería: igual venta con menor costo → más utilidad por peso vendido.','Creo que el precio descuenta un crecimiento menor al probable porque el mercado castigó al sector entero. El mecanismo sería: si los resultados confirman el crecimiento, el múltiplo se normaliza.','Creo que el nearshoring aumentará la demanda de sus servicios en México porque llegan nuevas plantas al país. El mecanismo sería: más contratos de largo plazo → ingresos más estables.','Creo que bajar su deuda reducirá el riesgo y el costo de financiamiento. El mecanismo sería: menos intereses → más flujo libre para el accionista.','Creo que un ciclo de tasas a la baja favorecerá a la empresa porque su demanda depende del crédito. El mecanismo sería: crédito más barato → más ventas.'],
++  contra:['Mi tesis dejaría de sostenerse si las ventas de los próximos dos trimestres crecen menos que el sector.','Mi tesis dejaría de sostenerse si el margen operativo cae dos trimestres seguidos.','Mi tesis dejaría de sostenerse si la deuda neta sube por encima de 3 veces el EBITDA.','Mi tesis dejaría de sostenerse si Banxico sube la tasa objetivo y encarece el financiamiento.','Mi tesis dejaría de sostenerse si el crecimiento implícito en el precio (DCF inverso, sección 02) ya supera lo que espero.','Mi tesis dejaría de sostenerse si un competidor gana participación de mercado de forma sostenida.'],
++  fuentes:['Reporte trimestral en BMV o SEC · fecha de publicación · respalda ventas y márgenes · próxima revisión: siguiente reporte.','Informe anual (o 10-K) · fecha · respalda deuda, segmentos y riesgos · próxima revisión: siguiente informe anual.','Banxico: tasa objetivo y tipo de cambio FIX · fecha · respalda el costo de financiamiento · próxima revisión: siguiente decisión de política monetaria.','INEGI: consumo, producción industrial o inflación · fecha · respalda la demanda · próxima revisión: siguiente publicación mensual.','Presentación a inversionistas · fecha · respalda la guía de la empresa · próxima revisión: siguiente llamada de resultados.','SEC Form 4 (compras y ventas de directivos) · fecha · respalda la confianza interna · próxima revisión: consultar en Movimientos públicos.'],
++  cierres:[['Acción tranquila (sintética)','100 100.4 99.9 100.6 100.2 100.9 100.5 101.1 100.8 101.3'],['Acción volátil (sintética)','100 104 97 103 95 101 108 99 106 98'],['Tendencia con sobresaltos (sintética)','100 102 101 104 103 99 105 107 106 110']],
++  sesiones:[['252 · acciones (sesiones al año)','252'],['365 · cripto (opera todos los días)','365'],['52 · datos semanales','52'],['12 · datos mensuales','12']],
++  lambda:[['0.94 · estándar para datos diarios (RiskMetrics)','0.94'],['0.97 · estándar para datos mensuales','0.97'],['0.90 · reacciona más rápido','0.9']]
++};
++const ESCENARIOS={
++  'escenario-dcf':{campos:['fcf','crecimiento','descuento','terminal','objetivo'],form:'dcf-form',opciones:[
++    ['Empresa madura: crece poco y es estable',[100,3,9,2,1500]],['Empresa en crecimiento: crece rápido, más riesgo',[100,12,11,3,2500]],['Empresa defensiva: crecimiento casi nulo',[100,1,8,1,1300]]]},
++  'escenario-vol':{campos:['cierres','sesiones','lambda'],form:'vol-form',opciones:PRECARGAS.cierres.map(([n,c])=>[n,[c,252,0.94]])}
++};
++for(const [id,lista] of Object.entries(PRECARGAS)){
++  const campo=$(id),sel=document.createElement('select');
++  sel.className='precarga';sel.setAttribute('aria-label',`Opciones precargadas para ${campo.closest('label').firstChild.textContent.trim()}`);
++  sel.append(new Option('Elegir una opción precargada…',''));
++  for(const x of lista){const [texto,valor]=Array.isArray(x)?x:[x,x];sel.append(new Option(texto,valor));}
++  sel.addEventListener('change',()=>{if(!sel.value)return;const agregar=campo.tagName==='TEXTAREA'&&id!=='cierres'&&campo.value.trim();campo.value=agregar?`${campo.value.trim()}\n${sel.value}`:sel.value;sel.value='';campo.dispatchEvent(new Event('input',{bubbles:true}));});
++  campo.after(sel);
++}
++for(const [id,e] of Object.entries(ESCENARIOS)){
++  const sel=$(id);
++  e.opciones.forEach(([n],i)=>sel.append(new Option(n,String(i))));sel.append(new Option('Personalizado (escribe tus valores)','propio'));
++  const aplicar=()=>{const o=e.opciones[Number(sel.value)];if(!o)return;e.campos.forEach((c,i)=>{$(c).value=o[1][i];});$(e.form).requestSubmit();};
++  sel.addEventListener('change',aplicar);
++  $(e.form).addEventListener('input',ev=>{if(ev.target!==sel)sel.value='propio';});
++  aplicar();
++}
++if(!$('fecha').value)$('fecha').value=new Date().toLocaleDateString('en-CA');
+diff --git a/web/static/referencias.json b/web/static/referencias.json
+index 734e5f8..81d26fc 100644
+--- a/web/static/referencias.json
++++ b/web/static/referencias.json
+@@ -1,6 +1,20 @@
+ {
+   "aviso": "Recursos citados en la construcción de Actinver Terminal. Cada fuente de datos se usa según sus condiciones; las marcas pertenecen a sus dueños. tests/test_referencias.py comprueba que toda dependencia del proyecto y todo proveedor de datos del código aparezcan aquí.",
+   "grupos": [
++    {
++      "titulo": "Formación Python aplicada",
++      "items": [
++        {
++          "nombre": "JPMorgan Chase — python-training",
++          "uso": "Curso de referencia y prácticas propias offline de series y validación de velas. No se ejecuta su integración de APIs ni habilita trading.",
++          "condiciones": "Apache-2.0 para el software original; código integrado propio. Sin aval ni certificado verificado. Datos de terceros con derechos separados.",
++          "url": "https://github.com/jpmorganchase/python-training",
++          "ids": [
++            "jpmorgan-python-training"
++          ]
++        }
++      ]
++    },
+     {
+       "titulo": "Fuentes de datos",
+       "items": [

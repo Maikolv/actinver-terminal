@@ -1511,6 +1511,35 @@ def get_lista_seguimiento(con=Depends(con_db)):
     return seguimiento.lista(con, AJUSTES)
 
 
+# Paneles nativos de la Mesa: solo lectura de lo guardado (terminal/mesa_datos.py); ninguna consulta a proveedores.
+@app.get("/api/mesa/noticias")
+def mesa_noticias(simbolo: str = "", limite: int = 40, con=Depends(con_db)):
+    from . import mesa_datos
+    if simbolo and not re.fullmatch(r"[A-Z]{2,5}:[A-Z0-9.&*\- ]{1,30}", simbolo):
+        raise HTTPException(422, "símbolo inválido")
+    return mesa_datos.noticias(con, simbolo, limite)
+
+
+@app.get("/api/mesa/macro")
+def mesa_macro(con=Depends(con_db)):
+    from . import mesa_datos
+    return mesa_datos.macro(con, AJUSTES)
+
+
+@app.get("/api/mesa/resumen")
+def mesa_resumen(con=Depends(con_db)):
+    from . import mesa_datos
+    ins = mercado.instrumentos(con)
+    cot, _ = cotizaciones_estado(con, [i for i, v in ins.items() if v["estado"] == "activo"])
+    return mesa_datos.resumen(con, AJUSTES, cot=cot)
+
+
+@app.get("/api/mesa/resultados")
+def mesa_resultados():
+    from . import mesa_datos
+    return mesa_datos.CONTRATO_RESULTADOS
+
+
 @app.post("/api/lista-seguimiento")
 def post_lista_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
     from . import seguimiento
@@ -1679,10 +1708,11 @@ WIDGETS_TV = {"cinta": ("ticker-tape", False), "resumen": ("market-overview", Fa
               "finanzas": ("financials", True), "noticias-emisora": ("timeline", True), "tecnico": ("technical-analysis", True),
               "cotizaciones": ("market-quotes", False), "destacados": ("hotlists", False), "mapa-etf": ("etf-heatmap", False),
               "divisas": ("forex-cross-rates", False), "mapa-divisas": ("forex-heat-map", False),
-              "mapa-cripto": ("crypto-coins-heatmap", False)}
+              "mapa-cripto": ("crypto-coins-heatmap", False), "cinta-macro": ("ticker-tape", False),
+              "macro": ("market-quotes", False), "cripto-mercado": ("crypto-mkt-screener", False)}
 MAPAS_TV = {"NASDAQ100", "SPX500"}
-FILTROS_TV = {"america", "mexico"}
-BASE_TV = {"isTransparent": False, "locale": "es", "width": "100%", "height": "100%"}
+FILTROS_TV = {"america", "mexico", "forex"}
+BASE_TV = {"isTransparent": True, "locale": "es", "width": "100%", "height": "100%"}  # transparente: toma el fondo de grafica.css
 DIVISAS_TV = ["USD", "MXN", "EUR", "JPY", "GBP", "CAD", "CNY"]
 
 
@@ -1705,6 +1735,24 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
             grupo("Divisas", [("FX_IDC:USDMXN", "Dólar / peso"), ("FX_IDC:EURMXN", "Euro / peso"), ("FX:EURUSD", "Euro / dólar")]),
             grupo("Bonos de EE. UU. (ETF, precio)", [("NASDAQ:SHY", "SHY · Tesoro 1–3 años"), ("NASDAQ:IEF", "IEF · Tesoro 7–10 años"), ("NASDAQ:TLT", "TLT · Tesoro 20+ años")]),
             grupo("Materias primas", [("TVC:GOLD", "Oro"), ("TVC:USOIL", "Petróleo WTI"), ("TVC:SILVER", "Plata")])]}
+    if tipo == "macro":
+        grupo = lambda t, ss: {"name": t, "symbols": [{"name": s, "displayName": d} for s, d in ss]}  # noqa: E731
+        return {**BASE_TV, "showSymbolLogo": True, "symbolsGroups": [
+            grupo("Tasas de EE. UU. (FRED, cierre diario o mensual)", [("FRED:DGS2", "Bono 2 años %"), ("FRED:DGS10", "Bono 10 años %"),
+                                     ("FRED:DGS30", "Bono 30 años %"), ("FRED:FEDFUNDS", "Fondos federales % (mensual)")]),
+            grupo("Volatilidad y dólar", [("CAPITALCOM:VIX", "VIX · volatilidad S&P 500"), ("CAPITALCOM:DXY", "Índice dólar (DXY)"),
+                                          ("FX_IDC:USDMXN", "Dólar / peso")]),
+            grupo("Energía", [("TVC:USOIL", "Petróleo WTI"), ("TVC:UKOIL", "Petróleo Brent"), ("CAPITALCOM:NATURALGAS", "Gas natural")]),
+            grupo("Metales", [("TVC:GOLD", "Oro"), ("TVC:SILVER", "Plata"), ("CAPITALCOM:COPPER", "Cobre")]),
+            grupo("Cripto (fuera del Reto)", [("BITSTAMP:BTCUSD", "Bitcoin"), ("BITSTAMP:ETHUSD", "Ether")])]}
+    if tipo == "cinta-macro":
+        return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
+            {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),
+                                                    ("FOREXCOM:DJI", "Dow Jones"), ("CAPITALCOM:VIX", "VIX"), ("FRED:DGS10", "Bono EE. UU. 10a %"),
+                                                    ("CAPITALCOM:DXY", "Dólar DXY"), ("FX_IDC:USDMXN", "USD/MXN"), ("FX_IDC:EURMXN", "EUR/MXN"),
+                                                    ("TVC:GOLD", "Oro"), ("TVC:USOIL", "WTI"), ("BITSTAMP:BTCUSD", "Bitcoin")]]}
+    if tipo == "cripto-mercado":
+        return {**BASE_TV, "defaultColumn": "overview", "screener_type": "crypto_mkt", "displayCurrency": "USD"}
     if tipo == "destacados":
         return {**BASE_TV, "exchange": "US", "dateRange": "1D", "showChart": True, "showSymbolLogo": True}
     if tipo == "mapa-etf":

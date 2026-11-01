@@ -21,6 +21,30 @@ export const PRESETS = {mercado:['grafica','mapa','resumen','calendario'],
   empresa:['grafica','info','finanzas','noticias-emisora','insiders','cartera']};
 export const AVISO_RIESGO = 'El riesgo calculado es un tope del escenario, no del fill real: un gap o un deslizamiento mayor puede superarlo.';
 export function rutaVelas(simbolo){return '/?'+new URLSearchParams({vista:'tab-velas',simbolo});}
+// GET compartido: una sola petición en curso por ruta (los paneles que piden lo mismo esperan la misma respuesta).
+// No es caché: al terminar se olvida, así nunca se sirve un dato viejo en lugar de uno fresco.
+const enCurso=new Map();
+export function obtener(ruta,ms=15000){
+  if(!enCurso.has(ruta))enCurso.set(ruta,fetch(ruta,{signal:AbortSignal.timeout(ms)}).then(async r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json();}).finally(()=>enCurso.delete(ruta)));
+  return enCurso.get(ruta);
+}
+// Variación con signo y flecha: el color nunca es la única señal (+ ▲ sube, − ▼ baja).
+export function signo(x,dec=2){if(x===null||x===undefined||!Number.isFinite(x))return 'SIN DATO';const v=(Math.abs(x)*100).toFixed(dec);return x>0?`+${v} % ▲`:x<0?`−${v} % ▼`:`0.${'0'.repeat(dec)} % =`;}
+export const RANGOS={'1M':21,'3M':63,'6M':126,'Todo':Infinity};
+export function recortar(puntos,rango){const n=RANGOS[rango]??Infinity;return Number.isFinite(n)?puntos.slice(-n):[...puntos];}
+// Tamaños guardados por panel. Disposiciones anteriores (sin «tamanos») migran a «normal».
+export function normalizarTamanos(t){const ids=new Set(CATALOGO.map(c=>c[0]));return Object.fromEntries(Object.entries(t&&typeof t==='object'?t:{}).filter(([k,v])=>ids.has(k)&&v==='ancho'));}
+// Paleta: un solo buscador para instrumentos, secciones, paneles y disposiciones. Nunca ejecuta acciones financieras.
+export function buscarPaleta(texto,{catalogo=[],secciones=[],activos=[]}={}){
+  const q=(texto||'').trim().toLocaleLowerCase('es');if(!q)return [];
+  const tiene=s=>s.toLocaleLowerCase('es').includes(q),out=[];
+  for(const i of catalogo.filter(i=>tiene(`${i.clave_operable} ${i.nombre}`)).slice(0,8))out.push({tipo:'instrumento',etiqueta:`${i.clave_operable} · ${i.nombre}`,valor:i.id});
+  for(const s of secciones.filter(s=>tiene(s.titulo)).slice(0,6))out.push({tipo:'seccion',etiqueta:`Ir a ${s.titulo}`,valor:s.url});
+  for(const [id,t] of CATALOGO.filter(c=>tiene(c[1])).slice(0,6))out.push({tipo:'panel',etiqueta:`${activos.includes(id)?'Enfocar':'Añadir'} panel: ${t}`,valor:id});
+  for(const [k,n] of Object.entries(NOMBRES_PRESET).filter(([,n])=>tiene(n)||tiene('disposición')))out.push({tipo:'disposicion',etiqueta:`Disposición: ${n}`,valor:k});
+  return out;
+}
+export const NOMBRES_PRESET={mercado:'Mercado',futuros:'Investigación de futuros',empresa:'Empresa y cartera'};
 export function normalizarLayout(v) {
   if(!Array.isArray(v))return [...PRESETS.mercado];
   return [...new Set(v.filter(k=>CATALOGO.some(c=>c[0]===k)))].slice(0,CATALOGO.length);
@@ -55,11 +79,20 @@ export function planNQ(entrada,stop,r,presupuesto,costos=0,deslizamiento=0) {
 }
 if(typeof document!=='undefined') {
   const KEY='actinver.mesa.v1', $=id=>document.getElementById(id);
-  let activos=[...PRESETS.mercado],simbolo='SIC:NVDA',catalogoListo=false,catalogo=[];
+  let activos=[...PRESETS.mercado],simbolo='SIC:NVDA',catalogoListo=false,catalogo=[],tamanos={},guardadas={};
   const crear=(tag,texto)=>{const n=document.createElement(tag);if(texto!==undefined)n.textContent=texto;return n;};
-  try {const s=JSON.parse(localStorage.getItem(KEY));if(s){activos=normalizarLayout(s.widgets);if(typeof s.simbolo==='string'&&s.simbolo.length<50)simbolo=s.simbolo;}}catch{}
-  const guardada=new Option('Personalizada / guardada','guardada');guardada.disabled=true;$('mesa-preset').prepend(guardada);$('mesa-preset').value='guardada';
-  function guardar(){try{localStorage.setItem(KEY,JSON.stringify({widgets:activos,simbolo}));}catch{$('mesa-estado').textContent='Su navegador no permite guardar la disposición.';}}
+  // Misma clave v1: las disposiciones anteriores ({widgets, simbolo}) se leen igual y ganan tamaños y nombres al guardar.
+  try {const s=JSON.parse(localStorage.getItem(KEY));if(s){activos=normalizarLayout(s.widgets);if(typeof s.simbolo==='string'&&s.simbolo.length<50)simbolo=s.simbolo;tamanos=normalizarTamanos(s.tamanos);
+    for(const [n,g] of Object.entries(s.guardadas&&typeof s.guardadas==='object'?s.guardadas:{}).slice(0,20))if(typeof n==='string'&&n.length<=40)guardadas[n]={widgets:normalizarLayout(g?.widgets),tamanos:normalizarTamanos(g?.tamanos)};}}catch{}
+  const guardada=new Option('Personalizada / guardada','guardada');guardada.disabled=true;$('mesa-preset').prepend(guardada);
+  function opcionesGuardadas(){$('mesa-preset').querySelectorAll('[data-guardada]').forEach(o=>o.remove());for(const n of Object.keys(guardadas)){const o=new Option(`Guardada: ${n}`,'g:'+n);o.dataset.guardada='1';$('mesa-preset').append(o);}}
+  opcionesGuardadas();$('mesa-preset').value='guardada';
+  function guardar(){try{localStorage.setItem(KEY,JSON.stringify({widgets:activos,simbolo,tamanos,guardadas}));}catch{$('mesa-estado').textContent='Su navegador no permite guardar la disposición.';}}
+  function aplicarDisposicion(valor){
+    if(valor.startsWith('g:')){const g=guardadas[valor.slice(2)];if(!g)return;activos=[...g.widgets];tamanos={...g.tamanos};}
+    else if(PRESETS[valor]){activos=[...PRESETS[valor]];tamanos={};}else return;
+    $('mesa-preset').value=valor;guardar();dibujar();
+  }
   function mover(id,delta){const i=activos.indexOf(id),j=i+delta;if(j<0||j>=activos.length)return;[activos[i],activos[j]]=[activos[j],activos[i]];$('mesa-preset').value='guardada';guardar();dibujar();}
   function boton(t,fn){const b=crear('button',t);b.type='button';b.className='boton boton--secundario';b.onclick=fn;return b;}
   function panelRiesgo(box){
@@ -79,6 +112,98 @@ if(typeof document!=='undefined') {
     form.onsubmit=e=>{e.preventDefault();calcular();};
     box.append(form,simple,output);calcular();
   }
+  // ---------- Contenido nativo: lee rutas locales de solo lectura y declara fuente, fecha y SIN DATO ----------
+  const el=(tag,attrs={},...hijos)=>{const n=document.createElement(tag);for(const [k,v] of Object.entries(attrs))if(v!==undefined&&v!==null&&v!==false)(k==='clase'?n.className=v:n.setAttribute(k,v));n.append(...hijos.flat().filter(x=>x!==null&&x!==undefined&&x!==false));return n;};
+  const fmt=(x,dec=2)=>x===null||x===undefined||!Number.isFinite(Number(x))?'SIN DATO':Number(x).toLocaleString('es-MX',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  const fecha=s=>s?String(s).slice(0,10):'s/f';
+  const nativo=(titulo,...hijos)=>el('div',{clase:'mesa-nativo'},el('p',{clase:'mesa-nativo__titulo'},titulo),...hijos);
+  const fallo=(caja,e)=>caja.replaceChildren(el('p',{clase:'sin-dato'},`SIN DATO · no se pudo consultar la terminal (${e.message}).`));
+  const svgNS='http://www.w3.org/2000/svg',s=(tag,a={})=>{const n=document.createElementNS(svgNS,tag);for(const [k,v] of Object.entries(a))n.setAttribute(k,v);return n;};
+  function graficaSvg(puntos,{velas=false,sma=true,volumen=true}){
+    const W=640,H=200,HV=volumen?48:0,m={i:52,d:8,s:8,b:18},n=puntos.length;
+    const hi=puntos.map(p=>velas?p.maximo:p.cierre),lo=puntos.map(p=>velas?p.minimo:p.cierre);
+    const max=Math.max(...hi),min=Math.min(...lo),rango=max-min||1,X=i=>m.i+(n<2?0:i*(W-m.i-m.d)/(n-1)),Y=v=>m.s+(max-v)*(H-m.s-m.b)/rango;
+    const g=s('svg',{viewBox:`0 0 ${W} ${H+HV}`,class:'mesa-grafica',role:'img','aria-label':`Gráfica de ${n} sesiones; mínimo ${fmt(min)}, máximo ${fmt(max)}`});
+    for(const v of [min,(min+max)/2,max]){g.append(s('line',{x1:m.i,x2:W-m.d,y1:Y(v),y2:Y(v),class:'rejilla'}));const t=s('text',{x:m.i-6,y:Y(v)+4,'text-anchor':'end'});t.textContent=fmt(v);g.append(t);}
+    if(velas){const w=Math.max(1,(W-m.i-m.d)/Math.max(n,1)*.6);puntos.forEach((p,i)=>{const sube=p.cierre>=p.apertura;g.append(s('line',{x1:X(i),x2:X(i),y1:Y(p.maximo),y2:Y(p.minimo),class:sube?'sube':'baja'}),
+      s('rect',{x:X(i)-w/2,y:Y(Math.max(p.apertura,p.cierre)),width:w,height:Math.max(1,Math.abs(Y(p.apertura)-Y(p.cierre))),class:sube?'sube':'baja hueca'}));});}
+    else g.append(s('polyline',{points:puntos.map((p,i)=>`${X(i)},${Y(p.cierre)}`).join(' '),class:'linea'}));
+    if(sma&&puntos.some(p=>p.media_20!=null))g.append(s('polyline',{points:puntos.map((p,i)=>p.media_20==null?null:`${X(i)},${Y(p.media_20)}`).filter(Boolean).join(' '),class:'sma'}));
+    if(volumen){const vmax=Math.max(...puntos.map(p=>p.volumen||0))||1;puntos.forEach((p,i)=>{const h=(p.volumen||0)/vmax*(HV-8);g.append(s('rect',{x:X(i)-1,y:H+HV-h,width:2,height:h,class:'volumen'}));});}
+    [0,n-1].forEach((i,j)=>{if(puntos[i]){const t=s('text',{x:X(i),y:H-2,'text-anchor':j?'end':'start'});t.textContent=fecha(puntos[i].fecha||puntos[i].inicio);g.append(t);}});
+    return g;
+  }
+  async function nativoFicha(caja,sim){
+    try{
+      const [v,serie]=await Promise.all([obtener('/api/flujo/velas?'+new URLSearchParams({simbolo:sim,intervalo:'1Day',dias:'180'})),obtener('/api/visualizaciones/serie/'+encodeURIComponent(sim)).catch(()=>null)]);
+      const barras=v.barras||[],puntos=serie?.puntos||[];
+      if(!barras.length&&!puntos.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'SIN DATO · no hay velas ni cierres guardados para este instrumento.'));return;}
+      const ult=puntos.at(-1),prev=puntos.at(-2);
+      const rep=el('select',{'aria-label':'Representación'},new Option('Línea de cierres','linea'),...(barras.length?[new Option('Velas OHLCV','velas')]:[]));
+      const rango=el('select',{'aria-label':'Rango temporal'},...Object.keys(RANGOS).map(k=>new Option(k,k)));rango.value='3M';
+      const cSma=el('input',{type:'checkbox','aria-label':'Media móvil de 20 sesiones'}),cVol=el('input',{type:'checkbox','aria-label':'Volumen'});cSma.checked=cVol.checked=true;
+      const fig=el('div',{clase:'mesa-grafica-caja'});
+      const pintar=()=>{const velas=rep.value==='velas',base=velas?barras.map(b=>({...b,fecha:b.inicio})):puntos;fig.replaceChildren(graficaSvg(recortar(base,rango.value),{velas,sma:cSma.checked&&!velas,volumen:cVol.checked}));};
+      [rep,rango,cSma,cVol].forEach(x=>x.addEventListener('change',pintar));
+      caja.replaceChildren(
+        el('dl',{clase:'mesa-kpis'},el('dt',{},'Último cierre'),el('dd',{},ult?`${fmt(ult.cierre)} ${serie.moneda||''}`:'SIN DATO'),
+          el('dt',{},'Variación 1 sesión'),el('dd',{clase:ult&&prev?(ult.cierre>prev.cierre?'sube':ult.cierre<prev.cierre?'baja':''):''},ult&&prev?signo(ult.cierre/prev.cierre-1):'SIN DATO'),
+          el('dt',{},'Fecha'),el('dd',{},fecha(serie?.fecha)),el('dt',{},'RSI 14'),el('dd',{},fmt(ult?.rsi_14,1))),
+        el('div',{clase:'mesa-controles-grafica'},el('label',{},'Ver ',rep),el('label',{},'Rango ',rango),el('label',{clase:'casilla'},cSma,' SMA 20'),el('label',{clase:'casilla'},cVol,' Volumen')),fig,
+        el('p',{clase:'mesa-procedencia'},`${sim} · intervalo diario · ${barras.length?`velas: ${(v.procedencia||[]).map(p=>p.fuente||p).join(', ')||'proveedor'}; `:''}cierres: ${serie?.proveedor||'SIN DATO'}, ${serie?.moneda||''}, ajustados solo por splits · ingesta ${fecha(serie?.obtenido_en)} · ${serie?.modo==='sintetico'?'SINTÉTICO':'histórico, no es cotización en vivo'}.`));
+      pintar();
+    }catch(e){fallo(caja,e);}
+  }
+  async function nativoNoticias(caja,sim){
+    try{
+      const r=await obtener('/api/mesa/noticias?'+new URLSearchParams(sim?{simbolo:sim,limite:'12'}:{limite:'15'}));
+      if(!r.noticias.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'SIN DATO · no hay titulares guardados'+(sim?' de este instrumento.':'.')));return;}
+      caja.replaceChildren(el('ul',{clase:'mesa-lista'},r.noticias.map(n=>el('li',{},el('a',{href:n.enlace,rel:'noopener noreferrer',target:'_blank'},n.titulo),
+        el('span',{clase:'mesa-meta'},` ${n.fuente} · publicado ${fecha(n.publicado)} · ingesta ${fecha(n.ingesta)}${n.instrumentos.length>1?` · también ${n.instrumentos.length-1} emisora(s)`:''}`)))),
+        el('p',{clase:'mesa-procedencia'},r.nota));
+    }catch(e){fallo(caja,e);}
+  }
+  async function nativoMacro(caja){
+    try{
+      const [m,r]=await Promise.all([obtener('/api/mesa/macro'),obtener('/api/mesa/resumen')]);
+      const grupos=[...new Set(m.series.map(x=>x.grupo))];
+      caja.replaceChildren(
+        el('p',{clase:'mesa-nativo__titulo'},`Resumen del corte ${r.corte.replace('T',' ').slice(0,16)} UTC · última sesión NYSE ${r.ultima_sesion.NYSE}, BMV ${r.ultima_sesion.BMV}`),
+        el('p',{},`Datos: ${r.datos.instrumentos} instrumentos (${Object.entries(r.datos.por_estado).map(([k,v])=>`${v} ${k}`).join(', ')}) · ${r.titulares_24h} titulares en 24 h · ${r.eventos_alto_impacto_7d.length} eventos de alto impacto en 7 días.`),
+        el('div',{clase:'tabla-contenedor'},el('table',{},el('caption',{},'Tasas, inflación y contexto (última observación conocida)'),
+          el('thead',{},el('tr',{},...['Serie','Valor','Periodo','Frecuencia','Fuente'].map(t=>el('th',{scope:'col'},t)))),
+          el('tbody',{},grupos.flatMap(gname=>[el('tr',{},el('th',{scope:'rowgroup',colspan:'5'},gname)),...m.series.filter(x=>x.grupo===gname).map(x=>el('tr',{},
+            el('th',{scope:'row'},x.titulo||x.serie),el('td',{clase:'num'},x.valor==null?'SIN DATO':`${fmt(x.valor)} ${x.unidad||''}`),el('td',{},x.periodo||'—'),el('td',{},x.frecuencia||'—'),
+            el('td',{},x.valor==null?(x.requisito||'Sin observaciones'):(x.fuente||'—'))))])))),
+        m.curva.aviso?el('p',{clase:'aviso-caja'},m.curva.aviso):null, m.aviso?el('p',{clase:'mesa-procedencia'},m.aviso):null,
+        el('p',{clase:'mesa-procedencia'},`${m.nota} ${r.nota}`));
+    }catch(e){fallo(caja,e);}
+  }
+  async function nativoCalendario(caja){
+    try{
+      const [r,c]=await Promise.all([obtener('/api/mesa/resumen'),obtener('/api/mesa/resultados')]);
+      caja.replaceChildren(
+        r.eventos_alto_impacto_7d.length?el('ul',{clase:'mesa-lista'},r.eventos_alto_impacto_7d.map(e=>el('li',{},el('strong',{},`${e.fecha.slice(0,16).replace('T',' ')} · ${e.pais}`),` ${e.titulo}`,
+          el('span',{clase:'mesa-meta'},` · pronóstico ${e.pronostico||'s/d'} · previo ${e.previo||'s/d'} · ${e.fuente}`)))):el('p',{clase:'sin-dato'},'SIN DATO · sin eventos de alto impacto guardados para los próximos 7 días.'),
+        el('p',{clase:'mesa-procedencia'},'Eventos económicos de EE. UU. y México (alto impacto), hora de la fuente.'),
+        el('p',{clase:'aviso-caja'},`Resultados de empresas: ${c.estado.toUpperCase()}. ${c.motivo} Siguiente acción: ${c.siguiente_accion}`));
+    }catch(e){fallo(caja,e);}
+  }
+  const NATIVOS={info:(c,sim)=>nativoFicha(c,sim),noticias:c=>nativoNoticias(c,''),'noticias-emisora':(c,sim)=>nativoNoticias(c,sim),resumen:c=>nativoMacro(c),calendario:c=>nativoCalendario(c)};
+  async function pintarSeguimiento(){
+    const caja=$('mesa-seguimiento');if(!caja)return;
+    try{
+      const r=await obtener('/api/lista-seguimiento');
+      if(!r.instrumentos.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'Seguimiento: SIN DATO · su lista está vacía. '),el('a',{href:'/?vista=tab-seguimiento'},'Agregar instrumentos en Seguimiento'));return;}
+      caja.replaceChildren(el('div',{clase:'tabla-contenedor'},el('table',{clase:'mesa-seguimiento'},el('caption',{},'Seguimiento · misma lista que la sección Seguimiento. Seleccione una fila para usar ese instrumento.'),
+        el('thead',{},el('tr',{},...['Instrumento','Último (MXN)','Var. 1 sesión','Fecha','Proveedor','Estado'].map(t=>el('th',{scope:'col'},t)))),
+        el('tbody',{},r.instrumentos.map(f=>{const valida=f.ultimo_mxn!=null&&f.vigencia&&f.vigencia!=='sin_datos';const v=valida?f.variacion?.[1]:null;
+          const b=el('button',{type:'button',clase:'boton boton--texto','aria-pressed':String(f.instrumento_id===simbolo)},f.clave);
+          b.addEventListener('click',()=>{if(!catalogo.some(i=>i.id===f.instrumento_id)){$('mesa-estado').textContent='SIN DATO · el instrumento no está en el catálogo activo.';return;}simbolo=f.instrumento_id;$('mesa-simbolo').value=simbolo;guardar();dibujar();pintarSeguimiento();});
+          return el('tr',{},el('th',{scope:'row'},b),el('td',{clase:'num'},fmt(f.ultimo_mxn)),el('td',{clase:'num '+(v>0?'sube':v<0?'baja':'')},signo(v)),el('td',{},f.fecha||'SIN DATO'),el('td',{},f.proveedor||'SIN DATO'),el('td',{},f.vigencia||'SIN DATO'));})))),
+        el('p',{clase:'mesa-procedencia'},r.nota));
+    }catch(e){fallo(caja,e);}
+  }
   function dibujar(){
     const anteriores=new Map([...$('mesa-paneles').children].map(n=>[n.dataset.panel,n]));
     const abiertos=new Set([...anteriores].filter(([,n])=>n.querySelector('details')?.open).map(([id])=>id));
@@ -97,7 +222,17 @@ if(typeof document!=='undefined') {
       const antes=boton('←',()=>{mover(id,-1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();}),despues=boton('→',()=>{mover(id,1);document.querySelector(`[data-panel="${id}"] h2`)?.focus();});
       antes.setAttribute('aria-label',`Mover ${titulo} antes`);despues.setAttribute('aria-label',`Mover ${titulo} después`);
       antes.disabled=activos.indexOf(id)===0;despues.disabled=activos.indexOf(id)===activos.length-1;
-      head.append(h,antes,despues,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
+      const ancho=boton('Ancho',()=>{const on=!tamanos[id];if(on)tamanos[id]='ancho';else delete tamanos[id];card.classList.toggle('mesa-panel--ancho',on);ancho.setAttribute('aria-pressed',String(on));$('mesa-preset').value='guardada';guardar();});
+      ancho.setAttribute('aria-pressed',String(!!tamanos[id]));ancho.setAttribute('aria-label',`Ocupar todo el ancho: ${titulo}`);card.classList.toggle('mesa-panel--ancho',!!tamanos[id]);
+      // Arrastre con el ratón; ← y → son el equivalente por teclado. El nodo se mueve, no se recrea: conserva lo abierto y lo escrito.
+      const asa=crear('span','⠿');asa.className='mesa-asa';asa.draggable=true;asa.title='Arrastrar para reordenar (con teclado use ← y →)';asa.setAttribute('aria-hidden','true');
+      asa.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/x-mesa-panel',id);e.dataTransfer.effectAllowed='move';card.classList.add('mesa-panel--arrastrando');});
+      asa.addEventListener('dragend',()=>card.classList.remove('mesa-panel--arrastrando'));
+      card.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/x-mesa-panel'))e.preventDefault();});
+      card.addEventListener('drop',e=>{const origen=e.dataTransfer.getData('text/x-mesa-panel');if(!origen||origen===id)return;e.preventDefault();
+        activos=activos.filter(x=>x!==origen);activos.splice(activos.indexOf(id),0,origen);$('mesa-preset').value='guardada';guardar();dibujar();});
+      head.append(asa,h,antes,despues,ancho,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
+      if(NATIVOS[id]&&catalogoListo){const caja=el('div',{clase:'mesa-nativo','aria-live':'polite'},el('p',{clase:'mesa-procedencia'},'Cargando datos locales…'));card.append(el('p',{clase:'mesa-nativo__titulo'},'Datos de la terminal'),caja);NATIVOS[id](caja,simbolo);}
       if(tipo==='chart'){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
       if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
       else if(tipo==='risk')panelRiesgo(card);
@@ -133,11 +268,40 @@ if(typeof document!=='undefined') {
   }
   for(const [id,t] of CATALOGO)$('mesa-agregar').append(new Option(t,id));
   $('mesa-anadir').onclick=()=>{const id=$('mesa-agregar').value;if(!activos.includes(id)){activos.push(id);$('mesa-preset').value='guardada';guardar();dibujar();}else{$('mesa-estado').textContent='Ese panel ya está en la mesa.';}};
-  $('mesa-preset').onchange=e=>{activos=[...PRESETS[e.target.value]];guardar();dibujar();};
+  $('mesa-preset').onchange=e=>aplicarDisposicion(e.target.value);
+  $('mesa-guardar').onclick=()=>{const n=$('mesa-nombre').value.trim().slice(0,40);if(!n){$('mesa-estado').textContent='Escriba un nombre para la disposición.';$('mesa-nombre').focus();return;}
+    guardadas[n]={widgets:[...activos],tamanos:{...tamanos}};opcionesGuardadas();$('mesa-preset').value='g:'+n;guardar();$('mesa-estado').textContent=`Disposición «${n}» guardada en este navegador.`;};
   $('mesa-simbolo').onchange=e=>{simbolo=e.target.value;guardar();dibujar();};
   function filtrar(){const texto=$('mesa-buscar').value.trim().toLocaleLowerCase('es');const filas=catalogo.filter(i=>`${i.clave_operable} ${i.nombre}`.toLocaleLowerCase('es').includes(texto));$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));$('mesa-simbolo').value=simbolo;if(!filas.length)$('mesa-simbolo').append(new Option('Sin coincidencias',''));$('mesa-estado').textContent=`${filas.length} coincidencias; el instrumento activo no cambia hasta seleccionarlo.`;}
-  $('mesa-buscar').addEventListener('input',filtrar);
-  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('mesa-buscar').focus();}if(e.key==='Escape'&&e.target===$('mesa-buscar')){$('mesa-buscar').value='';filtrar();$('mesa-simbolo').focus();}});
-  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
+  // Paleta de comandos sobre el mismo buscador (no hay otro catálogo): instrumentos, secciones, paneles y disposiciones.
+  let secciones=[],resultados=[],activo=-1;
+  let pedidas=false;  // las secciones se piden al primer uso de la paleta: la barra común ya cargó el mismo archivo
+  const lista=$('mesa-paleta'),buscador=$('mesa-buscar');
+  function pintarPaleta(){
+    resultados=buscarPaleta(buscador.value,{catalogo,secciones:secciones.map(s=>({...s,titulo:s.titulo})),activos:[...activos,...Object.keys(guardadas).map(n=>'g:'+n)]});
+    for(const [n] of Object.entries(guardadas))if(n.toLocaleLowerCase('es').includes(buscador.value.trim().toLocaleLowerCase('es')))resultados.push({tipo:'disposicion',etiqueta:`Disposición guardada: ${n}`,valor:'g:'+n});
+    activo=resultados.length?0:-1;
+    lista.replaceChildren(...resultados.map((r,i)=>{const o=crear('li',r.etiqueta);o.id='paleta-'+i;o.setAttribute('role','option');o.dataset.tipo=r.tipo;o.setAttribute('aria-selected',String(i===activo));o.addEventListener('mousedown',e=>{e.preventDefault();ejecutar(i);});return o;}));
+    lista.hidden=!resultados.length;buscador.setAttribute('aria-expanded',String(!lista.hidden));
+    if(activo>=0)buscador.setAttribute('aria-activedescendant','paleta-'+activo);else buscador.removeAttribute('aria-activedescendant');
+  }
+  function marcar(i){activo=i;[...lista.children].forEach((o,j)=>o.setAttribute('aria-selected',String(j===i)));buscador.setAttribute('aria-activedescendant','paleta-'+i);lista.children[i]?.scrollIntoView({block:'nearest'});}
+  function cerrarPaleta(){lista.hidden=true;buscador.setAttribute('aria-expanded','false');buscador.removeAttribute('aria-activedescendant');}
+  function ejecutar(i){
+    const r=resultados[i];if(!r)return;cerrarPaleta();
+    if(r.tipo==='instrumento'){simbolo=r.valor;buscador.value='';filtrar();$('mesa-simbolo').value=simbolo;guardar();dibujar();$('mesa-estado').textContent=`Instrumento activo: ${r.etiqueta}.`;}
+    else if(r.tipo==='seccion')location.assign(r.valor);
+    else if(r.tipo==='panel'){if(!activos.includes(r.valor)){activos.push(r.valor);$('mesa-preset').value='guardada';guardar();dibujar();}buscador.value='';filtrar();const h=document.querySelector(`[data-panel="${r.valor}"] h2`);h?.scrollIntoView({block:'center'});h?.focus();}
+    else if(r.tipo==='disposicion'){buscador.value='';filtrar();aplicarDisposicion(r.valor);}
+  }
+  buscador.addEventListener('input',()=>{filtrar();pintarPaleta();if(!pedidas){pedidas=true;obtener('/static/navegacion.json').then(d=>{secciones=[...d.areas,...d.secciones];if(buscador.value)pintarPaleta();}).catch(()=>{pedidas=false;});}});
+  buscador.addEventListener('blur',()=>setTimeout(cerrarPaleta,150));
+  buscador.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'&&resultados.length){e.preventDefault();marcar((activo+1)%resultados.length);}
+    else if(e.key==='ArrowUp'&&resultados.length){e.preventDefault();marcar((activo-1+resultados.length)%resultados.length);}
+    else if(e.key==='Enter'&&activo>=0&&!lista.hidden){e.preventDefault();ejecutar(activo);}
+  });
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();buscador.focus();buscador.select();}if(e.key==='Escape'&&e.target===buscador){if(!lista.hidden){cerrarPaleta();return;}buscador.value='';filtrar();$('mesa-simbolo').focus();}});
+  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();pintarSeguimiento();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
   dibujar();
 }

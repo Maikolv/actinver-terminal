@@ -10,7 +10,7 @@ const PAGINAS = ['web/static/recursos/oficina-inversion.html', 'web/static/recur
 
 test('cada sección de la terminal tiene guía completa, sin excepción', () => {
   const paneles = [...leer('web/index.html').matchAll(/role="tabpanel" id="([^"]+)"/g)].map((m) => m[1]);
-  assert.ok(paneles.length >= 24);
+  assert.ok(paneles.length >= 23);
   for (const p of paneles) {
     const g = GUIAS[p];
     assert.ok(g, `sin guía: ${p}`);

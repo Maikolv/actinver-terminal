@@ -1932,19 +1932,21 @@ function panoramaTradingView() {
   return h("section", { "aria-label": "Panorama de TradingView" },
     h("h2", { texto: "Panorama de TradingView" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
     marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
-    bloqueWidget("Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
-    bloqueWidget("Mapa de calor por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
+    bloqueWidget("1 · Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
+    bloqueWidget("2 · Tasas, volatilidad (VIX), dólar, energía, metales y cripto", marcoWidget("macro", {}, 620, "Variables macro"), true),
+    bloqueWidget("3 · Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
+    bloqueWidget("4 · Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
+    bloqueWidget("5 · Mapa de calor de acciones por sector", [selectorSimple("NASDAQ100", [["NASDAQ100", "Nasdaq 100"], ["SPX500", "S&P 500"]],
       (x) => { mapa.src = urlWidget("mapa", { mapa: x }); }, "Índice"), mapa]),
-    bloqueWidget("Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
-    bloqueWidget("Filtro de acciones", [selectorSimple("america", [["america", "EE. UU."], ["mexico", "México"]],
+    bloqueWidget("6 · Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
+    bloqueWidget("7 · Filtro de acciones y divisas", [selectorSimple("america", [["america", "Acciones de EE. UU."], ["mexico", "Acciones de México"], ["forex", "Divisas"]],
       (x) => { filtro.src = urlWidget("filtro", { filtro: x }); }, "Mercado"), filtro]),
-    bloqueWidget("Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
-    bloqueWidget("Cotizaciones por grupo (índices, dólar y euro, bonos de EE. UU., materias primas)", marcoWidget("cotizaciones", {}, 520, "Cotizaciones por grupo")),
-    bloqueWidget("Acciones de EE. UU. que más suben, bajan y se operan hoy", marcoWidget("destacados", {}, 560, "Acciones destacadas de EE. UU.")),
-    bloqueWidget("Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
-    bloqueWidget("Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
-    bloqueWidget("Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")),
-    bloqueWidget("Criptomonedas: mapa de calor (fuera del Reto)", marcoWidget("mapa-cripto", {}, 520, "Mapa de calor de criptomonedas")));
+    bloqueWidget("8 · Cotizaciones por grupo (índices, divisas, bonos en ETF, materias primas)", marcoWidget("cotizaciones", {}, 520, "Cotizaciones por grupo")),
+    bloqueWidget("9 · Mapa de calor de ETF de EE. UU. por tipo de activo", marcoWidget("mapa-etf", {}, 560, "Mapa de calor de ETF")),
+    bloqueWidget("10 · Divisas: tipos de cambio cruzados", marcoWidget("divisas", {}, 400, "Tipos de cambio cruzados")),
+    bloqueWidget("11 · Divisas: mapa de calor de variaciones", marcoWidget("mapa-divisas", {}, 400, "Mapa de calor de divisas")),
+    bloqueWidget("12 · Criptomonedas: mapa de calor (fuera del Reto)", marcoWidget("mapa-cripto", {}, 520, "Mapa de calor de criptomonedas")),
+    bloqueWidget("13 · Criptomonedas: tabla del mercado (fuera del Reto)", marcoWidget("cripto-mercado", {}, 520, "Mercado de criptomonedas")));
 }
 
 function fichaTradingView(simbolo) {
@@ -2670,7 +2672,7 @@ async function cargarBacktesting() {
         h("div", { clase: "formulario" },
           selectorSimple(B.estrategia, Object.entries(meta.estrategias).map(([k, e]) => [k, `${e.nombre} · v${e.version}`]), (x) => { B.estrategia = x; B.parametros = {}; cargarBacktesting(); }, "Estrategia"),
           ...params, fecha("desde", "Desde"), fecha("hasta", "Hasta"), h("label", {}, "Deslizamiento (pb) ", desl),
-          botonAccion("Correr backtest", "boton--primario", async (b) => {
+          botonAccion("Calcular backtest", "boton--primario", async (b) => {
             ocupado([b], true);
             try { pintarBacktest(await api("/api/backtests", { method: "POST", json: B })); cargarHistorialBt(); }
             catch (e) { document.getElementById("backtest-resultado").replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
@@ -2780,60 +2782,6 @@ function pintarGex(d) {
   return h("div", {}, encabezado, avisoOi, cont);
 }
 
-/* ---------- Laboratorio de alfa: permutación de signos por bloques ---------- */
-const lab = { ejemplo: null };
-function ejemploSintetico() {  // datos INVENTADOS con semilla fija (mulberry32 + Box-Muller); no son rendimientos de nadie
-  let a = 20261016;
-  const u = () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-  const z = () => Math.sqrt(-2 * Math.log(u() || 1e-12)) * Math.cos(2 * Math.PI * u());
-  const filas = ["benchmark,estrategia_sin_exceso_sintetica,estrategia_con_exceso_sintetica"];
-  for (let i = 0; i < 160; i++) {
-    const b = 0.0004 + 0.01 * z();
-    filas.push([b, b + 0.006 * z(), b + 0.0012 + 0.006 * z()].map((x) => x.toFixed(6)).join(","));
-  }
-  return filas.join("\n");
-}
-function cargarLaboratorio() {
-  const ta = h("textarea", { rows: 9, spellcheck: "false", "aria-label": "Rendimientos netos emparejados en CSV", clase: "area-csv", placeholder: "benchmark,mi_estrategia\n0.0042,0.0051\n-0.0031,-0.0012" });
-  ta.value = lab.ejemplo || "";
-  const archivo = h("input", { type: "file", accept: ".csv,text/csv", "aria-label": "Archivo CSV de rendimientos" });
-  archivo.addEventListener("change", async () => { if (archivo.files[0]) { ta.value = await archivo.files[0].text(); lab.ejemplo = null; } });
-  const campo = (etq, nombre, valor, extra = {}) => h("label", {}, `${etq} `, h("input", { type: "number", name: nombre, value: valor, step: "any", ...extra }));
-  const salida = h("div", { "aria-live": "polite" });
-  const ejemplo = botonAccion("Cargar ejemplo SINTÉTICO", "boton--secundario", () => { lab.ejemplo = ejemploSintetico(); ta.value = lab.ejemplo; salida.replaceChildren(); });
-  const form = h("form", { clase: "tarjeta" },
-    h("p", { clase: "ayuda", texto: "Pegue o cargue un CSV con encabezado: una columna «benchmark» (o «referencia»), una o más columnas de estrategia y, opcionalmente, «fecha». Rendimientos simples NETOS de costos, en decimal (0.01 = 1 %), emparejados por fecha. Máx. 5 000 filas y 20 estrategias." }),
-    h("div", { clase: "fila-controles" }, archivo, ejemplo), ta,
-    h("div", { clase: "fila-controles" }, campo("Bloque (vacío = automático)", "bloque", "", { min: 1, step: 1 }), campo("Volteos B", "B", 5000, { min: 199, max: 20000, step: 1 }),
-      campo("Semilla", "semilla", 12345, { min: 0, step: 1 }), campo("Nivel α", "alpha", 0.05, { min: 0.001, max: 0.49 }),
-      campo("Hipótesis exploradas (≥ estrategias)", "exploradas", "", { min: 1, step: 1 })),
-    h("button", { type: "submit", clase: "boton boton--primario", texto: "Ejecutar prueba" }));
-  form.addEventListener("submit", async (ev) => {
-    ev.preventDefault();
-    const boton = form.querySelector('button[type="submit"]'), f = form.elements;
-    ocupado([boton], true);
-    try {
-      const r = await api("/api/laboratorio/permutacion", { method: "POST", json: { csv: ta.value, bloque: f.bloque.value || null, B: Number(f.B.value), semilla: Number(f.semilla.value),
-        alpha: Number(f.alpha.value), hipotesis_exploradas: f.exploradas.value || null } });
-      salida.replaceChildren(pintarPermutacion(r, lab.ejemplo !== null && ta.value === lab.ejemplo));
-    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([boton], false); }
-  });
-  limpiar("laboratorio-contenido", h("div", { clase: "aviso-caja", role: "note", texto: "Preregistre hipótesis y variantes antes de mirar resultados; valide con walk-forward con purga/embargo y un holdout; use solo rendimientos netos de costos. Un p < 0.05 aislado no es alfa probado." }), form, salida);
-  seccionPreregistro(ta, form).then((x) => document.getElementById("laboratorio-contenido").append(x));
-}
-function pintarPermutacion(r, sintetico) {
-  return h("div", { clase: "tarjeta" },
-    sintetico ? h("p", {}, chip("sintetico", "DATOS SINTÉTICOS"), " Ejemplo inventado para ver cómo funciona la prueba; no son rendimientos reales de ninguna estrategia.") : null,
-    h("h2", { texto: "Resultado" }),
-    h("p", { clase: "ayuda", texto: `${r.hipotesis}. Estadístico: ${r.estadistico}. Método: ${r.metodo}.` }),
-    h("div", { clase: "kpis" }, kpi("Observaciones", String(r.n)), kpi("Bloque / bloques", `${r.bloque} / ${r.bloques}`), kpi("Volteos B", String(r.B)),
-      kpi("Semilla", String(r.semilla)), kpi("p mínimo posible", num(r.p_minimo)), kpi("Familia (Holm)", `${r.familia} → ${r.familia_total_holm}`)),
-    tabla([{ t: "Estrategia", f: (x) => x.estrategia }, { t: "Exceso medio por periodo", f: (x) => `${(x.exceso_medio * 100).toFixed(3)} %`, num: true },
-      { t: "p", f: (x) => num(x.p), num: true }, { t: "p Holm", f: (x) => num(x.p_holm), num: true },
-      { t: `Holm ≤ ${num(r.alpha)}`, f: (x) => (x.supera_alpha_holm ? "Sí" : "No") }, { t: "Lectura", f: (x) => x.lectura }], r.resultados, { caption: "Hipótesis unilateral: exceso medio neto > 0" }),
-    h("h3", { texto: "Advertencias y supuestos" }), h("ul", {}, r.advertencias.map((a) => h("li", { texto: a }))),
-    h("p", { clase: "ayuda", texto: `Huella sha256 de entradas y parámetros (reproducibilidad): ${r.huella_sha256}` }));
-}
 
 /* ---------- Plan intradía defensivo (informativo) ---------- */
 const intradia = { perdida: "" };
@@ -2932,53 +2880,6 @@ function seccionSkylit() {
     h("div", { clase: "fila-controles" }, archivo, h("a", { href: "/api/flujo/skylit/plantilla", clase: "boton boton--secundario", texto: "Descargar plantilla" }), boton), ta, salida);
 }
 
-/* ---------- Laboratorio: preregistro y holdout de un solo uso ---------- */
-async function seccionPreregistro(taCsv, formParams) {
-  const t = (n, etq, max, filas = 1) => h("label", { clase: "campo-bloque" }, `${etq} `, filas > 1 ? h("textarea", { name: n, rows: filas, maxlength: max }) : h("input", { name: n, maxlength: max }));
-  const salida = h("div", { "aria-live": "polite" });
-  const lista = h("div", {});
-  const form = h("form", { clase: "tarjeta" }, h("h2", { texto: "1. Preregistro (antes de mirar resultados)" }),
-    h("p", { clase: "ayuda", texto: "Fija hipótesis, estrategias, costos, fuentes, cómo se estimaron los parámetros (walk-forward), holdout y embargo. Usa B, semilla, α, bloque e hipótesis exploradas del formulario de arriba. Queda guardado con huella sha256 y fecha." }),
-    t("nombre", "Nombre", 80), t("hipotesis", "Hipótesis", 600, 2), t("benchmark", "Benchmark", 120), t("costos", "Costos incluidos", 400, 2),
-    t("fuentes", "Fuentes y licencia de los datos", 600, 2), t("walk_forward", "Walk-forward y purga usados para generar los rendimientos", 600, 2),
-    t("estrategias", "Estrategias (nombres de columna, separados por coma)", 400),
-    h("div", { clase: "fila-controles" }, h("label", {}, "Holdout (fracción final) ", h("input", { type: "number", name: "holdout", value: 0.3, min: 0.1, max: 0.5, step: 0.05 })),
-      h("label", {}, "Embargo (observaciones) ", h("input", { type: "number", name: "embargo", value: 5, min: 0, max: 250, step: 1 }))),
-    h("button", { type: "submit", clase: "boton boton--primario", texto: "Guardar preregistro" }));
-  const pintarEvaluacion = (r) => salida.replaceChildren(h("div", { clase: "tarjeta" },
-    r.holdout_ya_usado ? h("div", { clase: "aviso-caja", role: "status", texto: r.aviso_reuso }) : null,
-    h("div", { clase: "kpis" }, kpi("Exploración", String(r.tramos.exploracion)), kpi("Embargo", String(r.tramos.embargo)), kpi("Holdout", String(r.tramos.holdout))),
-    h("p", { clase: "ayuda", texto: r.lectura }), h("h3", { texto: "Holdout (confirmatorio)" }), pintarPermutacion(r.holdout, false),
-    h("h3", { texto: "Exploración (descriptiva)" }), pintarPermutacion(r.exploracion, false),
-    h("p", { clase: "ayuda", texto: `Huella del preregistro: ${r.huella_preregistro}` })));
-  const pintarLista = async () => {
-    const d = await api("/api/laboratorio/experimentos");
-    lista.replaceChildren(h("h2", { texto: "2. Evaluar con el CSV de arriba (el holdout se usa una sola vez)" }),
-      tabla([{ t: "#", f: (x) => x.id, num: true }, { t: "Nombre", f: (x) => x.nombre }, { t: "Preregistrado", f: (x) => horaCdmx(x.creado_en) },
-        { t: "Holdout", f: (x) => (x.evaluado_en ? `usado ${horaCdmx(x.evaluado_en)}` : "sin usar") },
-        { t: "", f: (x) => h("span", {}, botonAccion(x.evaluado_en ? "Ver resultado" : "Evaluar", "boton--secundario", async (b) => {
-          ocupado([b], true);
-          try { pintarEvaluacion(await api(`/api/laboratorio/experimentos/${x.id}/evaluar`, { method: "POST", json: { csv: taCsv.value } })); pintarLista(); }
-          catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
-        }), " ", h("a", { href: `/api/laboratorio/experimentos/${x.id}/exportar`, clase: "boton boton--texto", texto: "Exportar JSON" })) }],
-      d.experimentos, { vacio: "Sin preregistros." }));
-  };
-  form.addEventListener("submit", async (ev) => {
-    ev.preventDefault();
-    const f = form.elements, p = formParams.elements, b = form.querySelector('button[type="submit"]');
-    ocupado([b], true);
-    try {
-      const r = await api("/api/laboratorio/preregistro", { method: "POST", json: { nombre: f.nombre.value, hipotesis: f.hipotesis.value, benchmark: f.benchmark.value,
-        costos: f.costos.value, fuentes: f.fuentes.value, walk_forward: f.walk_forward.value, estrategias: f.estrategias.value.split(",").map((s) => s.trim()).filter(Boolean),
-        holdout: Number(f.holdout.value), embargo: Number(f.embargo.value), B: Number(p.B.value), semilla: Number(p.semilla.value), alpha: Number(p.alpha.value),
-        bloque: p.bloque.value || null, exploradas: p.exploradas.value || null } });
-      notificar(`Preregistro #${r.id} guardado (huella ${r.huella_preregistro.slice(0, 12)}…).`);
-      pintarLista();
-    } catch (e) { salida.replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
-  });
-  try { await pintarLista(); } catch (e) { lista.replaceChildren(errorCaja(e)); }
-  return h("div", {}, form, h("div", { clase: "tarjeta" }, lista), salida);
-}
 /* ---------- Asistente (terminal/asistente.py): datos, documentación y notas del usuario ---------- */
 const asistenteUI = { mensajes: [] };
 const NOMBRE_MOTOR = { claude: "Claude", ollama: "Ollama (local)", local: "respuestas locales", documentacion: "documentación y notas", comando: "comando", notas: "notas" };
@@ -3019,9 +2920,8 @@ document.getElementById("asistente-texto").addEventListener("keydown", (ev) => {
 document.querySelectorAll("[data-pregunta]").forEach((b) => b.addEventListener("click", () => preguntarAsistente(b.dataset.pregunta)));
 CARGAS["tab-asistente"] = () => { pintarAsistente(); document.getElementById("asistente-texto").focus(); };
 ATAJOS.ASI = "tab-asistente";
-CARGAS["tab-laboratorio"] = () => cargarLaboratorio();
 CARGAS["tab-intradia"] = () => cargarIntradia();
-Object.assign(ATAJOS, { LAB: "tab-laboratorio", INT: "tab-intradia", GEX: "tab-optionflow" });
+Object.assign(ATAJOS, { INT: "tab-intradia", GEX: "tab-optionflow" });
 
 /* Microestructura sin inventar datos. */
 function pintarMicroestructura(d) {

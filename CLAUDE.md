@@ -42,6 +42,8 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado: actualización acotada del 31-oct-2026
 
+Terminal profesional (1-nov): sistema negro/gris/blanco con rojo de identidad y contraste medido (`DESIGN.md`); Mesa con paleta de comandos, franja de Seguimiento, cuadrícula reordenable/ancha con migración, y Ficha, Noticias, Macro/resumen y Calendario nativos de solo lectura (`terminal/mesa_datos.py`). Resultados empresariales BLOQUEADOS (sin fuente); Excel de Markowitz rediseñado sin cambios numéricos, revisión visual en Excel pendiente. Ver `docs/terminal-pro-20261101.md`.
+
 Procesos: `docs/continuacion-procesos-20261031.md`. Respaldo offline probado, reloj inyectado y aviso por emisora. Reasignación de proveedores no aplicada; GEX condicionado a evidencia posterior al 2-nov. Pruebas y límites en el informe, sin trades ni Telegram.
 
 Optimización offline medida: `docs/optimizacion-medida-20261031.md`. Catálogo ligero, búsqueda por teclado y paneles conservados; sin caché ni fallback de precios nuevo. Límites y resultados de tres repeticiones documentados.
@@ -212,3 +214,8 @@ Navegación común: `web/static/navegacion.{json,mjs,css}` y selector de las 24 
 ### NQ — aporte Codex20/oct/2026
 
 Ficha añadida a Aprender y recursos, con guía, prerregistro y resultados agregados. Replay offline en futuros-lab:6901barras,5RTH completas,4sesiones desarrollo,0trades;6tests específicos aprobados. Sin ventaja demostrada; sin forward ni prueba real de OCO. No se alteró la interfaz ni se desplegó Quantower. Coordinación con Claude mediante documento local; expediente futuros-lab/entregables/nq-investigacion-20261020.
+
+
+### Formación Python — 1-nov-2026
+
+Curso python-training de JPMorgan clonado y fijado; prácticas propias offline accesibles desde Cuaderno. Ver docs/integracion-python-training-20261101.md. No cambia modelos ni ejecución; no instalar ni ejecutar automáticamente notebooks upstream con APIs.

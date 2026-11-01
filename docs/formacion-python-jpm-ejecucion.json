@@ -1,0 +1,4 @@
+{
+  "actinver": "{'observaciones': 3, 'desde': '2026-01-01', 'hasta': '2026-01-03', 'fuente': 'ejemplo_local', 'tipo_dato': 'sintetico', 'rendimiento_tramo': -0.01, 'volatilidad_entre_observaciones': 0.1414213562373095, 'caida_maxima': -0.1, 'nota': 'Estudio descriptivo; sin anualización, interpolación ni ventaja demostrada.'}\r\n",
+  "futuros": "{'valido': True, 'filas': 2, 'raiz': 'NQ', 'tick': 0.25, 'errores': [], 'evidencia_forward': False, 'nota': 'Solo integridad offline; no comprueba continuidad, alfa ni ejecución.'}\r\n"
+}

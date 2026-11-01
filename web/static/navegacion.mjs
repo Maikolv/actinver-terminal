@@ -8,12 +8,23 @@ export function destinoLocal(valor, origen) {
 if(typeof document!=='undefined') {
   const nav=document.querySelector('.nav-global');
   const selector=document.getElementById('destino-global');
+  // Reloj de plazas y cinta de indicadores macro (TradingView, con su retraso): la misma barra en todas las áreas.
+  const reloj=document.createElement('span');reloj.className='nav-global__reloj';reloj.setAttribute('aria-label','Hora en Ciudad de México, Nueva York y Londres');
+  const plazas=[['CDMX','America/Mexico_City'],['NY','America/New_York'],['LDN','Europe/London']];
+  const marcar=()=>reloj.replaceChildren(...plazas.flatMap(([n,z],i)=>{const b=document.createElement('b');b.textContent=n;
+    return [...(i?[' · ']:[]),b,' '+new Date().toLocaleTimeString('es-MX',{timeZone:z,hour:'2-digit',minute:'2-digit',hour12:false})];}));
+  marcar();setInterval(marcar,30000);
+  nav.querySelector('.nav-global__interior')?.append(reloj);
+  const cinta=document.createElement('iframe');cinta.className='cinta-global';cinta.loading='lazy';
+  cinta.title='Cinta de indicadores: índices, VIX, bono a 10 años, dólar, oro, petróleo y bitcoin (TradingView, con retraso)';
+  cinta.src=`/widget/cinta-macro?tema=${matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}`;
+  nav.after(cinta);
   function actualizar() {
     const tab=document.querySelector('[role="tab"][aria-selected="true"]');
     const actual=location.pathname==='/' ? '/?vista='+(tab?.id || new URLSearchParams(location.search).get('vista') || 'tab-resumen') : location.pathname;
     selector.value=[...selector.options].some(o=>o.value===actual)?actual:location.pathname;
     for(const enlace of nav.querySelectorAll('a')) {
-      const activa=enlace.getAttribute('href')===actual || (enlace.getAttribute('href')==='/' && location.pathname==='/' && actual!=='/?vista=tab-laboratorio');
+      const activa=enlace.getAttribute('href')===actual || (enlace.getAttribute('href')==='/' && location.pathname==='/');
       if(activa)enlace.setAttribute('aria-current','page');else enlace.removeAttribute('aria-current');
     }
   }

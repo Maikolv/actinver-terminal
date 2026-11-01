@@ -1,0 +1,10 @@
+Servidor 127.0.0.1:8766, TERMINAL_SIN_MOTOR=1, base real data/terminal.db, 3 repeticiones curl (s)
+/api/estado: 0.062711 0.024046 0.024245
+/api/lista-seguimiento: 0.019643 0.015869 0.015223
+/api/ficha/SIC:NVDA: 0.026114 0.016478 0.016832
+/api/visualizaciones/serie/SIC:NVDA: 0.069475 0.034147 0.038996
+/api/centro-investigacion: 0.052073 0.054032 0.056228
+/api/mercado: 0.304331 0.185967 0.195496
+/api/universo?solo_catalogo=true: 0.045477 0.034094 0.034611
+Mesa (sin disposición guardada, preset mercado, 4 paneles cerrados): DCL 176 ms, load 212 ms, 9 recursos, 38 KB, heap 4 MB,
+fetch: navegacion.json 12 ms, universo?solo_catalogo 55 ms.

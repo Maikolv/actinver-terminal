@@ -24,3 +24,7 @@
 .cuaderno-pie { border-top: 1px solid var(--borde); margin-top: 24px; padding-top: 16px; color: var(--texto-2); font-size: .85rem; }
 @media (max-width:600px) { .cuaderno .grid { grid-template-columns: 1fr; } .cuaderno .acciones .boton { width: 100%; } }
 @media print { .cuaderno { --fondo: white; --superficie: white; --superficie-2: white; --texto: black; --texto-2: #333; --borde: #999; } .cuaderno nav, .cuaderno button, .cuaderno .saltar { display: none; } .cuaderno main { padding: 16px 0; } .cuaderno-seccion { break-inside: avoid; } }
+.cuaderno .precarga { margin-top: 4px; font: inherit; font-weight: 400; font-size: .85rem; min-height: 36px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); padding: 6px 8px; max-width: 100%; }
+.cuaderno .escenario { min-width: min(100%, 320px); }
+.cuaderno .escenario select { min-height: 40px; font: inherit; }
+.cuaderno textarea, .cuaderno input { font-weight: 400; }

@@ -1,0 +1,16 @@
+Mismo servidor (127.0.0.1:8766, TERMINAL_SIN_MOTOR=1), misma base, mismo escenario (Mesa sin disposición guardada, preset Mercado).
+Rutas nuevas (3 repeticiones curl, s; código:tiempo):
+/api/mesa/macro: 200:0.064580 200:0.023767 200:0.039028
+/api/mesa/resumen: 200:0.043294 200:0.034274 200:0.034945
+/api/mesa/noticias: 200:0.025185 200:0.021842 200:0.020287
+/api/mesa/noticias?simbolo=SIC:NVDA: 200:0.033707 200:0.017605 200:0.061841
+/api/mesa/resultados: 200:0.005341 200:0.005935 200:0.004987
+Mesa (después): carga 1 (fría tras reinicio de la pestaña): DCL 168 ms, load 178 ms, 12 recursos, 49 KB, heap 4 MB;
+  fetch navegacion.json 16 ms, universo 128 ms, mesa/macro 50, mesa/resumen 66 (UNA petición compartida por 2 paneles),
+  mesa/resultados 14, lista-seguimiento 28.
+  cargas 2 y 3 (tibias): DCL 136 / 85 ms, load 146 / 94 ms, universo 61 / 55 ms.
+Antes: una carga, DCL 176 ms, load 212 ms, 9 recursos, 38 KB, heap 4 MB.
+Lectura: +3 recursos y +11 KB por el contenido nativo (antes los paneles no mostraban datos locales). La primera carga de
+universo subió a 128 ms por concurrencia con las rutas nativas; en cargas tibias vuelve a 55–61 ms. Sin cambio de memoria
+medible. Límite: pocas repeticiones, misma PC, sin perfiles de CPU; no se atribuye mejora de velocidad al parche.
+navegacion.json se pide una vez al cargar (la paleta lo pide solo al primer uso).
