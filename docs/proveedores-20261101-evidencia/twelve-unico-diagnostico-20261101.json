@@ -1,0 +1,14 @@
+{
+  "corte": "2026-11-01T19:53:50.797219+00:00",
+  "instrumento": "BMV:ALPEK",
+  "resultado": {
+    "estado": "bloqueado",
+    "consultas": 0,
+    "motivo": "Sin clave en un mecanismo permitido."
+  },
+  "solicitudes": 0,
+  "http": null,
+  "codigo_api": null,
+  "precios_guardados": false,
+  "habilitado_automaticamente": false
+}

@@ -1,5 +1,7 @@
 # Proveedores con acceso gratuito y herramientas visibles en la terminal
 
+**Actualización 2-nov-2026:** solo recursos gratuitos. Twelve: clave importada y validada mediante una consulta de estado, sin cotizaciones. XMEX/BMV exige Pro y no se activa. Barchart de contrato y API de Claude también bloqueados por política vigente. [Condiciones, evidencia y controles](politica-proveedores-gratuitos-20261102.md).
+
 Revisión general: **16-oct-2026**; alternativas para Skylit revisadas **18-oct-2026**, con la documentación oficial enlazada en cada fila. Cuando una página no permite confirmar
 una condición, la celda lo dice. Ningún plan se contrató ni se creó ninguna cuenta para esta revisión. Los
 conectores marcados «implementado» ya existían en la terminal y se reutilizan.
@@ -170,6 +172,16 @@ transacciones reales. Esta revisión no demuestra que no exista solución en nin
 
 ## 9. Mesa: brechas F1–F6 (1-nov-2026)
 
+Avance operativo posterior: `avance-gratuitos-20261101.md`. SEC ya tiene 100 publicaciones
+reales de cuatro emisoras, con XOM actual CIK 2115436. Treasury 30 años tiene 24 observaciones
+de la publicación original H.15, sin clave, y fuente fed_h15. No confundir esa cobertura con
+verificación de la API FRED ni publicaciones SEC con BPA u hora del anuncio.
+
+Revisión externa posterior: `confirmacion-externa-proveedores-20261101.md`. SP1 aparece
+como INPC en publicaciones del propio Banxico, aún sin GET de metadatos actual validado.
+XMEX general no se considera incluido en Basic: ficha oficial Pro+/Venture+, EOD y
+un símbolo de prueba. Ninguna de estas confirmaciones documentales activa conectores.
+
 Implementación y evidencia: `docs/proveedores-mesa-20261101.md` y
 `docs/proveedores-20261101-evidencia/`. Pruebas HTTP simuladas no acreditan acceso real al plan.
 No se leyó `.env`. No había credenciales ni identificación SEC en las variables permitidas.
@@ -177,13 +189,160 @@ Los tres conectores nuevos están **apagados por defecto**; SIN DATO cuando falt
 
 | ID | API oficial y dato | Estado y autenticación | Cupo y disponibilidad | Límites y pendientes |
 |---|---|---|---|---|
-| F2 | [FRED DGS30](https://fred.stlouisfed.org/series/DGS30), [API](https://fred.stlouisfed.org/docs/api/fred/series_observations.html): Treasury 30 años, diario, porcentaje | DGS30 añadido junto a DGS2/DGS10; FRED_API_KEY existente. Identidad documentada oficialmente; descarga autenticada no comprobada | Cinco solicitudes por ciclo, antes cuatro; conserva cupo local existente. Publicación diaria, no cotización intradía | Conocimiento desde descarga, periodo y huella; no presume licencia de redistribución |
+| F2 | [FRED DGS30](https://fred.stlouisfed.org/series/DGS30) y [publicación original H.15](https://www.federalreserve.gov/releases/h15/): Treasury 30 años, diario, porcentaje | API FRED añadida, acceso con clave aún sin verificar. Vía independiente gratuita: XML H.15 + cruce DDP/FRED oficiales; 24 observaciones reales, fuente fed_h15 | H.15: dos GET de publicaciones + dos HEAD de tamaño, sin cuenta ni clave. Último periodo 29-oct-2026, conocido desde importación el 1-nov. Sin polling nuevo | No es respuesta API FRED ni cotización vigente; fuente original, unidad/plazo/identidad, huellas y disponibilidad conservadas; no sustituye periodos más recientes por más antiguos |
 | F3 | [Banxico SIE](https://www.banxico.org.mx/SieAPIRest/service/v1/): tasa objetivo | SF61745 citado en documentación oficial; **no confirmado por GET de metadatos**: HTTP 400 sin token. BANXICO_TOKEN, cabecera Bmx-Token | Política local, no cuota oficial acreditada: 20/día y 8/min; catálogo y datos, una petición cada uno; sin reintentos, Retry-After persistente | Verifica título/identidad antes de pedir datos. Disponible desde descarga, nunca desde periodo histórico; apagado |
 | F6 | [Banxico SIE](https://www.banxico.org.mx/SieAPIRest/service/v1/): bono M 10 años | Mismo conector/credencial que F3; **ID no confirmado**, no adivinado | Comparte cupos de F3; publicación histórica, no rendimiento vigente | Exige título bono M/tasa fija y 10 años; rechaza UDIBONOS u otro plazo. Falta catálogo y GET oficial; SIN DATO |
 | F4 | [Banxico SIE](https://www.banxico.org.mx/SieAPIRest/service/v1/): INPC, índice mensual | Ruta optativa con BANXICO_TOKEN; **ID no confirmado**. SP1 dio HTTP 400 sin token; no se configura. No requiere credencial nueva INEGI | Comparte cupos de F3; periodo mensual separado del conocimiento | Exige título completo del índice; variación no sustituye nivel. Apagado hasta identificar serie en catálogo y confirmar por API; no se solicita token |
-| F1a | [SEC submissions](https://www.sec.gov/search-filings/edgar-application-programming-interfaces): publicación de 8-K/8-K-A Item 2.02 | Reutiliza ClienteSEC y SEC_USER_AGENT, identificación con contacto, no clave API. Verifica símbolo/CIK en respuesta | Cliente existente 5/s; política local adicional 5/min y 20/día; una consulta/CIK. Cero consultas reales por faltar identificación | Aceptación EDGAR no prueba hora del anuncio ni BPA. SIN DATO en campos no estructurados; reacción exige anuncio verificado; apagado |
+| F1a | [SEC submissions](https://www.sec.gov/search-filings/edgar-application-programming-interfaces): publicación de 8-K/8-K-A Item 2.02 | Verificados MU/723125, NVDA/1045810, AMD/2488 y XOM/2115436; 100 publicaciones reales. ClienteSEC con contacto Git existente usado solo en memoria, sin .env ni clave API | Seis GET reales: cuatro iniciales, catálogo oficial y XOM actual. CIK histórico 34088 rechazado; fuentes automáticas siguen apagadas. Cupo local 5/min y 20/día | Aceptación EDGAR no prueba hora del anuncio ni BPA. Estimación/reportado/revisión/reacción sin fuente permanecen SIN DATO |
 | F1b | [Alpha Vantage EARNINGS_CALENDAR](https://www.alphavantage.co/documentation/#earnings-calendar): fecha prevista, estimación BPA y moneda | ALPHAVANTAGE_API_KEY; apagado, plan_verificado=false. **Cero consultas reales**; inclusión en plan gratuito no acreditada | Techo local 25/día compartido con alpha_vantage; calendario 1/min, CSV de 3 meses, actualización diaria | Guarda conocimiento y todas las revisiones; excluye previsión posterior al anuncio. No entrega por sí solo BPA realizado/revisión/hora. Prueba autenticada única pendiente |
 | F5 | [Twelve Data XMEX](https://twelvedata.com/exchanges/XMEX), [precios](https://twelvedata.com/pricing): cierres BMV | Diagnóstico manual de una petición a símbolo verificado con TWELVEDATA_API_KEY. **Cero consultas reales**; no se modifica cola/configuración productiva | Basic anunciado 8 créditos/min y 800/día; diagnóstico conserva menor cupo local de 700/día y 8/min; EOD | Ficha XMEX indica Pro+/Venture+ y GMEXICOB de prueba. Una excepción no prueba cobertura gratuita general ni nivel de la cuenta. Sin acceso acreditado no se activa respaldo |
 
 La documentación es evidencia del contrato y condiciones anunciadas, no de los permisos de una cuenta.
 Ninguna fuente de esta tabla sustituye ticks/DOM CME; gratis no implica licencia de redistribución.
+
+### Actualización operativa posterior del 1-nov-2026
+
+Esta actualización reemplaza los estados de acceso pendientes de la tabla anterior,
+sin borrar la evidencia histórica. El usuario autorizó el cargador habitual de claves
+solo en memoria y ocho consultas gratuitas; se consumieron las ocho. No se activan fuentes.
+
+| ID | Evidencia real | Límite que permanece |
+|---|---|---|
+| F2 | FRED DGS30: un GET HTTP 200, 23 observaciones guardadas | Publicación histórica, no cotización actual; H.15 conserva identidad separada |
+| F3 | SIE SF61745: catálogo y datos HTTP 200, 24 observaciones | Tasa objetivo publicada; conocimiento desde captura |
+| F6 | SIE SF30057: catálogo y datos HTTP 200, 21 observaciones | Rendimiento promedio mensual a 10 años, nunca diario/vigente |
+| F4 | SIE SP1: catálogo HTTP 200, índice general nacional mensual confirmado por ID, título legado y cifra Indices | Datos todavía no descargados. Se corrigió el validador con pruebas; no se inventaron observaciones |
+| F1b | EARNINGS_CALENDAR: un GET HTTP 200, tres estimaciones guardadas | BPA reportado EARNINGS no consultado aún; código y revisiones observadas solo probados offline |
+
+Evidencia saneada: `proveedores-20261101-evidencia/gratis-verificacion-autorizada-20261101.json`
+y `sie-sp1-catalogo-20261101.json`. Detalle y siguientes verificaciones:
+`avance-gratuitos-20261101.md`. Se mantienen los cupos locales existentes; la respuesta
+HTTP 200 no acredita redistribución, datos en tiempo real ni permisos perpetuos del plan.
+
+### Seis consultas adicionales autorizadas y realizadas (1-nov-2026, 12:55–12:58 CDMX)
+
+Evidencia: `proveedores-20261101-evidencia/gratis-seis-adicionales-20261101.json`.
+El mismo cargador habitual se usó únicamente en memoria, sin mostrar ni copiar claves.
+Un contador impuso un máximo total de seis GET, sin reintentos ni redirecciones;
+las consultas Alpha se separaron más de 60 segundos y respetaron el cupo local compartido.
+
+- **F4 / SP1:** metadatos y datos HTTP 200; 24 índices mensuales guardados, de octubre
+  de 2024 a septiembre de 2026. Unidad índice, no porcentaje ni inflación interanual
+  calculada. Se confirmó nuevamente el título legado y la identidad antes de guardar.
+- **F1 / EARNINGS:** cuatro GET HTTP 200; ocho BPA reportados por cada MU, NVDA, AMD y
+  XOM (32 en total). Primeras capturas locales, no necesariamente el valor original del
+  anuncio. La API no informó moneda ni base contable en el contrato recibido: se muestran
+  como no informadas, sin asumir USD ni calcular sorpresa.
+- El campo `reportTime` aporta una ventana pre/post-market, no una hora exacta.
+  Se conserva y presenta la procedencia Alpha por separado. La reacción permanece SIN DATO.
+- No se observaron revisiones entre capturas: revisión SIN DATO, sin fabricar una
+  reformulación. El registro conserva cambios futuros observados con su conocimiento real.
+
+No se habilitaron conectores automáticos ni se modificaron precios, modelos o estrategias.
+Estas respuestas puntuales no prueban derechos de redistribución ni disponibilidad perpetua.
+
+### Variación histórica diaria con datos existentes
+
+El contrato admite ventana pre/post-market. Cuando EARNINGS.reportTime la declara en
+una observación API, el calendario puede mostrar variación descriptiva con los dos
+cierres consecutivos XNYS correspondientes, en USD y de una sola fuente, conocidos
+al corte y con la sesión final ya cerrada. No exige inventar hora exacta ni usar
+aceptación SEC. Se rechazan barras sintéticas, retrasadas, futuras o de monedas/fuentes
+mezcladas y no se rellena una sesión ausente con otra posterior. No aísla splits,
+dividendos ni causalidad; no es una señal de trading. Se verificaron 32 variaciones
+offline sin nuevas consultas: `variacion-diaria-auditoria-20261101.json` en la carpeta
+de evidencia. La hora exacta y revisiones no observadas siguen SIN DATO.
+
+### F5: diagnóstico autorizado sin credencial disponible
+
+Se intentó preparar la comprobación única para BMV:ALPEK. El cargador habitual no
+aportó TWELVEDATA_API_KEY: **0 llamadas HTTP**, sin dato guardado ni activación.
+`twelve-unico-diagnostico-20261101.json` registra ese resultado saneado. No se acredita
+rechazo de Basic ni acceso de cuenta. El permiso de una llamada sigue sin consumirse;
+no se crea una cuenta ni se solicita una clave nueva. La cobertura documental de XMEX
+y la futura respuesta autenticada son evidencias diferentes, que no se sustituyen.
+
+### Respaldo mensual FRED/BLS — verificación adicional
+
+Tres consultas autorizadas, tres HTTP 200: UNRATE, PAYEMS y CPIAUCSL. Se guardaron
+81 observaciones, incluido CPI_YOY calculado con el mismo mes del año previo de la
+misma captura. Fuente fred_macro, conocimiento desde descarga, no vintage histórico.
+Identidad/unidades oficiales: https://fred.stlouisfed.org/series/UNRATE,
+https://fred.stlouisfed.org/series/PAYEMS y https://fred.stlouisfed.org/series/CPIAUCSL.
+Evidencia: fred-macro-respaldo-20261101.json y macro-respaldo-lectura-20261101.json.
+No requiere cuenta/clave nuevas: usa FRED existente. No se habilita por defecto ni
+se añade a los conectores automáticos. La Mesa conserva BLS para meses iguales o más
+recientes y etiqueta FRED al usarlo; no sustituye una publicación fresca por otra vieja.
+
+La base habitual ya tenía BLS para septiembre: el respaldo no reemplazó sus datos.
+La petición pública BLS sin clave recibió HTTP 200 pero no confirmó el contrato
+completo; no se guardó ese intento ni se presenta como validación. No se evade un
+bloqueo ni se convierte una respuesta HTTP en cobertura acreditada.
+
+### Alternativas para el faltante BMV: resultado de revisión oficial
+
+| Proveedor | Acceso gratuito documentado | Cobertura BMV verificada en esta revisión | Acción |
+|---|---|---|---|
+| EODHD | 20 llamadas/día, 20/min y un año de historia en https://eodhd.com/pricing y https://eodhd.com/financial-apis/api-limits | Conector existente; su cuota no cubre por sí sola un refresco ilimitado | Reutilizar sin ampliar límites; no es una API nueva |
+| Twelve Data | Basic; XMEX https://twelvedata.com/exchanges/XMEX muestra Pro+/Venture+, EOD y un símbolo de prueba | Cuenta sin comprobar: no hay clave disponible; diagnóstico autorizado hizo 0 llamadas | Configuración manual de una clave existente si el usuario dispone de ella. No comprar ni crear cuenta automáticamente |
+| Marketstack | https://marketstack.com/pricing anuncia 100 consultas/mes, un año EOD, HTTPS y uso no comercial | No confirmada: información de exchanges no equivale a precios de XMEX en Free | No se implementa como proveedor BMV confirmado ni se activa. FAQ indexada menciona 1000, pero tarifa y FAQ abierta indican 100: no usar el límite mayor |
+| DataBursatil | No confirmada en fuente oficial accesible | Sitio oficial https://databursatil.com respondió 403 al lector | No eludirlo ni usar comentarios de terceros como licencia; verificación manual pendiente |
+
+Marketstack cuenta por símbolo, no solo por petición HTTP, según https://marketstack.com/faq.
+No se recomienda abrir otra cuenta como solución BMV sin confirmar primero mercado,
+permiso del plan y cuota. Nada de esta tabla sustituye ticks/DOM CME ni acredita datos
+en tiempo real, redistribución libre o una estrategia operativa.
+# Comprobación adicional BLS sin clave — 1-nov-2026
+
+Comprobación posterior del cliente ya implementado: `BLS.consultar`, sin credencial y con SQLite en memoria, completó una petición para 2024–2026. Resultado válido: 32 CPI, 32 desempleo, 33 empleo y 20 variaciones CPI interanuales; periodos 2024-01 a 2026-09. No se igualan artificialmente coberturas ni se cuentan M13 como meses. `proveedores-20261101-evidencia/bls-conector-real-20261101.json` registra el alcance y el consumo temporal de una petición. Código existente sin cambios; no se activó el conector ni se importaron observaciones a la base habitual. No acredita vintages históricos o el instante de publicación.
+
+Una petición oficial POST a `https://api.bls.gov/publicAPI/v2/timeseries/data/`, sin credenciales ni carga de entorno, confirmó REQUEST_SUCCEEDED y 63 observaciones mensuales (21 por CUSR0000SA0, LNS14000000 y CES0000000001) para 2025–2026. No se importaron datos ni se activaron conectores. Es cobertura macro estadounidense, sin profundidad de mercado; no sustituye tick/DOM CME ni acredita vintage o publicación exacta. La prueba no mide el cupo ni verifica otras ventanas. Evidencia: `proveedores-20261101-evidencia/bls-sin-clave-revision-20261101.json`; firma oficial: https://www.bls.gov/developers/api_signature_v2.htm. Se conserva el intento anterior HTTP 200 no confirmado como historial.
+
+
+### Finviz Elite
+
+La exportación que usa este conector corresponde a Elite y se excluye de la política gratuita. El monitor bloquea la actualización antes de la petición aunque exista un token configurado. La búsqueda de llamadas en terminal/ y tools/ encontró una sola ruta de producción, que pasa por ese bloqueo. Seis pruebas de test_finviz.py aprobadas con datos locales y HTTP simulado.
+
+### EODHD diferido y cierres
+
+El plan gratuito declara 20 llamadas diarias para uso personal sin tarjeta. El conector diferido comparte contador y pausa Retry-After con cierres. La regresión conjunta dio 74 aprobadas y una advertencia (pytest-cupo-eodhd-integrado.txt). El 3 de noviembre de 2026 se verificó el formato de la respuesta de AAPL.US con la clave pública demo, con marca de evento 13:54 UTC. Esa prueba no acredita acceso ni retraso efectivo para BMV. [Documentación oficial](https://eodhd.com/financial-apis/live-ohlcv-stocks-api).
+
+### Calendario económico del BLS
+
+Consulta manual gratuita de fechas de empleo e inflación de EE. UU., sin credenciales. La descarga oficial devolvió HTTP 403 para bls.ics desde esta PC. Mesa enlaza al calendario oficial incluso si la API local falla (Chromium aislado con HTTP 503 simulado). Esta alternativa cubre publicaciones del BLS. [Calendario oficial](https://www.bls.gov/schedule/).
+
+### Calendario de publicaciones BEA
+
+Fuente pública sin clave ni facturación. Mesa muestra una copia fechada, en UTC, de los próximos siete días. Las fechas pueden cambiar y se mantienen separadas de cifras publicadas y modelos. Para refrescar la copia ejecuta `uv run python tools/actualizar_calendario_bea.py` desde el repositorio. Si la descarga falla, se conserva el último corte. [Calendario oficial](https://www.bea.gov/news/schedule/icalendar).
+
+### SMARTRC 14: precios de valuación y cierres negociados
+
+La ficha pública de Actinver identifica SMARTRC 14 y publica un precio teórico fechado. El reporte diario describe rendimientos calculados con precios de valuación. Ambos sirven como referencia documental del fondo; no acreditan una serie de cierres negociados ni volumen. La oferta de Grupo BMV de Hechos Diarios y Precios de Cierre Mensual es de pago con tarjeta. El cuadro CF103 de Banxico ofrece indicadores de bolsa, no el histórico de esa emisión. Se conserva SIN DATO en Velas hasta verificar una serie autorizada de cierres para la clave exacta.
+
+- Ficha del fondo: https://portal.actinver.com/es/smartrc
+- Reporte de valuación: https://actinver.com/documents/d/actinver/reporte-diario
+- Productos de Grupo BMV: https://sibolsa.com/es/Grupo_BMV/Publicaciones_en_linea
+- Cuadro CF103: https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?accion=consultarCuadro&idCuadro=CF103
+
+**Vía local si ya se dispone de un archivo autorizado.** El importador existente admite
+la plantilla de precios con `fecha,instrumento_id,precio,moneda,tipo_dato`.
+Para cierres negociados de la serie 14, use `BMV:SMARTRC`, `MXN` y `cierre`;
+revise la previsualización antes de confirmar. El importador guarda el origen como
+`archivo` y puede reemplazar filas coincidentes de ese origen, por lo que conviene
+conservar aparte el documento de procedencia. Este formato aporta cierres fechados,
+sin OHLC intradía ni volumen. El precio teórico de la ficha no debe importarse como cierre.
+
+### Pausas de proveedores y regresión integrada
+
+Los clientes de contexto que heredan `ContextoAPI.json` pasan por `Adaptador._get`.
+BLS usa POST de lectura y registra `Retry-After` para HTTP 429 y 503. Comprueba
+la pausa antes de consumir cuota. La regresión integrada de BEA y BLS terminó
+con 915 aprobadas y una advertencia con el motor apagado. El cotejo de las rutas
+GET/POST directas en `terminal/adaptadores` y `terminal/centro_conectores.py`
+no equivale a verificar todos los clientes de `terminal/` ni la vigencia de sus datos.
+
+### Hora de distribución del comunicado de resultados de Micron
+
+MU, cuarto trimestre fiscal 2026, periodo terminado el 3 de septiembre. El comunicado emitido por Micron y distribuido por GlobeNewswire registra el 30 de septiembre de 2026 a las 16:01 ET (20:01 UTC), con precisión de minuto. Es la hora de distribución por ese canal, distinta del registro en SEC y de la conferencia. Evidencia para TP01-01, sin extrapolar a otros trimestres, emisoras o revisiones. Todavía no se ingiere como dato de Mesa.
+
+https://www.globenewswire.com/news-release/2026/09/30/3372366/0/en/micron-technology-inc-reports-record-fiscal-fourth-quarter-and-full-year-2026-results.html

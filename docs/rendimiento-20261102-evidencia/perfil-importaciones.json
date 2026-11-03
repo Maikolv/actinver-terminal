@@ -1,0 +1,37 @@
+{
+  "fecha": "2026-11-02T15:23:30.698517-06:00",
+  "python": "3.12.14",
+  "sistema": "Windows-11-10.0.26200-SP0",
+  "procesador": "AMD64 Family 23 Model 24 Stepping 1, AuthenticAMD",
+  "procesadores_logicos": 8,
+  "alcance": "Importación instrumentada, no arranque HTTP ni memoria de navegador.",
+  "cache": "Proceso nuevo por repetición; caché de disco Windows sin purgar.",
+  "fuentes": "Sin datos ni proveedores; base temporal vacía; conexiones prohibidas.",
+  "sha256_app": "bca60a15a885e5b27e3f583fcd4cf9e1aa2652fd8f563659ee79685788d584c2",
+  "repeticiones": [
+    {
+      "numero": 1,
+      "importacion_ms": 11961.182600003667,
+      "privada_bytes": 173035520,
+      "rss_bytes": 206589952,
+      "pico_rss_bytes": 206589952,
+      "pico_comprometido_bytes": 173035520
+    },
+    {
+      "numero": 2,
+      "importacion_ms": 8892.213099985383,
+      "privada_bytes": 174063616,
+      "rss_bytes": 207437824,
+      "pico_rss_bytes": 207437824,
+      "pico_comprometido_bytes": 174063616
+    },
+    {
+      "numero": 3,
+      "importacion_ms": 9023.361300001852,
+      "privada_bytes": 173469696,
+      "rss_bytes": 206880768,
+      "pico_rss_bytes": 206880768,
+      "pico_comprometido_bytes": 173469696
+    }
+  ]
+}

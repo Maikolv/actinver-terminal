@@ -1,0 +1,34 @@
+[
+  {
+    "ancho": 390,
+    "tema": "light",
+    "servicios_pago_bloqueados": 3,
+    "botones_aprobar": 0,
+    "errores": [],
+    "alcance": "Solo interfaz de costos; los otros endpoints devuelven SIN DATO y no prueban datos o proveedores."
+  },
+  {
+    "ancho": 390,
+    "tema": "dark",
+    "servicios_pago_bloqueados": 3,
+    "botones_aprobar": 0,
+    "errores": [],
+    "alcance": "Solo interfaz de costos; los otros endpoints devuelven SIN DATO y no prueban datos o proveedores."
+  },
+  {
+    "ancho": 1440,
+    "tema": "light",
+    "servicios_pago_bloqueados": 3,
+    "botones_aprobar": 0,
+    "errores": [],
+    "alcance": "Solo interfaz de costos; los otros endpoints devuelven SIN DATO y no prueban datos o proveedores."
+  },
+  {
+    "ancho": 1440,
+    "tema": "dark",
+    "servicios_pago_bloqueados": 3,
+    "botones_aprobar": 0,
+    "errores": [],
+    "alcance": "Solo interfaz de costos; los otros endpoints devuelven SIN DATO y no prueban datos o proveedores."
+  }
+]

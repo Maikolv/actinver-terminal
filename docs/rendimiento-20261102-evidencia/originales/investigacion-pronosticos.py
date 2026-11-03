@@ -1,0 +1,136 @@
+"""FUTURO: pronósticos emitidos a la hora T con información disponible en T, guardados aparte de las cotizaciones.
+
+- Se entrena con ejemplos cuya etiqueta ya se conocía en T (`disponible_etiqueta <= T`) y se pronostica desde la
+  última fecha de cada instrumento con `disponible_en <= T`.
+- El registro es inmutable: el resultado observado se añade después, cuando el precio objetivo está disponible.
+- Si el último experimento no superó a las referencias, se guarda `recomendacion_permitida = 0`.
+"""
+from __future__ import annotations
+
+import sqlite3
+from datetime import UTC, datetime
+
+import numpy as np
+import pandas as pd
+
+from . import datos, evaluacion
+
+
+def _calendario(iid: str) -> str:
+    return "XNYS" if iid.startswith("SIC:") else "XMEX"
+
+
+def fecha_objetivo(iid: str, fecha_base: str, H: int) -> str | None:
+    """Sesión H posterior a la fecha base en el calendario del instrumento (NYSE para el SIC, BMV para el resto)."""
+    from .. import vigencia
+    cal = vigencia.calendario(_calendario(iid))
+    try:
+        s = cal.date_to_session(pd.Timestamp(fecha_base), direction="next")
+        return cal.session_offset(s, H).date().isoformat()
+    except Exception:  # noqa: BLE001 — fuera del rango del calendario
+        return None
+
+
+def emitir(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | None = None, max_instrumentos: int = 300,
+           mxn: bool = True, etiqueta: str | None = None, objetivo: str | None = None) -> dict:
+    """Experimento + pronóstico a H sesiones. `mxn`: rendimientos en pesos (el Reto se mide en MXN). `objetivo`: fecha
+    objetivo fija (cierre del Reto); si falta, la sesión H posterior a la base en el calendario del instrumento."""
+    T = pd.Timestamp(T).tz_convert("UTC") if T is not None else pd.Timestamp(datetime.now(UTC))
+    etiqueta = etiqueta or f"{H}s"
+    exp = evaluacion.investigar(con, demo, H, T, config={"mxn": mxn}, guardar=True)
+    if exp.get("estado") != "ok":
+        return {"emitidos": 0, "etiqueta": etiqueta, **{k: v for k, v in exp.items() if not k.startswith("_")}}
+    precios = datos.precios_hasta(con, demo, T, mxn=mxn)
+    panel = datos.construir_panel(precios, H, datos.noticias_hasta(con, T))
+    panel = panel[panel["disponible_en"] <= T]
+    entren = datos.etiquetados_hasta(panel, T)
+    mdl = evaluacion.modelo(exp["variante_elegida"], exp["alfa_por_variante"][exp["variante_elegida"]],
+                            evaluacion.CONFIG_BASE["umbral_correlacion"], exp["semilla"]).fit(entren[datos.VARIABLES], entren["y"])
+    base = panel.sort_values("fecha").groupby("instrumento_id").tail(1).head(max_instrumentos)
+    pred = mdl.predict(base[datos.VARIABLES])
+    res = np.sort(exp["_residuos"])
+    q10, q90 = np.quantile(res, [0.10, 0.90])            # residuos estandarizados: el rango escala con la volatilidad
+    s = evaluacion.escala(base, H)
+    prob = 1 - np.searchsorted(res, -pred / s, side="right") / len(res)
+    emitido, datos_hasta = T.isoformat(), base["disponible_en"].max().isoformat()
+    version = f"{exp['version_codigo']}+{exp['huella_config']}"
+    from .. import registro
+    registro.registrar_version_modelo(con, version, {"variante": exp["variante_elegida"], "H": H,
+                                                     "alfa": exp["alfa_por_variante"][exp["variante_elegida"]]},
+                                      exp["semilla"], None, exp["recomendacion_permitida"], exp["veredicto"])
+    from . import reto_pronostico
+    barrera = reto_pronostico.barrera(exp, deterioro(con))
+    ultimo_cierre = precios.sort_values("fecha").groupby("instrumento_id").tail(1).set_index("instrumento_id")
+    moneda = "MXN" if mxn else "original"
+    filas = []
+    for r, p, pr, si in zip(base.itertuples(), pred, prob, s, strict=True):
+        u = ultimo_cierre.loc[r.instrumento_id] if r.instrumento_id in ultimo_cierre.index else None
+        precio_base = float(u["cierre"]) if u is not None and u["fecha"] == r.fecha else None
+        filas.append((emitido, datos_hasta, r.instrumento_id, H, r.fecha, objetivo or fecha_objetivo(r.instrumento_id, r.fecha, H),
+                      f"{exp['variante_elegida']}", version, exp["semilla"], float(p), float(p + q10 * si), float(p + q90 * si), float(pr),
+                      int(barrera["permitida"]), etiqueta, precio_base, moneda))
+    con.executemany("INSERT OR IGNORE INTO pronosticos (emitido_en, datos_hasta, instrumento_id, horizonte, fecha_base, "
+                    "fecha_objetivo, modelo, version, semilla, prediccion, p10, p90, prob_subida, recomendacion_permitida, "
+                    "etiqueta, precio_base, moneda) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", filas)
+    con.commit()
+    return {"emitidos": len(filas), "emitido_en": emitido, "datos_hasta": datos_hasta, "H": H, "etiqueta": etiqueta,
+            "version": version, "recomendacion_permitida": barrera["permitida"], "barrera": barrera,
+            "conclusion": exp["conclusion"], "historia_insuficiente": exp.get("historia_insuficiente", []),
+            "por_mercado": exp.get("por_mercado", [])}
+
+
+def resolver(con: sqlite3.Connection, demo: bool, ahora: pd.Timestamp | None = None) -> int:
+    """Añade el resultado observado a pronósticos cuyo precio objetivo (H sesiones después) ya está disponible."""
+    ahora = pd.Timestamp(ahora).tz_convert("UTC") if ahora is not None else pd.Timestamp(datetime.now(UTC))
+    pend = con.execute("SELECT id, instrumento_id, horizonte, fecha_base, moneda FROM pronosticos "
+                       "WHERE resuelto_en IS NULL").fetchall()
+    if not pend:
+        return 0
+    ids = sorted({p["instrumento_id"] for p in pend})
+    series = {False: datos.precios_hasta(con, demo, ahora, ids)}
+    if any(p["moneda"] == "MXN" for p in pend):
+        series[True] = datos.precios_hasta(con, demo, ahora, ids, mxn=True)
+    n = 0
+    for p in pend:
+        precios = series[p["moneda"] == "MXN"]
+        g = precios[precios["instrumento_id"] == p["instrumento_id"]].sort_values("fecha").reset_index(drop=True)
+        idx = g.index[g["fecha"] == p["fecha_base"]]
+        if not len(idx) or idx[0] + p["horizonte"] >= len(g):
+            continue
+        j = idx[0] + p["horizonte"]
+        y = float(np.log(g.loc[j, "cierre"] / g.loc[idx[0], "cierre"]))
+        con.execute("UPDATE pronosticos SET resultado=?, fecha_objetivo=COALESCE(fecha_objetivo, ?), resuelto_en=? "
+                    "WHERE id=? AND resuelto_en IS NULL", (y, g.loc[j, "fecha"], ahora.isoformat(), p["id"]))
+        n += 1
+    con.commit()
+    return n
+
+
+def deterioro(con: sqlite3.Connection, ventana: int = 200) -> dict | None:
+    """Error de los pronósticos ya resueltos frente a «sin cambio» y cobertura del intervalo (señal de deterioro)."""
+    df = pd.read_sql_query("SELECT prediccion, p10, p90, resultado FROM pronosticos WHERE resultado IS NOT NULL "
+                           "ORDER BY resuelto_en DESC LIMIT ?", con, params=(ventana,))
+    if len(df) < 30:
+        return None
+    mse, mse0 = float(((df.resultado - df.prediccion) ** 2).mean()), float((df.resultado ** 2).mean())
+    cob = float(((df.resultado >= df.p10) & (df.resultado <= df.p90)).mean())
+    return {"n": len(df), "mse": mse, "mse_sin_cambio": mse0, "razon": mse / mse0 if mse0 else None, "cobertura_80": cob}
+
+
+def listar(con: sqlite3.Connection, limite: int = 300) -> list[dict]:
+    """Última emisión de cada horizonte (por etiqueta: «1s», «5s», «reto»)."""
+    return [dict(r) for r in con.execute(
+        "SELECT p.* FROM pronosticos p JOIN (SELECT COALESCE(etiqueta, horizonte || 's') AS k, MAX(emitido_en) AS e "
+        "FROM pronosticos GROUP BY k) u ON COALESCE(p.etiqueta, p.horizonte || 's')=u.k AND p.emitido_en=u.e "
+        "ORDER BY p.horizonte, p.prediccion DESC LIMIT ?", (limite,))]
+
+
+def emision(con: sqlite3.Connection, etiqueta: str, previa: bool = False) -> list[dict]:
+    """Filas de la última emisión con esa etiqueta (o de la anterior, para comparar cambios)."""
+    es = [r[0] for r in con.execute("SELECT DISTINCT emitido_en FROM pronosticos WHERE COALESCE(etiqueta, horizonte || 's')=? "
+                                    "ORDER BY emitido_en DESC LIMIT 2", (etiqueta,))]
+    i = 1 if previa else 0
+    if len(es) <= i:
+        return []
+    return [dict(r) for r in con.execute("SELECT * FROM pronosticos WHERE COALESCE(etiqueta, horizonte || 's')=? AND emitido_en=? "
+                                         "ORDER BY prediccion DESC", (etiqueta, es[i]))]

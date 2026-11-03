@@ -1,0 +1,176 @@
+{
+  "antes-controlado": {
+    "arranque_http_ms": {
+      "mediana": 15087.16,
+      "p95": 20002.74,
+      "n": 3
+    },
+    "estado_frio_navegacion_ms": {
+      "mediana": 2883.17,
+      "p95": 2956.74,
+      "n": 3
+    },
+    "primer_panel_local_ms": {
+      "mediana": 1410.18,
+      "p95": 1435.72,
+      "n": 3
+    },
+    "navegacion_tibia_ms": {
+      "mediana": 224.72,
+      "p95": 233.71,
+      "n": 3
+    },
+    "ventana_espera_ms": {
+      "mediana": 60611.34,
+      "p95": 61240.26,
+      "n": 3
+    },
+    "peticiones_espera": {
+      "mediana": 1,
+      "p95": 1,
+      "n": 3
+    },
+    "bytes_cdp_espera": {
+      "mediana": 2892,
+      "p95": 2892,
+      "n": 3
+    },
+    "cpu_servidor_espera_s": {
+      "mediana": 0.38,
+      "p95": 0.39,
+      "n": 3
+    },
+    "tareas_pestana_s": {
+      "mediana": 0.55,
+      "p95": 0.75,
+      "n": 3
+    },
+    "estado_ms": {
+      "mediana": 26.49,
+      "p95": 40.71,
+      "n": 45
+    },
+    "universo_ms": {
+      "mediana": 213.88,
+      "p95": 240.36,
+      "n": 45
+    },
+    "pasado_primera_ms": {
+      "mediana": 2833.15,
+      "p95": 4449.92,
+      "n": 3
+    },
+    "futuro_primera_ms": {
+      "mediana": 655.09,
+      "p95": 742.49,
+      "n": 3
+    },
+    "servidor_privada_mib": {
+      "mediana": 213.47,
+      "p95": 213.63,
+      "n": 3
+    },
+    "servidor_pico_muestreado_mib": {
+      "mediana": 213.88,
+      "p95": 214.02,
+      "n": 3
+    },
+    "renderers_privada_mib": {
+      "mediana": 39.21,
+      "p95": 39.38,
+      "n": 3
+    },
+    "renderers_pico_muestreado_mib": {
+      "mediana": 45.86,
+      "p95": 46.19,
+      "n": 3
+    }
+  },
+  "despues-controlado": {
+    "arranque_http_ms": {
+      "mediana": 7499.97,
+      "p95": 10969.28,
+      "n": 3
+    },
+    "estado_frio_navegacion_ms": {
+      "mediana": 2606.15,
+      "p95": 3916.6,
+      "n": 3
+    },
+    "primer_panel_local_ms": {
+      "mediana": 1369.21,
+      "p95": 1914.38,
+      "n": 3
+    },
+    "navegacion_tibia_ms": {
+      "mediana": 279.79,
+      "p95": 286.23,
+      "n": 3
+    },
+    "ventana_espera_ms": {
+      "mediana": 60617.27,
+      "p95": 60650.78,
+      "n": 3
+    },
+    "peticiones_espera": {
+      "mediana": 1,
+      "p95": 1,
+      "n": 3
+    },
+    "bytes_cdp_espera": {
+      "mediana": 2892,
+      "p95": 2892,
+      "n": 3
+    },
+    "cpu_servidor_espera_s": {
+      "mediana": 0.55,
+      "p95": 0.84,
+      "n": 3
+    },
+    "tareas_pestana_s": {
+      "mediana": 0.85,
+      "p95": 1.11,
+      "n": 3
+    },
+    "estado_ms": {
+      "mediana": 31.36,
+      "p95": 50.51,
+      "n": 45
+    },
+    "universo_ms": {
+      "mediana": 281.66,
+      "p95": 444.49,
+      "n": 45
+    },
+    "pasado_primera_ms": {
+      "mediana": 7951.26,
+      "p95": 9311.63,
+      "n": 3
+    },
+    "futuro_primera_ms": {
+      "mediana": 3409.02,
+      "p95": 4174.37,
+      "n": 3
+    },
+    "servidor_privada_mib": {
+      "mediana": 123.77,
+      "p95": 123.79,
+      "n": 3
+    },
+    "servidor_pico_muestreado_mib": {
+      "mediana": 124.2,
+      "p95": 124.52,
+      "n": 3
+    },
+    "renderers_privada_mib": {
+      "mediana": 38.93,
+      "p95": 41.36,
+      "n": 3
+    },
+    "renderers_pico_muestreado_mib": {
+      "mediana": 46.22,
+      "p95": 48.59,
+      "n": 3
+    }
+  }
+}

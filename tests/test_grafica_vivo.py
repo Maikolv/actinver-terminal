@@ -13,6 +13,11 @@ def test_grafica_intervalo_y_enmarcado():
         assert "frame-ancestors 'self'" in r.headers["content-security-policy"]
         assert c.get("/grafica/SIC:MU?intervalo=7").status_code == 422
         assert c.get("/grafica/SIC:MU").status_code == 200  # diario por omisión
+        bmv = c.get("/grafica/BMV:AMX")
+        assert bmv.status_code == 200 and '"symbol": "BMV:AMX/B"' in bmv.text
+        assert c.get("/grafica/BMV:INEXISTENTE").status_code == 404
+        info = c.get("/widget/info?simbolo=BMV:AMX")
+        assert info.status_code == 200 and '"symbol": "BMV:AMX/B"' in info.text
         assert c.get("/api/flujo/velas?simbolo=SIC:MU&intervalo=1Day&dias=5").json()["grafica"] is True
 
 

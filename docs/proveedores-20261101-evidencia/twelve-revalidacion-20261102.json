@@ -1,0 +1,12 @@
+{
+  "corte": "2026-11-02T07:54:50.168880+00:00",
+  "instrumento": "BMV:ALPEK",
+  "solicitudes": 0,
+  "precios_guardados": false,
+  "habilitado_automaticamente": false,
+  "resultado": {
+    "estado": "bloqueado",
+    "consultas": 0,
+    "motivo": "Sin clave disponible mediante el cargador habitual autorizado."
+  }
+}

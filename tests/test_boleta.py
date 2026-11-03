@@ -127,10 +127,11 @@ def test_importar_notas_sa_valida_url_y_duplicados(con):
     c2 = _csv("notas_sa", [["2026-09-20T10:00:00-06:00", "SIC:AAPL", "Titular", "https://seekingalpha.com/news/1", "hecho (noticia)", "A", "tesis"]])
     assert importar.importar(con, c2, "n.csv", "notas_sa", _ins(con), confirmar=True)["aceptadas"] == 1
     assert importar.importar(con, c2, "n.csv", "notas_sa", _ins(con), confirmar=True)["duplicadas"] == 1
-    n = con.execute("SELECT fuente, event_time, available_at FROM noticias").fetchone()
-    migraciones.completar_tiempos(con)
-    n = con.execute("SELECT fuente, event_time, available_at FROM noticias").fetchone()
+    n = con.execute("SELECT fuente, event_time, available_at, ingested_at FROM noticias").fetchone()
     assert n[0] == "seekingalpha_manual" and n[1] < n[2]   # disponible al importarse, no al publicarse
+    assert n[2] == n[3]
+    sin_fecha = _csv("notas_sa", [["", "SIC:AAPL", "Otro titular", "https://seekingalpha.com/news/2", "", "", ""]])
+    assert importar.importar(con, sin_fecha, "n.csv", "notas_sa", _ins(con), confirmar=True)["rechazadas"] == 1
 
 
 def test_importar_insiderfinance_separa_fechas_y_no_asigna_bmv(con):
@@ -163,12 +164,41 @@ def test_importar_saldos(con):
 
 
 # --- calendario macro ---------------------------------------------------------------------------------------------
+def test_version_macro_se_revierte_con_la_transaccion(con):
+    con.commit()
+    con.execute("BEGIN")
+    fuentes_web.registrar_versiones_macro(
+        con, [{"id": "revertir", "fecha": "2026-10-10T12:30:00+00:00"}],
+        "2026-10-08T00:00:00+00:00")
+    assert con.in_transaction
+    con.rollback()
+    assert fuentes_web.macro_conocido_en(con, "revertir", "2026-10-09T12:00:00+00:00") is None
+
+
+def test_macro_conserva_reprogramacion_sin_cambio_de_consenso(con):
+    evento = {"id": "reprogramado", "fecha": "2026-10-10T12:30:00+00:00", "pronostico": "0.3%"}
+    nueva_fecha = "2026-10-10T13:30:00+00:00"
+    fuentes_web.registrar_versiones_macro(con, [evento], "2026-10-08T00:00:00+00:00")
+    fuentes_web.registrar_versiones_macro(con, [{**evento, "fecha": nueva_fecha}], "2026-10-09T13:00:00+01:00")
+    antes = fuentes_web.macro_conocido_en(con, evento["id"], "2026-10-09T11:59:00+00:00")
+    despues = fuentes_web.macro_conocido_en(con, evento["id"], "2026-10-09T12:00:00+00:00")
+    assert antes["fecha"] == evento["fecha"]
+    assert despues["fecha"] == nueva_fecha
+    assert antes["pronostico"] == despues["pronostico"] == "0.3%"
+
+
 def test_versiones_macro_y_dato_efectivo_no_antes_de_publicarse(con):
     ev = {"id": "e1", "fecha": "2026-10-10T08:30:00-04:00", "pais": "USD", "titulo": "CPI", "impacto": "High",
           "pronostico": "0.3%", "previo": "0.2%", "actual": ""}
     fuentes_web.registrar_versiones_macro(con, [ev], "2026-10-08T00:00:00+00:00")
     fuentes_web.registrar_versiones_macro(con, [ev], "2026-10-09T00:00:00+00:00")        # sin cambio: no hay versión nueva
     fuentes_web.registrar_versiones_macro(con, [{**ev, "pronostico": "0.4%"}], "2026-10-09T12:00:00+00:00")  # revisión
+    fuentes_web.registrar_versiones_macro(con, [{**ev, "pronostico": "0.4%", "actual": "9%"}],
+                                         "2026-10-09T13:00:00+00:00")
+    prematuro = fuentes_web.macro_conocido_en(con, "e1", "2026-10-10T12:30:00+00:00")
+    assert prematuro["actual"] is None and not prematuro["actual_publicado"]
+    con.execute("UPDATE eventos_macro_versiones SET actual='0.5%' WHERE evento_id='e1' AND obtenido_en=?",
+                ("2026-10-09T12:00:00+00:00",))  # versión guardada antes de la corrección
     fuentes_web.registrar_versiones_macro(con, [{**ev, "pronostico": "0.4%", "actual": "0.5%"}], "2026-10-10T13:00:00+00:00")
     assert con.execute("SELECT COUNT(*) FROM eventos_macro_versiones").fetchone()[0] == 3
     antes = fuentes_web.macro_conocido_en(con, "e1", "2026-10-09T06:00:00+00:00")

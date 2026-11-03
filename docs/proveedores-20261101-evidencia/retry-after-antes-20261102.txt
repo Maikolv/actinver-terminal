@@ -1,0 +1,242 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+FFFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+_______ test_pausa_persiste_entre_instancias_sin_consumir_cupo[120-429] _______
+
+con = <sqlite3.Connection object at 0x000001FFC2DA04F0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2E0E4B0>
+codigo = 429, cabecera = '120'
+
+    @pytest.mark.parametrize("codigo", [429, 503])
+    @pytest.mark.parametrize("cabecera", ["120", "Mon, 02 Nov 2026 20:02:00 GMT"])
+    def test_pausa_persiste_entre_instancias_sin_consumir_cupo(con, monkeypatch, codigo, cabecera):
+        hora = [datetime(2026, 11, 2, 20, tzinfo=UTC)]
+    
+        class Reloj(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return hora[0]
+    
+        monkeypatch.setattr("terminal.adaptadores.base.datetime", Reloj)
+        vistos = []
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(codigo, headers={"Retry-After": cabecera}) if len(vistos) == 1 else httpx.Response(200)
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            ajustes = {"peticiones_por_dia": 4}
+            primero = Adaptador(con, ajustes, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 429'
+
+tests\test_adaptadores_retry_after.py:30: AssertionError
+_______ test_pausa_persiste_entre_instancias_sin_consumir_cupo[120-503] _______
+
+con = <sqlite3.Connection object at 0x000001FFC2DF6A70>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2EA2F00>
+codigo = 503, cabecera = '120'
+
+    @pytest.mark.parametrize("codigo", [429, 503])
+    @pytest.mark.parametrize("cabecera", ["120", "Mon, 02 Nov 2026 20:02:00 GMT"])
+    def test_pausa_persiste_entre_instancias_sin_consumir_cupo(con, monkeypatch, codigo, cabecera):
+        hora = [datetime(2026, 11, 2, 20, tzinfo=UTC)]
+    
+        class Reloj(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return hora[0]
+    
+        monkeypatch.setattr("terminal.adaptadores.base.datetime", Reloj)
+        vistos = []
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(codigo, headers={"Retry-After": cabecera}) if len(vistos) == 1 else httpx.Response(200)
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            ajustes = {"peticiones_por_dia": 4}
+            primero = Adaptador(con, ajustes, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 503'
+
+tests\test_adaptadores_retry_after.py:30: AssertionError
+_ test_pausa_persiste_entre_instancias_sin_consumir_cupo[Mon, 02 Nov 2026 20:02:00 GMT-429] _
+
+con = <sqlite3.Connection object at 0x000001FFC2DF74C0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2D92F30>
+codigo = 429, cabecera = 'Mon, 02 Nov 2026 20:02:00 GMT'
+
+    @pytest.mark.parametrize("codigo", [429, 503])
+    @pytest.mark.parametrize("cabecera", ["120", "Mon, 02 Nov 2026 20:02:00 GMT"])
+    def test_pausa_persiste_entre_instancias_sin_consumir_cupo(con, monkeypatch, codigo, cabecera):
+        hora = [datetime(2026, 11, 2, 20, tzinfo=UTC)]
+    
+        class Reloj(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return hora[0]
+    
+        monkeypatch.setattr("terminal.adaptadores.base.datetime", Reloj)
+        vistos = []
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(codigo, headers={"Retry-After": cabecera}) if len(vistos) == 1 else httpx.Response(200)
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            ajustes = {"peticiones_por_dia": 4}
+            primero = Adaptador(con, ajustes, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 429'
+
+tests\test_adaptadores_retry_after.py:30: AssertionError
+_ test_pausa_persiste_entre_instancias_sin_consumir_cupo[Mon, 02 Nov 2026 20:02:00 GMT-503] _
+
+con = <sqlite3.Connection object at 0x000001FFC2DF7C40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2D04EC0>
+codigo = 503, cabecera = 'Mon, 02 Nov 2026 20:02:00 GMT'
+
+    @pytest.mark.parametrize("codigo", [429, 503])
+    @pytest.mark.parametrize("cabecera", ["120", "Mon, 02 Nov 2026 20:02:00 GMT"])
+    def test_pausa_persiste_entre_instancias_sin_consumir_cupo(con, monkeypatch, codigo, cabecera):
+        hora = [datetime(2026, 11, 2, 20, tzinfo=UTC)]
+    
+        class Reloj(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return hora[0]
+    
+        monkeypatch.setattr("terminal.adaptadores.base.datetime", Reloj)
+        vistos = []
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(codigo, headers={"Retry-After": cabecera}) if len(vistos) == 1 else httpx.Response(200)
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            ajustes = {"peticiones_por_dia": 4}
+            primero = Adaptador(con, ajustes, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 503'
+
+tests\test_adaptadores_retry_after.py:30: AssertionError
+___ test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[inv\xe1lida] ____
+
+con = <sqlite3.Connection object at 0x000001FFC2F80400>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2D930B0>
+cabecera = 'inv�lida'
+
+    @pytest.mark.parametrize("cabecera", ["inv�lida", "NaN", "Infinity", "-10"])
+    def test_cabecera_invalida_deja_pausa_conservadora_sin_dormir(con, monkeypatch, cabecera):
+        vistos = []
+        monkeypatch.setattr("terminal.adaptadores.base.time.sleep", lambda _: pytest.fail("No debe dormir ni reintentar"))
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(429, headers={"Retry-After": cabecera.encode("utf-8")})
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            adaptador = Adaptador(con, {}, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 429'
+
+tests\test_adaptadores_retry_after.py:54: AssertionError
+_______ test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[NaN] ________
+
+con = <sqlite3.Connection object at 0x000001FFC2F816C0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2EA35F0>
+cabecera = 'NaN'
+
+    @pytest.mark.parametrize("cabecera", ["inv�lida", "NaN", "Infinity", "-10"])
+    def test_cabecera_invalida_deja_pausa_conservadora_sin_dormir(con, monkeypatch, cabecera):
+        vistos = []
+        monkeypatch.setattr("terminal.adaptadores.base.time.sleep", lambda _: pytest.fail("No debe dormir ni reintentar"))
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(429, headers={"Retry-After": cabecera.encode("utf-8")})
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            adaptador = Adaptador(con, {}, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 429'
+
+tests\test_adaptadores_retry_after.py:54: AssertionError
+_____ test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[Infinity] _____
+
+con = <sqlite3.Connection object at 0x000001FFC2F81A80>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2EA34D0>
+cabecera = 'Infinity'
+
+    @pytest.mark.parametrize("cabecera", ["inv�lida", "NaN", "Infinity", "-10"])
+    def test_cabecera_invalida_deja_pausa_conservadora_sin_dormir(con, monkeypatch, cabecera):
+        vistos = []
+        monkeypatch.setattr("terminal.adaptadores.base.time.sleep", lambda _: pytest.fail("No debe dormir ni reintentar"))
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(429, headers={"Retry-After": cabecera.encode("utf-8")})
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            adaptador = Adaptador(con, {}, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 429'
+
+tests\test_adaptadores_retry_after.py:54: AssertionError
+_______ test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[-10] ________
+
+con = <sqlite3.Connection object at 0x000001FFC2F81E40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FFC2F37EF0>
+cabecera = '-10'
+
+    @pytest.mark.parametrize("cabecera", ["inv�lida", "NaN", "Infinity", "-10"])
+    def test_cabecera_invalida_deja_pausa_conservadora_sin_dormir(con, monkeypatch, cabecera):
+        vistos = []
+        monkeypatch.setattr("terminal.adaptadores.base.time.sleep", lambda _: pytest.fail("No debe dormir ni reintentar"))
+    
+        def responder(peticion):
+            vistos.append(peticion)
+            return httpx.Response(429, headers={"Retry-After": cabecera.encode("utf-8")})
+    
+        with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+            adaptador = Adaptador(con, {}, cliente=cliente)
+>           with pytest.raises(ErrorProveedor, match="Retry-After"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'Retry-After'
+E             Actual message: 'base: HTTP 429'
+
+tests\test_adaptadores_retry_after.py:54: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_adaptadores_retry_after.py::test_pausa_persiste_entre_instancias_sin_consumir_cupo[120-429]
+FAILED tests/test_adaptadores_retry_after.py::test_pausa_persiste_entre_instancias_sin_consumir_cupo[120-503]
+FAILED tests/test_adaptadores_retry_after.py::test_pausa_persiste_entre_instancias_sin_consumir_cupo[Mon, 02 Nov 2026 20:02:00 GMT-429]
+FAILED tests/test_adaptadores_retry_after.py::test_pausa_persiste_entre_instancias_sin_consumir_cupo[Mon, 02 Nov 2026 20:02:00 GMT-503]
+FAILED tests/test_adaptadores_retry_after.py::test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[inv\xe1lida]
+FAILED tests/test_adaptadores_retry_after.py::test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[NaN]
+FAILED tests/test_adaptadores_retry_after.py::test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[Infinity]
+FAILED tests/test_adaptadores_retry_after.py::test_cabecera_invalida_deja_pausa_conservadora_sin_dormir[-10]
+8 failed in 8.80s

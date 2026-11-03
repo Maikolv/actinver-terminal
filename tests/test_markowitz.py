@@ -29,6 +29,31 @@ def test_categorias_y_lectura_sec():
     assert capitalizacion.flotante_sec({"units": {"USD": [{"val": 5e9, "end": "2025-06-30", "filed": "2025-08-01"}]}}) == (5e9, "2025-06-30")
 
 
+def test_capitalizacion_detiene_tandas_durante_pausa_sec(con, ajustes, monkeypatch):
+    import httpx
+
+    monkeypatch.setattr(capitalizacion.mercado, "instrumentos", lambda con: {
+        "SIC:AAPL": {"mercado_operable": "BMV-SIC", "clase": "accion", "estado": "activo",
+                     "moneda_referencia": "USD", "clave": "AAPL"},
+    })
+    consultas = []
+
+    def responder(peticion):
+        consultas.append(peticion.url.path)
+        if len(consultas) == 1:
+            return httpx.Response(200, json={"0": {"ticker": "AAPL", "cik_str": 1}})
+        return httpx.Response(503, headers={"Retry-After": "120"})
+
+    with httpx.Client(transport=httpx.MockTransport(responder)) as cli:
+        for _ in range(2):
+            resultado = capitalizacion.actualizar(
+                con, ajustes, cliente=cli, env={"SEC_USER_AGENT": "Pruebas contacto@example.invalid"})
+            assert resultado["estado"] == "error" and resultado["sec"] == 0
+    assert len(consultas) == 2
+    assert consultas[1].endswith("/EntityCommonStockSharesOutstanding.json")
+    assert con.execute("SELECT 1 FROM ajustes_usuario WHERE clave='proveedor_pausa:sec_edgar'").fetchone()
+
+
 def test_capitalizacion_usa_el_flotante_si_la_sec_solo_reporta_una_serie(con, ajustes):
     sembrar(con)
     with db.transaccion(con):
@@ -166,6 +191,15 @@ def test_tasa_libre_de_cetes_y_respaldo(con, ajustes, monkeypatch):
                 "WHERE clave='cetes28'")
     t = markowitz.tasa_libre(con, ajustes, falla)
     assert t["valor"] == 0.0622 and "última tasa guardada" in t["aviso"]
+    with httpx.Client(transport=httpx.MockTransport(
+            lambda r: httpx.Response(503, headers={"Retry-After": "120"}))) as pausa:
+        markowitz.tasa_libre(con, ajustes, pausa)
+    assert con.execute("SELECT 1 FROM ajustes_usuario WHERE clave='proveedor_pausa:banxico'").fetchone()
+    def no_consultar(r):
+        raise AssertionError("La pausa de Banxico debe impedir la consulta de CETES")
+    with httpx.Client(transport=httpx.MockTransport(no_consultar)) as bloqueado:
+        t = markowitz.tasa_libre(con, ajustes, bloqueado)
+    assert t["fecha"] == "2026-10-29" and "última tasa guardada" in t["aviso"]
 
 
 def test_fuera_de_muestra_ledoit_wolf_y_topes_por_moneda(con, ajustes):

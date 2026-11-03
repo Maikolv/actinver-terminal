@@ -1,0 +1,68 @@
+[
+  {
+    "github": "londonstrategicedge/lse-data",
+    "url": "https://github.com/londonstrategicedge/lse-data",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\lse-data",
+    "commit": "d504065a5cdde9ed704bafa339e6a9b474910146",
+    "estado": "clonado_superficial_sin_lfs",
+    "licencia_api": "MIT",
+    "estrella_ya_presente": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "ejecutado": false,
+    "dependencias_instaladas": false
+  },
+  {
+    "github": "evan-kolberg/prediction-market-backtesting",
+    "url": "https://github.com/evan-kolberg/prediction-market-backtesting",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\prediction-market-backtesting",
+    "commit": "c76e77af00ef53472a9da8f66dae7fdd2d3e5928",
+    "estado": "clonado_superficial_sin_lfs",
+    "licencia_api": "NOASSERTION",
+    "estrella_ya_presente": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "ejecutado": false,
+    "dependencias_instaladas": false,
+    "licencia_revisada_localmente": "LGPL-3.0-or-later en prediction_market_extensions y archivos derivados; MIT en archivos propios indicados por LICENSE."
+  },
+  {
+    "github": "Jon-Becker/prediction-market-analysis",
+    "url": "https://github.com/Jon-Becker/prediction-market-analysis",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\prediction-market-analysis",
+    "commit": "2d69f7330fdee142d2cf75d901841f9174fdbbd2",
+    "estado": "clonado_superficial_sin_lfs",
+    "licencia_api": "MIT",
+    "estrella_ya_presente": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "ejecutado": false,
+    "dependencias_instaladas": false
+  },
+  {
+    "github": "pmxt-dev/pmxt",
+    "url": "https://github.com/pmxt-dev/pmxt",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\pmxt",
+    "commit": "4a367d812541154002eedda36b0916a3cf68e0f2",
+    "estado": "clonado_superficial_sin_lfs",
+    "licencia_api": "MIT",
+    "estrella_ya_presente": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "ejecutado": false,
+    "dependencias_instaladas": false
+  },
+  {
+    "github": "philippdubach/polymarket-microstructure",
+    "url": "https://github.com/philippdubach/polymarket-microstructure",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\polymarket-microstructure",
+    "commit": "c20b9037bc67f3602ec1971b3b6e7283ae2eee7f",
+    "estado": "clonado_superficial_sin_lfs",
+    "licencia_api": "MIT",
+    "estrella_ya_presente": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "ejecutado": false,
+    "dependencias_instaladas": false
+  }
+]

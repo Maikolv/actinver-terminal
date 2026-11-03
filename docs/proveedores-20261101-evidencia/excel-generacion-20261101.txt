@@ -1,0 +1,2 @@
+warning: Failed to set cwd to temp dir
+ok revision-20261101 {'plantilla': 39013, 'libro': 86084}

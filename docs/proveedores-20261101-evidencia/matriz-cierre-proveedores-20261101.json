@@ -1,0 +1,107 @@
+{
+  "corte": "2026-11-01T19:59:05.649839+00:00",
+  "alcance": "Pendientes F1-F6 de proveedores; no declara cerrados los demás pendientes de interfaz ni habilita operar.",
+  "requisitos": [
+    {
+      "id": "F1",
+      "estado": "implementado_con_cobertura_parcial",
+      "evidencia": [
+        "gratis-sec-20261101.json",
+        "sec-catalogo-20261101.json",
+        "gratis-sec-xom-20261101.json",
+        "gratis-verificacion-autorizada-20261101.json",
+        "gratis-seis-adicionales-20261101.json",
+        "variacion-diaria-auditoria-20261101.json",
+        "gratis-ui-fase4/resultado.json"
+      ],
+      "cubierto": "100 publicaciones SEC, tres previsiones, 32 BPA y 32 variaciones diarias por ventana API; revisiones observadas conservadas al corte.",
+      "faltantes": "Hora exacta, moneda/base contable del BPA y revisiones no observadas no se inventan."
+    },
+    {
+      "id": "F2",
+      "estado": "verificado_api_y_ui",
+      "evidencia": [
+        "gratis-verificacion-autorizada-20261101.json",
+        "h15-importacion-real-20261101.json",
+        "gratis-ui-fase4/resultado.json"
+      ],
+      "cubierto": "DGS30 FRED y respaldo H.15 con fuentes separadas."
+    },
+    {
+      "id": "F3",
+      "estado": "verificado_api_y_ui",
+      "evidencia": [
+        "gratis-verificacion-autorizada-20261101.json",
+        "gratis-ui-fase4/resultado.json"
+      ],
+      "cubierto": "SF61745, 24 observaciones."
+    },
+    {
+      "id": "F4",
+      "estado": "verificado_api_y_ui",
+      "evidencia": [
+        "sie-sp1-catalogo-20261101.json",
+        "gratis-seis-adicionales-20261101.json",
+        "gratis-ui-fase4/resultado.json"
+      ],
+      "cubierto": "SP1, 24 índices mensuales."
+    },
+    {
+      "id": "F5",
+      "estado": "bloqueado_sin_credencial",
+      "evidencia": [
+        "twelve-unico-diagnostico-20261101.json"
+      ],
+      "solicitudes_realizadas": 0,
+      "autorizacion_una_consulta_consumida": false,
+      "faltantes": "El cargador habitual no aportó TWELVEDATA_API_KEY. No se crea cuenta ni se solicita clave nueva; permisos de la cuenta sin comprobar."
+    },
+    {
+      "id": "F6",
+      "estado": "verificado_api_y_ui",
+      "evidencia": [
+        "gratis-verificacion-autorizada-20261101.json",
+        "gratis-ui-fase4/resultado.json"
+      ],
+      "cubierto": "SF30057, 21 promedios mensuales, nunca rendimiento diario/vigente."
+    }
+  ],
+  "verificacion": {
+    "suite_completa_anterior": {
+      "aprobadas": 824,
+      "segundos": 563.91,
+      "evidencia": "gratis-pytest-tras-seis-20261101.txt"
+    },
+    "suite_completa_ultima": {
+      "estado": "aprobada",
+      "evidencia": "gratis-pytest-variacion-20261101.txt",
+      "aprobadas": 837,
+      "advertencias": 1,
+      "segundos": 713.73,
+      "codigo_salida": 0
+    },
+    "node": {
+      "aprobadas": 43,
+      "evidencia": "gratis-node-variacion-20261101.txt"
+    },
+    "worker": {
+      "aprobadas": 19,
+      "evidencia": "gratis-worker-20261101.txt"
+    },
+    "chromium": {
+      "casos": 4,
+      "errores_js": 0,
+      "desbordamiento_horizontal": false,
+      "evidencia": "gratis-ui-fase4/resultado.json"
+    }
+  },
+  "limites": {
+    "operaciones_realizadas": false,
+    "proveedores_automaticos_habilitados": false,
+    "secretos_en_informe": false,
+    "commit_push": false,
+    "instancia_habitual_reiniciada": false,
+    "sin_ventaja_demostrada": true
+  },
+  "conclusion": "Implementación y verificación final aprobadas para los conectores cubiertos. Objetivo no declarado completo: F5 sin clave ni acceso de cuenta comprobado; no se reinició la instancia habitual."
+}

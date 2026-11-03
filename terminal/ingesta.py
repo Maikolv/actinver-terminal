@@ -6,7 +6,7 @@ import sqlite3
 from datetime import UTC, date, datetime, timedelta
 
 from . import vigencia
-from .adaptadores import CLASES, FX_USDMXN, ErrorProveedor, LimiteAlcanzado
+from .adaptadores import CLASES, FX_USDMXN, Barra, ErrorProveedor, LimiteAlcanzado
 from .config import Ajustes, credencial, secreto
 from .db import ahora as ahora_db, transaccion
 
@@ -25,7 +25,11 @@ def construir_adaptadores(con: sqlite3.Connection, ajustes: Ajustes, cliente=Non
     out = {}
     for n, clase in CLASES.items():
         extra = {"secreto": secreto(n)} if n == "alpaca" else {}
-        out[n] = clase(con, prov.get(n, {}), credencial(n), cliente=cliente, **extra)
+        cfg = prov.get(n, {})
+        # Estos conectores actuales requieren contrato/plan de pago; la clave no concede permiso de gasto.
+        if ajustes["app"].get("solo_proveedores_gratuitos", True) and n in {"twelvedata", "barchart"}:
+            cfg = {**cfg, "activo": False}
+        out[n] = clase(con, cfg, credencial(n), cliente=cliente, **extra)
     return out
 
 
@@ -81,7 +85,9 @@ def _consultado_hace_poco(con, proveedor: str, horas: float) -> bool:
     return datetime.now(UTC) - datetime.fromisoformat(f[0]) < timedelta(hours=horas)
 
 
-def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
+def actualizar_fx(con, adaptadores: dict, hoy: date | None = None, ajustes=None) -> dict:
+    from .migraciones import disponibilidad_fx
+
     hoy = hoy or date.today()
     for n in ORDEN_FX:
         a = adaptadores[n]
@@ -101,12 +107,20 @@ def actualizar_fx(con, adaptadores: dict, hoy: date | None = None) -> dict:
         except ErrorProveedor as e:
             _registrar(con, n, inicio, "error", 0, str(e))
             continue
+        barras, descartadas = _barras_en_intervalo(barras, desde, hoy)
+        if descartadas and not barras:
+            _registrar(con, n, inicio, "error", 0, f"USD/MXN: {descartadas} barras fuera del intervalo")
+            continue
         ts = ahora_db()
         with transaccion(con):
-            con.executemany("INSERT OR REPLACE INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
-                            [(b.fecha, b.cierre, n, "fx", ts) for b in barras])
-        _registrar(con, n, inicio, "ok", len(barras), "tipo de cambio USD/MXN")
-        return {"proveedor": n, "estado": "ok", "registros": len(barras)}
+            con.executemany("INSERT OR REPLACE INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en, "
+                            "event_time, available_at, ingested_at) VALUES ('USDMXN',?,?,?,?,?,?,?,?)",
+                            [(b.fecha, b.cierre, n, "fx", ts, *disponibilidad_fx(b.fecha, n, ajustes), ts)
+                             for b in barras])
+        estado = "parcial" if descartadas else "ok"
+        mensaje = f"USD/MXN: {descartadas} barras fuera del intervalo" if descartadas else "tipo de cambio USD/MXN"
+        _registrar(con, n, inicio, estado, len(barras), mensaje)
+        return {"proveedor": n, "estado": estado, "registros": len(barras)}
     return {"proveedor": None, "estado": "sin_proveedor", "registros": 0}
 
 
@@ -164,9 +178,24 @@ def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = Non
     return sorted(instrs, key=clave)
 
 
+def _barras_en_intervalo(barras: list[Barra], desde: date, hasta: date) -> tuple[list[Barra], int]:
+    """No normaliza ni inventa fechas: acepta solo fechas ISO canónicas del intervalo pedido."""
+    validas = []
+    for barra in barras:
+        try:
+            fecha = date.fromisoformat(barra.fecha)
+        except (ValueError, TypeError):
+            continue
+        if barra.fecha == fecha.isoformat() and desde <= fecha <= hasta:
+            validas.append(barra)
+    return validas, len(barras) - len(validas)
+
+
 def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | None = None,
                        hoy: date | None = None, ids_propuesta: list[str] | None = None,
-                       ahora: datetime | None = None) -> dict:
+                       ahora: datetime | None = None, ajustes=None) -> dict:
+    from .migraciones import disponibilidad_precio
+
     instante = ahora or datetime.now(UTC)
     hoy = hoy or instante.date()
     instrs = orden_cola(con, [dict(r) for r in con.execute("SELECT * FROM instrumentos WHERE estado='activo'")],
@@ -192,8 +221,12 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
             desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA)
             if respaldo:
                 desde = max(desde, esperada)  # recuperar el cierre faltante, no cinco años por cada respaldo
+            hasta = min(hoy, esperada)  # una barra de la sesión abierta todavía no es un cierre
+            if desde > hasta:
+                resumen[n]["al_dia"] += 1
+                break
             try:
-                barras = a.historico(ins, desde, hoy)
+                barras = a.historico(ins, desde, hasta)
             except LimiteAlcanzado as e:
                 agotados.add(n)
                 mensajes[n].append(str(e))
@@ -206,6 +239,10 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                 if respaldo:
                     break  # un solo proveedor de respaldo, también si falla
                 continue
+            barras, descartadas = _barras_en_intervalo(barras, desde, hasta)
+            if descartadas:
+                resumen[n]["errores"] += 1
+                mensajes[n].append(f"{ins['id']}: se descartaron {descartadas} barras con fecha inválida o fuera del intervalo solicitado")
             _intento(con, ins["id"], n, len(barras), hoy)
             if not barras and not respaldo and ins['id'] in (ids_prioritarios or []):
                 codigo = vigencia.codigo_calendario(ins)
@@ -217,8 +254,9 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
             moneda = ins["moneda_referencia"] or "MXN"
             with transaccion(con):
                 con.executemany(
-                    "INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    [(ins["id"], b.fecha, b.cierre, b.cierre_ajustado, b.volumen, moneda, n, a.tipo_dato, None, ts)
+                    "INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [(ins["id"], b.fecha, b.cierre, b.cierre_ajustado, b.volumen, moneda, n, a.tipo_dato, None, ts,
+                      *disponibilidad_precio(b.fecha, n, moneda, a.tipo_dato, None, ts, ajustes), ts)
                      for b in barras])
                 if barras and n in PROVEEDOR_CONFIABLE and ins.get("mercado_operable") == "BMV" and moneda == "MXN":
                     registrar_cobertura(con, n, ins["id"], a.simbolo(ins) if hasattr(a, "simbolo") else ins["id"],
@@ -227,9 +265,18 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
                 if barras:
                     con.execute("DELETE FROM precios WHERE instrumento_id=? AND proveedor IN (?, 'finviz_vivo') AND fecha<=?",
                                 (ins["id"], PROVEEDOR_VIVO, max(b.fecha for b in barras)))
-                eventos = [(ins["id"], b.fecha, "dividendo", b.dividendo, n) for b in barras if b.dividendo]
-                eventos += [(ins["id"], b.fecha, "split", b.factor_split, n) for b in barras if b.factor_split != 1]
-                con.executemany("INSERT OR REPLACE INTO eventos_corporativos (instrumento_id, fecha, tipo, valor, proveedor) VALUES (?,?,?,?,?)", eventos)
+                eventos = []
+                for b in barras:
+                    if not b.dividendo and b.factor_split == 1:
+                        continue
+                    marcas = disponibilidad_precio(b.fecha, n, moneda, a.tipo_dato, None, ts, ajustes)
+                    if b.dividendo:
+                        eventos.append((ins["id"], b.fecha, "dividendo", b.dividendo, n, *marcas, ts))
+                    if b.factor_split != 1:
+                        eventos.append((ins["id"], b.fecha, "split", b.factor_split, n, *marcas, ts))
+                con.executemany("INSERT OR REPLACE INTO eventos_corporativos "
+                                "(instrumento_id, fecha, tipo, valor, proveedor, event_time, available_at, ingested_at) "
+                                "VALUES (?,?,?,?,?,?,?,?)", eventos)
             resumen[n]["registros"] += len(barras)
             break
     for n in ORDEN_PRECIOS:
@@ -304,8 +351,8 @@ def actualizar_todo(con, ajustes: Ajustes, ids_prioritarios: list[str] | None = 
         out = {"modo": "demo", "registros": n, "nuevos": n}
     else:
         ad = construir_adaptadores(con, ajustes, cliente=cliente)
-        fx = actualizar_fx(con, ad)
-        precios = actualizar_precios(con, ad, ids_prioritarios, ids_propuesta=ids_propuesta)
+        fx = actualizar_fx(con, ad, ajustes=ajustes)
+        precios = actualizar_precios(con, ad, ids_prioritarios, ids_propuesta=ids_propuesta, ajustes=ajustes)
         fondos = actualizar_fondos(con, ajustes, cliente)
         out = {"fx": fx, "precios": precios, "fondos_actinver": fondos,
                "nuevos": fx.get("registros", 0) + sum(v["registros"] for v in precios.values()) + fondos.get("asignados", 0)}

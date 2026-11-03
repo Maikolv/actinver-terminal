@@ -70,7 +70,7 @@
     "estrella_antes": false,
     "estrella_agregada": true,
     "estrella_verificada": true,
-    "nota": "Se detectó tras descargar el clon. El clon creado en esta entrega se archivó de forma reversible en work/caveman-clon-redundante-20261031; no se eliminó ningún recurso previo.",
+    "nota": "Se detectó tras descargar el clon. El clon creado en esta entrega se archivó de forma reversible en C:/Users/MIKE/Documents/Codex/2026-10-16/tienes-total-facultad-sobre-mi-pc-2/work/caveman-clon-redundante-20261031; no se eliminó ningún recurso previo.",
     "tipo": "skill",
     "sha256_skill": "b4bb6fe3bf3da222993ca0aee5e7c6f5368b182dd30ce1172e8f8e3280eb7052",
     "licencia_origen_local": "C:/Users/MIKE/Documents/Codex/2026-10-16/tienes-total-facultad-sobre-mi-pc-2/work/caveman-clon-redundante-20261031/LICENSE",
@@ -219,7 +219,7 @@
     "github": "affaan-m/ECC",
     "commit": "4eb71d92a39cab44ad40ac9d8a6a5ccb4029d6c2",
     "estado": "ya estaba local; no se descargó de nuevo",
-    "licencia_archivos": [
+    "licencia_declarada": "MIT", "licencia_archivos": [
       "LICENSE"
     ],
     "estrella_antes": true,
@@ -398,6 +398,8 @@
     "remote": "https://github.com/senlindesign/taste-skill.git",
     "github": "senlindesign/taste-skill",
     "commit": "6dce223f2f5665d3636ca9a44ec3a7aa1322a9b8",
+    "licencia_declarada": "MIT",
+    "licencia_evidencia": "README.md del commit fijado: MIT © 2025 Sen Lin; sin texto completo LICENSE rastreado. Declaración confirmada, términos completos pendientes; no incorporar código por esta nota.",
     "estado": "ya estaba local; no se descargó de nuevo",
     "licencia_archivos": [],
     "estrella_antes": true,
@@ -442,11 +444,160 @@
     "github": "anthropics/skills",
     "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
     "estado": "ya estaba local; no se descargó de nuevo",
-    "licencia_archivos": [],
+    "licencia_archivos": [
+      "skills/academy-guide/LICENSE.txt",
+      "skills/algorithmic-art/LICENSE.txt",
+      "skills/brand-guidelines/LICENSE.txt",
+      "skills/canvas-design/LICENSE.txt",
+      "skills/claude-api/LICENSE.txt",
+      "skills/discernment-nudge/LICENSE.txt",
+      "skills/docx/LICENSE.txt",
+      "skills/frontend-design/LICENSE.txt",
+      "skills/internal-comms/LICENSE.txt",
+      "skills/mcp-builder/LICENSE.txt",
+      "skills/pdf/LICENSE.txt",
+      "skills/pptx/LICENSE.txt",
+      "skills/skill-creator/LICENSE.txt",
+      "skills/slack-gif-creator/LICENSE.txt",
+      "skills/theme-factory/LICENSE.txt",
+      "skills/web-artifacts-builder/LICENSE.txt",
+      "skills/webapp-testing/LICENSE.txt",
+      "skills/xlsx/LICENSE.txt"
+    ],
     "estrella_antes": true,
     "estrella_agregada": false,
     "estrella_verificada": true,
-    "tipo": "repositorio"
+    "tipo": "repositorio",
+    "licencia_alcance": "Mixta por skill: Apache-2.0 y propietaria/source-available; no existe permiso general MIT.",
+    "licencias_por_skill": [
+      {
+        "archivo": "skills/academy-guide/LICENSE.txt",
+        "skill": "academy-guide",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/academy-guide/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/algorithmic-art/LICENSE.txt",
+        "skill": "algorithmic-art",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/algorithmic-art/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/brand-guidelines/LICENSE.txt",
+        "skill": "brand-guidelines",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/brand-guidelines/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/canvas-design/LICENSE.txt",
+        "skill": "canvas-design",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/canvas-design/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/claude-api/LICENSE.txt",
+        "skill": "claude-api",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/claude-api/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/discernment-nudge/LICENSE.txt",
+        "skill": "discernment-nudge",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/discernment-nudge/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/docx/LICENSE.txt",
+        "skill": "docx",
+        "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+        "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/docx/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/frontend-design/LICENSE.txt",
+        "skill": "frontend-design",
+        "clasificacion": "Apache-2.0",
+        "sha256": "eb3d7b5485466acbd81f2b496f595ab637d2792e268206b27d99e793bdb67549",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/frontend-design/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/internal-comms/LICENSE.txt",
+        "skill": "internal-comms",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/internal-comms/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/mcp-builder/LICENSE.txt",
+        "skill": "mcp-builder",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/mcp-builder/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/pdf/LICENSE.txt",
+        "skill": "pdf",
+        "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+        "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/pdf/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/pptx/LICENSE.txt",
+        "skill": "pptx",
+        "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+        "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/pptx/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/skill-creator/LICENSE.txt",
+        "skill": "skill-creator",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/slack-gif-creator/LICENSE.txt",
+        "skill": "slack-gif-creator",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/slack-gif-creator/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/theme-factory/LICENSE.txt",
+        "skill": "theme-factory",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/theme-factory/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/web-artifacts-builder/LICENSE.txt",
+        "skill": "web-artifacts-builder",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/web-artifacts-builder/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/webapp-testing/LICENSE.txt",
+        "skill": "webapp-testing",
+        "clasificacion": "Apache-2.0",
+        "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/LICENSE.txt"
+      },
+      {
+        "archivo": "skills/xlsx/LICENSE.txt",
+        "skill": "xlsx",
+        "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+        "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+        "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/xlsx/LICENSE.txt"
+      }
+    ],
+    "nota_licencias": "Inventario corregido por lectura de licencias anidadas en el commit fijado. No se copian contenidos ni se ejecutan skills. docs/proveedores-20261101-evidencia/skills-licencias-20261101.json"
   },
   {
     "nombre": "humanizer",
@@ -515,6 +666,8 @@
     "remote": "https://github.com/multica-ai/andrej-karpathy-skills.git",
     "github": "multica-ai/andrej-karpathy-skills",
     "commit": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+    "licencia_declarada": "MIT",
+    "licencia_evidencia": "README.md y .claude-plugin/plugin.json del commit fijado declaran MIT; sin texto completo LICENSE rastreado. Declaración confirmada, términos completos pendientes; no incorporar código por esta nota.",
     "estado": "descargado en esta entrega",
     "estrella_antes": true,
     "estrella_agregada": false,
@@ -551,5 +704,179 @@
     "licencia_archivos": [
       "LICENSE"
     ]
-  }
+  },
+  {
+    "nombre": "ppt-master",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ppt-master",
+    "remote": "https://github.com/hugohe3/ppt-master.git",
+    "github": "hugohe3/ppt-master",
+    "commit": "82468e8d888a00db79969e6090bc33e87bf016a0",
+    "estado": "clon local verificado; referencia para presentaciones",
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_declarada": "MIT",
+    "licencia_archivos": ["LICENSE"]
+  },
+  {
+    "nombre": "OpenMontage",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\OpenMontage",
+    "remote": "https://github.com/calesthio/OpenMontage.git",
+    "github": "calesthio/OpenMontage",
+    "commit": "195eab24478dc9363326aec437aefc3701635ddf",
+    "estado": "clon separado; referencia audiovisual",
+    "estrella_antes": false,
+    "estrella_agregada": true,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_declarada": "AGPL-3.0"
+  },
+  {
+    "nombre": "archify",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\archify",
+    "remote": "https://github.com/tt-a1i/archify.git",
+    "github": "tt-a1i/archify",
+    "commit": "a4065941f12be7967436261d9934784e381d423c",
+    "estado": "clon local de la referencia de Broch Builds; atribución al reel pendiente",
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_declarada": "Apache-2.0"
+  },
+  {
+    "nombre": "hyperframes",
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\hyperframes",
+    "remote": "https://github.com/heygen-com/hyperframes.git",
+    "github": "heygen-com/hyperframes",
+    "commit": "b2acef5869bf6375e855ef3795014e6a3aa46bbb",
+    "estado": "árbol local limpio; referencia audiovisual",
+    "estrella_antes": true,
+    "estrella_agregada": false,
+    "estrella_verificada": true,
+    "tipo": "repositorio",
+    "licencia_declarada": "Apache-2.0",
+    "licencia_archivos": ["LICENSE"]
+  },
+  {
+  "nombre": "headroom",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\headroom",
+  "remote": "https://github.com/headroomlabs-ai/headroom.git",
+  "github": "headroomlabs-ai/headroom",
+  "commit": "7e0094d6c8b97492468b846855fea5c4acce9fec",
+  "estado": "clon local; referencia",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "Apache-2.0", "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "career-ops",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\career-ops",
+  "remote": "https://github.com/career-ops-hq/career-ops.git",
+  "github": "career-ops-hq/career-ops",
+  "commit": "0184805d575f6e25eb780623b34e6e1087b157a9",
+  "estado": "clon local; referencia",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "MIT", "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "BMAD-METHOD",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\BMAD-METHOD",
+  "remote": "https://github.com/bmad-code-org/BMAD-METHOD.git",
+  "github": "bmad-code-org/BMAD-METHOD",
+  "commit": "022be9314e4facd16826104a9f8033e1c5ed4fdc",
+  "estado": "clon local de referencia",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "MIT",
+  "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "claude-mem",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\claude-mem",
+  "remote": "https://github.com/thedotmack/claude-mem.git",
+  "github": "thedotmack/claude-mem",
+  "commit": "02584c4ac9d92fea45adf5c61e22c546b5738621",
+  "estado": "clon local de referencia",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "Apache-2.0",
+  "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "i-have-adhd",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\i-have-adhd",
+  "remote": "https://github.com/ayghri/i-have-adhd.git",
+  "github": "ayghri/i-have-adhd",
+  "commit": "1ecea1993b7fce257ffbd686c070948b5e07eda6",
+  "estado": "clon de referencia de Broch Builds; atribución exacta al reel pendiente",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "MIT", "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "marketingskills",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\marketingskills",
+  "remote": "https://github.com/coreyhaines31/marketingskills.git",
+  "github": "coreyhaines31/marketingskills",
+  "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+  "estado": "clon local de referencia",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "MIT", "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "get-shit-done",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\get-shit-done",
+  "remote": "https://github.com/gsd-build/get-shit-done.git",
+  "github": "gsd-build/get-shit-done",
+  "commit": "bdcaab2c752d9a33a1a1ca9acf3a3c81fb991815",
+  "estado": "clon de referencia; repositorio archivado",
+  "estrella_antes": false,
+  "estrella_agregada": true,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "MIT", "licencia_archivos": [
+    "LICENSE"
+  ]
+},
+  {
+  "nombre": "Understand-Anything",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\Understand-Anything",
+  "remote": "https://github.com/Egonex-AI/Understand-Anything.git",
+  "github": "Egonex-AI/Understand-Anything",
+  "commit": "4e6d3299017a7432da15957874992837a315c5b4",
+  "estado": "clon local de referencia",
+  "estrella_antes": true,
+  "estrella_agregada": false,
+  "estrella_verificada": true,
+  "tipo": "repositorio",
+  "licencia_declarada": "MIT", "licencia_archivos": [
+    "LICENSE"
+  ]
+}
 ]

@@ -1,0 +1,9 @@
+# Procedencia de datos: revisión del estado vigente — 2-nov-2026
+
+La descripción histórica de optimización no cubría todo el esquema actual. terminal/migraciones.py ya crea event_time, available_at e ingested_at en los datos temporales y completar_tiempos rellena los faltantes sin sobrescribir marcas existentes. terminal/ingesta.py llama a esa función al finalizar actualizar. Los registros de precios conservan además proveedor, fecha, hora_cotizacion y obtenido_en; no se necesita otro esquema solo para traducir los nombres.
+
+Para cierres diarios, event_time proviene del calendario de sesión y available_at del cierre más el retraso configurado. Esa disponibilidad es una regla estimada, no prueba de hora de publicación observada. Para cotizaciones con hora, se conserva el evento y la recepción registrada; para publicaciones de investigación se usa disponible_desde/confirmado_en. La fecha de descarga nunca debe reemplazar silenciosamente una publicación histórica. SIN DATO cuando no haya un tiempo conocido que pueda atribuirse a la fuente.
+
+Punto pendiente de PERF31-06: comprobar la conservación extremo a extremo por cada camino de respaldo y los clientes que no pasan por Adaptador._get. La existencia de columnas o de una normalización final no basta para declarar esa cobertura. No se alteraron reglas de disponibilidad, modelos, cortes de datos ni backtests en esta revisión.
+
+Lectura directa acotada: terminal/migraciones.py (disponibilidad_precio, disponibilidad_fx, completar_tiempos), terminal/ingesta.py (inserción de precios y cierre de actualizar), terminal/cotizaciones.py (Cotizacion y proveedores almacenados), terminal/centro_investigacion.py (disponible_desde y confirmado_en). codebase-memory y cobertura devolvieron Transport closed; no se atribuye cobertura al índice.

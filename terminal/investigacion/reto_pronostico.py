@@ -20,7 +20,7 @@ from datetime import UTC, date, datetime
 
 import pandas as pd
 
-from . import evaluacion, pronosticos
+from . import lecturas, pronosticos
 
 log = logging.getLogger("terminal.pronostico")
 
@@ -150,7 +150,7 @@ def emitir_si_toca(ajustes, horizontes=(1, 5)) -> bool:
 
 
 def _exp(con: sqlite3.Connection, H: int, demo: bool) -> dict | None:
-    return evaluacion.ultimo(con, H, demo)
+    return lecturas.ultimo(con, H, demo)
 
 
 def por_emisora(con: sqlite3.Connection, filas: list[dict], ahora: datetime | None = None) -> list[dict]:

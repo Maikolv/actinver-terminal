@@ -1,6 +1,12 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {buscarPaleta,signo,recortar,normalizarTamanos,CATALOGO,NOMBRES_PRESET,obtener} from '../web/static/mesa.mjs';
+import {buscarPaleta,signo,fmt,recortar,normalizarTamanos,CATALOGO,NOMBRES_PRESET,obtener} from '../web/static/mesa.mjs';
+
+test('el formato numérico distingue cero de campos vacíos o booleanos', () => {
+  for(const valor of [null,undefined,'','  ',false,true,NaN,Infinity])assert.equal(fmt(valor),'SIN DATO');
+  assert.equal(fmt(0),'0.00');
+  assert.equal(fmt('0'),'0.00');
+});
 
 const catalogo=[{id:'SIC:NVDA',clave_operable:'NVDA',nombre:'NVIDIA Corp'},{id:'BMV:GMEXICO',clave_operable:'GMEXICO B',nombre:'Grupo México'}];
 const secciones=[{titulo:'Velas',url:'/?vista=tab-velas'},{titulo:'Datos y fuentes',url:'/?vista=tab-universo'}];

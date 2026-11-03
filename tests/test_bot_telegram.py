@@ -42,6 +42,7 @@ class _Claude:
 
 
 def test_pregunta_con_claude_usa_contexto_de_solo_lectura_y_tope(con, ajustes):
+    ajustes.datos["app"]["solo_proveedores_gratuitos"] = False  # Cliente falso, sin llamadas externas.
     falso = _Claude()
     cb = bt.Chatbot(ajustes, cliente_claude=falso)
     cb.max_hora = 1
@@ -54,6 +55,7 @@ def test_pregunta_con_claude_usa_contexto_de_solo_lectura_y_tope(con, ajustes):
 
 
 def test_negativa_de_claude(con, ajustes):
+    ajustes.datos["app"]["solo_proveedores_gratuitos"] = False  # Cliente falso, sin llamadas externas.
     cb = bt.Chatbot(ajustes, cliente_claude=_Claude(stop="refusal"))
     assert "No puedo responder" in cb.responder(con, "pregunta")
 
@@ -68,4 +70,6 @@ def test_sin_credencial_no_se_activa_claude(ajustes, monkeypatch, tmp_path):
     monkeypatch.setattr(bt, "costo_aprobado", lambda s: False)
     assert bt.credencial_claude() and bt.Chatbot(ajustes).motor() == "local"
     monkeypatch.setattr(bt, "costo_aprobado", lambda s: s == "claude_api")
+    assert bt.Chatbot(ajustes).motor() == "local"  # El mandato gratuito prevalece sobre la aprobación antigua.
+    ajustes.datos["app"]["solo_proveedores_gratuitos"] = False
     assert bt.Chatbot(ajustes).motor() == "claude"

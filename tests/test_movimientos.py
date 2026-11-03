@@ -10,11 +10,32 @@ import pytest
 from terminal import alertas
 from terminal.movimientos import almacen as alm
 from terminal.movimientos import sec, servicio
+from terminal.adaptadores.base import LimiteAlcanzado
+from terminal.proveedores_mesa import SECResultados
 
 F = Path(__file__).parent / "fixtures" / "sec"
 TICKERS = json.loads((F / "company_tickers_extracto.json").read_text(encoding="utf-8"))
 BRK = "1067983"
 APA = "1656456"
+
+
+def test_pausa_sec_compartida_entre_movimientos_y_mesa(con):
+    url = "https://data.sec.gov/submissions/CIK0000320193.json"
+    agente = "Pruebas contacto@example.invalid"
+    consultas = []
+
+    def responder(peticion):
+        consultas.append(peticion)
+        return httpx.Response(503, headers={"Retry-After": "120"})
+
+    with httpx.Client(transport=httpx.MockTransport(responder)) as cli:
+        movimientos = sec.ClienteSEC(agente, cliente=cli, con=con)
+        with pytest.raises(sec.ErrorSEC, match="Retry-After"):
+            movimientos.get(url)
+        mesa = SECResultados(con, {}, agente, cliente=cli)
+        with pytest.raises(LimiteAlcanzado, match="Retry-After"):
+            mesa._peticion(url, ahora=datetime.now(UTC))
+    assert len(consultas) == 1
 
 
 def _13f(con, prefijo, acceso, cik, fecha, aceptado):

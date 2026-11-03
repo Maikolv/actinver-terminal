@@ -1,0 +1,71 @@
+diff --git a/terminal/ingesta.py b/terminal/ingesta.py
+index 3d9fbe2..97a8481 100644
+--- a/terminal/ingesta.py
++++ b/terminal/ingesta.py
+@@ -6,7 +6,7 @@ import sqlite3
+ from datetime import UTC, date, datetime, timedelta
+ 
+ from . import vigencia
+-from .adaptadores import CLASES, FX_USDMXN, ErrorProveedor, LimiteAlcanzado
++from .adaptadores import CLASES, FX_USDMXN, Barra, ErrorProveedor, LimiteAlcanzado
+ from .config import Ajustes, credencial, secreto
+ from .db import ahora as ahora_db, transaccion
+ 
+@@ -25,7 +25,11 @@ def construir_adaptadores(con: sqlite3.Connection, ajustes: Ajustes, cliente=Non
+     out = {}
+     for n, clase in CLASES.items():
+         extra = {"secreto": secreto(n)} if n == "alpaca" else {}
+-        out[n] = clase(con, prov.get(n, {}), credencial(n), cliente=cliente, **extra)
++        cfg = prov.get(n, {})
++        # Estos conectores actuales requieren contrato/plan de pago; la clave no concede permiso de gasto.
++        if ajustes["app"].get("solo_proveedores_gratuitos", True) and n in {"twelvedata", "barchart"}:
++            cfg = {**cfg, "activo": False}
++        out[n] = clase(con, cfg, credencial(n), cliente=cliente, **extra)
+     return out
+ 
+ 
+@@ -164,6 +168,19 @@ def orden_cola(con, instrs: list[dict], ids_prioritarios: list[str] | None = Non
+     return sorted(instrs, key=clave)
+ 
+ 
++def _barras_en_intervalo(barras: list[Barra], desde: date, hasta: date) -> tuple[list[Barra], int]:
++    """No normaliza ni inventa fechas: acepta solo fechas ISO canónicas del intervalo pedido."""
++    validas = []
++    for barra in barras:
++        try:
++            fecha = date.fromisoformat(barra.fecha)
++        except (ValueError, TypeError):
++            continue
++        if barra.fecha == fecha.isoformat() and desde <= fecha <= hasta:
++            validas.append(barra)
++    return validas, len(barras) - len(validas)
++
++
+ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | None = None,
+                        hoy: date | None = None, ids_propuesta: list[str] | None = None,
+                        ahora: datetime | None = None) -> dict:
+@@ -192,8 +209,12 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
+             desde = (ult + timedelta(days=1)) if ult else hoy - timedelta(days=365 * ANIOS_HISTORIA)
+             if respaldo:
+                 desde = max(desde, esperada)  # recuperar el cierre faltante, no cinco años por cada respaldo
++            hasta = min(hoy, esperada)  # una barra de la sesión abierta todavía no es un cierre
++            if desde > hasta:
++                resumen[n]["al_dia"] += 1
++                break
+             try:
+-                barras = a.historico(ins, desde, hoy)
++                barras = a.historico(ins, desde, hasta)
+             except LimiteAlcanzado as e:
+                 agotados.add(n)
+                 mensajes[n].append(str(e))
+@@ -206,6 +227,10 @@ def actualizar_precios(con, adaptadores: dict, ids_prioritarios: list[str] | Non
+                 if respaldo:
+                     break  # un solo proveedor de respaldo, también si falla
+                 continue
++            barras, descartadas = _barras_en_intervalo(barras, desde, hasta)
++            if descartadas:
++                resumen[n]["errores"] += 1
++                mensajes[n].append(f"{ins['id']}: se descartaron {descartadas} barras con fecha inválida o fuera del intervalo solicitado")
+             _intento(con, ins["id"], n, len(barras), hoy)
+             if not barras and not respaldo and ins['id'] in (ids_prioritarios or []):
+                 codigo = vigencia.codigo_calendario(ins)

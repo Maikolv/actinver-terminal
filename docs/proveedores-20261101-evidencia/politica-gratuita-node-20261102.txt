@@ -1,0 +1,72 @@
+✔ GET concurrentes se comparten; al terminar se consulta de nuevo, sin caché de precios (20.4968ms)
+✔ un error libera la solicitud y no reintenta ni devuelve datos anteriores (5.7981ms)
+✔ POST nunca se agrupan (4.7017ms)
+✔ el polling de Ranking no consulta con la página oculta (4.5589ms)
+✔ una sola familia tipográfica: --mono es la misma fuente y no hay monoespaciadas sueltas (45.0758ms)
+✔ los widgets de terceros siempre se piden en tema oscuro (23.1685ms)
+✔ ningún widget cortado: ajuste de alto con tope y rótulo del proveedor dentro de sus 32 px (2.2435ms)
+✔ cada sección de la terminal tiene guía completa, sin excepción (8.8142ms)
+✔ cada página de área carga la guía y tiene la suya (15.9348ms)
+✔ la oficina no muestra documentos de trabajo y ofrece accesos al instrumento (2.1864ms)
+✔ la oficina lista primero los instrumentos con datos guardados (1.2814ms)
+✔ todas las áreas comparten logo, cabecera y la misma barra de navegación (9.5577ms)
+✔ los recursos de backtesting viven en Datos y fuentes (2.6102ms)
+file:///C:/Users/MIKE/Desktop/Repos/actinver-terminal/tests/mesa.test.mjs:4
+import {normalizarAltos} from '../web/static/mesa.mjs';
+        ^^^^^^^^^^^^^^^
+SyntaxError: The requested module '../web/static/mesa.mjs' does not provide an export named 'normalizarAltos'
+    at #asyncInstantiate (node:internal/modules/esm/module_job:327:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:431:5)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.19.0
+✖ tests\mesa.test.mjs (1267.6712ms)
+✔ 22 tipos: 15 externos, 6 accesos y la calculadora manual (15.4521ms)
+✔ cada panel externo tiene ruta en el servidor y cada acceso apunta a una pestaña real (1.6204ms)
+✔ las disposiciones solo nombran paneles del catálogo y sin repetidos (2.9725ms)
+✔ los paneles externos avisan del origen y ningún texto del catálogo promete tiempo real (4.6879ms)
+✔ la paleta busca instrumentos por clave y nombre, secciones, paneles y disposiciones (14.5947ms)
+✔ la paleta nunca ofrece acciones financieras (1.6632ms)
+✔ signo y flecha además del color; SIN DATO cuando no hay variación válida (4.1679ms)
+✔ rango temporal recorta sin inventar puntos (8.2729ms)
+✔ tamaños guardados: migran disposiciones viejas y descartan ids o valores desconocidos (1.189ms)
+✔ consultas simultáneas a la misma ruta comparten una sola petición y no quedan en caché (88.0795ms)
+✔ contrato de 12 escenarios NQ y resultados finitos (9.8382ms)
+✔ el archivo Pine comparte epsilon, límites y no tiene operaciones ni alertas (8.2252ms)
+✔ Velas recibe el instrumento codificado sin añadir un panel (5.6502ms)
+✔ el escenario advierte gap y distingue tope de fill en JS y Pine (3.1304ms)
+✔ se mantiene la calculadora solo NQ sin cambiar sus unidades (1.2859ms)
+✔ el selector cubre todas las pestañas reales de la terminal (17.9009ms)
+✔ todas las áreas independientes existen y comparten navegación (98.5074ms)
+✔ el navegador sólo admite destinos locales (1.5726ms)
+✔ catálogo completo, sin duplicados ni instrumentos inactivos, preserva vencimiento (234.1167ms)
+✔ catálogo parcial o vacío no inventa instrumentos (3.1354ms)
+✔ sin datos no inventa mercado ni delta (68.2937ms)
+✔ comparación sólo con indicadores finitos y una fuente real (5.1244ms)
+✔ datos antiguos o futuros suspenden revisión intradía (1.1538ms)
+✔ delta cero válido, lado ausente o feeds mezclados bloqueados (1.1444ms)
+✔ flecha arriba inicial selecciona la última sugerencia y el recorrido envuelve (4.054ms)
+✔ paleta compartida busca nombre, clave e ID y solo acepta destinos locales (3.3672ms)
+✔ paleta limita resultados para no desplegar el universo completo (1.2922ms)
+✔ la Mesa coincide con la referencia exacta en los escenarios NQ (USD 20/punto) (67.1737ms)
+✔ contratos nunca excede lo que paga el presupuesto y TP nunca pasa de R (redondeo conservador) (87.1658ms)
+✔ semilla reproducible y partición completa de intentos hipotéticos (73.2218ms)
+✔ casos límite de acierto, costos y horizonte no fabrican aprobación (26.5875ms)
+✔ trailing restrictivo no mejora resultados frente al umbral estático con mismas secuencias (21.0613ms)
+✔ rechaza no finitos, riesgo cero, costos negativos y cómputo excesivo (1.9502ms)
+✔ centavos exactos evitan un trade adicional por deriva binaria y no admiten subcentavos (23.8744ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 47
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3065.6807
+
+✖ failing tests:
+
+test at tests\mesa.test.mjs:1:1
+✖ tests\mesa.test.mjs (1267.6712ms)
+  'test failed'

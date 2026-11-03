@@ -8,7 +8,7 @@ import json
 import os
 from zoneinfo import ZoneInfo
 from hashlib import sha256
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from .. import db
 from . import almacen, calculos
@@ -39,7 +39,15 @@ def catalogo(con, ajustes) -> dict:
         if cripto.cfg.get("activo", True) else []
     importados = sorted(set(almacen.simbolos(con, "flujo_barras")) | set(almacen.simbolos(con, "flujo_operaciones"))
                         | set(almacen.simbolos(con, "flujo_libro")) | set(almacen.simbolos(con, "flujo_opciones")))
-    return {"sic": sic, "cripto": pares, "con_datos": importados, "intervalos": list(INTERVALOS)}
+    demo = getattr(ajustes, "es_demo", False)
+    corte = (date.today() - timedelta(days=400)).isoformat()
+    cierres_bmv = [r[0] for r in con.execute(
+        "SELECT i.id FROM instrumentos i WHERE i.id LIKE 'BMV:%' AND i.estado='activo' "
+        "AND EXISTS (SELECT 1 FROM precios p WHERE p.instrumento_id=i.id AND p.fecha>=? AND p.cierre>0 "
+        "AND ((? AND p.proveedor='demo_sintetico' AND p.tipo_dato='sintetico') "
+        "OR (NOT ? AND p.proveedor<>'demo_sintetico' AND p.tipo_dato IN ('cierre','nav')))) ORDER BY i.id",
+        (corte, demo, demo))]
+    return {"sic": sic, "cripto": pares, "con_datos": importados, "cierres_bmv": cierres_bmv, "intervalos": list(INTERVALOS)}
 
 
 def estado(con, ajustes, env: dict | None = None) -> dict:
@@ -113,7 +121,7 @@ def actualizar(con, ajustes, tipo: str, simbolo: str, intervalo: str = "1Day", d
             if not origen:
                 raise FuenteNoDisponible("sin proveedor para este instrumento (solo emisoras con listado en EE. UU.; "
                                          "para la BMV importe un CSV)")
-            a = Alpaca(ajustes, env, cliente)
+            a = Alpaca(ajustes, env, cliente, con=con)
             if tipo == "contratos_oi":
                 metadatos, p = a.contratos_opciones(origen)
                 for meta in metadatos:

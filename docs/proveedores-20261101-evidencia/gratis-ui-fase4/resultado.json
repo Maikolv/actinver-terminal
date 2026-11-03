@@ -1,0 +1,65 @@
+{
+  "nota": "Base aislada con 379 observaciones públicas reales; incluye tres previsiones Alpha y bonos mensuales; 64 cierres públicos históricos de referencia; sin cartera ni credenciales. Bloqueo de terceros prueba interfaz, no disponibilidad de proveedores.",
+  "pruebas": [
+    {
+      "ancho": 1440,
+      "tema": "dark",
+      "archivo": "1440-dark.png",
+      "dimensiones": {
+        "ancho": 1440,
+        "contenido": 1440
+      },
+      "filas_calendario": 135,
+      "variaciones_diarias": 32,
+      "frecuencia_bono10": "mensual (promedio)",
+      "fuente_dgs30": "fred_macro",
+      "periodo_dgs30": "2026-10-29",
+      "errores": []
+    },
+    {
+      "ancho": 1440,
+      "tema": "light",
+      "archivo": "1440-light.png",
+      "dimensiones": {
+        "ancho": 1440,
+        "contenido": 1440
+      },
+      "filas_calendario": 135,
+      "variaciones_diarias": 32,
+      "frecuencia_bono10": "mensual (promedio)",
+      "fuente_dgs30": "fred_macro",
+      "periodo_dgs30": "2026-10-29",
+      "errores": []
+    },
+    {
+      "ancho": 390,
+      "tema": "dark",
+      "archivo": "390-dark.png",
+      "dimensiones": {
+        "ancho": 390,
+        "contenido": 390
+      },
+      "filas_calendario": 135,
+      "variaciones_diarias": 32,
+      "frecuencia_bono10": "mensual (promedio)",
+      "fuente_dgs30": "fred_macro",
+      "periodo_dgs30": "2026-10-29",
+      "errores": []
+    },
+    {
+      "ancho": 390,
+      "tema": "light",
+      "archivo": "390-light.png",
+      "dimensiones": {
+        "ancho": 390,
+        "contenido": 390
+      },
+      "filas_calendario": 135,
+      "variaciones_diarias": 32,
+      "frecuencia_bono10": "mensual (promedio)",
+      "fuente_dgs30": "fred_macro",
+      "periodo_dgs30": "2026-10-29",
+      "errores": []
+    }
+  ]
+}

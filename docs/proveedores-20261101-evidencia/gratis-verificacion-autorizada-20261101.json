@@ -1,0 +1,146 @@
+{
+  "corte": "2026-11-01T11:41:06.182508+00:00",
+  "fuentes": {
+    "F2": {
+      "estado": "confirmado",
+      "solicitudes": 1,
+      "observaciones_validas": 23,
+      "nuevas": 23,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:41:07.754605+00:00",
+      "identidad_observada": [
+        {
+          "serie": "DGS30",
+          "simbolo": "",
+          "titulo": "Tasa del Tesoro de EE. UU. a 30 años",
+          "unidad": "%"
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {},
+      "activado": false,
+      "http": [
+        {
+          "host": "api.stlouisfed.org",
+          "ruta": "/fred/series/observations",
+          "http": 200
+        }
+      ]
+    },
+    "F3": {
+      "estado": "confirmado",
+      "solicitudes": 2,
+      "observaciones_validas": 24,
+      "nuevas": 24,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:41:08.111103+00:00",
+      "identidad_observada": [
+        {
+          "serie": "BANXICO_OBJETIVO",
+          "simbolo": "",
+          "titulo": "Tasa objetivo",
+          "unidad": "%"
+        }
+      ],
+      "id_sie": "SF61745",
+      "emisoras_confirmadas": {},
+      "activado": false,
+      "http": [
+        {
+          "host": "www.banxico.org.mx",
+          "ruta": "/SieAPIRest/service/v1/series/SF61745",
+          "http": 200
+        },
+        {
+          "host": "www.banxico.org.mx",
+          "ruta": "/SieAPIRest/service/v1/series/SF61745/datos",
+          "http": 200
+        }
+      ]
+    },
+    "F4": {
+      "estado": "respuesta_no_confirmada",
+      "categoria": "proveedor",
+      "solicitudes": 1,
+      "activado": false,
+      "http": [
+        {
+          "host": "www.banxico.org.mx",
+          "ruta": "/SieAPIRest/service/v1/series/SP1",
+          "http": 200
+        }
+      ]
+    },
+    "F6": {
+      "estado": "confirmado",
+      "solicitudes": 2,
+      "observaciones_validas": 21,
+      "nuevas": 21,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:41:08.452725+00:00",
+      "identidad_observada": [
+        {
+          "serie": "BANXICO_BONO10",
+          "simbolo": "",
+          "titulo": "Bonos a tasa fija a 10 años Tasa de rendimiento promedio mensual, en por ciento anual",
+          "unidad": "%"
+        }
+      ],
+      "id_sie": "SF30057",
+      "emisoras_confirmadas": {},
+      "activado": false,
+      "http": [
+        {
+          "host": "www.banxico.org.mx",
+          "ruta": "/SieAPIRest/service/v1/series/SF30057",
+          "http": 200
+        },
+        {
+          "host": "www.banxico.org.mx",
+          "ruta": "/SieAPIRest/service/v1/series/SF30057/datos",
+          "http": 200
+        }
+      ]
+    },
+    "F1-ALPHA": {
+      "estado": "confirmado",
+      "solicitudes": 1,
+      "observaciones_validas": 3,
+      "nuevas": 3,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:41:09.053745+00:00",
+      "identidad_observada": [
+        {
+          "serie": "estimacion_bpa:2026-11-03",
+          "simbolo": "AMD",
+          "titulo": "Estimación de BPA (fecha prevista, no anuncio confirmado)",
+          "unidad": "USD/acción"
+        },
+        {
+          "serie": "estimacion_bpa:2026-11-17",
+          "simbolo": "NVDA",
+          "titulo": "Estimación de BPA (fecha prevista, no anuncio confirmado)",
+          "unidad": "USD/acción"
+        },
+        {
+          "serie": "estimacion_bpa:2026-12-16",
+          "simbolo": "MU",
+          "titulo": "Estimación de BPA (fecha prevista, no anuncio confirmado)",
+          "unidad": "USD/acción"
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {},
+      "activado": false,
+      "http": [
+        {
+          "host": "www.alphavantage.co",
+          "ruta": "/query",
+          "http": 200
+        }
+      ]
+    }
+  },
+  "solicitudes": 7,
+  "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+}

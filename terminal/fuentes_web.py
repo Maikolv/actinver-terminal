@@ -212,39 +212,43 @@ def actualizar_macro(con: sqlite3.Connection, ajustes: dict, cliente=None, forza
         return {"estado": "error", "mensaje": str(e)}
     ts = ahora()
     with transaccion(con):
-        con.executemany("INSERT OR REPLACE INTO eventos_macro (id, fecha, pais, titulo, impacto, pronostico, previo, fuente, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?)",
+        con.executemany("INSERT OR REPLACE INTO eventos_macro (id, fecha, pais, titulo, impacto, pronostico, previo, fuente, obtenido_en, event_time, available_at, ingested_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                         [(e["id"], e["fecha"], e["pais"], e["titulo"], e["impacto"], e["pronostico"], e["previo"],
-                          "forexfactory", ts) for e in ev])
+                          "forexfactory", ts, e["fecha"], ts, ts) for e in ev])
         registrar_versiones_macro(con, ev, ts)
     return {"estado": "ok", "registros": len(ev)}
 
 
 def registrar_versiones_macro(con: sqlite3.Connection, eventos: list[dict], ts: str) -> int:
     """Guarda una versión nueva de cada evento solo si cambió el consenso, el previo o el dato publicado.
-    Así se sabe QUÉ se conocía y CUÁNDO (revisiones incluidas)."""
+    El llamador confirma la transacción junto con el calendario vigente."""
     n = 0
     for e in eventos:
-        ult = con.execute("SELECT pronostico, previo, actual FROM eventos_macro_versiones WHERE evento_id=? "
-                          "ORDER BY obtenido_en DESC LIMIT 1", (e["id"],)).fetchone()
-        nuevo = (e.get("pronostico") or "", e.get("previo") or "", e.get("actual") or "")
-        if ult is None or tuple(x or "" for x in ult) != nuevo:
+        ult = con.execute("SELECT fecha, pronostico, previo, CASE WHEN julianday(obtenido_en)>=julianday(fecha) "
+                          "THEN actual ELSE '' END FROM eventos_macro_versiones WHERE evento_id=? "
+                          "ORDER BY julianday(obtenido_en) DESC, rowid DESC LIMIT 1", (e["id"],)).fetchone()
+        fecha = e.get("fecha")
+        publicado = fecha and datetime.fromisoformat(fecha) <= datetime.fromisoformat(ts)
+        nuevo = (e.get("pronostico") or "", e.get("previo") or "", (e.get("actual") or "") if publicado else "")
+        if ult is None or tuple(x or "" for x in ult) != (fecha or "", *nuevo):
             con.execute("INSERT OR IGNORE INTO eventos_macro_versiones (evento_id, obtenido_en, fecha, pais, titulo, impacto, "
                         "pronostico, previo, actual, fuente) VALUES (?,?,?,?,?,?,?,?,?,?)",
                         (e["id"], ts, e.get("fecha"), e.get("pais"), e.get("titulo"), e.get("impacto"), *nuevo, "forexfactory"))
             n += 1
-    con.commit()
     return n
 
 
 def macro_conocido_en(con: sqlite3.Connection, evento_id: str, T: str) -> dict | None:
     """Lo que se sabía del evento a la hora T: el consenso vigente y el dato efectivo SOLO si ya se había publicado
     (hora del evento ≤ T) y la terminal ya lo había obtenido (obtenido_en ≤ T)."""
-    f = con.execute("SELECT * FROM eventos_macro_versiones WHERE evento_id=? AND obtenido_en<=? ORDER BY obtenido_en DESC LIMIT 1",
+    f = con.execute("SELECT * FROM eventos_macro_versiones WHERE evento_id=? AND julianday(obtenido_en)<=julianday(?) "
+                    "ORDER BY julianday(obtenido_en) DESC, rowid DESC LIMIT 1",
                     (evento_id, T)).fetchone()
     if not f:
         return None
     d = dict(f)
-    publicado = d["fecha"] and datetime.fromisoformat(d["fecha"]) <= datetime.fromisoformat(T)
+    publicado = d["fecha"] and datetime.fromisoformat(d["fecha"]) <= min(
+        datetime.fromisoformat(T), datetime.fromisoformat(d["obtenido_en"]))
     if not publicado:
         d["actual"] = None
     d["actual_publicado"] = bool(publicado and d["actual"])
@@ -270,15 +274,20 @@ def actualizar_noticias(con: sqlite3.Connection, ajustes: dict, instrumentos: li
         ts = ahora()
         filas = []
         for it in items[:20]:
+            publicado = it["publicado"]
+            if publicado and datetime.fromisoformat(publicado) > datetime.fromisoformat(ts):
+                continue  # todavía no se puede tratar como publicado
             c = clasificar_titular(it["titulo"])
             ident = hashlib.sha1(f"{ins['id']}|{it.get('guid') or it['enlace']}".encode()).hexdigest()[:16]
             motivo = c["motivo"] + (f" · también menciona: {', '.join(it['otras_emisoras'][:5])}"
                                     if it.get("otras_emisoras") else "")
             filas.append((ident, ins["id"], it["titulo"], it["enlace"], it["publicado"], "seekingalpha_rss",
-                          c["impacto"], c["sentimiento"], motivo[:300], ts, it.get("autor", ""), it.get("tipo_contenido")))
+                          c["impacto"], c["sentimiento"], motivo[:300], ts, it.get("autor", ""),
+                          it.get("tipo_contenido"), publicado, ts, ts))
         with transaccion(con):
             con.executemany("INSERT OR REPLACE INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, sentimiento, "
-                            "motivo, obtenido_en, autor, tipo_contenido) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", filas)
+                            "motivo, obtenido_en, autor, tipo_contenido, event_time, available_at, ingested_at) "
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         n += len(filas)
     if not consultadas:
         return {"estado": "sin_emisoras", "registros": 0,
@@ -304,10 +313,11 @@ def actualizar_insiders(con: sqlite3.Connection, ajustes: dict, instrumentos: li
         ts = ahora()
         with transaccion(con):
             con.executemany("INSERT OR REPLACE INTO insiders (id, instrumento_id, fecha, nombre, cargo, codigo, acciones, precio, valor, "
-                            "enlace, fuente, obtenido_en, fecha_presentacion, cobertura) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
+                            "enlace, fuente, obtenido_en, fecha_presentacion, cobertura, event_time, available_at, ingested_at) "
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
                 (hashlib.sha1(f"{o['enlace']}|{o['fecha']}|{o['acciones']}|{o['codigo']}".encode()).hexdigest()[:16],
                  ins["id"], o["fecha"], o["nombre"], o["cargo"], o["codigo"], o["acciones"], o["precio"], o["valor"],
                  o["enlace"], "sec_edgar", ts, o.get("fecha_presentacion"),
-                 "emisora de EE. UU. (SEC); NO CUBRE BMV") for o in ops])
+                 "emisora de EE. UU. (SEC); NO CUBRE BMV", o["fecha"], ts, ts) for o in ops])
         n += len(ops)
     return {"estado": "ok" if not errores else "parcial", "registros": n, "errores": errores[:5]}

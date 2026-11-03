@@ -19,6 +19,7 @@ import json
 import math
 import sqlite3
 import time
+from contextlib import nullcontext
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -28,6 +29,8 @@ import pandas as pd
 from scipy.optimize import minimize
 
 from . import db, mercado, ranking, reto
+from .adaptadores.base import ErrorProveedor
+from .adaptadores.proveedores import Banxico
 from .config import Ajustes, credencial
 
 ANUAL = 252
@@ -51,9 +54,10 @@ def tasa_libre(con: sqlite3.Connection, ajustes: Ajustes, cliente: httpx.Client 
     error = "sin BANXICO_TOKEN" if not token else None
     if token:
         try:
-            r = (cliente or httpx.Client(timeout=15)).get(URL_SIE.format(s=SERIE_CETES28),
-                                                         headers={"Bmx-Token": token, "Accept": "application/json"})
-            r.raise_for_status()
+            with (nullcontext(cliente) if cliente is not None else httpx.Client(timeout=15)) as cli:
+                proveedor = Banxico(con, ajustes["proveedores"].get("banxico", {}), token, cliente=cli)
+                r = proveedor._get(URL_SIE.format(s=SERIE_CETES28),
+                                   headers={"Bmx-Token": token, "Accept": "application/json"}, intentos=1)
             d = r.json()["bmx"]["series"][0]["datos"][-1]
             dd, mm, aa = d["fecha"].split("/")
             nuevo = {"valor": round(float(d["dato"].replace(",", "")) / 100, 6), "fecha": f"{aa}-{mm}-{dd}",
@@ -62,7 +66,7 @@ def tasa_libre(con: sqlite3.Connection, ajustes: Ajustes, cliente: httpx.Client 
             db.escribir(con, "INSERT INTO ajustes_usuario VALUES ('cetes28', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
                              "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps(nuevo), db.ahora()))
             return nuevo
-        except (httpx.HTTPError, KeyError, IndexError, ValueError) as e:
+        except (ErrorProveedor, KeyError, IndexError, ValueError) as e:
             error = f"Banxico no respondió ({type(e).__name__})"
     if previo:
         return {**previo, "aviso": f"{error}: se usa la última tasa guardada"}

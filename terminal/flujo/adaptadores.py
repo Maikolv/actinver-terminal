@@ -54,10 +54,17 @@ def _cfg(ajustes, clave: str) -> dict:
 class Alpaca:
     nombre = "alpaca"
 
-    def __init__(self, ajustes=None, env: dict | None = None, cliente: httpx.Client | None = None):
+    def __init__(self, ajustes=None, env: dict | None = None, cliente: httpx.Client | None = None, *, con=None):
+        from ..adaptadores.base import Adaptador
+
         self.env = os.environ if env is None else env
         self.cfg = {"activo": True, **_cfg(ajustes, "alpaca")}
         self.cliente = cliente
+        self.pausa = Adaptador(con, {}) if con is not None else None
+        self.pausa_paper = Adaptador(con, {}) if con is not None else None
+        if self.pausa is not None:
+            self.pausa.proveedor = self.nombre
+            self.pausa_paper.proveedor = "alpaca_paper"
 
     def _get(self, ruta: str, params: dict) -> dict:
         if not self.cfg.get("activo", True):
@@ -65,6 +72,13 @@ class Alpaca:
         kid, sec = self.env.get("ALPACA_API_KEY_ID"), self.env.get("ALPACA_API_SECRET_KEY")
         if not (kid and sec):
             raise FuenteNoDisponible("faltan ALPACA_API_KEY_ID y ALPACA_API_SECRET_KEY en .env")
+        if self.pausa is not None:
+            from ..adaptadores.base import LimiteAlcanzado
+
+            try:
+                self.pausa._comprobar_pausa()
+            except LimiteAlcanzado as e:
+                raise FuenteNoDisponible(str(e)) from None
         cli = self.cliente or httpx.Client(timeout=15)
         try:
             r = cli.get(URL_DATOS + ruta, params=params, headers={"APCA-API-KEY-ID": kid, "APCA-API-SECRET-KEY": sec})
@@ -75,6 +89,8 @@ class Alpaca:
                 cli.close()
         if r.status_code in (401, 403):
             raise FuenteNoDisponible(f"Alpaca: credencial rechazada o sin permiso para este dato (HTTP {r.status_code})")
+        if self.pausa is not None and r.status_code in (429, 503) and "Retry-After" in r.headers:
+            self.pausa._registrar_pausa(r.headers["Retry-After"])
         if r.status_code == 429:
             raise FuenteNoDisponible("Alpaca: límite de consultas (HTTP 429)")
         if r.status_code != 200:
@@ -90,6 +106,13 @@ class Alpaca:
         kid, sec = self.env.get("ALPACA_PAPER_API_KEY_ID"), self.env.get("ALPACA_PAPER_API_SECRET_KEY")
         if not (kid and sec):
             raise FuenteNoDisponible("faltan credenciales específicas ALPACA_PAPER_API_KEY_ID/ALPACA_PAPER_API_SECRET_KEY para Paper")
+        if self.pausa_paper is not None:
+            from ..adaptadores.base import LimiteAlcanzado
+
+            try:
+                self.pausa_paper._comprobar_pausa()
+            except LimiteAlcanzado as e:
+                raise FuenteNoDisponible(str(e)) from None
         hoy = datetime.now(UTC).date()
         params = {"underlying_symbols": subyacente, "limit": limite, "status": "active",
                   "expiration_date_gte": hoy.isoformat(), "expiration_date_lte": (hoy + timedelta(days=DIAS_CADENA)).isoformat()}
@@ -102,6 +125,8 @@ class Alpaca:
                                 headers={"APCA-API-KEY-ID": kid, "APCA-API-SECRET-KEY": sec}, follow_redirects=False)
                 except httpx.HTTPError:
                     raise FuenteNoDisponible("Alpaca Paper: sin conexión") from None
+                if self.pausa_paper is not None and r.status_code in (429, 503) and "Retry-After" in r.headers:
+                    self.pausa_paper._registrar_pausa(r.headers["Retry-After"])
                 if r.status_code != 200:
                     raise FuenteNoDisponible(f"Alpaca Paper: consulta no disponible (HTTP {r.status_code}); sin alternativa de pago")
                 try:

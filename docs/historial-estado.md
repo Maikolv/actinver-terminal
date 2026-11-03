@@ -1,6 +1,16 @@
 # Historial de estado de actinver-terminal
 
+## Cierre de muestras Excel — 1-nov-2026
+
+La revisión en Excel 2013 abarcó diez hojas y todas las páginas de ambas muestras sintéticas. Se observaron contraste de entradas corregido, Método completo en Resumen y gráficos dentro del ancho de página. Se conservaron capturas por página sin imprimir, ejecutar Solver ni guardar desde Excel. La suite completa posterior a las correcciones terminó con 859 aprobadas, cero fallidas, una advertencia, 1097.18 s y salida 0. Registros en docs/excel-presentacion-20261101.md y docs/verificacion-conjunto-20261101.md. Alcance limitado a muestras y formato Carta; no prueba física ni validación de estrategia. Objetivo general aún abierto por pendientes externos.
+
 Archivado de `CLAUDE.md` el 18-oct-2026, sin cambios de texto, para mantener ese archivo breve. Lo vigente está en `CLAUDE.md`; aquí queda el detalle por fecha.
+
+## Verificación manual de proveedores gratuitos — 1-nov-2026
+
+Se comprobaron FRED DGS30, SIE SF61745/SP1/SF30057, SEC y Alpha mediante consultas oficiales autorizadas. SP1 confirmó el título legado del índice general nacional y SF30057 el promedio mensual a 10 años. Se añadieron 24 índices INPC y 32 BPA de MU/NVDA/AMD/XOM en la ampliación de seis GET, sin repetir el calendario ni activar servicios. El conocimiento comienza en cada captura; moneda/base contable no informadas y hora exacta/revisiones ausentes no se infieren.
+
+La revisión Chromium aislada de los datos guardados pasó en 1440 y 390 px, claro/oscuro, sin errores JS ni desbordamiento. La primera suite final se interrumpió por presión de memoria; no se presenta como aprobada. Evidencia y estado de su posterior ejecución: `docs/avance-gratuitos-20261101.md`. Sin operaciones, compras, mensajes externos ni commit/push.
 
 ## Estado comprobado (2026-10-12, v0.30.0, rama `main`)
 
@@ -378,3 +388,74 @@ Clon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuader
 ## Terminal profesional y Mesa — 1-nov-2026 (madrugada)
 
 Sistema negro/gris/blanco con rojo de identidad y contraste medido; Mesa con paleta, Seguimiento, cuadrícula configurable y paneles nativos (ficha, noticias, macro/resumen, calendario) de solo lectura; Excel de Markowitz con la misma identidad sin cambios numéricos. Resultados empresariales bloqueados por falta de fuente. Python 762/762, Node 40/40. Ver docs/terminal-pro-20261101.md.
+
+1-nov-2026 · TP01-04: persistencia de alto de marcos de Mesa (250–2000 px), teclado y restauración al recargar; paneles nativos con alto natural. 49 Node y dos recorridos de interfaz aprobados con proveedores simulados. Ver mesa-altos-20261101.md. Otros pendientes permanecen abiertos.
+
+1-nov-2026 · TP01-05 implementado y probado como componente; no se declara validada la cabecera completa. 51 pruebas Node; docs/paleta-principal-20261101.md. Sin operaciones.
+
+1-nov-2026 · Cierre de TP01-05: cuatro recorridos de página completa en FastAPI aislado, 390/1440 y claro/oscuro, sin errores JS, desbordamiento ni solicitudes distintas de GET. Capturas inspeccionadas; proveedores bloqueados. Evidencia: paleta-completa-ui/resultado.json.
+
+1-nov-2026 · TP01-07 verificado: incorporación a Seguimiento desde Mesa, misma lista, CSRF y origen conservados. Pruebas en base aislada; sin órdenes ni cambios en la lista habitual. Detalle: mesa-seguimiento-20261101.md.
+
+1-nov-2026 · TP01-03 parcial: plantilla sintética abierta y revisada visualmente en Excel 2013, guía/paramétrico/vista previa. Sin guardar ni imprimir. Segundo libro y hojas restantes pendientes por controlador; docs/excel-revision-visual-20261101.md.
+
+1-nov-2026 · R31-20: estrella actual OpenTerminal, 26 pruebas y compilación server/web reproducidas. Sin instalación, ejecución de servidor o modificación del upstream. Detalle: openterminal-reproduccion-20261101.md.
+
+1-nov-2026 · R31-09: corregida omisión de 18 licencias anidadas de anthropics/skills (14 Apache y 4 propietarias). No se declara licencia general MIT ni se cierran otras procedencias. Suite completa en seguimiento. Ver licencias-skills-revision-20261101.md.
+
+1-nov-2026 · R31-11 revalidado: protocolo Noise Bands existente, 25/25 hashes coinciden y prerregistro enlazado a resultados. Datos retrasados insuficientes (5 sesiones completas, 0 evaluables); sin nuevo backtest, inferencia ni operaciones. Ver nq-prerregistro-revision-20261101.md.
+
+1-nov-2026 · Corrección de navegación inicial de paleta (↑): 52 pruebas Node y dos recorridos Chromium del componente. Suite Python completa todavía en seguimiento; no se reinició.
+
+1-nov-2026 · Verificación completa: 856 aprobadas/1 falla por archivo de propietario Excel. Se conservó el registro, se ignoraron solo temporales estándar y pasaron 16 pruebas de seguridad. Repetición completa iniciada, sin resultado aún.
+
+1-nov-2026 · TP01-04 regresión corregida: dimensiones de disposiciones guardadas se aplican también al conservar nodos. tests/navegador/mesa-disposiciones.cjs verifica mismo iframe y restauración de ancho/alto en 390/1440. Sin servidor ni conexiones externas.
+
+1-nov-2026 · Cerrada la ejecución corregida: 858 Python aprobadas en 929.36 s, salida 0; Node 52 y worker 19. No se suman a corridas anteriores. Excel, Pine visual, identidad/permisos y datos insuficientes conservan sus límites; sin operaciones.
+
+1-nov-2026 · Excel: segundo libro revisado, tres correcciones de presentación y muestras con rótulo sintético por hoja. Plantilla: identidad exacta de campos comparados; libro recalculado: 36 diferencias flotantes ≤1.67e-16, sin otras diferencias. Vistas previas restantes pendientes.
+
+
+### 2-nov-2026 · Pine, verificación visual parcial
+
+Vector corto NQ con comisión y slippage coincide (riesgo USD 215, cuatro contratos). Diseño USDMXN 1D con indicadores originales restaurado, sin guardar/publicar ni operar. Sin cambios a la fuente Pine. MNQ, redondeo, inválidos y superposición pendientes. Evidencia en docs/pine-visual-limite-20261101.md.
+
+
+### 2-nov-2026 · Disposición Pine y casos MNQ
+
+Tabla manual abajo a la derecha, sin cambiar cálculos; tres fuentes activas idénticas. Compilación en Pine Editor y casos MNQ predeterminado, tick inválido y redondeo observados. Ocho pruebas específicas aprobadas; no nueva suite completa. Diseño original restaurado, sin guardar/publicar ni operar. Revisión exhaustiva pendiente; docs/pine-visual-limite-20261101.md.
+
+
+### 2-nov-2026 · Widgets públicos
+
+Revisión visual aislada de 15 tipos; identificado bloqueo artificial de POST de lectura del embed en diagnósticos anteriores. Mapas y explorador muestran contenido al permitir solo sus consultas públicas; telemetría bloqueada. Sin cambiar producción, proveedores o modelos; vigencia/universo e aislamiento completo pendientes. Evidencia en docs/widgets-publicos-20261102.md.
+
+
+### 2-nov-2026 · Paridad numérica Pine en plataforma
+
+Comprobador generado con las expresiones reales y 532 vectores locales: cero diferencias observadas en Pine Editor. Fallo inicial de tamaño conservado; representación compacta aprobada sin reducir muestra. Una prueba de integridad aprobada, diseño original restaurado, sin guardar/publicar ni operar. R31-02 verificado en ese alcance, con límites de interacción y no finitos documentados; docs/pine-visual-limite-20261101.md.
+
+
+### 2-nov-2026 · Contraste del indicador manual
+
+Blanco sobre gris oscuro explícito en cuatro filas; contraste 16.7:1, fuente actual compilada y observada en Pine Editor. Nueve pruebas específicas aprobadas. Comprobador de 532 casos idéntico, fórmulas intactas, gráfico restaurado. Marcadores inferiores aún pueden solaparse con la última fila; ver docs/pine-visual-limite-20261101.md.
+
+
+### 2-nov-2026 · Ubicación de tabla manual
+
+Centro derecha predeterminado y dos alternativas configurables; fuente compilada y tabla completa observada sin AMT/eventos superpuestos en ese recorrido. Cinco pruebas específicas aprobadas, comprobador numérico idéntico, gráfico original restaurado. Ver docs/pine-visual-limite-20261101.md. Sin operaciones.
+
+
+### 2-nov-2026 · Credencial Twelve y política gratuita
+
+Credencial importada al mecanismo local ignorado por Git y aceptada por /api_usage (una consulta, un crédito), sin cotizaciones. XMEX exige Pro: no consultado ni activado. Política solo_proveedores_gratuitos=true bloquea Twelve BMV/Barchart y Claude API frente a claves o permisos antiguos. 34 + 21 pruebas específicas aprobadas; una advertencia Starlette en la segunda selección, sin nueva suite completa. Sin compras, cuentas nuevas, motor, Telegram u operaciones. Evidencia sin secretos: docs/politica-proveedores-gratuitos-20261102.md.
+
+
+## 2-nov-2026 — Lecturas sin motores matemáticos
+
+Se separaron cuatro funciones de lectura/presentación y las importaciones de cálculo, sin cambiar fórmulas, ventanas, semillas o umbrales en el alcance AST revisado. Regresión específica: 74 aprobadas; suite completa: 881 aprobadas, cero fallidas, una advertencia, 569.91 s. Node 51 y worker 19 aprobadas. Tres repeticiones controladas: arranque mediano 15087.16 a 7053.57 ms y memoria privada servidor 213.47 a 122.41 MiB; primera respuesta de Estado, Universo, RSS y memoria de navegador no acreditan mejora general. Pasado/Futuro ya no cargan los motores al leer datos guardados. Informe, tabla completa, parche y hashes en docs/optimizacion-lecturas-20261102.md. PERF31-04/05 cerrados solo como perfil/medición, no como aprobación financiera; PERF31-06 y bloqueos externos permanecen abiertos. No operaciones, compras, mensajes, commit ni push.
+
+
+## 2-nov-2026 — Validación temporal y cuarentena de cierres
+
+Se acotó la ingesta al intervalo solicitado y a sesiones ya cerradas. Cuarentena reversible aplicada a 136 candidatos de Alpaca, con respaldo SQLite verificado y originales completos archivados. Otras 377160 filas de precios idénticas al respaldo; recuentos conservados de otras 62 tablas. No se recalcularon ni aprobaron resultados financieros. Pruebas específicas: 38 y 12 aprobadas; Node 51 (1109.8876 ms), worker 19 (698.2289 ms), cero fallidas. Suite Python completa posterior en curso, no sustituida por la anterior de 881. Detalle: docs/procedencia-cierres-20261102.md. PERF31-06 sigue parcial. Sin operaciones, consultas autenticadas, mensajes, commit ni push.

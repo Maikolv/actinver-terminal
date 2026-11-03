@@ -1,0 +1,50 @@
+[
+  {
+    "ancho": 1440,
+    "tema": "dark",
+    "medidas": {
+      "ancho": 1440,
+      "contenido": 1440
+    },
+    "errores": [],
+    "solicitudes_no_get": 0,
+    "archivo": "1440-dark.png",
+    "ejemplo": "Acierto 100% hipotético; no cuenta ni estrategia real."
+  },
+  {
+    "ancho": 1440,
+    "tema": "light",
+    "medidas": {
+      "ancho": 1440,
+      "contenido": 1440
+    },
+    "errores": [],
+    "solicitudes_no_get": 0,
+    "archivo": "1440-light.png",
+    "ejemplo": "Acierto 100% hipotético; no cuenta ni estrategia real."
+  },
+  {
+    "ancho": 390,
+    "tema": "dark",
+    "medidas": {
+      "ancho": 390,
+      "contenido": 390
+    },
+    "errores": [],
+    "solicitudes_no_get": 0,
+    "archivo": "390-dark.png",
+    "ejemplo": "Acierto 100% hipotético; no cuenta ni estrategia real."
+  },
+  {
+    "ancho": 390,
+    "tema": "light",
+    "medidas": {
+      "ancho": 390,
+      "contenido": 390
+    },
+    "errores": [],
+    "solicitudes_no_get": 0,
+    "archivo": "390-light.png",
+    "ejemplo": "Acierto 100% hipotético; no cuenta ni estrategia real."
+  }
+]

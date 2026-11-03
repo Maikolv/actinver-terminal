@@ -2,6 +2,21 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 3-nov-2026 — Seguimiento: comparación de varios instrumentos y captura 27
+
+- Comparación: un solo selector de 1 a 8 instrumentos (casillas de la lista, buscador por clave con Enter, atajos «Mi cartera», «Toda la lista» y «Limpiar»), con etiquetas que se quitan con ×. Antes las casillas y la lista múltiple (Ctrl+clic) se sobrescribían entre sí y exigían 2 como mínimo.
+- `/api/comparar` acepta 1 instrumento (siempre contra la referencia) y omite, avisando, los que no tienen historia suficiente en lugar de fallar toda la comparación. `tests/test_etapa3.py` 7 aprobadas; Node 52; suite completa previa 916 aprobadas.
+- Captura del portal 3-nov 14:27 (registro 27): valuación $872,402.68, poder de compra $2,472.95, GMEXICO B 650 títulos.
+- Se sube también el trabajo de Codex del 1 al 3-nov (proveedores gratuitos, cuarentena de cierres, Retry-After, lecturas ligeras, BEA/BLS); auditoría en la respuesta de la sesión.
+
+## [2026-11-01 — comprobación manual gratuita de proveedores]
+
+- Verificados por API FRED DGS30 y Banxico SF61745, SP1 y SF30057; este último conserva su frecuencia de promedio mensual. Importación independiente H.15 con fuente y huellas propias.
+- SEC: cien publicaciones de cuatro emisoras; XOM actual identificado como CIK 2115436, sin mezclar el histórico rechazado.
+- Alpha: tres estimaciones y 32 BPA históricos guardados. Primeras capturas locales, moneda/base contable no informadas; ventana pre/post-market separada de hora exacta. Reacción y revisiones no observadas SIN DATO.
+- Ocho consultas iniciales y seis adicionales autorizadas con el cargador habitual solo en memoria; no se imprimieron ni copiaron claves. Conectores automáticos apagados, sin operaciones, mensajes externos, commit o push.
+- Recorrido aislado de Mesa: 1440/390 px, claro/oscuro, sin errores JS ni desbordamiento; 379 observaciones públicas, sin precios/cartera/claves. Pruebas y límites finales en `docs/avance-gratuitos-20261101.md`.
+
 ## [2026-11-01 — conectores opcionales de Mesa, sin activar proveedores]
 
 - DGS30 agregado al conector FRED; el requisito desaparece con observaciones disponibles al corte.
@@ -1235,3 +1250,21 @@ Respaldo de una fuente para cartera con cero barras tras cierre, historial aditi
 ### Formación Python JPMorgan — 1-nov-2026
 
 Clon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuaderno enlaza prácticas originales de series y validación de velas de futuros; dos notebooks ejecutados offline, 21 pruebas específicas, cinco de referencias y nueve Node aprobadas. Seis vistas de navegador y caso SIN DATO comprobados. Sin instalar el entorno upstream ni modificar modelos, estrategia, proveedores o candados. Informe: docs/integracion-python-training-20261101.md. No es certificación ni aval del banco.
+
+
+### 2-nov-2026 · Credencial Twelve y política gratuita
+
+Credencial importada al mecanismo local ignorado por Git y aceptada por /api_usage (una consulta, un crédito), sin cotizaciones. XMEX exige Pro: no consultado ni activado. Política solo_proveedores_gratuitos=true bloquea Twelve BMV/Barchart y Claude API frente a claves o permisos antiguos. 34 + 21 pruebas específicas aprobadas; una advertencia Starlette en la segunda selección, sin nueva suite completa. Sin compras, cuentas nuevas, motor, Telegram u operaciones. Evidencia sin secretos: docs/politica-proveedores-gratuitos-20261102.md.
+
+## 2-nov-2026 — Regresión gratuita y Mesa
+
+Se conservó altura automática por decisión humana y se corrigió el ancho de paneles reutilizados al cambiar disposición guardada. Navegador móvil/escritorio aprobado con proveedores simulados; Node 51 aprobadas. Se corrigieron el respaldo macro por fecha mensual y CPI interanual exacto, y la entrega CSRF de Mesa sin caché: 27 pruebas específicas aprobadas. OCR reforzado sin persistencia: una aprobada. Pantalla de costos verificada en cuatro contextos con servicios de pago bloqueados. La suite completa posterior está en ejecución; no se afirma aprobación global. Registro de pendientes reconciliado con evidencia existente de Excel, paleta y Seguimiento. Sin operaciones ni notificaciones.
+
+## 2-nov-2026 — Retry-After persistente
+
+El adaptador común conserva la espera del proveedor en el registro local existente; 429/503 con Retry-After no reintentan ni duermen el servidor, y consultas siguientes no consumen cuota hasta vencer la pausa. Doce casos nuevos y regresión: 47 aprobadas en 17.64 s. Suite completa anterior: 866 aprobadas; nueva corrida posterior en retry-after-conjunto-20261102.txt, aún pendiente. PERF31-06 sigue parcial por procedencia y clientes fuera del método común. Sin red real ni operaciones. Detalle: docs/retry-after-persistente-20261102.md.
+
+
+## 2-nov-2026 — Lecturas sin motores matemáticos
+
+Se separaron cuatro funciones de lectura/presentación y las importaciones de cálculo, sin cambiar fórmulas, ventanas, semillas o umbrales en el alcance AST revisado. Regresión específica: 74 aprobadas; suite completa: 881 aprobadas, cero fallidas, una advertencia, 569.91 s. Node 51 y worker 19 aprobadas. Tres repeticiones controladas: arranque mediano 15087.16 a 7053.57 ms y memoria privada servidor 213.47 a 122.41 MiB; primera respuesta de Estado, Universo, RSS y memoria de navegador no acreditan mejora general. Pasado/Futuro ya no cargan los motores al leer datos guardados. Informe, tabla completa, parche y hashes en docs/optimizacion-lecturas-20261102.md. PERF31-04/05 cerrados solo como perfil/medición, no como aprobación financiera; PERF31-06 y bloqueos externos permanecen abiertos. No operaciones, compras, mensajes, commit ni push.

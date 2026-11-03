@@ -1,0 +1,22 @@
+[
+  {
+    "ancho": 390,
+    "tema": "light",
+    "errores": []
+  },
+  {
+    "ancho": 390,
+    "tema": "dark",
+    "errores": []
+  },
+  {
+    "ancho": 1440,
+    "tema": "light",
+    "errores": []
+  },
+  {
+    "ancho": 1440,
+    "tema": "dark",
+    "errores": []
+  }
+]

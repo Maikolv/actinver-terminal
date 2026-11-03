@@ -218,7 +218,9 @@ def main() -> None:
                           "secciones_pdf": "", "fuente_verificacion": fuente_ee, "detalle_verificacion": det,
                           "fecha_verificacion": hoy, "categoria": r["categoria"]})
         else:
-            filas.append({"id": f"BMV:{r['clave']}", "clave": r["clave"], "serie": "", "clave_operable": r["clave"],
+            serie = (r.get("serie") or "").strip()
+            filas.append({"id": f"BMV:{r['clave']}", "clave": r["clave"], "serie": serie,
+                          "clave_operable": f"{r['clave']} {serie}".strip(),
                           "nombre": r["motivo_candidato"], "clase": "etf", "pais": "MX", "mercado_operable": "BMV",
                           "moneda_operable": "MXN", "zona_horaria_operable": "America/Mexico_City",
                           "listado_referencia": f"BMV:{r['clave']}", "moneda_referencia": "MXN",

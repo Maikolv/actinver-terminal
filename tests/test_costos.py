@@ -13,12 +13,13 @@ def _claude(monkeypatch, presente: bool):
 def test_sin_credencial_no_hay_nada_que_aprobar(con, monkeypatch):
     _claude(monkeypatch, False)
     e = {s["id"]: s for s in costos.estado(con)["servicios"]}
-    assert e["claude_api"]["estado"].startswith("sin credencial") and not e["claude_api"]["requiere_decision"]
+    assert e["claude_api"]["estado"].startswith("bloqueado") and not e["claude_api"]["requiere_decision"]
     assert e["cloudflare"]["estado"] == "gratis"
     assert not any(c.activa for c in costos.reglas_costos(con))
 
 
 def test_credencial_detectada_queda_pendiente_alerta_y_no_se_usa(con, monkeypatch):
+    monkeypatch.setattr(costos, "_solo_gratuitos", lambda: False)  # Flujo histórico simulado, sin consultas externas.
     _claude(monkeypatch, True)
     e = {s["id"]: s for s in costos.estado(con)["servicios"]}
     assert e["claude_api"]["requiere_decision"] and "pendiente" in e["claude_api"]["estado"]
@@ -27,6 +28,7 @@ def test_credencial_detectada_queda_pendiente_alerta_y_no_se_usa(con, monkeypatc
 
 
 def test_aprobar_y_desistir(con, monkeypatch):
+    monkeypatch.setattr(costos, "_solo_gratuitos", lambda: False)  # Flujo histórico simulado, sin consultas externas.
     _claude(monkeypatch, True)
     costos.decidir(con, "claude_api", "aprobado")
     assert costos.decision(con, "claude_api") == "aprobado"
@@ -40,5 +42,9 @@ def test_aprobar_y_desistir(con, monkeypatch):
 
 def test_api_costos_exige_csrf():
     with TestClient(modulo.app, base_url="http://127.0.0.1:8765") as c:
-        assert c.get("/api/costos").status_code == 200
+        respuesta = c.get("/api/costos")
+        assert respuesta.status_code == 200
+        [finviz] = [s for s in respuesta.json()["servicios"] if s["id"] == "finviz_elite"]
+        assert finviz["estado"].startswith("bloqueado")
+        assert not finviz["puede_decidir"] and not finviz["requiere_decision"]
         assert c.post("/api/costos", json={"servicio": "claude_api", "decision": "aprobado"}).status_code == 403

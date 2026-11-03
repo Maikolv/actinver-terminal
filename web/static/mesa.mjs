@@ -29,6 +29,7 @@ export function obtener(ruta,ms=15000){
   return enCurso.get(ruta);
 }
 // Variación con signo y flecha: el color nunca es la única señal (+ ▲ sube, − ▼ baja).
+export const fmt=(x,dec=2)=>x===null||x===undefined||typeof x==='boolean'||(typeof x==='string'&&!x.trim())||!Number.isFinite(Number(x))?'SIN DATO':Number(x).toLocaleString('es-MX',{minimumFractionDigits:dec,maximumFractionDigits:dec});
 export function signo(x,dec=2){if(x===null||x===undefined||!Number.isFinite(x))return 'SIN DATO';const v=(Math.abs(x)*100).toFixed(dec);return x>0?`+${v} % ▲`:x<0?`−${v} % ▼`:`0.${'0'.repeat(dec)} % =`;}
 export const RANGOS={'1M':21,'3M':63,'6M':126,'Todo':Infinity};
 export function recortar(puntos,rango){const n=RANGOS[rango]??Infinity;return Number.isFinite(n)?puntos.slice(-n):[...puntos];}
@@ -114,7 +115,7 @@ if(typeof document!=='undefined') {
   }
   // ---------- Contenido nativo: lee rutas locales de solo lectura y declara fuente, fecha y SIN DATO ----------
   const el=(tag,attrs={},...hijos)=>{const n=document.createElement(tag);for(const [k,v] of Object.entries(attrs))if(v!==undefined&&v!==null&&v!==false)(k==='clase'?n.className=v:n.setAttribute(k,v));n.append(...hijos.flat().filter(x=>x!==null&&x!==undefined&&x!==false));return n;};
-  const fmt=(x,dec=2)=>x===null||x===undefined||!Number.isFinite(Number(x))?'SIN DATO':Number(x).toLocaleString('es-MX',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+
   const fecha=s=>s?String(s).slice(0,10):'s/f';
   const nativo=(titulo,...hijos)=>el('div',{clase:'mesa-nativo'},el('p',{clase:'mesa-nativo__titulo'},titulo),...hijos);
   const fallo=(caja,e)=>caja.replaceChildren(el('p',{clase:'sin-dato'},`SIN DATO · no se pudo consultar la terminal (${e.message}).`));
@@ -181,20 +182,30 @@ if(typeof document!=='undefined') {
   }
   async function nativoCalendario(caja){
     try{
-      const [r,c]=await Promise.all([obtener('/api/mesa/resumen'),obtener('/api/mesa/resultados')]);
+      const [resumen,resultados]=await Promise.allSettled([obtener('/api/mesa/resumen'),obtener('/api/mesa/resultados')]);
+      const r=resumen.value||{eventos_alto_impacto_7d:[]};
+      const c=resultados.value||{estado:'SIN DATO',motivo:'El servicio local de resultados no respondió.',siguiente_accion:'Volver a abrir la Mesa.'};
       caja.replaceChildren(
         r.eventos_alto_impacto_7d.length?el('ul',{clase:'mesa-lista'},r.eventos_alto_impacto_7d.map(e=>el('li',{},el('strong',{},`${e.fecha.slice(0,16).replace('T',' ')} · ${e.pais}`),` ${e.titulo}`,
           el('span',{clase:'mesa-meta'},` · pronóstico ${e.pronostico||'s/d'} · previo ${e.previo||'s/d'} · ${e.fuente}`)))):el('p',{clase:'sin-dato'},'SIN DATO · sin eventos de alto impacto guardados para los próximos 7 días.'),
         el('p',{clase:'mesa-procedencia'},'Eventos económicos de EE. UU. y México (alto impacto), hora de la fuente.'),
+        el('h3',{},'BEA · Publicaciones programadas (UTC)'),
+        r.calendario_bea?.eventos.length?el('ul',{clase:'mesa-lista'},r.calendario_bea.eventos.map(e=>el('li',{},`${e.fecha.slice(0,16).replace('T',' ')} UTC · ${e.titulo}`))):el('p',{clase:'sin-dato'},'SIN DATO · sin fechas BEA en el corte local para los próximos 7 días.'),
+        r.calendario_bea?.consultado_en?el('p',{clase:'mesa-procedencia'},`Copia local consultada ${r.calendario_bea.consultado_en}. Las fechas pueden cambiar.`):null,
         el('p',{clase:'aviso-caja'},`Resultados de empresas: ${c.estado.toUpperCase()}. ${c.motivo} Siguiente acción: ${c.siguiente_accion}`),
         ...(c.resultados||[]).map(x=>el('section',{clase:'tarjeta'},
           el('h3',{},`${x.simbolo} · ${x.fecha_reporte||'Anuncio sin fecha confirmada'}`),
-          el('p',{clase:'mesa-procedencia'},x.fecha_publicacion_sec?`Publicado en SEC: ${x.fecha_publicacion_sec}. No equivale a la hora del anuncio.`:'Fecha prevista, no anuncio confirmado.'),
+          el('p',{clase:'mesa-procedencia'},x.fecha_publicacion_sec?`Publicado en SEC: ${x.fecha_publicacion_sec}. No equivale a la hora del anuncio.`:x.reportado_bpa?'Fecha de reporte declarada por la fuente del BPA; hora exacta SIN DATO.':'Fecha prevista, no anuncio confirmado.'),
+          x.periodo_fiscal?el('p',{clase:'mesa-procedencia'},`Periodo fiscal: ${x.periodo_fiscal}`):null,
+          x.momento_declarado_por&&['antes','despues'].includes(x.momento)?el('p',{clase:'mesa-procedencia'},`Ventana declarada: ${x.momento==='antes'?'antes de la sesión':'después de la sesión'} · ${x.momento_declarado_por}. No confirma una hora exacta.`):null,
           el('ul',{},...[['estimacion_bpa','Estimación'],['reportado_bpa','BPA reportado'],['revisado_bpa','Revisión posterior']].map(([k,t])=>el('li',{},x[k]?`${t}: ${fmt(x[k].valor)} ${x[k].unidad||''} · ${x[k].fuente} · ${x[k].origen} · conocido desde ${x[k].disponible_desde}`:`${t}: SIN DATO`))),
           x.estimacion_bpa&&!x.estimacion_antes_anuncio_confirmada?el('p',{clase:'mesa-procedencia'},'No se ha confirmado que esta estimación anteceda al anuncio. No se calcula sorpresa.'):null,
+          x.reportado_bpa?.base_bpa?el('p',{clase:'mesa-procedencia'},`Base contable: ${x.reportado_bpa.base_bpa}`):null,
           x.estimacion_posterior_no_utilizada?el('p',{clase:'aviso-caja'},'Se excluyó una estimación conocida después del anuncio.'):null,
           el('p',{clase:'mesa-procedencia'},x.reaccion.reaccion==null?`Reacción: SIN DATO · ${x.reaccion.motivo||'sin cierres suficientes'}`:`Reacción histórica: ${fmt(x.reaccion.reaccion*100)}% · ${x.reaccion.base} → ${x.reaccion.fin} · ${x.reaccion.fuente_cierres}`))));
     }catch(e){fallo(caja,e);}
+    caja.append(el('p',{clase:'mesa-procedencia'},el('a',{href:'https://www.bls.gov/schedule/',rel:'noopener noreferrer',target:'_blank'},'Consultar el calendario oficial del BLS (empleo e inflación de EE. UU.)')));
+    caja.append(el('p',{clase:'mesa-procedencia'},el('a',{href:'https://www.bea.gov/news/schedule',rel:'noopener noreferrer',target:'_blank'},'Consultar el calendario oficial de BEA')));
   }
   const NATIVOS={info:(c,sim)=>nativoFicha(c,sim),noticias:c=>nativoNoticias(c,''),'noticias-emisora':(c,sim)=>nativoNoticias(c,sim),resumen:c=>nativoMacro(c),calendario:c=>nativoCalendario(c)};
   async function pintarSeguimiento(){
@@ -221,6 +232,9 @@ if(typeof document!=='undefined') {
         const cont=$('mesa-paneles'),destino=cont.children[activos.indexOf(id)]||null;
         if(destino!==anterior){if(cont.moveBefore)cont.moveBefore(anterior,destino);else cont.insertBefore(anterior,destino);}
         const flechas=anterior.querySelectorAll('header button');flechas[0].disabled=activos.indexOf(id)===0;flechas[1].disabled=activos.indexOf(id)===activos.length-1;
+        // Reutilizar el marco no debe conservar el ancho de la disposición anterior.
+        const anchoActual=!!tamanos[id];anterior.classList.toggle('mesa-panel--ancho',anchoActual);
+        anterior.querySelector('button[aria-pressed]')?.setAttribute('aria-pressed',String(anchoActual));
         anteriores.delete(id);continue;
       }
       const [,titulo,tipo,destino]=CATALOGO.find(c=>c[0]===id),card=crear('section');card.className='tarjeta mesa-panel';
@@ -239,10 +253,15 @@ if(typeof document!=='undefined') {
       card.addEventListener('drop',e=>{const origen=e.dataTransfer.getData('text/x-mesa-panel');if(!origen||origen===id)return;e.preventDefault();
         activos=activos.filter(x=>x!==origen);activos.splice(activos.indexOf(id),0,origen);$('mesa-preset').value='guardada';guardar();dibujar();});
       head.append(asa,h,antes,despues,ancho,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
-      if(NATIVOS[id]&&catalogoListo){const caja=el('div',{clase:'mesa-nativo','aria-live':'polite'},el('p',{clase:'mesa-procedencia'},'Cargando datos locales…'));card.append(el('p',{clase:'mesa-nativo__titulo'},'Datos de la terminal'),caja);NATIVOS[id](caja,simbolo);}
-      if(tipo==='chart'){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
+      if(NATIVOS[id]&&(catalogoListo||id==='calendario')){const caja=el('div',{clase:'mesa-nativo','aria-live':'polite'},el('p',{clase:'mesa-procedencia'},'Cargando datos locales…'));card.append(el('p',{clase:'mesa-nativo__titulo'},'Datos de la terminal'),caja);NATIVOS[id](caja,simbolo);}
+      const restringido=['chart','info'].includes(tipo)&&({'BMV:AMX':'AMX/B','BMV:SMARTRC':'SMARTRC/14'}[simbolo]);
+      if(tipo==='chart'&&!restringido){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
       if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
       else if(tipo==='risk')panelRiesgo(card);
+      else if(restringido){
+        const a=crear('a','Consultar cierres guardados en Velas');a.href=rutaVelas(simbolo);
+        card.append(crear('p','SIN DATO · TradingView reserva '+restringido+' para su propia plataforma.'),a);
+      }
       else if(['chart','info','perfil','finanzas','tecnico','noticias-emisora'].includes(tipo)&&(!catalogoListo||!catalogo.find(i=>i.id===simbolo)?.grafica)) {
         card.append(crear('p',!catalogoListo?'SIN DATO · catálogo no disponible. No se presupone un instrumento.':'SIN DATO · este instrumento no tiene gráfica externa declarada en el catálogo. Consulte Datos y fuentes.'));
         if(tipo!=='chart'){const a=crear('a','Consultar el instrumento en Velas');a.href=rutaVelas(simbolo);card.append(a);}
@@ -309,6 +328,6 @@ if(typeof document!=='undefined') {
     else if(e.key==='Enter'&&activo>=0&&!lista.hidden){e.preventDefault();ejecutar(activo);}
   });
   document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();buscador.focus();buscador.select();}if(e.key==='Escape'&&e.target===buscador){if(!lista.hidden){cerrarPaleta();return;}buscador.value='';filtrar();$('mesa-simbolo').focus();}});
-  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();pintarSeguimiento();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='No se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
+  (async()=>{try{const r=await fetch('/api/universo?solo_catalogo=true',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const u=await r.json();const filas=u.instrumentos.filter(i=>i.estado==='activo');catalogo=filas;catalogoListo=filas.length>0;$('mesa-simbolo').replaceChildren(...filas.map(i=>new Option(`${i.clave_operable} · ${i.nombre}`,i.id)));if(!filas.some(i=>i.id===simbolo))simbolo=filas[0]?.id||'';if(!filas.length)$('mesa-simbolo').append(new Option('Catálogo vacío',''));$('mesa-simbolo').value=simbolo;$('mesa-simbolo').disabled=!simbolo;$('mesa-estado').textContent=filas.length?'Catálogo local cargado. Los widgets externos pueden no cubrir todos los instrumentos.':'SIN DATO · catálogo vacío. Los escenarios manuales siguen disponibles.';dibujar();pintarSeguimiento();}catch{simbolo='';catalogoListo=false;$('mesa-simbolo').replaceChildren(new Option('Catálogo no disponible',''));$('mesa-simbolo').disabled=true;$('mesa-estado').textContent='SIN DATO · no se pudo consultar el catálogo. Vuelva a abrir esta mesa con la terminal en ejecución.';dibujar();}})();
   dibujar();
 }

@@ -1,0 +1,30 @@
+{
+  "fechas": [
+    {
+      "fecha": "2026-10-05",
+      "filas": 21,
+      "recepcion_min": "2026-10-05T13:40:09+00:00",
+      "recepcion_max": "2026-10-05T13:40:17+00:00",
+      "evento_min": "2026-10-05T20:00:00+00:00",
+      "evento_max": "2026-10-05T20:00:00+00:00"
+    },
+    {
+      "fecha": "2026-10-08",
+      "filas": 18,
+      "recepcion_min": "2026-10-08T13:53:28+00:00",
+      "recepcion_max": "2026-10-08T15:44:57+00:00",
+      "evento_min": "2026-10-08T20:00:00+00:00",
+      "evento_max": "2026-10-08T20:00:00+00:00"
+    },
+    {
+      "fecha": "2026-10-23",
+      "filas": 97,
+      "recepcion_min": "2026-10-23T13:57:44+00:00",
+      "recepcion_max": "2026-10-23T13:58:50+00:00",
+      "evento_min": "2026-10-23T20:00:00+00:00",
+      "evento_max": "2026-10-23T20:00:00+00:00"
+    }
+  ],
+  "con_alternativa_local_posterior_al_evento": 136,
+  "limite": "La comparación temporal no certifica precios ni publicación del proveedor; no se muestran importes o información de cuenta."
+}

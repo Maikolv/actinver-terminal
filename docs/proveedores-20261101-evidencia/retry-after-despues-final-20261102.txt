@@ -1,0 +1,4 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+...............................................                          [100%]
+47 passed in 17.64s

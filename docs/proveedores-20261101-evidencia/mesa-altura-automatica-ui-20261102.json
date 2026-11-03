@@ -1,0 +1,23 @@
+{
+  "proveedores": "simulados; solo interfaz",
+  "resultados": [
+    {
+      "ancho": 390,
+      "altura_automatica": true,
+      "tope_2000": true,
+      "cierre_destruye_marco": true,
+      "disposiciones_conservadas": true,
+      "marco_reutilizado": true,
+      "errores": []
+    },
+    {
+      "ancho": 1440,
+      "altura_automatica": true,
+      "tope_2000": true,
+      "cierre_destruye_marco": true,
+      "disposiciones_conservadas": true,
+      "marco_reutilizado": true,
+      "errores": []
+    }
+  ]
+}

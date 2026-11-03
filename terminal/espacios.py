@@ -9,12 +9,13 @@ from datetime import UTC, datetime
 
 from . import alertas, cotizaciones as cz, mercado, reto, servicios, vigencia
 from .config import Ajustes
-from .investigacion import evaluacion, pronosticos
 
 log = logging.getLogger("terminal.espacios")
 
 
 def pasado(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
+    from .investigacion import lecturas
+
     cond, par = ("proveedor = ?", ("demo_sintetico",)) if ajustes.es_demo else ("proveedor <> ?", ("demo_sintetico",))
     fuentes = [dict(r) for r in con.execute(
         f"SELECT proveedor, tipo_dato, COUNT(*) AS filas, COUNT(DISTINCT instrumento_id) AS instrumentos, MIN(fecha) AS desde, "
@@ -29,7 +30,7 @@ def pasado(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
         "SELECT instrumento_id, fecha, tipo, valor, proveedor, available_at FROM eventos_corporativos ORDER BY fecha DESC LIMIT 20")]
     exps = []
     for H in (1, 5):
-        e = evaluacion.ultimo(con, H, ajustes.es_demo)
+        e = lecturas.ultimo(con, H, ajustes.es_demo)
         if e:
             exps.append({k: e.get(k) for k in ("H", "L", "hora_corte", "cortes", "n_ejemplos", "purgados", "variante_elegida",
                                                "alfa_por_variante", "filtro_correlacion_por_pliegue", "variables_eliminadas_final",
@@ -91,6 +92,9 @@ def presente(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
 
 
 def futuro(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
+    # Mostrar emisiones guardadas no requiere importar ni entrenar el motor predictivo.
+    from .investigacion import lecturas, pronosticos
+
     lista = pronosticos.listar(con)
     ids = {p["instrumento_id"] for p in lista}
     ins = mercado.instrumentos(con)
@@ -98,7 +102,7 @@ def futuro(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
         p["clave_operable"] = (ins.get(p["instrumento_id"]) or {}).get("clave_operable")
     exps = []
     for H in (1, 5):
-        e = evaluacion.ultimo(con, H, ajustes.es_demo)
+        e = lecturas.ultimo(con, H, ajustes.es_demo)
         if e:
             exps.append({k: e.get(k) for k in ("H", "hora_corte", "prueba", "supera_referencias", "recomendacion_permitida",
                                                "conclusion", "prueba_ya_vista", "aviso", "datos", "variante_elegida", "veredicto",

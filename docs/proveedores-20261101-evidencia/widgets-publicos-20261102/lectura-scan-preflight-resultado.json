@@ -1,0 +1,29 @@
+[
+  {
+    "tipo": "filtro",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Resumen\nGeneral\nFiltros"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "scanner.tradingview.com",
+        "ruta": "/america/metainfo",
+        "metodo": "POST",
+        "motivo": "método excluido"
+      },
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "ruta": "/com.tradingview/track",
+        "metodo": "POST",
+        "motivo": "método excluido"
+      }
+    ],
+    "consulta_publica_scan_permitida": true,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:22:44.077Z"
+  }
+]

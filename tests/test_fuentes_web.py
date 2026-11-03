@@ -36,6 +36,19 @@ def test_rss_solo_enlaces_https(con):
     assert len(t) == 1 and t[0]["publicado"].startswith("2026-09-22T18:00")
 
 
+def test_ingesta_rss_conserva_procedencia_y_descarta_publicacion_futura(con, monkeypatch):
+    recibido = "2026-09-23T00:00:00+00:00"
+    monkeypatch.setattr(fw, "ahora", lambda: recibido)
+    futuro = (b'<item><title>Futuro</title><link>https://seekingalpha.com/news/2</link>'
+              b'<pubDate>Thu, 24 Sep 2026 14:00:00 -0400</pubDate></item>')
+    instrumentos = [{"id": "SIC:AAPL", "moneda_referencia": "USD", "listado_referencia": "AAPL"}]
+    with cliente({"AAPL.xml": RSS.replace(b"</channel>", futuro + b"</channel>")}) as cli:
+        resultado = fw.actualizar_noticias(con, {}, instrumentos, cliente=cli)
+    assert resultado["registros"] == 1
+    fila = con.execute("SELECT publicado,event_time,available_at,ingested_at FROM noticias").fetchone()
+    assert fila[0].startswith("2026-09-22T18:00") and tuple(fila[1:]) == (fila[0], recibido, recibido)
+
+
 def test_clasificacion_de_titulares():
     assert fw.clasificar_titular("Apple beats estimates, raises guidance")["sentimiento"] > 0
     c = fw.clasificar_titular("Boeing downgraded amid SEC investigation")

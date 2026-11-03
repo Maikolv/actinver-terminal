@@ -1,0 +1,15 @@
+{
+  "modo": "PAPER",
+  "adaptador_habilitado": false,
+  "live_habilitado": false,
+  "fondeada_habilitada": false,
+  "diario_real_disponible": false,
+  "incidentes": "no auditados",
+  "aprobada": false,
+  "ventaja": "sin ventaja demostrada",
+  "sesiones": 0,
+  "trades": 0,
+  "faltan": [
+    "demo técnica y diario real"
+  ]
+}

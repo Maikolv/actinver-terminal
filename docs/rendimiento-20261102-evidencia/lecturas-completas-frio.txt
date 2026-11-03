@@ -1,0 +1,112 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_importacion_y_clasificacion_de_lectura_no_cargan_modelos ________
+
+tmp_path = WindowsPath('C:/Users/MIKE/AppData/Local/Temp/pytest-of-MIKE/pytest-610/test_importacion_y_clasificaci0')
+
+    def test_importacion_y_clasificacion_de_lectura_no_cargan_modelos(tmp_path):
+        nombres = {"SYSTEMROOT", "WINDIR", "PATH", "TEMP", "TMP", "USERPROFILE", "LOCALAPPDATA", "APPDATA"}
+        entorno = {k: v for k, v in os.environ.items() if k.upper() in nombres}
+        entorno.update(TERMINAL_SIN_ENV="1", TERMINAL_SIN_CONFIG_LOCAL="1", TERMINAL_SIN_MOTOR="1",
+                       TERMINAL_MODO="real", TERMINAL_DATA_DIR=str(tmp_path), OPENBLAS_NUM_THREADS="1",
+                       OMP_NUM_THREADS="1", MKL_NUM_THREADS="1")
+        codigo = """
+    import socket, sys
+    def prohibida(*args, **kwargs):
+        raise AssertionError('La prueba de importaci�n no permite conexiones')
+    socket.socket.connect = prohibida
+    from terminal import app, criterios_propuestas, servicios
+    assert 'terminal.optimizador' not in sys.modules
+    assert 'sklearn' not in sys.modules and 'skfolio' not in sys.modules, sorted(n for n in sys.modules if n.startswith(('terminal.investigacion', 'skfolio', 'sklearn')))[:20]
+    filas = criterios_propuestas.clasificar([
+        {'tipo':'acciones','nombre':'A','estado':'calculada','puntuacion':{'total':2}},
+        {'tipo':'mixta','nombre':'B','estado':'insuficiente','motivos':['SIN DATO']},
+        {'tipo':'acciones','nombre':'C','estado':'calculada','puntuacion':{'total':5}},
+    ], {})
+    assert [f['alternativa'] for f in filas] == ['C','A','B']
+    assert [f['posicion'] for f in filas] == [1,2,None]
+    assert 'sklearn' not in sys.modules and 'skfolio' not in sys.modules
+    from fastapi.testclient import TestClient
+    with TestClient(app.app) as cliente:
+        assert cliente.get('/api/estado').status_code == 200
+        assert cliente.get('/api/universo').status_code == 200
+        assert cliente.get('/api/presente').status_code == 200
+        assert 'terminal.optimizador' not in sys.modules
+        assert 'sklearn' not in sys.modules and 'skfolio' not in sys.modules
+        assert cliente.get('/api/pasado').status_code == 200
+        assert cliente.get('/api/futuro').status_code == 200
+        assert 'terminal.investigacion.evaluacion' not in sys.modules
+        assert 'sklearn' not in sys.modules and 'skfolio' not in sys.modules
+    from terminal import optimizador
+    assert optimizador.clasificar is criterios_propuestas.clasificar
+    assert optimizador.costo_unitario is criterios_propuestas.costo_unitario
+    """
+        resultado = subprocess.run([sys.executable, "-c", codigo], cwd=Path(__file__).resolve().parents[1],
+                                   env=entorno, capture_output=True, text=True, timeout=90)
+>       assert resultado.returncode == 0, resultado.stderr
+E       AssertionError: warning: Failed to set cwd to temp dir
+E         Traceback (most recent call last):
+E           File "<string>", line 18, in <module>
+E           File "C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py", line 681, in __enter__
+E             self.portal = portal = stack.enter_context(anyio.from_thread.start_blocking_portal(**self.async_backend))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py", line 526, in enter_context
+E             result = _enter(cm)
+E                      ^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py", line 137, in __enter__
+E             return next(self.gen)
+E                    ^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\anyio\from_thread.py", line 554, in start_blocking_portal
+E             portal = future.result()
+E                      ^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 456, in result
+E             return self.__get_result()
+E                    ^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 401, in __get_result
+E             raise self._exception
+E           File "C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\anyio\from_thread.py", line 538, in run_blocking_portal
+E             run_eventloop(
+E           File "C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\anyio\_core\_eventloop.py", line 83, in run
+E             return async_backend.run(func, args, {}, backend_options)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2547, in run
+E             with Runner(debug=debug, loop_factory=loop_factory) as runner:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\runners.py", line 58, in __enter__
+E             self._lazy_init()
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\runners.py", line 137, in _lazy_init
+E             self._loop = events.new_event_loop()
+E                          ^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\events.py", line 823, in new_event_loop
+E             return get_event_loop_policy().new_event_loop()
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\events.py", line 720, in new_event_loop
+E             return self._loop_factory()
+E                    ^^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\windows_events.py", line 316, in __init__
+E             super().__init__(proactor)
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 640, in __init__
+E             self._make_self_pipe()
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 787, in _make_self_pipe
+E             self._ssock, self._csock = socket.socketpair()
+E                                        ^^^^^^^^^^^^^^^^^^^
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\socket.py", line 623, in _fallback_socketpair
+E             csock.connect((addr, port))
+E           File "<string>", line 4, in prohibida
+E         AssertionError: La prueba de importaci�n no permite conexiones
+E         Exception ignored in: <function BaseEventLoop.__del__ at 0x000002A451B1CCC0>
+E         Traceback (most recent call last):
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\base_events.py", line 732, in __del__
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 697, in close
+E           File "C:\Users\MIKE\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 779, in _close_self_pipe
+E         AttributeError: 'ProactorEventLoop' object has no attribute '_ssock'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal\\.venv\\Scripts\\python.exe', '-c', "\nimpo...events.py", line 779, in _close_self_pipe\nAttributeError: \'ProactorEventLoop\' object has no attribute \'_ssock\'\n').returncode
+
+tests\test_arranque_lectura.py:47: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_arranque_lectura.py::test_importacion_y_clasificacion_de_lectura_no_cargan_modelos
+1 failed in 11.23s

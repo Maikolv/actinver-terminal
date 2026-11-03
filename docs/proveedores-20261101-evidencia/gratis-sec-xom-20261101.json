@@ -1,0 +1,66 @@
+{
+  "corte": "2026-11-01T11:11:56.387768+00:00",
+  "fuentes": {
+    "F6": {
+      "estado": "sin_id_confirmado",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F2": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F3": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F4": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F1-SEC-XOM": {
+      "estado": "confirmado",
+      "solicitudes": 1,
+      "observaciones_validas": 2,
+      "nuevas": 2,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:11:57.023411+00:00",
+      "identidad_observada": [
+        {
+          "serie": "publicacion_sec:0002115436-26-000006",
+          "simbolo": "XOM",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0002115436-26-000018",
+          "simbolo": "XOM",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {
+        "XOM": 2115436
+      },
+      "activado": false,
+      "http": [
+        {
+          "host": "data.sec.gov",
+          "ruta": "/submissions/CIK0002115436.json",
+          "http": 200
+        }
+      ]
+    },
+    "F1-ALPHA": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    }
+  },
+  "solicitudes": 1,
+  "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+}

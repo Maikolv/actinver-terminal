@@ -1,0 +1,10 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+....................................                                     [100%]
+============================== warnings summary ===============================
+tests/test_tiempo_real.py::test_prueba_de_avisos_exige_csrf_y_responde
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+36 passed, 1 warning in 18.04s

@@ -1,0 +1,20 @@
+[
+  {
+    "libro": "plantilla",
+    "rotulo_sintetico_en_todas_las_hojas": true,
+    "diferencias_no_numericas_tras_normalizar_rotulos": [],
+    "diferencias_numericas": 0,
+    "maxima_diferencia_absoluta": 0,
+    "igualdad_exacta": true,
+    "nota": "Recalculación de muestra con un hilo BLAS; no se alteraron fórmulas del generador."
+  },
+  {
+    "libro": "libro",
+    "rotulo_sintetico_en_todas_las_hojas": true,
+    "diferencias_no_numericas_tras_normalizar_rotulos": [],
+    "diferencias_numericas": 36,
+    "maxima_diferencia_absoluta": 1.6653345369377348e-16,
+    "igualdad_exacta": false,
+    "nota": "Recalculación de muestra con un hilo BLAS; no se alteraron fórmulas del generador."
+  }
+]

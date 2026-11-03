@@ -20,10 +20,13 @@ cantidad = valido ? math.floor(presupuesto / riesgo) : 0
 plot(valido ? entrada : na, "Entrada manual", color.gray, 1)
 plot(valido ? stop : na, "SL manual", color.red, 2)
 plot(valido ? tp : na, "TP manual", color.teal, 2)
-var tabla = table.new(position.top_right, 1, 5)
+// Evita AMT arriba y los marcadores de eventos abajo; permite adaptar la disposición.
+ubicacion = input.string("Centro derecha", "Ubicación de la tabla", options=["Centro derecha", "Abajo derecha", "Arriba derecha"])
+posicionTabla = ubicacion == "Centro derecha" ? position.middle_right : ubicacion == "Abajo derecha" ? position.bottom_right : position.top_right
+var tabla = table.new(posicionTabla, 1, 5)
 if barstate.islast
     table.cell(tabla, 0, 0, "ESTUDIO MANUAL · SIN EJECUCIÓN", text_color=color.white, bgcolor=color.black)
-    table.cell(tabla, 0, 1, valido ? "TP " + str.tostring(tp) + " · SL " + str.tostring(stop) : "Use un futuro NQ/MNQ y precios válidos de 0.25", bgcolor=color.gray)
-    table.cell(tabla, 0, 2, valido ? "Riesgo USD " + str.tostring(riesgo) + " · caben " + str.tostring(cantidad) + " contratos" : "Sin escenario válido", bgcolor=color.gray)
-    table.cell(tabla, 0, 3, "No usa precios del gráfico. Costos cero = hipótesis.", bgcolor=color.gray)
-    table.cell(tabla, 0, 4, "Tope del escenario, no del fill real. Un gap o deslizamiento mayor puede superarlo.", bgcolor=color.gray)
+    table.cell(tabla, 0, 1, valido ? "TP " + str.tostring(tp) + " · SL " + str.tostring(stop) : "Use un futuro NQ/MNQ y precios válidos de 0.25", text_color=color.white, bgcolor=color.rgb(27, 30, 36))
+    table.cell(tabla, 0, 2, valido ? "Riesgo USD " + str.tostring(riesgo) + " · caben " + str.tostring(cantidad) + " contratos" : "Sin escenario válido", text_color=color.white, bgcolor=color.rgb(27, 30, 36))
+    table.cell(tabla, 0, 3, "No usa precios del gráfico. Costos cero = hipótesis.", text_color=color.white, bgcolor=color.rgb(27, 30, 36))
+    table.cell(tabla, 0, 4, "Tope del escenario, no del fill real. Un gap o deslizamiento mayor puede superarlo.", text_color=color.white, bgcolor=color.rgb(27, 30, 36))

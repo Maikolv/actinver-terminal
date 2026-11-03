@@ -90,13 +90,17 @@ def importar(con: sqlite3.Connection, ajustes, contenido: bytes, nombre: str, co
            "precios_bmv": [{"id": f["id"], "precio": f["precio"]} for f in bmv], "confirmado": False}
     if not confirmar or not bmv:
         return rep
+    from .migraciones import disponibilidad_precio
+
     sha = hashlib.sha256(contenido).hexdigest()
     ts = ahora()
+    marcas = disponibilidad_precio(doc["fecha"], "archivo", "MXN", "cierre", None, ts)
     with transaccion(con):
         for f in bmv:
             con.execute("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, "
-                        "proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                        (f["id"], doc["fecha"], f["precio"], None, None, "MXN", "archivo", "cierre", None, ts))
+                        "proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (f["id"], doc["fecha"], f["precio"], None, None, "MXN", "archivo", "cierre", None, ts, *marcas, ts))
         cur = con.execute("INSERT INTO importaciones (ts, archivo, sha256, tipo, filas, aceptadas, duplicadas, rechazadas, "
                           "contenido_original) VALUES (?,?,?,?,?,?,?,?,?)",
                           (ts, nombre[:100], sha, "precios_portal_pdf", len(doc["filas"]), len(bmv), 0, len(fuera), contenido))

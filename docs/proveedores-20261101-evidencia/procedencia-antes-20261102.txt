@@ -1,0 +1,111 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+_______ test_respuesta_solapada_conserva_valor_y_tres_marcas_conocidas ________
+
+con = <sqlite3.Connection object at 0x00000186B23A8B80>
+ajustes = Ajustes(datos={'app': {'solo_proveedores_gratuitos': True, 'modo': 'real', 'host': '127.0.0.1', 'puerto': 8765, 'moned...miento_ajustado': 0.25, 'riesgo': 0.2, 'diversificacion': 0.15, 'liquidez': 0.1, 'costos': 0.1, 'calidad_datos': 0.2}})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000186B2483260>
+
+    def test_respuesta_solapada_conserva_valor_y_tres_marcas_conocidas(con, ajustes, monkeypatch):
+        con.execute("INSERT INTO precios (instrumento_id,fecha,cierre,moneda,proveedor,tipo_dato,obtenido_en,"
+                    "event_time,available_at,ingested_at) VALUES ('SIC:AMD','2026-10-29',100,'USD','tiingo','cierre',?,?,?,?)",
+                    (MARCAS[2], *MARCAS))
+        con.commit()
+        adaptadores, llamadas = preparar(con, [barra("2026-10-29", 50), barra("2026-10-30", 110)])
+        monkeypatch.setattr(ingesta, "ahora_db", lambda: CERRADO.isoformat())
+        resultado = ingesta.actualizar_precios(con, adaptadores, ahora=CERRADO)
+        migraciones.completar_tiempos(con, ajustes)
+        vieja = con.execute("SELECT cierre,event_time,available_at,ingested_at,obtenido_en FROM precios "
+                            "WHERE instrumento_id='SIC:AMD' AND fecha='2026-10-29'").fetchone()
+>       assert tuple(vieja) == (100, *MARCAS, MARCAS[2])
+E       AssertionError: assert (50.0, '2026-...:00:00+00:00') == (100, '2026-1...:05:00+00:00')
+E         
+E         At index 0 diff: 50.0 != 100
+E         Use -v to get more diff
+
+tests\test_procedencia_precios.py:47: AssertionError
+________________ test_sesion_abierta_no_se_guarda_como_cierre _________________
+
+con = <sqlite3.Connection object at 0x00000186B23F32E0>
+
+    def test_sesion_abierta_no_se_guarda_como_cierre(con):
+        adaptadores, llamadas = preparar(con, [barra("2026-10-29", 100), barra("2026-10-30", 110)])
+        ingesta.actualizar_precios(con, adaptadores, ahora=ABIERTO)
+>       assert [r[0] for r in con.execute("SELECT fecha FROM precios")] == ["2026-10-29"]
+E       AssertionError: assert ['2026-10-29', '2026-10-30'] == ['2026-10-29']
+E         
+E         Left contains one more item: '2026-10-30'
+E         Use -v to get more diff
+
+tests\test_procedencia_precios.py:59: AssertionError
+______ test_fecha_invalida_o_futura_no_entra_en_la_historia[2026-10-00] _______
+
+con = <sqlite3.Connection object at 0x00000186B23F3880>, fecha = '2026-10-00'
+
+    @pytest.mark.parametrize("fecha", ["2026-10-00", "20261030", "2026-10-31", "sin-fecha"])
+    def test_fecha_invalida_o_futura_no_entra_en_la_historia(con, fecha):
+        adaptadores, _ = preparar(con, [barra("2026-10-30", 110), barra(fecha, 999)])
+        resultado = ingesta.actualizar_precios(con, adaptadores, ahora=CERRADO)
+>       assert [r[0] for r in con.execute("SELECT fecha FROM precios")] == ["2026-10-30"]
+E       AssertionError: assert ['2026-10-00', '2026-10-30'] == ['2026-10-30']
+E         
+E         At index 0 diff: '2026-10-00' != '2026-10-30'
+E         Left contains one more item: '2026-10-30'
+E         Use -v to get more diff
+
+tests\test_procedencia_precios.py:67: AssertionError
+_______ test_fecha_invalida_o_futura_no_entra_en_la_historia[20261030] ________
+
+con = <sqlite3.Connection object at 0x00000186B23F3F10>, fecha = '20261030'
+
+    @pytest.mark.parametrize("fecha", ["2026-10-00", "20261030", "2026-10-31", "sin-fecha"])
+    def test_fecha_invalida_o_futura_no_entra_en_la_historia(con, fecha):
+        adaptadores, _ = preparar(con, [barra("2026-10-30", 110), barra(fecha, 999)])
+        resultado = ingesta.actualizar_precios(con, adaptadores, ahora=CERRADO)
+>       assert [r[0] for r in con.execute("SELECT fecha FROM precios")] == ["2026-10-30"]
+E       AssertionError: assert ['2026-10-30', '20261030'] == ['2026-10-30']
+E         
+E         Left contains one more item: '20261030'
+E         Use -v to get more diff
+
+tests\test_procedencia_precios.py:67: AssertionError
+______ test_fecha_invalida_o_futura_no_entra_en_la_historia[2026-10-31] _______
+
+con = <sqlite3.Connection object at 0x00000186B254CE50>, fecha = '2026-10-31'
+
+    @pytest.mark.parametrize("fecha", ["2026-10-00", "20261030", "2026-10-31", "sin-fecha"])
+    def test_fecha_invalida_o_futura_no_entra_en_la_historia(con, fecha):
+        adaptadores, _ = preparar(con, [barra("2026-10-30", 110), barra(fecha, 999)])
+        resultado = ingesta.actualizar_precios(con, adaptadores, ahora=CERRADO)
+>       assert [r[0] for r in con.execute("SELECT fecha FROM precios")] == ["2026-10-30"]
+E       AssertionError: assert ['2026-10-30', '2026-10-31'] == ['2026-10-30']
+E         
+E         Left contains one more item: '2026-10-31'
+E         Use -v to get more diff
+
+tests\test_procedencia_precios.py:67: AssertionError
+_______ test_fecha_invalida_o_futura_no_entra_en_la_historia[sin-fecha] _______
+
+con = <sqlite3.Connection object at 0x00000186B254DC60>, fecha = 'sin-fecha'
+
+    @pytest.mark.parametrize("fecha", ["2026-10-00", "20261030", "2026-10-31", "sin-fecha"])
+    def test_fecha_invalida_o_futura_no_entra_en_la_historia(con, fecha):
+        adaptadores, _ = preparar(con, [barra("2026-10-30", 110), barra(fecha, 999)])
+        resultado = ingesta.actualizar_precios(con, adaptadores, ahora=CERRADO)
+>       assert [r[0] for r in con.execute("SELECT fecha FROM precios")] == ["2026-10-30"]
+E       AssertionError: assert ['2026-10-30', 'sin-fecha'] == ['2026-10-30']
+E         
+E         Left contains one more item: 'sin-fecha'
+E         Use -v to get more diff
+
+tests\test_procedencia_precios.py:67: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_procedencia_precios.py::test_respuesta_solapada_conserva_valor_y_tres_marcas_conocidas
+FAILED tests/test_procedencia_precios.py::test_sesion_abierta_no_se_guarda_como_cierre
+FAILED tests/test_procedencia_precios.py::test_fecha_invalida_o_futura_no_entra_en_la_historia[2026-10-00]
+FAILED tests/test_procedencia_precios.py::test_fecha_invalida_o_futura_no_entra_en_la_historia[20261030]
+FAILED tests/test_procedencia_precios.py::test_fecha_invalida_o_futura_no_entra_en_la_historia[2026-10-31]
+FAILED tests/test_procedencia_precios.py::test_fecha_invalida_o_futura_no_entra_en_la_historia[sin-fecha]
+6 failed in 4.48s

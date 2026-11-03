@@ -1668,7 +1668,9 @@ def simbolo_tradingview(ins: dict) -> str | None:
     if ins.get("clase", "").startswith("fondo") or ins.get("estado") not in ("activo",):
         return None
     if ins.get("mercado_operable") == "BMV":
-        return f"BMV:{ins['clave'].replace('&', '')}{(ins.get('serie') or '').replace('*', '').replace(' ', '')}"
+        clave = ins["clave"].replace("&", "_")
+        serie = (ins.get("serie") or "").replace("*", "").replace(" ", "")
+        return f"BMV:{clave}/{serie}" if serie else f"BMV:{clave}"
     pref = BOLSA_TV.get(ins.get("bolsa_referencia") or "")
     return f"{pref}:{ins['listado_referencia']}" if pref and ins.get("listado_referencia") else None
 
@@ -1692,6 +1694,7 @@ def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "") -> str:
 <title>{html.escape(titulo)} · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
 <link rel="stylesheet" href="/static/grafica.css"></head><body class="{clase}">
 {barra}
+<div class="estado-marco" role="status">SIN DATO · Esperando el marco de TradingView.</div>
 {cuerpo}
 </body></html>"""
 
@@ -1700,7 +1703,7 @@ def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "") -> str:
 def grafica(iid: str, intervalo: str = "D", tema: str = "dark", con=Depends(con_db)):
     ins = mercado.instrumentos(con).get(iid)
     sim = simbolo_tradingview(ins) if ins else None
-    if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
+    if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&_\-]{1,20}(?:/[A-Z0-9]{1,10})?", sim):
         raise HTTPException(404, "Instrumento sin gráfica disponible")
     if intervalo not in INTERVALOS_TV or tema not in TEMAS_TV:
         raise HTTPException(422, "intervalo o tema inválido")
@@ -1820,7 +1823,7 @@ def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", fi
     if con_simbolo:
         ins = mercado.instrumentos(con).get(simbolo)
         sim = simbolo_tradingview(ins) if ins else None
-        if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&\-]{1,20}", sim):
+        if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&_\-]{1,20}(?:/[A-Z0-9]{1,10})?", sim):
             raise HTTPException(404, "Instrumento sin widget disponible")
     # `</` se escapa para que ningún valor cierre la etiqueta <script> donde va la configuración.
     config = {**_config_widget(tipo, sim, con, mapa, filtro), "colorTheme": tema}
@@ -1853,6 +1856,13 @@ def salud():
 @app.get("/robots.txt", response_class=PlainTextResponse)
 def robots():
     return "User-agent: *\nDisallow: /\n"  # herramienta privada: nada debe indexarse
+
+
+@app.get("/static/mesa.html", response_class=HTMLResponse)
+def pagina_mesa():
+    """Entrega el control CSRF de esta instancia; el documento no se almacena en caché."""
+    pagina = (WEB / "static" / "mesa.html").read_text(encoding="utf-8").replace("__CSRF__", TOKEN_CSRF)
+    return HTMLResponse(pagina, headers={"Cache-Control": "no-store"})
 
 
 app.mount("/static", StaticFiles(directory=WEB / "static"), name="static")

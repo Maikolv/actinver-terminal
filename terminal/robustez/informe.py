@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .. import config, mercado, optimizador as op, reto, servicios
+from .. import config, mercado, reto, servicios
 from . import calculo, diseno as dz, estabilidad as es, montecarlo as mc, walkforward as wf
 
 
@@ -49,6 +49,8 @@ def _pico_mb() -> float | None:
 
 
 def preparar(con, ajustes, tipo: str, proxy_adr: bool = False) -> dict:
+    from .. import optimizador as op
+
     perfil = op.perfil_efectivo(servicios.perfil_actual(con, ajustes))
     el_l, excluidos, precios = op.universo(con, ajustes, perfil, tipo, None)
     el = {e["id"]: e for e in el_l}

@@ -1,0 +1,134 @@
+{
+  "fecha_local": "2026-11-01",
+  "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+  "remoto": "https://github.com/anthropics/skills.git",
+  "alcance": "Clon inventariado; no se hereda licencia a otras versiones o al plugin instalado",
+  "licencias": [
+    {
+      "archivo": "skills/academy-guide/LICENSE.txt",
+      "skill": "academy-guide",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/academy-guide/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/algorithmic-art/LICENSE.txt",
+      "skill": "algorithmic-art",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/algorithmic-art/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/brand-guidelines/LICENSE.txt",
+      "skill": "brand-guidelines",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/brand-guidelines/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/canvas-design/LICENSE.txt",
+      "skill": "canvas-design",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/canvas-design/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/claude-api/LICENSE.txt",
+      "skill": "claude-api",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/claude-api/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/discernment-nudge/LICENSE.txt",
+      "skill": "discernment-nudge",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/discernment-nudge/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/docx/LICENSE.txt",
+      "skill": "docx",
+      "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+      "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/docx/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/frontend-design/LICENSE.txt",
+      "skill": "frontend-design",
+      "clasificacion": "Apache-2.0",
+      "sha256": "eb3d7b5485466acbd81f2b496f595ab637d2792e268206b27d99e793bdb67549",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/frontend-design/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/internal-comms/LICENSE.txt",
+      "skill": "internal-comms",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/internal-comms/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/mcp-builder/LICENSE.txt",
+      "skill": "mcp-builder",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/mcp-builder/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/pdf/LICENSE.txt",
+      "skill": "pdf",
+      "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+      "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/pdf/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/pptx/LICENSE.txt",
+      "skill": "pptx",
+      "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+      "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/pptx/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/skill-creator/LICENSE.txt",
+      "skill": "skill-creator",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/skill-creator/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/slack-gif-creator/LICENSE.txt",
+      "skill": "slack-gif-creator",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/slack-gif-creator/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/theme-factory/LICENSE.txt",
+      "skill": "theme-factory",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/theme-factory/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/web-artifacts-builder/LICENSE.txt",
+      "skill": "web-artifacts-builder",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/web-artifacts-builder/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/webapp-testing/LICENSE.txt",
+      "skill": "webapp-testing",
+      "clasificacion": "Apache-2.0",
+      "sha256": "52b223c318576d65c32f70cb745f31352730e9f4c2c2c2570a66ce700f4f5a64",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/webapp-testing/LICENSE.txt"
+    },
+    {
+      "archivo": "skills/xlsx/LICENSE.txt",
+      "skill": "xlsx",
+      "clasificacion": "Propietaria; sujeta a términos de Anthropic",
+      "sha256": "6f8bd7f4d8ec5cb52b7a59ccb9e8c14c2a4ba529cb5adfc5e0bc676892b8ca79",
+      "fuente": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/xlsx/LICENSE.txt"
+    }
+  ]
+}

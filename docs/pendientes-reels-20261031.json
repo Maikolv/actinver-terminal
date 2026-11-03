@@ -14,12 +14,12 @@
     },
     {
       "id": "R31-02",
-      "estado": "compilado_en_servidor_tradingview; pendiente_visual",
+      "estado": "verificado_calculo_fijo_y_visual_en_alcance",
       "prioridad": "P1",
       "titulo": "Paridad Pine",
       "criterio_aceptacion": "Compilar en Pine Editor y comprobar los mismos escenarios.",
-      "evidencia": "docs/auditoria-reels-20261031-evidencia/cierre-pendientes/pine-check.json; nuevo SHA compilado con core.check de pine_check, sin cuenta ni CDP.",
-      "siguiente_accion": "Comprobar visualmente el indicador en NQZ2026/MNQZ2026 sin alertas ni estrategia; pasos en informe de cierre."
+      "evidencia": "532 vectores (510 válidos/22 inválidos) ejecutados en comprobador Pine generado desde expresiones de la fuente, cero diferencias; capturas y SHA en docs/proveedores-20261101-evidencia/pine-visual/. Recorridos manuales NQ/MNQ y restauración en docs/pine-visual-limite-20261101.md. Una prueba de integridad del generador aprobada.",
+      "siguiente_accion": "Repetir al cambiar fuente o vectores. No atribuir prueba de NaN/Infinity en campos Pine ni interacción exhaustiva de formularios: límites modelados y validaciones offline separados. No demuestra alfa ni habilita ejecución."
     },
     {
       "id": "R31-03",
@@ -55,7 +55,7 @@
       "titulo": "Proveedores",
       "criterio_aceptacion": "Comprobar contenido y vigencia por panel e instrumento, no solo HTTP.",
       "evidencia": "Tres widgets públicos cargaron en contexto sin sesión; cotizaciones mostró contenido, mapa y calendario no acreditan vigencia de precios.",
-      "siguiente_accion": "Comprobar los restantes y cada símbolo con procedencia, hora y retraso; conservar SIN DATO si no hay cobertura."
+      "siguiente_accion": "15 tipos externos observados en revisión aislada; mapas y explorador requieren las consultas públicas de lectura del embed, no un bloqueo indiscriminado de POST. Falta cobertura y vigencia por instrumento/campo; no se incorporan endpoints internos como API. Ver docs/widgets-publicos-20261102.md."
     },
     {
       "id": "R31-07",
@@ -72,17 +72,17 @@
       "prioridad": "P2",
       "titulo": "Recursos sin identidad",
       "criterio_aceptacion": "Confirmar propietario y URL antes de añadir un recurso con nombre ambiguo.",
-      "evidencia": "config/reels-20261031.json; no se inventaron los enlaces restantes ni se enviaron DMs.",
+      "evidencia": "config/reels-20261031.json; el catálogo público https://brochbuilds.com/skills identifica la colección de DeumR-AE7Xy. La guía pública de Charlie Hills identifica su lista de treinta (https://charliehills.ai/guides/top-30-claude-plugins-and-how-to-install-each-one). El usuario aportó los 30 nombres de DfBQ1AgOC1S agrupados en cinco categorías. Ya no se requiere acceder al reel para recuperar la lista. Las 30 referencias tienen ruta local, remoto y commit cotejados (Caveman mediante el clon archivado), y 30/30 estrellas verificadas. Archify e I Have ADHD se identificaron en Broch Builds; su atribución directa a DfBQ1AgOC1S sigue pendiente.",
       "siguiente_accion": "Obtener enlace público inequívoco o descripción/fotograma que identifique autor y repositorio."
     },
     {
       "id": "R31-09",
-      "estado": "parcial",
+      "estado": "parcial_licencias_por_skill_documentadas",
       "prioridad": "P2",
       "titulo": "Inventario y licencias",
       "criterio_aceptacion": "Distinguir skills instaladas y clones, con licencias comprobadas.",
-      "evidencia": "33 recursos sin observaciones; taste-skill, skills y andrej-karpathy-skills carecen de licencia inventariada verificable; Caveman instalado no coincide con la versión del clon archivado.",
-      "siguiente_accion": "Conservarlos como referencias de lectura; confirmar procedencia y licencia de la versión exacta antes de copiar contenidos."
+      "evidencia": "anthropics/skills: 18 licencias anidadas en commit inventariado, 14 Apache-2.0 y 4 propietarias/source-available, con huellas y enlaces fijados. Inventario corregido sin heredar derechos entre versiones. docs/licencias-skills-revision-20261101.md.",
+      "siguiente_accion": "Taste y Karpathy declaran MIT en README/manifiesto en los commits fijados, sin texto completo de licencia rastreado. Mantener referencia sin incorporación y conservar evidencia. Caveman instalado sigue sin procedencia exacta; no heredar licencia del clon archivado. Ver docs/licencias-skills-revision-20261101.md."
     },
     {
       "id": "R31-10",
@@ -95,12 +95,12 @@
     },
     {
       "id": "R31-11",
-      "estado": "pendiente_investigacion",
+      "estado": "protocolo_existente_datos_insuficientes",
       "prioridad": "P2",
       "titulo": "Hipótesis NQ",
       "criterio_aceptacion": "Regla y dataset preregistrados antes de inferencia estadística.",
-      "evidencia": "Los reels y el calculador manual no especifican una estrategia reproducible con ventaja.",
-      "siguiente_accion": "Definir contrato, horario, datos, costos y regla causal offline. Fuera de la corrección de la Mesa; no empezar estrategias."
+      "evidencia": "Noise Bands NB-NQ-20261025-v1 ya fija contrato, sesión, costos supuestos y reglas. 25/25 archivos coinciden con manifiesto y huella de prerregistro enlazada a resultados. Expediente: 6901 barras retrasadas, cinco sesiones completas, cero evaluables. docs/nq-prerregistro-revision-20261101.md.",
+      "siguiente_accion": "Conseguir historia licenciada suficiente antes de inferencia; no cambiar reglas contra resultados ni confundir protocolo de micros con NQ. Integridad local no certifica cronología externa ni ventaja. No iniciar estrategias o avisos actuales."
     },
     {
       "id": "R31-12",
@@ -154,7 +154,7 @@
       "titulo": "Marcos sin sandbox",
       "criterio_aceptacion": "Evaluar sandbox y referrerpolicy en los iframes de /grafica y /widget sin rebajar la CSP.",
       "evidencia": "Tres variantes públicas: sandbox rompe gráfica por cookies/Locks; no-referrer solo permite gráfica. Se conserva no-referrer en todos y sandbox solo calendario, con contenido visible pero avisos del proveedor. No se amplía allow-same-origin ni se rebaja CSP. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
-      "siguiente_accion": "Ver informe de cierre; no considerar cobertura o aislamiento completos."
+      "siguiente_accion": "Calendario muestra eventos con sandbox pero registra errores de cookie/Locks API; los otros marcos no tienen aislamiento completo acreditado. No debilitar CSP. Diagnóstico nuevo en docs/widgets-publicos-20261102.md."
     },
     {
       "id": "R31-18",
@@ -171,17 +171,17 @@
       "prioridad": "P2",
       "titulo": "Cobertura real por instrumento y panel",
       "criterio_aceptacion": "Mostrar SIN DATO donde no exista cobertura y no confundir carga de marco con dato.",
-      "evidencia": "Interfaz resuelta: preflight GET abortable antes de iframe, 404/red/no cobertura muestran SIN DATO y alternativa; HTTP200 no acredita contenido de otro origen. Cobertura real por proveedor sigue pendiente. Evidencia: docs/auditoria-reels-20261031-evidencia/cierre-pendientes",
-      "siguiente_accion": "Ver informe de cierre; no considerar cobertura o aislamiento completos."
+      "evidencia": "Interfaz resuelta: preflight GET abortable antes de iframe, 404/red/no cobertura muestran SIN DATO y alternativa. Un HTTP 200 acredita el marco. Chromium confirmó la restricción de AMX/B en gráfica e información y verificó el respaldo de Velas con cierres de caché. La serie local devuelve datos para 45 de 46 claves BMV activas. Para SMARTRC 14, cuatro recorridos aislados de Chromium confirman SIN DATO y ambos enlaces de consulta manual (BMV y TradingView). TradingView restringe BMV:SMARTRC/14 en gráfico y ficha; Chromium confirmó que ambos paneles de Mesa muestran SIN DATO, enlazan a Velas y omiten el marco. JavaScript: 52 pruebas aprobadas. El histórico local sigue pendiente de una fuente autorizada. Evidencias: docs/widgets-publicos-20261102.md y docs/proveedores-20261101-evidencia/widgets-bmv/.",
+      "siguiente_accion": "15 tipos externos observados en revisión aislada; mapas y explorador requieren las consultas públicas de lectura del embed, no un bloqueo indiscriminado de POST. Falta cobertura y vigencia por instrumento/campo; no se incorporan endpoints internos como API. Ver docs/widgets-publicos-20261102.md."
     },
     {
       "id": "R31-20",
-      "estado": "no_comprobado",
+      "estado": "verificado_actual_sin_atribucion_historica",
       "prioridad": "P2",
       "titulo": "Estrellas de GitHub y pruebas de OpenTerminal",
       "criterio_aceptacion": "Verificar el estado actual antes de afirmarlo.",
-      "evidencia": "«12 estrellas agregadas y 37 verificadas» y «13 pruebas / build de OpenTerminal» de docs/integracion-20261031.md no se reprodujeron: exigen sesión de GitHub o ejecutar el upstream.",
-      "siguiente_accion": "Reproducir con gh (solo lectura) y npm ci --ignore-scripts si el usuario lo autoriza."
+      "evidencia": "OpenTerminal commit aed097c680cd8ec1c391ae06966babe7d6d91fc6 limpio; estrella actual confirmada por gh. 37 estrellas previamente verificadas. npm test: 26 aprobadas en 8 archivos, 10.51 s. Compilación server y web terminada, tabla final de rutas y artefactos comprobados; proceso de verificación salida 0. docs/openterminal-reproduccion-20261101.md.",
+      "siguiente_accion": "Mantener separadas pruebas del upstream e integración de Actinver. La evidencia actual no demuestra quién añadió estrellas históricamente ni reproduce la cifra histórica de 13 pruebas."
     },
     {
       "id": "R31-21",

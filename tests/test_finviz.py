@@ -22,6 +22,7 @@ def test_csv_y_simbolos():
 
 
 def test_lote_guarda_como_retrasado_y_unknown(con, ajustes):
+    ajustes["app"]["solo_proveedores_gratuitos"] = False
     vistas = []
 
     def responder(r):
@@ -47,5 +48,14 @@ def test_token_rechazado_no_expone_url():
 
 
 def test_mercado_cerrado_no_consulta(con, ajustes):
+    ajustes["app"]["solo_proveedores_gratuitos"] = False
     sabado = datetime(2026, 10, 10, 16, 0, tzinfo=UTC)
     assert finviz.actualizar(con, ajustes, sabado, env={"FINVIZ_AUTH_TOKEN": "t"})["estado"] == "mercado_cerrado"
+
+def test_politica_gratuita_bloquea_token_configurado(con, ajustes):
+    def responder(_):
+        pytest.fail("Finviz no debe recibir peticiones bajo la política gratuita")
+
+    with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+        resultado = finviz.actualizar(con, ajustes, ABIERTO, env={"FINVIZ_AUTH_TOKEN": "ficticio"}, cliente=cliente)
+    assert resultado["estado"] == "bloqueado_por_politica_gratuita"

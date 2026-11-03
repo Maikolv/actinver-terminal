@@ -15,6 +15,10 @@
     {
       "titulo": "Mesa de investigación",
       "url": "/static/mesa.html"
+    },
+    {
+      "titulo": "Laboratorio de secuencias",
+      "url": "/static/recursos/lab-secuencias.html"
     }
   ],
   "secciones": [

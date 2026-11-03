@@ -29,6 +29,7 @@ from sklearn.preprocessing import StandardScaler
 from .. import __version__, reto
 from . import datos, division
 from .seleccion import FiltroCorrelacion
+from .lecturas import ultimo as ultimo
 
 VARIANTES = ("filtro_correlacion", "ridge", "pca")
 REFERENCIAS = ("sin_cambio", "historico_reciente", "regla_simple")
@@ -307,11 +308,3 @@ def investigar(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | No
     res["_modelo"] = final
     res["_residuos"] = residuos["modelo"]
     return res
-
-
-def ultimo(con: sqlite3.Connection, H: int, demo: bool) -> dict | None:
-    for (txt,) in con.execute("SELECT resultados FROM experimentos ORDER BY id DESC LIMIT 50"):
-        r = json.loads(txt)
-        if r.get("H") == H and r.get("demo") == demo:
-            return r
-    return None

@@ -173,7 +173,7 @@ def test_api_local_protegida_y_catalogo_completo(con):
     try:
         with TestClient(app, base_url="http://127.0.0.1:8765") as c:
             d = c.get("/api/centro-investigacion").json()
-            assert len(d["fuentes"]) == 19 and sum(f["conector"] for f in d["fuentes"]) == 8
+            assert len(d["fuentes"]) == 21 and sum(f["conector"] for f in d["fuentes"]) == 8
             assert next(f for f in d["fuentes"] if f["id"] == "ssrn")["estado"] == "consulta_manual"
             assert c.post("/api/centro-investigacion/actualizar", json={}).status_code == 403
             r = c.post("/api/centro-investigacion/importar", headers={"X-CSRF-Token": TOKEN_CSRF},

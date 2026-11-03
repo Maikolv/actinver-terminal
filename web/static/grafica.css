@@ -25,3 +25,12 @@ body.sin-cabecera { overflow: hidden; }
 body:not(.sin-cabecera) { display: flex; flex-direction: column; }
 body:not(.sin-cabecera) > header { flex: none; }
 body:not(.sin-cabecera) > .tradingview-widget-container { flex: 1 1 auto; min-height: 0; height: auto; }
+.estado-marco {
+  position: absolute;
+  inset: 50% 1rem auto;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: .875rem;
+  pointer-events: none;
+}
+body:has(.tradingview-widget-container iframe) .estado-marco { display: none; }

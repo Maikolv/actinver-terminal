@@ -367,7 +367,7 @@ class ConectorContratado(MarketDataProvider):
         else:
             headers[aut.get("nombre", "Authorization")] = aut.get("formato", "{clave}").format(clave=clave)
         url = base.rstrip("/") + c["ruta"].format(simbolo=sim)
-        r = self.con_reintentos(lambda: self.cliente.request(c.get("metodo", "GET"), url, params=params, headers=headers))
+        r = self._pedir(c.get("metodo", "GET"), url, params, headers)
         if r.status_code in (401, 403):
             raise ProveedorNoDisponible(f"{self.nombre}: credencial rechazada (HTTP {r.status_code})")
         if r.status_code != 200:
@@ -388,6 +388,9 @@ class ConectorContratado(MarketDataProvider):
                           float(_ruta(d, campos["precio"])), moneda, _utc(hora).isoformat(), recepcion,
                           e.get("latencia_declarada_s"), clasificar_latencia(hora, recepcion))
 
+
+    def _pedir(self, metodo, url, params, headers):
+        return self.con_reintentos(lambda: self.cliente.request(metodo, url, params=params, headers=headers))
 
 class BmvLicensedProvider(ConectorContratado):
     nombre = "bmv_licenciado"
@@ -424,6 +427,20 @@ class EodhdDiferidoProvider(ConectorContratado):
         self.env = {**self.env, "EODHD_DIFERIDO_API_KEY": self.env.get("EODHD_API_KEY", "")}
         return super()._consultar(instrumento)
 
+
+    def _pedir(self, metodo, url, params, headers):
+        from .adaptadores.base import ErrorProveedor
+        from .adaptadores.proveedores import Eodhd
+        from .config import cargar_ajustes
+
+        ajustes = cargar_ajustes()["proveedores"].get("eodhd", {})
+        proveedor = Eodhd(self.con, ajustes, self.env.get("EODHD_API_KEY"), cliente=self.cliente)
+        if metodo.upper() != "GET" or not proveedor.configurado():
+            raise ProveedorNoDisponible("EODHD: consulta diferida deshabilitada")
+        try:
+            return proveedor._get(url, params=params, headers=headers, intentos=1)
+        except ErrorProveedor as error:
+            raise ProveedorNoDisponible(str(error)) from None
 
 class InfoselProvider(ConectorContratado):
     """Infosel Market API v3 (Infosel HUB): último hecho y mejores posturas de BMV y del SIC en MXN.
@@ -692,6 +709,10 @@ def construir(con: sqlite3.Connection, modo_demo: bool, entorno: dict | None = N
           TwelveDataBmvProvider(con, env), ActinverPdfProvider(con, env),
           ManualOrCsvProvider(con, env), DemoProvider(con, env, modo_demo=modo_demo), ReferenciaOrigenProvider(con, env),
           ForeignMarketLicensedProvider(con, env)]
+    from .costos import _solo_gratuitos
+
+    if _solo_gratuitos():
+        ps = [p for p in ps if not isinstance(p, ConectorContratado) or isinstance(p, EodhdDiferidoProvider)]
     return {p.nombre: p for p in ps}
 
 
@@ -783,7 +804,9 @@ def verificar_cobertura(con: sqlite3.Connection, proveedores: dict[str, MarketDa
     por la descripción general del proveedor."""
     out = []
     ts = ahora_iso()
-    for nombre in nombres or PRIORIDAD:
+    for nombre in (nombres or PRIORIDAD):
+        if nombre not in proveedores:
+            continue
         p = proveedores[nombre]
         pend = p.pendientes()
         for ins in instrumentos:
@@ -836,6 +859,9 @@ def tabla_cobertura(con: sqlite3.Connection, proveedores: dict[str, MarketDataPr
         fila = {"instrumento_id": ins["id"], "clave_operable": ins["clave_operable"], "serie": ins["serie"],
                 "mercado": ins["mercado"], "moneda": ins["moneda_operable"], "en_catalogo_simulador": ins["en_catalogo_simulador"]}
         for n in PRIORIDAD:
+            if n not in proveedores:
+                fila[n] = "bloqueado_por_politica_gratuita"
+                continue
             v = ver.get((n, ins["id"]))
             fila[n] = v["estado"] if v else ("pendiente" if proveedores[n].pendientes() else "sin_verificar")
         filas.append(fila)

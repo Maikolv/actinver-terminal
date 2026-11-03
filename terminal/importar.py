@@ -145,9 +145,15 @@ def importar(con: sqlite3.Connection, contenido: bytes, nombre: str, tipo: str, 
                     cartera.registrar(con, t["compra"], origen, oc)
                     reporte["aceptadas"] += 1
             else:
-                con.execute("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                from .migraciones import disponibilidad_precio
+
+                ts = ahora()
+                marcas = disponibilidad_precio(t["fecha"], "archivo", t["moneda"], t["tipo_dato"], None, ts)
+                con.execute("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, "
+                            "proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) "
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                             (t["instrumento_id"], t["fecha"], t["precio"], None, None, t["moneda"], "archivo",
-                             t["tipo_dato"], None, ahora()))
+                             t["tipo_dato"], None, ts, *marcas, ts))
                 reporte["aceptadas"] += 1
         cur = con.execute("INSERT INTO importaciones (ts, archivo, sha256, tipo, filas, aceptadas, duplicadas, rechazadas,"
                           " contenido_original) VALUES (?,?,?,?,?,?,?,?,?)",

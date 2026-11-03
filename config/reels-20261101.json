@@ -1,0 +1,38 @@
+[
+  {
+    "id": "DfLZk23jLGs",
+    "url": "https://www.instagram.com/p/DfLZk23jLGs/",
+    "autor": null,
+    "tema": null,
+    "contenido_verificado": false,
+    "repositorios": [],
+    "estado": "descripcion_aportada_por_usuario_video_no_verificado",
+    "bloqueo": "Consulta web limitada; controlador Windows no pudo verificar URL actual. No se elude el control.",
+    "aplicacion": "Recursos concretos registrados en repositorios-20261101.json; asociación exacta texto/post pendiente de comprobar, sin inferirla por orden.",
+    "descripcion_usuario_disponible": true
+  },
+  {
+    "id": "DfKkuOOOSA8",
+    "url": "https://www.instagram.com/p/DfKkuOOOSA8/",
+    "autor": null,
+    "tema": null,
+    "contenido_verificado": false,
+    "repositorios": [],
+    "estado": "descripcion_aportada_por_usuario_video_no_verificado",
+    "bloqueo": "Consulta web limitada; controlador Windows no pudo verificar URL actual. No se elude el control.",
+    "aplicacion": "Recursos concretos registrados en repositorios-20261101.json; asociación exacta texto/post pendiente de comprobar, sin inferirla por orden.",
+    "descripcion_usuario_disponible": true
+  },
+  {
+    "id": "DfHxxjztOkR",
+    "url": "https://www.instagram.com/p/DfHxxjztOkR/",
+    "autor": null,
+    "tema": null,
+    "contenido_verificado": false,
+    "repositorios": [],
+    "estado": "descripcion_aportada_por_usuario_video_no_verificado",
+    "bloqueo": "Consulta web limitada; controlador Windows no pudo verificar URL actual. No se elude el control.",
+    "aplicacion": "Recursos concretos registrados en repositorios-20261101.json; asociación exacta texto/post pendiente de comprobar, sin inferirla por orden.",
+    "descripcion_usuario_disponible": true
+  }
+]

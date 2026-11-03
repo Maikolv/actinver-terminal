@@ -1,0 +1,31 @@
+
+> actinver-alertas-nube@1.0.0 test
+> node --test test/*.test.js
+
+✔ movimiento SIC: referencia en pesos = USD × FIX, etiquetada como referencia y no como precio del SIC (125.8715ms)
+✔ duplicados: la misma alerta no se repite en ejecuciones siguientes; un nivel nuevo sí (68.6716ms)
+✔ cartera sin sincronizar: avisa una vez y suspende compra/venta basadas en ese saldo (40.8689ms)
+✔ copia del portal antigua o registro local: el plan no dispara compras ni ventas (19.0502ms)
+✔ precio IEX vencido o sin tipo de cambio: no se inventa la señal (17.1704ms)
+✔ caída de un proveedor: un aviso tras 3 fallos seguidos, sin repetir, y aviso de recuperación (66.0685ms)
+✔ splits: con split registrado se ajusta el cierre previo; sin registrar se marca como dudoso (26.8023ms)
+✔ Telegram 429: espera corta ⇒ reintento; espera larga ⇒ queda en cola y sale en la siguiente ejecución (87.2247ms)
+✔ convivencia: con la terminal local activa la nube no consulta ni envía (relevo) (31.779ms)
+✔ aviso de prueba: solo sale de la nube cuando la terminal local dejó de sincronizar (19.4371ms)
+✔ fin de semana y festivos: sin consultas; horario de EE. UU. con y sin horario de verano (31.552ms)
+✔ resumen diario: una vez por sesión, desde 35 min antes de la apertura de la BMV (28.4589ms)
+✔ vector de firma compartido con la terminal (Python) (86.5121ms)
+✔ sincronización válida se guarda y una repetida (mismo nonce) se rechaza (190.7924ms)
+✔ firma inválida, secreto equivocado o cuerpo alterado ⇒ 401 sin guardar (24.8898ms)
+✔ marca de tiempo vieja (reenvío tardío) ⇒ 401 (11.6151ms)
+✔ secuencia anterior o igual ⇒ 409 aunque la firma sea nueva (35.2873ms)
+✔ validación estricta: campos extra, tipos y tamaño (23.7777ms)
+✔ sin secreto configurado no acepta nada; /estado exige firma y no expone textos (40.3978ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1104.7426

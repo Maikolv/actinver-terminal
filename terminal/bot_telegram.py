@@ -290,6 +290,9 @@ class Chatbot:
         self._claude_probado = cliente_claude is not None
 
     def _cliente_claude(self):
+        # La restricción vigente prevalece sobre claves y aprobaciones de costo antiguas.
+        if self.ajustes["app"].get("solo_proveedores_gratuitos", True):
+            return None
         if not self._claude_probado:
             self._claude_probado = True
             # La API de Claude cobra por uso: sin aprobación expresa del usuario (ajustes_usuario 'costo_claude_api' =

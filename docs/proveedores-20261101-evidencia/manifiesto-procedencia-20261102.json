@@ -1,0 +1,10 @@
+{
+  "alcance": "Código de validación y cuarentena; ingesta conserva cambios anteriores del árbol de trabajo",
+  "archivos": {
+    "terminal/ingesta.py": "4e87497ffe0282fbe443a24f34e08a8d9ce3752f741ba0e3fd9b11155c984141",
+    "terminal/calidad_precios.py": "173a0c10960a1039eecbe0058c5598dc2fccb8fffcaa21808f0c984a1cb2a813",
+    "scripts/cuarentena_cierres.py": "16dbcbc759ede78ddc8927c6eb59cf66e5c62eae7b06459355e35a5849803c69",
+    "tests/test_calidad_precios.py": "327c439768508281eb11bd4dc612a05adf4ada9f2cd8d39dc0c5cdf7665ee391",
+    "tests/test_procedencia_precios.py": "60ba602b8aadf1a9406e133010d0477d2c54b057202babbe92cb5930014c5c15"
+  }
+}

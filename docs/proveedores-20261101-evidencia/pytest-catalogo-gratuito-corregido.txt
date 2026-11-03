@@ -1,0 +1,79 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 55%]
+........................................................................ [ 63%]
+........................................................................ [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+..................F..................................................... [ 94%]
+................................................                         [100%]
+================================== FAILURES ===================================
+_ test_boletas_del_plan_del_dia_usan_la_propuesta_de_referencia_y_reemplazan __
+
+con = <sqlite3.Connection object at 0x0000011355192D40>
+ajustes = Ajustes(datos={'app': {'solo_proveedores_gratuitos': True, 'modo': 'real', 'host': '127.0.0.1', 'puerto': 8765, 'moned...miento_ajustado': 0.25, 'riesgo': 0.2, 'diversificacion': 0.15, 'liquidez': 0.1, 'costos': 0.1, 'calidad_datos': 0.2}})
+
+    def test_boletas_del_plan_del_dia_usan_la_propuesta_de_referencia_y_reemplazan(con, ajustes):
+        from terminal import boleta, servicios
+        from conftest import sembrar_precios
+        ids = [r[0] for r in con.execute("SELECT id FROM instrumentos WHERE id LIKE 'BMV:%' AND clase='accion' AND estado='activo' LIMIT 8")]
+        sembrar_precios(con, ids, sesiones=300)
+        servicios.calcular_propuestas(con, ajustes)
+        props = servicios.propuestas_guardadas(con, ajustes, servicios.perfil_actual(con, ajustes))
+        ref = resumen.propuesta_referencia(props)
+>       r1 = boleta.generar(con, ajustes, boleta.PLAN_DEL_DIA)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_resumen.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+terminal\boleta.py:226: in generar
+    boletas = [construir(con, ajustes, f, cart, efectivo_supuesto=sup) for f in filas]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\boleta.py:155: in construir
+    caduca = _caducidad(ahora)
+             ^^^^^^^^^^^^^^^^^
+terminal\boleta.py:73: in _caducidad
+    if vigencia.mercado_abierto("XMEX", ahora):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\vigencia.py:106: in mercado_abierto
+    if codigo != "XMEX" or _horario_reto(hoy.date()) is None:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\vigencia.py:46: in _horario_reto
+    if not reto.activo():
+           ^^^^^^^^^^^^^
+terminal\reto.py:29: in activo
+    return bool(config().get("activo"))
+                ^^^^^^^^
+terminal\reto.py:25: in config
+    return _cargar(ruta.stat().st_mtime) if ruta.exists() else {"activo": False}
+                   ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/MIKE/Desktop/Repos/actinver-terminal/config/reto.yaml')
+follow_symlinks = True
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       OSError: [WinError 1450] Recursos insuficientes en el sistema para completar el servicio solicitado: 'C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal\\config\\reto.yaml'
+
+..\..\..\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pathlib.py:840: OSError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_resumen.py::test_boletas_del_plan_del_dia_usan_la_propuesta_de_referencia_y_reemplazan
+1 failed, 911 passed, 1 warning in 931.14s (0:15:31)

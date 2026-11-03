@@ -1,0 +1,23 @@
+[
+  {
+    "tipo": "filtro",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Resumen\nMás capitalizadas\nFiltros\n4\nTICKER\n9051 COINCIDENCIAS\n3 ELEMENTOS\n\t\nPRECIO\n\t\n% CBO.\n\t\nCBO\n\t\nRATING TÉCNICO\n\t\nVOL.\n\t\nVOLUMEN*PRECIO\n\t\nCAPITALIZACIÓN DE MERCADO\n\t\nP/B\n\t\nBPA (TTM)\n\t\nEMPLEADOS\n\t\nSECTOR\nTICKER\nNO SE ENCONTRARON COINCIDENCIAS\n3 ELEMENTOS\n\t\nPRECIO\n\t\n% CBO.\n\t\nCBO\n\t\nRATING TÉCNICO\n\t\nVOL.\n\t\nVOLUMEN*PRECIO\n\t\nCAPITALIZACIÓN DE MERCADO\n\t\nP/B\n\t\nBPA (TTM)\n\t\nEMPLEADOS\n\t\nSECTOR\n\n\nAAPLE\n\t344,63USD\t−1,23%\t−4,28USD\tCompra\t67,84 M\t23,38 B\t5,03 TUSD\t39,51\t8,76USD\t166 K\tTecnología electrónica\n\nNVDAE\n\t204,64USD\t−4,22%\t−9,02USD\tVenta\t168,38 M\t34,46 B\t4,93 TUSD\t25,87\t7,95USD\t42 K\tTecnología electrónica\n\nMSFTE\n\t521,91USD\t−1,55%\t−8,23USD\tNeutral\t35,65 M\t18,61 B\t3,88 TUSD\t27,26\t19,20USD\t223 K\tServicios tecnológicos\n\nGOOGE\n\t278,22USD\t−1,45%\t−4,10USD\tFuerte venta\t45,12 M\t12,55 B\t3,41 TUSD\t14,52\t19,39USD\t190,82 K\tServicios tecnológicos\n\nAMZNE\n\t240,35USD\t−1,41%\t−3,44USD\tVenta\t104,89 M\t25,21 B\t2,59 TUSD\t19,43\t12,53USD\t1,58 M\tComercio minorista\n\nSPCXE\n\t134,72USD\t−6,37%\t−9,17USD\tFuerte venta\t122,65 M\t16,52 B\t1,83 TUSD\t—\t—\t—\tComunicaciones\n\nTSLAE\n\t399,81USD\t−0,87%\t−3,49USD\tCompra\t41,74 M\t16,69 B\t1,58 TUSD\t439,79\t1,00USD\t134,78 K\tBienes de consumo duraderos\n\nMETAE\n\t614,99USD\t−1,53%\t−9,53USD\tVenta\t25,36 M\t15,6 B\t1,57 TUSD\t20,97\t29,68USD\t78,86 K\tServicios tecnológicos\n\nAVGOE\n\t326,08USD\t−5,48%\t−18,92USD\tFuerte venta\t36,51 M\t11,91 B\t1,56 TUSD\t41,63\t8,06USD\t33 K\tTecnología electrónica\n\nLLYE\n\t1.417,54USD\t3,19%\t43,84USD\tFuerte compra\t5,25 M\t7,45 B\t1,33 TUSD\t46,57\t30,48USD\t50 K\tTecnologías sanitarias\n\nBRK.AE\n\t815.600,00USD\t−0,23%\t−1.900,00USD\tCompra\t191\t155,78 M\t1,16 TUSD\t13,67\t59.657,31USD\t387,81 K\tFinanzas\n\nMUE\n\t884,74USD\t−5,30%\t−49,53USD\tVenta\t30,87 M\t27,31 B\t1 TUSD\t11,92\t75,30USD\t61 K\tTecnología electrónica\n\nWMTE\n\t123,51USD\t1,86%\t2,26USD\tFuerte compra\t29,78 M\t3,68 B\t979,9 BUSD\t44,75\t2,7"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "ruta": "/com.tradingview/track",
+        "metodo": "POST",
+        "motivo": "método excluido"
+      }
+    ],
+    "consulta_publica_scan_permitida": true,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:23:29.094Z"
+  }
+]

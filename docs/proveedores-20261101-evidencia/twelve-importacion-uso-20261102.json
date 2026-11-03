@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-02T08:10:02.723881+00:00",
+  "clave_disponible": true,
+  "consultas": 1,
+  "endpoint": "/api_usage",
+  "credito_documentado": 1,
+  "twelve_bmv_activo": false,
+  "barchart_activo": false,
+  "cotizaciones_consultadas": false,
+  "facturacion_contratada": false,
+  "http": 200,
+  "clave_validada": true,
+  "plan": "no_identificado",
+  "current_usage": 1,
+  "plan_limit": 8,
+  "daily_usage": 1
+}

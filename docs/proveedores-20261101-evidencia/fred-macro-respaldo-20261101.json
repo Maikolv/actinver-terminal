@@ -1,0 +1,61 @@
+{
+  "corte": "2026-11-01T21:51:46.834388+00:00",
+  "fuentes": {
+    "MACRO-RESPALDO": {
+      "estado": "confirmado",
+      "solicitudes": 3,
+      "observaciones_validas": 81,
+      "nuevas": 81,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T21:51:47.931270+00:00",
+      "identidad_observada": [
+        {
+          "serie": "CPIAUCSL",
+          "simbolo": "",
+          "titulo": "CPI general desestacionalizado · FRED/BLS",
+          "unidad": "índice 1982-84=100"
+        },
+        {
+          "serie": "CPI_YOY",
+          "simbolo": "",
+          "titulo": "Cambio interanual del CPI desestacionalizado · FRED/BLS",
+          "unidad": "%"
+        },
+        {
+          "serie": "PAYEMS",
+          "simbolo": "",
+          "titulo": "Empleo no agrícola de EE. UU. · FRED/BLS",
+          "unidad": "miles de personas"
+        },
+        {
+          "serie": "UNRATE",
+          "simbolo": "",
+          "titulo": "Tasa de desempleo de EE. UU. · FRED/BLS",
+          "unidad": "%"
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {},
+      "activado": false,
+      "http": [
+        {
+          "host": "api.stlouisfed.org",
+          "ruta": "/fred/series/observations",
+          "http": 200
+        },
+        {
+          "host": "api.stlouisfed.org",
+          "ruta": "/fred/series/observations",
+          "http": 200
+        },
+        {
+          "host": "api.stlouisfed.org",
+          "ruta": "/fred/series/observations",
+          "http": 200
+        }
+      ]
+    }
+  },
+  "solicitudes": 3,
+  "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+}

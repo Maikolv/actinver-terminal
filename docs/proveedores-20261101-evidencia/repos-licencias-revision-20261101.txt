@@ -1,0 +1,38 @@
+37 repositorios; 33 sin problemas; 4 con observaciones
+OK  OpenTerminal                 MIT            
+OK  floorplan                    MIT            
+OK  day-trader-skill             MIT            
+OK  rederive                     MIT            
+OBS caveman                      Apache-2.0     procedencia de la versión instalada no verificada; no heredar licencia por el nombre
+OK  FinGPT                       MIT            
+OK  ai-hedge-fund                MIT            
+OK  AutoHedge                    MIT            
+OK  Vibe-Trading                 MIT            
+OK  FinceptTerminal              AGPL-3.0       
+OK  TradingAgents                Apache-2.0     
+OK  TradingAgents_TauricResearch Apache-2.0     
+OK  qlib                         MIT            
+OK  FinRL                        MIT            
+OK  ECC                          MIT            
+OK  rea                          MIT            
+OK  context7                     MIT            
+OK  playwright-mcp               Apache-2.0     
+OK  superpowers                  MIT            
+OK  mattpocock-skills            MIT            
+OK  ponytail                     MIT            
+OK  agents                       MIT            
+OK  Agent-Reach                  MIT            
+OK  last30days-skill             MIT            
+OK  gstack                       MIT            
+OK  ui-ux-pro-max-skill          MIT            
+OBS taste-skill                  -              sin archivo de licencia inventariado
+OK  impeccable                   Apache-2.0     
+OK  diagram-design               MIT            
+OBS skills                       Apache-2.0,Apache-2.0,Apache-2.0,Apache-2.0,Apache-2.0,Apache-2.0,desconocida,Apache-2.0,Apache-2.0,Apache-2.0,desconocida,desconocida,Apache-2.0,Apache-2.0,Apache-2.0,Apache-2.0,Apache-2.0,desconocida licencia skills/docx/LICENSE.txt: desconocida; licencia skills/pdf/LICENSE.txt: desconocida; licencia skills/pptx/LICENSE.txt: desconocida; licencia skills/xlsx/LICENSE.txt: desconocida
+OK  humanizer                    MIT            
+OK  replica-skill                MIT            
+OK  chrome-devtools-mcp          Apache-2.0     
+OK  graphify                     Apache-2.0,MIT 
+OBS andrej-karpathy-skills       -              sin archivo de licencia inventariado
+OK  taste-skill-Leonxlnx         MIT            
+OK  addyosmani-agent-skills      MIT            

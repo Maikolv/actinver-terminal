@@ -3,6 +3,7 @@
 # Las credenciales van en variables de entorno o en .env (ver .env.example), nunca aquí.
 
 [app]
+solo_proveedores_gratuitos = true # Mandato humano: no activar recursos de pago por detectar una clave.
 modo = "real"                 # "real" | "demo" (demo = datos SINTÉTICOS etiquetados, solo para pruebas)
 host = "127.0.0.1"            # solo escucha en la máquina local
 puerto = 8765
@@ -136,7 +137,7 @@ peticiones_por_hora = 45
 peticiones_por_dia = 900
 
 [proveedores.twelvedata]
-activo = true                        # alternativa BMV (EOD); solo con TWELVEDATA_API_KEY de plan Pro y símbolos verificados
+activo = false  # Solo proveedores gratuitos: este acceso requiere plan/contrato de pago.
 peticiones_por_dia = 700
 
 [proveedores.actinver_pdf]
@@ -152,7 +153,7 @@ feed_historico = "sip"               # plan gratuito: SIP con 15 min de retraso;
 peticiones_por_dia = 5000            # el plan gratuito permite 200 peticiones/min
 
 [proveedores.barchart]
-activo = true                        # históricos EE. UU. vía Barchart OnDemand; requiere BARCHART_API_KEY (contrato)
+activo = false  # Solo proveedores gratuitos: este acceso requiere plan/contrato de pago.
 peticiones_por_dia = 400
 
 [proveedores.archivo]

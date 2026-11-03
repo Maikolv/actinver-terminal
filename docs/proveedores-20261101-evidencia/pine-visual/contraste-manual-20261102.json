@@ -1,0 +1,9 @@
+{
+  "fuente_sha256": "37289793b3055f8d96bf525291566355e4f774ef88514106c062bd452ce51488",
+  "contraste_blanco_gris": 16.7,
+  "formula_y_comprobador_identicos": true,
+  "compilado_en_pine_editor": true,
+  "grafico_restaurado": true,
+  "operaciones": false,
+  "nota": "Solo cuatro colores de fila; fuente actual compilada y observada. La prueba numérica previa usa comprobador idéntico byte a byte. Marcadores del calendario del gráfico pueden tapar parte de la última fila en la posición inferior."
+}

@@ -96,6 +96,8 @@ def actualizar(con, ajustes, ahora: datetime | None = None, env: dict | None = N
     falta = pendientes(env)
     if falta:
         return {"estado": "sin_credencial", "pendientes": falta}
+    if ajustes["app"].get("solo_proveedores_gratuitos", True):
+        return {"estado": "bloqueado_por_politica_gratuita"}
     if not cfg.get("activo", True):
         return {"estado": "desactivado"}
     ahora = ahora or datetime.now(UTC)
@@ -122,12 +124,13 @@ def actualizar(con, ajustes, ahora: datetime | None = None, env: dict | None = N
     filas, registro = [], []
     for s, p in precios.items():
         for iid in mapa.get(s, []):
-            filas.append((iid, fecha, p, None, None, "USD", PROVEEDOR, "retrasado", recep, recep))
+            filas.append((iid, fecha, p, None, None, "USD", PROVEEDOR, "retrasado", recep, recep, None, recep, recep))
             registro.append((PROVEEDOR, s, f"US:{s}", iid, "origen_extranjero", "EE. UU.", p, "USD", recep, recep, 0.0,
                              None, "UNKNOWN", 0, "Finviz Elite: sin hora del último hecho; latencia no medible"))
     with con:
         con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, "
-                        "proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+                        "proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         con.executemany("INSERT INTO cotizaciones_registro (proveedor, simbolo_origen, simbolo_normalizado, instrumento_id, "
                         "mercado, bolsa, precio, moneda, hora_evento, hora_recepcion, latencia_declarada_s, "
                         "latencia_medida_s, estado_latencia, sintetico, detalle) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",

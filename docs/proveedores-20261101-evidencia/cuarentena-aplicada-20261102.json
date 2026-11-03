@@ -1,0 +1,21 @@
+{
+  "modo": "cuarentena local",
+  "auditoria_previa": {
+    "candidatos": 136,
+    "por_proveedor": {
+      "alpaca": 136
+    },
+    "sin_marcas_evaluables": 0
+  },
+  "respaldo": "C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal\\data\\respaldos\\terminal-20261102-200048-615000.db",
+  "resultado": {
+    "retirados_de_precios": 136,
+    "archivados_nuevos": 136,
+    "criterio": "cierre recibido antes de su evento registrado; sin certificar precio/publicaci�n"
+  },
+  "auditoria_posterior": {
+    "candidatos": 0,
+    "por_proveedor": {},
+    "sin_marcas_evaluables": 0
+  }
+}

@@ -82,13 +82,16 @@ def test_tipo_de_cambio_no_se_reconsulta_si_ya_se_obtuvo_hace_poco(con):
         def configurado(self): return True
         def historico(self, *a):
             llamadas.append(a)
-            return [Barra(fecha="2020-01-02", cierre=18.9)]
+            return [Barra(fecha="2020-01-02", cierre=18.9 if len(llamadas) == 1 else 99)]
     ads = {"banxico": type("X", (), {"configurado": lambda s: False})(), "fred": Fx()}
-    assert ingesta.actualizar_fx(con, ads)["estado"] == "ok" and len(llamadas) == 1
-    assert ingesta.actualizar_fx(con, ads)["estado"] == "al_dia" and len(llamadas) == 1
+    hoy = date(2020, 1, 3)
+    assert ingesta.actualizar_fx(con, ads, hoy=hoy)["estado"] == "ok" and len(llamadas) == 1
+    assert ingesta.actualizar_fx(con, ads, hoy=hoy)["estado"] == "al_dia" and len(llamadas) == 1
     con.execute("UPDATE ingestas SET fin='2000-01-01T00:00:00+00:00'")
-    ingesta.actualizar_fx(con, ads)
+    assert ingesta.actualizar_fx(con, ads, hoy=hoy)["estado"] == "sin_proveedor"
     assert len(llamadas) == 2 and ahora()
+    fila = con.execute("SELECT valor,event_time,available_at,ingested_at FROM fx WHERE proveedor='fred'").fetchone()
+    assert fila[0] == 18.9 and all(fila[1:])
 
 
 def test_fred_usa_api_oficial_con_clave_y_filtra_rango(con, monkeypatch):

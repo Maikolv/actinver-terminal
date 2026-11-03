@@ -1,0 +1,542 @@
+{
+  "fuente": "https://apps.bea.gov/API/signup/release_dates.json",
+  "consultado_en": "2026-11-03T19:20:31+00:00",
+  "eventos": [
+    {
+      "fecha": "2026-01-08T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-01-14T13:30:00+00:00",
+      "titulo": "U.S. International Transactions"
+    },
+    {
+      "fecha": "2026-01-16T15:00:00+00:00",
+      "titulo": "U.S. International Investment Position"
+    },
+    {
+      "fecha": "2026-01-22T13:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-01-22T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-01-22T15:00:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-01-23T13:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2026-01-29T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-02-05T13:30:00+00:00",
+      "titulo": "Gross Domestic Product by County and Metropolitan Area and Personal Income by County and Metropolitan Area"
+    },
+    {
+      "fecha": "2026-02-19T13:30:00+00:00",
+      "titulo": "Real Personal Consumption Expenditures by State and Real Personal Income by State"
+    },
+    {
+      "fecha": "2026-02-19T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-02-20T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-02-20T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-03-05T15:00:00+00:00",
+      "titulo": "Outdoor Recreation Economic Statistics"
+    },
+    {
+      "fecha": "2026-03-12T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-03-13T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-03-13T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-03-25T12:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2026-04-02T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-04-09T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-04-09T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-04-09T12:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2026-04-09T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-04-27T14:00:00+00:00",
+      "titulo": "Integrated BEA-BLS Industry-Level Production Account"
+    },
+    {
+      "fecha": "2026-04-30T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-04-30T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-05-05T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-05-21T14:00:00+00:00",
+      "titulo": "Global Value Chains (Trade in Value Added)"
+    },
+    {
+      "fecha": "2026-05-28T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-05-28T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-05-28T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-06-09T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-06-10T12:30:00+00:00",
+      "titulo": "New Foreign Direct Investment in the United States"
+    },
+    {
+      "fecha": "2026-06-16T14:00:00+00:00",
+      "titulo": "Distribution of U.S. Personal Income"
+    },
+    {
+      "fecha": "2026-06-16T17:30:00+00:00",
+      "titulo": "U.S. Household Production Economic Statistics"
+    },
+    {
+      "fecha": "2026-06-24T12:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2026-06-25T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-06-25T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-06-25T12:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2026-06-25T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-07-07T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-07-07T14:00:00+00:00",
+      "titulo": "U.S. Trade in Services Detailed Tables"
+    },
+    {
+      "fecha": "2026-07-10T12:30:00+00:00",
+      "titulo": "Activities of U.S. Affiliates of Foreign Multinational Enterprises"
+    },
+    {
+      "fecha": "2026-07-16T14:00:00+00:00",
+      "titulo": "Prototype Distribution of State Personal Income"
+    },
+    {
+      "fecha": "2026-07-21T12:30:00+00:00",
+      "titulo": "Direct Investment by Country and Industry"
+    },
+    {
+      "fecha": "2026-07-30T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-07-30T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-08-04T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-08-26T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-08-26T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-08-26T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-09-03T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-09-24T12:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2026-09-30T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-09-30T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-09-30T12:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2026-09-30T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-10-06T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-10-06T14:00:00+00:00",
+      "titulo": "Services Supplied Through Affiliates"
+    },
+    {
+      "fecha": "2026-10-22T14:00:00+00:00",
+      "titulo": "Experimental Research and Development Economic Statistics"
+    },
+    {
+      "fecha": "2026-10-29T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-10-29T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-11-04T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-11-18T15:00:00+00:00",
+      "titulo": "Outdoor Recreation Economic Statistics"
+    },
+    {
+      "fecha": "2026-11-20T13:30:00+00:00",
+      "titulo": "Activities of U.S. Multinational Enterprises"
+    },
+    {
+      "fecha": "2026-11-25T13:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-11-25T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-11-25T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2026-12-02T13:30:00+00:00",
+      "titulo": "GDP by County and Personal Income by County"
+    },
+    {
+      "fecha": "2026-12-08T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2026-12-10T13:30:00+00:00",
+      "titulo": "Real Personal Consumption Expenditures by State and Real Personal Income by State"
+    },
+    {
+      "fecha": "2026-12-18T13:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2026-12-23T13:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2026-12-23T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2026-12-23T13:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2026-12-23T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-01-07T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-01-28T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-01-28T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-02-04T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-02-25T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-02-25T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-03-09T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-03-24T12:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2027-03-31T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-03-31T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-03-31T12:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2027-03-31T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-04-06T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-04-29T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-04-29T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-04-30T12:30:00+00:00",
+      "titulo": "Activities of U.S. Affiliates of Foreign Multinational Enterprises"
+    },
+    {
+      "fecha": "2027-05-05T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-05-27T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-05-27T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-05-27T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-06-09T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-06-10T12:30:00+00:00",
+      "titulo": "New Foreign Direct Investment in the United States"
+    },
+    {
+      "fecha": "2027-06-24T12:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2027-06-25T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-06-25T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-06-25T12:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2027-06-25T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-07-07T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-07-07T14:00:00+00:00",
+      "titulo": "U.S. Trade in Services Detailed Tables"
+    },
+    {
+      "fecha": "2027-07-20T12:30:00+00:00",
+      "titulo": "Direct Investment by Country and Industry"
+    },
+    {
+      "fecha": "2027-07-29T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-07-29T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-08-05T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-08-20T12:30:00+00:00",
+      "titulo": "Activities of U.S. Multinational Enterprises"
+    },
+    {
+      "fecha": "2027-08-25T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-08-25T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-08-25T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-09-08T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-09-22T12:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2027-09-30T12:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-09-30T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-09-30T12:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2027-09-30T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-10-06T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-10-28T12:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-10-28T12:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-11-04T12:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-11-24T13:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-11-24T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-11-24T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    },
+    {
+      "fecha": "2027-12-01T13:30:00+00:00",
+      "titulo": "Gross Domestic Product by County and Personal Income by County"
+    },
+    {
+      "fecha": "2027-12-07T13:30:00+00:00",
+      "titulo": "U.S. International Trade in Goods and Services"
+    },
+    {
+      "fecha": "2027-12-15T13:30:00+00:00",
+      "titulo": "Real Consumer Spending by State and Real Personal Income by State"
+    },
+    {
+      "fecha": "2027-12-17T13:30:00+00:00",
+      "titulo": "U.S. International Transactions and Investment Position"
+    },
+    {
+      "fecha": "2027-12-22T13:30:00+00:00",
+      "titulo": "Corporate Profits"
+    },
+    {
+      "fecha": "2027-12-22T13:30:00+00:00",
+      "titulo": "Gross Domestic Product"
+    },
+    {
+      "fecha": "2027-12-22T13:30:00+00:00",
+      "titulo": "Gross Domestic Product by State and Personal Income by State"
+    },
+    {
+      "fecha": "2027-12-22T13:30:00+00:00",
+      "titulo": "Personal Income and Outlays"
+    }
+  ]
+}

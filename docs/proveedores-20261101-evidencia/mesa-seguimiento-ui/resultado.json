@@ -1,0 +1,41 @@
+{
+  "alcance": "FastAPI y SQLite aislados; solo POST a lista local permitido, proveedores bloqueados",
+  "resultados": [
+    {
+      "ancho": 1440,
+      "tema": "dark",
+      "instrumento": "SIC:NVDA",
+      "agregado_en_base_aislada": true,
+      "persistente": true,
+      "errores": [],
+      "prohibidas": []
+    },
+    {
+      "ancho": 1440,
+      "tema": "light",
+      "instrumento": "SIC:NVDA",
+      "agregado_en_base_aislada": false,
+      "persistente": true,
+      "errores": [],
+      "prohibidas": []
+    },
+    {
+      "ancho": 390,
+      "tema": "dark",
+      "instrumento": "SIC:NVDA",
+      "agregado_en_base_aislada": false,
+      "persistente": true,
+      "errores": [],
+      "prohibidas": []
+    },
+    {
+      "ancho": 390,
+      "tema": "light",
+      "instrumento": "SIC:NVDA",
+      "agregado_en_base_aislada": false,
+      "persistente": true,
+      "errores": [],
+      "prohibidas": []
+    }
+  ]
+}

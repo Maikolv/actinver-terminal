@@ -1,0 +1,29 @@
+{
+  "fecha": "2026-11-02T23:17:18.576683+00:00",
+  "archivo": "data/terminal.db",
+  "modo": "solo lectura; sin credenciales ni red",
+  "alcance": "Solo controles de fechas registradas en cierres de estos proveedores; no certifica exactitud, publicación, integridad total ni frescura. Sin precios ni información de cuenta en el informe.",
+  "proveedores": [
+    {
+      "proveedor": "alpaca",
+      "filas": 182057,
+      "marcas_no_evaluables": 0,
+      "recibidas_antes_del_evento": 136,
+      "fechas_no_evaluables": 0
+    },
+    {
+      "proveedor": "eodhd",
+      "filas": 11874,
+      "marcas_no_evaluables": 0,
+      "recibidas_antes_del_evento": 0,
+      "fechas_no_evaluables": 0
+    },
+    {
+      "proveedor": "tiingo",
+      "filas": 182704,
+      "marcas_no_evaluables": 0,
+      "recibidas_antes_del_evento": 0,
+      "fechas_no_evaluables": 0
+    }
+  ]
+}

@@ -120,7 +120,7 @@
     "autor": "brochbuilds",
     "tema": "Diez skills clasificadas por estrellas",
     "ideas": "Taste, Agent Skills, Caveman, Graphify, UI UX Pro Max, Ponytail, Anthropic Skills, Karpathy Skills, Matt Pocock Skills y Superpowers.",
-    "aplicacion": "Se verifican las diez identidades que aparecen en pantalla. Taste de Leonxlnx es distinto del taste-skill local de senlindesign. Las supuestas 320 skills por DM no se descargan por adivinación; las cifras de estrellas del video son promocionales.",
+    "aplicacion": "Se verifican las diez identidades que aparecen en pantalla. Taste de Leonxlnx es distinto del taste-skill local de senlindesign. El catálogo público del autor (https://brochbuilds.com/skills) vincula las diez del reel con un índice de 320 repositorios; se conserva como referencia sin instalación masiva; las cifras de estrellas del video son promocionales.",
     "repositorios": [
       "Leonxlnx/taste-skill",
       "addyosmani/agent-skills",

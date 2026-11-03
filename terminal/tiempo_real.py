@@ -307,12 +307,16 @@ class FlujoVivo:
             t = pd.Timestamp(hora)
             t = t.tz_localize("UTC") if t.tzinfo is None else t.tz_convert("UTC")
             fecha = t.tz_convert("America/New_York").date().isoformat()
-            filas += [(iid, fecha, precio, None, None, "USD", PROVEEDOR_VIVO, tipo, t.isoformat(), ts)
+            disponible = max(t, pd.Timestamp(ts)).isoformat()
+            filas += [(iid, fecha, precio, None, None, "USD", PROVEEDOR_VIVO, tipo, t.isoformat(), ts,
+                       t.isoformat(), disponible, ts)
                       for iid in mapa.get(s, [])]
         con = db.conectar()
         try:
             with db.transaccion(con):
-                con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+                con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, "
+                                "moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, "
+                                "ingested_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         finally:
             con.close()
         with self._lock:

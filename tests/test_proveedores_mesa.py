@@ -86,18 +86,41 @@ def test_identidades_no_equivalentes(tema, titulo):
 
 
 @pytest.mark.parametrize('cabecera', ['120', 'Fri, 30 Oct 2026 23:02:00 GMT'])
-def test_retry_after_persistente_sin_reintento(con, cabecera):
+@pytest.mark.parametrize('codigo', [429, 503])
+def test_retry_after_persistente_sin_reintento(con, cabecera, codigo):
     vistos = []
     def responder(r):
         vistos.append(r)
-        return httpx.Response(429, headers={'Retry-After': cabecera})
-    a = ConsultaMesa(con, {}, 'ficticia', cliente(responder))
-    a.proveedor = 'banxico_sie'
-    with pytest.raises(ErrorProveedor, match='Retry-After'):
-        a._peticion('https://www.banxico.org.mx/', ahora=AHORA)
-    with pytest.raises(LimiteAlcanzado):
-        a._peticion('https://www.banxico.org.mx/', ahora=AHORA+timedelta(seconds=60))
-    assert len(vistos) == 1
+        return (httpx.Response(codigo, headers={'Retry-After': cabecera})
+                if len(vistos) == 1 else httpx.Response(200))
+    url = 'https://www.alphavantage.co/query'
+    with cliente(responder) as cli:
+        a = AlphaCalendario(con, {}, 'ficticia', cli)
+        with pytest.raises(ErrorProveedor, match=f'HTTP {codigo}.*Retry-After'):
+            a._peticion(url, ahora=AHORA)
+        b = AlphaCalendario(con, {}, 'ficticia', cli)
+        with pytest.raises(LimiteAlcanzado, match='Retry-After'):
+            b._peticion(url, ahora=AHORA+timedelta(seconds=60))
+        assert len(vistos) == 1
+        assert [tuple(f) for f in con.execute('SELECT proveedor,peticiones FROM uso_proveedor '
+                                             "WHERE ventana LIKE 'd:%'")] == [('alpha_vantage', 1)]
+        assert b._peticion(url, ahora=AHORA+timedelta(seconds=121)).status_code == 200
+        assert len(vistos) == 2
+
+
+def test_banxico_mesa_y_fix_comparten_pausa(con):
+    from terminal.adaptadores.proveedores import Banxico
+
+    with cliente(lambda r: httpx.Response(503, headers={'Retry-After': '120'})) as cli:
+        mesa = BanxicoSIE(con, {}, 'ficticia', cli)
+        ahora = datetime.now(UTC)
+        with pytest.raises(ErrorProveedor, match='HTTP 503.*Retry-After'):
+            mesa._peticion('https://www.banxico.org.mx/', ahora=ahora)
+        fix = Banxico(con, {}, 'ficticia', cliente=cli)
+        with pytest.raises(LimiteAlcanzado, match='Retry-After'):
+            fix._get('https://www.banxico.org.mx/', intentos=1)
+        with pytest.raises(LimiteAlcanzado, match='Retry-After'):
+            mesa._peticion('https://www.banxico.org.mx/', ahora=ahora)
 
 
 def test_cupo_por_minuto_y_cupo_compartido_alpha(con):
@@ -176,7 +199,8 @@ def test_f5_sin_clave_o_catalogo_no_consulta_ni_habilita(con):
 
 
 def test_banxico_actualizar_persiste_fuente_real_y_no_precios(con, ajustes):
-    ajustes.datos['centro_investigacion'] = {'banxico_sie': {'activo': True}, 'bls': {'activo': False}}
+    ajustes.datos['centro_investigacion'] = {'banxico_sie': {'activo': True,
+        'series': {**dict.fromkeys(BanxicoSIE.CANDIDATOS), 'BANXICO_OBJETIVO': 'SF61745'}}, 'bls': {'activo': False}}
     def responder(r):
         fila = {'idSerie': 'SF61745', 'titulo': 'Tasa objetivo'}
         if r.url.path.endswith('/datos'):

@@ -21,6 +21,10 @@ Al terminar el Reto, la terminal pasa a llamarse **help-quote-terminal**:
 Los límites duros de arriba no cambian. Los datos del Reto se archivan, no se borran. Renombrar el repositorio o la
 carpeta requiere confirmación del usuario. Detalle y pasos: `docs/directriz-post-reto.md`.
 
+## Restricción de costos vigente — 2-nov-2026
+
+Solo proveedores y recursos gratuitos. Avisar inmediatamente si cualquier API, clave, dato, plugin o servicio exige facturación; no contratar ni iniciar pruebas con cobro/renovación. Una clave o aprobación de costo antigua no prevalece sobre esta regla. `app.solo_proveedores_gratuitos=true` bloquea los conectores actuales de Twelve BMV/Barchart y la API de Claude; respuestas locales conservadas. La clave Twelve ya está importada y validada en el mecanismo habitual, nunca imprimirla. XMEX/BMV requiere Pro: excluido por pago, no pendiente de comprar. Detalle: docs/politica-proveedores-gratuitos-20261102.md.
+
 ## Qué es
 
 Terminal local (FastAPI + SQLite + HTML/CSS/JS sin build) para comparar dos
@@ -42,7 +46,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 ## Estado comprobado: actualización acotada del 31-oct-2026
 
-Terminal profesional (1-nov): sistema negro/gris/blanco con rojo de identidad y contraste medido (`DESIGN.md`); Mesa con paleta de comandos, franja de Seguimiento, cuadrícula reordenable/ancha con migración, y Ficha, Noticias, Macro/resumen y Calendario nativos de solo lectura (`terminal/mesa_datos.py`). DGS30 incluido en FRED; conectores opcionales Banxico/SEC/Alpha apagados, sin acceso real acreditado. Calendario distingue publicación SEC, estimación, BPA y revisión; campos sin fuente siguen SIN DATO. Evidencia y bloqueos: `docs/proveedores-mesa-20261101.md`. Excel de Markowitz rediseñado sin cambios numéricos, revisión visual en Excel pendiente. Ver `docs/terminal-pro-20261101.md`.
+Terminal profesional (1-nov): sistema negro/gris/blanco con rojo de identidad y contraste medido (`DESIGN.md`); Mesa con paleta de comandos, franja de Seguimiento, cuadrícula reordenable/ancha con migración, y Ficha, Noticias, Macro/resumen y Calendario nativos de solo lectura (`terminal/mesa_datos.py`). Verificación manual real: FRED DGS30, SIE SF61745/SP1/SF30057 (bono promedio mensual), 100 publicaciones SEC, tres estimaciones Alpha y 32 BPA. Conectores automáticos siguen apagados. Calendario distingue publicación SEC, estimación, BPA y revisión; moneda/base contable no informadas, hora exacta y revisiones no observadas siguen SIN DATO. Evidencia actual: `docs/avance-gratuitos-20261101.md`; informe inicial: `docs/proveedores-mesa-20261101.md`. Excel de Markowitz rediseñado sin cambios numéricos, revisión visual en Excel pendiente. Ver `docs/terminal-pro-20261101.md`.
 
 Procesos: `docs/continuacion-procesos-20261031.md`. Respaldo offline probado, reloj inyectado y aviso por emisora. Reasignación de proveedores no aplicada; GEX condicionado a evidencia posterior al 2-nov. Pruebas y límites en el informe, sin trades ni Telegram.
 
@@ -55,9 +59,11 @@ Auditoría de Mesa y riesgo manual: ver `docs/auditoria-reels-20261031.md` y pen
 El detalle por fecha (capturas del 30-sep al 16-oct, versiones 0.6–0.30 y entregas del 11 al 17-oct) está en
 `docs/historial-estado.md`. Aquí solo lo vigente.
 
-- **Cuenta del Reto, última captura confirmada (viernes 30-oct, 14:00; registro 26):**
-  - Valuación $891,643.12 (−10.84 %, −5.4 % frente al 29-oct); poder de compra $2,922.11. Sin operaciones nuevas.
-    El portal mostró Inversiones $888,721.01 y la tabla de acciones $891,956.84 (desfase de $3,235.83 del propio portal).
+- **Cuenta del Reto, última captura confirmada (martes 3-nov, 14:27; registro 27):**
+  - Valuación $872,402.68 (−12.76 %, −$127,597.32); poder de compra $2,472.95. Compra nueva: GMEXICO B 648 → 650 títulos
+    ($449.16, igual a la baja del poder de compra). Inversiones $869,929.73 = acciones $869,915.29 + ACTDUAL B $14.44.
+  - 8 acciones y 1 título de ACTDUAL B. Pesos: MU 45.9 %, GMEXICO 16.7 %, AMD 13.6 %, NVDA 11.6 %, ALPEK 6.0 %,
+    XOM 3.1 %, NVAX 2.7 %, PFE 0.1 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %; MU a 4.1 puntos del tope).
   - Las capturas posteriores al cierre BMV guardan el cierre de respaldo (`actinver_portal`).
   - 8 acciones y 1 título de ACTDUAL B. Pesos: MU 46.8 %, GMEXICO 16.3 %, AMD 13.8 %, NVDA 11.2 %, ALPEK 5.9 %,
     XOM 3.1 %, NVAX 2.7 %, PFE 0.1 %. Cumple las reglas (≥ 5 emisoras, ≤ 50 %; MU a 3.2 puntos del tope).
@@ -219,3 +225,8 @@ Ficha añadida a Aprender y recursos, con guía, prerregistro y resultados agreg
 ### Formación Python — 1-nov-2026
 
 Curso python-training de JPMorgan clonado y fijado; prácticas propias offline accesibles desde Cuaderno. Ver docs/integracion-python-training-20261101.md. No cambia modelos ni ejecución; no instalar ni ejecutar automáticamente notebooks upstream con APIs.
+
+
+## Lecturas y carga de modelos — 2-nov-2026
+
+Estado medido: las cinco rutas de Estado, Universo, Presente, Pasado y Futuro no cargan sklearn/skfolio para leer información guardada. Funciones ligeras compartidas en criterios_propuestas.py e investigacion/lecturas.py, con entradas públicas reexportadas. Cálculos y entrenamiento explícitos conservados. Suite completa 881 aprobadas, Node 51 y worker 19; informe y límites en docs/optimizacion-lecturas-20261102.md. El arranque y memoria privada del servidor mejoraron en las muestras; no se afirma mejora de todos los endpoints ni de memoria del navegador. PERF31-06 y bloqueos externos siguen pendientes. Esto no autoriza operaciones de ningún tipo.

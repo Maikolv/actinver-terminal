@@ -449,8 +449,10 @@ def cobertura_twelvedata(_args) -> None:
 
 def claude(_args) -> None:
     """Una consulta mínima para confirmar que el chatbot puede usar Claude. La clave nunca se muestra."""
-    from .config import _cargar_env_local
+    from .config import _cargar_env_local, cargar_ajustes
     from .bot_telegram import credencial_claude
+    if cargar_ajustes()["app"].get("solo_proveedores_gratuitos", True):
+        sys.exit("Bloqueado por la política de solo recursos gratuitos: la API de Claude cobra por uso. No se realizó ninguna consulta.")
     _cargar_env_local()
     if not credencial_claude():
         sys.exit("Falta ANTHROPIC_API_KEY en .env (créela en console.anthropic.com, sección API Keys). No se muestra ni se registra.")

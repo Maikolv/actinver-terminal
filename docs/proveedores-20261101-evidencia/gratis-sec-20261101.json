@@ -1,0 +1,700 @@
+{
+  "corte": "2026-11-01T11:08:34.956613+00:00",
+  "fuentes": {
+    "F6": {
+      "estado": "sin_id_confirmado",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F2": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F3": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F4": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    },
+    "F1-SEC-MU": {
+      "estado": "confirmado",
+      "solicitudes": 1,
+      "observaciones_validas": 36,
+      "nuevas": 36,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:08:35.578265+00:00",
+      "identidad_observada": [
+        {
+          "serie": "publicacion_sec:0000723125-17-000162",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-18-000031",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-18-000061",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-18-000085",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-18-000152",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-19-000012",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-19-000032",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-19-000068",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-19-000172",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-20-000030",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-20-000063",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-20-000079",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-21-000009",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-21-000028",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-21-000049",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-21-000060",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-21-000086",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-22-000012",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-22-000034",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-22-000044",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-22-000070",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-23-000018",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-23-000038",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-23-000051",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-23-000071",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-24-000004",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-24-000016",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-24-000023",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-24-000046",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-25-000006",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-25-000019",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-25-000024",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-25-000044",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-26-000004",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-26-000013",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000723125-26-000018",
+          "simbolo": "MU",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {
+        "MU": 723125
+      },
+      "activado": false,
+      "http": [
+        {
+          "host": "data.sec.gov",
+          "ruta": "/submissions/CIK0000723125.json",
+          "http": 200
+        }
+      ]
+    },
+    "F1-SEC-NVDA": {
+      "estado": "confirmado",
+      "solicitudes": 1,
+      "observaciones_validas": 25,
+      "nuevas": 25,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:08:35.813703+00:00",
+      "identidad_observada": [
+        {
+          "serie": "publicacion_sec:0001045810-20-000187",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-21-000007",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-21-000063",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-21-000128",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-21-000160",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-22-000008",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-22-000073",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-22-000133",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-22-000136",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-22-000163",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-23-000014",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-23-000087",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-23-000171",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-23-000225",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-24-000028",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-24-000113",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-24-000262",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-24-000315",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-25-000021",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-25-000115",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-25-000207",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-25-000228",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-26-000019",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-26-000051",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0001045810-26-000073",
+          "simbolo": "NVDA",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {
+        "NVDA": 1045810
+      },
+      "activado": false,
+      "http": [
+        {
+          "host": "data.sec.gov",
+          "ruta": "/submissions/CIK0001045810.json",
+          "http": 200
+        }
+      ]
+    },
+    "F1-SEC-AMD": {
+      "estado": "confirmado",
+      "solicitudes": 1,
+      "observaciones_validas": 37,
+      "nuevas": 37,
+      "guardado_solicitado": true,
+      "conocido_desde": "2026-11-01T11:08:36.043167+00:00",
+      "identidad_observada": [
+        {
+          "serie": "publicacion_sec:0000002488-18-000014",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-18-000043",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-18-000058",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-18-000124",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-18-000186",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-19-000004",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-19-000043",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-19-000102",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-19-000157",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-20-000006",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-20-000048",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-20-000101",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-20-000161",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-21-000009",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-21-000054",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-21-000114",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-21-000176",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-22-000014",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-22-000074",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-22-000120",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-22-000163",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-22-000168",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-23-000007",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-23-000074",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-23-000135",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-23-000192",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-24-000009",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-24-000054",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-24-000121",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-24-000161",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-25-000009",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-25-000045",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-25-000106",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-25-000163",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-26-000014",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-26-000072",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        },
+        {
+          "serie": "publicacion_sec:0000002488-26-000121",
+          "simbolo": "AMD",
+          "titulo": "Publicación SEC 8-K Item 2.02",
+          "unidad": ""
+        }
+      ],
+      "id_sie": null,
+      "emisoras_confirmadas": {
+        "AMD": 2488
+      },
+      "activado": false,
+      "http": [
+        {
+          "host": "data.sec.gov",
+          "ruta": "/submissions/CIK0000002488.json",
+          "http": 200
+        }
+      ]
+    },
+    "F1-SEC-XOM": {
+      "estado": "respuesta_no_confirmada",
+      "categoria": "proveedor",
+      "solicitudes": 1,
+      "activado": false,
+      "http": [
+        {
+          "host": "data.sec.gov",
+          "ruta": "/submissions/CIK0000034088.json",
+          "http": 200
+        }
+      ]
+    },
+    "F1-ALPHA": {
+      "estado": "sin_credencial_en_memoria",
+      "solicitudes": 0,
+      "activado": false
+    }
+  },
+  "solicitudes": 4,
+  "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones.",
+  "identificacion": "Contacto Git configurado usado solo en memoria; no se incluye su valor."
+}

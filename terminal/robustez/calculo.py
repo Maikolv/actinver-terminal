@@ -12,7 +12,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .. import optimizador as op
 from . import diseno as dz
 
 
@@ -33,6 +32,8 @@ def evaluar(combo: dict, tipo: str, perfil: dict, ajustes, el: dict, R: pd.DataF
     """Pesos por pliegue con los parámetros de la combinación; rendimiento bruto, costo base y giro por fecha.
     `ajustar(cols, X)` permite inyectar el modelo (pruebas); por omisión, el optimizador de la terminal."""
     if ajustar is None:
+        from .. import optimizador as op
+
         base = float(ajustes["perfiles"][perfil["riesgo"]]["aversion_riesgo"])
         p_mod = {**perfil, "max_peso_activo": combo["tope"]}
 

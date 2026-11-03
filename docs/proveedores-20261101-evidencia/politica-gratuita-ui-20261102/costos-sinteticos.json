@@ -1,0 +1,139 @@
+{
+  "servicios": [
+    {
+      "id": "claude_api",
+      "nombre": "API de Claude (Asistente y bot de Telegram)",
+      "cobro": "pago por uso (tokens)",
+      "nota": "Solo se usa con tu aprobación; sin ella responden Ollama o el motor local, que no cobran.",
+      "detectado": true,
+      "decision": "aprobado",
+      "estado": "bloqueado por política: solo recursos gratuitos",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "twelvedata_bmv",
+      "nombre": "Twelve Data · BMV/XMEX",
+      "cobro": "plan Pro o superior (de pago)",
+      "requiere_pago": true,
+      "nota": "Basic es gratuito, pero no incluye este mercado. Conector BMV deshabilitado.",
+      "detectado": null,
+      "decision": null,
+      "estado": "bloqueado por política: solo recursos gratuitos",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "barchart",
+      "nombre": "Barchart OnDemand",
+      "cobro": "requiere contrato",
+      "requiere_pago": true,
+      "nota": "No acreditado como acceso gratuito permanente; conector deshabilitado.",
+      "detectado": null,
+      "decision": null,
+      "estado": "bloqueado por política: solo recursos gratuitos",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "alpaca",
+      "nombre": "Alpaca (datos de EE. UU.)",
+      "cobro": "gratis (IEX y SIP con retraso)",
+      "nota": "Sin órdenes; solo datos.",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "tiingo",
+      "nombre": "Tiingo",
+      "cobro": "gratis (plan sin costo)",
+      "nota": "Límite diario; no sube de plan solo.",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "eodhd",
+      "nombre": "EODHD (cierres BMV)",
+      "cobro": "gratis (20 consultas al día)",
+      "nota": "El plan de pago lo contrata solo el usuario.",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "alpha_vantage",
+      "nombre": "Alpha Vantage",
+      "cobro": "gratis (25 consultas al día)",
+      "nota": "",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "fred_bls_eia",
+      "nombre": "FRED, BLS y EIA",
+      "cobro": "gratis (datos públicos)",
+      "nota": "",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "banxico",
+      "nombre": "Banxico SIE",
+      "cobro": "gratis (token público)",
+      "nota": "",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "sec_edgar",
+      "nombre": "SEC EDGAR",
+      "cobro": "gratis (sin clave)",
+      "nota": "",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "telegram",
+      "nombre": "Telegram",
+      "cobro": "gratis",
+      "nota": "",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    },
+    {
+      "id": "cloudflare",
+      "nombre": "Cloudflare Workers (monitor en la nube)",
+      "cobro": "gratis (plan Free, sin tarjeta)",
+      "nota": "Al rebasar el límite gratuito el plan Free falla, no cobra.",
+      "detectado": null,
+      "decision": null,
+      "estado": "gratis",
+      "requiere_decision": false,
+      "puede_decidir": false
+    }
+  ],
+  "nota": "Política vigente: solo recursos gratuitos. Las claves y aprobaciones antiguas no habilitan servicios de pago."
+}

@@ -471,7 +471,7 @@
       "conceptos": [
         "Catálogo de 30 nombres y selección de una herramienta por tarea. Reutilizar skills ya disponibles de investigación, diseño y revisión; evitar instalar 30 plugins redundantes."
       ],
-      "ejercicio": "Consultar informe de incorporación y reproducir únicamente pruebas offline."
+      "ejercicio": "Consultar la guía pública del autor (https://charliehills.ai/guides/top-30-claude-plugins-and-how-to-install-each-one), cotejar los enlaces con el inventario local y reproducir únicamente pruebas offline."
     },
     {
       "titulo": "TradingView setup-to-bot: cinco repositorios",

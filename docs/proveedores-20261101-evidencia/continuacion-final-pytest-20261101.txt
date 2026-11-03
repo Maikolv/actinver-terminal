@@ -1,0 +1,60 @@
+warning: Failed to set cwd to temp dir
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 25%]
+........................................................................ [ 33%]
+........................................................................ [ 42%]
+........................................................................ [ 50%]
+........................................................................ [ 58%]
+........................................................................ [ 67%]
+........................................................................ [ 75%]
+........................................................................ [ 84%]
+..................................................................F..... [ 92%]
+.................................................................        [100%]
+================================== FAILURES ===================================
+__________________ test_sin_secretos_en_archivos_versionados __________________
+
+    def test_sin_secretos_en_archivos_versionados():
+        r = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=RAIZ,
+                           capture_output=True, text=True, check=True)
+        hallazgos = []
+        for f in r.stdout.splitlines():
+            p = RAIZ / f
+            if p.suffix in (".png", ".db", ".lock") or not p.is_file():
+                continue
+>           if PATRONES.search(p.read_text(encoding="utf-8", errors="ignore")):
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_seguridad.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/MIKE/Desktop/Repos/actinver-terminal/docs/terminal-pro-20261101-evidencia/excel/~$plantilla-sintetico-despues.xlsx')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = 'ignore'
+newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       PermissionError: [Errno 13] Permission denied: 'C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal\\docs\\terminal-pro-20261101-evidencia\\excel\\~$plantilla-sintetico-despues.xlsx'
+
+..\..\..\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pathlib.py:1013: PermissionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_seguridad.py::test_sin_secretos_en_archivos_versionados - P...
+1 failed, 856 passed, 1 warning in 833.24s (0:13:53)

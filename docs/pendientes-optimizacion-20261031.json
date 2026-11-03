@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-10-31",
+  "fecha": "2026-11-02",
   "mandato": "Sin trades ni ejecución",
   "items": [
     {
@@ -22,18 +22,21 @@
     },
     {
       "id": "PERF31-04",
-      "estado": "pendiente",
-      "titulo": "Perfilar arranque y p95 frío de estado; no hay mejora causal acreditada"
+      "estado": "resuelto_perfil_y_medicion",
+      "titulo": "Perfilar arranque y p95 frío de estado; no hay mejora causal acreditada",
+      "evidencia": "docs/optimizacion-lecturas-20261102.md; tres repeticiones por fase, mediana arranque 15087.16 a 7053.57 ms. Primera respuesta de Estado empeoró; no se acredita mejora general. Regresión completa: 881 aprobadas."
     },
     {
       "id": "PERF31-05",
-      "estado": "pendiente",
-      "titulo": "Medir memoria privada/picos: RSS renderer no bajó"
+      "estado": "resuelto_medicion_privada_y_picos",
+      "titulo": "Medir memoria privada/picos: RSS renderer no bajó",
+      "evidencia": "docs/rendimiento-20261102-evidencia/comparacion-controlada-final.json; memoria privada servidor 213.47 a 122.41 MiB, picos muestreados y RSS publicados. Memoria de navegador/RSS no mejoró. No equivale a ahorro global de RAM."
     },
     {
       "id": "PERF31-06",
-      "estado": "pendiente",
-      "titulo": "Normalizar tiempos de procedencia donde existan y respetar Retry-After por proveedor sin consumir cuotas de prueba"
+      "estado": "parcial_retry_after_y_cierres_verificados",
+      "titulo": "Normalizar tiempos de procedencia donde existan y respetar Retry-After por proveedor sin consumir cuotas de prueba",
+      "evidencia": "Cuarentena reversible de 136 cierres, con 377160 filas restantes idénticas al respaldo (suite de esa etapa: 895 aprobadas). Mesa respeta Retry-After en HTTP 503 y comparte la pausa de Banxico con FIX y CETES. La ingesta guarda marcas temporales desde la inserción en cierres, USD/MXN, eventos corporativos, calendario, RSS y registros de directivos. Las importaciones de noticias y directivos también guardan esas marcas. Suite Python integrada: 899 aprobadas, una advertencia de Starlette y salida 0 en 595.31 s (proveedores-20261101-evidencia/pytest-procedencia-integrada.txt). Regresión más reciente: 906 aprobadas, una advertencia y salida 0 en 860.83 s (proveedores-20261101-evidencia/pytest-velas-bmv-integrada.txt). Incluye las pausas de SEC, Alpaca y fondos, y el catálogo de cierres BMV. EODHD diferido comparte el contador diario y la pausa Retry-After de cierres. Dos regresiones con HTTP simulado verifican que la segunda ruta se bloquea sin otra petición; 14 pruebas aprobadas en test_adaptadores_retry_after.py. BLS registra Retry-After en POST (429 y 503) y comprueba la pausa antes de consumir cupo. Regresión conjunta de adaptadores, Mesa y BEA: 47 aprobadas con HTTP simulado donde corresponde. Pendiente verificar otros clientes y la vigencia de datos externos."
     },
     {
       "id": "PERF31-07",

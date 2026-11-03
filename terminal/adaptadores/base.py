@@ -7,11 +7,14 @@ en mensajes de error ni en registros.
 """
 from __future__ import annotations
 
+import json
+import math
 import re
 import sqlite3
 import time
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
+from email.utils import parsedate_to_datetime
 
 import httpx
 
@@ -110,10 +113,41 @@ class Adaptador:
         self.con.commit()
 
     # --- HTTP con reintentos -----------------------------------------------------------------
+    def _comprobar_pausa(self) -> None:
+        """La espera del proveedor persiste entre instrumentos e instancias, sin gastar cuota."""
+        fila = self.con.execute("SELECT valor FROM ajustes_usuario WHERE clave=?",
+                                ("proveedor_pausa:" + self.proveedor,)).fetchone()
+        if fila and datetime.fromisoformat(json.loads(fila[0])["hasta"]) > datetime.now(UTC):
+            raise LimiteAlcanzado(f"{self.proveedor}: en espera por Retry-After; no se consulta ahora")
+
+    def _registrar_pausa(self, cabecera: str) -> None:
+        """No duerme el servidor: difiere consultas usando el registro de pausas existente."""
+        ahora = datetime.now(UTC)
+        try:
+            segundos = float(cabecera)
+            if not math.isfinite(segundos) or segundos < 0:
+                segundos = 60.0
+            try:
+                hasta = ahora + timedelta(seconds=segundos)
+            except OverflowError:
+                hasta = datetime.max.replace(tzinfo=UTC)
+        except ValueError:
+            try:
+                fecha = parsedate_to_datetime(cabecera)
+                hasta = max(ahora, fecha.replace(tzinfo=UTC) if fecha.tzinfo is None else fecha)
+            except (ValueError, TypeError, OverflowError):
+                hasta = ahora + timedelta(seconds=60)
+        self.con.execute(
+            "INSERT INTO ajustes_usuario (clave, valor, actualizado_en) VALUES (?,?,?) "
+            "ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor, actualizado_en=excluded.actualizado_en",
+            ("proveedor_pausa:" + self.proveedor, json.dumps({"hasta": hasta.isoformat()}), ahora.isoformat()))
+        self.con.commit()
+
     def _get(self, url: str, *, params: dict | None = None, headers: dict | None = None,
              intentos: int = 3) -> httpx.Response:
         if self.requiere_credencial and not self.credencial:
             raise SinCredencial(f"{self.proveedor}: falta la credencial en variables de entorno")
+        self._comprobar_pausa()
         espera = 2.0
         ultimo = None
         for i in range(intentos):
@@ -129,6 +163,9 @@ class Adaptador:
                     raise ErrorProveedor(f"{self.proveedor}: credencial rechazada o sin permiso (HTTP {r.status_code})")
                 if r.status_code == 404:
                     raise ErrorProveedor(f"{self.proveedor}: símbolo no encontrado (HTTP 404)")
+                if r.status_code in (429, 503) and "Retry-After" in r.headers:
+                    self._registrar_pausa(r.headers["Retry-After"])
+                    raise ErrorProveedor(f"{self.proveedor}: HTTP {r.status_code}; se respeta Retry-After sin reintentar ahora")
                 ultimo = ErrorProveedor(f"{self.proveedor}: HTTP {r.status_code}")
                 if r.status_code not in (429, 500, 502, 503, 504):
                     break

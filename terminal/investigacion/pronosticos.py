@@ -13,7 +13,7 @@ from datetime import UTC, datetime
 import numpy as np
 import pandas as pd
 
-from . import datos, evaluacion
+from . import datos
 
 
 def _calendario(iid: str) -> str:
@@ -35,6 +35,8 @@ def emitir(con: sqlite3.Connection, demo: bool, H: int, T: pd.Timestamp | None =
            mxn: bool = True, etiqueta: str | None = None, objetivo: str | None = None) -> dict:
     """Experimento + pronóstico a H sesiones. `mxn`: rendimientos en pesos (el Reto se mide en MXN). `objetivo`: fecha
     objetivo fija (cierre del Reto); si falta, la sesión H posterior a la base en el calendario del instrumento."""
+    from . import evaluacion
+
     T = pd.Timestamp(T).tz_convert("UTC") if T is not None else pd.Timestamp(datetime.now(UTC))
     etiqueta = etiqueta or f"{H}s"
     exp = evaluacion.investigar(con, demo, H, T, config={"mxn": mxn}, guardar=True)

@@ -40,7 +40,7 @@ def generar(con: sqlite3.Connection, anios: int = 5, semilla: int = 42) -> int:
     instrs = con.execute("SELECT id, clase, categoria, moneda_referencia FROM instrumentos WHERE estado='activo'").fetchall()
     filas = []
     ts = ahora()
-    from ..migraciones import disponibilidad_precio
+    from ..migraciones import disponibilidad_fx, disponibilidad_precio
     tiempos = {(f.date().isoformat(), m): disponibilidad_precio(f.date().isoformat(), PROVEEDOR, m, "sintetico", None, ts)
                for f in fechas for m in ("USD", "MXN")}
     for ins in instrs:
@@ -55,11 +55,15 @@ def generar(con: sqlite3.Connection, anios: int = 5, semilla: int = 42) -> int:
         for f, p in zip(fechas, precio):
             d = f.date().isoformat()
             filas.append((ins["id"], d, float(p), float(p), 1e6, moneda, PROVEEDOR, "sintetico", None, ts,
-                          *tiempos[(d, "USD" if moneda == "USD" else "MXN")]))
+                          *tiempos[(d, "USD" if moneda == "USD" else "MXN")], ts))
     with transaccion(con):
         con.execute("DELETE FROM precios WHERE proveedor=?", (PROVEEDOR,))
-        con.executemany("INSERT INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", filas)
+        con.executemany("INSERT INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, proveedor, "
+                        "tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", filas)
         con.execute("DELETE FROM fx WHERE proveedor=?", (PROVEEDOR,))
-        con.executemany("INSERT INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,?,?,?,?)",
-                        [(f.date().isoformat(), float(v), PROVEEDOR, "sintetico", ts) for f, v in zip(fechas, fx)])
+        con.executemany("INSERT INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en, event_time, available_at, "
+                        "ingested_at) VALUES ('USDMXN',?,?,?,?,?,?,?,?)",
+                        [(fecha, float(v), PROVEEDOR, "sintetico", ts, *disponibilidad_fx(fecha, PROVEEDOR), ts)
+                         for fecha, v in zip((f.date().isoformat() for f in fechas), fx)])
     return len(filas)

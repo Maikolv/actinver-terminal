@@ -146,3 +146,46 @@ Detalle y evidencia en `docs/auditoria-reels-20261031.md` y `docs/pendientes-ree
 - **Pruebas:** el recuento «10 pruebas de Node» quedó atrás; hoy se ejecutan más archivos (`mesa_paridad`, `riesgo_nq_referencia`, `mesa_catalogo_auditoria`). La aritmética se contrastó con una referencia exacta en 532 escenarios NQ/MNQ.
 - **No reproducido por la auditoría:** «12 estrellas agregadas y 37 verificadas» y las 13 pruebas / build de OpenTerminal (R31-20). El estado de licencias real: 33 de 37 repositorios sin observaciones (R31-09).
 - **Concurrencia:** dos agentes editaron la Mesa a la vez; está registrado en R31-22.
+
+#### Cotejo audiovisual de DfBQ1AgOC1S
+
+La lista facilitada por el usuario permite separar las referencias siguientes. Se conservan para documentación y formación, sin incorporarlas al monitor financiero.
+
+- [HyperFrames](https://github.com/heygen-com/hyperframes) ya consta en la matriz de adopción, que registra un estudio local previo. Se reutiliza ese registro.
+- [OpenMontage](https://github.com/calesthio/OpenMontage) y [PPT Master](https://github.com/hugohe3/ppt-master) ya tienen clones locales y estrellas verificadas. El inventario registra sus commits y licencias. OpenMontage se conserva separado bajo AGPL-3.0 y PPT Master queda como referencia MIT para presentaciones.
+- El [catálogo de Broch Builds](https://brochbuilds.com/skills) identifica [tt-a1i/archify](https://github.com/tt-a1i/archify). Coincide con la descripción facilitada para DfBQ1AgOC1S, cuya atribución exacta sigue sin confirmación directa.
+
+#### Cotejo de los 30 nombres de DfBQ1AgOC1S
+
+El inventario contiene una referencia por cada nombre facilitado por el usuario, en el orden de su lista. Para Archify e I Have ADHD, la identidad procede de Broch Builds y la atribución directa al reel sigue pendiente.
+
+- [obra/superpowers](https://github.com/obra/superpowers)
+- [mattpocock/skills](https://github.com/mattpocock/skills)
+- [affaan-m/ECC](https://github.com/affaan-m/ECC)
+- [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
+- [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills)
+- [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify)
+- [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach)
+- [Egonex-AI/Understand-Anything](https://github.com/Egonex-AI/Understand-Anything)
+- [mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill)
+- [career-ops-hq/career-ops](https://github.com/career-ops-hq/career-ops)
+- [morluto/rea](https://github.com/morluto/rea)
+- [garrytan/gstack](https://github.com/garrytan/gstack)
+- [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
+- [thedotmack/claude-mem](https://github.com/thedotmack/claude-mem)
+- [headroomlabs-ai/headroom](https://github.com/headroomlabs-ai/headroom)
+- [gsd-build/get-shit-done](https://github.com/gsd-build/get-shit-done)
+- [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD)
+- [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
+- [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)
+- [tt-a1i/archify](https://github.com/tt-a1i/archify)
+- [pbakaus/impeccable](https://github.com/pbakaus/impeccable)
+- [hugohe3/ppt-master](https://github.com/hugohe3/ppt-master)
+- [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)
+- [anthropics/skills](https://github.com/anthropics/skills)
+- [calesthio/OpenMontage](https://github.com/calesthio/OpenMontage)
+- [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes)
+- [blader/humanizer](https://github.com/blader/humanizer)
+- [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)
+- [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills)

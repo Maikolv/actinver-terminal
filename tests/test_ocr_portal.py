@@ -56,12 +56,13 @@ def test_api_de_capturas_exige_csrf_y_devuelve_texto_sin_guardar_nada():
     archivos = [("imagenes", (n, (FIX / n).read_bytes(), "image/png"))
                 for n in ("portal_tabla_sintetica.png", "portal_resumen_sintetico.png")]
     with TestClient(app, base_url="http://127.0.0.1:8765") as c:
+        captura_anterior = c.get("/api/portal/captura").json()["captura"]
         assert c.post("/api/portal/capturas-imagen", files=archivos).status_code == 403
         r = c.post("/api/portal/capturas-imagen", files=archivos, headers={"X-CSRF-Token": TOKEN_CSRF})
         assert r.status_code == 200, r.text
         d = r.json()
         assert d["imagenes"] == 2 and d["n_posiciones"] == 3 and "ALPEK A\t5,430" in d["texto"]
-        assert c.get("/api/portal/captura").json()["captura"] is None or True  # no guarda: solo devuelve texto
+        assert c.get("/api/portal/captura").json()["captura"] == captura_anterior  # Solo vista previa; no guarda ni modifica.
         malo = c.post("/api/portal/capturas-imagen", files=[("imagenes", ("x.png", b"no es imagen", "image/png"))],
                       headers={"X-CSRF-Token": TOKEN_CSRF})
         assert malo.status_code == 200 and any("Formato no admitido" in a for a in malo.json()["avisos"])

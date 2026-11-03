@@ -16,7 +16,7 @@ def test_apagado_sin_especificacion_y_sin_clave():
     assert cz.EodhdDiferidoProvider(None, ENV).configurado()
 
 
-def test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos():
+def test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos(con):
     vistas = []
     hace_16_min = int(time.time()) - 16 * 60
 
@@ -24,7 +24,7 @@ def test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos():
         vistas.append(r.url)
         return httpx.Response(200, json={"code": "GMEXICOB.MX", "timestamp": hace_16_min, "gmtoffset": 0,
                                          "close": 233.10, "previousClose": 231.0})
-    p = cz.EodhdDiferidoProvider(None, ENV, cliente=httpx.Client(transport=httpx.MockTransport(responder)))
+    p = cz.EodhdDiferidoProvider(con, ENV, cliente=httpx.Client(transport=httpx.MockTransport(responder)))
     q = p._consultar(GMEXICO)
     assert vistas[0].path == "/api/real-time/GMEXICOB.MX" and vistas[0].params["api_token"] == "clave-de-prueba"
     assert q.precio == 233.10 and q.moneda == "MXN" and q.bolsa == "BMV"
@@ -32,9 +32,9 @@ def test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos():
     assert 15 * 60 <= q.latencia_medida_s <= 17 * 60
 
 
-def test_sin_hora_del_evento_no_hay_cotizacion():
+def test_sin_hora_del_evento_no_hay_cotizacion(con):
     import pytest
-    p = cz.EodhdDiferidoProvider(None, ENV, cliente=httpx.Client(transport=httpx.MockTransport(
+    p = cz.EodhdDiferidoProvider(con, ENV, cliente=httpx.Client(transport=httpx.MockTransport(
         lambda r: httpx.Response(200, json={"code": "GMEXICOB.MX", "close": 233.1}))))
     with pytest.raises(cz.ProveedorNoDisponible, match="hora"):
         p._consultar(GMEXICO)

@@ -1,0 +1,17 @@
+{
+  "fecha_local": "2026-11-01",
+  "metodo": "BLS.consultar existente, base SQLite en memoria y credencial None",
+  "peticiones": 1,
+  "observaciones_por_serie": {
+    "CUSR0000SA0": 32,
+    "LNS14000000": 32,
+    "CES0000000001": 33,
+    "CPI_YOY": 20
+  },
+  "periodo_minimo": "2024-01",
+  "periodo_maximo": "2026-09",
+  "presupuesto_memoria": 1,
+  "observaciones_importadas": 0,
+  "motor_iniciado": false,
+  "conectores_automaticos_activados": false
+}

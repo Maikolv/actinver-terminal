@@ -1,0 +1,182 @@
+{
+  "alcance": "Seis consultas adicionales autorizadas por el usuario: INPC y BPA de cuatro emisoras; sin activaciones.",
+  "resultados": [
+    {
+      "corte": "2026-11-01T18:55:16.135456+00:00",
+      "fuentes": {
+        "F6": {
+          "estado": "requiere_seleccion_explicita",
+          "solicitudes": 0,
+          "activado": false,
+          "id_confirmado": "SF30057"
+        },
+        "F4": {
+          "estado": "confirmado",
+          "solicitudes": 2,
+          "observaciones_validas": 24,
+          "nuevas": 24,
+          "guardado_solicitado": true,
+          "conocido_desde": "2026-11-01T18:55:16.420966+00:00",
+          "identidad_observada": [
+            {
+              "serie": "INPC",
+              "simbolo": "",
+              "titulo": "INPC nacional · índice general",
+              "unidad": "índice"
+            }
+          ],
+          "id_sie": "SP1",
+          "emisoras_confirmadas": {},
+          "activado": false,
+          "http": [
+            {
+              "host": "www.banxico.org.mx",
+              "ruta": "/SieAPIRest/service/v1/series/SP1",
+              "http": 200
+            },
+            {
+              "host": "www.banxico.org.mx",
+              "ruta": "/SieAPIRest/service/v1/series/SP1/datos",
+              "http": 200
+            }
+          ]
+        }
+      },
+      "solicitudes": 2,
+      "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+    },
+    {
+      "corte": "2026-11-01T18:55:16.461763+00:00",
+      "fuentes": {
+        "F1-BPA-MU": {
+          "estado": "confirmado",
+          "solicitudes": 1,
+          "observaciones_validas": 8,
+          "nuevas": 8,
+          "guardado_solicitado": true,
+          "conocido_desde": "2026-11-01T18:55:16.826378+00:00",
+          "identidad_observada": [
+            {
+              "serie": "reportado_bpa",
+              "simbolo": "MU",
+              "titulo": "BPA reportado por Alpha · captura local",
+              "unidad": "BPA · moneda no informada"
+            }
+          ],
+          "id_sie": null,
+          "emisoras_confirmadas": {},
+          "activado": false,
+          "http": [
+            {
+              "host": "www.alphavantage.co",
+              "ruta": "/query",
+              "http": 200
+            }
+          ]
+        }
+      },
+      "solicitudes": 1,
+      "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+    },
+    {
+      "corte": "2026-11-01T18:56:19.849142+00:00",
+      "fuentes": {
+        "F1-BPA-NVDA": {
+          "estado": "confirmado",
+          "solicitudes": 1,
+          "observaciones_validas": 8,
+          "nuevas": 8,
+          "guardado_solicitado": true,
+          "conocido_desde": "2026-11-01T18:56:20.131160+00:00",
+          "identidad_observada": [
+            {
+              "serie": "reportado_bpa",
+              "simbolo": "NVDA",
+              "titulo": "BPA reportado por Alpha · captura local",
+              "unidad": "BPA · moneda no informada"
+            }
+          ],
+          "id_sie": null,
+          "emisoras_confirmadas": {},
+          "activado": false,
+          "http": [
+            {
+              "host": "www.alphavantage.co",
+              "ruta": "/query",
+              "http": 200
+            }
+          ]
+        }
+      },
+      "solicitudes": 1,
+      "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+    },
+    {
+      "corte": "2026-11-01T18:57:23.157342+00:00",
+      "fuentes": {
+        "F1-BPA-AMD": {
+          "estado": "confirmado",
+          "solicitudes": 1,
+          "observaciones_validas": 8,
+          "nuevas": 8,
+          "guardado_solicitado": true,
+          "conocido_desde": "2026-11-01T18:57:23.474965+00:00",
+          "identidad_observada": [
+            {
+              "serie": "reportado_bpa",
+              "simbolo": "AMD",
+              "titulo": "BPA reportado por Alpha · captura local",
+              "unidad": "BPA · moneda no informada"
+            }
+          ],
+          "id_sie": null,
+          "emisoras_confirmadas": {},
+          "activado": false,
+          "http": [
+            {
+              "host": "www.alphavantage.co",
+              "ruta": "/query",
+              "http": 200
+            }
+          ]
+        }
+      },
+      "solicitudes": 1,
+      "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+    },
+    {
+      "corte": "2026-11-01T18:58:26.519200+00:00",
+      "fuentes": {
+        "F1-BPA-XOM": {
+          "estado": "confirmado",
+          "solicitudes": 1,
+          "observaciones_validas": 8,
+          "nuevas": 8,
+          "guardado_solicitado": true,
+          "conocido_desde": "2026-11-01T18:58:26.813577+00:00",
+          "identidad_observada": [
+            {
+              "serie": "reportado_bpa",
+              "simbolo": "XOM",
+              "titulo": "BPA reportado por Alpha · captura local",
+              "unidad": "BPA · moneda no informada"
+            }
+          ],
+          "id_sie": null,
+          "emisoras_confirmadas": {},
+          "activado": false,
+          "http": [
+            {
+              "host": "www.alphavantage.co",
+              "ruta": "/query",
+              "http": 200
+            }
+          ]
+        }
+      },
+      "solicitudes": 1,
+      "nota": "Investigación manual; no activa conectores ni acredita negociación o vigencia de cotizaciones."
+    }
+  ],
+  "solicitudes_totales": 6
+}

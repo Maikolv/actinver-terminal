@@ -1,0 +1,13 @@
+{
+  "fuente_sha256": "687dd9c3da8b0f545c7036720738eba681832b0ad4f813548d6b1c5b77ceb871",
+  "compilado_en_pine_editor": true,
+  "predeterminado": "Centro derecha",
+  "opciones": [
+    "Centro derecha",
+    "Abajo derecha",
+    "Arriba derecha"
+  ],
+  "formula_y_comprobador_identicos": true,
+  "restaurado": true,
+  "limite": "Se observó la posición predeterminada. No garantiza ausencia de solapamiento con cualquier indicador futuro o cualquier posición elegida."
+}

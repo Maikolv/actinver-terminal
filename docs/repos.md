@@ -349,3 +349,14 @@ Tres clones del TikTok registrados con hashes y licencias en `config/oficina-pix
 ### Reel de backtesting — 19-oct-2026
 
 Reel DepEDXbRMRF: cinco repositorios oficiales registrados en `config/repositorios-reel-bots.json`; backtesting.py y LEAN descargados, tres clones existentes conservados. Proyecto offline en `laboratorios/reel-bots/`; guía `docs/reel-bots-DepEDXbRMRF.md`.
+
+### Archify e I Have ADHD
+
+La transcripción facilitada por el usuario coincide en nombre y función con los clones
+`tt-a1i/archify` (diagramas interactivos) y `ayghri/i-have-adhd` (respuestas que empiezan
+por la acción). Sus remotos y commits se cotejaron con el inventario local. La asociación
+con el reel es inferida por nombre y función; falta un enlace explícito del autor.
+Se conservan los clones registrados sin duplicar instalaciones.
+
+- https://github.com/tt-a1i/archify
+- https://github.com/ayghri/i-have-adhd

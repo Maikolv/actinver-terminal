@@ -1,0 +1,25 @@
+
+> test
+> npm run test -w server
+
+
+> server@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 C:/Users/MIKE/Desktop/Repos/OpenTerminal/server
+
+ ✓ src/providers/ecb.test.ts (4 tests) 20ms
+ ✓ src/providers/binance.test.ts (3 tests) 21ms
+ ✓ src/rateLimit.test.ts (2 tests) 35ms
+ ✓ src/providers/tradingview.test.ts (4 tests) 22ms
+ ✓ src/cache.test.ts (6 tests) 67ms
+ ✓ src/db.test.ts (2 tests) 592ms
+ ✓ src/concurrency.test.ts (3 tests) 167ms
+ ✓ src/routes/market.test.ts (2 tests) 24ms
+
+ Test Files  8 passed (8)
+      Tests  26 passed (26)
+   Start at  18:03:44
+   Duration  10.51s (transform 6.57s, setup 0ms, collect 24.70s, tests 949ms, environment 5ms, prepare 11.79s)
+

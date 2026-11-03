@@ -7,13 +7,14 @@ SIN DATO con el requisito exacto, nunca se rellena.
 from __future__ import annotations
 
 import json
+import math
 import re
 import sqlite3
 import unicodedata
 from datetime import UTC, date, datetime, timedelta
 
 from . import centro_investigacion, mercado
-from .config import Ajustes
+from .config import CONFIG_DIR, Ajustes
 
 SIN_DATO = "SIN DATO"
 
@@ -35,10 +36,10 @@ SERIES_MACRO = [
 ]
 # Requisito cuando una serie no tiene observaciones guardadas (no se activa nada desde aquí).
 REQUISITO = {
-    "DGS30": "FRED DGS30 incluido en el conector; requiere observaciones descargadas con clave y actualización explícita.",
-    "BANXICO_OBJETIVO": "Banxico SIE apagado: confirmar título de SF61745 por GET antes de descargar; requiere token existente.",
-    "BANXICO_BONO10": "SIN DATO: código de bono M a 10 años sin confirmar; no se inventa el ID.",
-    "INPC": "Conector SIE apagado; ID del INPC pendiente de confirmación por GET oficial. No se presupone un código.",
+    "DGS30": "DGS30: falta observación FRED o importación de la publicación XML H.15 oficial, disponible sin clave.",
+    "BANXICO_OBJETIVO": "SF61745 confirmado como tasa objetivo; falta una observación guardada en esta base. Fuente automática apagada.",
+    "BANXICO_BONO10": "SF30057 confirmado como bono a tasa fija a 10 años, promedio mensual; falta observación en esta base.",
+    "INPC": "SP1 confirmado como índice nacional general mensual por catálogo SIE; falta una descarga manual de observaciones.",
 }
 
 
@@ -94,16 +95,49 @@ def macro(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = No
     ultima: dict[tuple[str, str], dict] = {}
     for o in obs:  # ordenadas por periodo descendente: la primera de cada serie es la más reciente
         ultima.setdefault((o["fuente"], o["serie"]), o)
+    respaldos = {"LNS14000000": "UNRATE", "CES0000000001": "PAYEMS", "CPI_YOY": "CPIAUCSL"}
+
+    def respaldo(serie):
+        sid = respaldos[serie]
+        o = ultima.get(("fred_macro", sid))
+        if not o or serie != "CPI_YOY":
+            return o
+        mes = o["periodo"][:7]
+        anterior = f"{int(mes[:4])-1:04d}{mes[4:]}"
+        base = next((f for f in obs if f["fuente"] == "fred_macro" and f["serie"] == sid
+                     and f["periodo"][:7] == anterior), None)
+        if not base or base["valor"] <= 0 or o["valor"] <= 0:
+            return None
+        valor = (o["valor"] / base["valor"] - 1) * 100
+        if not math.isfinite(valor):
+            return None
+        return {**o, "valor": valor, "unidad": "%", "titulo": "IPC EE. UU. · variación interanual de CPIAUCSL",
+                "disponible_desde": max(o["disponible_desde"], base["disponible_desde"])}
+
     filas = []
     for fuente, serie, frecuencia, grupo in SERIES_MACRO:
         o = ultima.get((fuente, serie))
+        serie_fuente = serie
+        if fuente == "bls" and serie in respaldos:
+            alternativa = respaldo(serie)
+            # Comparar meses, no cadenas de distinta longitud; en empate se conserva BLS.
+            if alternativa and (not o or alternativa["periodo"][:7] > o["periodo"][:7]):
+                o, fuente, serie_fuente = alternativa, "fred_macro", respaldos[serie]
+        if o and fuente == 'banxico_sie' and 'mensual' in _norm(o['titulo']):
+            frecuencia = 'mensual (promedio)' if serie == 'BANXICO_BONO10' else 'mensual'
+        if fuente == 'fred_macro' and serie == 'DGS30':
+            primaria = ultima.get(('fed_h15', serie))
+            if primaria and (not o or primaria['periodo'] > o['periodo']):
+                o, fuente = primaria, 'fed_h15'
         if not o:
             filas.append({"serie": serie, "fuente": fuente, "grupo": grupo, "frecuencia": frecuencia, "valor": None,
                           "estado": SIN_DATO, "requisito": REQUISITO.get(serie, "Sin observaciones guardadas de esta serie.")})
             continue
         filas.append({"serie": serie, "titulo": o["titulo"], "valor": o["valor"], "unidad": o["unidad"],
+                      "serie_fuente": serie_fuente,
                       "periodo": o["periodo"], "frecuencia": frecuencia, "fuente": fuente, "grupo": grupo,
-                      "ingesta": o["disponible_desde"], "url": o["url"], "estado": "PUBLICACIÓN · NO COTIZACIÓN"})
+                      "ingesta": o["disponible_desde"], "url": o["url"], "estado": "PUBLICACIÓN · NO COTIZACIÓN",
+                      "via": "XML oficial H.15; no verifica API FRED" if fuente == 'fed_h15' else "conector de investigación"})
     fx = mercado.ultimo_fx(con, ajustes)
     filas.insert(0, {"serie": "USDMXN", "titulo": "Dólar / peso (FIX o referencia)", "valor": fx.get("valor"),
                      "unidad": "MXN por USD", "periodo": fx.get("fecha"), "frecuencia": "diaria (hábil)",
@@ -119,6 +153,20 @@ def macro(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = No
             "aviso": ("Las series tienen periodos distintos (" + ", ".join([periodos[0], periodos[-1]]) + "); no se comparan como "
                       "si fueran del mismo día.") if len(periodos) > 1 else None,
             "nota": "Solo lectura de lo descargado por los conectores (FRED, BLS, EIA, Banxico). No consulta proveedores."}
+
+
+def calendario_bea(ahora: datetime) -> dict:
+    """Lee el corte local de fechas programadas para los próximos siete días."""
+    vacio = {"consultado_en": None, "eventos": []}
+    try:
+        corte = json.loads((CONFIG_DIR / "calendario_bea.json").read_text(encoding="utf-8"))
+        if datetime.fromisoformat(corte["consultado_en"]) > ahora:
+            return vacio
+        fin = ahora + timedelta(days=7)
+        eventos = [fila for fila in corte["eventos"] if ahora <= datetime.fromisoformat(fila["fecha"]) < fin]
+    except (OSError, ValueError, KeyError, TypeError):
+        return vacio
+    return {"consultado_en": corte["consultado_en"], "eventos": eventos}
 
 
 def resumen(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = None, cot: dict | None = None) -> dict:
@@ -149,6 +197,7 @@ def resumen(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None = 
             "ultima_sesion": {"NYSE": vigencia.ultima_sesion_cerrada("XNYS", ahora).isoformat(),
                               "BMV": vigencia.ultima_sesion_cerrada("XMEX", ahora).isoformat()},
             "datos": {"instrumentos": len(cot), "por_estado": conteo},
+            "calendario_bea": calendario_bea(ahora),
             "cifras": cifras, "eventos_alto_impacto_7d": eventos, "titulares_24h": n_noticias,
             "fuentes": {"cifras": "Panel macro (FRED, BLS, EIA, Banxico)", "eventos": "ForexFactory (feed de exportación)",
                         "titulares": "Seeking Alpha (RSS)", "estado de datos": "Precios guardados y su vigencia"},

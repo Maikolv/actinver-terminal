@@ -68,18 +68,28 @@ def lista(con, ajustes) -> dict:
 
 
 def comparar(con, ajustes, ids: list[str], ventana: int = 252, referencia: str = "BMV:NAFTRAC") -> dict:
-    ids = [i for i in dict.fromkeys(ids) if i][:MAX_COMPARAR]
-    if len(ids) < 2:
-        raise ValueError("elija al menos 2 instrumentos")
+    ids = [i for i in dict.fromkeys(ids) if i and i != referencia][:MAX_COMPARAR]
+    if not ids:
+        raise ValueError("elija al menos 1 instrumento (se compara siempre contra la referencia)")
     desconocidos = [i for i in ids + [referencia] if not _existe(con, i)]
     if desconocidos:
         raise ValueError("instrumento desconocido: " + ", ".join(desconocidos))
-    todos = list(dict.fromkeys(ids + [referencia]))
-    P = mercado.precios_mxn(con, ajustes, todos, ajustados="splits").ffill(limit=3)
-    P = P.dropna(subset=[i for i in todos if i in P.columns], how="any").tail(ventana + 1)
-    sin = [i for i in todos if i not in P.columns]
-    if len(P) < 30 or sin:
-        raise ValueError("historia común insuficiente" + (f" (sin precios: {', '.join(sin)})" if sin else ""))
+    P = mercado.precios_mxn(con, ajustes, ids + [referencia], ajustados="splits").ffill(limit=3)
+    if referencia not in P.columns or P[referencia].dropna().size < 31:
+        raise ValueError(f"la referencia {referencia} no tiene historia suficiente")
+    P = P[P[referencia].notna()].tail(ventana + 1)
+    # Un instrumento sin historia en la ventana se omite y se informa, en lugar de impedir toda la comparación.
+    omitidos = [i for i in ids if i not in P.columns or P[i].notna().sum() < 31]
+    ids = [i for i in ids if i not in omitidos]
+    # El periodo común lo marca el instrumento de historia más corta; si queda en menos de 30 sesiones, se omite.
+    while ids and P[ids + [referencia]].dropna().shape[0] < 31:
+        corto = min(ids, key=lambda i: P[i].notna().sum())
+        omitidos.append(corto)
+        ids.remove(corto)
+    if not ids:
+        raise ValueError("historia común insuficiente (sin precios suficientes: " + ", ".join(omitidos) + ")")
+    todos = ids + [referencia]
+    P = P[todos].dropna()
     R = P.pct_change().iloc[1:]
     base = (P / P.iloc[0] * 100)
     ins = mercado.instrumentos(con)
@@ -95,6 +105,7 @@ def comparar(con, ajustes, ids: list[str], ventana: int = 252, referencia: str =
                       "beta": beta, "sharpe_sin_tasa": float(r.mean() / r.std() * math.sqrt(252)) if r.std() > 0 else None})
     corr = R[todos].corr().round(3)
     return {"desde": str(P.index[0].date()), "hasta": str(P.index[-1].date()), "sesiones": len(R), "referencia": referencia,
+            "omitidos": [{"id": i, "clave": ins.get(i, {}).get("clave_operable") or i} for i in omitidos],
             "metricas": filas, "correlacion": {"ids": todos, "matriz": corr.values.tolist()},
             "serie": {"fechas": [str(d.date()) for d in base.index], **{i: base[i].round(3).tolist() for i in todos}},
             "nota": "Fechas comunes a todos (cierres en MXN ajustados por splits). Sharpe sin restar tasa libre de riesgo. "

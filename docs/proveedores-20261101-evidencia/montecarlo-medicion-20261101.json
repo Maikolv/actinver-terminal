@@ -1,0 +1,40 @@
+{
+  "nota": "Solo función nueva, misma configuración y semilla, tres repeticiones; no comparación antes/después ni ahorro demostrado.",
+  "node": "v24.19.0",
+  "configuracion": {
+    "acierto": 0.45,
+    "ratio": 1.4,
+    "riesgo": 100,
+    "objetivo": 1500,
+    "drawdown": 1000,
+    "limiteDiario": 400,
+    "tradesDia": 5,
+    "maxTrades": 200,
+    "iteraciones": 10000,
+    "semilla": 42,
+    "trailing": "estatico"
+  },
+  "mediciones": [
+    {
+      "repeticion": 1,
+      "ms": 138.43439999999998,
+      "heap_antes": 4875280,
+      "heap_despues": 5471864,
+      "intentos": 10000
+    },
+    {
+      "repeticion": 2,
+      "ms": 52.315300000000036,
+      "heap_antes": 5472616,
+      "heap_despues": 5159624,
+      "intentos": 10000
+    },
+    {
+      "repeticion": 3,
+      "ms": 37.256399999999985,
+      "heap_antes": 5159864,
+      "heap_despues": 5229616,
+      "intentos": 10000
+    }
+  ]
+}

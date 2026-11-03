@@ -1,0 +1,8 @@
+{
+  "casos": 532,
+  "validos": 510,
+  "fuente_sha256": "687dd9c3da8b0f545c7036720738eba681832b0ad4f813548d6b1c5b77ceb871",
+  "vectores_sha256": "55eef89c9269d64fffeef2e967de7f650210251ba6627edc6024228d75d41efe",
+  "comprobacion_sha256": "abb8d69cb84097c87468f2e0f1271124b0f483c82bc4e69b274b57accdd0471a",
+  "limite": "Los límites de input se modelan explícitamente; no simula la interacción con campos ni prueba na/Infinity como entradas de usuario."
+}

@@ -1,0 +1,99 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 31%]
+................................FF...................................... [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 55%]
+........................................................................ [ 63%]
+........................................................................ [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+................................................                         [100%]
+================================== FAILURES ===================================
+_____ test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos _____
+
+    def test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos():
+        vistas = []
+        hace_16_min = int(time.time()) - 16 * 60
+    
+        def responder(r):
+            vistas.append(r.url)
+            return httpx.Response(200, json={"code": "GMEXICOB.MX", "timestamp": hace_16_min, "gmtoffset": 0,
+                                             "close": 233.10, "previousClose": 231.0})
+        p = cz.EodhdDiferidoProvider(None, ENV, cliente=httpx.Client(transport=httpx.MockTransport(responder)))
+>       q = p._consultar(GMEXICO)
+            ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_eodhd_diferido.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+terminal\cotizaciones.py:428: in _consultar
+    return super()._consultar(instrumento)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\cotizaciones.py:370: in _consultar
+    r = self._pedir(c.get("metodo", "GET"), url, params, headers)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\cotizaciones.py:441: in _pedir
+    return proveedor._get(url, params=params, headers=headers, intentos=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\adaptadores\base.py:150: in _get
+    self._comprobar_pausa()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <terminal.adaptadores.proveedores.Eodhd object at 0x000001A34153FB30>
+
+    def _comprobar_pausa(self) -> None:
+        """La espera del proveedor persiste entre instrumentos e instancias, sin gastar cuota."""
+>       fila = self.con.execute("SELECT valor FROM ajustes_usuario WHERE clave=?",
+               ^^^^^^^^^^^^^^^^
+                                ("proveedor_pausa:" + self.proveedor,)).fetchone()
+E       AttributeError: 'NoneType' object has no attribute 'execute'
+
+terminal\adaptadores\base.py:118: AttributeError
+_________________ test_sin_hora_del_evento_no_hay_cotizacion __________________
+
+    def test_sin_hora_del_evento_no_hay_cotizacion():
+        import pytest
+        p = cz.EodhdDiferidoProvider(None, ENV, cliente=httpx.Client(transport=httpx.MockTransport(
+            lambda r: httpx.Response(200, json={"code": "GMEXICOB.MX", "close": 233.1}))))
+        with pytest.raises(cz.ProveedorNoDisponible, match="hora"):
+>           p._consultar(GMEXICO)
+
+tests\test_eodhd_diferido.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+terminal\cotizaciones.py:428: in _consultar
+    return super()._consultar(instrumento)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\cotizaciones.py:370: in _consultar
+    r = self._pedir(c.get("metodo", "GET"), url, params, headers)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\cotizaciones.py:441: in _pedir
+    return proveedor._get(url, params=params, headers=headers, intentos=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+terminal\adaptadores\base.py:150: in _get
+    self._comprobar_pausa()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <terminal.adaptadores.proveedores.Eodhd object at 0x000001A34180F1A0>
+
+    def _comprobar_pausa(self) -> None:
+        """La espera del proveedor persiste entre instrumentos e instancias, sin gastar cuota."""
+>       fila = self.con.execute("SELECT valor FROM ajustes_usuario WHERE clave=?",
+               ^^^^^^^^^^^^^^^^
+                                ("proveedor_pausa:" + self.proveedor,)).fetchone()
+E       AttributeError: 'NoneType' object has no attribute 'execute'
+
+terminal\adaptadores\base.py:118: AttributeError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_eodhd_diferido.py::test_respuesta_simulada_queda_como_retrasada_con_su_hora_y_en_pesos
+FAILED tests/test_eodhd_diferido.py::test_sin_hora_del_evento_no_hay_cotizacion
+2 failed, 910 passed, 1 warning in 837.95s (0:13:57)

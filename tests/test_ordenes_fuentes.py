@@ -29,7 +29,24 @@ def test_propuesta_informa_el_numero_de_ordenes(con, ajustes):
     assert min(a["peso"] for a in p["pesos"]) >= float(ajustes["optimizacion"]["banda_rebalanceo_pp"]) / 100 - 1e-4
 
 
-def test_infosel_y_edimex_quedan_pendientes_sin_contrato(con):
+def test_catalogo_gratuito_excluye_conectores_contratados(con, monkeypatch):
+    from terminal import costos
+
+    monkeypatch.setattr(costos, "_solo_gratuitos", lambda: True)
+    proveedores = cz.construir(con, False, entorno={"INFOSEL_API_KEY": "ficticia"})
+    assert {"eodhd_bmv", "eodhd_diferido", "manual_csv"} <= proveedores.keys()
+    assert not {"infosel", "edimex", "bmv_licenciado", "lseg", "ice"} & proveedores.keys()
+    filas = cz.tabla_cobertura(con, proveedores)
+    assert filas and all(fila["infosel"] == "bloqueado_por_politica_gratuita" for fila in filas)
+    instrumentos = cz.catalogo(con)[:1]
+    resultados = cz.verificar_cobertura(con, proveedores, instrumentos, ["infosel", "manual_csv"])
+    assert [fila["proveedor"] for fila in resultados] == ["manual_csv"]
+
+
+def test_infosel_y_edimex_quedan_pendientes_sin_contrato(con, monkeypatch):
+    from terminal import costos
+
+    monkeypatch.setattr(costos, "_solo_gratuitos", lambda: False)
     ps = cz.construir(con, False, entorno={})
     for n in ("infosel", "edimex"):
         assert not ps[n].configurado() and any("Contrato" in x for x in ps[n].pendientes())

@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {normalizarLayout,planNQ,CATALOGO,PRESETS} from '../web/static/mesa.mjs';
+// El usuario conserva la altura automática; su cobertura vive en estetica.test.mjs.
 test('la disposición descarta destinos inyectados, duplicados y tipos desconocidos',()=>{
  assert.deepEqual(normalizarLayout(['mapa','https://evil.test','mapa','riesgo']),['mapa','riesgo']);
  assert.deepEqual(normalizarLayout(null),PRESETS.mercado);

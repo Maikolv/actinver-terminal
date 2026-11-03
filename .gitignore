@@ -46,3 +46,7 @@ data/
 # Salidas de compilación de C# dentro de evidencias
 **/bin/Debug/
 **/obj/
+# Archivos temporales de propietario creados por Office al abrir documentos.
+~$*.xlsx
+~$*.docx
+~$*.pptx

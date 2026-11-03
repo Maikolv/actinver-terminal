@@ -1,0 +1,16 @@
+{
+  "http": 200,
+  "ruta": "/series/SP1",
+  "consulta_en": "2026-11-01T11:43:36.139977+00:00",
+  "serie": {
+    "idSerie": "SP1",
+    "titulo": "IPC Por objeto del gasto                                                         Nacional I n d i c e   G e n e r a l",
+    "periodicidad": "Mensual",
+    "unidad": "Sin Unidad",
+    "cifra": "Indices",
+    "fechaInicio": "01/01/1969",
+    "fechaFin": "01/09/2026"
+  },
+  "solicitudes_del_lote": 8,
+  "datos_guardados": false
+}

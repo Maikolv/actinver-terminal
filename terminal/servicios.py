@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import alertas, cartera, db, ingesta, mercado, optimizador, reto, vigencia
+from . import alertas, cartera, criterios_propuestas, db, ingesta, mercado, reto, vigencia
 from .config import Ajustes
 
 log = logging.getLogger("terminal.servicios")
@@ -163,7 +163,7 @@ def seguimiento(con, ajustes: Ajustes) -> dict:
 
 # --------------------------------------------------------------------------------------------------------------
 # Código y configuración que determinan una propuesta. Si cambian, las propuestas guardadas dejan de ser actuales.
-ARCHIVOS_CALCULO = ("optimizador.py", "servicios.py", "mercado.py", "portal.py", "reto.py", "vigencia.py")
+ARCHIVOS_CALCULO = ("optimizador.py", "criterios_propuestas.py", "servicios.py", "mercado.py", "portal.py", "reto.py", "vigencia.py")
 SECCIONES_CALCULO = ("optimizacion", "perfiles", "costos", "puntuacion", "vigencia")
 _huella_codigo: str | None = None
 
@@ -347,6 +347,9 @@ def propuestas_guardadas(con, ajustes: Ajustes, perfil: dict) -> dict:
 
 
 def calcular_propuestas(con, ajustes: Ajustes) -> dict:
+    # Las consultas de lectura no necesitan cargar skfolio/sklearn; el cálculo conserva el mismo motor.
+    from . import optimizador
+
     perfil = perfil_actual(con, ajustes)
     actual = cartera_actual(con, ajustes)
     ids = [i for i, v in mercado.instrumentos(con).items() if v["estado"] == "activo"]
@@ -393,7 +396,7 @@ def advertir_compras(p: dict, actual: dict) -> dict:
 
 def respuesta_propuestas(props: dict) -> dict:
     presentes = [v for v in props.values() if v]
-    return {"propuestas": props, "clasificacion": optimizador.clasificar(presentes, {}) if presentes else []}
+    return {"propuestas": props, "clasificacion": criterios_propuestas.clasificar(presentes, {}) if presentes else []}
 
 
 # --------------------------------------------------------------------------------------------------------------
@@ -420,7 +423,7 @@ def simular(con, ajustes: Ajustes, cambios: list[dict]) -> dict:
         if monto < 0:
             titulos = min(titulos, math.floor(valores.get(iid, 0) / px + 1e-9))
         importe = titulos * px
-        costo = importe * optimizador.costo_unitario(ins[iid], ajustes)
+        costo = importe * criterios_propuestas.costo_unitario(ins[iid], ajustes)
         costo_total += costo
         if monto >= 0:
             efectivo -= importe + costo

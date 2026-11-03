@@ -1,0 +1,45 @@
+{
+  "proveedores": "bloqueados; instancia aislada sin motor",
+  "resultados": [
+    {
+      "ancho": 390,
+      "tema": "dark",
+      "medidas": {
+        "ventana": 390,
+        "contenido": 390
+      },
+      "errores": [],
+      "mutaciones": []
+    },
+    {
+      "ancho": 390,
+      "tema": "light",
+      "medidas": {
+        "ventana": 390,
+        "contenido": 390
+      },
+      "errores": [],
+      "mutaciones": []
+    },
+    {
+      "ancho": 1440,
+      "tema": "dark",
+      "medidas": {
+        "ventana": 1440,
+        "contenido": 1440
+      },
+      "errores": [],
+      "mutaciones": []
+    },
+    {
+      "ancho": 1440,
+      "tema": "light",
+      "medidas": {
+        "ventana": 1440,
+        "contenido": 1440
+      },
+      "errores": [],
+      "mutaciones": []
+    }
+  ]
+}

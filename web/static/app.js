@@ -1915,11 +1915,16 @@ async function estadoFlujo(forzar) {
   return flujo.estado;
 }
 
-function selectorSimbolo(valor, alCambiar, { etiqueta = "Instrumento" } = {}) {
+function selectorSimbolo(valor, alCambiar, { etiqueta = "Instrumento", incluirCierres = false } = {}) {
   const c = flujo.estado.catalogo;
+  const cierres = incluirCierres ? (c.cierres_bmv || []).filter(x => !c.con_datos.includes(x)) : [];
+  const bmvSinDatos = incluirCierres && /^BMV:[A-Z0-9&.-]+$/.test(valor) &&
+    !c.con_datos.includes(valor) && !cierres.includes(valor);
   const sel = h("select", { "aria-label": etiqueta, onchange: (e) => alCambiar(e.target.value) },
     h("option", { value: "" }, "Elija un instrumento…"),
+    bmvSinDatos ? h("option", { value: valor }, valor + " · sin datos guardados") : null,
     c.con_datos.length ? h("optgroup", { label: "Con datos guardados" }, c.con_datos.map((x) => h("option", { value: x }, x))) : null,
+    cierres.length ? h("optgroup", { label: "BMV · cierres diarios guardados" }, cierres.map(x => h("option", { value: x }, x))) : null,
     h("optgroup", { label: "SIC (precio de origen en EE. UU., USD)" }, c.sic.map((x) => h("option", { value: x.id }, `${x.clave} · ${x.origen}`))));
   sel.value = valor;
   return h("label", {}, `${etiqueta} `, sel);
@@ -2167,7 +2172,7 @@ async function cargarVelas() {
       return h("label", {}, c, ` ${t}`);
     });
     const controles = h("div", { clase: "fila-controles" },
-      selectorSimbolo(v.simbolo, (x) => { v.simbolo = x; cargarVelas(); }),
+      selectorSimbolo(v.simbolo, (x) => { v.simbolo = x; cargarVelas(); }, { incluirCierres: true }),
       selectorSimple(v.intervalo, flujo.estado.catalogo.intervalos.map((x) => [x, NOMBRE_INTERVALO[x] || x]), (x) => { v.intervalo = x; cargarVelas(); }, "Intervalo"),
       selectorSimple(v.dias, [5, 30, 90, 180, 365].map((d) => [d, `${d} días`]), (x) => { v.dias = Number(x); cargarVelas(); }, "Rango"),
       ...casillas, botonAct);
@@ -2181,7 +2186,30 @@ async function cargarVelas() {
     const contGraf = h("div", {}, d.barras.length ? graficaVelas(d.barras, v, v.intervalo) : null);
     const rotuloVivo = h("p", { clase: "ayuda", role: "status", "aria-live": "off" });
     if (d.barras.length) seguirVelaViva(d.barras, v, contGraf, rotuloVivo);
-    limpiar("velas-contenido", controles, d.grafica ? graficaTradingView(v) : null, d.grafica ? fichaTradingView(v.simbolo) : null,
+    const graficaExterna = d.grafica && v.simbolo !== "BMV:AMX";
+    let respaldo = null;
+    if (!d.barras.length && v.simbolo.startsWith("BMV:")) {
+      const serie = await api("/api/visualizaciones/serie/" + encodeURIComponent(v.simbolo)).catch(() => null);
+      if (solicitud !== cargaVelasId) return;
+      if (!serie) {
+        respaldo = h("div", { clase: "aviso-caja", role: "status",
+          texto: "SIN DATO · No se pudo consultar el histórico local." });
+      } else if (serie.puntos?.length) {
+        respaldo = h("section", { clase: "tarjeta" },
+          h("h3", { texto: "Cierres diarios guardados" }),
+          h("p", { clase: "ayuda", texto: `Fuente del último cierre: ${serie.proveedor || "SIN DATO"} · ${serie.moneda || "SIN DATO"} · ${serie.modo === "sintetico" ? "Sintético" : "Histórico"} · Ajustados por splits.` }),
+          tabla([{ t: "Fecha", f: (p) => p.fecha }, { t: "Cierre", f: (p) => num(p.cierre), num: true }],
+            serie.puntos.slice(-12).reverse()));
+      } else if (v.simbolo === "BMV:SMARTRC") {
+        respaldo = h("div", { clase: "aviso-caja" },
+          h("p", { role: "status", texto: "SIN DATO · No hay cierres locales de SMARTRC 14." }),
+          h("a", { href: "https://www.bmv.com.mx/es/emisoras/estadisticas/SMARTRC%2014-31400",
+            target: "_blank", rel: "noopener noreferrer", texto: "Consultar la gráfica pública de BMV" }),
+          h("p", {}, h("a", { href: "https://es.tradingview.com/symbols/BMV-SMARTRC%2F14/",
+            target: "_blank", rel: "noopener noreferrer", texto: "Consultar SMARTRC 14 en TradingView" })));
+      }
+    }
+    limpiar("velas-contenido", controles, graficaExterna ? graficaTradingView(v) : null, graficaExterna ? fichaTradingView(v.simbolo) : null,
       d.barras.length ? h("div", {},
         h("p", { clase: "ayuda" }, chip("retrasado", v.intervalo === "1Day" ? "Barras diarias" : "Barras intradía"), " ", `${d.zona_horaria}. ${d.nota}`),
         cajaProcedencia(d.procedencia), contGraf, rotuloVivo,
@@ -2195,7 +2223,7 @@ async function cargarVelas() {
           ...(v.estoc ? [{ t: "%K", f: (b) => num(b.estoc_k), num: true }, { t: "%D", f: (b) => num(b.estoc_d), num: true }] : []),
           { t: "Calidad", f: (b) => chipCalidad(b.calidad) }], ult,
         { caption: "Últimas 12 barras (alternativa accesible a la gráfica)" }))
-        : h("div", { clase: "aviso-caja", role: "status", texto: d.vacio }),
+        : respaldo || h("div", { clase: "aviso-caja", role: "status", texto: d.vacio }),
       formImportar("velas", cargarVelas), formImportarExterno(v.simbolo, cargarVelas));
   } catch (e) { if (solicitud === cargaVelasId) limpiar("velas-contenido", errorCaja(e)); }
 }
@@ -2633,8 +2661,35 @@ async function cargarSeguimiento() {
       try { etapa3.ficha = iid; document.getElementById("seguimiento-ficha").replaceChildren(pintarFicha(await api(`/api/ficha/${encodeURIComponent(iid)}`))); }
       catch (e) { notificar(e.message); }
     });
-    const marcar = (iid) => { const c = h("input", { type: "checkbox", "aria-label": `Comparar ${iid}` }); c.checked = C.ids.includes(iid);
-      c.addEventListener("change", () => { C.ids = c.checked ? [...C.ids, iid] : C.ids.filter((x) => x !== iid); }); return c; };
+    // Una sola selección (C.ids) para casillas de la lista, buscador y atajos: cualquier cambio repinta las etiquetas y casillas.
+    const MAX = 8, porId = new Map(lista.map((i) => [i.id, i]));
+    const nombreId = (iid) => porId.get(iid)?.clave_operable || iid;
+    const elegidos = h("div", { clase: "chips-comparar", role: "list", "aria-label": "Instrumentos elegidos para comparar" });
+    const casillas = new Map();
+    const fijar = (ids) => {
+      const fuera = [...new Set(ids)].filter((x) => x && x !== C.referencia);
+      if (fuera.length > MAX) notificar(`Se comparan hasta ${MAX} instrumentos; se tomaron los primeros ${MAX}.`);
+      C.ids = fuera.slice(0, MAX);
+      casillas.forEach((c, iid) => { c.checked = C.ids.includes(iid); });
+      elegidos.replaceChildren(...(C.ids.length ? C.ids.map((iid) => h("span", { clase: "chip-comparar", role: "listitem" }, nombreId(iid),
+        h("button", { type: "button", "aria-label": `Quitar ${nombreId(iid)} de la comparación`, onclick: () => fijar(C.ids.filter((x) => x !== iid)) }, "×")))
+        : [h("span", { clase: "suave", texto: "Ninguno elegido todavía." })]));
+    };
+    const marcar = (iid) => { const c = h("input", { type: "checkbox", "aria-label": `Comparar ${iid}` });
+      casillas.set(iid, c); c.checked = C.ids.includes(iid);
+      c.addEventListener("change", () => fijar(c.checked ? [...C.ids, iid] : C.ids.filter((x) => x !== iid))); return c; };
+    const buscador = h("input", { type: "search", list: "comparar-opciones", size: 28, placeholder: "Escriba clave o nombre…", "aria-label": "Buscar instrumento para comparar" });
+    const opciones = h("datalist", { id: "comparar-opciones" }, lista.map((i) => h("option", { value: i.id }, `${i.clave_operable || i.id} · ${i.nombre || ""}`)));
+    const anadir = () => {
+      const t = buscador.value.trim(), T = t.toUpperCase();
+      const iid = porId.has(t) ? t : (lista.find((i) => (i.clave_operable || "").toUpperCase().replace(/[ *]/g, "") === T.replace(/[ *]/g, "")) || {}).id;
+      if (!iid) { notificar("No se encontró ese instrumento en el universo."); return; }
+      fijar([...C.ids, iid]); buscador.value = "";
+    };
+    buscador.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); anadir(); } });
+    buscador.addEventListener("change", () => { if (porId.has(buscador.value.trim())) anadir(); });
+    const atajo = (texto, f) => botonAccion(texto, "boton--secundario", async (b) => {
+      ocupado([b], true); try { fijar(await f()); } catch (e) { notificar(e.message); } finally { ocupado([b], false); } });
     const v = (x) => (x == null ? "—" : h("span", { clase: signo(x), texto: `${x > 0 ? "+" : ""}${pct(x)}` }));
     limpiar("seguimiento-contenido",
       h("h2", { texto: "Lista de seguimiento" }),
@@ -2647,16 +2702,24 @@ async function cargarSeguimiento() {
       d.instrumentos, { caption: d.nota, vacio: "Lista vacía: agregue instrumentos para seguirlos y compararlos." }),
       h("div", { id: "seguimiento-ficha", "aria-live": "polite" }),
       h("h2", { texto: "Comparación de instrumentos" }),
-      h("p", { clase: "ayuda", texto: "Marque de 2 a 8 instrumentos en la lista (o elíjalos abajo) y pulse «Comparar»." }),
-      h("div", { clase: "fila-controles" }, selectorUniverso(lista, C.ids, (x) => { C.ids = x; }, "Instrumentos", true),
-        selectorSimple(C.referencia, [["BMV:NAFTRAC", "NAFTRAC (IPC)"], ["SIC:SPY", "SPY (S&P 500)"]], (x) => { C.referencia = x; }, "Referencia"),
+      h("p", { clase: "ayuda", texto: `Elija de 1 a ${MAX} instrumentos: márquelos en la lista, búsquelos por clave o use un atajo. Siempre se comparan contra la referencia; si alguno no tiene historia suficiente se omite y se avisa.` }),
+      h("div", { clase: "fila-controles" }, h("label", {}, "Añadir ", buscador), opciones,
+        botonAccion("Añadir", "boton--secundario", async () => anadir()),
+        atajo("Mi cartera", async () => (await api("/api/cartera")).posiciones.filter((p) => p.clase !== "fondo" && !String(p.clase || "").startsWith("fondo")).map((p) => p.instrumento_id)),
+        atajo("Toda la lista", async () => d.instrumentos.map((f) => f.instrumento_id)),
+        atajo("Limpiar", async () => [])),
+      elegidos,
+      h("div", { clase: "fila-controles" },
+        selectorSimple(C.referencia, [["BMV:NAFTRAC", "NAFTRAC (IPC)"], ["SIC:SPY", "SPY (S&P 500)"]], (x) => { C.referencia = x; fijar(C.ids); }, "Referencia"),
         selectorSimple(C.ventana, [[63, "3 meses"], [126, "6 meses"], [252, "1 año"], [504, "2 años"]], (x) => { C.ventana = Number(x); }, "Ventana"),
         botonAccion("Comparar", "boton--primario", async (b) => {
+          if (!C.ids.length) { notificar("Elija al menos un instrumento."); return; }
           ocupado([b], true);
           try { pintarComparacion(await api(`/api/comparar?ids=${encodeURIComponent(C.ids.join(","))}&ventana=${C.ventana}&referencia=${encodeURIComponent(C.referencia)}`)); }
           catch (e) { document.getElementById("comparacion").replaceChildren(errorCaja(e)); } finally { ocupado([b], false); }
         })),
       h("div", { id: "comparacion", "aria-live": "polite" }));
+    fijar(C.ids);
     if (etapa3.ficha) { try { document.getElementById("seguimiento-ficha").replaceChildren(pintarFicha(await api(`/api/ficha/${encodeURIComponent(etapa3.ficha)}`))); } catch { /* sin ficha */ } }
   } catch (e) { limpiar("seguimiento-contenido", errorCaja(e)); }
 }
@@ -2667,6 +2730,7 @@ function pintarComparacion(d) {
   const corr = (v) => { const s = h("span", { clase: "celda-iv", texto: num(v) }); s.style.backgroundColor = colorCalor(-v); return s; };
   document.getElementById("comparacion").replaceChildren(
     h("p", { clase: "ayuda", texto: `${d.desde} a ${d.hasta} · ${d.sesiones} sesiones comunes. ${d.nota}` }),
+    d.omitidos?.length ? h("div", { clase: "aviso-caja", role: "status", texto: `SIN DATO suficiente, omitidos de la comparación: ${d.omitidos.map((o) => o.clave).join(", ")}.` }) : "",
     grafica(ids.map((i, k) => ({ nombre: clave(i), color: PALETA[k % PALETA.length], datos: d.serie.fechas.map((f, j) => ({ x: f, y: d.serie[i][j] })) })),
       { formato: num, etiqueta: "Valor de 100 invertidos al inicio" }),
     tabla([{ t: "Instrumento", f: (m) => `${m.clave}${m.es_referencia ? " (referencia)" : ""}` }, { t: "Rend. total", f: (m) => pct(m.rend_total), num: true },
@@ -2800,7 +2864,8 @@ function pintarGex(d) {
       firmada ? h("div", { clase: "aviso-caja", role: "note", texto: d.convencion }) : h("p", { clase: "ayuda", texto: "Absoluta: cuánta gamma hay abierta, sin signo ni dirección. Cambie a «firmada» para ver la convención calls + / puts −." }),
       h("div", { clase: "kpis" }, kpi("Spot de la referencia", `${num(d.spot)} ${d.moneda}`), kpi("Instante de la cadena", horaCdmx(d.instante)),
         kpi(firmada ? "Total firmado (convención)" : "Total absoluto", `${fmtCompacto.format(firmada ? d.totales.firmada : d.totales.absoluta)} ${d.moneda}/1 %`),
-        kpi("Contratos usados", `${d.contratos_usados} de ${d.total}`)),
+        kpi("Contratos usados", `${d.contratos_usados} de ${d.total}`),
+        kpi("Cobertura de la cadena", Number.isFinite(d.cobertura) ? `${num(d.cobertura * 100)} %` : "SIN DATO")),
       cajaProcedencia(d.procedencia),
       tabla(cols, d.vencimientos, { caption: `${firmada ? "GEX firmado (convención)" : "GEX absoluto"} por vencimiento y strike, ${d.moneda} por movimiento de 1 % del subyacente${d.strikes.length > 24 ? " (24 strikes más cercanos al spot)" : ""}` }),].filter(Boolean));
   };

@@ -135,8 +135,20 @@ def actualizar(con: sqlite3.Connection, ajustes: Ajustes, limite: int = 150, for
     propio = cliente is None
     cliente = cliente or httpx.Client(timeout=20, headers={"User-Agent": ua, "Accept-Encoding": "gzip, deflate"})
     hechos = 0
+    from .fuentes_web import SecEdgar
+    from .adaptadores.base import ErrorProveedor
+
+    sec = SecEdgar(con, {}, ua, cliente=cliente)
+
+    def consultar(url):
+        sec._comprobar_pausa()
+        respuesta = cliente.get(url)
+        if respuesta.status_code in (429, 503) and "Retry-After" in respuesta.headers:
+            sec._registrar_pausa(respuesta.headers["Retry-After"])
+        return respuesta
+
     try:
-        mapa = {v["ticker"].upper(): int(v["cik_str"]) for v in cliente.get(TICKERS_SEC).raise_for_status().json().values()}
+        mapa = {v["ticker"].upper(): int(v["cik_str"]) for v in consultar(TICKERS_SEC).raise_for_status().json().values()}
         for iid, v in pendientes:
             ticker = (v.get("listado_referencia") or v["clave"]).replace(".", "-").upper()
             cik = mapa.get(ticker)
@@ -145,14 +157,17 @@ def actualizar(con: sqlite3.Connection, ajustes: Ajustes, limite: int = 150, for
                 flot = fflot = None
             else:
                 time.sleep(0.12)
-                r = cliente.get(CONCEPTO_SEC.format(cik=cik, concepto="EntityCommonStockSharesOutstanding"))
+                r = consultar(CONCEPTO_SEC.format(cik=cik, concepto="EntityCommonStockSharesOutstanding"))
+                if r.status_code != 404:
+                    r.raise_for_status()
                 time.sleep(0.12)
-                rf = cliente.get(CONCEPTO_SEC.format(cik=cik, concepto="EntityPublicFloat"))
+                rf = consultar(CONCEPTO_SEC.format(cik=cik, concepto="EntityPublicFloat"))
+                if rf.status_code != 404:
+                    rf.raise_for_status()
                 flot, fflot = flotante_sec(rf.json()) if rf.status_code == 200 else (None, None)
                 if r.status_code == 404:
                     estado, acc, fecha, form, det = "sin_dato", None, None, None, "la SEC no publica acciones en circulación para esta emisora"
                 else:
-                    r.raise_for_status()
                     acc, fecha, form = acciones_sec(r.json())
                     if acc is None:
                         estado, det = "sin_dato", "sin filas de acciones en circulación"
@@ -166,7 +181,7 @@ def actualizar(con: sqlite3.Connection, ajustes: Ajustes, limite: int = 150, for
             with db.transaccion(con):
                 _guardar(con, iid, acc, fecha, form, "sec_edgar", estado, det, flot, fflot)
             hechos += 1
-    except httpx.HTTPError as e:
+    except (httpx.HTTPError, ErrorProveedor) as e:
         return {"estado": "error", "bmv": len(bmv), "sec": hechos, "mensaje": f"SEC no respondió: {e}"}
     finally:
         if propio:

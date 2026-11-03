@@ -1,0 +1,8 @@
+{
+  "estado": "no_confirmado",
+  "categoria": "ErrorProveedor",
+  "solicitudes": 1,
+  "http": 200,
+  "credencial_utilizada": false,
+  "motor_iniciado": false
+}

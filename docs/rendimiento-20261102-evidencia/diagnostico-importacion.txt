@@ -1,0 +1,49 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_importacion_y_clasificacion_de_lectura_no_cargan_modelos ________
+
+tmp_path = WindowsPath('C:/Users/MIKE/AppData/Local/Temp/pytest-of-MIKE/pytest-608/test_importacion_y_clasificaci0')
+
+    def test_importacion_y_clasificacion_de_lectura_no_cargan_modelos(tmp_path):
+        nombres = {"SYSTEMROOT", "WINDIR", "PATH", "TEMP", "TMP", "USERPROFILE", "LOCALAPPDATA", "APPDATA"}
+        entorno = {k: v for k, v in os.environ.items() if k.upper() in nombres}
+        entorno.update(TERMINAL_SIN_ENV="1", TERMINAL_SIN_CONFIG_LOCAL="1", TERMINAL_SIN_MOTOR="1",
+                       TERMINAL_MODO="real", TERMINAL_DATA_DIR=str(tmp_path), OPENBLAS_NUM_THREADS="1",
+                       OMP_NUM_THREADS="1", MKL_NUM_THREADS="1")
+        codigo = """
+    import socket, sys
+    def prohibida(*args, **kwargs):
+        raise AssertionError('La prueba de importaci�n no permite conexiones')
+    socket.socket.connect = prohibida
+    from terminal import app, criterios_propuestas, servicios
+    assert 'terminal.optimizador' not in sys.modules
+    assert 'sklearn' not in sys.modules and 'skfolio' not in sys.modules, sorted(n for n in sys.modules if n.startswith(('terminal.investigacion', 'skfolio', 'sklearn')))[:20]
+    filas = criterios_propuestas.clasificar([
+        {'tipo':'acciones','nombre':'A','estado':'calculada','puntuacion':{'total':2}},
+        {'tipo':'mixta','nombre':'B','estado':'insuficiente','motivos':['SIN DATO']},
+        {'tipo':'acciones','nombre':'C','estado':'calculada','puntuacion':{'total':5}},
+    ], {})
+    assert [f['alternativa'] for f in filas] == ['C','A','B']
+    assert [f['posicion'] for f in filas] == [1,2,None]
+    assert 'sklearn' not in sys.modules and 'skfolio' not in sys.modules
+    from terminal import optimizador
+    assert optimizador.clasificar is criterios_propuestas.clasificar
+    assert optimizador.costo_unitario is criterios_propuestas.costo_unitario
+    """
+        resultado = subprocess.run([sys.executable, "-c", codigo], cwd=Path(__file__).resolve().parents[1],
+                                   env=entorno, capture_output=True, text=True, timeout=90)
+>       assert resultado.returncode == 0, resultado.stderr
+E       AssertionError: warning: Failed to set cwd to temp dir
+E         Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E         AssertionError: ['sklearn', 'sklearn.__check_build', 'sklearn.__check_build._check_build', 'sklearn._config', 'sklearn._cyutility', 'sklearn._distributor_init', 'sklearn._loss', 'sklearn._loss._loss', 'sklearn._loss.link', 'sklearn._loss.loss', 'sklearn.base', 'sklearn.callback', 'sklearn.callback._base', 'sklearn.callback._callback_context', 'sklearn.callback._callback_support', 'sklearn.callback._progressbar', 'sklearn.callback._scoring_monitor', 'sklearn.callback._transport', 'sklearn.covariance', 'sklearn.covariance._elliptic_envelope']
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['C:\\Users\\MIKE\\Desktop\\Repos\\actinver-terminal\\.venv\\Scripts\\python.exe', '-c', "\nimpo...ring_monitor\', \'sklearn.callback._transport\', \'sklearn.covariance\', \'sklearn.covariance._elliptic_envelope\']\n').returncode
+
+tests\test_arranque_lectura.py:36: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_arranque_lectura.py::test_importacion_y_clasificacion_de_lectura_no_cargan_modelos
+1 failed in 11.28s

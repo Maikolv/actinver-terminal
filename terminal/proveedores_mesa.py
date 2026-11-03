@@ -37,7 +37,8 @@ class ConsultaMesa(Adaptador):
         if not self.configurado():
             raise ErrorProveedor('Conector apagado o sin credencial.')
         alias = 'alpha_vantage' if self.proveedor == 'alpha_calendario' else self.proveedor
-        clave = 'proveedor_pausa:' + alias
+        proveedor_pausa = {'banxico_sie': 'banxico', 'sec_resultados': 'sec_edgar'}.get(alias, alias)
+        clave = 'proveedor_pausa:' + proveedor_pausa
         pausa = self.con.execute('SELECT valor FROM ajustes_usuario WHERE clave=?', (clave,)).fetchone()
         if pausa and datetime.fromisoformat(json.loads(pausa[0])['hasta']) > ahora:
             raise LimiteAlcanzado('Proveedor en espera por Retry-After.')
@@ -57,7 +58,7 @@ class ConsultaMesa(Adaptador):
             r = self.cliente.get(url, params=params, headers=headers)
         except httpx.HTTPError:
             raise ErrorProveedor('Error de conexión con el proveedor.') from None
-        if r.status_code == 429:
+        if r.status_code == 429 or (r.status_code == 503 and 'Retry-After' in r.headers):
             try:
                 segundos = max(0, float(r.headers.get('Retry-After', '60')))
             except ValueError:
@@ -70,7 +71,7 @@ class ConsultaMesa(Adaptador):
             hasta = (ahora + timedelta(seconds=segundos)).isoformat()
             db.escribir(self.con, "INSERT INTO ajustes_usuario VALUES (?,?,?) ON CONFLICT(clave) DO UPDATE SET valor=excluded.valor, actualizado_en=excluded.actualizado_en",
                         (clave, json.dumps({'hasta': hasta}), ahora.isoformat()))
-            raise ErrorProveedor('HTTP 429: se respeta Retry-After; no se reintenta ahora.')
+            raise ErrorProveedor(f'HTTP {r.status_code}: se respeta Retry-After; no se reintenta ahora.')
         if r.status_code != 200:
             raise ErrorProveedor(f'Proveedor respondió HTTP {r.status_code}; no se guarda el cuerpo ni la URL de error.')
         return r
@@ -82,9 +83,9 @@ class ConsultaMesa(Adaptador):
 
 class BanxicoSIE(ConsultaMesa):
     proveedor = 'banxico_sie'
-    # SF61745 está citado en documentación oficial; todavía debe confirmar su título por API.
-    # Ningún ID de bono o INPC se da por confirmado sin la consulta de metadatos.
-    CANDIDATOS = {'BANXICO_OBJETIVO': 'SF61745', 'BANXICO_BONO10': None, 'INPC': None}
+    # Identidades confirmadas por GET oficial el 1-nov-2026. Cada consulta las revalida.
+    # SF30057 es promedio mensual: nunca se trata como rendimiento diario o vigente.
+    CANDIDATOS = {'BANXICO_OBJETIVO': 'SF61745', 'BANXICO_BONO10': 'SF30057', 'INPC': 'SP1'}
     BASE = 'https://www.banxico.org.mx/SieAPIRest/service/v1/series/'
 
     @staticmethod
@@ -98,14 +99,26 @@ class BanxicoSIE(ConsultaMesa):
             raise ErrorProveedor('SIE no confirmó un contrato de serie válido; SIN DATO.') from None
 
     @staticmethod
-    def coincide(tema, titulo):
+    def coincide(tema, titulo, *, sid=None, cifra=None, periodicidad=None, unidad=None):
         s = _norm(titulo)
         if tema == 'BANXICO_OBJETIVO':
             return 'objetivo' in s and 'tasa' in s
         if tema == 'BANXICO_BONO10':
             return bool('udibono' not in s and 'tiie' not in s and re.search(r'\bbonos?\b', s) and re.search(r'\b10\s+anos\b', s)
                         and (re.search(r'\bbonos?\s+m\b', s) or re.search(r'tasa.*fija', s)))
-        return tema == 'INPC' and 'indice nacional de precios al consumidor' in s and 'variacion' not in s
+        if tema != 'INPC' or 'variacion' in s:
+            return False
+        if unidad is not None and ('%' in str(unidad) or 'porc' in _norm(str(unidad)) or 'por ciento' in _norm(str(unidad))):
+            return False
+        if periodicidad is not None and _norm(str(periodicidad)).strip() != 'mensual':
+            return False
+        if 'indice nacional de precios al consumidor' in s:
+            return True
+        # Título real del catálogo SP1: IPC Por objeto del gasto Nacional I n d i c e G e n e r a l.
+        # No se acepta por parecido: ID, texto completo, tipo índice y periodicidad deben coincidir.
+        return (sid == 'SP1' and re.sub(r'[^a-z0-9]', '', s) == 'ipcporobjetodelgastonacionalindicegeneral'
+                and _norm(str(cifra)).strip() in ('indice', 'indices')
+                and _norm(str(periodicidad)).strip() == 'mensual')
 
     def consultar(self, ahora):
         from .centro_conectores import observacion, numero
@@ -117,7 +130,8 @@ class BanxicoSIE(ConsultaMesa):
                 raise ErrorProveedor('Código SIE no válido o tema no reconocido.')
             headers = {'Bmx-Token': self.credencial, 'Accept': 'application/json'}
             meta = self._serie(self._peticion(self.BASE + sid, ahora=ahora, headers=headers), sid)
-            if not isinstance(meta.get('titulo'), str) or not self.coincide(tema, meta['titulo']):
+            if not isinstance(meta.get('titulo'), str) or not self.coincide(tema, meta['titulo'], sid=sid,
+                    cifra=meta.get('cifra'), periodicidad=meta.get('periodicidad'), unidad=meta.get('unidad')):
                 raise ErrorProveedor('El catálogo SIE no confirmó la identidad de la serie; SIN DATO.')
             # El título se confirma ANTES de pedir o persistir observaciones.
             datos = self._serie(self._peticion(self.BASE + sid + '/datos', ahora=ahora, headers=headers), sid)
@@ -131,8 +145,12 @@ class BanxicoSIE(ConsultaMesa):
                 valor = numero(str(f.get('dato', '')).replace(',', ''))
                 if valor is None or periodo > ahora.date():
                     continue
-                out.append(observacion(tema, periodo.isoformat(), valor, 'índice' if tema == 'INPC' else '%',
-                                       meta['titulo'][:160], texto=f'Serie SIE {sid}; identidad confirmada por API en esta consulta. Publicación original desconocida; disponible desde la descarga.'))
+                texto = json.dumps({'serie_sie': sid, 'titulo_catalogo': meta['titulo'],
+                    'periodicidad': meta.get('periodicidad'), 'unidad_catalogo': meta.get('unidad'),
+                    'cifra_catalogo': meta.get('cifra'),
+                    'aviso': 'Identidad confirmada por GET. Publicación original desconocida; disponible desde la descarga.'}, ensure_ascii=False)
+                titulo = 'INPC nacional · índice general' if tema == 'INPC' else meta['titulo'][:160]
+                out.append(observacion(tema, periodo.isoformat(), valor, 'índice' if tema == 'INPC' else '%', titulo, texto=texto))
         return out
 
 
@@ -170,6 +188,11 @@ class AlphaCalendario(ConsultaMesa):
         from .centro_conectores import observacion, numero
         if not self.ajustes.get('plan_verificado'):
             raise ErrorProveedor('Calendario deshabilitado: falta verificar el plan con una única consulta autorizada.')
+        return self.comprobar_acceso(ahora)
+
+    def comprobar_acceso(self, ahora):
+        """Una prueba manual del CSV; no cambia el permiso ni activa el conector."""
+        from .centro_conectores import observacion, numero
         r = self._peticion('https://www.alphavantage.co/query', ahora=ahora,
                            params={'function': 'EARNINGS_CALENDAR', 'horizon': '3month', 'apikey': self.credencial})
         lector = csv.DictReader(io.StringIO(r.text))
@@ -187,6 +210,74 @@ class AlphaCalendario(ConsultaMesa):
             out.append(observacion('estimacion_bpa:' + fecha, ahora.date().isoformat(), f['estimate'],
                                    f['currency'] + '/acción', 'Estimación de BPA (fecha prevista, no anuncio confirmado)', simbolo, texto))
         return out
+
+
+class AlphaResultados(ConsultaMesa):
+    """Una consulta EARNINGS por símbolo; las estimaciones retrospectivas no se importan."""
+    proveedor = 'alpha_calendario'  # Mismo permiso de fuente y cupo compartido alpha_vantage.
+
+    def consultar(self, ahora):
+        from .centro_conectores import observacion, numero
+        simbolo = self.ajustes.get('simbolo', '')
+        if not isinstance(simbolo, str) or not re.fullmatch(r'[A-Z][A-Z0-9.-]{0,14}', simbolo):
+            raise ErrorProveedor('Símbolo de resultados no válido.')
+        d = self._peticion('https://www.alphavantage.co/query', ahora=ahora,
+            params={'function': 'EARNINGS', 'symbol': simbolo, 'apikey': self.credencial}).json()
+        if not isinstance(d, dict) or d.get('symbol') != simbolo or not isinstance(d.get('quarterlyEarnings'), list):
+            raise ErrorProveedor('La API no confirmó el símbolo y el contrato de resultados; no se activa nada.')
+        moneda = d.get('reportedCurrency')
+        unidad = moneda + '/acción' if isinstance(moneda, str) and re.fullmatch(r'[A-Z]{3}', moneda) else 'BPA · moneda no informada'
+        vistos, out = set(), []
+        for f in d['quarterlyEarnings']:
+            if not isinstance(f, dict):
+                raise ErrorProveedor('Fila de resultados no válida.')
+            valor = numero(f.get('reportedEPS'))
+            try:
+                fiscal = date.fromisoformat(f.get('fiscalDateEnding', ''))
+                reporte = date.fromisoformat(f.get('reportedDate', ''))
+            except (TypeError, ValueError):
+                continue
+            if fiscal > reporte or reporte > ahora.date() or valor is None:
+                continue
+            if fiscal in vistos:
+                raise ErrorProveedor('Dos resultados para el mismo periodo fiscal; no se elige uno arbitrariamente.')
+            vistos.add(fiscal)
+            momento = {'pre-market': 'antes', 'post-market': 'despues'}.get(f.get('reportTime'))
+            texto = json.dumps({'fecha_reporte': reporte.isoformat(), 'periodo_fiscal': fiscal.isoformat(),
+                'clase': 'bpa_reportado', 'momento': momento, 'hora_anuncio': None,
+                'momento_declarado_por': 'Alpha EARNINGS.reportTime' if momento else None,
+                'base_bpa': 'No especificada por la API; no se calcula sorpresa.',
+                'aviso': 'Primera captura local del valor que entrega el proveedor, no necesariamente el anuncio original. '
+                         'No se importan estimatedEPS ni surprise históricos como si se conocieran antes del anuncio.'}, ensure_ascii=False)
+            out.append(observacion('reportado_bpa', fiscal.isoformat(), valor, unidad,
+                'BPA reportado por Alpha · captura local', simbolo, texto))
+        return sorted(out, key=lambda f: f['periodo'], reverse=True)[:8]
+
+
+def guardar_resultados_alpha(con, filas, conocido):
+    """Conserva el primer BPA local; cambios posteriores son revisiones observadas.
+
+    No afirma que un cambio sea una reformulación contable oficial. La disponibilidad
+    sigue siendo la de cada captura, nunca la fecha histórica del reporte.
+    """
+    from . import centro_investigacion as centro
+    nuevos = 0
+    for f in filas:
+        if f['fuente'] != 'alpha_calendario' or f['serie'] != 'reportado_bpa' or f['origen'] != 'api':
+            raise ValueError('Solo se admiten BPA de la consulta oficial de resultados.')
+        anterior = con.execute("SELECT * FROM investigacion_observaciones WHERE fuente='alpha_calendario' AND "
+            "simbolo=? AND periodo=? AND serie IN ('reportado_bpa','revisado_bpa') AND origen='api' "
+            "ORDER BY disponible_desde DESC,id DESC LIMIT 1", (f['simbolo'], f['periodo'])).fetchone()
+        nueva = dict(f)
+        if anterior and (anterior['valor'] != f['valor'] or anterior['serie'] == 'revisado_bpa'):
+            nueva['serie'] = 'revisado_bpa'
+            nueva['titulo'] = 'BPA modificado en capturas de Alpha'
+            m = json.loads(nueva['texto'])
+            m['clase'] = 'revision_observada'
+            m['aviso_revision'] = 'Cambio entre capturas locales; no acredita una reformulación oficial del emisor.'
+            nueva['texto'] = json.dumps(m, ensure_ascii=False)
+        nuevos += centro._guardar(con, [nueva], conocido)
+    return nuevos
 
 
 class SECResultados(ConsultaMesa):

@@ -2,12 +2,70 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
+import httpx
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from terminal.flujo import almacen
+from terminal.flujo.servicio import catalogo
+from terminal.flujo.adaptadores import Alpaca, FuenteNoDisponible
 from terminal.flujo.contratos import OperacionOpcion, Procedencia
 from terminal.seguridad import Seguridad, TOKEN_CSRF
+
+
+@pytest.mark.parametrize("codigo", [429, 503])
+def test_alpaca_flujo_respeta_pausa_entre_instancias(con, codigo):
+    llamadas = []
+
+    def responder(peticion):
+        llamadas.append(peticion)
+        return httpx.Response(codigo, headers={"Retry-After": "120"})
+
+    env = {"ALPACA_API_KEY_ID": "prueba", "ALPACA_API_SECRET_KEY": "ficticia"}
+    with httpx.Client(transport=httpx.MockTransport(responder)) as cli:
+        with pytest.raises(FuenteNoDisponible, match=str(codigo)):
+            Alpaca(env=env, cliente=cli, con=con)._get("/v2/stocks/bars", {})
+        with pytest.raises(FuenteNoDisponible, match="Retry-After"):
+            Alpaca(env=env, cliente=cli, con=con)._get("/v2/stocks/bars", {})
+    assert len(llamadas) == 1
+
+
+def test_pausa_paper_no_bloquea_datos_alpaca(con):
+    solicitudes = []
+
+    def responder(peticion):
+        solicitudes.append(peticion.url.host)
+        if "paper" in peticion.url.host:
+            return httpx.Response(503, headers={"Retry-After": "120"})
+        return httpx.Response(200, json={"bars": []})
+
+    env = {"ALPACA_PAPER_API_KEY_ID": "prueba", "ALPACA_PAPER_API_SECRET_KEY": "ficticia",
+           "ALPACA_API_KEY_ID": "prueba", "ALPACA_API_SECRET_KEY": "ficticia"}
+    ajustes = {"flujo": {"alpaca": {"contratos_oi": True}}}
+    with httpx.Client(transport=httpx.MockTransport(responder)) as cli:
+        with pytest.raises(FuenteNoDisponible, match="503"):
+            Alpaca(ajustes, env, cli, con=con).contratos_opciones("MU")
+        siguiente = Alpaca(ajustes, env, cli, con=con)
+        with pytest.raises(FuenteNoDisponible, match="Retry-After"):
+            siguiente.contratos_opciones("MU")
+        assert siguiente._get("/v2/stocks/bars", {}) == {"bars": []}
+    assert solicitudes == ["paper-api.alpaca.markets", "data.alpaca.markets"]
+
+
+def test_catalogo_bmv_separa_cierres_historicos_y_sinteticos(con, monkeypatch):
+    from datetime import date
+    from types import SimpleNamespace
+    from terminal.flujo import servicio
+
+    monkeypatch.setattr(servicio, "Cripto", lambda _: SimpleNamespace(cfg={"activo": False}))
+    fecha = date.today().isoformat()
+    con.executemany(
+        "INSERT INTO precios (instrumento_id,fecha,cierre,moneda,proveedor,tipo_dato,obtenido_en) "
+        "VALUES (?,?,10,'MXN',?,?,?)",
+        [("BMV:AMX", fecha, "archivo", "cierre", fecha),
+         ("BMV:WALMEX", fecha, "demo_sintetico", "sintetico", fecha)])
+    assert catalogo(con, SimpleNamespace(es_demo=False))["cierres_bmv"] == ["BMV:AMX"]
+    assert catalogo(con, SimpleNamespace(es_demo=True))["cierres_bmv"] == ["BMV:WALMEX"]
 
 
 @pytest.fixture

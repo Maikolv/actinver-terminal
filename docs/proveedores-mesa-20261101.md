@@ -1,5 +1,16 @@
 # Proveedores oficiales de Mesa — 1-nov-2026
 
+Estado posterior de los pendientes gratuitos: `avance-gratuitos-20261101.md`.
+SEC: cuatro emisoras verificadas y 100 publicaciones reales. Treasury 30 años: 24
+observaciones XML de fuente primaria H.15, sin acreditar API FRED. Se conserva debajo
+el informe original y sus pruebas históricas, sin convertir sus resultados en actuales.
+
+Actualización documental posterior: `confirmacion-externa-proveedores-20261101.md`.
+SP1 ya tiene referencia primaria en publicaciones de Banxico, pero no GET de catálogo
+confirmado. XMEX general se descarta como cobertura gratuita Basic según su ficha
+oficial. Las comprobaciones de cuentas siguen bloqueadas; se conserva abajo la evidencia
+y el estado de la primera entrega, sin reescribir sus resultados históricos.
+
 Alcance: consultas de investigación y calendario de solo lectura. Sin motor, órdenes,
 cuentas, mensajes externos, compras, commit o push. No se leyó `.env` ni se cambiaron
 credenciales. Los datos simulados de pruebas nunca se guardaron en la base del usuario.

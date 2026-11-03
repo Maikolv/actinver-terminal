@@ -1,0 +1,21 @@
+{
+  "alcance": "Componente real extraído de app.js, datos simulados, sin integración completa de la página",
+  "resultados": [
+    {
+      "ancho": 390,
+      "navegacion_teclado": true,
+      "flecha_arriba_inicial_ultima": true,
+      "escape_conserva_texto": true,
+      "consultas_deduplicadas": 2,
+      "errores": []
+    },
+    {
+      "ancho": 1440,
+      "navegacion_teclado": true,
+      "flecha_arriba_inicial_ultima": true,
+      "escape_conserva_texto": true,
+      "consultas_deduplicadas": 2,
+      "errores": []
+    }
+  ]
+}

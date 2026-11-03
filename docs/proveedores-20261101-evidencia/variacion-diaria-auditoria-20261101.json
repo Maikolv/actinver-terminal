@@ -1,0 +1,582 @@
+{
+  "corte": "2026-11-01T19:45:18.026676+00:00",
+  "nota": "Cálculo retrospectivo offline con cierres ya guardados; no es forward, efecto causal ni alfa. Sin consultas externas ni órdenes.",
+  "variaciones": [
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2026-10-30",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-10-29",
+        "cierre_base": 183.29,
+        "fin": "2026-10-30",
+        "cierre_fin": 187.25,
+        "reaccion": 0.021605106661574558,
+        "sesiones": 1,
+        "fuente_cierres": "tiingo",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-11-01T05:30:35+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2026-09-30",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-09-30",
+        "cierre_base": 1065.11,
+        "fin": "2026-10-01",
+        "cierre_fin": 1097.39,
+        "reaccion": 0.030306728882462997,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2026-08-26",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-08-26",
+        "cierre_base": 209.66,
+        "fin": "2026-08-27",
+        "cierre_fin": 227.98,
+        "reaccion": 0.08737956691786697,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2026-08-04",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-08-04",
+        "cierre_base": 518.58,
+        "fin": "2026-08-05",
+        "cierre_fin": 482.05,
+        "reaccion": -0.07044236183423969,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2026-07-31",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-07-30",
+        "cierre_base": 156.97,
+        "fin": "2026-07-31",
+        "cierre_fin": 155.44,
+        "reaccion": -0.009747085430336977,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2026-06-24",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-06-24",
+        "cierre_base": 1048.51,
+        "fin": "2026-06-25",
+        "cierre_fin": 1213.56,
+        "reaccion": 0.15741385394512197,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2026-05-20",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-05-20",
+        "cierre_base": 223.47,
+        "fin": "2026-05-21",
+        "cierre_fin": 219.51,
+        "reaccion": -0.017720499395892153,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2026-05-05",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-05-05",
+        "cierre_base": 355.26,
+        "fin": "2026-05-06",
+        "cierre_fin": 421.39,
+        "reaccion": 0.18614535832911105,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2026-05-01",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-04-30",
+        "cierre_base": 154.33,
+        "fin": "2026-05-01",
+        "cierre_fin": 152.75,
+        "reaccion": -0.010237802112356698,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2026-03-18",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-03-18",
+        "cierre_base": 461.73,
+        "fin": "2026-03-19",
+        "cierre_fin": 444.27,
+        "reaccion": -0.037814307062569164,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2026-02-25",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-02-25",
+        "cierre_base": 195.56,
+        "fin": "2026-02-26",
+        "cierre_fin": 184.89,
+        "reaccion": -0.054561259971364406,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2026-02-03",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-02-03",
+        "cierre_base": 242.11,
+        "fin": "2026-02-04",
+        "cierre_fin": 200.19,
+        "reaccion": -0.17314443847837768,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2026-01-30",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2026-01-29",
+        "cierre_base": 140.51,
+        "fin": "2026-01-30",
+        "cierre_fin": 141.4,
+        "reaccion": 0.006334068749555222,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2025-12-17",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-12-17",
+        "cierre_base": 225.52,
+        "fin": "2025-12-18",
+        "cierre_fin": 248.55,
+        "reaccion": 0.10211954593827599,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2025-11-19",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-11-19",
+        "cierre_base": 186.52,
+        "fin": "2025-11-20",
+        "cierre_fin": 180.64,
+        "reaccion": -0.031524769461720004,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2025-11-04",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-11-04",
+        "cierre_base": 250.05,
+        "fin": "2025-11-05",
+        "cierre_fin": 256.33,
+        "reaccion": 0.02511497700459886,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2025-10-31",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-10-30",
+        "cierre_base": 114.69,
+        "fin": "2025-10-31",
+        "cierre_fin": 114.36,
+        "reaccion": -0.0028773214752811915,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2025-09-23",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-09-23",
+        "cierre_base": 166.41,
+        "fin": "2025-09-24",
+        "cierre_fin": 161.71,
+        "reaccion": -0.028243494982272632,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2025-08-27",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-08-27",
+        "cierre_base": 181.6,
+        "fin": "2025-08-28",
+        "cierre_fin": 180.17,
+        "reaccion": -0.007874449339207112,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2025-08-05",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-08-05",
+        "cierre_base": 174.31,
+        "fin": "2025-08-06",
+        "cierre_fin": 163.12,
+        "reaccion": -0.0641959726923298,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2025-08-01",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-07-31",
+        "cierre_base": 111.64,
+        "fin": "2025-08-01",
+        "cierre_fin": 109.64,
+        "reaccion": -0.017914725904693674,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2025-06-25",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-06-25",
+        "cierre_base": 127.25,
+        "fin": "2025-06-26",
+        "cierre_fin": 126.0,
+        "reaccion": -0.00982318271119842,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2025-05-28",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-05-28",
+        "cierre_base": 134.81,
+        "fin": "2025-05-29",
+        "cierre_fin": 139.19,
+        "reaccion": 0.03249017135227361,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2025-05-06",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-05-06",
+        "cierre_base": 98.62,
+        "fin": "2025-05-07",
+        "cierre_fin": 100.36,
+        "reaccion": 0.01764348002433569,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2025-05-02",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-05-01",
+        "cierre_base": 105.78,
+        "fin": "2025-05-02",
+        "cierre_fin": 106.21,
+        "reaccion": 0.00406504065040636,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2025-03-20",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-03-20",
+        "cierre_base": 103.0,
+        "fin": "2025-03-21",
+        "cierre_fin": 94.72,
+        "reaccion": -0.08038834951456308,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2025-02-26",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-02-26",
+        "cierre_base": 131.28,
+        "fin": "2025-02-27",
+        "cierre_fin": 120.15,
+        "reaccion": -0.084780621572212,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2025-02-04",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-02-04",
+        "cierre_base": 119.5,
+        "fin": "2025-02-05",
+        "cierre_fin": 112.01,
+        "reaccion": -0.06267782426778234,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "XOM",
+      "fecha_reporte": "2025-01-31",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2025-01-30",
+        "cierre_base": 109.57,
+        "fin": "2025-01-31",
+        "cierre_fin": 106.83,
+        "reaccion": -0.02500684493930816,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T13:40:10+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "MU",
+      "fecha_reporte": "2024-12-18",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2024-12-18",
+        "cierre_base": 103.9,
+        "fin": "2024-12-19",
+        "cierre_fin": 87.09,
+        "reaccion": -0.1617901828681425,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:36+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "NVDA",
+      "fecha_reporte": "2024-11-20",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2024-11-20",
+        "cierre_base": 145.89,
+        "fin": "2024-11-21",
+        "cierre_fin": 146.67,
+        "reaccion": 0.005346493933785723,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:37+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    },
+    {
+      "simbolo": "AMD",
+      "fecha_reporte": "2024-10-29",
+      "hora_anuncio": null,
+      "reaccion": {
+        "base": "2024-10-29",
+        "cierre_base": 166.25,
+        "fin": "2024-10-30",
+        "cierre_fin": 148.6,
+        "reaccion": -0.10616541353383457,
+        "sesiones": 1,
+        "fuente_cierres": "alpaca",
+        "moneda": "USD",
+        "conocido_desde_cierres": "2026-10-05T21:44:30+00:00",
+        "criterio": "Variación de cierres consecutivos por ventana declarada; no aísla splits, dividendos ni efecto causal.",
+        "precision_anuncio": "ventana declarada; hora exacta SIN DATO"
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "fuente": "fed_h15",
+  "serie": "DGS30",
+  "serie_board": "RIFLGFCY30_N.B",
+  "identidad": {
+    "SERIES_NAME": "RIFLGFCY30_N.B",
+    "INSTRUMENT": "TCMNOM",
+    "MATURITY": "Y30",
+    "FREQ": "9",
+    "UNIT": "Percent:_Per_Year",
+    "UNIT_MULT": "1",
+    "CURRENCY": "NA"
+  },
+  "observaciones": 24,
+  "nuevas": 24,
+  "periodo_inicial": "2026-09-25",
+  "periodo_final": "2026-10-29",
+  "disponible_desde": "2026-11-01T11:18:41.291707+00:00",
+  "sha256_zip": "5c4479da8a26928022d4792921e2e39f8ce0d8c4bc4f92dc8c5a9cf984a5d560",
+  "sha256_equivalencias": "536ba3dc62d10f51d70208a6f35aea022bb4d41d9feb2659de22cf649065852d",
+  "api_fred_verificada": false,
+  "activado": false
+}

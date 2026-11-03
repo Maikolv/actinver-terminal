@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 
 import httpx
 
+from ..adaptadores.base import Adaptador, LimiteAlcanzado
+
 ARCHIVO = "https://www.sec.gov/Archives/edgar/data/{cik}/{acc}"
 SUBMISSIONS = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
 TICKERS = "https://www.sec.gov/files/company_tickers.json"
@@ -28,7 +30,7 @@ class ClienteSEC:
     """Peticiones a la SEC con ritmo máximo, reintentos con espera creciente y conteo de consultas."""
 
     def __init__(self, user_agent: str | None, cliente: httpx.Client | None = None, max_por_seg: float = 5.0,
-                 reintentos: int = 3, dormir=time.sleep):
+                 reintentos: int = 3, dormir=time.sleep, con=None):
         if not user_agent or "@" not in user_agent:
             raise ErrorSEC("SEC_USER_AGENT no definido (nombre y correo de contacto): la SEC exige identificarse")
         self.cli = cliente or httpx.Client(timeout=30, follow_redirects=True)
@@ -38,10 +40,18 @@ class ClienteSEC:
         self.dormir = dormir
         self._ultima = 0.0
         self.consultas = 0
+        self.pausa = Adaptador(con, {}) if con is not None else None
+        if self.pausa is not None:
+            self.pausa.proveedor = "sec_edgar"
 
     def get(self, url: str) -> httpx.Response:
         espera = 1.0
         for intento in range(self.reintentos + 1):
+            if self.pausa is not None:
+                try:
+                    self.pausa._comprobar_pausa()
+                except LimiteAlcanzado as e:
+                    raise ErrorSEC(str(e)) from None
             falta = self.intervalo - (time.monotonic() - self._ultima)
             if falta > 0:
                 self.dormir(falta)
@@ -57,6 +67,9 @@ class ClienteSEC:
                 continue
             if r.status_code == 200:
                 return r
+            if self.pausa is not None and r.status_code in (429, 503) and "Retry-After" in r.headers:
+                self.pausa._registrar_pausa(r.headers["Retry-After"])
+                raise ErrorSEC(f"SEC respondió {r.status_code}. Se respeta Retry-After.")
             if r.status_code in (429, 500, 502, 503, 504) and intento < self.reintentos:
                 self.dormir(min(float(r.headers.get("Retry-After") or espera), 60))
                 espera *= 2

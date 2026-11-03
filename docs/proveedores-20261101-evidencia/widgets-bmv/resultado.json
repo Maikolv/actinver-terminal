@@ -1,0 +1,30 @@
+[
+  {
+    "tipo": "grafica",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "1m\n30m\n1h\nD\nIndicadores\nA\nBMV:AMX/B\n1D\nO\n∅\nH\n∅\nL\n∅\nC\n∅\n∅ (∅%)\nEste símbolo no existe\nPruebe a seleccionar otro para su análisis y podrá ver los datos aquí.\nCambiar símbolo\nNotificación\nSímbolo solo disponible en TradingView.\nAceptar\nclose"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "consulta_publica_scan_permitida": false,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-03T02:54:19.872Z"
+  },
+  {
+    "tipo": "info",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "AMERICA MOVIL SAB DE CV CLASS B\nAMX/B\nAMX/BMexican Stock Exchange\n`\nEste símbolo solo está disponible en TradingView"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "consulta_publica_scan_permitida": false,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-03T02:54:38.901Z"
+  }
+]

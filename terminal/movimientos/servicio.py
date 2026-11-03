@@ -127,8 +127,8 @@ def factor_split(con):
 
 
 # ------------------------------------------------------------------------------------------------- actualización
-def _cliente(cliente=None) -> sec.ClienteSEC:
-    return sec.ClienteSEC(os.environ.get("SEC_USER_AGENT"), cliente=cliente)
+def _cliente(cliente=None, *, con=None) -> sec.ClienteSEC:
+    return sec.ClienteSEC(os.environ.get("SEC_USER_AGENT"), cliente=cliente, con=con)
 
 
 def tickers_sec(cli: sec.ClienteSEC) -> list[dict]:
@@ -157,7 +157,7 @@ def _xml_de_indice(cli, cik: int, acceso: str) -> tuple[str | None, str | None]:
 def actualizar_13f(con, ajustes, cli: sec.ClienteSEC | None = None) -> dict:
     alm.asegurar(con)
     c = cfg(ajustes)
-    cli = cli or _cliente()
+    cli = cli or _cliente(con=con)
     nuevos, errores, avisos = 0, [], []
     tickers = None
     for g in gestores(ajustes):
@@ -207,7 +207,7 @@ def emisoras_form4(con, ajustes) -> list[dict]:
 def actualizar_form4(con, ajustes, cli: sec.ClienteSEC | None = None, emisoras: list[dict] | None = None) -> dict:
     alm.asegurar(con)
     c = cfg(ajustes)
-    cli = cli or _cliente()
+    cli = cli or _cliente(con=con)
     emisoras = emisoras if emisoras is not None else emisoras_form4(con, ajustes)
     limite = (date.today() - timedelta(days=int(c["dias_form4"]))).isoformat()
     nuevos, errores = 0, []
@@ -253,7 +253,7 @@ def actualizar(con, ajustes, forzar: bool = False) -> dict:
         return {"estado": "en_curso"}
     try:
         c = cfg(ajustes)
-        cli = _cliente()
+        cli = _cliente(con=con)
         res = {}
         if forzar or _toca(con, "form4", c["cada_horas_form4"]):
             res["form4"] = actualizar_form4(con, ajustes, cli)

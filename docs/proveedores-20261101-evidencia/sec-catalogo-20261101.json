@@ -1,0 +1,27 @@
+{
+  "fuente": "https://www.sec.gov/files/company_tickers.json",
+  "http": 200,
+  "consulta_en": "2026-11-01T11:09:56.826973+00:00",
+  "emisoras": [
+    {
+      "simbolo": "NVDA",
+      "cik": 1045810,
+      "nombre": "NVIDIA CORP"
+    },
+    {
+      "simbolo": "MU",
+      "cik": 723125,
+      "nombre": "MICRON TECHNOLOGY INC"
+    },
+    {
+      "simbolo": "AMD",
+      "cik": 2488,
+      "nombre": "ADVANCED MICRO DEVICES INC"
+    },
+    {
+      "simbolo": "XOM",
+      "cik": 2115436,
+      "nombre": "ExxonMobil Holdings Corp"
+    }
+  ]
+}

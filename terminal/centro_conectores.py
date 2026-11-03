@@ -65,6 +65,27 @@ class FredMacro(ContextoAPI):
         return out
 
 
+class FredMacroLaboral(FredMacro):
+    """Respaldo optativo de publicaciones BLS; tres consultas, sin alta automática."""
+    SERIES = {
+        "UNRATE": ("%", "Tasa de desempleo de EE. UU. · FRED/BLS"),
+        "PAYEMS": ("miles de personas", "Empleo no agrícola de EE. UU. · FRED/BLS"),
+        "CPIAUCSL": ("índice 1982-84=100", "CPI general desestacionalizado · FRED/BLS"),
+    }
+
+    def consultar(self, ahora):
+        out = super().consultar(ahora)
+        # Solo pares de meses separados exactamente un año y de esta misma captura.
+        cpi = {o['periodo'][:7]: o['valor'] for o in out if o['serie'] == 'CPIAUCSL' and o['valor'] > 0}
+        for periodo, valor in cpi.items():
+            anterior = cpi.get(f"{int(periodo[:4])-1}{periodo[4:]}")
+            if anterior:
+                out.append(observacion('CPI_YOY', periodo, (valor/anterior - 1)*100, '%',
+                    'Cambio interanual del CPI desestacionalizado · FRED/BLS',
+                    texto='Calculado con CPIAUCSL de la misma captura; publicación mensual revisable, no vintage histórico.'))
+        return out
+
+
 class AlphaVantage(ContextoAPI):
     proveedor = "alpha_vantage"
     # OVERVIEW requiere suscripción premium. INCOME_STATEMENT respondió con una clave gratuita el 12-oct-2026.
@@ -179,11 +200,14 @@ class BLS(ContextoAPI):
         cuerpo = {"seriesid": list(self.SERIES), "startyear": str(ahora.year - 2), "endyear": str(ahora.year)}
         if self.credencial:
             cuerpo["registrationkey"] = self.credencial
+        self._comprobar_pausa()
         self._consumir()
         try:
             r = self.cliente.post("https://api.bls.gov/publicAPI/v2/timeseries/data/", json=cuerpo)
         except httpx.HTTPError:
             raise ErrorProveedor("BLS: error de conexión") from None
+        if r.status_code in (429, 503) and "Retry-After" in r.headers:
+            self._registrar_pausa(r.headers["Retry-After"])
         if r.status_code != 200:
             raise ErrorProveedor(f"BLS: HTTP {r.status_code}")
         try:

@@ -1,0 +1,700 @@
+[
+ {
+  "nombre": "OpenTerminal",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\OpenTerminal",
+  "existe": true,
+  "problemas": [],
+  "head": "aed097c680cd8ec1c391ae06966babe7d6d91fc6",
+  "remoto": "https://github.com/ErTasselli/OpenTerminal.git",
+  "commit_inventario": "aed097c680cd8ec1c391ae06966babe7d6d91fc6",
+  "remoto_inventario": "https://github.com/ErTasselli/OpenTerminal.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "floorplan",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\floorplan",
+  "existe": true,
+  "problemas": [],
+  "head": "cec107540da3910c6d7a5fa6400fc9851bf4c15e",
+  "remoto": "https://github.com/haydenschmitty/floorplan.git",
+  "commit_inventario": "cec107540da3910c6d7a5fa6400fc9851bf4c15e",
+  "remoto_inventario": "https://github.com/haydenschmitty/floorplan.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "day-trader-skill",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\day-trader-skill",
+  "existe": true,
+  "problemas": [],
+  "head": "3d0f4ef6986f4984b7c6bd46f7ff4f87744c3abd",
+  "remoto": "https://github.com/Jakeschincariol/day-trader-skill.git",
+  "commit_inventario": "3d0f4ef6986f4984b7c6bd46f7ff4f87744c3abd",
+  "remoto_inventario": "https://github.com/Jakeschincariol/day-trader-skill.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": true
+ },
+ {
+  "nombre": "rederive",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\rederive",
+  "existe": true,
+  "problemas": [],
+  "head": "7f43edc0ee0e098e98f77b01187027238aba77c8",
+  "remoto": "https://github.com/EricJujianZou/rederive.git",
+  "commit_inventario": "7f43edc0ee0e098e98f77b01187027238aba77c8",
+  "remoto_inventario": "https://github.com/EricJujianZou/rederive.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "caveman",
+  "path": "C:/Users/MIKE/.codex/plugins/cache/claude-cowork/anthropic-skills/1.0.0/skills/caveman",
+  "existe": true,
+  "problemas": [
+   "procedencia de la versión instalada no verificada; no heredar licencia por el nombre"
+  ],
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ]
+  ],
+  "tipo": "skill; no se exige repositorio Git en la instalación"
+ },
+ {
+  "nombre": "FinGPT",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\FinGPT",
+  "existe": true,
+  "problemas": [],
+  "head": "ac5c5443fbeeafad801e7a3c188e4f24cfaad4d8",
+  "remoto": "https://github.com/AI4Finance-Foundation/FinGPT.git",
+  "commit_inventario": "ac5c5443fbeeafad801e7a3c188e4f24cfaad4d8",
+  "remoto_inventario": "https://github.com/AI4Finance-Foundation/FinGPT.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "ai-hedge-fund",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ai-hedge-fund",
+  "existe": true,
+  "problemas": [],
+  "head": "d3a2b6b2bc3579cf0f5bde9cebeea9754f1eae15",
+  "remoto": "https://github.com/virattt/ai-hedge-fund.git",
+  "commit_inventario": "d3a2b6b2bc3579cf0f5bde9cebeea9754f1eae15",
+  "remoto_inventario": "https://github.com/virattt/ai-hedge-fund.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "AutoHedge",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\AutoHedge",
+  "existe": true,
+  "problemas": [],
+  "head": "c549c7950da112286e76725d49f6a25de8fa99bd",
+  "remoto": "https://github.com/The-Swarm-Corporation/AutoHedge.git",
+  "commit_inventario": "c549c7950da112286e76725d49f6a25de8fa99bd",
+  "remoto_inventario": "https://github.com/The-Swarm-Corporation/AutoHedge.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": true
+ },
+ {
+  "nombre": "Vibe-Trading",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\Vibe-Trading",
+  "existe": true,
+  "problemas": [],
+  "head": "b705d188b08013cc3fa904be72d40a41798181e8",
+  "remoto": "https://github.com/HKUDS/Vibe-Trading.git",
+  "commit_inventario": "b705d188b08013cc3fa904be72d40a41798181e8",
+  "remoto_inventario": "https://github.com/HKUDS/Vibe-Trading.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "FinceptTerminal",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\FinceptTerminal",
+  "existe": true,
+  "problemas": [],
+  "head": "b7d850b49dc033bb133e6e5d2476444ac5c422b1",
+  "remoto": "https://github.com/Fincept-Corporation/FinceptTerminal.git",
+  "commit_inventario": "b7d850b49dc033bb133e6e5d2476444ac5c422b1",
+  "remoto_inventario": "https://github.com/Fincept-Corporation/FinceptTerminal.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "AGPL-3.0"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "TradingAgents",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents",
+  "existe": true,
+  "problemas": [],
+  "head": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+  "remoto": "https://github.com/TauricResearch/TradingAgents.git",
+  "commit_inventario": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+  "remoto_inventario": "https://github.com/TauricResearch/TradingAgents.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "TradingAgents_TauricResearch",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents_TauricResearch",
+  "existe": true,
+  "problemas": [],
+  "head": "01477f9afb7a47b849ed4c9259d3a9a4738d9fda",
+  "remoto": "https://github.com/vongchu/TradingAgents_TauricResearch.git",
+  "commit_inventario": "01477f9afb7a47b849ed4c9259d3a9a4738d9fda",
+  "remoto_inventario": "https://github.com/vongchu/TradingAgents_TauricResearch.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "qlib",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\qlib",
+  "existe": true,
+  "problemas": [],
+  "head": "54355232463878d2eebb91fe0ee5fa7fa1f5976c",
+  "remoto": "https://github.com/microsoft/qlib.git",
+  "commit_inventario": "54355232463878d2eebb91fe0ee5fa7fa1f5976c",
+  "remoto_inventario": "https://github.com/microsoft/qlib.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "FinRL",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\FinRL",
+  "existe": true,
+  "problemas": [],
+  "head": "00f3596facd01cced5217d875d8c1fc413a31665",
+  "remoto": "https://github.com/AI4Finance-Foundation/FinRL.git",
+  "commit_inventario": "00f3596facd01cced5217d875d8c1fc413a31665",
+  "remoto_inventario": "https://github.com/AI4Finance-Foundation/FinRL.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "ECC",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ECC",
+  "existe": true,
+  "problemas": [],
+  "head": "4eb71d92a39cab44ad40ac9d8a6a5ccb4029d6c2",
+  "remoto": "https://github.com/affaan-m/ECC.git",
+  "commit_inventario": "4eb71d92a39cab44ad40ac9d8a6a5ccb4029d6c2",
+  "remoto_inventario": "https://github.com/affaan-m/ECC.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "rea",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\rea",
+  "existe": true,
+  "problemas": [],
+  "head": "ae8051302b5834322fa00cfa31c968ae74ab6ed9",
+  "remoto": "https://github.com/morluto/rea.git",
+  "commit_inventario": "ae8051302b5834322fa00cfa31c968ae74ab6ed9",
+  "remoto_inventario": "https://github.com/morluto/rea.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "context7",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\context7",
+  "existe": true,
+  "problemas": [],
+  "head": "522c4db4fa2e1e31f1b320f09fa8c8fab376987a",
+  "remoto": "https://github.com/upstash/context7.git",
+  "commit_inventario": "522c4db4fa2e1e31f1b320f09fa8c8fab376987a",
+  "remoto_inventario": "https://github.com/upstash/context7.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "playwright-mcp",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\playwright-mcp",
+  "existe": true,
+  "problemas": [],
+  "head": "b8b4183e099f136cbec0388a6088d4aa2f6b9685",
+  "remoto": "https://github.com/microsoft/playwright-mcp.git",
+  "commit_inventario": "b8b4183e099f136cbec0388a6088d4aa2f6b9685",
+  "remoto_inventario": "https://github.com/microsoft/playwright-mcp.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "superpowers",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\superpowers",
+  "existe": true,
+  "problemas": [],
+  "head": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+  "remoto": "https://github.com/obra/superpowers.git",
+  "commit_inventario": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+  "remoto_inventario": "https://github.com/obra/superpowers.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "mattpocock-skills",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\mattpocock-skills",
+  "existe": true,
+  "problemas": [],
+  "head": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+  "remoto": "https://github.com/mattpocock/skills.git",
+  "commit_inventario": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+  "remoto_inventario": "https://github.com/mattpocock/skills.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "ponytail",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ponytail",
+  "existe": true,
+  "problemas": [],
+  "head": "11082c488dee22d6eefd8d072a925dfc975ee12e",
+  "remoto": "https://github.com/DietrichGebert/ponytail.git",
+  "commit_inventario": "11082c488dee22d6eefd8d072a925dfc975ee12e",
+  "remoto_inventario": "https://github.com/DietrichGebert/ponytail.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "agents",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\agents",
+  "existe": true,
+  "problemas": [],
+  "head": "46891e7e60da0e52baf1050b7b6391b64e84c6d9",
+  "remoto": "https://github.com/wshobson/agents.git",
+  "commit_inventario": "46891e7e60da0e52baf1050b7b6391b64e84c6d9",
+  "remoto_inventario": "https://github.com/wshobson/agents.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "Agent-Reach",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\Agent-Reach",
+  "existe": true,
+  "problemas": [],
+  "head": "a19a171fa980a0785849596492e0af4db800c82f",
+  "remoto": "https://github.com/Panniantong/Agent-Reach.git",
+  "commit_inventario": "a19a171fa980a0785849596492e0af4db800c82f",
+  "remoto_inventario": "https://github.com/Panniantong/Agent-Reach.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": true
+ },
+ {
+  "nombre": "last30days-skill",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\last30days-skill",
+  "existe": true,
+  "problemas": [],
+  "head": "0341304f8ecb307ca0a939e48ecd002761ef23b2",
+  "remoto": "https://github.com/mvanhorn/last30days-skill.git",
+  "commit_inventario": "0341304f8ecb307ca0a939e48ecd002761ef23b2",
+  "remoto_inventario": "https://github.com/mvanhorn/last30days-skill.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "gstack",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\gstack",
+  "existe": true,
+  "problemas": [],
+  "head": "20eb6202fa8ea83a882e7c0463b722cd8a31af1e",
+  "remoto": "https://github.com/garrytan/gstack.git",
+  "commit_inventario": "20eb6202fa8ea83a882e7c0463b722cd8a31af1e",
+  "remoto_inventario": "https://github.com/garrytan/gstack.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "ui-ux-pro-max-skill",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ui-ux-pro-max-skill",
+  "existe": true,
+  "problemas": [],
+  "head": "50d8a7de0900119855614541f15a1a616691eb33",
+  "remoto": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+  "commit_inventario": "50d8a7de0900119855614541f15a1a616691eb33",
+  "remoto_inventario": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "taste-skill",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\taste-skill",
+  "existe": true,
+  "problemas": [
+   "sin archivo de licencia inventariado"
+  ],
+  "head": "6dce223f2f5665d3636ca9a44ec3a7aa1322a9b8",
+  "remoto": "https://github.com/senlindesign/taste-skill.git",
+  "commit_inventario": "6dce223f2f5665d3636ca9a44ec3a7aa1322a9b8",
+  "remoto_inventario": "https://github.com/senlindesign/taste-skill.git",
+  "licencias": [],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "impeccable",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\impeccable",
+  "existe": true,
+  "problemas": [],
+  "head": "6af45ac9a5eb8792f033d3242f52e99812fd91fa",
+  "remoto": "https://github.com/pbakaus/impeccable.git",
+  "commit_inventario": "6af45ac9a5eb8792f033d3242f52e99812fd91fa",
+  "remoto_inventario": "https://github.com/pbakaus/impeccable.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "diagram-design",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\diagram-design",
+  "existe": true,
+  "problemas": [],
+  "head": "246d6d71d752245403d2bf28d27f124192584d18",
+  "remoto": "https://github.com/cathrynlavery/diagram-design.git",
+  "commit_inventario": "246d6d71d752245403d2bf28d27f124192584d18",
+  "remoto_inventario": "https://github.com/cathrynlavery/diagram-design.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "skills",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\skills",
+  "existe": true,
+  "problemas": [
+   "licencia skills/docx/LICENSE.txt: desconocida",
+   "licencia skills/pdf/LICENSE.txt: desconocida",
+   "licencia skills/pptx/LICENSE.txt: desconocida",
+   "licencia skills/xlsx/LICENSE.txt: desconocida"
+  ],
+  "head": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+  "remoto": "https://github.com/anthropics/skills.git",
+  "commit_inventario": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+  "remoto_inventario": "https://github.com/anthropics/skills.git",
+  "licencias": [
+   [
+    "skills/academy-guide/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/algorithmic-art/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/brand-guidelines/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/canvas-design/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/claude-api/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/discernment-nudge/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/docx/LICENSE.txt",
+    "desconocida"
+   ],
+   [
+    "skills/frontend-design/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/internal-comms/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/mcp-builder/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/pdf/LICENSE.txt",
+    "desconocida"
+   ],
+   [
+    "skills/pptx/LICENSE.txt",
+    "desconocida"
+   ],
+   [
+    "skills/skill-creator/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/slack-gif-creator/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/theme-factory/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/web-artifacts-builder/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/webapp-testing/LICENSE.txt",
+    "Apache-2.0"
+   ],
+   [
+    "skills/xlsx/LICENSE.txt",
+    "desconocida"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "humanizer",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\humanizer",
+  "existe": true,
+  "problemas": [],
+  "head": "8c307f367c91bd974002f10f2be2965d642c13df",
+  "remoto": "https://github.com/blader/humanizer.git",
+  "commit_inventario": "8c307f367c91bd974002f10f2be2965d642c13df",
+  "remoto_inventario": "https://github.com/blader/humanizer.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "replica-skill",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\replica-skill",
+  "existe": true,
+  "problemas": [],
+  "head": "77c9436fb3d18c3d58169efb8caf4fe906b0dc51",
+  "remoto": "https://github.com/Jakeschincariol/replica-skill.git",
+  "commit_inventario": "77c9436fb3d18c3d58169efb8caf4fe906b0dc51",
+  "remoto_inventario": "https://github.com/Jakeschincariol/replica-skill.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "chrome-devtools-mcp",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\chrome-devtools-mcp",
+  "existe": true,
+  "problemas": [],
+  "head": "8d009e854f8aa55b1ec31628e836d4d4731b8ec8",
+  "remoto": "https://github.com/ChromeDevTools/chrome-devtools-mcp.git",
+  "commit_inventario": "8d009e854f8aa55b1ec31628e836d4d4731b8ec8",
+  "remoto_inventario": "https://github.com/ChromeDevTools/chrome-devtools-mcp.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "graphify",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\graphify",
+  "existe": true,
+  "problemas": [],
+  "head": "f5155badddaa3286c78a51653791131e9e2e4d29",
+  "remoto": "https://github.com/Graphify-Labs/graphify.git",
+  "commit_inventario": "f5155badddaa3286c78a51653791131e9e2e4d29",
+  "remoto_inventario": "https://github.com/Graphify-Labs/graphify.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "Apache-2.0"
+   ],
+   [
+    "LICENSE-MIT",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "andrej-karpathy-skills",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\andrej-karpathy-skills",
+  "existe": true,
+  "problemas": [
+   "sin archivo de licencia inventariado"
+  ],
+  "head": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+  "remoto": "https://github.com/multica-ai/andrej-karpathy-skills.git",
+  "commit_inventario": "2c606141936f1eeef17fa3043a72095b4765b9c2",
+  "remoto_inventario": "https://github.com/multica-ai/andrej-karpathy-skills.git",
+  "licencias": [],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "taste-skill-Leonxlnx",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\taste-skill-Leonxlnx",
+  "existe": true,
+  "problemas": [],
+  "head": "12af471f627f866411b4bd785b19646d3672784c",
+  "remoto": "https://github.com/Leonxlnx/taste-skill.git",
+  "commit_inventario": "12af471f627f866411b4bd785b19646d3672784c",
+  "remoto_inventario": "https://github.com/Leonxlnx/taste-skill.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ },
+ {
+  "nombre": "addyosmani-agent-skills",
+  "path": "C:\\Users\\MIKE\\Desktop\\Repos\\addyosmani-agent-skills",
+  "existe": true,
+  "problemas": [],
+  "head": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+  "remoto": "https://github.com/addyosmani/agent-skills.git",
+  "commit_inventario": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+  "remoto_inventario": "https://github.com/addyosmani/agent-skills.git",
+  "licencias": [
+   [
+    "LICENSE",
+    "MIT"
+   ]
+  ],
+  "cambios_locales": false
+ }
+]

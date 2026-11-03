@@ -297,7 +297,10 @@ def cierres_desde_captura(con: sqlite3.Connection, hora: str, posiciones: list[d
     cierre = vigencia.cierre_de_sesion("XMEX", d)
     if cierre is None or t < pd.Timestamp(cierre):
         return 0
+    from .migraciones import disponibilidad_precio
+
     ahora = datetime.now(UTC).isoformat(timespec="seconds")
+    marcas = disponibilidad_precio(d.isoformat(), PROVEEDOR_CIERRE, "MXN", "cierre", t.isoformat(), ahora)
     filas = []
     for p in posiciones:
         meta = ins.get(p.get("instrumento_id")) or {}
@@ -305,9 +308,10 @@ def cierres_desde_captura(con: sqlite3.Connection, hora: str, posiciones: list[d
         if (px and px > 0 and meta.get("mercado_operable") == "BMV" and (meta.get("moneda_referencia") or "MXN") == "MXN"
                 and not str(meta.get("clase") or "").startswith("fondo")):
             filas.append((p["instrumento_id"], d.isoformat(), float(px), None, None, "MXN", PROVEEDOR_CIERRE, "cierre",
-                          t.isoformat(), ahora))
+                          t.isoformat(), ahora, *marcas, ahora))
     con.executemany("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, "
-                    "proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)", filas)
+                    "proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) "
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", filas)
     return len(filas)
 
 

@@ -76,6 +76,10 @@ a:hover { text-decoration-thickness: 2px; }
 .marca__logo path { fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 .acciones-cabecera { display: flex; gap: 8px; }
 .comandos-cabecera { display: flex; gap: 4px; }
+.comandos-cabecera { position: relative; }
+#paleta-principal { position: absolute; top: 100%; right: 0; z-index: 20; width: min(420px, 85vw); max-height: 360px; overflow: auto; margin: 4px 0; padding: 4px; list-style: none; background: var(--superficie); color: var(--texto); border: 1px solid var(--borde-control); box-shadow: 0 4px 12px #0004; }
+#paleta-principal [role="option"] { padding: 10px; cursor: pointer; overflow-wrap: anywhere; }
+#paleta-principal [aria-selected="true"] { background: var(--superficie-2); border-left: 3px solid var(--acento-grafico); font-weight: bold; }
 .comandos-cabecera input { width: min(24vw, 240px); min-width: 165px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); font: inherit; }
 #btn-detalle-datos { display: none; }
 .ayuda-comandos { max-width: 1280px; margin: 6px auto 0; color: var(--texto-2); font-size: .8rem; }
@@ -476,3 +480,9 @@ tbody tr:hover td { background: var(--superficie-2); }
 .sesion::before { content: "●"; margin-right: 5px; }
 .sesion--abierta { color: var(--positivo); border-color: color-mix(in srgb, var(--positivo) 60%, transparent); }
 .sesion--cerrada::before { color: var(--texto-2); }
+
+/* Seguimiento: instrumentos elegidos para comparar (texto + botón, no solo color) */
+.chips-comparar { display: flex; flex-wrap: wrap; gap: .4rem; margin: .4rem 0 .6rem; }
+.chip-comparar { display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .25rem .15rem .55rem; border: 1px solid var(--borde-control); border-radius: 999px; background: var(--superficie); font-variant-numeric: tabular-nums; }
+.chip-comparar button { border: 0; background: transparent; color: var(--texto); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 .3rem; min-width: 24px; min-height: 24px; }
+.chip-comparar button:hover, .chip-comparar button:focus-visible { color: var(--acento); }

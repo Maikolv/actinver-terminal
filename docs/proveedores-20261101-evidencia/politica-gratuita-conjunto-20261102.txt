@@ -1,0 +1,103 @@
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 25%]
+........................................................................ [ 33%]
+........................................................................ [ 41%]
+..............................FF........................................ [ 50%]
+.......................................F................................ [ 58%]
+............................................F........................... [ 66%]
+........................................................................ [ 75%]
+........................................................................ [ 83%]
+........................................................................ [ 91%]
+........................................................................ [100%]
+================================== FAILURES ===================================
+_ test_respaldo_tres_consultas_sin_alterar_precios_y_cpi_exactamente_interanual _
+
+con = <sqlite3.Connection object at 0x0000021FFFC87E20>
+ajustes = Ajustes(datos={'app': {'solo_proveedores_gratuitos': True, 'modo': 'real', 'host': '127.0.0.1', 'puerto': 8765, 'moned...miento_ajustado': 0.25, 'riesgo': 0.2, 'diversificacion': 0.15, 'liquidez': 0.1, 'costos': 0.1, 'calidad_datos': 0.2}})
+
+    def test_respaldo_tres_consultas_sin_alterar_precios_y_cpi_exactamente_interanual(con, ajustes):
+        consultas = []
+        def responder(r):
+            sid = r.url.params['series_id']
+            consultas.append(sid)
+            valores = {'UNRATE': [('2026-10-01', '4.2')], 'PAYEMS': [('2026-10-01', '159000')],
+                       'CPIAUCSL': [('2026-10-01', '300'), ('2025-10-01', '200'), ('2025-09-01', '.')]}[sid]
+            return httpx.Response(200, json={'observations': [{'date': d, 'value': v} for d, v in valores]})
+        antes = con.execute('SELECT COUNT(*) FROM precios').fetchone()[0]
+        r = verificar(con, env={'FRED_API_KEY': 'ficticia'}, cliente=httpx.Client(transport=httpx.MockTransport(responder)),
+            ahora=AHORA, guardar=True, solo=['fred_macro'], macro_laboral=True)
+        assert consultas == ['UNRATE', 'PAYEMS', 'CPIAUCSL'] and r['solicitudes'] == 3
+        assert r['fuentes']['MACRO-RESPALDO']['observaciones_validas'] == 5
+        series = {f['serie']: f for f in mesa_datos.macro(con, ajustes, AHORA)['series']}
+>       assert series['CPI_YOY']['valor'] == pytest.approx(50)
+E       assert None == 50 � 5.0e-05
+E         
+E         comparison failed
+E         Obtained: None
+E         Expected: 50 � 5.0e-05
+
+tests\test_macro_alternativa.py:37: AssertionError
+_ test_misma_fecha_prefiere_bls_y_no_sustituye_fresca_por_respaldo_antiguo[2026-09-fred_macro] _
+
+con = <sqlite3.Connection object at 0x0000021FFB12F970>
+ajustes = Ajustes(datos={'app': {'solo_proveedores_gratuitos': True, 'modo': 'real', 'host': '127.0.0.1', 'puerto': 8765, 'moned...miento_ajustado': 0.25, 'riesgo': 0.2, 'diversificacion': 0.15, 'liquidez': 0.1, 'costos': 0.1, 'calidad_datos': 0.2}})
+primaria = '2026-09', esperada = 'fred_macro'
+
+    @pytest.mark.parametrize('primaria,esperada', [('2026-09','fred_macro'),('2026-10','bls'),('2026-11','bls')])
+    def test_misma_fecha_prefiere_bls_y_no_sustituye_fresca_por_respaldo_antiguo(con, ajustes, primaria, esperada):
+        guardar(con, 'fred_macro', 'UNRATE', '2026-10-01', 4.2, '%')
+        guardar(con, 'bls', 'LNS14000000', primaria, 4.3, '%')
+        f = next(f for f in mesa_datos.macro(con, ajustes, AHORA)['series'] if f['serie'] == 'LNS14000000')
+>       assert f['fuente'] == esperada
+E       AssertionError: assert 'bls' == 'fred_macro'
+E         
+E         - fred_macro
+E         + bls
+
+tests\test_macro_alternativa.py:51: AssertionError
+__________________ test_mesa_entrega_control_csrf_sin_cache ___________________
+
+    def test_mesa_entrega_control_csrf_sin_cache():
+        with TestClient(modulo.app, base_url="http://127.0.0.1:8765") as c:
+            r = c.get("/static/mesa.html")
+            assert r.status_code == 200
+            assert r.headers["cache-control"] == "no-store"
+>           assert f'content="{TOKEN_CSRF}"' in r.text
+E           assert 'content="UDZeImGQHOEpaz4QwbCRqcPrXOiE6jheukz6qp8MoCw"' in '<!doctype html><html lang="es-MX"><head><meta name="csrf" content="__CSRF__"><meta charset="utf-8"><meta name="viewpo...arget="_blank">Proyecto original</a> � <a href="/?vista=tab-ayuda">Referencias y cr�ditos</a></p></main></body></html>'
+E            +  where '<!doctype html><html lang="es-MX"><head><meta name="csrf" content="__CSRF__"><meta charset="utf-8"><meta name="viewpo...arget="_blank">Proyecto original</a> � <a href="/?vista=tab-ayuda">Referencias y cr�ditos</a></p></main></body></html>' = <Response [200 OK]>.text
+
+tests\test_mesa_seguimiento.py:13: AssertionError
+______ test_api_de_capturas_exige_csrf_y_devuelve_texto_sin_guardar_nada ______
+
+    @hay_ocr
+    def test_api_de_capturas_exige_csrf_y_devuelve_texto_sin_guardar_nada():
+        from fastapi.testclient import TestClient
+    
+        from terminal.app import app
+        from terminal.seguridad import TOKEN_CSRF
+        archivos = [("imagenes", (n, (FIX / n).read_bytes(), "image/png"))
+                    for n in ("portal_tabla_sintetica.png", "portal_resumen_sintetico.png")]
+        with TestClient(app, base_url="http://127.0.0.1:8765") as c:
+            assert c.post("/api/portal/capturas-imagen", files=archivos).status_code == 403
+            r = c.post("/api/portal/capturas-imagen", files=archivos, headers={"X-CSRF-Token": TOKEN_CSRF})
+            assert r.status_code == 200, r.text
+            d = r.json()
+>           assert d["imagenes"] == 2 and d["n_posiciones"] == 3 and "ALPEK A\t5,430" in d["texto"]
+E           assert (1 == 2)
+
+tests\test_ocr_portal.py:63: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\MIKE\Desktop\Repos\actinver-terminal\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_macro_alternativa.py::test_respaldo_tres_consultas_sin_alterar_precios_y_cpi_exactamente_interanual
+FAILED tests/test_macro_alternativa.py::test_misma_fecha_prefiere_bls_y_no_sustituye_fresca_por_respaldo_antiguo[2026-09-fred_macro]
+FAILED tests/test_mesa_seguimiento.py::test_mesa_entrega_control_csrf_sin_cache
+FAILED tests/test_ocr_portal.py::test_api_de_capturas_exige_csrf_y_devuelve_texto_sin_guardar_nada
+4 failed, 860 passed, 1 warning in 2976.71s (0:49:36)

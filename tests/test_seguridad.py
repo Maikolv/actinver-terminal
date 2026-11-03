@@ -103,6 +103,13 @@ def test_env_ignorado_por_git():
     assert len(r.stdout.split()) == 4
 
 
+def test_temporales_office_no_entran_en_el_inventario_versionable():
+    rutas = [f"docs/~$muestra.{ext}" for ext in ("xlsx", "docx", "pptx")]
+    r = subprocess.run(["git", "check-ignore", *rutas], cwd=RAIZ,
+                       capture_output=True, text=True, check=True)
+    assert r.stdout.splitlines() == rutas
+
+
 def test_cambio_de_modo_separa_bases_y_actualiza(cliente, monkeypatch):
     from terminal import config, db, ingesta
     llamadas = []

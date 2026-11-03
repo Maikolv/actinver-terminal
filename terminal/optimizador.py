@@ -37,6 +37,7 @@ from sklearn.pipeline import Pipeline
 
 from . import mercado, reto, vigencia
 from .config import CONFIG_DIR, Ajustes
+from .criterios_propuestas import clasificar as clasificar, costo_unitario as costo_unitario
 
 CLASES_ACCIONES = ("accion", "reit")
 CLASES_MIXTA = ("accion", "reit", "etf", "fibra", "fondo_deuda", "fondo_renta_variable", "fondo_multiactivo")
@@ -125,26 +126,6 @@ def _moneda_exposicion(ins: dict, fondos: dict) -> str:
         e = fondos[ins["id"]]["exposicion_divisa"]
         return "USD" if e.startswith(("USD", "EUR", "Global")) else "MXN"
     return ins.get("moneda_referencia") or "MXN"
-
-
-def _clase_costo(ins: dict) -> str:
-    if ins["clase"].startswith("fondo"):
-        return "fondo"
-    if ins["clase"] in ("accion", "reit"):
-        return "accion_sic" if ins["mercado_operable"] == "BMV-SIC" else "accion_bmv"
-    return ins["clase"] if ins["clase"] in ("etf", "fibra") else "accion_bmv"
-
-
-def costo_unitario(ins: dict, ajustes: Ajustes) -> float:
-    """Costo de operar un peso: comisión con IVA + spread estimado. Con el Reto activo, la comisión es la del
-    simulador (0.10 % + IVA sobre toda orden, reglamento §8)."""
-    c = ajustes["costos"]
-    spread = c["spread_pct"].get(_clase_costo(ins), 0.003)
-    if reto.activo() and reto.costo_operacion() is not None:
-        return reto.costo_operacion() + spread
-    if ins["clase"].startswith("fondo"):
-        return 0.0  # compra/venta de fondos sin comisión explícita; el costo va implícito en el NAV
-    return c["comision_pct"] * (1 + c["iva"]) + spread
 
 
 def universo(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
@@ -948,23 +929,6 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "aviso": "Estimación informativa basada en datos históricos. No es una recomendación personalizada ni una promesa "
                  "de rendimiento. La terminal no envía órdenes.",
     }
-
-
-def clasificar(propuestas: list[dict], cartera_actual: dict) -> list[dict]:
-    """Ordena las alternativas por puntuación total. Se presenta como resultado de criterios, no como certeza."""
-    filas = []
-    for p in propuestas:
-        clave = p.get("clave", p["tipo"])
-        if p.get("estado") in ("calculada", "demostracion"):
-            filas.append({"alternativa": p["nombre"], "tipo": p["tipo"], "clave": clave, "puntuacion": p["puntuacion"]["total"],
-                          "estado": p["estado"]})
-        else:
-            filas.append({"alternativa": p["nombre"], "tipo": p["tipo"], "clave": clave, "puntuacion": None,
-                          "estado": p.get("estado"), "motivo": "; ".join(p.get("motivos", []))})
-    filas.sort(key=lambda f: -(f["puntuacion"] if f["puntuacion"] is not None else -1))
-    for i, f in enumerate(filas, 1):
-        f["posicion"] = i if f["puntuacion"] is not None else None
-    return filas
 
 
 def dias_desde(fecha: str | None) -> int | None:

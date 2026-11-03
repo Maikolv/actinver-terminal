@@ -85,8 +85,14 @@ def test_seguimiento_y_comparacion(con, ajustes):
     c = seguimiento.comparar(con, ajustes, ["SIC:MU", "SIC:NVDA"], 200)
     ref = next(m for m in c["metricas"] if m["es_referencia"])
     assert ref["beta"] == 1.0 and len(c["correlacion"]["matriz"]) == 3 and c["correlacion"]["matriz"][0][0] == pytest.approx(1)
-    with pytest.raises(ValueError, match="al menos 2"):
-        seguimiento.comparar(con, ajustes, ["SIC:MU"])
+    uno = seguimiento.comparar(con, ajustes, ["SIC:MU"], 200)   # uno basta: siempre se compara contra la referencia
+    assert [m["id"] for m in uno["metricas"]] == ["SIC:MU", "BMV:NAFTRAC"] and uno["omitidos"] == []
+    con_omitido = seguimiento.comparar(con, ajustes, ["SIC:MU", "SIC:AMD", "SIC:NVDA"], 200)   # AMD sin precios sembrados
+    assert [o["id"] for o in con_omitido["omitidos"]] == ["SIC:AMD"] and len(con_omitido["metricas"]) == 3
+    with pytest.raises(ValueError, match="al menos 1"):
+        seguimiento.comparar(con, ajustes, [])
+    with pytest.raises(ValueError, match="historia común insuficiente"):
+        seguimiento.comparar(con, ajustes, ["SIC:AMD"])
     seguimiento.quitar(con, "SIC:MU")
     assert seguimiento.lista(con, ajustes)["instrumentos"] == []
 
@@ -100,6 +106,6 @@ def test_api_etapa3():
         assert set(c.get("/api/backtests").json()["estrategias"]) >= {"comprar_y_mantener", "momento"}
         assert c.get("/api/backtests/999999").status_code == 404
         assert c.get("/api/riesgo").status_code == 200
-        assert c.get("/api/comparar", params={"ids": "SIC:MU"}).status_code == 422
+        assert c.get("/api/comparar", params={"ids": ""}).status_code == 422
         assert c.post("/api/lista-seguimiento", json={"id": "NADA"}, headers={"X-CSRF-Token": TOKEN_CSRF}).status_code == 422
         assert c.get("/api/ficha/NADA").status_code == 404

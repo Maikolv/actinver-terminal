@@ -1,0 +1,67 @@
+[
+  {
+    "tipo": "mapa",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "−8%\n−5%\n−2%\n0%\n2%\n5%\n8%\nE"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "consulta_publica_scan_permitida": true,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:20:51.667Z"
+  },
+  {
+    "tipo": "filtro",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Resumen\nGeneral\nFiltros"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "scanner.tradingview.com",
+        "motivo": "método excluido"
+      },
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "consulta_publica_scan_permitida": true,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:21:11.638Z"
+  },
+  {
+    "tipo": "destacados",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Activas\nGanadoras\nPerdedoras\nMás\n\t\n\t\n\t\n\t\n1D\n1M\n3M\n1A\n5A\nTodos\nINTC\nD\nIntel Corporation\n65,76\n−28,58%\n−26,31\nNVDA\nD\nNVIDIA Corporation\n204,64\n−4,22%\n−9,02\nSPCX\nD\nSpace Exploration Technologies Corp\n134,72\n−6,37%\n−9,17\nAMZN\nD\nAmazon.com, Inc.\n240,35\n−1,41%\n−3,44\nNOK\nD\nNokia Oyj Sponsored ADR\n8,56\n−8,06%\n−0,75"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "consulta_publica_scan_permitida": true,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:21:23.065Z"
+  },
+  {
+    "tipo": "mapa-etf",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "−8%\n−5%\n−2%\n0%\n2%\n5%\n8%\nE"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "consulta_publica_scan_permitida": true,
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:21:31.487Z"
+  }
+]

@@ -1,0 +1,235 @@
+[
+  {
+    "tipo": "mapa",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": ""
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "scanner.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:17:07.176Z"
+  },
+  {
+    "tipo": "calendario",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "2 de noviembre\nEE. UU.\nISM Manufacturing PMI\n54,6\nIndex\n54,5\nIndex\n3 de noviembre\nEE. UU.\nJOLTS Job Openings\n7,125 M\nPerson\n7,079 M\nPerson\n4 de noviembre\nEE. UU.\nADP National Employment\n65 K\nPerson\n90 K\nPerson\nEE. UU.\nS&P Global Comp PMI Final\n58,4\nIndex (diffusion)\nEE. UU.\nISM N-Mfg PMI\n54,8\nIndex\n54,9\nIndex\n5 de noviembre\nEE. UU.\nInitial Jobless Clm *\n195 K\nPerson\n194 K\nPerson\nMéxico\nInterest Rate\n6,5\n%\n6 de noviembre\nEE. UU.\nNon-Farm Payrolls\n65 K\nPerson\n29 K\nPerson\nUnemployment Rate\n4,2\n%\n4,2\n%\n9 de noviembre\nMéxico\nCore Inflation*\n0,2\n%\n10 de noviembre\nEE. UU.\nCore CPI MM, SA\n0,3\n%\nCore CPI YY, NSA\n2,6\n%\nCPI MM, SA\n0,6\n%\nCPI YY, NSA\n3,7\n%\n12 de noviembre\nEE. UU.\nInitial Jobless Clm *\nEE. UU.\nExisting Home Sales\n3,99 M\nNumber of\n17 de noviembre\nEE. UU.\nRetail Sales MM\n0,8\n%\n18 de noviembre\nEE. UU.\nBuilding Permits: Number\n1,4 M\nNumber of\n19 de noviembre\nEE. UU.\nInitial Jobless Clm *\n23 de noviembre\nMéxico\nGDP QQ Final\n1,4\n%\nGDP YY Final\n2,1\n%\nEE. UU.\nS&P Global Comp PMI Flash\n57,6\nIndex (diffusion)\n27 de noviembre\nEE. UU.\nInitial Jobless Clm *\n1 de diciembre\nEE. UU.\nISM Manufacturing PMI\nJOLTS Job Openings\nMás eventos"
+      }
+    ],
+    "errores": [
+      "Failed to execute 'request' on 'LockManager': Access to the Locks API is denied in this context.",
+      "Failed to execute 'request' on 'LockManager': Access to the Locks API is denied in this context.",
+      "Failed to read the 'cookie' property from 'Document': The document is sandboxed and lacks the 'allow-same-origin' flag."
+    ],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:17:15.832Z"
+  },
+  {
+    "tipo": "noticias",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Top Stories\nINTC: Intel Stock Plunges 24% as Weak Outlook Overshadows Strong Earnings Growth\nGOOGL: Alphabet Stock Drops 10% as Wall Street Searches for Better Earnings\nMSFT: Microsoft Stock Rises 5% as Azure Growth Beats Forecasts, Spending Undershoots\nSK Hynix Stock Jumps 10% on $75 Billion Payout Plan, Massive Profit Increase\nAnthropic Files for IPO: Sales Surge, Costs Mount and Spending Plans Top $500 Billion\nMETA: Meta Shares Fall 1.9% as AI Push Drives $95 Billion Stock Offering\nMicrosoft, Alphabet Set to Report Q3 Earnings. Who’s Spending More on AI Buildout?\nOct 21\nTSLA: Tesla Stock Falls 3% as Spending Cuts, Shrinking Profits Cloud Earnings Beat\nOct 21\nMETA: Meta Stock Rises 4% on Big Revenue Beat. New Share Class Will Help Fund AI\nOct 20\nSPCX: SpaceX Stock Soars 10% as Revenue Explodes, Musk Confirms Merger Talks\nOct 20\nNFLX: Netflix Stock Drops 6% as Weak Outlook Eclipses Profit Jump\nOct 19\nMETA: Meta Stock Drops Ahead of Key Earnings. What Traders Will Be Watching.\nOct 19\nSPCX: SpaceX Stock Pops as Traders Look to Earnings with Big Move Expected\nOct 18\nTSLA: Tesla Reports Earnings with Shares Down 21% on Year (and a Failed Roadster Pump)\nOct 16\nRKLB: Rocket Lab Falls 7% to December Lows as Neutron Debut Slips to 2027\nKeep reading"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:17:24.386Z"
+  },
+  {
+    "tipo": "filtro",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Resumen\nGeneral\nFiltros"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "scanner.tradingview.com",
+        "motivo": "método excluido"
+      },
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:17:37.918Z"
+  },
+  {
+    "tipo": "resumen",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Índices\nDivisas\nMaterias primas\nMás\n\t\n\t\n\t\n\t\n1D\n1M\n3M\n1A\n5A\nTodos\nSPXUSD\nS&P 500\n7.614,5\n+0,41%\n+31,10\nNSXUSD\nNasdaq 100\n28.627,5\n+0,77%\n+219,60\nDJI\nDow Jones\n51.925,9\n+0,26%\n+134,00"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:17:48.317Z"
+  },
+  {
+    "tipo": "cotizaciones",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Nombre\nValor\nCambio\nCambio%\nApertura\nMáximo\nMínimo\nAnterior\nÍNDICES\nS&P 500\n7.614,0\n30,60\n0,40%\n7.583,6\n7.625,5\n7.583,6\n7.583,5\nNasdaq 100\n28.625,2\n217,30\n0,76%\n28.408,4\n28.698,4\n28.408,4\n28.407,9\nDow Jones\n51.923,9\n132,00\n0,25%\n51.791,4\n52.021,4\n51.791,4\n51.791,9\nNikkei 225\n63.290,11\nE\n−1.369,36\n−2,12%\n64.344,37\n64.589,04\n62.711,42\n64.659,47\nDAX\n25.818,21\nE\n−221,47\n−0,85%\n25.948,61\n26.026,20\n25.779,15\n26.039,68\nDIVISAS\nDólar / peso\n18,76290\n0,02\n0,10%\n18,77400\n18,80250\n18,76290\n18,74350\nEuro / peso\n20,9912\n−0,03\n−0,12%\n21,0164\n21,0398\n20,9628\n21,0164\nEuro / dólar\n1,11875\n0,00\n0,27%\n1,11574\n1,11893\n1,11503\n1,11574\nBONOS DE EE. UU. (ETF, PRECIO)\nSHY · Tesoro 1–3 años\n81,70\nD\n0,12\n0,15%\n81,68\n81,74\n81,64\n81,58\nIEF · Tesoro 7–10 años\n91,76\nD\n0,51\n0,56%\n91,61\n91,78\n91,42\n91,25\nTLT · Tesoro 20+ años\n81,84\nD\n0,35\n0,43%\n81,86\n82,03\n81,38\n81,49\nMATERIAS PRIMAS\nOro\n3.907,140\n31,95\n0,82%\n3.874,300\n3.919,300\n3.874,300\n3.875,190\nPetróleo WTI\n100,75\n−2,19\n−2,13%\n102,39\n102,75\n100,15\n102,94\nPlata\n50,3520\n1,25\n2,54%\n49,1070\n50,5180\n49,1070\n49,1070"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:18:01.976Z"
+  },
+  {
+    "tipo": "destacados",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Activas\nGanadoras\nPerdedoras\nMás\n\t\n\t\n\t\n\t\n1D\n1M\n3M\n1A\n5A\nTodos\nINTC\nD\nIntel Corporation\n65,76\n−28,58%\n−26,31\nNVDA\nD\nNVIDIA Corporation\n204,64\n−4,22%\n−9,02\nSPCX\nD\nSpace Exploration Technologies Corp\n134,72\n−6,37%\n−9,17\nAMZN\nD\nAmazon.com, Inc.\n240,35\n−1,41%\n−3,44\nNOK\nD\nNokia Oyj Sponsored ADR\n8,56\n−8,06%\n−0,75"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:18:22.715Z"
+  },
+  {
+    "tipo": "mapa-etf",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": ""
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "scanner.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:18:35.375Z"
+  },
+  {
+    "tipo": "divisas",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "\t\nUSD\t\nMXN\t\nEUR\t\nJPY\t\nGBP\t\nCAD\t\nCNY\n\nUSD\t\t\n18,75900\n\t\n0,8936\n\t\n157,849\n\t\n0,74605\n\t\n1,39843\n\t\n6,6454\n\n\nMXN\t\n0,05324\n\t\t\n0,04723\n\t\n8,390\n\t\n0,03956\n\t\n0,07413\n\t\n0,353817\n\n\nEUR\t\n1,11875\n\t\n20,9916\n\t\t\n176,600\n\t\n0,83467\n\t\n1,56435\n\t\n7,4396\n\n\nJPY\t\n0,006333\n\t\n0,11886\n\t\n0,0056632\n\t\t\n0,004723\n\t\n0,008856\n\t\n0,04210\n\n\nGBP\t\n1,3403\n\t\n25,1473\n\t\n1,1976\n\t\n211,566\n\t\t\n1,87422\n\t\n8,9135\n\n\nCAD\t\n0,7147\n\t\n13,4173\n\t\n0,6389\n\t\n112,880\n\t\n0,5332\n\t\t\n4,7552\n\n\nCNY\t\n0,1503\n\t\n2,8206646\n\t\n0,13436\n\t\n23,710\n\t\n0,11214\n\t\n0,2099\n\t"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:18:45.983Z"
+  },
+  {
+    "tipo": "info",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "NVIDIA CORPORATION\nNVDA\nNVDANasdaq Stock Market\n`\n204,64\nD\nUSD\n−9,02\n(−4,22%)\nAL CIERRE (A PARTIR DEL 30 OCT, 17:59 GMT-6)\n17 de noviembre\nPRÓXIMOS BENEFICIOS\n7,95\nBPA\n4,93 T\nCAP. DE MERCADO\n0,49%\nREND. POR DIVIDENDOS\n27,01\nP/B"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:18:56.341Z"
+  },
+  {
+    "tipo": "perfil",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Perfil de NVDA\nSector: Tecnología electrónica\nIndustria: Semiconductores\nEmpleados (FY): ‪42 K‬\nNVIDIA Corp se dedica al diseño y la fabricación de procesadores gráficos para ordenadores, chipsets y software multimedia relacionado. Opera a través de los siguientes segmentos: Unidades de procesamiento gráfico (GPU), Procesadores Tegra y Todos los demás. El segmento de Unidades de procesamiento gráfico (GPU) comprende marcas de productos que se dirigen a mercados especializados, como GeForce para jugadores, Quadro para diseñadores, Tesla y DGX para científicos de datos de IA e investigadores de big data, además de GRID para usuarios de computación visual en la nube. El segmento de procesadores Tegra integra todo un ordenador en un solo chip e incorpora las GPU y CPU multinúcleos para impulsar la supercomputación de robots autónomos, drones y automóviles, así como para consolas y dispositivos móviles de juego y entretenimiento. El segmento de Todos los demás hace referencia a los gastos de la compensación basada en acciones, los costes de infraestructura y soporte corporativo, los costes relacionados con adquisiciones y acuerdos legales, además de otros cargos no recurrentes. Jen Hsun Huang, Chris A. Malachowsky y Curtis R. Priem fundaron la empresa en enero de 1993 y tiene su sede en Santa Clara, California."
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:19:17.589Z"
+  },
+  {
+    "tipo": "finanzas",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Información financiera de NVDA\nFinal del ejercicio fiscal\n2026-01-31\nÚltimo período fiscal\n2026-Q2\nÚltima fecha de cierre del ejercicio\n2026-07-31\nValoración\nCapitalización de mercado\n‪4,93 T‬\nValor de empresa\n‪4,87 T‬\nValor de empresa/EBITDA (TTM)\n24,20\nRatio precio/beneficio\n27,01\nRatio precio/ventas\n17,13\nRatio precio/valor contable\n22,53\nRatio precio/flujo de caja\n38,62\nRatio precio/flujo libre de caja\n40,85\nCuenta de resultados\nIngresos totales (TTM)\n‪302,97 B‬\nIngresos por acción (TTM)\n12,48\nBeneficio bruto (TTM)\n‪226,24 B‬\nIngresos de explotación (TTM)\n‪197,58 B‬\nIngresos netos (TTM)\n‪192,88 B‬\nBPA diluido (TTM)\n7,91\nBPA diluido (FQ)\n2,46\nTotal acciones circulantes\n‪24,10 B‬\nFlotación de acciones\n‪23,19 B‬\nBalance de situación\nActivos totales (FQ)\n‪320,27 B‬\nTotal pasivo (FQ)\n‪91,29 B‬\nTotal fondos propios (FQ)\n‪228,98 B‬\nDeuda total (FQ)\n‪38,86 B‬\nValor contable por acción (FQ)\n9,48\nRatio actual (FQ)\n4,59\nRatio deuda/fondos propios (FQ)\n0,17\nRotación de activos (FQ)\n1,31\nFlujo de efectivo\nFlujo de caja operativo (TTM)\n‪134,36 B‬\nFlujo de efectivo por inversión (TTM)\n‪−75,01 B‬\nFlujo de efectivo por financiación (TTM)\n‪−48,55 B‬\nFlujo de efectivo libre (TTM)\n‪127,01 B‬\nCapEx (TTM)\n‪−7,35 B‬\nRentabilidad\nMargen bruto (TTM)\n74,67%\nMargen de explotación (TTM)\n65,21%\nMargen antes de impuestos (TTM)\n75,83%\nMargen neto (TTM)\n63,66%\nEficiencia\nRendimiento de los activos (TTM)\n83,68%\nRentabilidad de los fondos propios (TTM)\n117,21%\nRendimiento del capital invertido (TTM)\n102,39%\nIngresos por empleado (FY)\n‪5,14 M‬\nIngresos netos por empleado (FY)\n‪2,86 M‬\nHistórico de precios\nVolumen medio (10 días)\n‪98,56 M‬\nBeta a 1 año\n1,75\nMáx. últimas 52 sem.\n243,37\nMín. últimas 52 sem.\n164,27\nObjetivo respecto al precio a 1 año\n334,45\nDividendos\nRendimiento del dividendo indicado\n0"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:19:27.996Z"
+  },
+  {
+    "tipo": "tecnico",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "Análisis técnico de NVDA\n1 minuto\n5 minutos\n15 minutos\n30 minutos\n1 hora\n2 horas\n4 horas\n1 día\n1 semana\n1 mes\nMás\nVenta\nVenta\n15\nNeutral\n10\nCompra\n1"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:19:40.142Z"
+  },
+  {
+    "tipo": "noticias-emisora",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "NVDATop Stories\nOct 6\nNVDA: Nvidia Nears $6 Trillion as Record Close Signals Renewed Confidence in AI Demand\nSep 3\nNVDA: Nvidia Buys Hugging Face for $13B in Open-Source Power Grab. It’s a Slam Dunk for Durant\nAug 26\nNVDA: Nvidia Stock Jumps 5% as Traders Cheer Record Revenue, Rare Bold Guidance\nAug 23\nNVDA: Nvidia Earnings Put $5.2T Valuation in Waiting Mode. What Traders Need to See\nAug 11\nNVDA: Nvidia Taps Wall Street Giants for $500 Billion AI Buildout. Bank of Jensen Opens.\nJul 27\nNVDA: Nvidia Stock Pops 1% on $250 Billion OpenAI Financing in the Works\nJun 1\nNVDA: Nvidia Stock Gains After Huang Updates — First Real PC Revolution in 40 Years?\nMay 21\nNVDA: Nvidia Stock Tumbles Despite Double Beat. Here Are the Numbers to Know\nMay 18\nNVDA: Nvidia Stock Steady Ahead of Big Earnings Day — Here’s What to Watch\nApr 17\nNVDA: Nvidia Stock Snaps Longest Bullish Run Since 1999. What’s Next?\nMar 16\nNVDA: Nvidia Stock Off 5% This Year. Can the GTC Event Turn It Around?\nFeb 26\nNVDA: Nvidia Stock Steady Despite Record Revenue, 94% Profit Jump\nFeb 24\nNVDA: Nvidia Stock Gains Ahead of Earnings Release. What Traders Are Watching\nNov 26, 2025\nNVDA: Nvidia Drops 2.4% on Report Google Plans to Sell AI Chips to Meta. Now What?\nNov 20, 2025\nNVDA: Nvidia Stock Soars 6% After Record Sales, Profit Jumps to $32 Billion\nKeep reading"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [
+      {
+        "host": "snowplow-pixel.tradingview.com",
+        "motivo": "método excluido"
+      }
+    ],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:19:50.070Z"
+  },
+  {
+    "tipo": "grafica",
+    "contenido": [
+      {
+        "host": "www.tradingview-widget.com",
+        "texto": "1m\n30m\n1h\nD\nIndicadores\nN\nNVIDIA Corporation\n1D\nCboe One\nO\n208,94\nH\n209,06\nL\n200,92\nC\n204,64\n−9,02 (−4,22%)"
+      }
+    ],
+    "errores": [],
+    "bloqueos": [],
+    "vigencia": "NO VERIFICADA",
+    "observado_en": "2026-11-02T07:20:01.524Z"
+  }
+]

@@ -1,0 +1,152 @@
+[
+  {
+    "tipo": "mapa",
+    "archivo": "mapa.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "1035",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "calendario",
+    "archivo": "calendario.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "889",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "noticias",
+    "archivo": "noticias.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "905",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "filtro",
+    "archivo": "filtro.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "946",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "resumen",
+    "archivo": "resumen.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "1313",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "cotizaciones",
+    "archivo": "cotizaciones.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "1841",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "destacados",
+    "archivo": "destacados.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "918",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "mapa-etf",
+    "archivo": "mapa-etf.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "1024",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "divisas",
+    "archivo": "divisas.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "912",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "info",
+    "archivo": "info.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "866",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "perfil",
+    "archivo": "perfil.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "869",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "finanzas",
+    "archivo": "finanzas.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "865",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "tecnico",
+    "archivo": "tecnico.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "942",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "noticias-emisora",
+    "archivo": "noticias-emisora.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "911",
+      "content-type": "text/html; charset=utf-8"
+    }
+  },
+  {
+    "tipo": "grafica",
+    "archivo": "grafica.html",
+    "headers": {
+      "content-security-policy": "default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'",
+      "x-frame-options": "SAMEORIGIN",
+      "content-length": "1194",
+      "content-type": "text/html; charset=utf-8"
+    }
+  }
+]

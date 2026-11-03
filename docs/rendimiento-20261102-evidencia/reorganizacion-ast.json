@@ -1,0 +1,67 @@
+{
+  "alcance": "Compara AST excluyendo importaciones, alias explícitos de funciones trasladadas y la inclusión del nuevo archivo en la huella de caché. No verifica efectos de importación ni sustituye pruebas de ejecución.",
+  "modulos": {
+    "terminal/servicios.py": {
+      "ast_original_normalizado": "f9e380b3299ec48512a884f470895b24022f1d0446cc084c1b26732df9500a91",
+      "ast_actual_normalizado": "f9e380b3299ec48512a884f470895b24022f1d0446cc084c1b26732df9500a91",
+      "coinciden": true
+    },
+    "terminal/optimizador.py": {
+      "ast_original_normalizado": "8c89e1e6cf54a73b21a5aa671a70deed62df4b282ba1bdb226a57e92c6a21862",
+      "ast_actual_normalizado": "8c89e1e6cf54a73b21a5aa671a70deed62df4b282ba1bdb226a57e92c6a21862",
+      "coinciden": true
+    },
+    "terminal/espacios.py": {
+      "ast_original_normalizado": "837b95682dfc16ab683e5cc248c4775ef5db3c17cf9e6bd64d2f12533b54f3b7",
+      "ast_actual_normalizado": "837b95682dfc16ab683e5cc248c4775ef5db3c17cf9e6bd64d2f12533b54f3b7",
+      "coinciden": true
+    },
+    "terminal/investigacion/evaluacion.py": {
+      "ast_original_normalizado": "0a7aa4d9b232b6f6cf8cda8faa882577a64d55087f3aba3fed4cdf508bca6362",
+      "ast_actual_normalizado": "0a7aa4d9b232b6f6cf8cda8faa882577a64d55087f3aba3fed4cdf508bca6362",
+      "coinciden": true
+    },
+    "terminal/investigacion/pronosticos.py": {
+      "ast_original_normalizado": "643116d73f8e1cb04023eacdad335cdbf69e7f1b23dd1aa7a9e7b7f1d87ca6c1",
+      "ast_actual_normalizado": "643116d73f8e1cb04023eacdad335cdbf69e7f1b23dd1aa7a9e7b7f1d87ca6c1",
+      "coinciden": true
+    },
+    "terminal/investigacion/reto_pronostico.py": {
+      "ast_original_normalizado": "485d85016f5375ea6dabf4d28c3677467c4e95275feea3059e863d416bf7c401",
+      "ast_actual_normalizado": "485d85016f5375ea6dabf4d28c3677467c4e95275feea3059e863d416bf7c401",
+      "coinciden": true
+    },
+    "terminal/robustez/informe.py": {
+      "ast_original_normalizado": "2321bfbbdd3a7e73ff63c337be076a4c6dff8b2f552dcf4f539eff704941aa5e",
+      "ast_actual_normalizado": "2321bfbbdd3a7e73ff63c337be076a4c6dff8b2f552dcf4f539eff704941aa5e",
+      "coinciden": true
+    },
+    "terminal/robustez/calculo.py": {
+      "ast_original_normalizado": "4bf196e96fead317061b5bdfa7eb4dbe0df4e61ea0e660b44cf766c79472686e",
+      "ast_actual_normalizado": "4bf196e96fead317061b5bdfa7eb4dbe0df4e61ea0e660b44cf766c79472686e",
+      "coinciden": true
+    },
+    "terminal/criterios_propuestas.py": {
+      "funciones_originales": {
+        "_clase_costo": "cec63ea9f8c79b9a317d201f82ad2d4e8eca47c42203024ab886e4fac28d9af6",
+        "costo_unitario": "f3abc5223450dc2a84b1e94233f870676e0ddf8aef07bd391eca4a8367d3d820",
+        "clasificar": "94ffcf8f0ca05021fe178f2569c22eed74295bcccce08a81138358e54570c08a"
+      },
+      "funciones_actuales": {
+        "_clase_costo": "cec63ea9f8c79b9a317d201f82ad2d4e8eca47c42203024ab886e4fac28d9af6",
+        "costo_unitario": "f3abc5223450dc2a84b1e94233f870676e0ddf8aef07bd391eca4a8367d3d820",
+        "clasificar": "94ffcf8f0ca05021fe178f2569c22eed74295bcccce08a81138358e54570c08a"
+      },
+      "coinciden": true
+    },
+    "terminal/investigacion/lecturas.py": {
+      "funciones_originales": {
+        "ultimo": "daee23b157cbd692e5c3b09f656e66830a84871160ccbdf5587a8e309caf7cc4"
+      },
+      "funciones_actuales": {
+        "ultimo": "daee23b157cbd692e5c3b09f656e66830a84871160ccbdf5587a8e309caf7cc4"
+      },
+      "coinciden": true
+    }
+  }
+}

@@ -94,7 +94,10 @@ def importar(con: sqlite3.Connection, contenido: bytes, origen: str, confirmar: 
            "precios": [{"id": i, "precio": p} for i, p in asignados]}
     if not confirmar or not asignados:
         return rep
+    from .migraciones import disponibilidad_precio
+
     ts = ahora()
+    marcas = disponibilidad_precio(hoja["fecha_valuacion"], PROVEEDOR, "MXN", "nav", None, ts)
     with transaccion(con):
         for iid, precio in asignados:
             previo = con.execute("SELECT cierre FROM precios WHERE instrumento_id=? AND fecha=? AND proveedor=?",
@@ -103,8 +106,9 @@ def importar(con: sqlite3.Connection, contenido: bytes, origen: str, confirmar: 
                 auditar(con, "precio", iid, "correccion_fuente", antes={"precio": previo["cierre"]},
                         despues={"precio": precio, "sha256": sha})
             con.execute("INSERT OR REPLACE INTO precios (instrumento_id, fecha, cierre, cierre_ajustado, volumen, moneda, "
-                        "proveedor, tipo_dato, hora_cotizacion, obtenido_en) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                        (iid, hoja["fecha_valuacion"], precio, precio, None, "MXN", PROVEEDOR, "nav", None, ts))
+                        "proveedor, tipo_dato, hora_cotizacion, obtenido_en, event_time, available_at, ingested_at) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (iid, hoja["fecha_valuacion"], precio, precio, None, "MXN", PROVEEDOR, "nav", None, ts, *marcas, ts))
             from .ingesta import registrar_cobertura
             ins = fondos[iid]
             registrar_cobertura(con, PROVEEDOR, iid, f"{ins['clave']} {ins.get('serie') or 'B'}",
@@ -147,13 +151,26 @@ def actualizar(con: sqlite3.Connection, ajustes, cliente: httpx.Client | None = 
     intento = con.execute("SELECT MAX(inicio) FROM ingestas WHERE proveedor=?", (PROVEEDOR,)).fetchone()[0]
     if intento and ahora_dt - datetime.fromisoformat(intento) < timedelta(hours=REINTENTO_HORAS):
         return {"estado": "en_espera", "fecha_valuacion": ultima}
+    from .adaptadores.base import Adaptador, LimiteAlcanzado
+
+    pausa = Adaptador(con, cfg)
+    pausa.proveedor = PROVEEDOR
+    try:
+        pausa._comprobar_pausa()
+    except LimiteAlcanzado:
+        return {"estado": "en_espera", "fecha_valuacion": ultima}
     cli = cliente or httpx.Client(timeout=60, follow_redirects=True,
                                   headers={"User-Agent": "actinver-terminal/uso-personal (lectura de la hoja publica)"})
     try:
         r = cli.get(URL)
+        if r.status_code in (429, 503) and "Retry-After" in r.headers:
+            pausa._registrar_pausa(r.headers["Retry-After"])
         if r.status_code != 200:
             raise ErrorHoja(f"HTTP {r.status_code}")
         rep = importar(con, r.content, URL)
         return {"estado": "ok", **{k: rep[k] for k in ("fecha_valuacion", "asignados", "sin_serie_en_documento")}}
     except (httpx.HTTPError, ErrorHoja) as e:
         return {"estado": "error", "mensaje": str(e)[:200]}
+    finally:
+        if cliente is None:
+            cli.close()

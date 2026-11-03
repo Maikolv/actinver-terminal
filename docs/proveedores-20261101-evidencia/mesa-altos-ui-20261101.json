@@ -1,0 +1,17 @@
+{
+  "proveedores": "simulados; solo interfaz",
+  "resultados": [
+    {
+      "ancho": 390,
+      "alto_restaurado": 1999,
+      "cierre_destruye_marco": true,
+      "errores": []
+    },
+    {
+      "ancho": 1440,
+      "alto_restaurado": 1999,
+      "cierre_destruye_marco": true,
+      "errores": []
+    }
+  ]
+}

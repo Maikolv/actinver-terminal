@@ -1,0 +1,851 @@
+{
+  "fecha": "2026-11-02T21:47:15.418Z",
+  "fase": "antes-controlado",
+  "node": "v24.19.0",
+  "cpu": "AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx  ",
+  "ram_bytes": 6323187712,
+  "procesadores_logicos": 8,
+  "cache": "Proceso y contexto nuevos; caché de disco Windows sin purgar.",
+  "fuentes": "Copia SQLite local; motor/env/configuración personal y red externa desactivados; no prueba proveedores.",
+  "dataset_sha256": "0469a0ef07b9f0201cadec8fd3e0b7fb8832b7c6b31e9128b1ef875e1236b49b",
+  "dataset_bytes": 248385536,
+  "archivos": {
+    "terminal/app.py": "bca60a15a885e5b27e3f583fcd4cf9e1aa2652fd8f563659ee79685788d584c2",
+    "terminal/servicios.py": "bc15d527f4663de3ed536973813e8eaa7da182153b60be3365de9441e66f6121",
+    "terminal/optimizador.py": "5ee30d7f69ab7d4d5c0a75052847c46217530e3470a4f21aa96aba3780034638",
+    "web/static/mesa.mjs": "d1b2cd9dd2c71c673e7bdf516aac080c21fd7a7b20f51bbac8765d7b2da06163",
+    "config/ajustes.ejemplo.toml": "feb13daa612445193c1f255fd21395fcee245c024a61e7862183fe13804b71eb"
+  },
+  "repeticiones": [
+    {
+      "numero": 1,
+      "arranque_http_ms": 12798.8609,
+      "sondeos_arranque": 61,
+      "primer_panel_local_ms": 1327.5198999999993,
+      "navegacion_tibia_ms": 223.55519999999888,
+      "estado_frio_navegacion_ms": 1600.054,
+      "api": {
+        "estado": [
+          54.42610000000059,
+          32.19759999999951,
+          28.66729999999734,
+          27.363099999998667,
+          24.760200000000623,
+          32.668100000002596,
+          31.587100000000646,
+          26.183199999999488,
+          32.0067999999992,
+          30.244399999999587,
+          30.14129999999932,
+          26.755099999998492,
+          29.84639999999854,
+          30.275300000001153,
+          42.171699999998964
+        ],
+        "universo": [
+          211.86949999999706,
+          199.03549999999814,
+          196.3882999999987,
+          222.70230000000083,
+          204.82730000000083,
+          213.87799999999697,
+          194.9415999999983,
+          216.03359999999884,
+          225.22629999999845,
+          216.42759999999907,
+          204.91229999999996,
+          207.34900000000198,
+          206.71440000000075,
+          206.1826000000001,
+          198.58120000000054
+        ]
+      },
+      "vistas_diferidas": {
+        "pasado": {
+          "primera_consulta_ms": 757.0082999999868,
+          "memoria": [
+            {
+              "Id": 12748,
+              "CPU": 1.90625,
+              "WorkingSet64": 90619904,
+              "PrivateMemorySize64": 41287680,
+              "PeakWorkingSet64": 124313600
+            },
+            {
+              "Id": 5876,
+              "CPU": 15.046875,
+              "WorkingSet64": 129310720,
+              "PrivateMemorySize64": 224010240,
+              "PeakWorkingSet64": 274477056
+            }
+          ]
+        },
+        "futuro": {
+          "primera_consulta_ms": 611.155700000003,
+          "memoria": [
+            {
+              "Id": 12748,
+              "CPU": 1.90625,
+              "WorkingSet64": 90472448,
+              "PrivateMemorySize64": 41287680,
+              "PeakWorkingSet64": 124313600
+            },
+            {
+              "Id": 5876,
+              "CPU": 15.578125,
+              "WorkingSet64": 132415488,
+              "PrivateMemorySize64": 224313344,
+              "PeakWorkingSet64": 274477056
+            }
+          ]
+        }
+      },
+      "api_muestras_por_endpoint": 15,
+      "ventana_espera_ms": 60588.4865,
+      "peticiones_espera": 1,
+      "bytes_cdp_espera": 2892,
+      "peticiones_pagina_total": 35,
+      "bytes_cdp_pagina_total": 135389,
+      "peticiones_api_medidas": 30,
+      "marcos_globales": 1,
+      "externas_bloqueadas": 2,
+      "mutaciones": 0,
+      "errores_js": [],
+      "renderers": [
+        12748
+      ],
+      "pid_servidor": 5876,
+      "muestras_memoria": [
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.0625,
+            "WorkingSet64": 124055552,
+            "PrivateMemorySize64": 46702592,
+            "PeakWorkingSet64": 124055552
+          },
+          {
+            "Id": 5876,
+            "CPU": 14,
+            "WorkingSet64": 258822144,
+            "PrivateMemorySize64": 224411648,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.234375,
+            "WorkingSet64": 110616576,
+            "PrivateMemorySize64": 46866432,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.015625,
+            "WorkingSet64": 258822144,
+            "PrivateMemorySize64": 224411648,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.421875,
+            "WorkingSet64": 110968832,
+            "PrivateMemorySize64": 47427584,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.015625,
+            "WorkingSet64": 258822144,
+            "PrivateMemorySize64": 224411648,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.578125,
+            "WorkingSet64": 110993408,
+            "PrivateMemorySize64": 47853568,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.015625,
+            "WorkingSet64": 258822144,
+            "PrivateMemorySize64": 224411648,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.859375,
+            "WorkingSet64": 109015040,
+            "PrivateMemorySize64": 44187648,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.015625,
+            "WorkingSet64": 258822144,
+            "PrivateMemorySize64": 224411648,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.875,
+            "WorkingSet64": 109125632,
+            "PrivateMemorySize64": 44290048,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.03125,
+            "WorkingSet64": 258822144,
+            "PrivateMemorySize64": 224411648,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.890625,
+            "WorkingSet64": 107319296,
+            "PrivateMemorySize64": 43081728,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.046875,
+            "WorkingSet64": 258732032,
+            "PrivateMemorySize64": 224301056,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.890625,
+            "WorkingSet64": 107319296,
+            "PrivateMemorySize64": 43081728,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.046875,
+            "WorkingSet64": 256475136,
+            "PrivateMemorySize64": 224301056,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.890625,
+            "WorkingSet64": 99147776,
+            "PrivateMemorySize64": 43081728,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.078125,
+            "WorkingSet64": 142655488,
+            "PrivateMemorySize64": 224301056,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.90625,
+            "WorkingSet64": 92622848,
+            "PrivateMemorySize64": 41287680,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.3125,
+            "WorkingSet64": 133390336,
+            "PrivateMemorySize64": 224010240,
+            "PeakWorkingSet64": 274477056
+          }
+        ],
+        [
+          {
+            "Id": 12748,
+            "CPU": 1.90625,
+            "WorkingSet64": 91385856,
+            "PrivateMemorySize64": 41287680,
+            "PeakWorkingSet64": 124313600
+          },
+          {
+            "Id": 5876,
+            "CPU": 14.3125,
+            "WorkingSet64": 131047424,
+            "PrivateMemorySize64": 224010240,
+            "PeakWorkingSet64": 274477056
+          }
+        ]
+      ],
+      "heap_js_bytes": 3100960,
+      "tareas_pestana_s": 0.40882499999999994,
+      "cpu_servidor_espera_s": 0.3125
+    },
+    {
+      "numero": 2,
+      "arranque_http_ms": 20002.7402,
+      "sondeos_arranque": 91,
+      "primer_panel_local_ms": 1435.7247000000061,
+      "navegacion_tibia_ms": 233.70840000000317,
+      "estado_frio_navegacion_ms": 2956.744,
+      "api": {
+        "estado": [
+          40.71239999998943,
+          33.63969999999972,
+          29.1875,
+          29.566500000000815,
+          28.3637000000017,
+          24.009599999990314,
+          30.336100000000442,
+          26.491800000003423,
+          25.2387000000017,
+          23.980100000000675,
+          24.85670000000391,
+          26.118900000001304,
+          25.02499999999418,
+          23.81020000000717,
+          23.759799999999814
+        ],
+        "universo": [
+          214.721000000005,
+          209.96949999999197,
+          212.62080000000424,
+          200.5573000000004,
+          203.78450000000885,
+          234.50139999999374,
+          219.1826000000001,
+          213.1079999999929,
+          207.26880000000529,
+          198.36690000000817,
+          207.37700000000768,
+          240.35599999999977,
+          214.2838000000047,
+          221.34920000001148,
+          217.6435000000056
+        ]
+      },
+      "vistas_diferidas": {
+        "pasado": {
+          "primera_consulta_ms": 2833.1502000000037,
+          "memoria": [
+            {
+              "Id": 21996,
+              "CPU": 2.1875,
+              "WorkingSet64": 85561344,
+              "PrivateMemorySize64": 40886272,
+              "PeakWorkingSet64": 109727744
+            },
+            {
+              "Id": 7608,
+              "CPU": 19.046875,
+              "WorkingSet64": 49389568,
+              "PrivateMemorySize64": 223412224,
+              "PeakWorkingSet64": 238055424
+            }
+          ]
+        },
+        "futuro": {
+          "primera_consulta_ms": 655.0898999999918,
+          "memoria": [
+            {
+              "Id": 21996,
+              "CPU": 2.1875,
+              "WorkingSet64": 85561344,
+              "PrivateMemorySize64": 40886272,
+              "PeakWorkingSet64": 109727744
+            },
+            {
+              "Id": 7608,
+              "CPU": 19.65625,
+              "WorkingSet64": 61460480,
+              "PrivateMemorySize64": 223608832,
+              "PeakWorkingSet64": 238055424
+            }
+          ]
+        }
+      },
+      "api_muestras_por_endpoint": 15,
+      "ventana_espera_ms": 60611.34079999999,
+      "peticiones_espera": 1,
+      "bytes_cdp_espera": 2892,
+      "peticiones_pagina_total": 35,
+      "bytes_cdp_pagina_total": 135394,
+      "peticiones_api_medidas": 30,
+      "marcos_globales": 1,
+      "externas_bloqueadas": 2,
+      "mutaciones": 0,
+      "errores_js": [],
+      "renderers": [
+        21996
+      ],
+      "pid_servidor": 7608,
+      "muestras_memoria": [
+        [
+          {
+            "Id": 21996,
+            "CPU": 1.203125,
+            "WorkingSet64": 109359104,
+            "PrivateMemorySize64": 46567424,
+            "PeakWorkingSet64": 109359104
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.328125,
+            "WorkingSet64": 220250112,
+            "PrivateMemorySize64": 223834112,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 1.359375,
+            "WorkingSet64": 98820096,
+            "PrivateMemorySize64": 46768128,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.359375,
+            "WorkingSet64": 219406336,
+            "PrivateMemorySize64": 223834112,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 1.53125,
+            "WorkingSet64": 99278848,
+            "PrivateMemorySize64": 47329280,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.375,
+            "WorkingSet64": 218144768,
+            "PrivateMemorySize64": 223834112,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 1.765625,
+            "WorkingSet64": 99758080,
+            "PrivateMemorySize64": 47886336,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.390625,
+            "WorkingSet64": 198438912,
+            "PrivateMemorySize64": 223834112,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 1.9375,
+            "WorkingSet64": 100114432,
+            "PrivateMemorySize64": 48087040,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.40625,
+            "WorkingSet64": 167387136,
+            "PrivateMemorySize64": 223834112,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 2.078125,
+            "WorkingSet64": 94826496,
+            "PrivateMemorySize64": 44924928,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.40625,
+            "WorkingSet64": 118976512,
+            "PrivateMemorySize64": 223715328,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 2.171875,
+            "WorkingSet64": 92823552,
+            "PrivateMemorySize64": 43036672,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.40625,
+            "WorkingSet64": 103464960,
+            "PrivateMemorySize64": 223715328,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 2.171875,
+            "WorkingSet64": 84799488,
+            "PrivateMemorySize64": 43036672,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.40625,
+            "WorkingSet64": 60329984,
+            "PrivateMemorySize64": 223715328,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 2.171875,
+            "WorkingSet64": 84979712,
+            "PrivateMemorySize64": 43036672,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.40625,
+            "WorkingSet64": 49414144,
+            "PrivateMemorySize64": 223715328,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 2.1875,
+            "WorkingSet64": 86102016,
+            "PrivateMemorySize64": 40886272,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.703125,
+            "WorkingSet64": 53436416,
+            "PrivateMemorySize64": 223408128,
+            "PeakWorkingSet64": 238055424
+          }
+        ],
+        [
+          {
+            "Id": 21996,
+            "CPU": 2.1875,
+            "WorkingSet64": 86077440,
+            "PrivateMemorySize64": 40886272,
+            "PeakWorkingSet64": 109727744
+          },
+          {
+            "Id": 7608,
+            "CPU": 17.703125,
+            "WorkingSet64": 52813824,
+            "PrivateMemorySize64": 223408128,
+            "PeakWorkingSet64": 238055424
+          }
+        ]
+      ],
+      "heap_js_bytes": 3095200,
+      "tareas_pestana_s": 0.547195,
+      "cpu_servidor_espera_s": 0.375
+    },
+    {
+      "numero": 3,
+      "arranque_http_ms": 15087.162799999991,
+      "sondeos_arranque": 72,
+      "primer_panel_local_ms": 1410.1761999999871,
+      "navegacion_tibia_ms": 224.7225000000035,
+      "estado_frio_navegacion_ms": 2883.172,
+      "api": {
+        "estado": [
+          30.355600000009872,
+          26.230199999990873,
+          27.86139999999432,
+          25.598499999992782,
+          26.269499999994878,
+          22.702799999999115,
+          21.17129999998724,
+          21.786099999997532,
+          25.798399999999674,
+          26.34870000000228,
+          25.942199999990407,
+          23.46160000000964,
+          26.686699999991106,
+          23.57289999999921,
+          23.59269999997923
+        ],
+        "universo": [
+          203.31530000001658,
+          216.5109999999986,
+          230.51620000001276,
+          240.5685999999987,
+          226.8859999999986,
+          212.90549999999348,
+          219.82070000001113,
+          227.34700000000885,
+          226.87879999997676,
+          218.01480000000447,
+          208.31599999999162,
+          237.49679999999353,
+          211.91140000001178,
+          246.1196999999811,
+          234.04509999998845
+        ]
+      },
+      "vistas_diferidas": {
+        "pasado": {
+          "primera_consulta_ms": 4449.924600000028,
+          "memoria": [
+            {
+              "Id": 31104,
+              "CPU": 2.953125,
+              "WorkingSet64": 84619264,
+              "PrivateMemorySize64": 41111552,
+              "PeakWorkingSet64": 104165376
+            },
+            {
+              "Id": 9884,
+              "CPU": 18.328125,
+              "WorkingSet64": 51798016,
+              "PrivateMemorySize64": 223838208,
+              "PeakWorkingSet64": 258379776
+            }
+          ]
+        },
+        "futuro": {
+          "primera_consulta_ms": 742.4905000000144,
+          "memoria": [
+            {
+              "Id": 31104,
+              "CPU": 2.953125,
+              "WorkingSet64": 84619264,
+              "PrivateMemorySize64": 41111552,
+              "PeakWorkingSet64": 104165376
+            },
+            {
+              "Id": 9884,
+              "CPU": 18.921875,
+              "WorkingSet64": 66199552,
+              "PrivateMemorySize64": 227405824,
+              "PeakWorkingSet64": 258379776
+            }
+          ]
+        }
+      },
+      "api_muestras_por_endpoint": 15,
+      "ventana_espera_ms": 61240.25859999997,
+      "peticiones_espera": 1,
+      "bytes_cdp_espera": 2892,
+      "peticiones_pagina_total": 35,
+      "bytes_cdp_pagina_total": 135388,
+      "peticiones_api_medidas": 30,
+      "marcos_globales": 1,
+      "externas_bloqueadas": 2,
+      "mutaciones": 0,
+      "errores_js": [],
+      "renderers": [
+        31104
+      ],
+      "pid_servidor": 9884,
+      "muestras_memoria": [
+        [
+          {
+            "Id": 31104,
+            "CPU": 1.328125,
+            "WorkingSet64": 103694336,
+            "PrivateMemorySize64": 46448640,
+            "PeakWorkingSet64": 103694336
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.03125,
+            "WorkingSet64": 236425216,
+            "PrivateMemorySize64": 224264192,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 1.53125,
+            "WorkingSet64": 93204480,
+            "PrivateMemorySize64": 46772224,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.046875,
+            "WorkingSet64": 129040384,
+            "PrivateMemorySize64": 224264192,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 1.640625,
+            "WorkingSet64": 93548544,
+            "PrivateMemorySize64": 47468544,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.078125,
+            "WorkingSet64": 129191936,
+            "PrivateMemorySize64": 224264192,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 1.921875,
+            "WorkingSet64": 92733440,
+            "PrivateMemorySize64": 47902720,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.078125,
+            "WorkingSet64": 127782912,
+            "PrivateMemorySize64": 224264192,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 2.3125,
+            "WorkingSet64": 92557312,
+            "PrivateMemorySize64": 48431104,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.09375,
+            "WorkingSet64": 124219392,
+            "PrivateMemorySize64": 224264192,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 2.671875,
+            "WorkingSet64": 92000256,
+            "PrivateMemorySize64": 44625920,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.09375,
+            "WorkingSet64": 120537088,
+            "PrivateMemorySize64": 224264192,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 2.953125,
+            "WorkingSet64": 90374144,
+            "PrivateMemorySize64": 43012096,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.09375,
+            "WorkingSet64": 120348672,
+            "PrivateMemorySize64": 224145408,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 2.953125,
+            "WorkingSet64": 90226688,
+            "PrivateMemorySize64": 43012096,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.09375,
+            "WorkingSet64": 120393728,
+            "PrivateMemorySize64": 224145408,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 2.953125,
+            "WorkingSet64": 84361216,
+            "PrivateMemorySize64": 42946560,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.109375,
+            "WorkingSet64": 117645312,
+            "PrivateMemorySize64": 224145408,
+            "PeakWorkingSet64": 258379776
+          }
+        ],
+        [
+          {
+            "Id": 31104,
+            "CPU": 2.953125,
+            "WorkingSet64": 85536768,
+            "PrivateMemorySize64": 41111552,
+            "PeakWorkingSet64": 104165376
+          },
+          {
+            "Id": 9884,
+            "CPU": 16.421875,
+            "WorkingSet64": 93278208,
+            "PrivateMemorySize64": 223838208,
+            "PeakWorkingSet64": 258379776
+          }
+        ]
+      ],
+      "heap_js_bytes": 3095200,
+      "tareas_pestana_s": 0.75283,
+      "cpu_servidor_espera_s": 0.390625
+    }
+  ],
+  "fuentes_cargadas": {
+    "servicios": "643c09b3784850bb4699f625970eca6378d2ff28ee448d5d6cc7516a0d9ee2da",
+    "optimizador": "3a36462e1f16d67c3e9551f09fafc0a1db2507018a5ca8f107ad827a2c696eb4",
+    "espacios": "12030789fcd414d7317c8266501453a2899761b69d38756c3ed441adc2f9d706"
+  },
+  "protocolo": "Dos fases con cargador idéntico, compilación sin caché de bytecode para tres módulos; primera respuesta de navegación medida antes de consultas explícitas. Pasado/Futuro se consultan después de la ventana de memoria para declarar carga diferida."
+}

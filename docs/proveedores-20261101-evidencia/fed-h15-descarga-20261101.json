@@ -1,0 +1,50 @@
+[
+  {
+    "archivo": "data\\verificacion-gratuita-20261101\\crosswalk.csv",
+    "url": "https://www.federalreserve.gov/data/documents/DDP-FRED%20Data%20Series%20Crosswalk.csv",
+    "http": 200,
+    "bytes": 1775573,
+    "sha256": "536ba3dc62d10f51d70208a6f35aea022bb4d41d9feb2659de22cf649065852d",
+    "columnas": [
+      "ddp_release",
+      "board_series_id",
+      "fred_series_id"
+    ],
+    "equivalencia_DGS30": [
+      {
+        "ddp_release": "H15",
+        "board_series_id": "RIFLGFCY30_N.B",
+        "fred_series_id": "DGS30"
+      }
+    ]
+  },
+  {
+    "archivo": "data\\verificacion-gratuita-20261101\\h15.zip",
+    "url": "https://www.federalreserve.gov/releases/h15/data/FRB_h15_xml.zip",
+    "http": 200,
+    "bytes": 4286970,
+    "sha256": "5c4479da8a26928022d4792921e2e39f8ce0d8c4bc4f92dc8c5a9cf984a5d560",
+    "contenido": [
+      {
+        "nombre": "H15_discontinued.xsd",
+        "bytes_descomprimidos": 10237
+      },
+      {
+        "nombre": "H15_H15.xsd",
+        "bytes_descomprimidos": 10219
+      },
+      {
+        "nombre": "H15_data.xml",
+        "bytes_descomprimidos": 70868161
+      },
+      {
+        "nombre": "H15_struct.xml",
+        "bytes_descomprimidos": 96648
+      },
+      {
+        "nombre": "frb_common.xsd",
+        "bytes_descomprimidos": 139952
+      }
+    ]
+  }
+]

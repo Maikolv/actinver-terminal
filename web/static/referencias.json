@@ -4,6 +4,7 @@
 {
   "titulo": "Conectores opcionales de Mesa (1-nov-2026)",
   "items": [
+    {"nombre":"Federal Reserve Board — H.15 y cruce DDP/FRED","uso":"Publicación XML de Treasury 30 años, fuente original con identidad, unidad y disponibilidad comprobadas. Importación puntual sin clave; no cotización ni verificación API FRED.","condiciones":"Descarga oficial para análisis local; citar Federal Reserve Board. No se presume autorización de redistribución de fuentes ajenas.","url":"https://www.federalreserve.gov/data/data-download-fred-information.htm","ids":["fed_h15"]},
     {
       "nombre": "Banxico SIE (validación de identidad previa)",
       "uso": "Tasa objetivo, bono M10 e INPC únicamente con código/título confirmados por GET. Apagado por defecto.",

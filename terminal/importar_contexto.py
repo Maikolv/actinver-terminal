@@ -61,6 +61,8 @@ def plantilla(tipo: str) -> str:
 def _fecha(v: str, campo: str, errores: list[str], con_hora: bool = False) -> str | None:
     try:
         t = pd.Timestamp(v)
+        if pd.isna(t):
+            raise ValueError("fecha ausente")
     except (ValueError, TypeError):
         errores.append(f"{campo}: fecha inválida")
         return None
@@ -186,16 +188,19 @@ def importar(con: sqlite3.Connection, filas: list[dict], contenido: bytes, nombr
     with transaccion(con):
         for _, r, clave in validas:
             if tipo == "notas_sa":
+                disponible = max(pd.Timestamp(ts), pd.Timestamp(r["publicado"])).tz_convert("UTC").isoformat()
                 con.execute("INSERT INTO noticias (id, instrumento_id, titulo, enlace, publicado, fuente, impacto, motivo, obtenido_en, "
-                            "autor, tipo_contenido) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                            "autor, tipo_contenido, event_time, available_at, ingested_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                             (f"sam-{clave}", r["instrumento_id"], r["titulo"], r["url"], r["publicado"], "seekingalpha_manual",
-                             "normal", r["tesis"] or "nota del participante", ts, r["autor"], r["tipo_contenido"]))
+                             "normal", r["tesis"] or "nota del participante", ts, r["autor"], r["tipo_contenido"],
+                             r["publicado"], disponible, ts))
             elif tipo == "insiderfinance":
                 con.execute("INSERT INTO insiders (id, instrumento_id, fecha, nombre, cargo, codigo, acciones, precio, valor, enlace, "
-                            "fuente, obtenido_en, fecha_presentacion, cobertura) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                            "fuente, obtenido_en, fecha_presentacion, cobertura, event_time, available_at, ingested_at) "
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                             (f"if-{clave}", r["instrumento_id"], r["fecha"], r["nombre"], r["cargo"], r["codigo"], r["acciones"],
                              r["precio"], r["valor"], r["enlace"], "insiderfinance_csv", ts, r["fecha_presentacion"],
-                             "EE. UU.; NO CUBRE BMV; confirmar con SEC Form 4"))
+                             "EE. UU.; NO CUBRE BMV; confirmar con SEC Form 4", r["fecha"], ts, ts))
             elif tipo == "calificaciones_sa":
                 con.execute("INSERT INTO calificaciones (id, instrumento_id, fecha, fuente, quant, autores, wall_street, valuacion, "
                             "crecimiento, rentabilidad, momentum, revisiones, importado_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",

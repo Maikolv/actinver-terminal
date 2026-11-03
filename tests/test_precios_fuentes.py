@@ -35,6 +35,7 @@ def test_simbolos_eodhd_conservan_ampersand_y_guion():
     assert Eodhd.simbolo({"clave": "PE&OLES", "serie": "*"}) == "PE&OLES"
     assert Eodhd.simbolo({"clave": "LASITE", "serie": "B-1"}) == "LASITEB-1"
     assert Eodhd.simbolo({"clave": "GFNORTE", "serie": "O"}) == "GFNORTEO"
+    assert Eodhd.simbolo({"clave": "SMARTRC", "serie": "14"}) == "SMARTRC14"
     assert TwelveData.simbolo({"clave": "LIVEPOL", "serie": "C-1"}) == "LIVEPOLC.1"
 
 
@@ -75,6 +76,21 @@ def test_importar_hoja_asigna_serie_exacta_y_verifica_cobertura(con, monkeypatch
     assert cz.cobertura_verificada(con, "actinver_pdf", "FONDO:ACTIGOB")
     with pytest.raises(fa.ErrorHoja):
         fa.importar(con, b"no es pdf", "x.txt")
+
+
+def test_hoja_de_fondos_respeta_pausa_persistente(con, ajustes):
+    import httpx
+
+    consultas = []
+
+    def responder(peticion):
+        consultas.append(peticion)
+        return httpx.Response(503, headers={"Retry-After": "120"})
+
+    with httpx.Client(transport=httpx.MockTransport(responder)) as cliente:
+        assert fa.actualizar(con, ajustes, cliente=cliente)["estado"] == "error"
+        assert fa.actualizar(con, ajustes, cliente=cliente)["estado"] == "en_espera"
+    assert len(consultas) == 1
 
 
 def test_hoja_ambigua_no_asigna(con, monkeypatch):

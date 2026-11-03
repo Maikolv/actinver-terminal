@@ -1,0 +1,17 @@
+{
+  "commit_base": "501114d43e0b3c7b081d1b952aa243884f39d7e5",
+  "archivos": {
+    "terminal/servicios.py": "bc15d527f4663de3ed536973813e8eaa7da182153b60be3365de9441e66f6121",
+    "terminal/optimizador.py": "5ee30d7f69ab7d4d5c0a75052847c46217530e3470a4f21aa96aba3780034638",
+    "terminal/espacios.py": "b3d8ba4e414261959c6edee8a4071a04ace7b842a69ff68cf39cf2131455189d",
+    "terminal/investigacion/evaluacion.py": "a62457fb34307e7b12cab48cdb9fbf06b1fbc2117772f5c36ce1170b5a5b9a20",
+    "terminal/investigacion/pronosticos.py": "fbbb21f713728a36153807d5e004d6a91f1a60f2faf6a946a2a6bd49d08c0c7d",
+    "terminal/investigacion/reto_pronostico.py": "789472eccea0fd5e66eedd028048e2a7952273dee238d4ba0c639dfd62c2b5af",
+    "terminal/robustez/informe.py": "271409e8a4c34cb65b9b5d4e8c4d6517c8f87491cc4029d0d00136c4f68dabe6",
+    "terminal/robustez/calculo.py": "5d2d742a27d2dbebdf953b573e86b8001548b6264ad450279f190ae0f9563d9c",
+    "terminal/criterios_propuestas.py": "2828667162aee4e3cb27837daff8518a1e2b1fcfac3efa32d42e6a465e23ae6c",
+    "terminal/investigacion/lecturas.py": "6ff56563aa5861611c9ce6ad18350f52ec0b4c75515e5cd061ac8a96cee7bd86",
+    "tests/test_arranque_lectura.py": "eac700d87abf75163fa2ffbda6d5767e8c32e08d09b59fca3951fc75d54fe0b4"
+  },
+  "restriccion": "No incluye cambios ajenos ni archivos de credenciales; no se hizo commit/push."
+}

@@ -1,0 +1,24 @@
+{
+  "fecha_local": "2026-11-01",
+  "metodo": "POST oficial mediante httpx sin importar la aplicación ni cargar .env",
+  "url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+  "solicitudes": 1,
+  "credencial_utilizada": false,
+  "cuerpo": {
+    "seriesid": ["CUSR0000SA0", "LNS14000000", "CES0000000001"],
+    "startyear": "2025",
+    "endyear": "2026"
+  },
+  "http": 200,
+  "status": "REQUEST_SUCCEEDED",
+  "message": [],
+  "tipo_Results": "dict",
+  "observaciones_por_serie": {
+    "CUSR0000SA0": 21,
+    "LNS14000000": 21,
+    "CES0000000001": 21
+  },
+  "observaciones_importadas": 0,
+  "conector_automatico_activado": false,
+  "alcance": "Acceso público confirmado para esta petición de dos años. No reejecuta el conector, no valida otras ventanas o cuotas y no cambia la base habitual. No acredita hora exacta de publicación ni vintage histórico."
+}

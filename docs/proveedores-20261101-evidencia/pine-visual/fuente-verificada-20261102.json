@@ -1,0 +1,9 @@
+{
+  "fecha": "2026-11-02",
+  "sha256": "88a4e98b1c9082df402ac20fbd5c3bf6f710ca4fec3f8797ef44a4d7a2a3cf57",
+  "compilacion_en_pine_editor": true,
+  "publicado": false,
+  "operaciones": false,
+  "alcance": "Disposición, instrumento incompatible, MNQ predeterminado, tick inválido y redondeo; casos NQ previos en fuente anterior con mismas fórmulas.",
+  "pendiente": "Recorrido exhaustivo de vectores en plataforma."
+}

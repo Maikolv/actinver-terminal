@@ -69,3 +69,12 @@ Esta medición no cubre todas las pestañas, proveedor real cargado ni motor act
 ## Lectura crítica de las cifras
 
 El p95 de /api/estado fue peor después (2034 ms frente a 606 ms); las 45 observaciones incluyen la primera carga, no solo tibias. Ese endpoint no recibió optimización de servidor. El RSS renderer de la muestra pareada aumentó (mediana 82.24 a 92.26 MiB); no se demostró ahorro de memoria. Debe repetirse con seguimiento de memoria privada/picos y ventanas más largas antes de atribuir la variación al parche. La mejora comprobada principal es evitar precios para el selector y conservar los marcos. El arranque sigue siendo el mayor tiempo absoluto; investigar su perfil de importaciones queda pendiente, sin mover costo ocultamente a la primera consulta.
+
+## PERF31-06: reproducción acotada — 2-nov-2026
+
+El adaptador común terminal/adaptadores/base.py todavía usa espera exponencial 2/4 s para respuestas reintentables, sin leer Retry-After. Se confirmó por lectura directa de _get; no se hicieron consultas reales ni se consumieron cuotas. No basta sustituir el sleep: una espera larga debe impedir que el siguiente instrumento o una nueva instancia vuelva a consultar antes de tiempo. La corrección debe conservar límites persistentes, acotar bloqueo del servidor y probar segundos, fecha HTTP, cabecera inválida, último intento y reinstanciación, con httpx.MockTransport.
+
+codebase-memory se volvió a consultar: list_projects y check_index_coverage devolvieron Transport closed. Fallback acotado a terminal/adaptadores/base.py, tests/test_adaptadores.py y esquema de uso_proveedor en terminal/db.py. No se atribuye cobertura al índice. Este diagnóstico deja PERF31-06 pendiente; no equivale a implementación.
+
+
+Actualización 2-nov-2026: PERF31-04/05 tienen perfil y medición finales en docs/optimizacion-lecturas-20261102.md; no rehacerlos por los estados históricos de esta página. Las lecturas no cargan sklearn/skfolio; cálculo explícito conservado y 881 pruebas completas aprobadas. La primera respuesta de Estado y varias métricas no mejoraron: conservar sus resultados adversos. PERF31-06 y los bloqueos externos siguen abiertos. Ningún resultado autoriza operar.
