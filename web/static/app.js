@@ -1943,7 +1943,7 @@ function graficaTradingView(v) {
 }
 
 // Widgets gratuitos de TradingView en marcos aislados (/widget/...). Solo muestran; no alimentan cálculos.
-const AVISO_TV = "Datos de TradingView: EE. UU. con la cotización gratuita de Cboe en USD; las emisoras de la BMV no están disponibles en estos widgets gratuitos. Pueden diferir del simulador del Reto. Solo informa.";
+const AVISO_TV = "Datos de TradingView: EE. UU. con la cotización gratuita de Cboe en USD; de la BMV solo hay perfil, fundamentales y análisis técnico (sin precio ni noticias) en estos widgets gratuitos. Pueden diferir del simulador del Reto. Solo informa.";
 // Los widgets y la gráfica de TradingView siguen el modo claro/oscuro del sistema, igual que la terminal.
 const TEMA_TV = "dark";  // los widgets de terceros siempre en negro, en cualquier modo de la terminal
 const urlWidget = (tipo, params = {}) => `/widget/${tipo}?${new URLSearchParams({ ...params, tema: TEMA_TV })}`;
@@ -1964,9 +1964,9 @@ function panoramaTradingView() {
     marcoWidget("cinta", {}, 76, "Cinta con tus posiciones"),
     bloqueWidget("1 · Resumen de mercados (índices, dólar, materias primas)", marcoWidget("resumen", {}, 460, "Resumen de mercados"), true),
     bloqueWidget("2 · Índices y dólar: gráfica comparada (S&P 500, Nasdaq 100, Dow Jones, DXY, USD/MXN)", marcoWidget("indices", {}, 480, "Gráfica comparada de índices y dólar"), true),
-    bloqueWidget("3 · Medidor técnico del S&P 500 (TradingView; no es una recomendación)", [
+    bloqueWidget("3 · Medidor técnico del S&P 500 vía SPY (TradingView; no es una recomendación)", [
       h("div", { clase: "aviso-caja", role: "note", texto: "Lo calcula TradingView con medias móviles y osciladores. No es una recomendación ni una predicción." }),
-      marcoWidget("tecnico-indice", {}, 460, "Medidor técnico del S&P 500")]),
+      marcoWidget("tecnico-indice", {}, 460, "Medidor técnico del S&P 500 (ETF SPY)")]),
     bloqueWidget("4 · Tasas, volatilidad (VIX), dólar, energía y metales", marcoWidget("macro", {}, 720, "Variables macro"), true),
     bloqueWidget("5 · Calendario económico (EE. UU. y México)", marcoWidget("calendario", {}, 520, "Calendario económico")),
     bloqueWidget("6 · Noticias del mercado", marcoWidget("noticias", {}, 520, "Noticias del mercado")),
@@ -1983,13 +1983,16 @@ function panoramaTradingView() {
 
 function fichaTradingView(simbolo) {
   const s = { simbolo };
+  // BMV: TradingView reserva el precio y las noticias para su plataforma; perfil, fundamentales y técnico sí cargan.
+  const bmv = simbolo.startsWith("BMV:");
   return h("section", { "aria-label": "Ficha de TradingView" },
     h("h3", { texto: "Ficha de la emisora (TradingView)" }), h("p", { clase: "ayuda", texto: AVISO_TV }),
-    marcoWidget("info", s, 190, "Precio y rango del día"),
-    bloqueWidget("Panorama del precio", marcoWidget("panorama", s, 420, "Panorama del precio")),
+    bmv ? h("div", { clase: "aviso-caja", role: "note", texto: "BMV: TradingView no permite mostrar el precio, el panorama ni las noticias de esta emisora en sus widgets gratuitos. Use los cierres guardados de esta sección; abajo quedan perfil, fundamentales y análisis técnico." }) : "",
+    bmv ? "" : marcoWidget("info", s, 190, "Precio y rango del día"),
+    bmv ? "" : bloqueWidget("Panorama del precio", marcoWidget("panorama", s, 420, "Panorama del precio")),
     bloqueWidget("Perfil de la empresa", marcoWidget("perfil", s, 420, "Perfil de la empresa")),
     bloqueWidget("Datos fundamentales", marcoWidget("finanzas", s, 520, "Datos fundamentales")),
-    bloqueWidget("Noticias de la emisora", marcoWidget("noticias-emisora", s, 480, "Noticias de la emisora")),
+    bmv ? "" : bloqueWidget("Noticias de la emisora", marcoWidget("noticias-emisora", s, 480, "Noticias de la emisora")),
     bloqueWidget("Resumen técnico de TradingView (no es una recomendación)", [
       h("div", { clase: "aviso-caja", role: "note", texto: "Este medidor de «Comprar / Vender» lo calcula TradingView con promedios móviles y osciladores. No es una recomendación ni una predicción, y la terminal no tiene evidencia de que esas señales funcionen. La decisión es tuya." }),
       marcoWidget("tecnico", s, 460, "Resumen técnico de TradingView")]));
@@ -2186,7 +2189,7 @@ async function cargarVelas() {
     const contGraf = h("div", {}, d.barras.length ? graficaVelas(d.barras, v, v.intervalo) : null);
     const rotuloVivo = h("p", { clase: "ayuda", role: "status", "aria-live": "off" });
     if (d.barras.length) seguirVelaViva(d.barras, v, contGraf, rotuloVivo);
-    const graficaExterna = d.grafica && v.simbolo !== "BMV:AMX";
+    const graficaExterna = d.grafica && !v.simbolo.startsWith("BMV:");  // TradingView no muestra gráficas de la BMV en widgets gratuitos
     let respaldo = null;
     if (!d.barras.length && v.simbolo.startsWith("BMV:")) {
       const serie = await api("/api/visualizaciones/serie/" + encodeURIComponent(v.simbolo)).catch(() => null);
@@ -2209,7 +2212,7 @@ async function cargarVelas() {
             target: "_blank", rel: "noopener noreferrer", texto: "Consultar SMARTRC 14 en TradingView" })));
       }
     }
-    limpiar("velas-contenido", controles, graficaExterna ? graficaTradingView(v) : null, graficaExterna ? fichaTradingView(v.simbolo) : null,
+    limpiar("velas-contenido", controles, graficaExterna ? graficaTradingView(v) : null, d.grafica ? fichaTradingView(v.simbolo) : null,
       d.barras.length ? h("div", {},
         h("p", { clase: "ayuda" }, chip("retrasado", v.intervalo === "1Day" ? "Barras diarias" : "Barras intradía"), " ", `${d.zona_horaria}. ${d.nota}`),
         cajaProcedencia(d.procedencia), contGraf, rotuloVivo,
@@ -2711,7 +2714,7 @@ async function cargarSeguimiento() {
       elegidos,
       h("div", { clase: "fila-controles" },
         selectorSimple(C.referencia, [["BMV:NAFTRAC", "NAFTRAC (IPC)"], ["SIC:SPY", "SPY (S&P 500)"]], (x) => { C.referencia = x; fijar(C.ids); }, "Referencia"),
-        selectorSimple(C.ventana, [[63, "3 meses"], [126, "6 meses"], [252, "1 año"], [504, "2 años"]], (x) => { C.ventana = Number(x); }, "Ventana"),
+        selectorSimple(C.ventana, [[63, "3 meses"], [126, "6 meses"], [252, "1 año"], [504, "2 años"], [1260, "5 años"], [2520, "10 años"]], (x) => { C.ventana = Number(x); }, "Ventana"),
         botonAccion("Comparar", "boton--primario", async (b) => {
           if (!C.ids.length) { notificar("Elija al menos un instrumento."); return; }
           ocupado([b], true);
@@ -3055,7 +3058,7 @@ const PF_PCT = ["rf", "peso_max", "rend_objetivo", "riesgo_objetivo"];
 function genInicial(perfil = "crecimiento") {
   const o = pf.meta.objetivos[perfil];
   return { objetivo: perfil, clase: "acciones", mercado_filtro: "ambos", caps: [], n: Math.max(o.min_activos, 6), fijos: [], excluir: [],
-    completar: true, metodo: "auto", peso_max: o.peso_max, capital: 100000, rf: pf.meta.tasa_libre.valor, ventana: 252, aversion: o.aversion,
+    completar: perfil !== "cuenta", metodo: "auto", peso_max: o.peso_max, capital: 100000, rf: pf.meta.tasa_libre.valor, ventana: 252, aversion: o.aversion,
     rend_objetivo: 0.12, riesgo_objetivo: 0.18, covarianza: "muestral", usd_max: null, sector_max: null, vistas: [], nombre: "", descripcion: "" };
 }
 async function cargarPortafolios() {
@@ -3068,9 +3071,19 @@ async function cargarPortafolios() {
     const primera = !pf.g;
     if (primera) pf.g = genInicial();
     pintarPortafolios();
-    if (primera || !pf.ultimo) generarPropuesta(); else pintarPropuesta();
+    if (primera || !pf.ultimo || cuentaCambio(d.cuenta)) generarPropuesta(); else pintarPropuesta();
   } catch (e) { if (vigente()) limpiar("portafolios-contenido", errorCaja(e)); }
 }
+// Con el perfil «Mi cuenta principal», la propuesta se recalcula cuando cambia la cartera de la cuenta (nueva captura
+// del portal u operación registrada): se revisa al entrar a la sección y cada minuto mientras está a la vista.
+const cuentaCambio = (c) => pf.g?.objetivo === "cuenta" && !!c && !!pf.ultimo?.cuenta && c.firma !== pf.ultimo.cuenta.firma;
+setInterval(async () => {
+  if (document.hidden || pf.g?.objetivo !== "cuenta" || !pestanaVisible("panel-portafolios")) return;
+  try {
+    const { cuenta } = await api("/api/portafolios/cuenta");
+    if (cuentaCambio(cuenta)) { notificar("Cambió la cartera de su cuenta principal: la propuesta se actualizó."); cargarPortafolios(); }
+  } catch { /* se reintenta en el siguiente minuto */ }
+}, 60000);
 const nombreIns = (id) => { const i = (pf.universo || []).find((x) => x.id === id); return i ? `${i.clave_operable} · ${(i.nombre || "").trim().slice(0, 40)}` : id; };
 const claveIns = (id) => ((pf.universo || []).find((x) => x.id === id) || {}).clave_operable || id;
 
@@ -3111,9 +3124,11 @@ function tablaGuardados() {
 function abrirPortafolio(p, copia) {
   const s = p.especificacion;
   pf.editando = copia ? null : p.id;
-  pf.g = { ...genInicial(s.objetivo in pf.meta.objetivos ? s.objetivo : "crecimiento"), ...s, fijos: [...s.activos], excluir: [], completar: false,
-    n: s.activos.length, metodo: s.metodo, nombre: copia ? `${s.nombre} (copia)` : s.nombre };
-  delete pf.g.activos;
+  // con origen «cuenta», las posiciones salen de la cartera actual; solo se fijan los instrumentos agregados aparte
+  const fijos = s.origen === "cuenta" ? s.activos.filter((a) => !(a in (s.pesos || {}))) : [...s.activos];
+  pf.g = { ...genInicial(s.objetivo in pf.meta.objetivos ? s.objetivo : "crecimiento"), ...s, fijos, excluir: [], completar: false,
+    n: s.activos.length, metodo: s.origen === "cuenta" && s.metodo === "cuenta" ? "auto" : s.metodo, nombre: copia ? `${s.nombre} (copia)` : s.nombre };
+  for (const k of ["activos", "pesos", "origen", "firma_cuenta"]) delete pf.g[k];
   pintarPortafolios(); generarPropuesta();
   document.getElementById("panel-portafolios")?.scrollIntoView({ behavior: "smooth" });
 }
@@ -3164,7 +3179,10 @@ function generadorPortafolio() {
   };
   const perfiles = h("div", { clase: "segmentado", role: "radiogroup", "aria-label": "Perfil" },
     Object.entries(M.objetivos).map(([k, o]) => h("button", { type: "button", role: "radio", "aria-checked": String(g.objetivo === k), texto: o.nombre,
-      onclick: () => { Object.assign(g, { objetivo: k, peso_max: o.peso_max, aversion: o.aversion, n: Math.max(g.fijos.length, o.min_activos, g.n) });
+      onclick: () => { const deCuenta = g.objetivo === "cuenta";
+        Object.assign(g, { objetivo: k, peso_max: o.peso_max, aversion: o.aversion, n: Math.max(g.fijos.length, o.min_activos, g.n) });
+        if (k === "cuenta") Object.assign(g, { completar: false, metodo: "auto" }, M.cuenta?.valor_total > 0 ? { capital: Math.round(M.cuenta.valor_total) } : {});
+        else if (deCuenta) g.completar = true;
         pintarPortafolios(); cambioGen(true); } })));
   const o = M.objetivos[g.objetivo];
   const sel = (k, opciones, etiqueta, alCambiar) => selectorSimple(g[k], opciones, (v) => { g[k] = v; if (alCambiar) alCambiar(v); cambioGen(true); }, etiqueta);
@@ -3269,11 +3287,16 @@ function pintarPropuesta() {
   const boton = (texto, etiqueta, fn) => h("button", { type: "button", clase: "pf-quitar", "aria-label": etiqueta, title: etiqueta, texto, onclick: fn });
   const quitarFijo = (id) => { g.fijos = g.fijos.filter((x) => x !== id); g.vistas = (g.vistas || []).filter((v) => v.activo !== id && v.contra !== id); if (!g.completar) g.n = Math.max(2, g.fijos.length); cambioGen(true); pintarPropuesta(); };
   const sugeridos = r && !pf.error ? r.sugeridos : [];
+  const cuenta = r && !pf.error && g.objetivo === "cuenta" ? r.cuenta : null;
   rellenar(pf.ui.instrumentos,
+    cuenta ? h("div", { clase: "pf-seleccion", "aria-label": "Instrumentos de su cuenta principal" },
+      h("span", { clase: "pf-etiqueta", texto: "De su cuenta principal:" }),
+      cuenta.ids.map((id) => chip(id, "chip--fijo", pct(cuenta.pesos[id]), [boton("×", `Dejar fuera ${claveIns(id)}`, () => aplicarSugerencia({ excluir: id }))])),
+      h("span", { clase: "suave", texto: ` · ${cuenta.captura ? `captura del portal ${fechaLocal(cuenta.captura)}` : "registro local"}; pesos sin efectivo` })) : null,
     h("div", { clase: "pf-seleccion", "aria-label": "Instrumentos fijados por usted" },
       h("span", { clase: "pf-etiqueta", texto: "Fijados por usted:" }),
       g.fijos.length ? g.fijos.map((id) => chip(id, "chip--fijo", null, [boton("×", `Quitar ${claveIns(id)}`, () => quitarFijo(id))]))
-        : h("span", { clase: "suave", texto: "ninguno (la terminal elige todo)" })),
+        : h("span", { clase: "suave", texto: cuenta ? "ninguno además de su cuenta" : "ninguno (la terminal elige todo)" })),
     h("div", { clase: "pf-seleccion", "aria-label": "Instrumentos sugeridos por la terminal" },
       h("span", { clase: "pf-etiqueta", texto: "Sugeridos por la terminal:" }),
       sugeridos.length ? sugeridos.map((id) => chip(id, "chip--calculada", r.motivos[id],

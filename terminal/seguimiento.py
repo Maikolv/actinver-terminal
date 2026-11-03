@@ -74,7 +74,8 @@ def comparar(con, ajustes, ids: list[str], ventana: int = 252, referencia: str =
     desconocidos = [i for i in ids + [referencia] if not _existe(con, i)]
     if desconocidos:
         raise ValueError("instrumento desconocido: " + ", ".join(desconocidos))
-    P = mercado.precios_mxn(con, ajustes, ids + [referencia], ajustados="splits").ffill(limit=3)
+    from . import historia_externa  # historia del Excel del usuario como dato histórico hasta su último día
+    P = historia_externa.precios_largos(con, ajustes, ids + [referencia], ajustados="splits").ffill(limit=3)
     if referencia not in P.columns or P[referencia].dropna().size < 31:
         raise ValueError(f"la referencia {referencia} no tiene historia suficiente")
     P = P[P[referencia].notna()].tail(ventana + 1)

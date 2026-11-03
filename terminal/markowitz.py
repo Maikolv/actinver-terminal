@@ -7,6 +7,8 @@ Sigue el método del Taller de Construcción de Portafolios de Acelera Academy:
   Utilidad: U = E(r) − ½ A σ²  (A = aversión al riesgo). Asignación al activo riesgoso: y* = (E(r_p) − r_f) / (A σ_p²).
 
 Cada perfil (conservador → agresivo) propone método, tope por activo y aversión; el usuario puede cambiarlos.
+El perfil «Mi cuenta principal» toma las posiciones y pesos de la cartera actual (captura vigente del portal o registro
+local) en cada cálculo, y los portafolios guardados con ese origen se recalculan cuando esa cartera cambia.
 `generar()` arma la propuesta completa a partir de las especificaciones del usuario: completa sus instrumentos con
 los mejores del Ranking que no se muevan igual, optimiza y devuelve sugerencias de la terminal para mejorarla.
 Es una simulación educativa: no envía órdenes ni es una recomendación personalizada. Los portafolios se guardan en
@@ -15,6 +17,7 @@ Es una simulación educativa: no envía órdenes ni es una recomendación person
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import math
 import sqlite3
@@ -34,7 +37,7 @@ from .adaptadores.proveedores import Banxico
 from .config import Ajustes, credencial
 
 ANUAL = 252
-VENTANAS = (126, 252, 504, 756)
+VENTANAS = (126, 252, 504, 756, 1260, 2520)  # 5 y 10 años: posibles con la historia del Excel del usuario
 
 # Tasa libre de riesgo inicial del generador: CETES a 28 días, subasta semanal (Banxico SIE SF43936, «Valores
 # gubernamentales, Resultados de la subasta semanal, Tasa de rendimiento, Cetes a 28 días», porcentaje; clave
@@ -96,6 +99,7 @@ METODOS = {
     "riesgo_objetivo": "Riesgo objetivo con el mayor rendimiento",
     "utilidad": "Máxima utilidad U = E(r) − ½·A·σ²",
     "equiponderado": "Pesos iguales (1/N), referencia",
+    "cuenta": "Pesos actuales de su cuenta principal",
 }
 OBJETIVOS = {
     "conservador": {"nombre": "Conservador", "metodo": "min_varianza", "peso_max": 0.20, "min_activos": 8, "aversion": 10.0,
@@ -110,6 +114,11 @@ OBJETIVOS = {
     "agresivo": {"nombre": "Agresivo", "metodo": "max_sharpe", "peso_max": 0.40, "min_activos": 5, "aversion": 2.0,
                  "horizonte_anios": 10, "riesgo_ref": None,
                  "descripcion": "Acepta más volatilidad a cambio de crecimiento; aun así diversifica."},
+    "cuenta": {"nombre": "Mi cuenta principal", "metodo": "cuenta", "peso_max": 0.50, "min_activos": 5, "aversion": 2.0,
+               "horizonte_anios": 1, "riesgo_ref": None,
+               "descripcion": "Usa las posiciones y los pesos de su cuenta principal (última captura del portal o su registro "
+                              "local) y se actualiza sola cuando esa cartera cambia. Elija otro método para ver cómo la "
+                              "repartiría el optimizador con los mismos instrumentos."},
 }
 # Portafolios guardados antes del 28-oct-2026 usaban otros nombres de objetivo; se leen con su equivalente.
 ALIAS = {"seguridad": "conservador", "pertenencia": "moderado", "estima": "crecimiento", "autorrealizacion": "agresivo"}
@@ -155,7 +164,7 @@ def normalizar(spec: dict, ins: dict) -> dict:
     if not 2 <= len(activos) <= MAX_ACTIVOS:
         raise ErrorPortafolio(f"elija de 2 a {MAX_ACTIVOS} instrumentos")
     nombre = str(spec.get("nombre") or "").strip()[:80] or "Portafolio sin nombre"
-    ventana = int(_num(spec, "ventana", 252, 60, 1260))
+    ventana = int(_num(spec, "ventana", 252, 60, 2520))
     out = {
         "nombre": nombre, "descripcion": str(spec.get("descripcion") or "").strip()[:500], "objetivo": objetivo,
         "metodo": metodo, "activos": activos, "ventana": ventana,
@@ -188,13 +197,24 @@ def normalizar(spec: dict, ins: dict) -> dict:
     if len({(v["activo"], v["contra"]) for v in normalizadas}) != len(normalizadas):
         raise ErrorPortafolio("vistas duplicadas")
     out["vistas"] = normalizadas
+    if spec.get("origen") == "cuenta" or metodo == "cuenta":
+        pesos = spec.get("pesos")
+        if not isinstance(pesos, dict) or not pesos:
+            raise ErrorPortafolio("pesos de la cuenta: faltan (elija el perfil «Mi cuenta principal»)")
+        try:
+            pesos = {a: float(w) for a, w in pesos.items() if a in activos}
+        except (TypeError, ValueError):
+            raise ErrorPortafolio("pesos de la cuenta: deben ser números") from None
+        if not pesos or any(not (0 <= w <= 1) or math.isnan(w) for w in pesos.values()) or sum(pesos.values()) <= 0:
+            raise ErrorPortafolio("pesos de la cuenta: entre 0 y 1 y al menos uno positivo")
+        out.update(origen="cuenta", pesos=pesos, firma_cuenta=str(spec.get("firma_cuenta") or "")[:64])
     return out
 
 
 def _datos(con, ajustes, ids: list[str], ventana: int, base: pd.DataFrame | None = None) -> tuple[pd.DataFrame, list[dict]]:
     """Precios en MXN (ajustados por dividendos y splits) en fechas comunes. Excluye lo que tiene huecos.
     `base`: matriz de `mercado.precios_mxn` ya leída que contiene estos ids (cada columna es independiente)."""
-    p = mercado.precios_mxn(con, ajustes, ids) if base is None else base[[i for i in ids if i in base.columns]]
+    p = _precios(con, ajustes, ids) if base is None else base[[i for i in ids if i in base.columns]]
     excluidos = [{"id": i, "motivo": "sin precios"} for i in ids if i not in p.columns]
     p = p[[i for i in ids if i in p.columns]].dropna(how="all").iloc[-(ventana + 1):]
     cobertura = p.notna().mean()
@@ -202,6 +222,13 @@ def _datos(con, ajustes, ids: list[str], ventana: int, base: pd.DataFrame | None
         excluidos.append({"id": i, "motivo": f"historia insuficiente ({cobertura[i]:.0%} de la ventana)"})
     p = p[[c for c in p.columns if cobertura[c] >= 0.8]].ffill(limit=3).dropna()
     return p, excluidos
+
+
+def _precios(con, ajustes, ids: list[str]) -> pd.DataFrame:
+    """Precios MXN de la terminal con la historia del Excel del usuario empalmada como dato histórico (hasta su último
+    día; después, la serie local). Permite ventanas de 5 y 10 años también en BMV."""
+    from . import historia_externa
+    return historia_externa.precios_largos(con, ajustes, ids)
 
 
 def _vol(w, cov):
@@ -274,8 +301,8 @@ def _restricciones(grupos) -> list[dict]:
     return [{"type": "ineq", "fun": (lambda w, m=m, t=t: t - m @ w), "jac": (lambda w, m=m: -m)} for _, m, t in grupos]
 
 
-def _pesos(s: dict, mu: np.ndarray, cov: np.ndarray, lo: float, hi: float, extra: list, w_min=None, w_tan=None):
-    """Pesos del método elegido. Devuelve (w, avisos, w_min, w_tan)."""
+def _pesos(s: dict, mu: np.ndarray, cov: np.ndarray, lo: float, hi: float, extra: list, w_min=None, w_tan=None, ids=()):
+    """Pesos del método elegido. Devuelve (w, avisos, w_min, w_tan). `ids`: orden de mu (lo usa «pesos de la cuenta»)."""
     n, rf = len(mu), s["rf"]
     var = lambda w: (w @ cov @ w, 2 * cov @ w)  # noqa: E731
 
@@ -295,6 +322,11 @@ def _pesos(s: dict, mu: np.ndarray, cov: np.ndarray, lo: float, hi: float, extra
         w = w_tan
     elif m == "equiponderado":
         w = np.full(n, 1 / n)
+    elif m == "cuenta":  # los de la cartera actual; lo que no está en la cuenta pesa 0 y el resto se reescala a 100 %
+        w = np.array([s["pesos"].get(i, 0.0) for i in ids], dtype=float)
+        if w.sum() <= 0:
+            raise ErrorPortafolio("Ningún instrumento de su cuenta tiene historia suficiente para calcular el portafolio.")
+        w = w / w.sum()
     elif m == "utilidad":
         w, _ = _optimizar(lambda w: (-(w @ mu - 0.5 * s["aversion"] * (w @ cov @ w)), -(mu - s["aversion"] * (cov @ w))),
                           n, lo, hi, extra)
@@ -334,7 +366,7 @@ def fuera_de_muestra(P: pd.DataFrame, s: dict, lo: float, hi: float, extra: list
         mu, cov = _estimar(R.iloc[t - ent:t], s["covarianza"])
         if s.get("vistas"):
             mu = _black_litterman(list(R.columns), cov, s["vistas"], s["aversion"])
-        w, *_ = _pesos(s, mu, cov, lo, hi, extra)
+        w, *_ = _pesos(s, mu, cov, lo, hi, extra, ids=list(R.columns))
         crec = np.cumprod(1 + R.iloc[t:t + PASO_REBALANCEO].values, axis=0)
         for k, pesos in (("propuesta", w), ("1/N", np.full(n, 1 / n))):
             rot = float(np.abs(pesos - previos[k]).sum()) if previos[k] is not None else 1.0  # la primera compra también cuesta
@@ -363,6 +395,7 @@ def fuera_de_muestra(P: pd.DataFrame, s: dict, lo: float, hi: float, extra: list
                     "método" + ("" if ent == s["ventana"] else f" (ventana acortada de {s['ventana']} por historia disponible)")
                     + "; comisión del Reto "
                     + (f"{c:.3%} por peso operado (con IVA)" if costo else "no configurada: 0 %") + "."
+                    + (" Con «pesos de su cuenta» se usan los pesos de hoy en todos los meses." if s["metodo"] == "cuenta" else "")
                     + (" Las vistas de Black-Litterman son las de hoy y se aplican a todos los meses: si se formaron viendo "
                        "el pasado reciente, esta prueba favorece a la propuesta." if s.get("vistas") else "")}
 
@@ -381,7 +414,7 @@ def _rend_max(mu: np.ndarray, lo: float, hi: float) -> float:
 def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict, base: pd.DataFrame | None = None) -> dict:
     ins = mercado.instrumentos(con)
     s = normalizar(spec, ins)
-    base = mercado.precios_mxn(con, ajustes, s["activos"]) if base is None else base
+    base = _precios(con, ajustes, s["activos"]) if base is None else base
     precios, excluidos = _datos(con, ajustes, s["activos"], s["ventana"], base)
     ids = list(precios.columns)
     if len(ids) < 2 or len(precios) < 61:
@@ -419,9 +452,16 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict, base: pd.Dat
             frontera.append({"rend": rend(w), "riesgo": _vol(w, cov), "pesos": dict(zip(ids, np.round(w, 6).tolist()))})
             w_prev = w
     m = s["metodo"]
-    w, avisos, *_ = _pesos(s, mu, cov, lo, hi, extra, w_min, w_tan)
+    w, avisos, *_ = _pesos(s, mu, cov, lo, hi, extra, w_min, w_tan, ids)
     excedidos = [f"{nombre} {float(mk @ w):.0%} > {t:.0%}" for nombre, mk, t in grupos if float(mk @ w) > t + 1e-4]
-    if excedidos:
+    if s.get("pesos"):
+        sin = [ins[e["id"]]["clave_operable"] for e in excluidos if e["id"] in s["pesos"]]
+        if sin:
+            avisos.append(f"Sin historia suficiente, fuera del cálculo: {', '.join(sin)}; los pesos de la cuenta se "
+                          "reescalan entre el resto.")
+    if excedidos and m == "cuenta":  # la cuenta es la que es: se informa en lugar de rechazarla
+        avisos.append("Su cuenta supera los topes por moneda o sector: " + "; ".join(excedidos) + ".")
+    elif excedidos:
         raise ErrorPortafolio("Con esos topes por moneda o sector no se llega a 100 % (" + "; ".join(excedidos)
                               + "): súbalos o agregue instrumentos en pesos o de otros sectores.")
     if s.get("sector_max") is not None:
@@ -472,7 +512,8 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict, base: pd.Dat
         "reglas_reto": {"emisoras": activos_con_peso, "peso_max": float(w.max()),
                         "cumple": activos_con_peso >= 5 and float(w.max()) <= 0.5},
         "datos": {"inicio": precios.index[0].date().isoformat(), "fin": precios.index[-1].date().isoformat(),
-                  "sesiones": len(R), "excluidos": excluidos, "precios": "MXN ajustados por dividendos y splits"},
+                  "sesiones": len(R), "excluidos": excluidos,
+                  "precios": "MXN ajustados por dividendos y splits; hasta el 9-oct-2025, historia del Excel del usuario"},
         "avisos": avisos, "aviso": AVISO, "calculado_en": db.ahora(),
     }
 
@@ -516,6 +557,45 @@ def eliminar(con: sqlite3.Connection, pid: int) -> bool:
         return con.execute("DELETE FROM portafolios_usuario WHERE id=?", (pid,)).rowcount > 0
 
 
+# ---------- cuenta principal ----------
+def cuenta_principal(con: sqlite3.Connection, ajustes: Ajustes) -> dict:
+    """Posiciones abiertas de la cuenta principal (la misma cartera de «Cartera»: captura vigente del portal o registro
+    local) con su peso por valor en MXN, sin contar el efectivo. `firma` cambia cuando cambian posiciones o captura."""
+    from . import servicios
+    c = servicios.cartera_actual(con, ajustes)
+    con_valor = [p for p in c["posiciones"] if (p.get("valor_mxn") or 0) > 0]
+    total = sum(p["valor_mxn"] for p in con_valor)
+    captura = c.get("captura") or {}
+    huella = [c.get("fuente"), captura.get("id"), sorted((p["instrumento_id"], round(p.get("cantidad") or 0, 6)) for p in c["posiciones"])]
+    return {"pesos": {p["instrumento_id"]: p["valor_mxn"] / total for p in con_valor} if total else {},
+            "sin_valor": [p.get("clave_operable") or p["instrumento_id"] for p in c["posiciones"] if p not in con_valor],
+            "fuente": c.get("fuente"), "captura": captura.get("hora_portal"), "efectivo": c.get("efectivo"),
+            "valor_total": c.get("valor_total"),
+            "firma": hashlib.sha256(json.dumps(huella, default=str).encode()).hexdigest()[:16]}
+
+
+def refrescar_cuenta(con: sqlite3.Connection, ajustes: Ajustes, cuenta: dict | None = None) -> int:
+    """Recalcula los portafolios guardados con origen «cuenta» cuya cartera ya no es la actual. Los instrumentos que el
+    usuario agregó aparte se conservan. Devuelve cuántos se actualizaron."""
+    guardados = [p for p in listar(con) if p["especificacion"].get("origen") == "cuenta"]
+    if not guardados:
+        return 0
+    cuenta = cuenta or cuenta_principal(con, ajustes)
+    ins, n = mercado.instrumentos(con), 0
+    for p in guardados:
+        s = p["especificacion"]
+        if s.get("firma_cuenta") == cuenta["firma"] or not cuenta["pesos"]:
+            continue
+        pesos = {i: w for i, w in cuenta["pesos"].items() if i in ins}
+        adicionales = [a for a in s["activos"] if a not in (s.get("pesos") or {}) and a not in pesos]
+        try:
+            guardar(con, ajustes, {**s, "activos": list(pesos) + adicionales, "pesos": pesos, "firma_cuenta": cuenta["firma"]}, p["id"])
+            n += 1
+        except ErrorPortafolio:
+            continue
+    return n
+
+
 # ---------- ayuda para construir y generador de propuestas ----------
 _PRECIOS: dict = {}
 
@@ -530,7 +610,7 @@ def _precios_cache(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str]) ->
         return previo[2]
     if len(_PRECIOS) >= 16:  # pocas combinaciones de filtros a la vez; se descarta la más vieja
         _PRECIOS.pop(min(_PRECIOS, key=lambda k: _PRECIOS[k][0]))
-    p = mercado.precios_mxn(con, ajustes, ids)
+    p = _precios(con, ajustes, ids)
     _PRECIOS[clave] = (ahora, marca, p)
     return p
 
@@ -586,7 +666,7 @@ def sugerir(con: sqlite3.Connection, ajustes: Ajustes, objetivo: str = "crecimie
         raise ErrorPortafolio("perfil desconocido")
     n = max(2, min(int(n), MAX_ACTIVOS))
     candidatos = _candidatos(con, ajustes, objetivo, mercado_filtro, clase, caps)[: max(n * 4, 30)]
-    precios = mercado.precios_mxn(con, ajustes, [f["id"] for f in candidatos])
+    precios = _precios(con, ajustes, [f["id"] for f in candidatos])
     R = precios.iloc[-253:].pct_change(fill_method=None)
     elegidos, motivos, _ = _elegir(R, candidatos, n, [], set(), corr_max)
     return {"activos": elegidos, "motivos": motivos, "objetivo": objetivo, "parametros": OBJETIVOS[objetivo],
@@ -627,10 +707,18 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
     n = int(_num(g, "n", perfil["min_activos"], 2, MAX_ACTIVOS))
     excluir = set(_ids(g.get("excluir"), ins, "excluir"))
     fijos = [f for f in _ids(g.get("fijos"), ins, "fijos") if f not in excluir]
-    ventana = int(_num(g, "ventana", 252, 60, 1260))
+    ventana = int(_num(g, "ventana", 252, 60, 2520))
+    cuenta = None
+    if objetivo == "cuenta":
+        cuenta = cuenta_principal(con, ajustes)
+        propios = [i for i in cuenta["pesos"] if i in ins and i not in excluir]
+        if not propios:
+            raise ErrorPortafolio("Su cuenta principal no tiene posiciones con precio: registre una captura del portal "
+                                  "en Cartera o sus operaciones.")
+        fijos = propios + [f for f in fijos if f not in propios]
     sugeridos, motivos, alternativas, criterio = [], {}, [], "Solo los instrumentos que usted eligió."
     base = None
-    if g.get("completar", True) is not False and len(fijos) < n:
+    if g.get("completar", objetivo != "cuenta") is not False and len(fijos) < n:
         filas = _candidatos(con, ajustes, objetivo, mercado_filtro, clase, caps)[: max(n * 4, 40)]
         base = _precios_cache(con, ajustes, list(dict.fromkeys(fijos + [f["id"] for f in filas])))
         precios, fuera = _datos(con, ajustes, list(base.columns), ventana, base)
@@ -650,6 +738,11 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
                                   "horizonte_anios", "covarianza", "usd_max", "sector_max", "vistas") if k in g},
             "objetivo": objetivo, "metodo": perfil["metodo"] if metodo == "auto" else metodo, "activos": activos,
             "ventana": ventana, "peso_max": g.get("peso_max", perfil["peso_max"]), "aversion": g.get("aversion", perfil["aversion"])}
+    if cuenta:
+        spec.update(origen="cuenta", pesos={i: cuenta["pesos"][i] for i in propios}, firma_cuenta=cuenta["firma"])
+        criterio = ("Posiciones y pesos de su cuenta principal ("
+                    + (f"captura del portal del {cuenta['captura'][:16].replace('T', ' ')}" if cuenta["captura"] else "registro local")
+                    + ")" + (" más los instrumentos que usted agregó" if len(fijos) > len(propios) or sugeridos else "") + ".")
     consejos = []
     peso_max = _num(spec, "peso_max", perfil["peso_max"], 0.01, 1)
     if peso_max * len(activos) < 1 - 1e-9:
@@ -659,9 +752,14 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
                                                    "prefiere un tope más bajo."})
     res = calcular(con, ajustes, spec, base)
     consejos += _consejos(res, perfil)
+    if cuenta and cuenta["sin_valor"]:
+        consejos.insert(0, {"tipo": "aviso", "texto": "Sin precio en la terminal, fuera de la propuesta: " + ", ".join(cuenta["sin_valor"]) + "."})
     return {"resultado": res, "sugerencias": consejos, "alternativas": alternativas, "motivos": motivos,
-            "fijos": [f for f in fijos if f in activos], "sugeridos": sugeridos, "criterio": criterio,
-            "perfil": {"clave": objetivo, **perfil}}
+            "fijos": [f for f in fijos if f in activos and not (cuenta and f in propios)], "sugeridos": sugeridos,
+            "criterio": criterio, "perfil": {"clave": objetivo, **perfil},
+            "cuenta": None if not cuenta else {"ids": propios, "pesos": spec["pesos"], "firma": cuenta["firma"],
+                                               "fuente": cuenta["fuente"], "captura": cuenta["captura"],
+                                               "efectivo": cuenta["efectivo"], "valor_total": cuenta["valor_total"]}}
 
 
 def _consejos(res: dict, perfil: dict) -> list[dict]:
@@ -670,11 +768,11 @@ def _consejos(res: dict, perfil: dict) -> list[dict]:
     s, m, act = res["especificacion"], res["metricas"], res["activos"]
     por_id = {a["id"]: a for a in act}
     for a in sorted(act, key=lambda a: a["peso"]):
-        if a["peso"] < 0.005:
+        if a["peso"] < 0.005 and s["metodo"] != "cuenta":
             out.append({"texto": f"{a['clave']} no recibe peso: con estos datos no mejora el portafolio. Quítelo y la terminal "
                                  "pondrá otro en su lugar.", "accion": {"excluir": a["id"]}, "etiqueta": f"Quitar {a['clave']}"})
     tope = [a for a in act if a["peso"] >= s["peso_max"] - 1e-3]
-    if len(tope) >= 2 and s["peso_max"] < 0.5:
+    if len(tope) >= 2 and s["peso_max"] < 0.5 and s["metodo"] != "cuenta":
         nuevo = round(min(0.5, s["peso_max"] + 0.10), 2)
         out.append({"texto": f"{len(tope)} instrumentos llegaron al tope de {s['peso_max']:.0%}. Con un tope de {nuevo:.0%} el "
                              "optimizador concentra más en los mejores: más rendimiento esperado y menos diversificación.",
@@ -685,8 +783,10 @@ def _consejos(res: dict, perfil: dict) -> list[dict]:
                              f"{m['sharpe']:.2f}), con un riesgo de {t['riesgo']:.0%}.",
                     "accion": {"metodo": "max_sharpe"}, "etiqueta": "Usar máximo Sharpe"})
     if eq["sharpe"] is not None and m["sharpe"] is not None and eq["sharpe"] >= m["sharpe"] - 0.05:
-        out.append({"tipo": "info", "texto": f"Repartir en partes iguales (1/N) da un Sharpe parecido ({eq['sharpe']:.2f}): aquí "
-                                             "la optimización casi no agrega valor, y 1/N depende menos de estimaciones históricas."})
+        out.append({"tipo": "info", "texto": f"Repartir en partes iguales (1/N) da un Sharpe parecido ({eq['sharpe']:.2f}"
+                                             + (f" contra {m['sharpe']:.2f} de su cuenta)." if s["metodo"] == "cuenta" else
+                                                "): aquí la optimización casi no agrega valor, y 1/N depende menos de "
+                                                "estimaciones históricas.")})
     ref = perfil.get("riesgo_ref")
     if ref and m["riesgo"] > ref and s["metodo"] != "min_varianza":
         out.append({"texto": f"El riesgo ({m['riesgo']:.1%} anual) supera lo habitual para un perfil {perfil['nombre'].lower()} "

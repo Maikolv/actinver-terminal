@@ -25,7 +25,7 @@ export const GUIAS = {
   'panel-portafolios': {
     titulo: 'Mis portafolios',
     que: 'Arma carteras de prueba, aparte de su cuenta del Reto: reparte el dinero buscando el mejor equilibrio entre ganancia esperada y riesgo (método de Markowitz). Si tiene una opinión propia sobre una emisora, puede sumarla (Black-Litterman). Se recalcula con cada cambio.',
-    pasos: ['Elija un perfil (Conservador, Moderado, Crecimiento o Agresivo).',
+    pasos: ['Elija un perfil (Conservador, Moderado, Crecimiento o Agresivo), o «Mi cuenta principal» para partir de su cartera actual; esta se actualiza sola cuando registra una captura u operación.',
       'Ajuste qué instrumentos considerar, cuántos y el tope por instrumento; fije los que usted quiera.',
       'Si tiene una hipótesis propia, agregue una vista anual y su confianza; después revise la prueba fuera de muestra frente a 1/N.',
       'Aplique las sugerencias con un clic y revise los supuestos antes de guardar.',

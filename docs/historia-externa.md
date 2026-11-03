@@ -12,7 +12,24 @@ Entregada por el usuario el 7-oct-2026 como «data histórica 100 % verificable 
 - sha256 del archivo y conteos: `docs/evidencia/historia_externa.json`. La matriz se guarda en
   `data/referencias/historia_externa/` (fuera de Git, como el resto de `data/`).
 
-## Reglas de uso
+## Dato absoluto para la historia (3-nov-2026)
+
+El usuario volvió a entregar el mismo archivo (sha256 idéntico, `5ee9220d…`) e indicó tomarlo como **dato absoluto** para
+la historia. Desde entonces (`historia_externa.empalmar` / `precios_largos`):
+
+- Hasta el 9-oct-2025 mandan los rendimientos del Excel, en **todas** las columnas mapeadas al catálogo (también las 5
+  «rechazadas» y las «sin verificar»); después, la serie local. El nivel se ancla a la serie local: el precio de hoy no
+  cambia. Sigue sin entrar a la tabla `precios` y nunca es precio vigente.
+- Si la serie local empieza después del fin del Excel, un hueco de hasta 25 sesiones se toma «sin cambio» y se
+  informa; con más (fondos como ACTDUAL, cuya serie local empieza en sep-2026) no se empalma.
+- Se excluyen igual «AC» (es otra empresa), los 3 perfiles índice y las columnas fuera del catálogo.
+- Lo usan el generador de **Mis portafolios** (ventanas nuevas de 5 y 10 años y prueba fuera de muestra más larga) y la
+  **comparación de Seguimiento** (5 y 10 años). El motor de propuestas, el Ranking y el riesgo usan ventanas de menos de
+  un año, que la serie local ya cubre: no cambian. La validación V1 de abajo ya usó esta historia.
+- En SIC el Excel es precio ajustado por dividendos: en Seguimiento (base «solo splits») el tramo anterior al
+  9-oct-2025 incluye dividendos.
+
+## Reglas de uso (7-oct-2026; la regla 2 queda sustituida por la sección anterior para el empalme)
 
 1. No entra a la tabla `precios`. Termina el 9-oct-2025: nunca se muestra como precio vigente.
 2. Cada columna se verifica contra la serie que ya tiene la terminal (Tiingo/Alpaca para SIC, EODHD para BMV) en las

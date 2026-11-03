@@ -58,3 +58,33 @@ def test_perfiles_reportan_rendimiento_y_caida():
     df.iloc[300:, 0] *= 0.8
     r = hx.perfiles(df)["Moderado"]
     assert r["max_caida"] < -0.15 and r["rend_anual"] > 0
+
+
+def test_empalme_dato_absoluto_hasta_el_fin_del_excel(con, ajustes, tmp_path, monkeypatch):
+    """El Excel manda hasta su último día (aunque difiera de la serie local), el precio de hoy no cambia y un hueco largo
+    entre el Excel y la serie local no se empalma."""
+    from terminal import mercado
+    f = pd.bdate_range("2020-01-01", periods=80)
+    con.executemany("INSERT INTO fx (par, fecha, valor, proveedor, tipo_dato, obtenido_en) VALUES ('USDMXN',?,20,'fred','fix','x')",
+                    [(d.date().isoformat(),) for d in f])
+    rng = np.random.default_rng(3)
+    excel = 100 * np.cumprod(1 + rng.normal(0, 0.01, 60))
+    local = 50 * np.cumprod(1 + rng.normal(0, 0.01, 50))
+    _local(con, "SIC:AAPL", f[30:], local, "USD")      # traslapa 30 sesiones con el Excel, con otros rendimientos
+    _local(con, "SIC:MSFT", f[75:], local[:5], "USD")  # empieza 15 sesiones después del Excel
+    d = tmp_path / "hx"
+    d.mkdir()
+    pd.DataFrame({"AAPL": excel, "MSFT": excel}, index=f[:60]).to_csv(d / "precios.csv.gz")
+    monkeypatch.setattr(hx, "carpeta", lambda: d)
+    hx._CACHE.clear()
+    P0 = mercado.precios_mxn(con, ajustes, ["SIC:AAPL", "SIC:MSFT"])
+    P, info = hx.empalmar(con, ajustes, P0)
+    assert P["SIC:AAPL"].iloc[-1] == P0["SIC:AAPL"].iloc[-1] and P.index.min() == f[0]
+    r = P["SIC:AAPL"].pct_change()
+    assert np.allclose(r.loc[f[1:60]], pd.Series(excel, index=f[:60]).pct_change().loc[f[1:60]])  # manda el Excel
+    assert np.allclose(r.loc[f[61]:], P0["SIC:AAPL"].pct_change().loc[f[61]:])                     # después, lo local
+    assert [e["id"] for e in info["empalmados"]] == ["SIC:AAPL", "SIC:MSFT"] and info["empalmados"][1]["hueco"] == 15
+    monkeypatch.setattr(hx, "MAX_HUECO", 10)
+    hx._CACHE.clear()
+    _, info = hx.empalmar(con, ajustes, P0)
+    assert [e["id"] for e in info["omitidos"]] == ["SIC:MSFT"]

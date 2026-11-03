@@ -9,6 +9,7 @@ import os
 import re
 import threading
 import time
+import urllib.parse
 from contextlib import asynccontextmanager
 from datetime import date
 
@@ -1014,16 +1015,36 @@ def _xlsx(datos: bytes, nombre: str) -> Response:
     return Response(datos, media_type=XLSX, headers={"Content-Disposition": f'attachment; filename="{nombre}"'})
 
 
+def _cuenta_al_dia(con) -> dict | None:
+    """Cartera de la cuenta principal y recálculo de los portafolios guardados con ese origen si cambió. Si la
+    cartera no se puede leer, la lista de portafolios se sirve igual (sin actualizar)."""
+    from . import markowitz
+    try:
+        cuenta = markowitz.cuenta_principal(con, AJUSTES)
+        markowitz.refrescar_cuenta(con, AJUSTES, cuenta)
+    except Exception:  # noqa: BLE001
+        log.exception("no se pudo leer la cuenta principal para Mis portafolios")
+        return None
+    return {k: cuenta[k] for k in ("firma", "fuente", "captura", "valor_total")} | {"n": len(cuenta["pesos"])}
+
+
 @app.get("/api/portafolios")
 def get_portafolios(con=Depends(con_db)):
     from . import markowitz
+    cuenta = _cuenta_al_dia(con)
     resumen = [{"id": p["id"], "nombre": p["nombre"], "actualizado_en": p["actualizado_en"], "especificacion": p["especificacion"],
                 **({k: p["resultado"].get(k) for k in ("metricas", "metodo_nombre", "objetivo_nombre", "calculado_en")}
                    | {"n_activos": sum(1 for a in p["resultado"]["activos"] if a["peso"] >= 0.005)} if p["resultado"] else {})}
                for p in markowitz.listar(con)]
     return {"portafolios": resumen, "objetivos": markowitz.OBJETIVOS, "metodos": markowitz.METODOS,
             "ventanas": markowitz.VENTANAS, "aviso": markowitz.AVISO, "tasa_libre": markowitz.tasa_libre(con, AJUSTES),
-            "covarianzas": markowitz.COVARIANZAS}
+            "covarianzas": markowitz.COVARIANZAS, "cuenta": cuenta}
+
+
+@app.get("/api/portafolios/cuenta")
+def get_portafolios_cuenta(con=Depends(con_db)):
+    """Firma de la cartera de la cuenta principal: la interfaz recalcula la propuesta cuando cambia."""
+    return {"cuenta": _cuenta_al_dia(con)}
 
 
 @app.get("/api/portafolios/sugerir")
@@ -1060,6 +1081,7 @@ def post_portafolio(cuerpo: dict = Body(...), con=Depends(con_db)):
 @app.get("/api/portafolios/excel")
 def get_portafolios_excel(con=Depends(con_db)):
     from . import excel_markowitz, markowitz
+    _cuenta_al_dia(con)
     todos = markowitz.listar(con)
     if not todos:
         raise cartera.ErrorValidacion(["Aún no hay portafolios guardados; descargue la plantilla o guarde uno primero."])
@@ -1096,6 +1118,7 @@ def delete_portafolio(pid: int, con=Depends(con_db)):
 @app.get("/api/portafolios/{pid}/excel")
 def get_portafolio_excel(pid: int, con=Depends(con_db)):
     from . import excel_markowitz, markowitz
+    _cuenta_al_dia(con)
     p = _markowitz(markowitz.obtener, con, pid)
     return _xlsx(_markowitz(excel_markowitz.libro, con, AJUSTES, [p]), f"portafolio_{pid}_markowitz.xlsx")
 
@@ -1573,7 +1596,7 @@ def post_lista_seguimiento(cuerpo: dict = Body(...), con=Depends(con_db)):
 def get_comparar(ids: str, ventana: int = 252, referencia: str = "BMV:NAFTRAC", con=Depends(con_db)):
     from . import seguimiento
     try:
-        return seguimiento.comparar(con, AJUSTES, [x.strip() for x in ids.split(",")], max(30, min(ventana, 1260)), referencia)
+        return seguimiento.comparar(con, AJUSTES, [x.strip() for x in ids.split(",")], max(30, min(ventana, 2520)), referencia)
     except ValueError as e:
         raise HTTPException(422, str(e)) from None
 
@@ -1684,7 +1707,7 @@ LOGO_SVG = ('<svg class="marca__logo" aria-hidden="true" width="18" height="18" 
             'rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg>')
 
 
-def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "") -> str:
+def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "", esperando: bool = True) -> str:
     """Página aislada para un widget de TradingView, con el logo y los colores de la terminal."""
     clase = ("tema-claro" if tema == "light" else "tema-oscuro") + ("" if cabecera else " sin-cabecera")
     barra = (f'<header><a class="marca" href="/" target="_top">{LOGO_SVG}<span>Actinver Terminal</span></a> {cabecera}</header>'
@@ -1694,9 +1717,28 @@ def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "") -> str:
 <title>{html.escape(titulo)} · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
 <link rel="stylesheet" href="/static/grafica.css"></head><body class="{clase}">
 {barra}
-<div class="estado-marco" role="status">SIN DATO · Esperando el marco de TradingView.</div>
+{'<div class="estado-marco" role="status">SIN DATO · Esperando el marco de TradingView.</div>' if esperando else ''}
 {cuerpo}
 </body></html>"""
+
+
+# TradingView reserva para su propia plataforma el precio de la BMV en widgets gratuitos (gráfica, cotización, panorama
+# y noticias muestran «solo disponible en TradingView»; comprobado el 3-nov-2026). Fundamentales, perfil y técnico sí cargan.
+BMV_SIN_WIDGET = {"grafica": "la gráfica de precios", "info": "el precio y rango del día", "panorama": "el panorama del precio",
+                  "noticias-emisora": "las noticias de la emisora"}
+
+
+def _aviso_bmv(iid: str, sim: str, que: str, tema: str) -> HTMLResponse:
+    """Página local en lugar del marco vacío de TradingView para una emisora de la BMV."""
+    clave = sim.split(":", 1)[1]
+    externo = "https://es.tradingview.com/symbols/BMV-" + urllib.parse.quote(clave, safe="") + "/"
+    velas = "/?" + urllib.parse.urlencode({"vista": "tab-velas", "simbolo": iid})
+    cuerpo = f"""<main class="aviso-bmv" role="status"><p><strong>SIN DATO · {html.escape(clave)}</strong></p>
+<p>TradingView no permite mostrar {html.escape(que)} de la BMV en sus widgets gratuitos.</p>
+<p><a href="{html.escape(velas)}" target="_top">Ver los cierres guardados en Velas</a> ·
+<a href="{html.escape(externo)}" target="_blank" rel="noopener noreferrer">Abrir en TradingView (sitio externo)</a></p></main>"""
+    return HTMLResponse(_pagina_tv(f"{clave} · BMV", tema, cuerpo, esperando=False),
+                        headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})
 
 
 @app.get("/grafica/{iid}", response_class=HTMLResponse)
@@ -1707,6 +1749,8 @@ def grafica(iid: str, intervalo: str = "D", tema: str = "dark", con=Depends(con_
         raise HTTPException(404, "Instrumento sin gráfica disponible")
     if intervalo not in INTERVALOS_TV or tema not in TEMAS_TV:
         raise HTTPException(422, "intervalo o tema inválido")
+    if sim.startswith("BMV:"):
+        return _aviso_bmv(iid, sim, BMV_SIN_WIDGET["grafica"], tema)
     cfg = json.dumps({"autosize": True, "symbol": sim, "interval": intervalo, "timezone": "America/Mexico_City",
                       "theme": tema, "style": "1", "locale": "es", "allow_symbol_change": False,
                       "support_host": "https://www.tradingview.com"})
@@ -1770,8 +1814,8 @@ def _config_widget(tipo: str, sim: str | None, con, mapa: str, filtro: str) -> d
                 "lineColor": "rgba(243, 244, 246, 0.95)", "topColor": "rgba(243, 244, 246, 0.16)", "bottomColor": "rgba(243, 244, 246, 0)",  # neutro: el rojo se leería como pérdida
                 "lineWidth": 2, "fontFamily": "Segoe UI, system-ui, sans-serif", "valuesTracking": "1",
                 "dateRanges": ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]}
-    if tipo == "tecnico-indice":
-        return {**BASE_TV, "symbol": "FOREXCOM:SPXUSD", "interval": "1D", "showIntervalTabs": True, "displayMode": "multiple"}
+    if tipo == "tecnico-indice":  # SPY: el CFD FOREXCOM:SPXUSD no tiene análisis técnico en el widget gratuito
+        return {**BASE_TV, "symbol": "AMEX:SPY", "interval": "1D", "showIntervalTabs": True, "displayMode": "multiple"}
     if tipo == "cinta-macro":
         return {**BASE_TV, "showSymbolLogo": True, "displayMode": "compact", "isTransparent": True, "symbols": [
             {"proName": s, "title": d} for s, d in [("FOREXCOM:SPXUSD", "S&P 500"), ("FOREXCOM:NSXUSD", "Nasdaq 100"),
@@ -1825,8 +1869,12 @@ def widget_tradingview(tipo: str, simbolo: str = "", mapa: str = "NASDAQ100", fi
         sim = simbolo_tradingview(ins) if ins else None
         if not sim or not re.fullmatch(r"[A-Z]{3,6}:[A-Z0-9.&_\-]{1,20}(?:/[A-Z0-9]{1,10})?", sim):
             raise HTTPException(404, "Instrumento sin widget disponible")
+        if sim.startswith("BMV:") and tipo in BMV_SIN_WIDGET:
+            return _aviso_bmv(simbolo, sim, BMV_SIN_WIDGET[tipo], tema)
     # `</` se escapa para que ningún valor cierre la etiqueta <script> donde va la configuración.
     config = {**_config_widget(tipo, sim, con, mapa, filtro), "colorTheme": tema}
+    if tipo == "perfil":
+        config["locale"] = "en"  # TradingView no publica la descripción de la empresa en español para la mayoría de emisoras
     cfg = json.dumps(config, ensure_ascii=False).replace("</", "<\\/")
     pagina = _pagina_tv("Widget de TradingView", tema, f"""<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
 <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">Datos de TradingView</a></div>

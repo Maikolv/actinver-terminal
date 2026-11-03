@@ -70,7 +70,7 @@ def test_capitalizacion_usa_el_flotante_si_la_sec_solo_reporta_una_serie(con, aj
 def test_markowitz_metodos_respetan_restricciones_y_teoria(con, ajustes):
     sembrar(con)
     base = {"activos": IDS, "peso_max": 0.4, "rf": 0.05, "ventana": 252}
-    res = {m: markowitz.calcular(con, ajustes, {**base, "metodo": m}) for m in markowitz.METODOS}
+    res = {m: markowitz.calcular(con, ajustes, {**base, "metodo": m}) for m in markowitz.METODOS if m != "cuenta"}
     for r in res.values():
         w = np.array([a["peso"] for a in r["activos"]])
         assert abs(w.sum() - 1) < 1e-6 and w.min() >= -1e-9 and w.max() <= 0.4 + 1e-6
@@ -249,3 +249,29 @@ def test_sectores_por_fuente_sin_mezclar_taxonomias():
     assert s["SIC:XLK"] == s["SIC:VGT"] == "ETF · Tecnología"                 # sector declarado en el nombre del fondo
     assert s["SIC:NVDA"].startswith("SIC ")                                  # acciones de EE. UU.: grupo SIC de la SEC
     assert "SIC:SPY" not in s and "BMV:WALMEX" not in s                      # amplios y BMV: sin sector, no se inventa
+
+
+def test_perfil_cuenta_principal_pega_la_cartera_y_se_actualiza(con, ajustes, monkeypatch):
+    """«Mi cuenta principal» usa las posiciones y pesos de la cartera actual; al cambiar, los guardados se recalculan."""
+    sembrar(con)
+    cartera = {"pesos": {"SIC:MU": 0.5, "SIC:NVDA": 0.3, "BMV:AMX": 0.2}, "firma": "a"}
+    monkeypatch.setattr(markowitz, "cuenta_principal", lambda con, ajustes: {
+        **cartera, "sin_valor": [], "fuente": "portal", "captura": "2026-11-03T14:27:00-06:00", "efectivo": 0, "valor_total": 1})
+    r = markowitz.generar(con, ajustes, {"objetivo": "cuenta"})
+    pesos = {a["id"]: a["peso"] for a in r["resultado"]["activos"]}
+    assert pesos == pytest.approx(cartera["pesos"]) and r["sugeridos"] == [] and r["cuenta"]["firma"] == "a"
+    assert r["resultado"]["especificacion"]["metodo"] == "cuenta" and r["fijos"] == []
+    # otro método reparte los mismos instrumentos; un instrumento propio se agrega aparte y conserva su lugar
+    r2 = markowitz.generar(con, ajustes, {"objetivo": "cuenta", "metodo": "min_varianza", "fijos": ["SIC:AAPL"]})
+    assert [a["id"] for a in r2["resultado"]["activos"]] == ["SIC:MU", "SIC:NVDA", "BMV:AMX", "SIC:AAPL"] and r2["fijos"] == ["SIC:AAPL"]
+    guardado = markowitz.guardar(con, ajustes, {**r2["resultado"]["especificacion"], "nombre": "Mi cuenta"})
+    assert markowitz.refrescar_cuenta(con, ajustes) == 0  # misma cartera: no recalcula
+    cartera.update(pesos={"SIC:MU": 0.6, "BMV:WALMEX": 0.4}, firma="b")
+    assert markowitz.refrescar_cuenta(con, ajustes) == 1
+    s = markowitz.obtener(con, guardado["id"])["especificacion"]
+    assert s["activos"] == ["SIC:MU", "BMV:WALMEX", "SIC:AAPL"] and s["firma_cuenta"] == "b" and s["pesos"] == {"SIC:MU": 0.6, "BMV:WALMEX": 0.4}
+    with pytest.raises(markowitz.ErrorPortafolio, match="pesos de la cuenta"):
+        markowitz.calcular(con, ajustes, {"activos": IDS, "metodo": "cuenta"})
+    cartera.update(pesos={})
+    with pytest.raises(markowitz.ErrorPortafolio, match="no tiene posiciones"):
+        markowitz.generar(con, ajustes, {"objetivo": "cuenta"})

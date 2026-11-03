@@ -254,7 +254,8 @@ if(typeof document!=='undefined') {
         activos=activos.filter(x=>x!==origen);activos.splice(activos.indexOf(id),0,origen);$('mesa-preset').value='guardada';guardar();dibujar();});
       head.append(asa,h,antes,despues,ancho,boton('Quitar',()=>{activos=activos.filter(x=>x!==id);$('mesa-preset').value='guardada';guardar();dibujar();$('mesa-agregar').focus();}));card.append(head);
       if(NATIVOS[id]&&(catalogoListo||id==='calendario')){const caja=el('div',{clase:'mesa-nativo','aria-live':'polite'},el('p',{clase:'mesa-procedencia'},'Cargando datos locales…'));card.append(el('p',{clase:'mesa-nativo__titulo'},'Datos de la terminal'),caja);NATIVOS[id](caja,simbolo);}
-      const restringido=['chart','info'].includes(tipo)&&({'BMV:AMX':'AMX/B','BMV:SMARTRC':'SMARTRC/14'}[simbolo]);
+      // TradingView reserva precio y noticias de toda la BMV para su plataforma (no solo AMX/SMARTRC); perfil, finanzas y técnico sí cargan.
+      const restringido=['chart','info','noticias-emisora'].includes(tipo)&&simbolo.startsWith('BMV:')&&({'BMV:AMX':'AMX/B','BMV:SMARTRC':'SMARTRC/14'}[simbolo]||simbolo.slice(4));
       if(tipo==='chart'&&!restringido){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
       if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
       else if(tipo==='risk')panelRiesgo(card);

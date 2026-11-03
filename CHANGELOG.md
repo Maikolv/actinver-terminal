@@ -2,6 +2,28 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 3-nov-2026 — Excel «Benchmarks_time_series» como dato histórico absoluto
+
+- Es el mismo archivo importado el 7-oct (sha256 idéntico). Hasta hoy solo lo usaban la validación V1 con historia larga y el TSM mensual; el generador y el resto de la terminal no.
+- `historia_externa.empalmar`/`precios_largos`: hasta el 9-oct-2025 mandan los rendimientos del Excel (todas las columnas mapeadas, no solo las verificadas); después, la serie local; el precio de hoy no cambia. Huecos ≤ 25 sesiones se informan como «sin cambio»; más largos (ACTDUAL) no se empalman. No entra a `precios`.
+- Mis portafolios: ventanas de 5 y 10 años (2,520 sesiones desde feb-2017 con tu cuenta) y prueba fuera de muestra más larga (167 meses con ventana de 1 año). Seguimiento › Comparar: 5 y 10 años.
+- Prueba nueva en `tests/test_historia_externa.py`; `test_historia_externa`, `test_markowitz`, `test_etapa3`: 29 aprobadas. Detalle en `docs/historia-externa.md`.
+
+## 3-nov-2026 — «Mi cuenta principal» en Mis portafolios
+
+- Decidir › Mis portafolios › 1. Perfil tiene un quinto perfil, **Mi cuenta principal**: pega las posiciones y los pesos por valor (sin efectivo) de la cartera de la cuenta, la misma de «Cartera» (captura vigente del portal o registro local). Método «Pesos actuales de su cuenta»; cualquier otro método reparte los mismos instrumentos para comparar. Capital a simular = valor de la cuenta.
+- Se actualiza solo: el servidor lee la cartera en cada cálculo; la interfaz compara una firma (posiciones + captura) al entrar a la sección y cada minuto mientras está a la vista. Los portafolios guardados con ese origen se recalculan al listar o descargar en Excel cuando la cartera cambió, conservando los instrumentos agregados aparte.
+- Instrumentos sin historia (ACTDUAL B) quedan fuera y los pesos se reescalan con aviso; los topes por moneda/sector se informan en lugar de rechazar la cuenta. Solo simula: no envía órdenes.
+- Rutas: `/api/portafolios` incluye `cuenta`; nueva `GET /api/portafolios/cuenta`. Prueba nueva en `tests/test_markowitz.py`.
+
+## 3-nov-2026 — Revisión de los 21 widgets de TradingView
+
+- Se abrieron uno por uno los 21 tipos de widget y la gráfica con SIC (MU, SPY) y BMV (GMEXICO, ALPEK, WALMEX, NAFTRAC).
+- Medidor técnico del S&P 500: el CFD `FOREXCOM:SPXUSD` no tiene análisis técnico en el widget gratuito («Aquí todavía no existen datos»); ahora usa `AMEX:SPY`.
+- Perfil de la empresa: TradingView no publica la descripción en español (MU, GMEXICO salían vacíos); el widget de perfil se pide en inglés.
+- BMV: TradingView reserva para su plataforma la gráfica, el precio, el panorama y las noticias de **todas** las emisoras (no solo AMX/SMARTRC). `/grafica` y esos widgets devuelven un aviso local con enlaces a Velas y a TradingView; Velas, la ficha y Mesa ya no muestran marcos vacíos. Perfil, fundamentales y técnico de la BMV sí se muestran.
+- Pruebas: `test_grafica_vivo`, `test_seguridad`, `test_etapa3` 25 aprobadas; Node 52.
+
 ## 3-nov-2026 — Seguimiento: comparación de varios instrumentos y captura 27
 
 - Comparación: un solo selector de 1 a 8 instrumentos (casillas de la lista, buscador por clave con Enter, atajos «Mi cartera», «Toda la lista» y «Limpiar»), con etiquetas que se quitan con ×. Antes las casillas y la lista múltiple (Ctrl+clic) se sobrescribían entre sí y exigían 2 como mínimo.

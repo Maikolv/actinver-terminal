@@ -34,3 +34,5 @@ body:not(.sin-cabecera) > .tradingview-widget-container { flex: 1 1 auto; min-he
   pointer-events: none;
 }
 body:has(.tradingview-widget-container iframe) .estado-marco { display: none; }
+.aviso-bmv { max-width: 40rem; margin: 1.5rem auto; padding: 0 1rem; text-align: center; font-size: .9rem; line-height: 1.5; }
+.aviso-bmv a { color: inherit; text-decoration-color: var(--acento, #f06a6a); text-underline-offset: 3px; }

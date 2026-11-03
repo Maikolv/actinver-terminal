@@ -13,11 +13,18 @@ def test_grafica_intervalo_y_enmarcado():
         assert "frame-ancestors 'self'" in r.headers["content-security-policy"]
         assert c.get("/grafica/SIC:MU?intervalo=7").status_code == 422
         assert c.get("/grafica/SIC:MU").status_code == 200  # diario por omisión
+        # BMV: TradingView no muestra su precio en widgets gratuitos; se sirve un aviso local con alternativas, sin script.
         bmv = c.get("/grafica/BMV:AMX")
-        assert bmv.status_code == 200 and '"symbol": "BMV:AMX/B"' in bmv.text
+        assert bmv.status_code == 200 and "embed-widget" not in bmv.text and "SIN DATO · AMX/B" in bmv.text
+        assert "tab-velas" in bmv.text and "BMV-AMX%2FB" in bmv.text and "Esperando el marco" not in bmv.text
         assert c.get("/grafica/BMV:INEXISTENTE").status_code == 404
-        info = c.get("/widget/info?simbolo=BMV:AMX")
-        assert info.status_code == 200 and '"symbol": "BMV:AMX/B"' in info.text
+        for tipo in ("info", "panorama", "noticias-emisora"):
+            r = c.get(f"/widget/{tipo}?simbolo=BMV:AMX")
+            assert r.status_code == 200 and "embed-widget" not in r.text and "SIN DATO" in r.text, tipo
+        for tipo in ("perfil", "finanzas", "tecnico"):   # estos sí cargan para la BMV
+            assert '"symbol": "BMV:AMX/B"' in c.get(f"/widget/{tipo}?simbolo=BMV:AMX").text, tipo
+        assert '"locale": "en"' in c.get("/widget/perfil?simbolo=SIC:MU").text   # la descripción solo existe en inglés
+        assert '"symbol": "AMEX:SPY"' in c.get("/widget/tecnico-indice").text
         assert c.get("/api/flujo/velas?simbolo=SIC:MU&intervalo=1Day&dias=5").json()["grafica"] is True
 
 

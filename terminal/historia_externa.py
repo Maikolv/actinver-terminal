@@ -232,3 +232,78 @@ def extender(con, ajustes, R: pd.DataFrame, informe: dict | None = None, df: pd.
         salida.append({"id": iid, "sesiones_agregadas": int(len(antes)),
                        "desde": str(antes.index[0].date()) if len(antes) else None})
     return R2, salida
+
+
+# ---------------------------------------------------------------------------------------------- dato histórico
+# Desde el 3-nov-2026 el usuario indicó tomar el Excel como DATO ABSOLUTO para la historia: hasta su último día manda el
+# Excel (todas las columnas mapeadas al catálogo, no solo las verificadas el 7-oct) y después la serie local. Sigue sin
+# entrar a la tabla `precios` y nunca es precio vigente: se empalma en memoria en las matrices de cálculo.
+MAX_HUECO = 25  # sesiones entre el fin del Excel y el primer dato local que se aceptan como «sin cambio»
+_CACHE: dict = {}
+
+
+def _niveles_mxn(con, ajustes) -> tuple[pd.DataFrame, dict[str, str]]:
+    """Matriz del Excel en MXN con columnas = id del instrumento (en caché mientras no cambie el archivo)."""
+    f = carpeta() / "precios.csv.gz"
+    if not f.exists():
+        return pd.DataFrame(), {}
+    clave = (str(f), f.stat().st_mtime, con.execute("PRAGMA database_list").fetchone()[2])
+    if clave not in _CACHE:
+        df = cargar()
+        cols = {c: m["id"] for c, m in mapear(con, df.columns).items() if m["id"]}
+        monedas = {r[0]: r[1] for r in con.execute("SELECT id, moneda_referencia FROM instrumentos")}
+        P = df[list(cols)].rename(columns=cols)
+        P = P.loc[:, ~P.columns.duplicated()]
+        usd = [c for c in P.columns if monedas.get(c) == "USD"]
+        if usd:
+            fx = mercado.fx_serie(con, ajustes)
+            fx_al = fx.reindex(P.index.union(fx.index)).ffill(limit=3).reindex(P.index)
+            P[usd] = P[usd].mul(fx_al, axis=0)  # sin tipo de cambio (antes de nov-1993) queda vacío: no se inventa
+        _CACHE.clear()
+        _CACHE[clave] = (P, json.loads((carpeta() / "procedencia.json").read_text(encoding="utf-8")) if
+                         (carpeta() / "procedencia.json").exists() else {})
+    return _CACHE[clave]
+
+
+def empalmar(con, ajustes, P: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """`P`: matriz de `mercado.precios_mxn`. Hasta el último día del Excel usa sus rendimientos; el nivel se ancla a la
+    serie local para que el precio de hoy no cambie. Devuelve (matriz, informe con lo agregado y lo omitido)."""
+    X, proc = _niveles_mxn(con, ajustes)
+    info = {"fuente": f"Excel del usuario «{proc.get('archivo', 'Benchmarks_time_series')}» hasta {proc.get('hasta', '?')}",
+            "empalmados": [], "omitidos": []}
+    if X.empty or P.empty:
+        return P, info
+    ids = [i for i in P.columns if i in X.columns]
+    if not ids:
+        return P, info
+    idx = P.index.union(X.index[X.index < P.index.max()])
+    out = P.reindex(idx)
+    for iid in ids:
+        x, loc = X[iid].dropna(), P[iid].dropna()
+        if x.empty or loc.empty:
+            continue
+        fin = x.index[-1]
+        comunes = loc.index[(loc.index <= fin) & loc.index.isin(x.index)]
+        if len(comunes):  # se traslapan: manda el Excel hasta su último día común
+            ancla, hueco = comunes[-1], 0
+            escala = loc[ancla] / x[ancla]
+        else:
+            hueco = int(((P.index > fin) & (P.index < loc.index[0])).sum())
+            if loc.index[0] < fin or hueco > MAX_HUECO:
+                info["omitidos"].append({"id": iid, "motivo": f"{hueco} sesiones sin datos entre el Excel y la serie local"})
+                continue
+            ancla, escala = fin, loc.iloc[0] / x[fin]
+        hist = x.loc[:ancla] * escala
+        out.loc[out.index <= ancla, iid] = hist.reindex(out.index[out.index <= ancla])
+        if hueco:  # hueco corto sin observaciones: se mantiene el último nivel (rendimiento 0) y se informa
+            tramo = (out.index > ancla) & (out.index < loc.index[0])
+            out.loc[tramo, iid] = hist.iloc[-1]
+        info["empalmados"].append({"id": iid, "desde": str(hist.index[0].date()), "hasta": str(ancla.date()), "hueco": hueco})
+    return out.dropna(how="all"), info
+
+
+def precios_largos(con, ajustes, ids: list[str], ajustados: bool | str = True) -> pd.DataFrame:
+    """`mercado.precios_mxn` con la historia del Excel empalmada (ver `empalmar`). En SIC el Excel es precio ajustado
+    por dividendos y splits; con `ajustados="splits"` la parte anterior al empalme incluye dividendos."""
+    P, _ = empalmar(con, ajustes, mercado.precios_mxn(con, ajustes, ids, ajustados=ajustados))
+    return P
