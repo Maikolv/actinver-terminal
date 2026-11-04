@@ -243,7 +243,8 @@ def _restricciones(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[di
 def _parametros_lente(lente: str, perfil: dict, ajustes: Ajustes) -> tuple[float, float]:
     """(aversión al riesgo λ, tope por activo) de cada lente.
     ajuste      -> perfil del inversionista (λ del perfil, tope del perfil, limitado por la regla del Reto).
-    rendimiento -> máximo rendimiento esperado (λ bajo explícito; tope que garantiza ≥ 5 emisoras)."""
+    rendimiento -> máximo rendimiento esperado (λ bajo explícito; tope que garantiza ≥ 5 emisoras).
+    markowitz   -> portafolio tangente (máximo Sharpe, lo que resuelve Solver); tope del perfil, λ no interviene."""
     rc = reto.config() if reto.activo() else {}
     tope_reto = (rc.get("reglas") or {}).get("max_peso_emisora") or 1.0
     if lente == "rendimiento":
@@ -302,6 +303,7 @@ def _modelo(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], pr
             aversion_mult: float = 1.0, k_acciones: int | None = None, lente: str = "ajuste",
             mu_fijo: np.ndarray | None = None) -> Pipeline:
     aversion, tope = _parametros_lente(lente, perfil, ajustes)
+    tangente = lente == "markowitz"
     topes = {e["id"]: (min(tope, 0.10) if e["ventana_venta"] != "diaria" else tope) for e in elegibles}
     if tipo == "mixta" and lente == "ajuste":  # los fondos de deuda son vehículos diversificados: tope mayor
         tope_reto = (reto.config().get("reglas") or {}).get("max_peso_emisora") or 1.0 if reto.activo() else 1.0
@@ -316,8 +318,10 @@ def _modelo(tipo: str, perfil: dict, ajustes: Ajustes, elegibles: list[dict], pr
     acciones = tuple(e["id"] for e in elegibles if e["clase"] in CLASES_ACCIONES)
     k = k_acciones or int(ajustes["optimizacion"]["max_activos"]) * 2
     opt = MeanRisk(
-        objective_function=ObjectiveFunction.MAXIMIZE_UTILITY,
+        # Markowitz: max (μᵀw − r_f)/σ_p, la misma meta que Solver en el Excel; las demás lentes, máxima utilidad
+        objective_function=ObjectiveFunction.MAXIMIZE_RATIO if tangente else ObjectiveFunction.MAXIMIZE_UTILITY,
         risk_measure=RiskMeasure.VARIANCE,
+        risk_free_rate=float(perfil.get("rf_anual", 0.0)) / DIAS if tangente else 0.0,
         risk_aversion=aversion * aversion_mult,  # misma unidad que μ y Σ diarios
         prior_estimator=EmpiricalPrior(mu_estimator=MuFijo(mu_fijo) if mu_fijo is not None else MuRobusto(),
                                        covariance_estimator=LedoitWolf()),
@@ -700,7 +704,7 @@ def _huella_datos(X: pd.DataFrame) -> str:
 
 NOMBRES = {"acciones": "Solo acciones", "mixta": "Acciones + ETF + fondos"}
 LENTES = {"rendimiento": "Máximo rendimiento esperado", "ajuste": "Ajuste a su perfil y cartera",
-          "puntuacion": "Máxima puntuación"}
+          "puntuacion": "Máxima puntuación", "markowitz": "Markowitz · máximo Sharpe (Solver)"}
 # Candidatos declarados ANTES de evaluar para la lente «Máxima puntuación»: multiplicador de aversión × tope por emisora.
 CANDIDATOS_PUNTUACION = [(m, t) for t in (0.12, 0.20, 0.30) for m in (1.0, 3.0, 10.0, 30.0)]
 
@@ -755,6 +759,9 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     creado = datetime.now(UTC).isoformat(timespec="seconds")
     perfil_usuario = perfil
     perfil = perfil_efectivo(perfil)
+    if lente == "markowitz":  # tasa libre de riesgo de la tangente: CETES 28 de Banxico (o la última guardada)
+        from .markowitz import tasa_libre
+        perfil = {**perfil, "rf_anual": float(tasa_libre(con, ajustes)["valor"])}
     elegibles_l, excluidos, precios = universo(con, ajustes, perfil, tipo, cotiz)
     fx = mercado.ultimo_fx(con, ajustes)
     base = {"tipo": tipo, "lente": lente, "clave": f"{tipo}_{lente}",
@@ -911,7 +918,9 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
         "mercado_acciones": perfil.get("mercado_acciones", "ambos"),
         "n_elegibles": len(elegibles), "n_excluidos": len(excluidos),
         "reproducibilidad": {
-            "funcion_objetivo": "max μᵀw − λ·wᵀΣw − Σc|Δw| − γ·‖w‖² ; μ James-Stein, Σ Ledoit-Wolf, varianza como riesgo",
+            "funcion_objetivo": ("max (μᵀw − r_f)/√(wᵀΣw) − Σc|Δw| (portafolio tangente, como Solver)" if lente == "markowitz"
+                                 else "max μᵀw − λ·wᵀΣw − Σc|Δw| − γ·‖w‖²") + " ; μ James-Stein, Σ Ledoit-Wolf, varianza como riesgo",
+            "tasa_libre_riesgo": perfil.get("rf_anual"),
             "regularizacion_l2_gamma": float(o.get("l2_regularizacion", 0.0)),
             "lente": lente, "aversion_riesgo_lambda": aversion,
             "horizonte_anios": float(perfil["horizonte_anios"]), "horizonte_origen": perfil.get("horizonte_origen", "perfil"),

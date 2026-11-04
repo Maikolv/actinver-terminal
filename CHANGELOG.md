@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 3-nov-2026 — Solver de Markowitz, horizonte de predicción y la «Matriz de precios» del usuario
+
+- **Mis portafolios**: bloque «Solver de Markowitz» con el portafolio de máximo Sharpe bajo las mismas restricciones (suma 100 %, tope/mínimo por instrumento, topes por moneda y sector), su diferencia con el elegido y un botón para usar sus pesos. Horizonte de la predicción en días, semanas, meses o años (`horizonte_valor` + `horizonte_unidad`; 1 semana = 5 sesiones, 1 mes = 21, 1 año = 252) con rendimiento esperado, rango del 90 %, probabilidad de pérdida y valores en MXN para el elegido, el Solver y 1/N (`markowitz.proyeccion`: E·t, σ·√t, normal; extrapola la historia, no la predice).
+- **Excel**: cada hoja de modelo trae el modelo de Solver guardado (nombres ocultos `solver_*`: maximizar el Sharpe cambiando los pesos, suma = 1, tope y mínimo, GRG Nonlinear): Datos → Solver → Resolver. Columna «Peso Solver (terminal)» y bloque de proyección con lista de unidades. La plantilla suma la hoja «Matriz de precios» del documento del usuario (AAL, ABNB, MU, XOM, MSFT, 12–30-oct-2026, en `config/markowitz_matriz_ejemplo.csv`), con su misma estructura completada: covarianzas, rendimiento/varianza/σ del portafolio, anualización, Sharpe, proyección y Solver. Fórmulas verificadas con un evaluador externo (`formulas`) contra numpy: idénticas.
+- **Propuestas**: cuarta lente «Markowitz (Solver)» = portafolio tangente (`MeanRisk` MAXIMIZE_RATIO con r_f = CETES 28 de Banxico), mismas restricciones, validación y comparación que las demás. Con datos reales: 21 s (acciones) y 38 s (mixta) más por ciclo del motor. Horizonte del perfil en días, semanas, meses o años (mínimo 1 día).
+- Corregido: la descarga de Excel de portafolios guardados antes de este cambio fallaba (404) porque su especificación no traía el horizonte nuevo; ahora se usa la especificación normalizada. Las tres descargas (plantilla, todos, uno) verificadas desde el servidor y el navegador.
+- Pruebas nuevas en `tests/test_markowitz.py` (horizonte, Solver, nombres de Solver en el Excel, validación del perfil, Excel de un guardado antiguo) y `tests/test_optimizador.py` (lente Markowitz). Node 52/52.
+
 ## 3-nov-2026 — Excel «Benchmarks_time_series» como dato histórico absoluto
 
 - Es el mismo archivo importado el 7-oct (sha256 idéntico). Hasta hoy solo lo usaban la validación V1 con historia larga y el TSM mensual; el generador y el resto de la terminal no.

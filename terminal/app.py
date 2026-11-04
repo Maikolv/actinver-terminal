@@ -193,7 +193,19 @@ def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
             e.append(f"{campo}: {etiqueta}")
         return v
 
-    out["horizonte_anios"] = num("horizonte_anios", 0.02, 40, "entre 0.02 y 40 años")
+    unidad = str(p.get("horizonte_unidad") or "anios")
+    if p.get("horizonte_valor") not in (None, ""):  # número + unidad (días, semanas, meses o años)
+        from .criterios_propuestas import UNIDADES_HORIZONTE, horizonte_sesiones
+        if unidad not in UNIDADES_HORIZONTE:
+            e.append("horizonte_unidad: dias, semanas, meses o anios")
+            unidad = "anios"
+        valor = num("horizonte_valor", 1e-9, 10_000, "un número positivo")
+        anios = horizonte_sesiones(valor, unidad) / 252 if valor else None
+        if anios is not None and not 1 / 252 <= anios <= 40:
+            e.append("horizonte: entre 1 día y 40 años")
+        out.update(horizonte_valor=valor, horizonte_unidad=unidad, horizonte_anios=anios)
+    else:
+        out["horizonte_anios"] = num("horizonte_anios", 1 / 252, 40, "entre 1/252 (un día) y 40 años")
     out["horizonte_reto"] = bool(p.get("horizonte_reto", True))
     out["capital"] = num("capital", 0, 1e10, "entre 0 y 10 000 millones")
     out["max_peso_activo"] = num("max_peso_activo", 0.02, 1, "entre 0.02 y 1 (2 % a 100 %)")

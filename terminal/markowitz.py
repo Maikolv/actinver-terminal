@@ -32,6 +32,7 @@ import pandas as pd
 from scipy.optimize import minimize
 
 from . import db, mercado, ranking, reto
+from .criterios_propuestas import UNIDADES_HORIZONTE, horizonte_sesiones
 from .adaptadores.base import ErrorProveedor
 from .adaptadores.proveedores import Banxico
 from .config import Ajustes, credencial
@@ -172,11 +173,19 @@ def normalizar(spec: dict, ins: dict) -> dict:
         "peso_max": _num(spec, "peso_max", base["peso_max"], 0.01, 1), "peso_min": _num(spec, "peso_min", 0, 0, 0.5),
         "aversion": _num(spec, "aversion", base["aversion"], 0.1, 50),
         "rend_objetivo": _num(spec, "rend_objetivo", 0.12, -1, 5), "riesgo_objetivo": _num(spec, "riesgo_objetivo", 0.18, 0.001, 5),
-        "horizonte_anios": _num(spec, "horizonte_anios", base["horizonte_anios"], 0.1, 60),
+        "horizonte_valor": _num(spec, "horizonte_valor", _num(spec, "horizonte_anios", base["horizonte_anios"], 1 / 252, 60),
+                                1e-9, 15_120),
+        "horizonte_unidad": spec.get("horizonte_unidad") or "anios",
         "covarianza": spec.get("covarianza") or "muestral",
         "usd_max": None if spec.get("usd_max") in (None, "") else _num(spec, "usd_max", 1, 0, 1),
         "sector_max": None if spec.get("sector_max") in (None, "") else _num(spec, "sector_max", 1, 0.01, 1),
     }
+    if out["horizonte_unidad"] not in UNIDADES_HORIZONTE:
+        raise ErrorPortafolio("horizonte: unidad dias, semanas, meses o anios")
+    out["horizonte_sesiones"] = horizonte_sesiones(out["horizonte_valor"], out["horizonte_unidad"])
+    if out["horizonte_sesiones"] > 60 * ANUAL:
+        raise ErrorPortafolio("horizonte: máximo 60 años")
+    out["horizonte_anios"] = out["horizonte_sesiones"] / ANUAL
     if out["covarianza"] not in COVARIANZAS:
         raise ErrorPortafolio("covarianza: muestral o ledoit_wolf")
     if out["peso_min"] > out["peso_max"]:
@@ -400,6 +409,21 @@ def fuera_de_muestra(P: pd.DataFrame, s: dict, lo: float, hi: float, extra: list
                        "el pasado reciente, esta prueba favorece a la propuesta." if s.get("vistas") else "")}
 
 
+Z90 = 1.6448536269514722  # cuantil 95 % de la normal: banda central del 90 %
+
+
+def proyeccion(rend: float, riesgo: float, sesiones: int, capital: float) -> dict:
+    """Proyección a `sesiones` con la media y la σ anuales: E_h = E·t, σ_h = σ·√t (t = sesiones/252), banda del 90 %
+    E_h ± 1.645·σ_h y P(pérdida) = Φ(−E_h/σ_h). Las mismas fórmulas van al Excel. Supone rendimientos normales e
+    independientes: describe la historia, no es un pronóstico."""
+    t = sesiones / ANUAL
+    e, s = rend * t, riesgo * math.sqrt(t)
+    bajo, alto = e - Z90 * s, e + Z90 * s
+    perdida = 0.5 * (1 + math.erf(-e / (s * math.sqrt(2)))) if s > 0 else float(e < 0)
+    return {"sesiones": sesiones, "anios": t, "rend": e, "riesgo": s, "bajo": bajo, "alto": alto, "prob_perdida": perdida,
+            "valor": capital * (1 + e), "valor_bajo": capital * (1 + bajo), "valor_alto": capital * (1 + alto)}
+
+
 def _rend_max(mu: np.ndarray, lo: float, hi: float) -> float:
     """Rendimiento máximo alcanzable con los topes: llena primero los activos de mayor rendimiento."""
     w = np.full(len(mu), lo)
@@ -480,6 +504,22 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict, base: pd.Dat
                 "utilidad": r - 0.5 * s["aversion"] * v * v}
 
     met = metricas(w)
+    met_tan = metricas(w_tan)
+    hs, cap = s["horizonte_sesiones"], s["capital"]
+    unidad = {"dias": "días", "semanas": "semanas", "meses": "meses", "anios": "años"}[s["horizonte_unidad"]]
+    proy = {"horizonte": f"{s['horizonte_valor']:g} {unidad}", "sesiones": hs,
+            "elegido": proyeccion(met["rend"], met["riesgo"], hs, cap),
+            "solver": proyeccion(met_tan["rend"], met_tan["riesgo"], hs, cap),
+            "1/N": proyeccion(float(eqw @ mu), _vol(eqw, cov), hs, cap),
+            "nota": "E_h = E(r)·t y σ_h = σ·√t con t = sesiones/252; banda del 90 % = E_h ± 1.645·σ_h; supone rendimientos "
+                    "normales con la media y covarianza de la ventana. Es una extrapolación de la historia, no un pronóstico."}
+    w_solver = {ins[i]["clave_operable"]: float(w_tan[k]) for k, i in enumerate(ids)}
+    solver = {"metricas": met_tan, "pesos": dict(sorted(w_solver.items(), key=lambda x: -x[1])),
+              "es_elegido": bool(np.abs(w - w_tan).sum() < 1e-3),
+              "mejora_sharpe": (met_tan["sharpe"] or 0) - (met["sharpe"] or 0),
+              "nota": "Solver de Markowitz: maximiza el Sharpe (E(r_p) − r_f)/σ_p cambiando los pesos, con suma = 100 %, "
+                      f"tope de {hi:.0%} y mínimo de {lo:.0%} por instrumento" + (" y sus topes por moneda o sector" if grupos else "")
+                      + ". Es lo mismo que Datos → Solver en el Excel (GRG Nonlinear)."}
     y = (met["rend"] - rf) / (s["aversion"] * met["riesgo"] ** 2) if met["riesgo"] > 0 else None
     contrib = w * (cov @ w) / max(w @ cov @ w, 1e-18)
     ultimo = precios.iloc[-1]
@@ -501,7 +541,8 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, spec: dict, base: pd.Dat
     corr = np.corrcoef(R.values.T)
     return {
         "especificacion": s, "metodo_nombre": METODOS[m], "objetivo_nombre": OBJETIVOS[s["objetivo"]]["nombre"],
-        "metricas": met, "metricas_1n": metricas(eqw), "min_varianza": metricas(w_min), "tangente": metricas(w_tan),
+        "metricas": met, "metricas_1n": metricas(eqw), "min_varianza": metricas(w_min), "tangente": met_tan,
+        "solver": solver, "proyeccion": proy,
         "pesos_tangente": dict(zip(ids, np.round(w_tan, 6).tolist())), "pesos_min_varianza": dict(zip(ids, np.round(w_min, 6).tolist())),
         "asignacion_riesgosa": y, "caida_maxima": caida, "peor_dia": float(serie.min()),
         "activos": filas, "frontera": frontera, "correlacion": {"ids": ids, "matriz": np.round(corr, 4).tolist()},
@@ -735,7 +776,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, g: dict) -> dict:
                               "o la capitalización, o agregue instrumentos propios.")
     metodo = g.get("metodo") or "auto"
     spec = {**{k: g[k] for k in ("nombre", "descripcion", "capital", "rf", "peso_min", "rend_objetivo", "riesgo_objetivo",
-                                  "horizonte_anios", "covarianza", "usd_max", "sector_max", "vistas") if k in g},
+                                  "horizonte_valor", "horizonte_unidad", "covarianza", "usd_max", "sector_max", "vistas") if k in g},
             "objetivo": objetivo, "metodo": perfil["metodo"] if metodo == "auto" else metodo, "activos": activos,
             "ventana": ventana, "peso_max": g.get("peso_max", perfil["peso_max"]), "aversion": g.get("aversion", perfil["aversion"])}
     if cuenta:

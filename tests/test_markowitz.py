@@ -109,7 +109,15 @@ def test_persistencia_y_excel_con_formulas(con, ajustes):
     assert any("COVARIANCE.S" in f for f in formulas) and any(f.startswith("=SQRT(MAX(") for f in formulas)
     assert wb["Resumen"]["G4"].value.startswith("='P1 Modelo'!")
     plantilla = load_workbook(io.BytesIO(excel_markowitz.plantilla()))
-    assert plantilla.sheetnames == ["Guía", "Paramétrico Acelera", "Histórico Datos", "Histórico Modelo"]
+    assert plantilla.sheetnames == ["Guía", "Matriz de precios", "Paramétrico Acelera", "Histórico Datos", "Histórico Modelo"]
+    # Solver ya cargado en cada hoja de modelo: maximizar el Sharpe cambiando los pesos, con suma = 1
+    for ws in (modelo, plantilla["Matriz de precios"], plantilla["Histórico Modelo"]):
+        n = {k: v.attr_text for k, v in ws.defined_names.items()}
+        assert n["solver_typ"] == "1" and n["solver_eng"] == "1" and n["solver_rhs1"] == "1"
+        assert ws[n["solver_opt"].split("!")[1].replace("$", "")].value.startswith("=IFERROR((")  # celda del Sharpe
+        assert ws.defined_names["solver_adj"].hidden
+    assert modelo["H9"].value == "Peso Solver (terminal)"
+    assert any(c.value == "Proyección a un horizonte (días, semanas, meses o años)" for fila in modelo.iter_rows() for c in fila)
     assert plantilla["Guía"]._images and plantilla["Histórico Modelo"]._images  # logo de la terminal en cada hoja
     assert not any(str(c.value).startswith("=") and "#REF!" in c.value for ws in plantilla for fila in ws.iter_rows() for c in fila)
     assert markowitz.eliminar(con, p["id"]) and not markowitz.listar(con)
@@ -275,3 +283,46 @@ def test_perfil_cuenta_principal_pega_la_cartera_y_se_actualiza(con, ajustes, mo
     cartera.update(pesos={})
     with pytest.raises(markowitz.ErrorPortafolio, match="no tiene posiciones"):
         markowitz.generar(con, ajustes, {"objetivo": "cuenta"})
+
+
+def test_horizonte_en_dias_semanas_meses_y_anios(con, ajustes):
+    sembrar(con)
+    r = markowitz.calcular(con, ajustes, {"activos": IDS, "horizonte_valor": 2, "horizonte_unidad": "semanas", "capital": 1000})
+    s, p = r["especificacion"], r["proyeccion"]
+    assert s["horizonte_sesiones"] == 10 and p["sesiones"] == 10 and p["horizonte"] == "2 semanas"
+    m, e = r["metricas"], p["elegido"]
+    assert e["rend"] == pytest.approx(m["rend"] * 10 / 252) and e["riesgo"] == pytest.approx(m["riesgo"] * (10 / 252) ** 0.5)
+    assert e["bajo"] < e["rend"] < e["alto"] and 0 < e["prob_perdida"] < 1 and e["valor"] == pytest.approx(1000 * (1 + e["rend"]))
+    # el Solver es el máximo Sharpe: ningún otro punto calculado lo supera
+    assert r["solver"]["metricas"]["sharpe"] >= max(m["sharpe"], r["metricas_1n"]["sharpe"], r["min_varianza"]["sharpe"]) - 1e-9
+    assert abs(sum(r["solver"]["pesos"].values()) - 1) < 1e-6
+    assert markowitz.normalizar({"activos": IDS, "horizonte_valor": 3, "horizonte_unidad": "meses"}, mercado_ins(con))["horizonte_sesiones"] == 63
+    with pytest.raises(markowitz.ErrorPortafolio, match="unidad"):
+        markowitz.calcular(con, ajustes, {"activos": IDS, "horizonte_unidad": "lustros"})
+
+
+def mercado_ins(con):
+    from terminal import mercado
+    return mercado.instrumentos(con)
+
+
+def test_perfil_de_propuestas_acepta_horizonte_con_unidad():
+    from terminal import cartera
+    from terminal.app import validar_perfil
+    base = {"riesgo": "moderado", "capital": 1000, "max_peso_activo": 0.2, "max_exposicion_usd": 1}
+    p = validar_perfil({**base, "horizonte_valor": 3, "horizonte_unidad": "meses"}, set())
+    assert p["horizonte_anios"] == pytest.approx(63 / 252) and p["horizonte_unidad"] == "meses"
+    assert validar_perfil({**base, "horizonte_valor": 1, "horizonte_unidad": "dias"}, set())["horizonte_anios"] == pytest.approx(1 / 252)
+    assert validar_perfil({**base, "horizonte_anios": 2}, set())["horizonte_anios"] == 2  # perfiles guardados antes
+    for malo in ({"horizonte_valor": 1, "horizonte_unidad": "siglos"}, {"horizonte_valor": 50, "horizonte_unidad": "anios"}):
+        with pytest.raises(cartera.ErrorValidacion):
+            validar_perfil({**base, **malo}, set())
+
+
+def test_excel_de_portafolio_guardado_antes_del_horizonte_con_unidad(con, ajustes):
+    """Los guardados antes del 3-nov no traen horizonte_valor/horizonte_unidad: el Excel se descarga igual."""
+    sembrar(con)
+    p = markowitz.guardar(con, ajustes, {"nombre": "Viejo", "activos": IDS})
+    viejo = {k: v for k, v in p["especificacion"].items() if k not in ("horizonte_valor", "horizonte_unidad", "horizonte_sesiones")}
+    wb = load_workbook(io.BytesIO(excel_markowitz.libro(con, ajustes, [{**p, "especificacion": viejo}])))
+    assert "P1 Modelo" in wb.sheetnames

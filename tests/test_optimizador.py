@@ -116,3 +116,21 @@ def test_frente_a_mantener_con_el_mismo_metodo_y_dos_ventanas(con_datos, ajustes
     dif = [v["propuesta"]["media"] - v["mantener"]["media"] for v in f["por_ventana"]]
     assert f["propuesta"]["media"] - f["mantener"]["media"] == pytest.approx(min(dif))
     assert optimizador.proponer(con_datos, ajustes, perfil, "acciones", VACIA)["frente_a_mantener"] is None
+
+
+def test_lente_markowitz_es_el_portafolio_tangente(con_datos, ajustes, perfil):
+    """La lente Markowitz maximiza (μᵀw − r_f)/σ: su Sharpe estimado no queda debajo del de «Ajuste» con los mismos datos."""
+    m = optimizador.proponer(con_datos, ajustes, perfil, "acciones", VACIA, lente="markowitz")
+    a = optimizador.proponer(con_datos, ajustes, perfil, "acciones", VACIA, lente="ajuste")
+    assert m["estado"] == "calculada" and m["lente_nombre"].startswith("Markowitz")
+    assert "portafolio tangente" in m["reproducibilidad"]["funcion_objetivo"]
+    assert m["reproducibilidad"]["tasa_libre_riesgo"] is not None
+    assert abs(sum(x["peso"] for x in m["pesos"]) - 1) < 1e-3
+    X = optimizador.rendimientos(mercado.precios_mxn(con_datos, ajustes, ACCIONES), ACCIONES).dropna()
+    rf = m["reproducibilidad"]["tasa_libre_riesgo"] / 252
+
+    def sharpe(p):
+        w = pd.Series({x["id"]: x["peso"] for x in p["pesos"]}).reindex(X.columns).fillna(0).values
+        r = X.values @ w
+        return (r.mean() - rf) / r.std()
+    assert sharpe(m) >= sharpe(a) - 0.02  # μ contraída y Σ Ledoit-Wolf: holgura frente al Sharpe muestral

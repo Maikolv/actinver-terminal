@@ -108,6 +108,7 @@
         <button type="button" role="radio" aria-checked="false" data-valor="rendimiento">Máximo rendimiento</button>
         <button type="button" role="radio" aria-checked="true" data-valor="ajuste">Ajuste a su perfil</button>
         <button type="button" role="radio" aria-checked="false" data-valor="puntuacion">Máxima puntuación</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="markowitz">Markowitz (Solver)</button>
       </div>
       <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-mercado-propuesta" hidden>
         <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
@@ -502,7 +503,8 @@
       </fieldset>
       <div class="campos">
         <label class="casilla"><input type="checkbox" name="horizonte_reto"> Usar como horizonte las sesiones que faltan para el cierre del Reto</label>
-        <label>Horizonte propio (años)<input name="horizonte_anios" inputmode="decimal" required></label>
+        <label>Horizonte propio de la predicción<span class="fila-controles"><input name="horizonte_valor" inputmode="decimal" required aria-label="Cantidad" size="6">
+          <select name="horizonte_unidad" aria-label="Unidad del horizonte"><option value="dias">días</option><option value="semanas">semanas</option><option value="meses">meses</option><option value="anios">años</option></select></span></label>
         <label>Capital a invertir (MXN)<input name="capital" inputmode="decimal" required></label>
         <label>Peso máximo por activo (%)<input name="max_peso_activo" inputmode="decimal" required></label>
         <label>Exposición máxima a dólar (%)<input name="max_exposicion_usd" inputmode="decimal" required></label>
@@ -528,7 +530,7 @@
     <div class="texto">
       <h2>Qué hace esta terminal</h2>
       <p><strong>Cómo usarla cada día:</strong> 1) copie su cuenta del portal en «Mi portafolio Actinver» (sin eso, todo queda como «decisión pendiente»); 2) revise «Plan de acción»: comprar, vender, mantener o pendiente por instrumento, con cantidad, precio, fuente, motivo e invalidación; 3) verifique cada precio en el portal y capture usted las órdenes. Las secciones técnicas están en «Más».</p>
-      <p>Calcula en todo momento dos carteras —solo acciones, y acciones con ETF y fondos—, cada una con tres lentes: <strong>máximo rendimiento esperado</strong> (agresiva, con su riesgo explícito), <strong>ajuste a su perfil y cartera</strong> y <strong>máxima puntuación</strong> (elige con la primera mitad de la validación y se reporta con la segunda; por eso puede quedar debajo de «Ajuste»). Además hay variantes solo nacionales y solo extranjeras. Las compara con su cartera registrada y le avisa cuando conviene cambiar algo. <strong>No envía órdenes</strong>: las operaciones se capturan en el simulador del Reto.</p>
+      <p>Calcula en todo momento dos carteras —solo acciones, y acciones con ETF y fondos—, cada una con cuatro lentes: <strong>máximo rendimiento esperado</strong> (agresiva, con su riesgo explícito), <strong>ajuste a su perfil y cartera</strong>, <strong>máxima puntuación</strong> (elige con la primera mitad de la validación y se reporta con la segunda; por eso puede quedar debajo de «Ajuste») y <strong>Markowitz (Solver)</strong>: el portafolio tangente de máximo Sharpe, el mismo que resuelve Solver en el Excel. Además hay variantes solo nacionales y solo extranjeras. Las compara con su cartera registrada y le avisa cuando conviene cambiar algo. <strong>No envía órdenes</strong>: las operaciones se capturan en el simulador del Reto.</p>
       <h2>Estado de los datos</h2>
       <dl class="glosario">
         <dt><span class="chip chip--vigente">Vigente</span></dt><dd>Corresponde a la última sesión esperada para su tipo (cierre, valor liquidativo o tipo de cambio).</dd>

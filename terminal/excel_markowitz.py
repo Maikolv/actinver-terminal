@@ -5,6 +5,11 @@
 * `libro(...)`: los portafolios guardados del generador, cada uno con sus precios, rendimientos, estadísticos,
   covarianzas, correlaciones, pesos, resultados, frontera eficiente y gráfica.
 
+Cada hoja de modelo deja cargado el modelo de Solver (nombres ocultos `solver_*` de la hoja, los que Excel guarda al
+pulsar «Guardar» en Solver): Datos → Solver abre ya con objetivo, celdas variables y restricciones; solo falta «Resolver».
+Todas llevan un bloque de proyección a un horizonte en días, semanas, meses o años con las fórmulas de
+`markowitz.proyeccion`. La plantilla incluye además la «Matriz de precios» del documento del usuario, completada.
+
 Llevan el diseño de la terminal (logo, colores y tipografía de `web/static/app.css`) y una hoja «Guía» con los pasos
 y las celdas exactas de cada libro. La varianza del portafolio se calcula sin fórmulas matriciales:
 (Σw)_i = Σ_j cov_ij·w_j y σ²_p = Σ_i w_i·(Σw)_i, así funciona igual en Excel, LibreOffice y Google Sheets.
@@ -22,8 +27,12 @@ from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.drawing.image import Image as ImagenXL
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter as L
+from openpyxl.utils.cell import absolute_coordinate
+from openpyxl.workbook.defined_name import DefinedName
+from openpyxl.worksheet.datavalidation import DataValidation
 
 from . import markowitz
+from .config import CONFIG_DIR
 
 # Identidad de la terminal (DESIGN.md): banda negra con texto blanco, encabezados gris oscuro, cuerpo blanco para que
 # imprima legible, y rojo solo como acento. Entradas y resultados se distinguen por FORMA (borde punteado / doble
@@ -48,6 +57,8 @@ PCT, NUM = "0.00%", "#,##0.00"
 ACELERA = (["IPC", "SP500", "Treasury MXN"], [0.11, 0.16, 0.09], [0.18, 0.17, 0.10],
            [[1, 0.324, -0.265], [0.324, 1, 0.472], [-0.265, 0.472, 1]])
 AVISO = "Simulación educativa con datos históricos: no es pronóstico ni recomendación. La terminal no envía órdenes."
+EJEMPLO_MATRIZ = CONFIG_DIR / "markowitz_matriz_ejemplo.csv"  # precios del documento «Matriz de precios» del usuario
+UNIDADES = (("días", 1), ("semanas", 5), ("meses", 21), ("años", 252))  # = criterios_propuestas.UNIDADES_HORIZONTE
 
 
 @lru_cache(maxsize=1)
@@ -240,7 +251,8 @@ def _frontera(ws, fila: int, res: dict, ancla: str) -> None:
 
 
 def _hoja_historica(wb: Workbook, prefijo: str, nombres: list[str], precios: pd.DataFrame | None, filas_vacias: int,
-                    pesos: list[float], rf: float, aversion: float, peso_max: float, peso_min: float, res: dict | None) -> dict:
+                    pesos: list[float], rf: float, aversion: float, peso_max: float, peso_min: float, res: dict | None,
+                    capital: float = 100_000, horizonte: tuple[float, str] = (1, "años")) -> dict:
     n = len(nombres)
     datos = wb.create_sheet(f"{prefijo}Datos"[:31])
     cr = n + 3  # primera columna de rendimientos
@@ -282,7 +294,8 @@ def _hoja_historica(wb: Workbook, prefijo: str, nombres: list[str], precios: pd.
         _entrada(ws.cell(3 + k, 2, v), fmt)
     f_e = 10
     ws.cell(f_e - 2, 1, "Activos: estadísticos anuales y pesos").font = SECCION
-    for k, t in enumerate(["Activo", "E(r) anual", "σ anual", "Sharpe", "Peso w", "Máx.", "Mín."]):
+    for k, t in enumerate(["Activo", "E(r) anual", "σ anual", "Sharpe", "Peso w", "Máx.", "Mín."]
+                          + (["Peso Solver (terminal)"] if res else [])):
         _cabecera(ws.cell(f_e - 1, 1 + k, t))
     for i, nm in enumerate(nombres):
         r = f_e + i
@@ -293,6 +306,8 @@ def _hoja_historica(wb: Workbook, prefijo: str, nombres: list[str], precios: pd.
         _entrada(ws.cell(r, 5, pesos[i]), PCT)
         ws.cell(r, 6, "=$B$5").number_format = PCT
         ws.cell(r, 7, "=$B$6").number_format = PCT
+        if res:  # el máximo Sharpe que calculó la terminal: Solver debe llegar a lo mismo
+            ws.cell(r, 8, res["pesos_tangente"].get(res["activos"][i]["id"], 0.0)).number_format = PCT
     etiquetas = nombres if precios is not None else [f"='{datos.title}'!{L(2 + k)}2" for k in range(n)]
     f_cov = f_e + n + 2
     ws.cell(f_cov - 1, 1, "Matriz de covarianzas anual = COVARIANCE.S × 252").font = SECCION
@@ -304,8 +319,11 @@ def _hoja_historica(wb: Workbook, prefijo: str, nombres: list[str], precios: pd.
             lambda i, j: f'=IFERROR(CORREL({rango(i)},{rango(j)}),"")')
     f_res = f_cor + n + 3
     celdas = _resultados(ws, f_res, n, f_e, "B", "E", fc, cc, "$B$3", "$B$4")
+    _solver(ws, celdas["Sharpe"], celdas["pesos"], celdas["Suma de pesos (debe ser 100 %)"], "B5", "B6")
+    proy = _proyeccion(ws, f_res + n + 12, celdas["E(r_p) anual"], celdas["σ_p anual"], capital, *horizonte)
+    celdas.update(proy)
     if res:
-        _frontera(ws, f_res + 2 * n + 14, res, f"K{f_e}")
+        _frontera(ws, proy["fin"] + 2, res, f"K{f_e}")
     ws.column_dimensions["A"].width = 42
     for c in range(2, n + 12):
         ws.column_dimensions[L(c)].width = 14
@@ -343,8 +361,9 @@ def _hoja_parametrica(wb: Workbook) -> dict:
     ws.cell(f_cov - 1, 1, "Covarianzas cov_ij = ρ_ij · σ_i · σ_j").font = SECCION
     fc, cc = _matriz(ws, f_cov, 1, nombres, lambda i, j: f"={L(cr + j)}{fr + i}*$C${f_e + i}*$C${f_e + j}")
     celdas = _resultados(ws, f_cov + n + 3, n, f_e, "B", "E", fc, cc, "$B$3", "$B$4")
+    _solver(ws, celdas["Sharpe"], celdas["pesos"], celdas["Suma de pesos (debe ser 100 %)"])
     # Dos activos con correlación variable (preguntas 1–3 del ejercicio original, sin las referencias rotas)
-    f2 = f_cov + 3 * n + 16
+    f2 = f_cov + 3 * n + 16  # (dos activos)
     ws.cell(f2, 1, "Dos activos (A = IPC, B = SP500): σ_p = √(wA²σA² + wB²σB² + 2·wA·wB·ρ·σA·σB)").font = SECCION
     ws.cell(f2 + 1, 1, "ρ(A,B) para esta tabla").font = NEGRITA
     _entrada(ws.cell(f2 + 1, 2, 0.5))
@@ -376,12 +395,151 @@ def _hoja_parametrica(wb: Workbook) -> dict:
     return {"hoja": ws.title, "rho": f"{L(cr + 1)}{fr}:{L(cr + n - 1)}{fr + n - 2}", "f_e": f_e, "n": n, **celdas}
 
 
+def _solver(ws, objetivo: str, pesos: str, suma: str, maximo: str | None = None, minimo: str | None = None) -> None:
+    """Deja el modelo de Solver guardado en la hoja: maximizar `objetivo` cambiando `pesos`, con suma = 1, pesos ≤ máximo,
+    pesos ≥ mínimo y no negativos, motor GRG Nonlinear. Son los mismos nombres ocultos que Excel escribe al guardar."""
+    h = f"'{ws.title}'!"
+    restr = [(suma, 2, "1")] + ([(pesos, 1, h + absolute_coordinate(maximo))] if maximo else []) \
+        + ([(pesos, 3, h + absolute_coordinate(minimo))] if minimo else [])
+    nombres = {"solver_adj": h + absolute_coordinate(pesos), "solver_opt": h + absolute_coordinate(objetivo), "solver_typ": "1",
+               "solver_val": "0", "solver_num": str(len(restr)), "solver_eng": "1", "solver_neg": "1", "solver_ver": "3",
+               "solver_lin": "2", "solver_cvg": "0.0001", "solver_drv": "1", "solver_est": "1", "solver_itr": "2147483647",
+               "solver_mip": "2147483647", "solver_msl": "2", "solver_nod": "2147483647", "solver_nwt": "1",
+               "solver_pre": "0.000001", "solver_rbv": "1", "solver_rlx": "2", "solver_rsd": "0", "solver_scl": "1",
+               "solver_sho": "2", "solver_ssz": "100", "solver_tim": "2147483647", "solver_tol": "0.01"}
+    for k, (izq, rel, der) in enumerate(restr, start=1):
+        nombres |= {f"solver_lhs{k}": h + absolute_coordinate(izq), f"solver_rel{k}": str(rel), f"solver_rhs{k}": der}
+    for nombre, valor in nombres.items():
+        ws.defined_names[nombre] = DefinedName(nombre, attr_text=valor, hidden=True)
+
+
+def _proyeccion(ws, fila: int, e: str, s: str, capital: float, horizonte: float = 1, unidad: str = "años",
+                por_anio: bool = True) -> dict:
+    """Bloque de proyección: el usuario elige cantidad y unidad; E_h = E·t, σ_h = σ·√t, banda del 90 % y P(pérdida),
+    las mismas fórmulas que `markowitz.proyeccion`. `e` y `s` son celdas anuales (t = sesiones/252) o diarias
+    (`por_anio=False`, t = sesiones)."""
+    ws.cell(fila, 1, "Proyección a un horizonte (días, semanas, meses o años)").font = SECCION
+    t = f"B{fila + 3}/252" if por_anio else f"B{fila + 3}"
+    u = f"B{fila + 2}"
+    filas = [("Horizonte (cantidad)", horizonte, "0.##", True), ("Unidad (días, semanas, meses o años)", unidad, None, True),
+             ("Sesiones bursátiles", f'=MAX(1,ROUND(B{fila + 1}*IF({u}="días",1,IF({u}="semanas",5,IF({u}="meses",21,252))),0))',
+              "0", False),
+             ("Capital (MXN)", capital, NUM, True),
+             ("Rendimiento esperado en el horizonte", f"={e}*{t}", PCT, False),
+             ("Riesgo σ en el horizonte", f"={s}*SQRT({t})", PCT, False),
+             ("Escenario bajo (solo 5 % de las veces peor)", f"=B{fila + 5}-1.645*B{fila + 6}", PCT, False),
+             ("Escenario alto (solo 5 % de las veces mejor)", f"=B{fila + 5}+1.645*B{fila + 6}", PCT, False),
+             ("Probabilidad de terminar con pérdida", f'=IFERROR(NORMDIST(0,B{fila + 5},B{fila + 6},TRUE),"")', PCT, False),
+             ("Valor esperado (MXN)", f"=B{fila + 4}*(1+B{fila + 5})", NUM, False),
+             ("Valor en el escenario bajo (MXN)", f"=B{fila + 4}*(1+B{fila + 7})", NUM, False),
+             ("Valor en el escenario alto (MXN)", f"=B{fila + 4}*(1+B{fila + 8})", NUM, False)]
+    for k, (et, v, fmt, entrada) in enumerate(filas, start=1):
+        ws.cell(fila + k, 1, et).font = NEGRITA
+        c = ws.cell(fila + k, 2, v)
+        if entrada:
+            _entrada(c, fmt)
+        else:
+            c.number_format = fmt
+            if k in (5, 6, 10):
+                _resultado(c)
+    dv = DataValidation(type="list", formula1='"' + ",".join(nm for nm, _ in UNIDADES) + '"', allow_blank=False)
+    ws.add_data_validation(dv)
+    dv.add(u)
+    ws.cell(fila + len(filas) + 1, 1, "E_h = E·t y σ_h = σ·√t; banda del 90 % = E_h ± 1.645·σ_h. Supone rendimientos normales con "
+            "la media y covarianza de la ventana: extrapola la historia, no la predice.").font = SUAVE
+    return {"proyeccion": f"B{fila + 5}", "horizonte": f"B{fila + 1}", "unidad": u, "fin": fila + len(filas) + 1}
+
+
+def _hoja_matriz(wb: Workbook, precios: pd.DataFrame, rf: float = 0.07) -> dict:
+    """«Matriz de precios y rendimiento» del documento del usuario (precios del más reciente al más antiguo, rendimiento
+    (P_t − P_t−1)/P_t−1, promedio, varianza y desviación por activo, proporciones 1/N), completada con covarianzas,
+    resultados del portafolio, Sharpe, proyección y el modelo de Solver listo."""
+    nombres, N, n = list(precios.columns), len(precios), precios.shape[1]
+    ws = wb.create_sheet("Matriz de precios")
+    c0 = n + 4  # columna «Indicador financiero», como en el documento original (I con 5 activos)
+    _encabezado(ws, "Matriz de precios y rendimiento", c0 + n,
+                "Su documento, completado: pegue precios de cierre (del más reciente al más antiguo) en la matriz de borde "
+                "punteado. " + AVISO)
+    ws.cell(3, 1, "Matriz de precios").font = SECCION
+    _cabecera(ws.cell(4, 1, "Fecha"))
+    for j, nm in enumerate(nombres):
+        _entrada(ws.cell(4, 2 + j, nm))
+    for k in range(N):
+        _entrada(ws.cell(5 + k, 1, precios.index[k].date()), "dd.mm.yyyy")
+        for j in range(n):
+            _entrada(ws.cell(5 + k, 2 + j, float(precios.iloc[k, j])), NUM)
+    rt = 5 + N + 1
+    ws.cell(rt, 1, "Matriz de rendimiento  r_t = (P_t − P_t−1) / P_t−1").font = SECCION
+    _cabecera(ws.cell(rt + 1, 1, "Fecha"))
+    for j in range(n):
+        _cabecera(ws.cell(rt + 1, 2 + j, f"={L(2 + j)}4"))
+    for k in range(N - 1):
+        ws.cell(rt + 2 + k, 1, f"=A{5 + k}").number_format = "dd.mm.yyyy"
+        for j in range(n):
+            p = L(2 + j)
+            ws.cell(rt + 2 + k, 2 + j, f'=IFERROR(({p}{5 + k}-{p}{6 + k})/{p}{6 + k},"")').number_format = "0.0000%"
+    rango = lambda j: f"{L(2 + j)}{rt + 2}:{L(2 + j)}{rt + N}"  # noqa: E731
+    cols = [L(c0 + 1 + j) for j in range(n)]
+    _cabecera(ws.cell(4, c0, "Indicador financiero (diario)"))
+    for j in range(n):
+        _cabecera(ws.cell(4, c0 + 1 + j, f"={L(2 + j)}4"))
+    for j in range(n):
+        ws.cell(5, c0 + 1 + j, f"=AVERAGE({rango(j)})").number_format = "0.0000%"
+        ws.cell(6, c0 + 1 + j, f"=VAR({rango(j)})").number_format = "0.000000"
+        ws.cell(7, c0 + 1 + j, f"=SQRT({cols[j]}6)").number_format = "0.0000%"
+    for f, et in ((5, "Rendimiento promedio"), (6, "Varianza"), (7, "Desviación estándar")):
+        ws.cell(f, c0, et).font = NEGRITA
+    _cabecera(ws.cell(9, c0, "Proporciones w (Solver las cambia)"))
+    for j in range(n):
+        _cabecera(ws.cell(9, c0 + 1 + j, f"={L(2 + j)}4"))
+        _entrada(ws.cell(10, c0 + 1 + j, round(1 / n, 6)), PCT)
+    props = f"{cols[0]}10:{cols[-1]}10"
+    ws.cell(12, c0, "Matriz de varianzas y covarianzas (diaria) = COVARIANCE.S").font = SECCION
+    fc, _ = _matriz(ws, 13, c0, [f"={L(2 + j)}4" for j in range(n)],
+                    lambda i, j: f"=IFERROR(_xlfn.COVARIANCE.S({rango(i)},{rango(j)}),0)")
+    fa = fc + n + 1
+    ws.cell(fa, c0, "(Σw)_i auxiliar").font = SUAVE
+    for i in range(n):
+        ws.cell(fa, c0 + 1 + i, f"=SUMPRODUCT({cols[0]}{fc + i}:{cols[-1]}{fc + i},{props})").number_format = "0.000000"
+    r0 = fa + 3
+    ws.cell(r0 - 1, c0, "Portafolio").font = SECCION
+    v = L(c0 + 1)
+    for k, (et, f, fmt, entrada) in enumerate([
+            ("Rendimiento del portafolio (diario)", f"=SUMPRODUCT({props},{cols[0]}5:{cols[-1]}5)", "0.0000%", False),
+            ("Varianza del portafolio (diaria)", f"=SUMPRODUCT({props},{cols[0]}{fa}:{cols[-1]}{fa})", "0.000000", False),
+            ("Desviación estándar del portafolio (diaria)", f"=SQRT(MAX({v}{r0 + 1},0))", "0.0000%", False),
+            ("Rendimiento anualizado (×252)", f"={v}{r0}*252", PCT, False),
+            ("Riesgo anualizado (×√252)", f"={v}{r0 + 2}*SQRT(252)", PCT, False),
+            ("Tasa libre de riesgo anual", rf, PCT, True),
+            ("Sharpe anual (objetivo de Solver)", f'=IFERROR(({v}{r0 + 3}-{v}{r0 + 5})/{v}{r0 + 4},"")', "0.000", False),
+            ("Suma de proporciones (debe ser 100 %)", f"=SUM({props})", PCT, False),
+            ("Proporción máxima por activo", 1, PCT, True)]):
+        ws.cell(r0 + k, c0, et).font = NEGRITA
+        c = ws.cell(r0 + k, c0 + 1, f)
+        if entrada:
+            _entrada(c, fmt)
+        else:
+            c.number_format = fmt
+            if k in (3, 4, 6):
+                _resultado(c)
+    sharpe, suma, maximo = f"{v}{r0 + 6}", f"{v}{r0 + 7}", f"{v}{r0 + 8}"
+    _solver(ws, sharpe, props, suma, maximo)
+    proy = _proyeccion(ws, rt + N + 2, f"{v}{r0}", f"{v}{r0 + 2}", 100_000, 1, "meses", por_anio=False)
+    ws.column_dimensions["A"].width = 46
+    for c in range(2, c0 + n + 1):
+        ws.column_dimensions[L(c)].width = 13
+    ws.column_dimensions[L(c0)].width = 44
+    return {"hoja": ws.title, "pesos": props, "Sharpe": sharpe, "suma": suma, "maximo": maximo, "rf": f"{v}{r0 + 5}",
+            "precios": f"A5:{L(1 + n)}{4 + N}", "n": n, **proy}
+
+
 def _pasos_solver(h: dict) -> list[str]:
     pesos, hoja = h["pesos"], h["hoja"]
     return [
         "Active Solver una sola vez: Archivo → Opciones → Complementos → abajo «Administrar: Complementos de Excel» → Ir → marque "
         "«Solver» → Aceptar.",
-        f"Vaya a la hoja «{hoja}» y abra Datos → Solver.",
+        f"Vaya a la hoja «{hoja}» y abra Datos → Solver: el modelo ya viene cargado (máximo Sharpe). Pulse «Resolver» → "
+        "«Conservar solución de Solver». Los pasos siguientes son lo que ya está capturado, por si quiere cambiarlo.",
         f"Establecer objetivo: {h['Sharpe']} (Sharpe) con «Máx.»  —  o {h['σ_p anual']} (riesgo σ_p) con «Mín.» si busca el de "
         "menor riesgo.",
         f"Cambiando las celdas de variables: {pesos}.",
@@ -399,6 +557,7 @@ def _bytes(wb: Workbook) -> bytes:
 
 def plantilla() -> bytes:
     wb = Workbook()
+    m = _hoja_matriz(wb, pd.read_csv(EJEMPLO_MATRIZ, index_col="Fecha", parse_dates=True))
     p = _hoja_parametrica(wb)
     h = _hoja_historica(wb, "Histórico ", [f"Activo {k}" for k in range(1, 6)], None, 253, [0.2] * 5, 0.07, 4, 0.4, 0, None)
     f_e, n = p["f_e"], p["n"]
@@ -406,6 +565,18 @@ def plantilla() -> bytes:
         ("¿Para qué sirve?", ["Calcula qué mezcla de inversiones da el mejor rendimiento por cada unidad de riesgo (teoría de "
                               "Markowitz). Tiene dos formas de usarla: un ejercicio rápido con supuestos y un modelo con sus "
                               "propios precios."]),
+        ("Opción 0 · Su documento «Matriz de precios» (hoja «Matriz de precios»)", [
+            f"{m['precios']}: fechas y precios de cierre, del más reciente al más antiguo, como en su documento (trae su ejemplo "
+            "AAL, ABNB, MU, XOM y MSFT del 12 al 30-oct-2026). Puede cambiar nombres y precios.",
+            "La matriz de rendimiento (P_t − P_t−1)/P_t−1, el rendimiento promedio, la varianza y la desviación estándar se "
+            "calculan solas, igual que en su archivo.",
+            f"Proporciones w en {m['pesos']} (empiezan en 1/N). Resultado: Sharpe anual {m['Sharpe']}, suma {m['suma']}; tasa libre "
+            f"de riesgo en {m['rf']} y proporción máxima por activo en {m['maximo']}.",
+            f"Solver: Datos → Solver ya trae el modelo (maximizar {m['Sharpe']} cambiando {m['pesos']}, suma = 1, cada w ≤ "
+            f"{m['maximo']}, sin negativos, GRG Nonlinear). Pulse «Resolver».",
+            f"Proyección: elija la cantidad en {m['horizonte']} y la unidad en {m['unidad']} (días, semanas, meses o años); "
+            f"rendimiento esperado en {m['proyeccion']}. Con 15 días de precios la estimación es muy inestable: use más historia "
+            "si puede."]),
         ("Opción A · Ejercicio rápido (hoja «Paramétrico Acelera»)", [
             "B3: tasa libre de riesgo anual (use la de CETES; p. ej. 7 %). B4: aversión al riesgo A (2 agresivo · 4–6 moderado · "
             "10 conservador).",
@@ -421,7 +592,9 @@ def plantilla() -> bytes:
             "Los rendimientos diarios (columnas H–L) y toda la hoja «Histórico Modelo» se calculan solos.",
             f"«Histórico Modelo»: B3 tasa libre de riesgo, B4 aversión A, B5 y B6 peso máximo y mínimo, {h['pesos']} sus pesos.",
             f"Resultado: rendimiento {h['E(r_p) anual']}, riesgo {h['σ_p anual']}, Sharpe {h['Sharpe']}. La suma de pesos "
-            f"({h['Suma de pesos (debe ser 100 %)']}) debe dar 100 %."]),
+            f"({h['Suma de pesos (debe ser 100 %)']}) debe dar 100 %.",
+            f"Proyección: cantidad en {h['horizonte']}, unidad en {h['unidad']}; rendimiento esperado en el horizonte en "
+            f"{h['proyeccion']}."]),
         ("Encontrar la mejor mezcla con Solver (Opción B)", _pasos_solver(h)),
         ("Cómo leer los resultados", [
             "E(r_p): rendimiento anual promedio que habría tenido la mezcla. σ_p: cuánto varía (riesgo). Sharpe: rendimiento extra "
@@ -443,12 +616,13 @@ def libro(con, ajustes, portafolios: list[dict]) -> bytes:
         _cabecera(resumen.cell(3, k, t))
     hojas = []
     for k, p in enumerate(portafolios, start=1):
-        s = p["especificacion"]
-        res = markowitz.calcular(con, ajustes, s)  # se recalcula con los datos actuales para que las hojas cuadren
+        res = markowitz.calcular(con, ajustes, p["especificacion"])  # con los datos actuales, para que las hojas cuadren
+        s = res["especificacion"]  # normalizada: los guardados antes del horizonte en días/semanas/meses/años lo traen completo
         precios, _ = markowitz._datos(con, ajustes, [a["id"] for a in res["activos"]], s["ventana"])
         claves = [a["clave"] for a in res["activos"]]
+        unidad = dict(zip(("dias", "semanas", "meses", "anios"), (u for u, _ in UNIDADES)))[s["horizonte_unidad"]]
         celdas = _hoja_historica(wb, f"P{k} ", claves, precios, 0, [a["peso"] for a in res["activos"]], s["rf"],
-                                 s["aversion"], s["peso_max"], s["peso_min"], res)
+                                 s["aversion"], s["peso_max"], s["peso_min"], res, s["capital"], (s["horizonte_valor"], unidad))
         hojas.append((s["nombre"], celdas))
         h = f"'{celdas['hoja']}'"
         for c, v in enumerate([k, s["nombre"], res["objetivo_nombre"], res["metodo_nombre"], ", ".join(claves), s["ventana"],
@@ -474,9 +648,14 @@ def libro(con, ajustes, portafolios: list[dict]) -> bytes:
             "«Resumen»: los portafolios lado a lado (rendimiento, riesgo y Sharpe enlazados a sus hojas).",
             "Por cada portafolio, «P# Datos» (precios en MXN y rendimientos diarios) y «P# Modelo» (estadísticos, covarianzas, "
             "correlaciones, pesos, resultados, frontera eficiente y gráfica).",
-            "Los pesos con borde rojo punteado son los que calculó la terminal. Cámbielos para explorar: todo se recalcula."]),
+            "Los pesos con borde rojo punteado son los que calculó la terminal. Cámbielos para explorar: todo se recalcula.",
+            "Columna «Peso Solver (terminal)»: el portafolio de máximo Sharpe que calculó la terminal; Solver en Excel llega a lo "
+            "mismo (salvo redondeo y topes por moneda o sector, que Excel no aplica).",
+            "Bloque «Proyección»: cambie la cantidad y la unidad (días, semanas, meses o años) para ver el rendimiento esperado, su "
+            "rango del 90 % y la probabilidad de pérdida a ese plazo."]),
         ("Dónde está cada cosa", [f"«{nombre}» → hoja «{c['hoja']}»: pesos {c['pesos']} · rendimiento {c['E(r_p) anual']} · riesgo "
-                                  f"{c['σ_p anual']} · Sharpe {c['Sharpe']} · suma de pesos {c['Suma de pesos (debe ser 100 %)']}."
+                                  f"{c['σ_p anual']} · Sharpe {c['Sharpe']} · suma de pesos {c['Suma de pesos (debe ser 100 %)']} · "
+                                  f"horizonte {c['horizonte']} y {c['unidad']} → {c['proyeccion']}."
                                   for nombre, c in hojas]),
         ("Volver a optimizar con Solver", _pasos_solver(hojas[0][1]) + (
             ["En los demás portafolios use las celdas de su hoja (lista de arriba)."] if len(hojas) > 1 else [])),

@@ -4,6 +4,15 @@ from __future__ import annotations
 from . import reto
 from .config import Ajustes
 
+# Horizonte de proyección: unidad -> sesiones bursátiles (252 al año, 21 al mes, 5 a la semana).
+UNIDADES_HORIZONTE = {"dias": 1, "semanas": 5, "meses": 21, "anios": 252}
+
+
+def horizonte_sesiones(valor: float, unidad: str) -> int:
+    if unidad not in UNIDADES_HORIZONTE:
+        raise ValueError("unidad del horizonte: dias, semanas, meses o anios")
+    return max(1, round(float(valor) * UNIDADES_HORIZONTE[unidad]))
+
 
 def _clase_costo(ins: dict) -> str:
     if ins["clase"].startswith("fondo"):

@@ -49,7 +49,7 @@ const CLASES = { accion: "Acción", reit: "Acción (REIT)", etf: "ETF", fibra: "
   fondo_renta_variable: "Fondo de renta variable", fondo_multiactivo: "Fondo multiactivo" };
 const ETAPAS = { inscripcion: "Inscripción", practica: "Semana de práctica", previa_competencia: "Antes de la competencia",
   competencia: "Competencia", concluido: "Concluido" };
-const LENTES = { rendimiento: "Máximo rendimiento", ajuste: "Ajuste a su perfil", puntuacion: "Máxima puntuación" };
+const LENTES = { rendimiento: "Máximo rendimiento", ajuste: "Ajuste a su perfil", puntuacion: "Máxima puntuación", markowitz: "Markowitz (Solver)" };
 
 function externo(url, texto) {
   if (typeof url !== "string" || !url.startsWith("https://")) return h("span", { texto });
@@ -1634,7 +1634,8 @@ async function cargarPerfil() {
     const f = document.getElementById("form-perfil");
     f.querySelectorAll('input[name="riesgo"]').forEach((r) => { r.checked = r.value === d.perfil.riesgo; });
     f.elements.horizonte_reto.checked = d.perfil.horizonte_reto !== false;
-    f.elements.horizonte_anios.value = d.perfil.horizonte_anios;
+    f.elements.horizonte_valor.value = d.perfil.horizonte_valor ?? d.perfil.horizonte_anios;
+    f.elements.horizonte_unidad.value = d.perfil.horizonte_unidad || "anios";
     f.elements.capital.value = d.perfil.capital;
     f.elements.max_peso_activo.value = Math.round(d.perfil.max_peso_activo * 100);
     f.elements.max_exposicion_usd.value = Math.round(d.perfil.max_exposicion_usd * 100);
@@ -1644,7 +1645,7 @@ async function cargarPerfil() {
     f.elements.incluir_etf_por_confirmar.checked = !!d.perfil.incluir_etf_por_confirmar;
     f.elements.excluir.value = (d.perfil.excluir || []).join(", ");
     limpiar("criterios", h("h2", { texto: "Criterios de puntuación, costos y alertas" }),
-      h("p", { clase: "ayuda", texto: `Horizonte efectivo: ${d.perfil_efectivo.horizonte_anios} años (${d.perfil_efectivo.horizonte_origen || "perfil"}). Se cambian en config/local.toml y config/reto.yaml.` }),
+      h("p", { clase: "ayuda", texto: `Horizonte efectivo: ${d.perfil_efectivo.horizonte_anios} años ≈ ${Math.round(d.perfil_efectivo.horizonte_anios * 252)} sesiones (${d.perfil_efectivo.horizonte_origen || "perfil"}). Se cambian en config/local.toml y config/reto.yaml.` }),
       tabla([{ t: "Criterio", f: (x) => x[0].replace("_", " ") }, { t: "Peso", f: (x) => x[1], num: true }], Object.entries(d.puntuacion)),
       h("p", { clase: "suave", texto: `Spreads estimados: ${Object.entries(d.costos.spread_pct).map(([k, v]) => `${k} ${pct(v)}`).join(", ")}; ISR ${pct(d.costos.impuesto_ganancia)}; banda ${d.optimizacion.banda_rebalanceo_pp} pp.` }));
   } catch (e) { limpiar("criterios", errorCaja(e)); }
@@ -1656,7 +1657,7 @@ document.getElementById("form-perfil").addEventListener("submit", async (ev) => 
   const n = (v) => Number(String(v).replace(/[\s,$%]/g, ""));
   const cuerpo = {
     riesgo: (f.querySelector('input[name="riesgo"]:checked') || {}).value, horizonte_reto: f.elements.horizonte_reto.checked,
-    horizonte_anios: n(f.elements.horizonte_anios.value), capital: n(f.elements.capital.value),
+    horizonte_valor: n(f.elements.horizonte_valor.value), horizonte_unidad: f.elements.horizonte_unidad.value, capital: n(f.elements.capital.value),
     max_peso_activo: n(f.elements.max_peso_activo.value) / 100, max_exposicion_usd: n(f.elements.max_exposicion_usd.value) / 100,
     escenario: f.elements.escenario.value, incluir_etf_por_confirmar: f.elements.incluir_etf_por_confirmar.checked,
     mercado_acciones: f.elements.mercado_acciones.value, criterio_plan: f.elements.criterio_plan.value,
@@ -3059,7 +3060,7 @@ function genInicial(perfil = "crecimiento") {
   const o = pf.meta.objetivos[perfil];
   return { objetivo: perfil, clase: "acciones", mercado_filtro: "ambos", caps: [], n: Math.max(o.min_activos, 6), fijos: [], excluir: [],
     completar: perfil !== "cuenta", metodo: "auto", peso_max: o.peso_max, capital: 100000, rf: pf.meta.tasa_libre.valor, ventana: 252, aversion: o.aversion,
-    rend_objetivo: 0.12, riesgo_objetivo: 0.18, covarianza: "muestral", usd_max: null, sector_max: null, vistas: [], nombre: "", descripcion: "" };
+    rend_objetivo: 0.12, riesgo_objetivo: 0.18, horizonte_valor: o.horizonte_anios || 1, horizonte_unidad: "anios", covarianza: "muestral", usd_max: null, sector_max: null, vistas: [], nombre: "", descripcion: "" };
 }
 async function cargarPortafolios() {
   const vigente = turno("portafolios");
@@ -3238,6 +3239,8 @@ function generadorPortafolio() {
       numero("rf", "Tasa libre de riesgo anual (%)", { min: -5, max: 50 }),
       selectorSimple(g.ventana, M.ventanas.map((v) => [v, `${v} sesiones (~${(v / 252).toFixed(1)} años)`]), (v) => { g.ventana = +v; cambioGen(true); }, "Historia para estimar"),
       numero("aversion", "Aversión al riesgo A", { min: 0.1, max: 50 }),
+      numero("horizonte_valor", "Horizonte de la predicción", { min: 1, max: 15120 }),
+      sel("horizonte_unidad", [["dias", "días (sesiones)"], ["semanas", "semanas"], ["meses", "meses"], ["anios", "años"]], "Unidad del horizonte"),
       sel("covarianza", Object.entries(M.covarianzas), "Covarianza"),
       tope("usd_max", "Máximo en dólares, SIC (%)"),
       tope("sector_max", "Máximo por sector (%)"),
@@ -3378,6 +3381,36 @@ function bloqueFueraDeMuestra(f) {
     h("p", { clase: "suave", texto: f.lectura }));
 }
 
+// Solver de Markowitz: el portafolio de máximo Sharpe con las mismas restricciones (lo que hace Datos → Solver en el Excel).
+function bloqueSolver(r) {
+  const sv = r.solver;
+  if (!sv) return null;
+  const m = sv.metricas;
+  return h("div", { clase: "tarjeta", "aria-label": "Solver de Markowitz" },
+    h("h3", { texto: "Solver de Markowitz: el mejor portafolio por unidad de riesgo" }),
+    h("div", { clase: "rejilla" }, kpi("E(r) anual", pct(m.rend), signo(m.rend)), kpi("σ anual", pct(m.riesgo)),
+      kpi("Sharpe", vacio(m.sharpe) ? "—" : m.sharpe.toFixed(2)),
+      kpi("Frente al elegido", sv.es_elegido ? "es el mismo" : `${sv.mejora_sharpe >= 0 ? "+" : ""}${sv.mejora_sharpe.toFixed(2)} Sharpe`)),
+    h("p", { texto: "Pesos del Solver: " + Object.entries(sv.pesos).filter(([, w]) => w >= 0.005).map(([c, w]) => `${c} ${pct(w)}`).join(" · ") }),
+    sv.es_elegido ? null : h("button", { type: "button", clase: "boton boton--secundario", texto: "Usar los pesos del Solver (método máximo Sharpe)",
+      onclick: () => aplicarSugerencia({ metodo: "max_sharpe" }) }),
+    h("p", { clase: "ayuda", texto: sv.nota }));
+}
+function bloqueProyeccion(r) {
+  const p = r.proyeccion;
+  if (!p) return null;
+  const filas = [["Elegido", p.elegido], ["Solver (máx. Sharpe)", p.solver], ["1/N (referencia)", p["1/N"]]];
+  return h("div", {},
+    h("h3", { texto: `Proyección a ${p.horizonte} (${p.sesiones} sesiones)` }),
+    tabla([{ t: "Portafolio", f: (x) => x[0] }, { t: "Rend. esperado", f: (x) => h("span", { clase: signo(x[1].rend) }, pct(x[1].rend)), num: true },
+      { t: "σ en el horizonte", f: (x) => pct(x[1].riesgo), num: true },
+      { t: "Rango 90 %", f: (x) => `${pct(x[1].bajo)} a ${pct(x[1].alto)}`, num: true },
+      { t: "Prob. de pérdida", f: (x) => pct(x[1].prob_perdida), num: true },
+      { t: "Valor esperado", f: (x) => mxn(x[1].valor), num: true },
+      { t: "Valor en el rango 90 %", f: (x) => `${mxn(x[1].valor_bajo)} a ${mxn(x[1].valor_alto)}`, num: true }],
+    filas, { caption: `Capital ${mxn(r.especificacion.capital)}. ${p.nota}` }));
+}
+
 function pintarResultadoPf(r) {
   const m = r.metricas, sp = r.especificacion;
   const comp = [["Elegido", m], ["Tangente (máx. Sharpe)", r.tangente], ["Mínima varianza", r.min_varianza], ["1/N (referencia)", r.metricas_1n]];
@@ -3394,6 +3427,7 @@ function pintarResultadoPf(r) {
       kpi("Sharpe", vacio(m.sharpe) ? "—" : m.sharpe.toFixed(2)), kpi("Caída máxima en la ventana", pct(r.caida_maxima), "negativo"),
       kpi("Peor día", pct(r.peor_dia), "negativo"), kpi("Parte en riesgo sugerida y*", vacio(r.asignacion_riesgosa) ? "—" : pct(Math.max(0, Math.min(1, r.asignacion_riesgosa))))),
     h("p", { clase: "ayuda", texto: `y* = (E − r_f)/(A·σ²) con A = ${sp.aversion}: fracción del capital para este portafolio riesgoso; el resto iría a un instrumento libre de riesgo (p. ej. CETES). Valores > 100 % se muestran como 100 %.` }),
+    bloqueSolver(r), bloqueProyeccion(r),
     r.avisos.length ? h("div", { clase: "aviso-caja", role: "status" }, r.avisos.map((a) => h("p", { texto: a }))) : null,
     r.datos.excluidos.length ? h("p", { clase: "suave", texto: `Excluidos: ${r.datos.excluidos.map((e) => `${nombreIns(e.id)} (${e.motivo})`).join("; ")}` }) : null,
     bloqueFueraDeMuestra(r.fuera_de_muestra),

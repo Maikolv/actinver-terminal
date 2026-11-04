@@ -17,7 +17,7 @@ from . import alertas, cartera, criterios_propuestas, db, ingesta, mercado, reto
 from .config import Ajustes
 
 log = logging.getLogger("terminal.servicios")
-COMBINACIONES = [(t, lente) for t in ("acciones", "mixta") for lente in ("rendimiento", "ajuste", "puntuacion")]
+COMBINACIONES = [(t, lente) for t in ("acciones", "mixta") for lente in ("rendimiento", "ajuste", "puntuacion", "markowitz")]
 # Con el perfil en «ambos», la lente de máxima puntuación se calcula además por separado para cada mercado
 VARIANTES_MERCADO = {"nacionales": "Solo nacionales (BMV)", "extranjeras": "Solo extranjeras (SIC)"}
 
