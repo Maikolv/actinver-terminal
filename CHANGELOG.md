@@ -2,6 +2,15 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 4-nov-2026 — Velas, Order Flow y Option Flow para todo el SIC
+
+- Las vistas Velas, Order Flow y Option Flow piden solas al proveedor (Alpaca gratuito) lo que falta o está viejo, una vez por instrumento y tipo; antes solo con el botón «Actualizar», y solo 5 de 143 instrumentos SIC tenían velas guardadas.
+- `scripts/rellenar_flujo.py`: carga inicial de los 143 SIC (velas 1Day/1Hour/15Min/5Min/1Min, libro IEX, operaciones SIP, OI y cadena de opciones). Resultado: 142–143 con datos en cada tipo; los huecos fueron cortes de red reintentados.
+- Fuera de sesión, las operaciones se piden y se muestran terminando en el último cierre (antes la ventana «últimos 60/240 min» salía vacía).
+- BRKB: Alpaca exige «BRK.B»; se quitaba el punto y no había velas ni cotización.
+- `/api/flujo/estado`: de 24 s a 0.25 s con millones de operaciones (lista de símbolos por salto de índice en vez de DISTINCT).
+- GEX: solo calculable con el mercado abierto (spot a ≤ 60 s de la cadena); la tarea programada se activó en `config/local.toml` para las emisoras SIC en cartera. BMV y fondos siguen sin fuente gratuita de flujo intradía ni opciones.
+
 ## 4-nov-2026 — Propuestas y plan de acción con la teoría de Markowitz
 
 - Nuevo criterio del plan «Markowitz: máximo Sharpe» (Reto y perfil), ahora el del usuario (antes «mayor ganancia»). El plan toma, entre las propuestas de la lente «Markowitz (Solver)», la de mayor Sharpe medido con el mismo método que la cartera actual (`resumen.sharpe_plan`).

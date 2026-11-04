@@ -25,9 +25,10 @@ def es_cripto(simbolo: str) -> bool:
 
 
 def origen_eeuu(con, simbolo: str) -> str | None:
-    """Símbolo de origen en EE. UU. de un instrumento del catálogo (p. ej. SIC:MU → MU)."""
+    """Símbolo de origen en EE. UU. de un instrumento del catálogo (p. ej. SIC:MU → MU; SIC:BRKB → BRK.B, con el punto que
+    Alpaca exige: sin él no devuelve velas ni cotización)."""
     f = con.execute("SELECT listado_referencia FROM instrumentos WHERE id=? AND moneda_referencia='USD'", (simbolo,)).fetchone()
-    return f[0].replace(".", "") if f and f[0] else None
+    return f[0] if f and f[0] else None
 
 
 def catalogo(con, ajustes) -> dict:
@@ -254,6 +255,11 @@ def orderflow(con, ajustes, simbolo: str, minutos: int = 240, niveles: int = 20)
     libro = almacen.ultimo_libro(con, simbolo, demo=ajustes.es_demo)
     desde = (datetime.now(UTC) - timedelta(minutes=int(minutos))).isoformat()
     ops = almacen.operaciones(con, simbolo, desde, demo=ajustes.es_demo)
+    if not ops:  # fuera de sesión: el mismo rango, terminando en la última operación guardada (se dice en la procedencia)
+        ultima = almacen.operaciones(con, simbolo, None, demo=ajustes.es_demo, limite=1)
+        if ultima:
+            fin = datetime.fromisoformat(ultima[-1]["instante"])
+            ops = almacen.operaciones(con, simbolo, (fin - timedelta(minutes=int(minutos))).isoformat(), demo=ajustes.es_demo)
     res = calculos.resumen_operaciones(ops)
     return {"simbolo": simbolo, "libro": calculos.resumen_libro(libro, niveles),
             "libro_meta": {k: libro[k] for k in ("instante", "fuente", "licencia", "mercado", "feed", "calidad", "retraso_s",

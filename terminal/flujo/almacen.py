@@ -178,7 +178,12 @@ def cadena(con, subyacente: str, demo: bool = False, hasta: str | None = None) -
 def simbolos(con, tabla: str) -> list[str]:
     assert tabla in ("flujo_barras", "flujo_libro", "flujo_operaciones", "flujo_opciones")
     col = "subyacente" if tabla == "flujo_opciones" else "simbolo"
-    return [r[0] for r in con.execute(f"SELECT DISTINCT {col} FROM {tabla} ORDER BY 1")]
+    # Salto por el índice (simbolo/subyacente es su primera columna): con millones de operaciones, DISTINCT recorría la
+    # tabla entera (24 s en /api/flujo/estado); así son unas pocas búsquedas por símbolo distinto.
+    return [r[0] for r in con.execute(
+        f"WITH RECURSIVE s(x) AS (SELECT min({col}) FROM {tabla} UNION ALL "
+        f"SELECT (SELECT min({col}) FROM {tabla} WHERE {col} > s.x) FROM s WHERE s.x IS NOT NULL) "
+        "SELECT x FROM s WHERE x IS NOT NULL")]
 
 
 def registrar_consulta(con, clave: str, estado: str, registros: int, mensaje: str) -> None:

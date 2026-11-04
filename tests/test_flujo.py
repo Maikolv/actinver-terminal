@@ -239,3 +239,35 @@ def test_gex_programado_apagado_y_una_vez_por_paso(con, ajustes, monkeypatch):
     assert servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(12, 0)) == []          # entre pasos: nada
     assert [r["paso"] for r in servicio.gex_programado(con, ajustes, ["SIC:NVDA"], a_las(14, 10))] == ["cadena_14"]
     assert llamadas == [("contratos_oi", "SIC:NVDA"), ("opciones", "SIC:NVDA"), ("opciones", "SIC:NVDA")]
+
+
+def test_orderflow_fuera_de_sesion_usa_las_ultimas_operaciones_guardadas(con, ajustes):
+    """4-nov: con el mercado cerrado, la ventana «últimos 240 min» quedaba vacía aunque hubiera operaciones del cierre."""
+    from terminal.flujo.contratos import Operacion, Procedencia
+    viejo = (AHORA - timedelta(days=2)).replace(microsecond=0)
+    ops = [Operacion("SIC:MU", (viejo - timedelta(minutes=k)).isoformat(), 100 + k, 10, None, f"t{k}") for k in range(5)]
+    almacen.guardar_operaciones(con, ops, Procedencia("x", "y", "z"))
+    con.commit()
+    o = servicio.orderflow(con, ajustes, "SIC:MU", minutos=60)
+    assert len(o["operaciones"]) == 5 and o["resumen"]["n"] == 5
+    assert len(servicio.orderflow(con, ajustes, "SIC:MU", minutos=2)["operaciones"]) == 3  # el mismo rango, desde la última
+
+
+def test_operaciones_alpaca_fuera_de_sesion_piden_el_cierre(monkeypatch):
+    from terminal import vigencia
+    pedido = {}
+
+    def manejar(req):
+        pedido.update(dict(req.url.params))
+        return httpx.Response(200, json={"trades": []})
+    a = Alpaca({}, {"ALPACA_API_KEY_ID": "k", "ALPACA_API_SECRET_KEY": "s"}, httpx.Client(transport=httpx.MockTransport(manejar)))
+    monkeypatch.setattr(vigencia, "mercado_abierto", lambda codigo, ahora=None: False)
+    a.operaciones("MU", "SIC:MU")
+    cierre = vigencia.cierre_sesion("XNYS", vigencia.ultima_sesion_cerrada("XNYS"))
+    assert datetime.fromisoformat(pedido["end"]) <= cierre.to_pydatetime()
+
+
+def test_origen_conserva_el_punto_de_clases(con):
+    """4-nov: «BRKB» sin punto devolvía 0 velas y HTTP 404 en Alpaca; «BRK.B» trae todo."""
+    con.execute("UPDATE instrumentos SET listado_referencia='BRK.B', moneda_referencia='USD' WHERE id='SIC:MU'")
+    assert servicio.origen_eeuu(con, "SIC:MU") == "BRK.B"

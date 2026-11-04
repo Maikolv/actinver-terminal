@@ -175,6 +175,9 @@ class Alpaca:
 
     def operaciones(self, simbolo_origen: str, simbolo: str, minutos: int = 60) -> tuple[list[Operacion], Procedencia]:
         fin = datetime.now(UTC) - timedelta(seconds=RETRASO_SIP_S)
+        from .. import vigencia
+        if not vigencia.mercado_abierto("XNYS"):  # fuera de sesión: los últimos minutos de la sesión que ya cerró
+            fin = min(fin, vigencia.cierre_sesion("XNYS", vigencia.ultima_sesion_cerrada("XNYS")).to_pydatetime())
         d = self._get(f"/v2/stocks/{simbolo_origen}/trades", {"feed": "sip", "start": (fin - timedelta(minutes=minutos)).isoformat(),
                                                              "end": fin.isoformat(), "limit": 10000, "sort": "desc"})
         ops = [Operacion(simbolo, instante(t["t"][:26] + "Z" if len(t["t"]) > 27 else t["t"]), float(t["p"]), float(t["s"]),

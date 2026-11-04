@@ -2038,6 +2038,19 @@ async function pedirActualizacion(tipo, simbolo, extra, boton) {
   finally { ocupado([boton], false); }
 }
 
+// Al abrir Velas, Order Flow u Option Flow de un instrumento con proveedor (SIC o cripto), lo que falta o está viejo se
+// pide solo, una vez por instrumento y tipo en esta página; el botón «Actualizar» sigue para forzarlo.
+const autoPedidos = new Set();
+const conProveedor = (s) => !!flujo.estado && [...flujo.estado.catalogo.sic, ...flujo.estado.catalogo.cripto].some((x) => x.id === s);
+const horasDesde = (iso) => (Date.now() - Date.parse(iso)) / 3.6e6;
+async function autoActualizar(tipo, simbolo, extra = {}) {
+  const k = `${tipo}|${simbolo}|${extra.intervalo || ""}`;
+  if (autoPedidos.has(k) || !conProveedor(simbolo)) return false;
+  autoPedidos.add(k);
+  try { return (await api("/api/flujo/actualizar", { method: "POST", json: { tipo, simbolo, ...extra } })).estado === "ok"; }
+  catch { return false; }
+}
+
 /* Velas japonesas con volumen, SMA20, Bollinger, VWAP anclado y RSI (Wilder). */
 function graficaVelas(barras, op, intervalo) {
   const ancho = 760, alto = 300, altoVol = 70, m = { i: 64, d: 12, s: 10, inf: 22 };
@@ -2186,6 +2199,11 @@ async function cargarVelas() {
     }
     const d = await api(`/api/flujo/velas?simbolo=${encodeURIComponent(v.simbolo)}&intervalo=${v.intervalo}&dias=${v.dias}`);
     if (solicitud !== cargaVelasId) return;
+    const vieja = !d.barras.length || horasDesde(d.barras.at(-1).inicio) > (v.intervalo === "1Day" ? 96 : 24);
+    if (vieja && await autoActualizar("velas", v.simbolo, { intervalo: v.intervalo, dias: v.dias })) {
+      if (solicitud === cargaVelasId) cargarVelas();
+      return;
+    }
     const ult = d.barras.slice(-12).reverse();
     const contGraf = h("div", {}, d.barras.length ? graficaVelas(d.barras, v, v.intervalo) : null);
     const rotuloVivo = h("p", { clase: "ayuda", role: "status", "aria-live": "off" });
@@ -2325,6 +2343,13 @@ async function cargarOrderFlow() {
       api(`/api/flujo/libro-operaciones?simbolo=${encodeURIComponent(o.simbolo)}&minutos=${o.minutos}&niveles=${o.niveles}`),
       api(`/api/flujo/perfiles?simbolo=${encodeURIComponent(o.simbolo)}&paso_precio=${o.pasoAmt}`)]);
     if (!vigente()) return;
+    const faltan = [!d.libro_meta || horasDesde(d.libro_meta.instante) > 24 ? ["libro"] : null,
+      !d.operaciones.length ? ["operaciones"] : null,
+      !(perfiles.sesiones || []).length ? ["velas", { intervalo: "5Min", dias: 7 }] : null].filter(Boolean);
+    if (faltan.length && (await Promise.all(faltan.map(([t, x]) => autoActualizar(t, o.simbolo, x)))).some(Boolean)) {
+      if (vigente()) cargarOrderFlow();
+      return;
+    }
     const L = d.libro, R = d.resumen;
     const filasLibro = L ? Array.from({ length: Math.max(L.bids.length, L.asks.length) }, (_, i) => ({ b: L.bids[i], a: L.asks[i] })) : [];
     limpiar("orderflow-contenido", controles, provs,
@@ -2459,6 +2484,11 @@ async function cargarOptionFlow() {
     const qs = new URLSearchParams({ subyacente: o.subyacente, ...Object.fromEntries(Object.entries(F).filter(([, v]) => v !== "" && v != null)) });
     const d = await api(`/api/flujo/optionflow?${qs}`);
     if (!vigente()) return;
+    if (!d.total && await autoActualizar("opciones", o.subyacente)) {
+      await autoActualizar("contratos_oi", o.subyacente);  // OI de cierre previo para el GEX, si está autorizado
+      if (vigente()) cargarOptionFlow();
+      return;
+    }
     const curvas = d.iv.curvas, vSel = F.vencimiento || Object.keys(curvas)[0];
     const curva = vSel && curvas[vSel] ? curvas[vSel] : [];
     const usarEnModelo = (c) => botonAccion("Al modelo", "boton--secundario", () => {
