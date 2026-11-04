@@ -45,6 +45,7 @@ export const GUIAS = {
     pasos: ['Elija el universo (solo acciones o con ETF y fondos).',
       'Elija la lente: máximo rendimiento, ajuste a su perfil, máxima puntuación o Markowitz (Solver).',
       'El horizonte de la estimación (días, semanas, meses o años) se cambia en «Reto y perfil».',
+      'Con el criterio «Markowitz» de «Reto y perfil», el plan de acción usa la propuesta de máximo Sharpe y solo sugiere operar si mejora el Sharpe de su cartera después de comisiones.',
       'Compare pesos, riesgo y la diferencia con su cartera; use «Simular cambio» para ver el efecto sin enviar nada.'],
     terminos: [['Máximo rendimiento', 'La más agresiva: busca la mayor ganancia esperada y muestra su riesgo.'],
       ['Ajuste a su perfil', 'Respeta su perfil, horizonte y topes de «Reto y perfil».'],

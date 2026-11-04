@@ -205,9 +205,7 @@ def generar(con: sqlite3.Connection, ajustes: Ajustes, clave: str = "acciones_aj
         mm = resumen.mantener_es_mejor(p, (p.get("perfil") or {}).get("criterio_plan", "puntuacion"),
                                        float(ajustes["optimizacion"].get("margen_mejora_mantener", resumen.MARGEN_MANTENER)))
         if mm and servicios.cartera_actual(con, ajustes).get("fuente") == "portal":
-            raise ValueError(f"hoy no conviene cambiar nada. Con el mismo método, tu cartera actual espera "
-                             f"{mm['mantener']:+.1%} y la propuesta {mm['propuesta']:+.1%} al cierre del Reto, después de "
-                             "comisiones: cambiar no mejora la ganancia esperada")
+            raise ValueError("hoy no conviene cambiar nada. " + resumen.texto_mantener(mm).rstrip("."))
         cur = con.execute("UPDATE boletas SET estado='descartada', motivo_estado='reemplazada por las boletas del plan del día' "
                           "WHERE estado='vigente'")
         reemplazadas = cur.rowcount

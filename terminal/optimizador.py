@@ -488,7 +488,7 @@ def _escenarios(X: pd.DataFrame, pesos: pd.Series, horizonte: float, elegibles: 
 
 
 def _frente_a_mantener(X: pd.DataFrame, ventanas: list[pd.DataFrame], pesos: pd.Series, previos: dict, cartera_actual: dict,
-                       horizonte: float, elegibles: dict) -> dict | None:
+                       horizonte: float, elegibles: dict, rf: float = 0.0) -> dict | None:
     """Propuesta y cartera actual medidas con el MISMO método (mismos datos, misma regla de media y volatilidad, pesos
     fijos en el periodo de validación). Los escenarios de la propuesta usan su validación walk-forward y no son
     comparables con «mantener» (5-oct-2026: +2.2 % frente a +7.6 % con métodos distintos; +7.0 % frente a +7.6 % con el
@@ -507,8 +507,11 @@ def _frente_a_mantener(X: pd.DataFrame, ventanas: list[pd.DataFrame], pesos: pd.
 
     def medir(w, X_val):
         e = _escenarios(X, w[w > 0], horizonte, elegibles, oos=_serie_pesos(X_val, w[w > 0]) if len(X_val) else None)
+        vol = e["volatilidad_anual"]
         return {"media": e["media_anual_usada"] * e["horizonte_anios"], "central_p50": e["central_p50"],
-                "adverso_p10": e["adverso_p10"], "favorable_p90": e["favorable_p90"], "volatilidad_anual": e["volatilidad_anual"]}
+                "adverso_p10": e["adverso_p10"], "favorable_p90": e["favorable_p90"], "volatilidad_anual": vol,
+                "media_anual": e["media_anual_usada"], "horizonte_anios": e["horizonte_anios"],
+                "sharpe": (e["media_anual_usada"] - rf) / vol if vol else None}  # Markowitz: exceso sobre CETES por unidad de σ
     por_ventana = [{"desde": str(v.index[0].date()) if len(v) else None, "hasta": str(v.index[-1].date()) if len(v) else None,
                     "propuesta": medir(w_prop, v), "mantener": medir(w_act, v)} for v in ventanas]
     peor = min(por_ventana, key=lambda x: x["propuesta"]["media"] - x["mantener"]["media"])
@@ -759,9 +762,10 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     creado = datetime.now(UTC).isoformat(timespec="seconds")
     perfil_usuario = perfil
     perfil = perfil_efectivo(perfil)
-    if lente == "markowitz":  # tasa libre de riesgo de la tangente: CETES 28 de Banxico (o la última guardada)
-        from .markowitz import tasa_libre
-        perfil = {**perfil, "rf_anual": float(tasa_libre(con, ajustes)["valor"])}
+    # tasa libre de riesgo (CETES 28 de Banxico o la última guardada): la usa la tangente de la lente Markowitz y el Sharpe
+    # con que el plan compara la propuesta contra mantener la cartera
+    from .markowitz import tasa_libre
+    perfil = {**perfil, "rf_anual": float(tasa_libre(con, ajustes)["valor"])}
     elegibles_l, excluidos, precios = universo(con, ajustes, perfil, tipo, cotiz)
     fx = mercado.ultimo_fx(con, ajustes)
     base = {"tipo": tipo, "lente": lente, "clave": f"{tipo}_{lente}",
@@ -871,7 +875,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     contrib = _contribucion_riesgo(X, pesos)
     esc = _escenarios(X, pesos[pesos > 0], float(perfil["horizonte_anios"]), elegibles, oos=oos)
     frente = _frente_a_mantener(X, [X_todo.loc[oos.index], X_todo.iloc[-len(oos):]], pesos, previos, cartera_actual,
-                                float(perfil["horizonte_anios"]), elegibles)
+                                float(perfil["horizonte_anios"]), elegibles, perfil["rf_anual"])
     capital = float(perfil.get("capital") or 0)
     asignacion, residuo = _asignacion_discreta(pesos, elegibles, capital)
     for a in asignacion:

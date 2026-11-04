@@ -102,8 +102,10 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
     mantener_mejor = resumen.mantener_es_mejor(p, (p.get("perfil") or {}).get("criterio_plan", "puntuacion"),
                                                 float(ajustes["optimizacion"].get("margen_mejora_mantener", resumen.MARGEN_MANTENER))) if p else None
     if mantener_mejor and confirmada:  # cambiar no mejora la ganancia esperada: se conserva lo que hay, sin operar
-        nota = (f"La propuesta no supera a mantener su cartera ({mantener_mejor['metrica']} {mantener_mejor['propuesta']:+.1%} "
-                f"frente a {mantener_mejor['mantener']:+.1%}, mismo método, después de comisiones): no se sugiere operar.")
+        nota = ("La propuesta no supera a mantener su cartera (" + (
+            f"Sharpe {mantener_mejor['propuesta']:.2f} frente a {mantener_mejor['mantener']:.2f}" if mantener_mejor.get("es_sharpe")
+            else f"{mantener_mejor['metrica']} {mantener_mejor['propuesta']:+.1%} frente a {mantener_mejor['mantener']:+.1%}")
+            + ", mismo método, después de comisiones): no se sugiere operar.")
         filas = [{**f, "accion": "mantener", "monto_mxn": 0.0, "delta_pp": 0.0, "nota": nota}
                  for f in filas if f["id"] in actuales]
         objetivo = {}
@@ -188,7 +190,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         "generado_en": ahora.isoformat(timespec="seconds"), "reglas": reglas, "cuenta": cuenta, "cuenta_hora_texto": cuenta_txt,
         "propuesta": ({"clave": p["clave"], "nombre": p["nombre"], "puntuacion": p["puntuacion"]["total"],
                        "datos_hasta": p.get("datos_hasta"),
-                       "por_que": ("Mayor ganancia media esperada al cierre del Reto (criterio elegido en su perfil)."
+                       "por_que": ("Portafolio de máximo Sharpe de Markowitz (criterio elegido en su perfil)."
+                                   if (p.get("perfil") or {}).get("criterio_plan") == "markowitz"
+                                   else "Mayor ganancia media esperada al cierre del Reto (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "ganancia"
                                    else "Mayor plusvalía esperada al cierre del Reto (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "plusvalia"

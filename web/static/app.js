@@ -5,7 +5,7 @@
 const CSRF = document.querySelector('meta[name="csrf"]').content;
 const estado = {
   alertasResumen: null, propuestas: null, clasificacion: [], cartera: null, universo: null, datos: null, reto: null,
-  universoSel: "acciones", lenteSel: "ajuste", mercadoSel: "ambos", lenteResumen: "ajuste", ultimoCiclo: null,
+  universoSel: "acciones", lenteSel: "markowitz", mercadoSel: "ambos", lenteResumen: "ajuste", ultimoCiclo: null,
 };
 
 /* ---------- utilidades ---------- */

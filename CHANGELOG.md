@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 4-nov-2026 — Propuestas y plan de acción con la teoría de Markowitz
+
+- Nuevo criterio del plan «Markowitz: máximo Sharpe» (Reto y perfil), ahora el del usuario (antes «mayor ganancia»). El plan toma, entre las propuestas de la lente «Markowitz (Solver)», la de mayor Sharpe medido con el mismo método que la cartera actual (`resumen.sharpe_plan`).
+- Cambiar o mantener se decide por Sharpe: la propuesta, con la comisión de cambiar descontada de su rendimiento en el horizonte, debe superar el Sharpe de mantener la cartera por 0.10 (`resumen.MARGEN_SHARPE`). `_frente_a_mantener` reporta media anual, volatilidad y Sharpe sobre CETES 28 para ambas; todas las lentes guardan la tasa libre de riesgo usada.
+- El mensaje de Telegram, la nota del plan de acción y la boleta del plan del día explican la decisión en Sharpe (`resumen.texto_mantener`); «Por qué esta» describe el portafolio de máximo Sharpe.
+- Con el criterio Markowitz, la propuesta del día fijada solo puede ser de la lente Markowitz (si se está recalculando, el plan espera) y entre sesiones se cambia solo si el Sharpe mejora en 0.10 o más.
+- Propuestas abre en la lente «Markowitz (Solver)». Pruebas nuevas en `tests/test_referencia_plan.py`.
+
 ## 3-nov-2026 — Solver de Markowitz, horizonte de predicción y la «Matriz de precios» del usuario
 
 - **Mis portafolios**: bloque «Solver de Markowitz» con el portafolio de máximo Sharpe bajo las mismas restricciones (suma 100 %, tope/mínimo por instrumento, topes por moneda y sector), su diferencia con el elegido y un botón para usar sus pesos. Horizonte de la predicción en días, semanas, meses o años (`horizonte_valor` + `horizonte_unidad`; 1 semana = 5 sesiones, 1 mes = 21, 1 año = 252) con rendimiento esperado, rango del 90 %, probabilidad de pérdida y valores en MXN para el elegido, el Solver y 1/N (`markowitz.proyeccion`: E·t, σ·√t, normal; extrapola la historia, no la predice).

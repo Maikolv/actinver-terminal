@@ -266,6 +266,12 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
     sesion = resumen.sesion_objetivo(datetime.now(UTC)).isoformat()
     criterio = resumen.criterio_plan(out)
     elegido, motivo = None, None
+    if criterio == "markowitz":  # el plan sigue la lente Markowitz: nunca se fija otra mientras esa se recalcula
+        if previa and not str(previa.get("clave", "")).endswith("_markowitz"):
+            previa = None
+        if (nueva or {}).get("lente") != "markowitz" and any((v or {}).get("lente") == "markowitz" and v.get("recalcular")
+                                                             for v in out.values()):
+            return None
     if previa and _fragil(out.get(previa.get("clave"))) and any(_valida(v) and not _fragil(v) for v in out.values()):
         previa = None  # una propuesta frágil no se conserva como referencia si hay una alternativa robusta o sin evaluar
     if previa and previa.get("criterio") == criterio and previa.get("clave") in out:
@@ -286,7 +292,9 @@ def _fijar_referencia(con, ajustes: Ajustes, perfil: dict, out: dict) -> str | N
                 return None  # se está recalculando: el plan espera a esa misma propuesta en vez de saltar a otra
         elif _valida(out.get(previa["clave"])) and nueva:
             ant, nva = out[previa["clave"]], nueva
-            if criterio in ("plusvalia", "ganancia"):
+            if criterio == "markowitz":
+                cambia = (resumen.sharpe_plan(nva) or 0) - (resumen.sharpe_plan(ant) or 0) >= resumen.MARGEN_SHARPE
+            elif criterio in ("plusvalia", "ganancia"):
                 ea, en = ant.get("escenarios") or {}, nva.get("escenarios") or {}
                 mejora = (resumen.metrica_plan(nva, criterio) or 0) - (resumen.metrica_plan(ant, criterio) or 0)
                 domina = (mejora > 0 and en.get("adverso_p10") is not None and ea.get("adverso_p10") is not None

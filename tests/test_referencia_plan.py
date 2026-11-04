@@ -152,3 +152,41 @@ def test_mantener_es_mejor_con_el_mismo_metodo():
     f["propuesta"]["media"] = 0.085                                             # +0.8 pp netos: menos que el margen
     assert resumen.mantener_es_mejor(p, "ganancia")
     assert resumen.mantener_es_mejor({"frente_a_mantener": {"comparable": False}}, "ganancia") is None
+
+
+def test_criterio_markowitz_elige_maximo_sharpe_y_compara_sharpe_con_mantener():
+    """Markowitz: el plan usa la lente «markowitz» de mayor Sharpe y solo opera si el Sharpe neto de comisiones supera al
+    de mantener la cartera por MARGEN_SHARPE."""
+    def lado(media, vol, adverso=-0.1):
+        return {"media_anual": media, "volatilidad_anual": vol, "horizonte_anios": 0.5, "sharpe": (media - 0.07) / vol,
+                "adverso_p10": adverso, "media": media * 0.5, "central_p50": media * 0.4}
+
+    def p(clave, lente, media, punt):
+        return {"clave": clave, "nombre": clave, "lente": lente, "estado": "calculada", "puntuacion": {"total": punt},
+                "perfil": {"criterio_plan": "markowitz"}, "reproducibilidad": {"tasa_libre_riesgo": 0.07},
+                "mejora_esperada": {"costo_cambio": 0.002},
+                "frente_a_mantener": {"comparable": True, "propuesta": lado(media, 0.2), "mantener": lado(0.15, 0.25)}}
+    props = {"acciones_ajuste": p("acciones_ajuste", "ajuste", 0.40, 95),
+             "acciones_markowitz": p("acciones_markowitz", "markowitz", 0.25, 60),
+             "mixta_markowitz": p("mixta_markowitz", "markowitz", 0.30, 55)}
+    ref = resumen.propuesta_referencia(props)
+    assert ref["clave"] == "mixta_markowitz"                        # máximo Sharpe entre las Markowitz, no la mejor puntuada
+    assert resumen.mantener_es_mejor(ref, "markowitz") is None      # Sharpe (0.30−0.004−0.07)/0.2=1.13 vs 0.32 ⇒ se opera
+    ref["frente_a_mantener"]["propuesta"] = lado(0.15, 0.22)        # (0.15−0.004−0.07)/0.22=0.35 vs 0.32: no alcanza el margen
+    mm = resumen.mantener_es_mejor(ref, "markowitz")
+    assert mm and mm["es_sharpe"] and abs(mm["mantener"] - 0.32) < 1e-9
+    assert "Sharpe 0.32" in resumen.texto_mantener(mm) and "%" not in resumen.texto_mantener(mm)
+
+
+def test_con_markowitz_el_plan_no_fija_otra_lente(con, ajustes):
+    """4-nov: con el criterio Markowitz y las propuestas Markowitz recalculándose, el plan esperaba en vez de fijar
+    «acciones_ajuste» para toda la sesión."""
+    perfil = {**ajustes["perfil"], "criterio_plan": "markowitz"}
+    out = _out(con, ajustes, perfil, [("acciones_ajuste", 0.03, 90), ("acciones_markowitz", 0.02, 60)])
+    out["acciones_ajuste"]["lente"], out["acciones_markowitz"]["lente"] = "ajuste", "markowitz"
+    out["acciones_markowitz"]["recalcular"] = True
+    out["acciones_markowitz"]["avisos"] = ["recalculando"]
+    assert servicios._fijar_referencia(con, ajustes, perfil, out) is None
+    out["acciones_markowitz"].pop("recalcular"), out["acciones_markowitz"].pop("avisos")
+    out["acciones_markowitz"]["metricas_estimacion"] = {"sharpe": 1.5}
+    assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_markowitz"

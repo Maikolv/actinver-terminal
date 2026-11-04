@@ -122,8 +122,8 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     L.append("")
     mm = plan.get("mantener_mejor")
     if mm:
-        L.append(f"✅ Hoy no cambies nada. Medidas igual, tu cartera actual espera {mm['mantener']:+.1%} al cierre del Reto "
-                 f"y la propuesta {mm['propuesta']:+.1%}: cambiar no mejora la ganancia esperada y cuesta comisiones.")
+        from .resumen import texto_mantener
+        L.append(f"✅ Hoy no cambies nada. {texto_mantener(mm)}")
         L.append(f"   Riesgo en un mal escenario (1 de cada 10): tu cartera {mm['adverso_mantener']:+.1%}, "
                  f"la propuesta {mm['adverso_propuesta']:+.1%}.")
     elif not (ventas or compras or cond):

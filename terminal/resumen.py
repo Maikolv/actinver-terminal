@@ -23,7 +23,9 @@ DIAS = ("lun", "mar", "mié", "jue", "vie", "sáb", "dom")
 
 
 CRITERIOS_PLAN = {"puntuacion": "mayor puntuación", "plusvalia": "mayor plusvalía esperada al cierre del Reto",
-                  "ganancia": "mayor ganancia media esperada al cierre del Reto"}
+                  "ganancia": "mayor ganancia media esperada al cierre del Reto",
+                  "markowitz": "máximo Sharpe (teoría de portafolios de Markowitz)"}
+MARGEN_SHARPE = 0.10  # con Markowitz, la propuesta debe superar el Sharpe de mantener por al menos 0.10 tras comisiones
 
 
 def ganancia_esperada(p: dict) -> float | None:
@@ -42,6 +44,8 @@ def mantener_es_mejor(p: dict | None, criterio: str, margen: float = MARGEN_MANT
     """Con criterio de ganancia: si la propuesta NO supera a mantener la cartera actual (mismo método, después de
     comisiones y por más que el margen de ruido), el plan no sugiere operar. Devuelve las cifras para explicarlo."""
     f = (p or {}).get("frente_a_mantener") or {}
+    if criterio == "markowitz" and f.get("comparable") and f["propuesta"].get("sharpe") is not None:
+        return _mantener_por_sharpe(p, f)
     if criterio not in ("ganancia", "plusvalia") or not f.get("comparable"):
         return None
     k = "media" if criterio == "ganancia" else "central_p50"
@@ -52,6 +56,41 @@ def mantener_es_mejor(p: dict | None, criterio: str, margen: float = MARGEN_MANT
     return {"propuesta": f["propuesta"][k], "mantener": f["mantener"][k], "costo": costo, "neta": neta, "margen": margen,
             "metrica": "ganancia promedio" if k == "media" else "resultado más común",
             "adverso_propuesta": f["propuesta"]["adverso_p10"], "adverso_mantener": f["mantener"]["adverso_p10"]}
+
+
+def _mantener_por_sharpe(p: dict, f: dict) -> dict | None:
+    """Markowitz: se cambia solo si el Sharpe de la propuesta, con la comisión de cambiar descontada de su rendimiento,
+    supera al de mantener la cartera (mismo método y datos) por `MARGEN_SHARPE`."""
+    pr, mn = f["propuesta"], f["mantener"]
+    costo = float(((p.get("mejora_esperada") or {}).get("costo_cambio")) or 0)
+    rf = float((p.get("reproducibilidad") or {}).get("tasa_libre_riesgo") or 0)
+    h = max(float(pr.get("horizonte_anios") or 1), 1 / 252)
+    s_prop = (pr["media_anual"] - costo / h - rf) / pr["volatilidad_anual"] if pr["volatilidad_anual"] else 0.0
+    s_mant = mn.get("sharpe")
+    if s_mant is None or s_prop - s_mant >= MARGEN_SHARPE:
+        return None
+    return {"propuesta": s_prop, "mantener": s_mant, "costo": costo, "neta": s_prop - s_mant, "margen": MARGEN_SHARPE,
+            "metrica": "Sharpe", "es_sharpe": True,
+            "adverso_propuesta": pr["adverso_p10"], "adverso_mantener": mn["adverso_p10"]}
+
+
+def texto_mantener(mm: dict) -> str:
+    """Frase para «hoy no cambies nada», en porcentaje (ganancia/plusvalía) o en Sharpe (Markowitz)."""
+    if mm.get("es_sharpe"):
+        return (f"Con Markowitz (rendimiento extra sobre CETES por unidad de riesgo), tu cartera actual tiene Sharpe "
+                f"{mm['mantener']:.2f} y la propuesta {mm['propuesta']:.2f} después de comisiones: cambiar no mejora la "
+                "relación rendimiento/riesgo.")
+    return (f"Medidas igual, tu cartera actual espera {mm['mantener']:+.1%} al cierre del Reto y la propuesta "
+            f"{mm['propuesta']:+.1%}: cambiar no mejora la ganancia esperada y cuesta comisiones.")
+
+
+def sharpe_plan(p: dict) -> float | None:
+    """Sharpe con que se elige entre propuestas Markowitz: el de la comparación con la cartera (mismo método) o, sin
+    cartera comparable, el de la estimación."""
+    f = (p or {}).get("frente_a_mantener") or {}
+    if f.get("comparable") and f["propuesta"].get("sharpe") is not None:
+        return f["propuesta"]["sharpe"]
+    return ((p or {}).get("metricas_estimacion") or {}).get("sharpe")
 
 
 def metrica_plan(p: dict, criterio: str) -> float | None:
@@ -83,6 +122,10 @@ def propuesta_referencia(propuestas: dict) -> dict | None:
     if fijada:
         return fijada[0]
     crit = criterio_plan(propuestas)
+    if crit == "markowitz":
+        mk = [p for p in cands if p.get("lente") == "markowitz" and sharpe_plan(p) is not None]
+        if mk:
+            return max(mk, key=lambda x: (sharpe_plan(x), x["puntuacion"]["total"]))
     if crit in ("plusvalia", "ganancia"):
         con_esc = [p for p in cands if metrica_plan(p, crit) is not None]
         if con_esc:
@@ -195,8 +238,13 @@ def bloque_propuestas(props: dict | None, ref: dict, detalle: bool = False) -> l
         if detalle or marca:
             out.append(f"   desglose: {_desglose(x)}")
     crit = criterio_plan(props or {})
-    plusvalia = crit in ("plusvalia", "ganancia")
-    if crit == "ganancia":
+    plusvalia = crit in ("plusvalia", "ganancia", "markowitz")
+    if crit == "markowitz":
+        s = sharpe_plan(ref)
+        out.append(f"Por qué esta: usted eligió el criterio MARKOWITZ; «{ref['nombre']}» es el portafolio de máximo Sharpe "
+                   f"(mayor rendimiento extra sobre CETES por unidad de riesgo{f', Sharpe {s:.2f}' if s is not None else ''}), "
+                   "con las restricciones de su perfil. Es una estimación con datos históricos, no una promesa.")
+    elif crit == "ganancia":
         er = ref.get("escenarios") or {}
         out.append(f"Por qué esta: usted eligió el criterio MAYOR GANANCIA; «{ref['nombre']}» tiene la mayor ganancia media "
                    f"esperada al cierre del Reto ({ganancia_esperada(ref) or 0:+.1%}), con escenario adverso "
