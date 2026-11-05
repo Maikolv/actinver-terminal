@@ -52,7 +52,8 @@ def indicadores(s: pd.Series, r: dict) -> dict | None:
     sma_c, sma_l = float(s.tail(r["sma_corta"]).mean()), float(s.tail(r["sma_larga"]).mean())
     return {"precio": precio, "sigma_diaria": sigma, "maximo": maximo, "stop": maximo * (1 - r["k_sigma"] * sigma),
             "sma_corta": sma_c, "sma_larga": sma_l, "bajista": precio < sma_c < sma_l,
-            "alcista": precio > sma_l and sma_c > sma_l}
+            "alcista": precio > sma_l and sma_c > sma_l, "vol_anual": sigma * math.sqrt(DIAS),
+            "rend_3m": precio / float(s.iloc[-64]) - 1 if len(s) > 63 else None}
 
 
 def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None) -> dict:
@@ -138,7 +139,7 @@ def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None)
                 compras.append({"id": iid, "peso_actual": actuales[iid]["peso_actual"] if iid in actuales else 0.0,
                                 "peso_objetivo": nuevo, "motivo": f"Reinversión en tendencia alcista (precio > SMA{r['sma_larga']} "
                                 f"y SMA{r['sma_corta']} > SMA{r['sma_larga']}) de la propuesta «{propuesta.get('nombre', '')}».",
-                                **{k: ind[k] for k in ("precio", "sma_corta", "sma_larga")}})
+                                **{k: ind[k] for k in ("precio", "sma_corta", "sma_larga", "vol_anual", "rend_3m")}})
 
     if minimo and not compras and len([f for f in filas if f["peso_objetivo"] > 0]) < minimo:
         _minimo_reto(filas, minimo, r)
@@ -149,12 +150,18 @@ def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None)
         accion = "vender" if delta < -0.005 else "mantener"
         salida.append({"id": f["id"], "clave_operable": f["clave"], "peso_actual": f["peso_actual"],
                        "peso_objetivo": f["peso_objetivo"], "delta_pp": delta * 100, "monto_mxn": delta * total,
-                       "accion": accion, "nota": " ".join(f["motivos"]) or "Sin señal de riesgo: se mantiene."})
+                       "accion": accion, "nota": " ".join(f["motivos"]) or "Sin señal de riesgo: se mantiene.",
+                       **_corto(f, accion, r), "vol_anual": f.get("vol_anual")})
     for c in compras:
         delta = c["peso_objetivo"] - c["peso_actual"]
         salida.append({"id": c["id"], "clave_operable": (ins.get(c["id"]) or {}).get("clave_operable") or c["id"],
                        "peso_actual": c["peso_actual"], "peso_objetivo": c["peso_objetivo"], "delta_pp": delta * 100,
-                       "monto_mxn": delta * total, "accion": "comprar", "nota": c["motivo"]})
+                       "monto_mxn": delta * total, "accion": "comprar", "nota": c["motivo"],
+                       "motivo_corto": "Va al alza" + (f" ({c['rend_3m']:+.0%} en 3 meses)" if c.get("rend_3m") is not None else "")
+                                       + " y está en la propuesta Markowitz.",
+                       "invalida": f"No compres si cae debajo de ${c['sma_larga']:,.2f} (su promedio de 50 días).",
+                       "vol_anual": c.get("vol_anual"), "rend_3m": c.get("rend_3m")})
+    _emparejar(salida)
     finales = {**{f["id"]: f["peso_objetivo"] for f in filas}, **{c["id"]: c["peso_objetivo"] for c in compras}}
     Rf = P[[i for i in finales if i in P.columns]].ffill(limit=3).pct_change(fill_method=None).tail(60).fillna(0.0)
     w_final = pd.Series(finales).reindex(Rf.columns).fillna(0.0).values
@@ -168,6 +175,60 @@ def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None)
                         "valor_total": total},
             "nota": "Reglas de control de pérdidas, no un pronóstico: reducen caídas grandes a cambio de vender a veces antes "
                     "de un rebote. Ninguna regla garantiza utilidad."}
+
+
+def _corto(f: dict, accion: str, r: dict) -> dict:
+    """Motivo e invalidación en una línea, con el precio que cambia la decisión."""
+    regla, stop = f.get("regla"), f.get("stop")
+    if "stop" not in f:
+        return {"motivo_corto": "Sin historia suficiente para evaluar el riesgo.", "invalida": "—"}
+    motivo = {"stop": f"Cayó debajo de su stop (${stop:,.2f}) y de su promedio de 50 días.",
+              "tendencia_perdida": f"Va a la baja y pierde {abs(f.get('perdida_costo') or 0):.0%} contra tu costo.",
+              "tendencia": "Va a la baja (debajo de sus promedios de 20 y 50 días): reducir a la mitad.",
+              "concentracion": f"Pesa {f['peso_actual']:.0%} de tu cartera; el tope es {r['peso_max']:.0%}.",
+              "volatilidad": "Recorte para bajar la volatilidad de la cartera."}.get(regla, "Sin señal de riesgo.")
+    if accion == "mantener" and f["peso_objetivo"] > 0 and any("mínimo de" in m for m in f["motivos"]):
+        motivo = "Se conserva una parte para cumplir el mínimo de 5 emisoras del Reto."
+    if accion == "vender":
+        invalida = (f"No vendas si antes de la orden vuelve arriba de ${stop:,.2f}." if regla == "stop"
+                    else f"No vendas si vuelve arriba de ${f['sma_corta']:,.2f} (su promedio de 20 días).")
+    else:
+        invalida = f"Vender si cae debajo de ${stop:,.2f} y de ${f['sma_larga']:,.2f} (promedio de 50 días)."
+    return {"motivo_corto": motivo, "invalida": invalida}
+
+
+def _emparejar(salida: list[dict]) -> None:
+    """Qué compra reemplaza a qué venta: el dinero de cada venta (de la mayor a la menor) se asigna a las compras en
+    orden, como un flujo de efectivo. Cada fila recibe `reemplazo` con instrumento y porqué."""
+    ventas = sorted([s for s in salida if s["accion"] == "vender"], key=lambda s: s["monto_mxn"])
+    compras = sorted([s for s in salida if s["accion"] == "comprar"], key=lambda s: -s["monto_mxn"])
+    resto = {c["id"]: c["monto_mxn"] for c in compras}
+    for v in ventas:
+        falta, parejas = -v["monto_mxn"], []
+        for c in compras:
+            if falta <= 1 or resto[c["id"]] <= 1:
+                continue
+            m = min(falta, resto[c["id"]])
+            resto[c["id"]] -= m
+            falta -= m
+            parejas.append((c, m))
+        if not parejas:
+            v["reemplazo"] = "Efectivo (ninguna emisora de la propuesta va al alza hoy)."
+            continue
+        v["reemplazo"] = "; ".join(
+            f"{_clave(c)} (≈ ${m:,.0f}): va al alza" + (f" {c['rend_3m']:+.0%} en 3 meses" if c.get("rend_3m") is not None else "")
+            + (f", volatilidad {c['vol_anual']:.0%} frente a {v['vol_anual']:.0%}" if c.get("vol_anual") and v.get("vol_anual") else "")
+            for c, m in parejas)
+        for c, m in parejas:
+            c.setdefault("_reemplaza", []).append(_clave(v))
+    for c in compras:
+        c["reemplazo"] = ("Reemplaza a " + ", ".join(c.pop("_reemplaza")) + ".") if c.get("_reemplaza") else "Nueva posición."
+    for s in salida:
+        s.setdefault("reemplazo", "—")
+
+
+def _clave(s: dict) -> str:
+    return str(s.get("clave_operable") or s["id"]).replace(" *", "")
 
 
 def _minimo_reto(filas: list[dict], minimo: int, r: dict) -> None:

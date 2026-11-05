@@ -357,6 +357,20 @@ function tarjetaReto(r, c) {
 }
 const DECISION = { comprar: ["vigente", "Comprar"], vender: ["vencido", "Vender"], mantener: ["calculada", "Mantener"],
   pendiente: ["retrasado", "Decisión pendiente"] };
+// Textos de una línea para la tabla del plan; el detalle completo queda en el título (al pasar el cursor).
+const motivoCorto = (m) => (m || "—").split(/(?<=\.)\s/)[0];
+function faltaCorta(a) {
+  const f = a.falta.join(" ");
+  if (/Saldo confirmado/.test(f)) return "Falta: captura tu cuenta del portal.";
+  if (/Efectivo confirmado insuficiente/.test(f)) return "Espera a que el dinero de las ventas llegue a tu poder de compra.";
+  if (/Precio BMV confiable|confiable/.test(f) && a.referencia) {
+    const r = a.referencia;
+    return r.lado_sugerido === "venta" ? `Sin precio exacto del simulador: vende con límite ${mxn(r.precio_min, true)}.`
+      : `Sin precio exacto del simulador: compra con máximo ${mxn(r.precio_max, true)}.`;
+  }
+  if (/confiable/.test(f)) return "Falta el precio exacto del simulador: no la toques hoy.";
+  return `Falta: ${a.falta[0].split(" (")[0]}.`;
+}
 function tarjetaPlan(plan) {
   const c = plan.cuenta, r = plan.reglas || {}, res = plan.resumen;
   const cuenta = c.confirmada
@@ -390,8 +404,14 @@ function tarjetaPlan(plan) {
       { t: "Monto", f: (a) => (a.decision === "pendiente" ? `≈ ${mxn(a.monto)}` : mxn(a.monto)), num: true },
       { t: "Peso actual → objetivo", f: (a) => `${pct(a.peso_actual)} → ${pct(a.peso_objetivo)}` },
       { t: "Precio (fuente · fecha)", f: (a) => h("span", { title: a.precio.nota || "" }, `${a.precio.fuente || "—"} · ${a.precio.fecha || "—"}${a.precio.es_referencia ? " · referencia *" : ""}`) },
-      { t: "Motivo", f: (a) => a.motivo },
-      { t: "Falta o se invalida si", f: (a) => (a.falta.length ? h("span", { clase: "no-cumple", texto: `Falta: ${a.falta.join(" · ")}` }) : a.invalidacion || "—") }],
+      { t: "Motivo", f: (a) => h("span", { title: a.motivo, texto: a.motivo_corto || motivoCorto(a.motivo) }) },
+      { t: "Reemplazo", f: (a) => h("span", {}, ...(a.reemplazo || "—").split("; ").flatMap((x, i) => {
+        const [ins, ...resto] = x.split(": ");
+        return [i ? h("br") : null, resto.length ? h("strong", { texto: ins }) : x, resto.length ? `: ${resto.join(": ")}` : null];
+      }).filter(Boolean)) },
+      { t: "Falta o se invalida si", f: (a) => h("span", { title: [...a.falta, a.invalidacion].filter(Boolean).join(" · ") },
+        a.falta.length ? h("span", { clase: "no-cumple", texto: faltaCorta(a) }) : null, a.falta.length ? h("br") : null,
+        a.invalida_corto || (a.falta.length ? "" : a.invalidacion || "—")) }],
     filas, { caption: "Ordenadas por prioridad: ventas, luego compras por tamaño del ajuste, luego mantener. * SIC: referencia de la bolsa de origen × tipo de cambio, no cotización ejecutable. Nada se envía: usted captura cada orden en el portal.",
       vacio: "Sin acciones: la cartera está dentro de la banda de rebalanceo o no hay propuesta vigente.",
       claseFila: (a) => (a.decision === "pendiente" ? "fila-inactiva" : null) }),

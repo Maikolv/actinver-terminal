@@ -117,6 +117,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         objetivo = {f["id"]: f["peso_objetivo"] for f in filas}
         mantener_mejor = None
         faltan = [x for x in faltan if not x.startswith("Propuesta vigente")]
+    cortos = {f["id"]: f for f in riesgo.get("filas") or []}  # motivo, invalidación y reemplazo en una línea
     ids = sorted({f["id"] for f in filas})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
     acciones = []
@@ -133,7 +134,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
                 "peso_actual": round(float((actuales.get(iid) or {}).get("peso") or f.get("peso_actual") or 0), 4),
                 "peso_objetivo": round(float(f.get("peso_objetivo", objetivo.get(iid, 0.0)) or 0), 4),
                 "delta_pp": float(f.get("delta_pp") or 0), "motivo": f.get("nota") or "", "precio": _precio(cot.get(iid), iid),
-                "invalidacion": "", "falta": [], "referencia": None, "costo": None}
+                "invalidacion": "", "falta": [], "referencia": None, "costo": None,
+                "motivo_corto": (cortos.get(iid) or {}).get("motivo_corto"), "invalida_corto": (cortos.get(iid) or {}).get("invalida"),
+                "reemplazo": (cortos.get(iid) or {}).get("reemplazo") or "—"}
         if accion == "mantener":
             fila["motivo"] = fila["motivo"] or f"Peso dentro de la banda de ±{banda:g} pp frente al objetivo: no conviene pagar comisión."
             fila["invalidacion"] = (f"El peso se aleja más de {banda:g} pp del objetivo, cambia la propuesta de referencia "

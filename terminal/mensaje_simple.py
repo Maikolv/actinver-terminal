@@ -32,6 +32,11 @@ def _dinero(x: float) -> str:
     return f"${x:,.0f}" if abs(x) >= 1000 else f"${x:,.2f}"
 
 
+def _reemplazos(texto: str) -> str:
+    """«USO (≈ $111,746): va al alza …; TGT (…)» → «USO, TGT» para el mensaje corto; el porqué va en /detalle."""
+    return ", ".join(p.split(" (")[0].strip() for p in texto.split(";")) if "(" in texto else texto.rstrip(".")
+
+
 def _nombre(clave: str) -> str:
     return clave.replace(" *", "")
 
@@ -156,7 +161,8 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
                 r = a["referencia"]
                 todo = (a.get("titulos_actuales") or 0) and r["titulos_aprox"] >= a["titulos_actuales"]
                 L.append(f"  {n}. {_nombre(a['clave'])}: VENDE {'TODAS tus' if todo else 'unas'} {r['titulos_aprox']:,} acciones. "
-                         f"Precio límite ${r['precio_min']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_min'])}).")
+                         f"Precio límite ${r['precio_min']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_min'])})."
+                         + (f" Reemplázala con: {_reemplazos(a['reemplazo'])}." if a.get("reemplazo") not in (None, "—") else ""))
         if c_compra:
             L.append(f"{'2️⃣' if (c_venta or ventas) else '1️⃣'} COMPRA (orden limitada; no pagues más del precio máximo)"
                      + (" en cuanto el dinero de las ventas aparezca en tu poder de compra:" if (c_venta or ventas) else ":"))

@@ -80,3 +80,25 @@ def test_minimo_de_emisoras_y_volatilidad_objetivo(monkeypatch):
     assert all(f["peso_objetivo"] <= 0.02 + 1e-9 for f in r["posiciones"] if f["id"] != "SIC:OK")
     r2 = g.evaluar(None, {"gestion_riesgo": {"vol_objetivo": 0.0001}}, _cartera({"SIC:OK": 0.25}), None)
     assert r2["posiciones"][0]["regla"] == "volatilidad" and r2["posiciones"][0]["peso_objetivo"] < 0.25
+
+
+def test_emparejar_reemplazos_por_flujo_de_efectivo():
+    salida = [{"id": "SIC:A", "clave_operable": "A *", "accion": "vender", "monto_mxn": -100.0, "vol_anual": 0.8},
+              {"id": "SIC:B", "clave_operable": "B *", "accion": "vender", "monto_mxn": -50.0, "vol_anual": 0.5},
+              {"id": "SIC:X", "clave_operable": "X *", "accion": "comprar", "monto_mxn": 120.0, "vol_anual": 0.2, "rend_3m": 0.1},
+              {"id": "SIC:Y", "clave_operable": "Y *", "accion": "comprar", "monto_mxn": 30.0, "vol_anual": 0.3, "rend_3m": 0.05},
+              {"id": "SIC:H", "clave_operable": "H *", "accion": "mantener", "monto_mxn": 0.0}]
+    g._emparejar(salida)
+    a, b, x, y, h = salida
+    assert a["reemplazo"].startswith("X (≈ $100)") and "volatilidad 20% frente a 80%" in a["reemplazo"]
+    assert b["reemplazo"].startswith("X (≈ $20)") and "Y (≈ $30)" in b["reemplazo"]
+    assert x["reemplazo"] == "Reemplaza a A, B." and y["reemplazo"] == "Reemplaza a B." and h["reemplazo"] == "—"
+
+
+def test_motivo_e_invalidacion_cortos():
+    f = {"regla": "stop", "stop": 100.0, "sma_corta": 95.0, "sma_larga": 98.0, "peso_actual": 0.4, "peso_objetivo": 0.0,
+         "motivos": [], "perdida_costo": -0.3}
+    c = g._corto(f, "vender", R)
+    assert c["motivo_corto"].startswith("Cayó debajo de su stop ($100.00)") and "vuelve arriba de $100.00" in c["invalida"]
+    m = g._corto({**f, "regla": None, "peso_objetivo": 0.4}, "mantener", R)
+    assert m["motivo_corto"] == "Sin señal de riesgo." and m["invalida"].startswith("Vender si cae debajo de $100.00")

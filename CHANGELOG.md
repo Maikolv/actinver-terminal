@@ -2,6 +2,12 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 5-nov-2026 — Reemplazos y textos cortos en el plan de acción
+
+- Columna «Reemplazo» en la tabla del plan: el dinero de cada venta se asigna a las compras como flujo de efectivo (de la venta mayor a la menor), con instrumento, monto aproximado y porqué (tendencia, rendimiento de 3 meses y volatilidad frente a la vendida); cada compra dice a quién reemplaza. Telegram añade «Reemplázala con: …» a cada venta.
+- «Motivo» y «Falta o se invalida si» en una línea, con el precio exacto que cambia la decisión (stop, promedio de 20 o 50 días); para lo que se mantiene, el precio al que habría que vender. El detalle completo queda al pasar el cursor.
+- Pruebas: dos nuevas en `tests/test_gestion_riesgo.py`; 59 del plan y 52 de Node aprobadas. Suite completa previa: 935 aprobadas.
+
 ## 5-nov-2026 — Plan explícito, captura 28 y auditoría
 
 - Captura 28 del portal registrada como 5-nov 14:30 (el usuario la fechó 04/11; sus precios corresponden al 5-nov: MU 12,330 = 657 USD, AMD 7,580 = 404 USD, NVDA 3,409 = 181.6 USD). Valuación $734,482.07, poder de compra $2,472.95, 8 acciones; ACTDUAL ya no aparece.
