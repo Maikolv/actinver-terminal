@@ -401,7 +401,8 @@ def diferencias(con: sqlite3.Connection, ajustes, r: dict) -> dict:
 
 def cartera(con: sqlite3.Connection, cot: dict, c: dict) -> dict:
     """Cartera con la forma de `cartera.calcular`, construida con la captura del portal (títulos y efectivo del Reto)
-    y valuada con el último precio de la terminal; si no hay precio vigente, con el que mostraba el portal."""
+    y valuada con el último precio de la terminal; si no hay precio vigente o es de un día anterior a la captura, con el
+    que mostraba el portal."""
     filas, valor_pos, sin_precio = [], 0.0, []
     for p in c["posiciones"]:
         if p["titulos"] <= 0:
@@ -409,6 +410,10 @@ def cartera(con: sqlite3.Connection, cot: dict, c: dict) -> dict:
         q = cot.get(p["instrumento_id"], {})
         precio = q.get("precio_mxn") if q.get("estado") not in (None, "sin_datos", "vencido") else None
         origen_precio = "terminal"
+        # 5-nov: GMEXICO valuado con el cierre EODHD del 4-nov (225.21) frente a 219.01 del portal a las 14:30 del 5-nov.
+        # Un precio de la terminal de un día anterior a la captura es más viejo que el del portal: manda el portal.
+        if precio is not None and p["precio"] and str(q.get("fecha") or "")[:10] < str(c.get("hora_portal") or "")[:10]:
+            precio = None
         if precio is None and p["precio"]:
             precio, origen_precio = p["precio"], "portal"
         valor = p["titulos"] * precio if precio is not None else p["valor"]

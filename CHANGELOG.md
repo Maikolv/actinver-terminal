@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 5-nov-2026 — Plan explícito, captura 28 y auditoría
+
+- Captura 28 del portal registrada como 5-nov 14:30 (el usuario la fechó 04/11; sus precios corresponden al 5-nov: MU 12,330 = 657 USD, AMD 7,580 = 404 USD, NVDA 3,409 = 181.6 USD). Valuación $734,482.07, poder de compra $2,472.95, 8 acciones; ACTDUAL ya no aparece.
+- Valuación: un precio de la terminal de un día anterior a la captura ya no gana sobre el del portal (GMEXICO 225.21 del 4-nov frente a 219.01 del portal; ALPEK 14.85 frente a 13.51). La cuenta pasó de $742,043 a $733,465 en la terminal (portal $734,482; la diferencia es el SIC en vivo).
+- Mensaje del plan explícito: «VENDE TODAS tus 25 acciones. Precio límite …», «COMPRA 31 acciones. Precio máximo …» y «✋ MANTÉN (no las vendas): …», sin «revisa primero»; el precio límite es la protección.
+- Auditoría: `mercado.cotizaciones` recorría el último precio de todos los instrumentos aunque se pidiera uno (0.17 s × 15 boletas del plan); con una lista corta filtra antes de agrupar (0.003 s, mismos resultados). Las excepciones del registro eran del 3-nov (sandbox) y no se repiten; el resto son cortes de red con reconexión.
+- Precio límite de las órdenes: si la posición se valuó con el precio del portal, la referencia es ese (GMEXICO pasaba de límite de venta 220.71 —no se ejecutaba con 219.01— a 214.63). El aviso «precios atrasados» ya no nombra posiciones valuadas con la captura del día.
+- Con el criterio Markowitz y sus propuestas recalculándose, el plan espera en lugar de tomar otra lente (`resumen.propuesta_referencia`; antes salía «acciones_rendimiento» a medio recálculo).
+- Pruebas: `tests/test_mensaje_simple.py` y `tests/test_portal.py` ampliadas; 54 + 12 aprobadas en el conjunto afectado.
+
 ## 5-nov-2026 — Gestión de riesgo en el plan de acción: vender, reducir o mantener
 
 - Nuevo `terminal/gestion_riesgo.py`, primero en el plan: por posición, stop por volatilidad confirmado por tendencia (máximo de 22 sesiones − 3σ diaria y precio < SMA50 ⇒ vender), tendencia bajista (precio < SMA20 < SMA50 ⇒ reducir a la mitad; con pérdida ≥ 15 % contra el costo ⇒ vender), tope de 25 % por posición y volatilidad objetivo de la cartera de 30 % anual. Respeta el mínimo de 5 emisoras del Reto. Lo liberado se reinvierte en emisoras de la propuesta de referencia con tendencia alcista (precio > SMA50 y SMA20 > SMA50), nunca en las que vende.

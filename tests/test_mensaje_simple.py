@@ -56,13 +56,13 @@ def test_condicional_y_pendientes_sin_dato():
     plan = _plan([_accion("AMD *", "pendiente", referencia=ref, propuesta="comprar"),
                   _accion("FUNO 11", "pendiente", propuesta="comprar")])
     t = ms.construir(plan, PROP, [], AHORA)
-    assert "AMD: compra unas 3 acciones si cuesta entre $900.00 y $950.00; precio límite $950.00" in t
+    assert "AMD: COMPRA 3 acciones. Precio máximo $950.00" in t and "Revisa primero" not in t
     assert "No toques hoy" in t and "FUNO 11" in t
     venta = {"lado_sugerido": "venta", "titulos_aprox": 15, "precio_min": 18900.0, "precio_max": 19700.0}
     compra = {"lado_sugerido": "compra", "titulos_aprox": 93, "precio_min": 2060.0, "precio_max": 2150.0}
     t = ms.construir(_plan([_accion("INTC *", "pendiente", referencia=compra, propuesta="comprar"),
                             _accion("MU *", "pendiente", referencia=venta, propuesta="vender")]), PROP, [], AHORA)
-    assert t.index("MU: vende") < t.index("INTC: compra") and "precio límite $18,900.00" in t
+    assert t.index("MU: VENDE") < t.index("INTC: COMPRA") and "Precio límite $18,900.00" in t
     assert "Haz primero las ventas: lo que te queda ($37,129) no alcanza" in t
 
 
@@ -121,3 +121,12 @@ def test_concentracion_y_precios_atrasados_se_dicen_en_palabras_sencillas():
     assert "precios del 09-10" in t
     t2 = ms.construir(plan, PROP, [], AHORA, concentracion={"clave": "AMD *", "peso": 0.15})
     assert "de tu cartera" not in t2 and "Ojo: la valuación" not in t2   # bajo el umbral y precios al día: no se dice
+
+
+def test_orden_explicita_vende_todas_y_mantener_con_lista():
+    venta = {"lado_sugerido": "venta", "titulos_aprox": 25, "precio_min": 12052.76, "precio_max": 12544.71}
+    plan = _plan([_accion("MU *", "pendiente", referencia=venta, propuesta="vender", tenencia=25),
+                  _accion("XOM *", "mantener", tenencia=8), _accion("PFE *", "mantener", tenencia=2)])
+    t = ms.construir(plan, PROP, [], AHORA)
+    assert "MU: VENDE TODAS tus 25 acciones. Precio límite $12,052.76" in t
+    assert "✋ MANTÉN (no las vendas): XOM, PFE." in t

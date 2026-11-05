@@ -110,15 +110,19 @@ def cotizaciones(con: sqlite3.Connection, ajustes: Ajustes, ids: list[str] | Non
     """Última cotización por instrumento con proveedor, bolsa, moneda, zona horaria, tipo de dato,
     hora de la cotización, retraso medido y estado de vigencia."""
     ins = instrumentos(con)
+    pocos = bool(ids) and len(ids) <= 200
     ids = ids or list(ins)
     cond, par = _filtro_proveedor(ajustes)
     fx = ultimo_fx(con, ajustes)
-    # Una sola consulta: último registro por instrumento (evita N consultas).
+    # Una sola consulta: último registro por instrumento (evita N consultas). Con una lista corta se filtra antes de
+    # agrupar: la boleta pedía uno a la vez y cada llamada recorría todos los precios (0.17 s × 15 órdenes del plan).
+    solo = f" AND instrumento_id IN ({','.join('?' * len(ids))})" if pocos else ""
+    par_ids = tuple(ids) if pocos else ()
     ultimos = {}
     for r in con.execute(
             f"SELECT p.instrumento_id, p.fecha, p.cierre, p.moneda, p.proveedor, p.tipo_dato, p.hora_cotizacion, p.obtenido_en "
-            f"FROM precios p JOIN (SELECT instrumento_id, MAX(fecha) AS f FROM precios WHERE {cond} GROUP BY instrumento_id) m "
-            f"ON p.instrumento_id = m.instrumento_id AND p.fecha = m.f WHERE p.{cond}", (*par, *par)):
+            f"FROM precios p JOIN (SELECT instrumento_id, MAX(fecha) AS f FROM precios WHERE {cond}{solo} GROUP BY instrumento_id) m "
+            f"ON p.instrumento_id = m.instrumento_id AND p.fecha = m.f WHERE p.{cond}", (*par, *par_ids, *par)):
         previo = ultimos.get(r["instrumento_id"])  # misma fecha en varias fuentes: gana la de mayor prioridad
         if previo is None or prioridad_fuente(r["proveedor"]) < prioridad_fuente(previo["proveedor"]):
             ultimos[r["instrumento_id"]] = r

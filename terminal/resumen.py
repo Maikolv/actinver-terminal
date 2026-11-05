@@ -126,6 +126,8 @@ def propuesta_referencia(propuestas: dict) -> dict | None:
         mk = [p for p in cands if p.get("lente") == "markowitz" and sharpe_plan(p) is not None]
         if mk:
             return max(mk, key=lambda x: (sharpe_plan(x), x["puntuacion"]["total"]))
+        if any((p or {}).get("lente") == "markowitz" for p in propuestas.values()):
+            return None  # las Markowitz se están recalculando: el plan espera en vez de tomar otra lente
     if crit in ("plusvalia", "ganancia"):
         con_esc = [p for p in cands if metrica_plan(p, crit) is not None]
         if con_esc:

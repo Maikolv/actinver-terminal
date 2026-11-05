@@ -152,3 +152,14 @@ def test_nuevo_plan_reemplaza_la_alerta_de_plan_anterior(con, monkeypatch):
     vivas = con.execute("SELECT clave FROM alertas WHERE regla='plan_propuesta' AND estado='nueva'").fetchall()
     assert len(vivas) == 1 and "mixta_puntuacion:" in vivas[0][0]
     assert con.execute("SELECT COUNT(*) FROM alertas WHERE regla='plan_propuesta' AND estado='caducada'").fetchone()[0] == 1
+
+
+def test_precio_del_portal_manda_si_la_terminal_tiene_uno_de_un_dia_anterior():
+    """5-nov: GMEXICO valuado con el cierre del 4-nov (225.21) frente a 219.01 del portal a las 14:30 del 5-nov."""
+    c = {"hora_portal": "2026-11-05T14:30:00-06:00", "efectivo": 0, "valor_portafolio": 2190.1,
+         "posiciones": [{"instrumento_id": "BMV:GMEXICO", "titulos": 10, "precio": 219.01, "valor": 2190.1, "costo_promedio": 231.25}]}
+    viejo = {"BMV:GMEXICO": {"precio_mxn": 225.21, "estado": "retrasado", "fecha": "2026-11-04"}}
+    f = portal.cartera(None, viejo, c)["posiciones"][0]
+    assert f["precio_mxn"] == 219.01 and f["origen_precio"] == "portal"
+    nuevo = {"BMV:GMEXICO": {"precio_mxn": 220.5, "estado": "vigente", "fecha": "2026-11-05"}}
+    assert portal.cartera(None, nuevo, c)["posiciones"][0]["origen_precio"] == "terminal"

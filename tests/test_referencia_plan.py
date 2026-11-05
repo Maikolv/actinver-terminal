@@ -190,3 +190,12 @@ def test_con_markowitz_el_plan_no_fija_otra_lente(con, ajustes):
     out["acciones_markowitz"].pop("recalcular"), out["acciones_markowitz"].pop("avisos")
     out["acciones_markowitz"]["metricas_estimacion"] = {"sharpe": 1.5}
     assert servicios._fijar_referencia(con, ajustes, perfil, out) == "acciones_markowitz"
+
+
+def test_markowitz_recalculandose_no_cae_en_otra_lente():
+    otra = {"clave": "acciones_rendimiento", "nombre": "x", "lente": "rendimiento", "estado": "calculada",
+            "puntuacion": {"total": 90}, "perfil": {"criterio_plan": "markowitz"}}
+    mk = {"clave": "acciones_markowitz", "nombre": "y", "lente": "markowitz", "estado": "calculada", "puntuacion": {"total": 60},
+          "perfil": {"criterio_plan": "markowitz"}, "avisos": ["se recalculará"], "recalcular": True}
+    assert resumen.propuesta_referencia({"a": otra, "b": mk}) is None
+    assert resumen.propuesta_referencia({"a": otra})["clave"] == "acciones_rendimiento"  # sin Markowitz guardada: respaldo

@@ -146,17 +146,27 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
             n += 1
             L.append(f"  {n}. {_nombre(a['clave'])}: compra {a['cantidad']:,} acciones, pagando como máximo "
                      f"${a['precio_limite']:,.2f} cada una (≈ {_dinero(a['monto'])}).")
-    if cond:
-        L.append("🟡 Revisa primero el precio en el portal (no tengo su precio exacto del simulador). "
-                 "Si está fuera del rango, no la toques hoy:")
-        for a in cond:
-            r = a["referencia"]
-            if r.get("lado_sugerido", "compra") == "compra":
-                L.append(f"  • {_nombre(a['clave'])}: compra unas {r['titulos_aprox']:,} acciones si cuesta entre "
-                         f"${r['precio_min']:,.2f} y ${r['precio_max']:,.2f}; precio límite ${r['precio_max']:,.2f}.")
-            else:
-                L.append(f"  • {_nombre(a['clave'])}: vende unas {r['titulos_aprox']:,} acciones si cuesta entre "
-                         f"${r['precio_min']:,.2f} y ${r['precio_max']:,.2f}; precio límite ${r['precio_min']:,.2f}.")
+    if cond:  # sin precio exacto del simulador: la orden es explícita y el precio límite es la protección
+        c_venta = [a for a in cond if a["referencia"].get("lado_sugerido") == "venta"]
+        c_compra = [a for a in cond if a["referencia"].get("lado_sugerido", "compra") == "compra"]
+        if c_venta:
+            L.append(f"{'1️⃣' if not ventas else '➕'} VENDE (orden limitada; el precio límite evita vender demasiado barato):")
+            for a in c_venta:
+                n += 1
+                r = a["referencia"]
+                todo = (a.get("titulos_actuales") or 0) and r["titulos_aprox"] >= a["titulos_actuales"]
+                L.append(f"  {n}. {_nombre(a['clave'])}: VENDE {'TODAS tus' if todo else 'unas'} {r['titulos_aprox']:,} acciones. "
+                         f"Precio límite ${r['precio_min']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_min'])}).")
+        if c_compra:
+            L.append(f"{'2️⃣' if (c_venta or ventas) else '1️⃣'} COMPRA (orden limitada; no pagues más del precio máximo)"
+                     + (" en cuanto el dinero de las ventas aparezca en tu poder de compra:" if (c_venta or ventas) else ":"))
+            for a in c_compra:
+                n += 1
+                r = a["referencia"]
+                L.append(f"  {n}. {_nombre(a['clave'])}: COMPRA {r['titulos_aprox']:,} acciones. Precio máximo "
+                         f"${r['precio_max']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_max'])}).")
+        L.append("  Si el precio del portal ya pasó el límite, la orden no se ejecuta: deja la orden puesta o escribe /plan "
+                 "para recalcular.")
     if cond:
         efectivo = float(c.get("efectivo_tras_compras") if c.get("efectivo_tras_compras") is not None else c.get("efectivo") or 0)
         compra_cond = sum(a["referencia"].get("monto_mxn") or a["referencia"]["titulos_aprox"] * a["referencia"]["precio_max"]
@@ -164,6 +174,9 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
         if any(a["referencia"].get("lado_sugerido") == "venta" for a in cond) and compra_cond > efectivo:
             L.append(f"  ➜ Haz primero las ventas: lo que te queda ({_dinero(efectivo)}) no alcanza para estas compras "
                      "sin ese dinero. Si el portal no te deja comprar todo, compra menos acciones.")
+    mantener = [a for a in acc if a["decision"] == "mantener" and (a.get("titulos_actuales") or 0) > 0]
+    if mantener and (ventas or compras or cond):
+        L.append("✋ MANTÉN (no las vendas): " + ", ".join(_nombre(a["clave"]) for a in mantener) + ".")
     if espera:
         L.append("⏸ No toques hoy (falta un dato para decidir): " + ", ".join(_nombre(a["clave"]) for a in espera[:8])
                  + (" …" if len(espera) > 8 else "") + ".")
@@ -270,6 +283,8 @@ def precios_atrasados(con, cartera: dict, ahora: datetime) -> list[dict]:
     for p in cartera.get('posiciones') or []:
         iid = p['instrumento_id']
         fecha = (p.get('fecha_precio') or '')[:10]
+        if p.get('origen_precio') == 'portal':  # valuada con el precio de la captura confirmada: esa es su fecha
+            fecha = str((cartera.get('captura') or {}).get('hora_portal') or '')[:10]
         ultima = vigencia.ultima_sesion_cerrada(vigencia.codigo_calendario(meta.get(iid, {})), ahora)
         try:
             observada = date.fromisoformat(fecha) if fecha else None

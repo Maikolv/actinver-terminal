@@ -109,7 +109,11 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     precio = float(q["precio"]) if q else None
     condicional = None
     if not q and lado:
-        condicional = referencia_condicional(con, ajustes, i["id"], monto, lado)
+        # Si la cartera se valuó con el precio del portal (más reciente que el de la terminal), la referencia es ese:
+        # 5-nov, GMEXICO con límite de venta 220.71 (del cierre del 4-nov) frente a 219.01 en el portal no se ejecutaba.
+        del_portal = next((float(x["precio_mxn"]) for x in cart.get("posiciones", []) if x.get("instrumento_id") == i["id"]
+                           and x.get("origen_precio") == "portal" and x.get("precio_mxn")), None)
+        condicional = referencia_condicional(con, ajustes, i["id"], monto, lado, precio=del_portal)
         if condicional and lado == "venta":  # vender: con el precio de referencia y nunca más de lo que se tiene
             tiene = int(pos_tit.get(i["id"], 0))
             condicional["titulos_aprox"] = min(tiene, round(abs(monto) / condicional["precio_ref_mxn"]))
@@ -328,12 +332,14 @@ def listar(con: sqlite3.Connection, ajustes: Ajustes, recalcular_vigentes: bool 
     return out
 
 
-def referencia_condicional(con, ajustes: Ajustes, iid: str, monto: float, lado: str) -> dict | None:
+def referencia_condicional(con, ajustes: Ajustes, iid: str, monto: float, lado: str, precio: float | None = None) -> dict | None:
     """Guía para una emisora sin cotización confiable (típicamente SIC): cierre de la bolsa de origen convertido a MXN.
 
     NO es la cotización del SIC ni habilita la boleta: da títulos aproximados y una banda de ±2 % fuera de la cual el
     participante no debe capturar sin regenerar. Solo con referencia vigente o retrasada (nunca vencida ni ausente)."""
     q = mercado.cotizaciones(con, ajustes, [iid]).get(iid) or {}
+    if precio:  # precio del portal en la captura confirmada, más reciente que el de la terminal
+        q = {**q, "precio_mxn": precio, "estado": "vigente", "proveedor": "portal (captura)", "moneda": "MXN", "precio": precio}
     ref = q.get("precio_mxn")
     if not ref or q.get("estado") not in ("vigente", "retrasado"):
         return None
