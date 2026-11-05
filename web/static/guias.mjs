@@ -5,6 +5,7 @@ export const GUIAS = {
     titulo: 'Plan de acción',
     que: 'Lo que conviene revisar hoy con su cuenta del Reto: comprar, vender, mantener o «decisión pendiente» por instrumento, con cantidad, precio de referencia, fuente, motivo e invalidación.',
     pasos: ['Registre primero su cuenta en «Mi portafolio Actinver»; sin captura reciente, todo queda como decisión pendiente.',
+      'Lea primero «Gestión de riesgo»: si una posición rompió su stop, está en tendencia bajista o concentra demasiado, el plan la vende o reduce antes de seguir la propuesta, y reinvierte en emisoras en tendencia alcista.',
       'Lea cada fila: acción, cantidad, precio límite sugerido y por qué.',
       'Verifique el precio en el portal del Reto y capture usted la orden; la terminal no envía nada.',
       'Si algo no le convence, pregunte al Asistente o revise Propuestas y Riesgo.'],

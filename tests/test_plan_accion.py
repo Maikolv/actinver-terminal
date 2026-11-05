@@ -2,8 +2,9 @@
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
+import pytest
 
-from terminal import cartera, mercado, migraciones, plan_accion, portal, servicios, vigencia
+from terminal import cartera, gestion_riesgo, mercado, migraciones, plan_accion, portal, servicios, vigencia
 
 from conftest import sembrar_precios
 
@@ -15,6 +16,14 @@ PROP = {"clave": "acciones_puntuacion", "nombre": "Acciones · Máxima puntuaci�
              "monto_mxn": 282_500.0, "accion": "comprar"},
             {"id": "SIC:AAPL", "clave_operable": "AAPL *", "peso_actual": 0.0, "peso_objetivo": 0.2, "delta_pp": 20.0,
              "monto_mxn": 200_000.0, "accion": "comprar"}]}}
+
+
+@pytest.fixture(autouse=True)
+def sin_reglas_de_riesgo(monkeypatch, request):
+    """Estas pruebas miden la lógica de la propuesta y del efectivo; los precios sembrados son aleatorios y la gestión de
+    riesgo (tests/test_gestion_riesgo.py) podría vender la posición de prueba. La integración se prueba aparte."""
+    if "integracion_riesgo" not in request.node.name:
+        monkeypatch.setattr(gestion_riesgo, "evaluar", lambda *a, **k: {"activo": False, "filas": [], "ordenes": False})
 
 
 def _base(con):
@@ -110,3 +119,17 @@ def test_venta_total_sic_pendiente_indica_todos_los_titulos(con, ajustes):
          "monto_mxn": -precio, "accion": "vender"}]}}
     a = plan_accion.calcular(con, ajustes, propuesta=p)["acciones"][0]
     assert a["decision"] == "pendiente" and a["referencia"]["titulos_aprox"] == 1 and "todos sus títulos" in a["referencia"]["nota"]
+
+
+def test_integracion_riesgo_vende_aunque_la_propuesta_diga_mantener(con, ajustes, monkeypatch):
+    _base(con)
+    _capturar(con, 982_500.0)
+    venta = {"id": "BMV:AMX", "clave_operable": "AMX B", "peso_actual": 0.0175, "peso_objetivo": 0.0, "delta_pp": -1.75,
+             "monto_mxn": -17_500.0, "accion": "vender", "nota": "Rompió su stop."}
+    monkeypatch.setattr(gestion_riesgo, "evaluar", lambda *a, **k: {"activo": True, "filas": [venta], "ordenes": True,
+                                                                     "posiciones": [], "cartera": {}})
+    p = {**PROP, "cambios": {"filas": []}}
+    plan = plan_accion.calcular(con, ajustes, propuesta=p)
+    amx = next(a for a in plan["acciones"] if a["instrumento_id"] == "BMV:AMX")
+    assert amx["accion_propuesta"] == "vender" and "stop" in amx["motivo"] and plan["mantener_mejor"] is None
+    assert plan["propuesta"]["por_que"].startswith("Gestión de riesgo")

@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 5-nov-2026 — Gestión de riesgo en el plan de acción: vender, reducir o mantener
+
+- Nuevo `terminal/gestion_riesgo.py`, primero en el plan: por posición, stop por volatilidad confirmado por tendencia (máximo de 22 sesiones − 3σ diaria y precio < SMA50 ⇒ vender), tendencia bajista (precio < SMA20 < SMA50 ⇒ reducir a la mitad; con pérdida ≥ 15 % contra el costo ⇒ vender), tope de 25 % por posición y volatilidad objetivo de la cartera de 30 % anual. Respeta el mínimo de 5 emisoras del Reto. Lo liberado se reinvierte en emisoras de la propuesta de referencia con tendencia alcista (precio > SMA50 y SMA20 > SMA50), nunca en las que vende.
+- Las ventas por riesgo mandan sobre «mantener» de la comparación con la propuesta. El mensaje de Telegram y la pestaña Plan de acción abren con «🛡️ Gestión de riesgo» (resultado desde el inicio, volatilidad actual y la que quedaría, y la regla con cifras de cada venta). Parámetros en `[gestion_riesgo]` de la configuración.
+- Con la cartera del 5-nov (−25.8 %, volatilidad 41 %): vender MU, AMD, NVDA, GMEXICO y NVAX (stop roto con tendencia bajista), conservar ALPEK, XOM y PFE y reinvertir en USO, SIGMAF, FIBRAMQ, ALPEK, TGT, FEMSA, KOF, MRK y LLY; volatilidad estimada 12 %. Sin la confirmación por SMA50, la caída general del día vendía también XOM y ALPEK.
+- Pruebas nuevas: `tests/test_gestion_riesgo.py` (3) y la integración en `tests/test_plan_accion.py`. Son reglas de control de pérdidas, no un pronóstico; ninguna garantiza utilidad.
+
 ## 5-nov-2026 — Verificación completa
 
 - Suite: 928 pruebas de Python y 52 de Node aprobadas (33 min con el motor corriendo).

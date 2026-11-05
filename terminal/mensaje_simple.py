@@ -113,6 +113,10 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     elif precios_al is not None:
         L.append(f"⏳ Ojo: la valuación usa precios del {precios_al:%d-%m}; los del último cierre aún no se descargan. "
                  "Escribe /plan en unos minutos.")
+    from .gestion_riesgo import lineas as lineas_riesgo
+    riesgo = lineas_riesgo(plan.get("gestion_riesgo") or {})
+    if riesgo:
+        L += [""] + riesgo
     acc = plan["acciones"]
     ventas = [a for a in acc if a["decision"] == "vender"]
     compras = [a for a in acc if a["decision"] == "comprar"]
@@ -179,7 +183,8 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     elif r.get("activo"):
         L.append(f"• Reglas del Reto cumplidas: al menos {r.get('min_emisoras')} empresas distintas y ninguna con más de "
                  f"{float(r.get('max_peso_emisora') or 0.5):.0%} del dinero.")
-    if concentracion and concentracion.get("peso", 0) >= CONCENTRACION:
+    vendidas = {a["clave"] for a in acc if a.get("accion_propuesta") == "vender"}
+    if concentracion and concentracion.get("peso", 0) >= CONCENTRACION and concentracion.get("clave") not in vendidas:
         k, w = _nombre(concentracion["clave"]), concentracion["peso"]
         L.append(f"• ⚖️ {k} es el {w:.0%} de tu cartera: si {k} baja 10 %, tu cartera baja ≈ {w * 0.10:.1%} solo por ella. "
                  "Es un dato de riesgo, no una orden.")

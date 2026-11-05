@@ -369,9 +369,16 @@ function tarjetaPlan(plan) {
   const avisos = [...(r.errores || []), ...(r.avisos || [])].map((a) => h("div", { clase: "aviso-caja", texto: a }));
   const faltan = plan.faltan.length ? h("div", { clase: "aviso-caja" }, h("strong", { texto: "Datos que faltan: " }), plan.faltan.join(" · ")) : null;
   const filas = plan.acciones;
+  const g = plan.gestion_riesgo || {};
+  const riesgo = g.activo ? h("div", { clase: g.ordenes ? "aviso-caja" : "", role: "status" },
+    h("strong", { texto: "🛡️ Gestión de riesgo: " }),
+    `la cartera va ${pct(g.cartera.resultado_total)} desde el inicio; volatilidad ${pct(g.cartera.vol_actual)} al año`
+      + (g.ordenes ? ` → ${pct(g.cartera.vol_despues)} con este plan. Las ventas por stop, tendencia o concentración mandan sobre la propuesta.`
+        : ". Ninguna posición rompió su stop ni está en tendencia bajista: mantener es la decisión de riesgo."),
+    h("p", { clase: "suave", texto: `Reglas: stop = máximo de ${g.reglas.ventana_maximo} sesiones − ${g.reglas.k_sigma}× la volatilidad diaria y precio debajo de su SMA${g.reglas.sma_larga}; tendencia bajista (precio < SMA${g.reglas.sma_corta} < SMA${g.reglas.sma_larga}) reduce a la mitad o vende si pierde ≥ ${pct(g.reglas.perdida_costo)}; tope ${pct(g.reglas.peso_max)} por posición; volatilidad objetivo ${pct(g.reglas.vol_objetivo)}. ${g.nota}` })) : null;
   return h("section", { clase: "tarjeta", "aria-labelledby": "t-plan" },
     h("h2", { id: "t-plan", texto: plan.propuesta ? `Plan de acción — «${plan.propuesta.nombre}» (${plan.propuesta.puntuacion.toFixed(1)}/100, datos al ${plan.propuesta.datos_hasta})` : "Plan de acción" }),
-    cuenta, reglas, ...avisos, faltan,
+    cuenta, riesgo, reglas, ...avisos, faltan,
     h("div", { clase: "kpis" }, kpi("Compras", `${res.comprar} · ${mxn(res.monto_compras)}`), kpi("Ventas", `${res.vender} · ${mxn(res.monto_ventas)}`),
       kpi("Mantener", String(res.mantener)), kpi("Decisión pendiente", String(res.pendiente), res.pendiente ? "negativo" : "")),
     tabla([

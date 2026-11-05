@@ -20,7 +20,7 @@ from datetime import UTC, date, datetime
 
 import pandas as pd
 
-from . import boleta, mercado, reto, servicios
+from . import boleta, gestion_riesgo, mercado, reto, servicios
 from .config import Ajustes
 
 ZONA = "America/Mexico_City"
@@ -109,6 +109,14 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         filas = [{**f, "accion": "mantener", "monto_mxn": 0.0, "delta_pp": 0.0, "nota": nota}
                  for f in filas if f["id"] in actuales]
         objetivo = {}
+    # Gestión de riesgo primero: stops, tendencia, concentración y volatilidad de la cartera mandan sobre «mantener»
+    riesgo = (gestion_riesgo.evaluar(con, ajustes, cart, p) if (ajustes.get("gestion_riesgo") or {}).get("activo", True)
+              else {"activo": False, "filas": [], "ordenes": False})
+    if riesgo.get("ordenes"):
+        filas = list(riesgo["filas"])
+        objetivo = {f["id"]: f["peso_objetivo"] for f in filas}
+        mantener_mejor = None
+        faltan = [x for x in faltan if not x.startswith("Propuesta vigente")]
     ids = sorted({f["id"] for f in filas})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
     acciones = []
@@ -190,7 +198,10 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         "generado_en": ahora.isoformat(timespec="seconds"), "reglas": reglas, "cuenta": cuenta, "cuenta_hora_texto": cuenta_txt,
         "propuesta": ({"clave": p["clave"], "nombre": p["nombre"], "puntuacion": p["puntuacion"]["total"],
                        "datos_hasta": p.get("datos_hasta"),
-                       "por_que": ("Portafolio de máximo Sharpe de Markowitz (criterio elegido en su perfil)."
+                       "por_que": ("Gestión de riesgo: hay posiciones con stop roto, tendencia bajista o exceso de riesgo; "
+                                   "lo liberado se reinvierte en emisoras de esta propuesta con tendencia alcista."
+                                   if riesgo.get("ordenes") else
+                                   "Portafolio de máximo Sharpe de Markowitz (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "markowitz"
                                    else "Mayor ganancia media esperada al cierre del Reto (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "ganancia"
@@ -198,6 +209,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
                                    if (p.get("perfil") or {}).get("criterio_plan") == "plusvalia"
                                    else "Es la propuesta vigente con mayor puntuación (criterio del plan del día).")} if p else None),
         "acciones": acciones, "faltan": faltan, "mantener_mejor": mantener_mejor if confirmada else None,
+        "gestion_riesgo": riesgo,
         "resumen": {d: sum(1 for a in acciones if a["decision"] == d) for d in ("comprar", "vender", "mantener", "pendiente")}
         | {"monto_compras": round(sum(a["monto"] for a in acciones if a["decision"] == "comprar"), 2),
            "monto_ventas": round(sum(a["monto"] for a in acciones if a["decision"] == "vender"), 2)},
