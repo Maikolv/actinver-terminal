@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 5-nov-2026 — Verificación completa
+
+- Suite: 928 pruebas de Python y 52 de Node aprobadas (33 min con el motor corriendo).
+- Recorrido de las 23 secciones: todas con contenido, sin cajas de error.
+- Auditoría de flujo con el mercado abierto (214 instrumentos): los 143 del SIC con velas 1Day/1Hour/15Min/5Min/1Min al día e indicadores completos en la última vela, libro, operaciones, footprint, TPO y cadena con IV. BMV (46) y fondos (25): sin fuente gratuita de flujo, SIN DATO.
+- GEX calculable en MU y NVDA (OI del 23 al 27-oct); AMD y XOM sin OI unido. La tarea programada lo actualiza en la siguiente sesión con la terminal encendida.
+- Ciclo del motor completo: propuestas 1,295 s (con la suite en paralelo y las lentes Markowitz), investigación 462 s.
+
 ## 4-nov-2026 — Velas, Order Flow y Option Flow para todo el SIC
 
 - Las vistas Velas, Order Flow y Option Flow piden solas al proveedor (Alpaca gratuito) lo que falta o está viejo, una vez por instrumento y tipo; antes solo con el botón «Actualizar», y solo 5 de 143 instrumentos SIC tenían velas guardadas.
