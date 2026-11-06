@@ -28,8 +28,9 @@ def test_ventas_antes_que_compras_con_tope_de_precio_y_sin_jerga():
     t = ms.construir(plan, PROP, [], AHORA, date(2026, 10, 6), 29)
     assert t.startswith("📋 Qué hacer hoy, martes 06-10 (quedan 29 días de Reto)")
     assert t.index("VENDE") < t.index("COMPRA")
-    assert "ALPEK A: vende 3,394 acciones (todas las que tienes), a no menos de $14.60" in t
-    assert "MU: compra 2 acciones, pagando como máximo $19,400.00" in t
+    assert "ALPEK A: VENDE TODAS tus 3,394 acciones. Precio límite $14.60" in t
+    assert "MU: COMPRA 2 acciones con el dinero que ya tienes. Precio máximo $19,400.00" in t
+    assert t.count("1️⃣") == 1 and t.count("2️⃣") == 1   # ventas juntas y después compras, una sola vez cada bloque
     assert "ALPEK A" in t.split("Ojo:")[1]          # precio retrasado señalado
     assert "lo más común +3.1%" in t and "-6.2%" in t   # rango al cierre del Reto, como estimación
     for jerga in ("p10", "p50", "banda", "pp", "SIC", "peso objetivo", "rebalanceo"):

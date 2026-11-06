@@ -2,6 +2,13 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 6-nov-2026 — Captura 29 y órdenes del plan corregidas
+
+- Captura 29 del portal (6-nov 14:39): valuación $763,210.77, poder de compra $2,472.95, mismas 8 posiciones (sin ventas ejecutadas). La terminal valúa todo con los precios del portal: $763,274.
+- Boleta: si la captura es de un día posterior a la cotización «vigente» de la terminal, el precio de referencia es el del portal (GMEXICO: límite de venta 218.57 con el cierre del 5-nov, arriba de 218.02 del portal; ahora 217.58). Con objetivo 0 % se venden todos los títulos (salía 648 de 650).
+- Mensaje del plan: todas las ventas juntas en 1️⃣ y todas las compras en 2️⃣ (las que esperan el dinero de las ventas, marcadas); antes salía «➕ VENDE» después de una compra y el paso 2 dos veces.
+- Pruebas: `tests/test_mensaje_simple.py` actualizada; 42 de mensaje, boleta y plan aprobadas.
+
 ## 5-nov-2026 — Sin pestañas redundantes: Velas, Order Flow y Option Flow solo dentro de la Ficha técnica
 
 - Mercado y flujo queda en Mercado, Ficha técnica, Seguimiento y Movimientos públicos. Los contenidos de Velas, Order Flow y Option Flow esperan ocultos en `#almacen-flujo` y se muestran completos en las pestañas internas de la ficha.

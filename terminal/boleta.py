@@ -107,6 +107,13 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         tipo = "investigar"  # sin precio confiable se inhibe cualquier propuesta direccional
         faltan.append("Precio BMV confiable de la serie exacta (" + "; ".join(conf.get("motivos", [])[:2]) + ")")
     precio = float(q["precio"]) if q else None
+    # 6-nov: GMEXICO con cierre EODHD del 5-nov (219.01, «vigente») frente a 218.02 en la captura de las 14:39 del 6-nov: con
+    # el precio viejo el límite de venta (218.57) quedaba arriba del mercado. Si la captura es de un día posterior, manda ella.
+    pos_portal = next((x for x in cart.get("posiciones", []) if x.get("instrumento_id") == i["id"]
+                       and x.get("origen_precio") == "portal" and x.get("precio_mxn")), None)
+    hora_captura = str(((cart.get("captura") or {}).get("hora_portal")) or "")[:10]
+    if q and pos_portal and hora_captura > str(q.get("fecha") or "")[:10]:
+        precio = float(pos_portal["precio_mxn"])
     condicional = None
     if not q and lado:
         # Si la cartera se valuó con el precio del portal (más reciente que el de la terminal), la referencia es ese:
@@ -129,6 +136,8 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
         cantidad = math.floor(abs(monto) / limite + 1e-9)  # sin perder un título por punto flotante
         if lado == "venta":
             cantidad = min(cantidad, int(pos_tit.get(i["id"], 0)))
+            if fila.get("peso_objetivo") == 0:  # objetivo 0 %: todos los títulos, no los que alcance el monto
+                cantidad = int(pos_tit.get(i["id"], 0))
         if lado == "compra":
             cantidad = min(cantidad, math.floor(efectivo / (limite * (1 + (reto.costo_operacion() or 0)))))
         importe = cantidad * limite

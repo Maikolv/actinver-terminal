@@ -138,39 +138,38 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     elif not (ventas or compras or cond):
         L.append("✅ Hoy no tienes que hacer nada: tu cartera ya está como el plan. No pagues comisiones sin necesidad.")
     n = 0
-    if ventas:
-        L.append("1️⃣ Primero VENDE (orden limitada):")
+    # Todas las ventas juntas y después todas las compras (6-nov: las ventas con precio de referencia salían después de una
+    # compra y el paso 2 aparecía dos veces).
+    c_venta = [a for a in cond if a["referencia"].get("lado_sugerido") == "venta"]
+    c_compra = [a for a in cond if a["referencia"].get("lado_sugerido", "compra") == "compra"]
+    reemplazo = lambda a: (f" Reemplázala con: {_reemplazos(a['reemplazo'])}." if a.get("reemplazo") not in (None, "—") else "")  # noqa: E731
+    if ventas or c_venta:
+        L.append("1️⃣ Primero VENDE (orden limitada; el precio límite evita vender demasiado barato):")
         for a in ventas:
             n += 1
-            todo = " (todas las que tienes)" if a.get("titulos_actuales") and a["cantidad"] >= a["titulos_actuales"] else ""
-            L.append(f"  {n}. {_nombre(a['clave'])}: vende {a['cantidad']:,} acciones{todo}, a no menos de "
-                     f"${a['precio_limite']:,.2f} cada una (≈ {_dinero(a['monto'])}).")
-    if compras:
-        L.append(f"{'2️⃣ Después' if ventas else '1️⃣'} COMPRA con el dinero que ya tienes (orden limitada):")
+            todo = a.get("titulos_actuales") and a["cantidad"] >= a["titulos_actuales"]
+            L.append(f"  {n}. {_nombre(a['clave'])}: VENDE {'TODAS tus ' if todo else ''}{a['cantidad']:,} acciones. "
+                     f"Precio límite ${a['precio_limite']:,.2f} (≈ {_dinero(a['monto'])})." + reemplazo(a))
+        for a in c_venta:
+            n += 1
+            r = a["referencia"]
+            todo = (a.get("titulos_actuales") or 0) and r["titulos_aprox"] >= a["titulos_actuales"]
+            L.append(f"  {n}. {_nombre(a['clave'])}: VENDE {'TODAS tus' if todo else 'unas'} {r['titulos_aprox']:,} acciones. "
+                     f"Precio límite ${r['precio_min']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_min'])})." + reemplazo(a))
+    if compras or c_compra:
+        L.append(f"{'2️⃣ Después' if (ventas or c_venta) else '1️⃣'} COMPRA (orden limitada; no pagues más del precio máximo):")
         for a in compras:
             n += 1
-            L.append(f"  {n}. {_nombre(a['clave'])}: compra {a['cantidad']:,} acciones, pagando como máximo "
-                     f"${a['precio_limite']:,.2f} cada una (≈ {_dinero(a['monto'])}).")
-    if cond:  # sin precio exacto del simulador: la orden es explícita y el precio límite es la protección
-        c_venta = [a for a in cond if a["referencia"].get("lado_sugerido") == "venta"]
-        c_compra = [a for a in cond if a["referencia"].get("lado_sugerido", "compra") == "compra"]
-        if c_venta:
-            L.append(f"{'1️⃣' if not ventas else '➕'} VENDE (orden limitada; el precio límite evita vender demasiado barato):")
-            for a in c_venta:
-                n += 1
-                r = a["referencia"]
-                todo = (a.get("titulos_actuales") or 0) and r["titulos_aprox"] >= a["titulos_actuales"]
-                L.append(f"  {n}. {_nombre(a['clave'])}: VENDE {'TODAS tus' if todo else 'unas'} {r['titulos_aprox']:,} acciones. "
-                         f"Precio límite ${r['precio_min']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_min'])})."
-                         + (f" Reemplázala con: {_reemplazos(a['reemplazo'])}." if a.get("reemplazo") not in (None, "—") else ""))
-        if c_compra:
-            L.append(f"{'2️⃣' if (c_venta or ventas) else '1️⃣'} COMPRA (orden limitada; no pagues más del precio máximo)"
-                     + (" en cuanto el dinero de las ventas aparezca en tu poder de compra:" if (c_venta or ventas) else ":"))
-            for a in c_compra:
-                n += 1
-                r = a["referencia"]
-                L.append(f"  {n}. {_nombre(a['clave'])}: COMPRA {r['titulos_aprox']:,} acciones. Precio máximo "
-                         f"${r['precio_max']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_max'])}).")
+            L.append(f"  {n}. {_nombre(a['clave'])}: COMPRA {a['cantidad']:,} acciones con el dinero que ya tienes. Precio máximo "
+                     f"${a['precio_limite']:,.2f} (≈ {_dinero(a['monto'])}).")
+        if c_compra and (ventas or c_venta):
+            L.append("  En cuanto el dinero de las ventas aparezca en tu poder de compra:")
+        for a in c_compra:
+            n += 1
+            r = a["referencia"]
+            L.append(f"  {n}. {_nombre(a['clave'])}: COMPRA {r['titulos_aprox']:,} acciones. Precio máximo "
+                     f"${r['precio_max']:,.2f} (≈ {_dinero(r['titulos_aprox'] * r['precio_max'])}).")
+    if cond:
         L.append("  Si el precio del portal ya pasó el límite, la orden no se ejecuta: deja la orden puesta o escribe /plan "
                  "para recalcular.")
     if cond:
