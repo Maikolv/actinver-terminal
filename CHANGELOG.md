@@ -2,6 +2,24 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 5-nov-2026 — Sin pestañas redundantes: Velas, Order Flow y Option Flow solo dentro de la Ficha técnica
+
+- Mercado y flujo queda en Mercado, Ficha técnica, Seguimiento y Movimientos públicos. Los contenidos de Velas, Order Flow y Option Flow esperan ocultos en `#almacen-flujo` y se muestran completos en las pestañas internas de la ficha.
+- Quitada también la ficha pequeña del mapa de calor (`fichaCelda`, «Ver cierres e indicadores», «Abrir velas OHLCV»): la ficha técnica ya trae esa información.
+- La guía de la ficha suma los términos de las tres guías retiradas (OHLCV, SIP/IEX, delta, POC, VAH/VAL, GEX, OI y spot); la cobertura por sección pasa a una sola entrada `tab-ficha`.
+- Enlaces: la dirección canónica es `?vista=tab-ficha&simbolo=…&sub=velas|orderflow|optionflow`; las viejas (`?vista=tab-velas…`) redirigen a la ficha. Mesa, Oficina y el aviso BMV apuntan a la ficha.
+- Pruebas ajustadas: `tests/guias.test.mjs`, `tests/mesa_catalogo_auditoria.test.mjs`, `tests/mesa_pendientes.test.mjs` y `tests/test_grafica_vivo.py`. Suite completa: 943 Python y 52 Node aprobadas.
+
+## 5-nov-2026 — Ficha técnica por emisora (Mercado y flujo)
+
+- Nueva pestaña «Ficha técnica» junto a Mercado; cada celda del mapa de calor abre la ficha de su emisora. Las consultadas quedan en una lista (preferencia del navegador).
+- `terminal/ficha_tecnica.py` y `/api/ficha-tecnica` (+ `/api/ficha-tecnica/flujo`): precio con su vigencia (tiempo real solo con el flujo IEX; el del portal cuando la captura es más reciente), variaciones 1 día–1 año, rango de 52 semanas, sector, capitalización y su posición; análisis técnico sobre cierres (SMA 20/50/200, EMA 20/50, RSI, MACD, Bollinger, volatilidad, stop por volatilidad) con señales y lectura; velas OHLCV o, sin ellas, la línea de cierres; Order Flow (libro IEX y operaciones SIP); Option Flow (contratos, vencimientos, IV ATM a ≥ 7 días, put/call, volumen inusual, GEX aparte); fundamentales, noticias y los widgets de TradingView disponibles (BMV: técnico, perfil y finanzas). Precio en vivo por SSE en el SIC con el flujo IEX activo.
+- Rendimiento: la ficha base no carga scipy (antes 4.6 s solo por leer el sector) y Order/Option Flow y el GEX llegan después de mostrar lo demás: 3–4 s con el motor tranquilo. Durante la etapa de investigación del motor todas las rutas pesadas se vuelven lentas (optionflow 24 s, plan 79 s): pendiente de auditoría.
+- Corregido antes de publicar: el nombre `pintarFicha` ya existía (ficha de Seguimiento); la nueva es `pintarFichaTecnica`.
+- Velas, Order Flow y Option Flow completos dentro de la ficha (pestañas internas): sus paneles se mueven a la ficha con la emisora elegida (mismos controles, indicadores, libro, footprint, DOM, subasta, TPO, cinta, cadena, superficie de IV, Heston, volumen inusual, GEX, Skylit, importación y actualización) y regresan a su pestaña al visitarla; sin código ni ids duplicados. Sustituyen a los resúmenes de flujo de la ficha.
+- Option Flow y GEX omiten contratos vencidos (la curva de IV de MU abría en el 14-oct, de una cadena del 12-oct; 1,970 contratos vencidos ya no se muestran). La prueba con vencimiento fijo al 20-nov pasa a ser relativa a hoy.
+- Pruebas: `tests/test_ficha_tecnica.py` (3), una nueva en `tests/test_flujo.py`; 65 de flujo y Node 52 aprobadas.
+
 ## 5-nov-2026 — Reemplazos y textos cortos en el plan de acción
 
 - Columna «Reemplazo» en la tabla del plan: el dinero de cada venta se asigna a las compras como flujo de efectivo (de la venta mayor a la menor), con instrumento, monto aproximado y porqué (tendencia, rendimiento de 3 meses y volatilidad frente a la vendida); cada compra dice a quién reemplaza. Telegram añade «Reemplázala con: …» a cada venta.

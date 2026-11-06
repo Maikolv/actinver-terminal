@@ -8,8 +8,8 @@ export const CATALOGO = [
   ['info','Ficha de cotización','info'],
   ['perfil','Perfil de empresa','perfil'], ['finanzas','Fundamentales','finanzas'],
   ['tecnico','Resumen técnico externo','tecnico'], ['noticias-emisora','Noticias del instrumento','noticias-emisora'],
-  ['opciones','Cadena, GEX y gamma','link','tab-optionflow'],
-  ['orderflow','Libro, delta y perfil','link','tab-orderflow'],
+  ['opciones','Cadena, GEX y gamma','link','tab-ficha:optionflow'],
+  ['orderflow','Libro, delta y perfil','link','tab-ficha:orderflow'],
   ['cartera','Cartera y rendimiento','link','tab-cartera'],
   ['asistente','Asistente de investigación','link','tab-asistente'],
   ['insiders','Movimientos públicos','link','tab-movimientos'],
@@ -20,7 +20,7 @@ export const PRESETS = {mercado:['grafica','mapa','resumen','calendario'],
   futuros:['grafica','calendario','orderflow','opciones','riesgo','robustez'],
   empresa:['grafica','info','finanzas','noticias-emisora','insiders','cartera']};
 export const AVISO_RIESGO = 'El riesgo calculado es un tope del escenario, no del fill real: un gap o un deslizamiento mayor puede superarlo.';
-export function rutaVelas(simbolo){return '/?'+new URLSearchParams({vista:'tab-velas',simbolo});}
+export function rutaVelas(simbolo){return '/?'+new URLSearchParams({vista:'tab-ficha',sub:'velas',simbolo});}
 // GET compartido: una sola petición en curso por ruta (los paneles que piden lo mismo esperan la misma respuesta).
 // No es caché: al terminar se olvida, así nunca se sirve un dato viejo en lugar de uno fresco.
 const enCurso=new Map();
@@ -256,20 +256,20 @@ if(typeof document!=='undefined') {
       if(NATIVOS[id]&&(catalogoListo||id==='calendario')){const caja=el('div',{clase:'mesa-nativo','aria-live':'polite'},el('p',{clase:'mesa-procedencia'},'Cargando datos locales…'));card.append(el('p',{clase:'mesa-nativo__titulo'},'Datos de la terminal'),caja);NATIVOS[id](caja,simbolo);}
       // TradingView reserva precio y noticias de toda la BMV para su plataforma (no solo AMX/SMARTRC); perfil, finanzas y técnico sí cargan.
       const restringido=['chart','info','noticias-emisora'].includes(tipo)&&simbolo.startsWith('BMV:')&&({'BMV:AMX':'AMX/B','BMV:SMARTRC':'SMARTRC/14'}[simbolo]||simbolo.slice(4));
-      if(tipo==='chart'&&!restringido){const local=crear('a','Abrir Velas de la terminal');local.href=rutaVelas(simbolo);card.append(local);}
-      if(tipo==='link'){const a=crear('a','Abrir '+titulo);a.href='/?'+new URLSearchParams({vista:destino,simbolo});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
+      if(tipo==='chart'&&!restringido){const local=crear('a','Abrir la ficha técnica (velas)');local.href=rutaVelas(simbolo);card.append(local);}
+      if(tipo==='link'){const a=crear('a','Abrir '+titulo);const [vista,sub]=destino.split(':');a.href='/?'+new URLSearchParams({vista,simbolo,...(sub?{sub}:{})});a.className='boton';card.append(crear('p','Abra el análisis completo con sus fuentes, fecha y límites de datos.'),a);}
       else if(tipo==='risk')panelRiesgo(card);
       else if(restringido){
-        const a=crear('a','Consultar cierres guardados en Velas');a.href=rutaVelas(simbolo);
+        const a=crear('a','Consultar cierres guardados en la ficha técnica');a.href=rutaVelas(simbolo);
         card.append(crear('p','SIN DATO · TradingView reserva '+restringido+' para su propia plataforma.'),a);
       }
       else if(['chart','info','perfil','finanzas','tecnico','noticias-emisora'].includes(tipo)&&(!catalogoListo||!catalogo.find(i=>i.id===simbolo)?.grafica)) {
         card.append(crear('p',!catalogoListo?'SIN DATO · catálogo no disponible. No se presupone un instrumento.':'SIN DATO · este instrumento no tiene gráfica externa declarada en el catálogo. Consulte Datos y fuentes.'));
-        if(tipo!=='chart'){const a=crear('a','Consultar el instrumento en Velas');a.href=rutaVelas(simbolo);card.append(a);}
+        if(tipo!=='chart'){const a=crear('a','Consultar el instrumento en la ficha técnica');a.href=rutaVelas(simbolo);card.append(a);}
       }
       else {const d=crear('details'),s=crear('summary','Mostrar panel');d.append(s,crear('p','Referencia externa de TradingView; retraso y disponibilidad propios. No alimenta los cálculos de la terminal. HTTP 200 solo confirma que se sirve el marco: la terminal no puede verificar los datos de otro origen.'));
         const aviso=crear('p');aviso.setAttribute('role','status');d.append(aviso);
-        const alternativa=crear('a','Alternativa local: '+(tipo==='chart'?'Velas':'Datos y fuentes'));alternativa.href=tipo==='chart'?rutaVelas(simbolo):'/?'+new URLSearchParams({vista:'tab-universo',simbolo});d.append(alternativa);
+        const alternativa=crear('a','Alternativa local: '+(tipo==='chart'?'Ficha técnica':'Datos y fuentes'));alternativa.href=tipo==='chart'?rutaVelas(simbolo):'/?'+new URLSearchParams({vista:'tab-universo',simbolo});d.append(alternativa);
         let control;
         d.addEventListener('toggle',async()=>{
           if(!d.open){control?.abort();control=null;d.querySelector('iframe')?.remove();aviso.textContent='';return;}

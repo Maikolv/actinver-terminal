@@ -276,6 +276,9 @@ def optionflow(con, ajustes, subyacente: str, filtros: dict | None = None) -> di
     f = filtros or {}
     cadena = almacen.enriquecer_contratos(con, almacen.cadena(con, subyacente, demo=ajustes.es_demo), demo=ajustes.es_demo)
     hoy = datetime.now(UTC).date()
+    # 5-nov: la curva de IV abría en el vencimiento 14-oct de una cadena del 12-oct; un contrato vencido ya no existe
+    vencidos = sum(1 for c in cadena if c["vencimiento"] < hoy.isoformat())
+    cadena = [c for c in cadena if c["vencimiento"] >= hoy.isoformat()]
     vencs = sorted({c["vencimiento"] for c in cadena})
 
     def pasa(c):
@@ -299,7 +302,7 @@ def optionflow(con, ajustes, subyacente: str, filtros: dict | None = None) -> di
     regla = {"ratio_oi": float(f.get("ratio_oi") or 1.0), "percentil": float(f.get("percentil") or 0.95),
              "minimo": float(f.get("vol_inusual_min") or 100)}
     _, origen_tasa = tasa_libre_riesgo(con)
-    return {"subyacente": subyacente, "vencimientos": vencs, "contratos": visibles, "total": len(cadena),
+    return {"subyacente": subyacente, "vencimientos": vencs, "contratos": visibles, "total": len(cadena), "vencidos_omitidos": vencidos,
             "iv": calculos.superficie_iv(visibles), "inusual": calculos.volumen_inusual(visibles, **regla), "regla": regla,
             "procedencia": _procedencia(cadena), "vacio": None if cadena else SIN_FUENTE,
             "tasa_para_iv_calculada": origen_tasa,
@@ -349,6 +352,8 @@ def gex(con, ajustes, subyacente: str) -> dict:
     """GEX de la última cadena guardada. No usa `_spot` ni ninguna otra tabla: solo datos de la misma cadena."""
     from . import gex as g
     cadena = almacen.enriquecer_contratos(con, almacen.cadena(con, subyacente, demo=ajustes.es_demo), demo=ajustes.es_demo)
+    hoy = datetime.now(UTC).date().isoformat()
+    cadena = [c for c in cadena if c["vencimiento"] >= hoy]  # sin contratos ya vencidos
     return {"subyacente": subyacente, **g.calcular(cadena), "procedencia": _procedencia(cadena),
             "nota": "Exposición gamma de contratos (opciones), no flujo de operaciones: no indica quién compró o vendió."}
 

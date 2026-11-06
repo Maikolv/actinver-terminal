@@ -1292,6 +1292,18 @@ def flujo_gex(subyacente: str, con=Depends(con_db)):
     return servicio.gex(con, AJUSTES, subyacente)
 
 
+@app.get("/api/ficha-tecnica")
+def get_ficha_tecnica(simbolo: str, flujo: bool = True, con=Depends(con_db)):
+    """Ficha técnica de una emisora: precio, análisis técnico, velas, Order/Option Flow, fundamentales y widgets.
+    `flujo=false` omite el resumen de Order/Option Flow (la interfaz muestra esos paneles completos dentro de la ficha)."""
+    from . import ficha_tecnica
+    try:
+        return ficha_tecnica.ficha(con, AJUSTES, simbolo, servicios.cartera_actual(con, AJUSTES), flujo=flujo)
+    except KeyError:
+        raise HTTPException(404, "Instrumento desconocido") from None
+
+
+
 VIVO_CADA_S, VIVO_EVENTOS = 2.0, 900  # ~30 min por conexión; EventSource se reconecta solo
 
 
@@ -1744,10 +1756,10 @@ def _aviso_bmv(iid: str, sim: str, que: str, tema: str) -> HTMLResponse:
     """Página local en lugar del marco vacío de TradingView para una emisora de la BMV."""
     clave = sim.split(":", 1)[1]
     externo = "https://es.tradingview.com/symbols/BMV-" + urllib.parse.quote(clave, safe="") + "/"
-    velas = "/?" + urllib.parse.urlencode({"vista": "tab-velas", "simbolo": iid})
+    velas = "/?" + urllib.parse.urlencode({"vista": "tab-ficha", "sub": "velas", "simbolo": iid})
     cuerpo = f"""<main class="aviso-bmv" role="status"><p><strong>SIN DATO · {html.escape(clave)}</strong></p>
 <p>TradingView no permite mostrar {html.escape(que)} de la BMV en sus widgets gratuitos.</p>
-<p><a href="{html.escape(velas)}" target="_top">Ver los cierres guardados en Velas</a> ·
+<p><a href="{html.escape(velas)}" target="_top">Ver los cierres guardados en la ficha técnica</a> ·
 <a href="{html.escape(externo)}" target="_blank" rel="noopener noreferrer">Abrir en TradingView (sitio externo)</a></p></main>"""
     return HTMLResponse(_pagina_tv(f"{clave} · BMV", tema, cuerpo, esperando=False),
                         headers={"Content-Security-Policy": CSP_GRAFICA, "X-Frame-Options": "SAMEORIGIN"})

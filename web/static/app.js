@@ -154,7 +154,6 @@ window.addEventListener("resize", flechasPestanas);
 function activarPestana(tab, enfocar, cargar = true) {
   elegirGrupo(tab.dataset.grupo); ultimaDeGrupo[tab.dataset.grupo] = tab.id;
   const previo = document.querySelector('[role="tabpanel"]:not([hidden])');
-  if (cargar && previo && typeof compartirSimbolo === "function") compartirSimbolo(previo.id, tab.id);
   document.querySelectorAll('[role="tab"]').forEach((t) => {
     const sel = t === tab;
     t.setAttribute("aria-selected", sel); t.tabIndex = sel ? 0 : -1;
@@ -928,7 +927,6 @@ document.getElementById("form-importar").addEventListener("submit", async (ev) =
 /* ---------- mercado ---------- */
 let visuales = null;
 const filtroMapa = { mercado: "todos", clase: "todos", sector: "todos", proveedor: "todos", ventana: 1 };
-let visualSeleccion = null;
 
 function intensidadMapa(v) {
   if (v === null || v === undefined) return "sin-dato";
@@ -945,28 +943,6 @@ function filtroSelect(clave, etiqueta, valores, nombres = {}) {
   return h("label", {}, `${etiqueta} `, sel);
 }
 
-function fichaCelda(c) {
-  const fila = (t, v) => [h("dt", { texto: t }), h("dd", { texto: v ?? "—" })];
-  const botonVelas = esReferenciaSic(c.id) ? h("button", { type: "button", clase: "boton boton--secundario", texto: "Abrir velas OHLCV",
-    onclick: () => { flujo.velas.simbolo = c.id; irA("tab-velas"); } }) : null;
-  return h("section", { clase: "ficha-celda", "aria-label": `Detalle de ${c.clave}` },
-    h("h3", { texto: `${c.clave} · ${c.nombre || ""}` }),
-    h("dl", {}, fila("Variación", c.variacion == null ? "no disponible" : pct(c.variacion)),
-      fila("Método", visuales.metodo),
-      fila("Cierre usado", `${num(c.cierre)} ${c.moneda} (${c.fecha})`),
-      fila("Cierre de comparación", c.cierre_anterior == null ? "—" : `${num(c.cierre_anterior)} ${c.moneda} (${c.fecha_anterior})`),
-      fila("Ajuste por split", c.ajuste_split ? "sí: precios ajustados por un split en el periodo" : "no fue necesario"),
-      fila("Fuente", `${c.proveedor} · tipo ${c.tipo_dato}`),
-      fila("Captura", `${fechaLocal(c.obtenido_en)} (${visuales.zona_horaria})`),
-      fila("Rezago", `${c.dias_calendario} día(s) calendario desde el cierre`),
-      fila("Calidad", visuales.modo === "sintetico" ? "DATOS SINTÉTICOS de demostración" : "cierre histórico local; no es tiempo real ni la cotización del simulador"),
-      fila("Mercado · clase · sector", `${c.mercado || "—"} · ${CLASES[c.clase] || c.clase || "—"} · ${c.sector || "—"}`)),
-    h("div", { clase: "fila-controles" },
-      h("button", { type: "button", clase: "boton boton--secundario", texto: "Ver cierres e indicadores", onclick: () => cargarSerieMercado(c.id) }),
-      botonVelas,
-      c.grafica ? h("a", { href: `/grafica/${encodeURIComponent(c.id)}?tema=${TEMA_TV}`, target: "_blank", rel: "noopener", clase: "boton boton--secundario", texto: "Velas de TradingView (externo)" }) : null));
-}
-
 function pintarMapaMercado() {
   const raiz = document.getElementById("mercado-visualizaciones");
   if (!visuales) return;
@@ -976,12 +952,11 @@ function pintarMapaMercado() {
   const selVentana = h("select", { "aria-label": "Ventana de la variación" }, visuales.ventanas.map((v) => h("option", { value: v }, v === 1 ? "1 sesión" : `${v} sesiones`)));
   selVentana.value = String(filtroMapa.ventana);
   selVentana.addEventListener("change", () => { filtroMapa.ventana = Number(selVentana.value); cargarVisualizacionesMercado(); });
-  const sel = visuales.celdas.find((c) => c.id === visualSeleccion);
   const tarjetas = visibles.map((c) => h("button", {
-    type: "button", clase: `mercado-tile mercado-tile--${intensidadMapa(c.variacion)}`, "aria-pressed": String(c.id === visualSeleccion),
+    type: "button", clase: `mercado-tile mercado-tile--${intensidadMapa(c.variacion)}`,
     title: `${c.nombre || c.clave}. Fuente ${c.proveedor}; cierre ${c.fecha}; rezago ${c.dias_calendario} día(s) calendario.`,
     "aria-label": `${c.clave}: ${c.variacion == null ? "variación no disponible" : pct(c.variacion)} en ${filtroMapa.ventana} sesión(es); cierre del ${c.fecha}`,
-    onclick: () => { visualSeleccion = c.id; pintarMapaMercado(); },
+    onclick: () => abrirFicha(c.id),  // la ficha técnica completa vive en su propia pestaña, junto a Mercado
   }, h("strong", { texto: c.clave || c.id }),
   h("span", { texto: c.variacion == null ? "—" : `${c.variacion > 0 ? "+" : ""}${pct(c.variacion)}` }),
   h("small", { texto: c.fecha })));
@@ -996,30 +971,9 @@ function pintarMapaMercado() {
       filtroSelect("mercado", "Mercado", unicos("mercado")), filtroSelect("clase", "Clase", unicos("clase"), CLASES),
       filtroSelect("sector", "Sector", unicos("sector")), filtroSelect("proveedor", "Proveedor", unicos("proveedor"))),
     escala,
-    h("p", { clase: "suave", texto: `${visibles.length} de ${visuales.total} instrumentos con cierre. Seleccione uno para ver su ficha.` }),
-    sel ? fichaCelda(sel) : null,
+    h("p", { clase: "suave", texto: `${visibles.length} de ${visuales.total} instrumentos con cierre. Seleccione uno para abrir su ficha técnica completa.` }),
     visibles.length ? h("div", { clase: "mercado-mapa" }, ...tarjetas) : h("p", { clase: "vacio", texto: "No hay cierres disponibles con estos filtros." }),
-    h("div", { id: "mercado-indicadores" }));
-}
-
-async function cargarSerieMercado(iid) {
-  visualSeleccion = iid;
-  const destino = document.getElementById("mercado-indicadores");
-  if (!destino) return;
-  destino.replaceChildren(h("p", { clase: "suave", texto: "Cargando cierres e indicadores…" }));
-  try {
-    const d = await api(`/api/visualizaciones/serie/${encodeURIComponent(iid)}`);
-    if (visualSeleccion !== iid || !destino.isConnected) return;
-    const ultimo = d.puntos[d.puntos.length - 1];
-    const celda = visuales.celdas.find((c) => c.id === iid);
-    destino.replaceChildren(h("h3", { texto: `${d.clave} · cierres e indicadores` }),
-      h("p", { clase: "ayuda", texto: d.nota }),
-      d.puntos.length ? grafica([
-        { nombre: `Cierre (${d.moneda})`, color: "var(--acento)", datos: d.puntos.map((p) => ({ x: p.fecha, y: p.cierre })) },
-        { nombre: "Media móvil 20 sesiones", color: "var(--retrasado)", datos: d.puntos.map((p) => ({ x: p.fecha, y: p.media_20 })) },
-      ], { formato: num, etiqueta: `Cierres y media móvil de ${d.clave}` }) : h("p", { clase: "vacio", texto: "Sin cierres históricos disponibles." }),
-      ultimo ? h("p", { clase: "ayuda", texto: `RSI de 14 sesiones (Wilder): ${ultimo.rsi_14 == null ? "sin historia suficiente" : num(ultimo.rsi_14)} · Fuente: ${d.proveedor} · fecha del cierre: ${d.fecha} · captura: ${fechaLocal(d.obtenido_en)} (America/Mexico_City) · rezago: ${celda?.dias_calendario ?? "sin dato"} día(s) calendario · calidad: cierre histórico local, sin verificación intradía. ${d.modo === "sintetico" ? "DATOS SINTÉTICOS." : "No es precio en tiempo real."}` }) : null);
-  } catch (e) { if (destino.isConnected) destino.replaceChildren(errorCaja(e)); }
+)
 }
 
 async function cargarVisualizacionesMercado() {
@@ -1757,7 +1711,9 @@ async function iniciar() {
   document.getElementById("form-operacion").elements.fecha.value = new Date().toISOString().slice(0, 10);
   let inicial = null;
   try { inicial = localStorage.getItem("pestana"); } catch { /* sin almacenamiento */ }
-  const solicitada = new URLSearchParams(location.search).get("vista");
+  const VISTAS_FICHA = { "tab-velas": "velas", "tab-orderflow": "orderflow", "tab-optionflow": "optionflow" };  // enlaces viejos
+  const pedida = new URLSearchParams(location.search).get("vista");
+  const solicitada = VISTAS_FICHA[pedida] ? "tab-ficha" : pedida;
   const candidata = document.getElementById(solicitada || inicial || "");
   inicial = candidata?.matches('[role="tab"]') ? candidata.id : "tab-resumen";
   activarPestana(document.getElementById(inicial), false, false);
@@ -1767,7 +1723,9 @@ async function iniciar() {
   const valor = (x) => (x.status === "fulfilled" ? x.value : null);
   // ?simbolo= (p. ej. desde la Oficina): tras el primer await, cuando `flujo` ya está definido más abajo en el archivo
   const simbolo = new URLSearchParams(location.search).get("simbolo");
-  if (simbolo) { flujo.velas.simbolo = flujo.of.simbolo = simbolo; if (simbolo.startsWith("SIC:")) flujo.op.subyacente = simbolo; }
+  if (simbolo) { flujo.velas.simbolo = flujo.of.simbolo = simbolo; if (simbolo.startsWith("SIC:")) flujo.op.subyacente = simbolo; ficha.simbolo = simbolo; }
+  const sub = new URLSearchParams(location.search).get("sub") || VISTAS_FICHA[pedida];
+  if (PRESTADOS[sub]) ficha.subvista = sub;
   estado.reto = valor(r);
   estado.cartera = valor(c);
   estado.alertasResumen = valor(a) && valor(a).alertas;
@@ -2569,10 +2527,8 @@ async function cargarOptionFlow() {
   } catch (e) { if (vigente()) limpiar("optionflow-contenido", errorCaja(e)); }
 }
 
-CARGAS["tab-velas"] = () => cargarVelas();
-CARGAS["tab-orderflow"] = () => cargarOrderFlow();
-CARGAS["tab-optionflow"] = () => cargarOptionFlow();
-Object.assign(ATAJOS, { VEL: "tab-velas", OF: "tab-orderflow", OPC: "tab-optionflow" });
+// Velas, Order Flow y Option Flow viven dentro de «Ficha técnica» (mostrarFlujoEnFicha); sus atajos llevan ahí.
+Object.assign(ATAJOS, { VEL: "tab-ficha", OF: "tab-ficha", OPC: "tab-ficha" });
 
 /* ---------- Etapa 2: Heston, exportación a hftbacktest e importación de formatos externos ---------- */
 function pintarHeston(r) {
@@ -2871,13 +2827,6 @@ Object.assign(ATAJOS, { RIE: "tab-riesgo", SEG: "tab-seguimiento", BT: "tab-back
 
 
 /* ---------- Accesos y navegación orgánica entre análisis ---------- */
-function compartirSimbolo(origen, destino) {
-  const sym = { "panel-velas": flujo.velas.simbolo, "panel-orderflow": flujo.of.simbolo, "panel-optionflow": flujo.op.subyacente }[origen];
-  if (!sym) return;
-  if (destino === "tab-velas") flujo.velas.simbolo = sym;
-  if (destino === "tab-orderflow") flujo.of.simbolo = sym;
-  if (destino === "tab-optionflow" && !sym.includes("/")) flujo.op.subyacente = sym; // las opciones solo existen para el SIC
-}
 document.addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-ir]");
   if (!b) return;
@@ -3073,7 +3022,7 @@ document.querySelectorAll("[data-pregunta]").forEach((b) => b.addEventListener("
 CARGAS["tab-asistente"] = () => { pintarAsistente(); document.getElementById("asistente-texto").focus(); };
 ATAJOS.ASI = "tab-asistente";
 CARGAS["tab-intradia"] = () => cargarIntradia();
-Object.assign(ATAJOS, { INT: "tab-intradia", GEX: "tab-optionflow" });
+Object.assign(ATAJOS, { INT: "tab-intradia", GEX: "tab-ficha" });
 
 /* Microestructura sin inventar datos. */
 function pintarMicroestructura(d) {
@@ -3509,3 +3458,159 @@ function pintarResultadoPf(r) {
     h("p", { clase: "ayuda", texto: r.aviso }));
 }
 Object.assign(ATAJOS, { PORT: "tab-portafolios", MARKOWITZ: "tab-portafolios" });
+
+
+/* ---------- Ficha técnica por emisora (terminal/ficha_tecnica.py). Solo informa: nada se envía. ----------
+   Se abre desde el mapa de calor de Mercado o con el buscador; las emisoras consultadas quedan en una lista
+   (preferencia de este navegador). Precio en vivo por SSE solo para el SIC con el flujo IEX activo. */
+const ficha = { simbolo: null, universo: null, vivo: null };
+const FICHAS_KEY = "fichas-consultadas";
+const fichasRecientes = () => { try { return JSON.parse(localStorage.getItem(FICHAS_KEY) || "[]"); } catch { return []; } };
+function recordarFicha(id) {
+  try { localStorage.setItem(FICHAS_KEY, JSON.stringify([id, ...fichasRecientes().filter((x) => x !== id)].slice(0, 24))); } catch { /* sin almacenamiento */ }
+}
+function abrirFicha(id) { ficha.simbolo = id; irA("tab-ficha"); }
+const ESTADO_SENAL = { alcista: "vigente", respetado: "vigente", sobreventa: "vigente", "dentro de las bandas": "calculada",
+  neutral: "calculada", lateral: "calculada", bajista: "vencido", roto: "vencido", sobrecompra: "retrasado",
+  "arriba de la banda": "retrasado", "debajo de la banda": "retrasado" };
+
+async function cargarFicha() {
+  const vigente = turno("ficha");
+  if (ficha.vivo) { ficha.vivo.close(); ficha.vivo = null; }
+  devolverPaneles();  // antes de repintar: si no, el panel prestado se perdería con el contenido anterior
+  try {
+    if (!ficha.universo) ficha.universo = (await api("/api/universo")).instrumentos.filter((i) => i.estado === "activo");
+    if (!vigente()) return;
+    const clave = (id) => (ficha.universo.find((i) => i.id === id) || {}).clave_operable || id;
+    const lista = h("datalist", { id: "ficha-universo" }, ficha.universo.map((i) => h("option", { value: `${i.clave_operable} | ${i.id}` })));
+    const buscar = h("input", { type: "text", list: "ficha-universo", placeholder: "Emisora, p. ej. MU o GMEXICO", "aria-label": "Buscar emisora" });
+    const ir = () => {
+      const t = buscar.value.trim(), u = t.toUpperCase();
+      const id = t.includes("|") ? t.split("|").pop().trim()
+        : (ficha.universo.find((i) => i.clave_operable.toUpperCase().startsWith(u) || i.id.toUpperCase().endsWith(`:${u}`)) || {}).id;
+      if (!id) { notificar("No encontré esa emisora en el universo."); return; }
+      ficha.simbolo = id; cargarFicha();
+    };
+    buscar.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); ir(); } });
+    const recientes = fichasRecientes();
+    const cabecera = h("section", { clase: "tarjeta" },
+      h("div", { clase: "fila-controles" }, buscar, lista, h("button", { type: "button", clase: "boton boton--primario", texto: "Ver ficha", onclick: ir })),
+      recientes.length ? h("div", { clase: "pf-seleccion", "aria-label": "Emisoras consultadas" }, h("span", { clase: "pf-etiqueta", texto: "Consultadas:" }),
+        recientes.map((id) => h("button", { type: "button", clase: `chip ${id === ficha.simbolo ? "chip--fijo" : "chip--calculada"}`, texto: clave(id),
+          onclick: () => { ficha.simbolo = id; cargarFicha(); } })),
+        h("button", { type: "button", clase: "boton boton--texto", texto: "Borrar lista", onclick: () => { try { localStorage.removeItem(FICHAS_KEY); } catch { /* */ } cargarFicha(); } }))
+        : h("p", { clase: "suave", texto: "Seleccione una emisora en el mapa de calor de Mercado o búsquela aquí; las consultadas quedan en esta lista." }));
+    if (!ficha.simbolo) { limpiar("ficha-contenido", cabecera); return; }
+    limpiar("ficha-contenido", cabecera, h("div", { clase: "tarjeta esqueleto esqueleto--bloque", "aria-hidden": "true" }));
+    const sic = ficha.simbolo.startsWith("SIC:");
+    const [f, velas] = await Promise.all([api(`/api/ficha-tecnica?simbolo=${encodeURIComponent(ficha.simbolo)}&flujo=false`),
+      sic ? api(`/api/flujo/velas?simbolo=${encodeURIComponent(ficha.simbolo)}&intervalo=1Day&dias=180`).catch(() => null) : null]);
+    if (!vigente()) return;
+    recordarFicha(f.id);
+    limpiar("ficha-contenido", cabecera, ...pintarFichaTecnica(f, velas));
+    if (sic && estado.datos?.tiempo_real?.activo) precioEnVivo(f);
+    mostrarFlujoEnFicha(ficha.subvista || "velas", f);
+  } catch (e) { if (vigente()) limpiar("ficha-contenido", errorCaja(e)); }
+}
+
+function precioEnVivo(f) {
+  const destino = document.getElementById("ficha-vivo");
+  if (!destino) return;
+  ficha.vivo = new EventSource(`/api/flujo/vela-viva?simbolo=${encodeURIComponent(f.id)}`);
+  ficha.vivo.onmessage = (ev) => {
+    const b = JSON.parse(ev.data);
+    if (!destino.isConnected) { ficha.vivo?.close(); return; }
+    destino.textContent = b.sin_vela ? "En vivo: sin operaciones IEX todavía."
+      : `En vivo (IEX): ${num(b.cierre)} ${f.precio.moneda_origen || ""} · ${fechaLocal(b.inicio)} · ${b.operaciones} operaciones`;
+  };
+}
+
+function pintarFichaTecnica(f, velas) {
+  const p = f.precio, t = f.tecnico, pos = f.posicion, cap = f.perfil.capitalizacion || {};
+  const v = t.variacion || {};
+  const fila = (a, b) => [h("dt", { texto: a }), h("dd", { texto: b ?? "—" })];
+  const encabezado = h("section", { clase: "tarjeta ficha", "aria-labelledby": "ficha-titulo" },
+    h("h2", { id: "ficha-titulo", texto: `${f.clave} · ${f.nombre}` }),
+    h("p", {}, chip(p.tiempo_real ? "vigente" : p.vigencia, p.etiqueta), " ",
+      h("span", { clase: "suave", texto: `Fuente ${p.proveedor || "—"}${p.precio_origen && p.moneda_origen !== "MXN" ? ` · origen ${num(p.precio_origen)} ${p.moneda_origen}` : ""}` })),
+    h("p", { id: "ficha-vivo", clase: "ayuda", role: "status", "aria-live": "off" }),
+    h("div", { clase: "kpis" }, kpi("Precio (MXN)", mxn(p.precio_mxn, true)),
+      ...[["1 día", v["1d"]], ["5 días", v["5d"]], ["1 mes", v["1m"]], ["3 meses", v["3m"]], ["1 año", v["1a"]]]
+        .map(([e, x]) => kpi(e, signoPct(x), signo(x))),
+      kpi("Rango 52 semanas", t.disponible ? `${mxn(t.minimo_52s, true)} – ${mxn(t.maximo_52s, true)}` : "—"),
+      kpi("Desde el máximo", t.disponible ? pct(t.desde_maximo) : "—", t.desde_maximo < 0 ? "negativo" : "")),
+    h("dl", {},
+      fila("Mercado · clase", `${f.perfil.mercado || "—"} · ${CLASES[f.perfil.clase] || f.perfil.clase || "—"}`),
+      fila("Sector", f.perfil.sector || "sin clasificación"),
+      fila("Capitalización", cap.cap_categoria ? `${cap.cap_categoria} cap · ${mxn(cap.cap_mxn)} (${cap.cap_detalle || cap.cap_estado})` : "sin dato"),
+      fila("Listado de origen", f.perfil.listado ? `${f.perfil.listado} · ${f.perfil.bolsa_origen || ""}` : "—"),
+      pos ? fila("Su posición", `${num(pos.titulos)} títulos · ${pct(pos.peso)} de su cartera · plusvalía ${mxn(pos.plusvalia)} (${signoPct(pos.plusvalia_pct)})`) : fila("Su posición", "no la tiene")));
+  const tecnico = h("section", { clase: "tarjeta" }, h("h2", { texto: "Análisis técnico" }),
+    t.disponible ? h("div", {},
+      h("p", {}, h("strong", { texto: `Lectura: ${t.lectura}. ` }), h("span", { clase: "suave", texto: `Cierres diarios del ${t.serie[0]?.fecha} al ${t.fecha} (${t.sesiones} sesiones).` })),
+      tabla([{ t: "Indicador", f: (s) => s.indicador }, { t: "Estado", f: (s) => chip(ESTADO_SENAL[s.estado] || "calculada", s.estado) }, { t: "Detalle", f: (s) => s.detalle }],
+        t.senales, { caption: "Verde: a favor del alza · rojo: en contra · amarillo: extremo" }),
+      h("div", { clase: "kpis" }, kpi("SMA 20 / 50 / 200", [t.sma20, t.sma50, t.sma200].map((x) => (vacio(x) ? "—" : num(x))).join(" / ")),
+        kpi("EMA 20 / 50", [t.ema20, t.ema50].map((x) => (vacio(x) ? "—" : num(x))).join(" / ")), kpi("RSI 14", vacio(t.rsi14) ? "—" : num(t.rsi14)),
+        kpi("Volatilidad anual (20 sesiones)", vacio(t.volatilidad_anual) ? "—" : pct(t.volatilidad_anual)), kpi("Stop por volatilidad", vacio(t.stop) ? "—" : num(t.stop))),
+      velas && velas.barras.length ? graficaVelas(velas.barras.slice(-120), { sma: true, ema50: true, boll: true }, "1Day")
+        : grafica([{ nombre: "Cierre (MXN)", color: "var(--acento)", datos: t.serie.map((s) => ({ x: s.fecha, y: s.cierre })) }],
+          { formato: num, etiqueta: `Cierres de ${f.clave}` }),
+      velas && velas.barras.length ? null : h("p", { clase: "suave", texto: f.velas.motivo || "" }))
+      : h("p", { clase: "vacio", texto: `Sin análisis técnico: ${t.motivo}.` }));
+  const accesos = h("div", { clase: "fila-controles" },
+    h("button", { type: "button", clase: "boton boton--secundario", texto: "Agregar a Seguimiento", onclick: async () => {
+      try { await api("/api/seguimiento", { method: "POST", json: { instrumento_id: f.id } }); notificar(`${f.clave} agregado a Seguimiento.`); }
+      catch (e) { notificar(e.message); } } }));
+  const disponibles = f.widgets.filter((w) => w.disponible && w.tipo !== "grafica");  // la gráfica ya está en el panel de Velas
+  const widgets = disponibles.length ? h("section", { "aria-label": "Widgets de TradingView" }, h("h2", { texto: "Widgets de TradingView" }),
+    h("p", { clase: "ayuda", texto: AVISO_TV }),
+    ...disponibles.map((w) => bloqueWidget(w.nombre, marcoWidget(w.tipo, { simbolo: f.id }, w.tipo === "info" ? 200 : w.tipo === "noticias-emisora" || w.tipo === "finanzas" ? 560 : 440, `${w.nombre} de ${f.clave}`),
+        ["info", "tecnico"].includes(w.tipo))),
+    f.widgets.length > disponibles.length ? h("p", { clase: "suave", texto: `Sin widget gratuito para la BMV: ${f.widgets.filter((w) => !w.disponible).map((w) => w.nombre.toLowerCase()).join(", ")}.` }) : null)
+    : h("p", { clase: "suave", texto: "Sin widgets de TradingView para fondos." });
+  const fund = h("section", { clase: "tarjeta" }, h("h2", { texto: "Fundamentales y noticias" }),
+    f.fundamentales.length ? tabla([{ t: "Periodo", f: (x) => x.periodo }, { t: "Dato", f: (x) => x.titulo || x.serie },
+      { t: "Valor", f: (x) => (vacio(x.valor) ? x.texto || "—" : `${num(x.valor)} ${x.unidad || ""}`), num: true }, { t: "Fuente", f: (x) => x.fuente }],
+    f.fundamentales, { caption: "Centro de investigación (SEC, Alpha Vantage o importados)" }) : h("p", { clase: "vacio", texto: "Sin estados financieros guardados para esta emisora." }),
+    f.noticias.length ? h("ul", {}, f.noticias.map((n) => h("li", {}, h("a", { href: n.enlace, target: "_blank", rel: "noopener", texto: n.titulo }),
+      h("span", { clase: "suave", texto: ` · ${n.fuente || ""} · ${fechaLocal(n.publicado)}` })))) : h("p", { clase: "vacio", texto: "Sin noticias recientes guardadas." }));
+  const sic = f.id.startsWith("SIC:");
+  const pestanas = h("div", { clase: "segmentado", role: "radiogroup", "aria-label": "Análisis de flujo", id: "ficha-flujo-pestanas" },
+    [["velas", "Velas"], ["orderflow", "Order Flow"], ["optionflow", "Option Flow"]].map(([k, t]) => h("button", {
+      type: "button", role: "radio", "data-valor": k, "aria-checked": String((ficha.subvista || "velas") === k), texto: t,
+      onclick: () => mostrarFlujoEnFicha(k, f) })));
+  const flujoFicha = h("section", { clase: "tarjeta", "aria-label": "Velas, Order Flow y Option Flow" },
+    h("h2", { texto: "Velas, Order Flow y Option Flow" }),
+    h("p", { clase: "ayuda", texto: sic ? "Los mismos paneles completos de Mercado y flujo, con esta emisora ya elegida: indicadores, libro, cinta, footprint, TPO, cadena, superficie de volatilidad, GEX, importación y actualización desde el proveedor."
+      : "Velas: los cierres diarios con sus indicadores. Order Flow y Option Flow no tienen fuente gratuita para la BMV ni para fondos: los paneles lo indican y permiten importar un CSV con datos que usted tenga derecho a usar." }),
+    pestanas, h("div", { id: "ficha-flujo-panel" }));
+  return [encabezado, accesos, tecnico, flujoFicha, widgets, fund, h("p", { clase: "ayuda", texto: f.nota })];
+}
+
+// Velas, Order Flow y Option Flow ya no tienen pestaña propia: su contenido (con sus controles e ids) espera oculto en
+// #almacen-flujo y se muestra dentro de la ficha con la emisora elegida. Un solo código y ningún id duplicado.
+const PRESTADOS = { velas: ["velas-contenido", "almacen-flujo", () => cargarVelas()],
+  orderflow: ["orderflow-contenido", "almacen-flujo", () => cargarOrderFlow()],
+  optionflow: ["optionflow-contenido", "almacen-flujo", () => cargarOptionFlow()] };
+function devolverPaneles() {
+  for (const [id, panel] of Object.values(PRESTADOS)) {
+    const n = document.getElementById(id), p = document.getElementById(panel);
+    if (n && p && n.parentElement !== p) p.append(n);
+  }
+}
+function mostrarFlujoEnFicha(clave, f) {
+  const destino = document.getElementById("ficha-flujo-panel");
+  if (!destino) return;
+  ficha.subvista = clave;
+  document.querySelectorAll("#ficha-flujo-pestanas [role=radio]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.valor === clave)));
+  devolverPaneles();
+  if (clave === "velas") flujo.velas.simbolo = f.id;
+  else if (clave === "orderflow") flujo.of.simbolo = f.id;
+  else flujo.op.subyacente = f.id;
+  const [id, , cargar] = PRESTADOS[clave];
+  destino.replaceChildren(document.getElementById(id));
+  cargar();
+}
+CARGAS["tab-ficha"] = () => cargarFicha();
+Object.assign(ATAJOS, { FICHA: "tab-ficha", FT: "tab-ficha" });

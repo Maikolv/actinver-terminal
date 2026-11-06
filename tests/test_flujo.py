@@ -95,7 +95,8 @@ def test_importar_velas_libro_y_opciones_todo_o_nada(con, ajustes):
         importar_csv.importar(con, "libro", libro)
     with pytest.raises(ValueError, match="encabezados"):
         importar_csv.importar(con, "opciones", b"contrato,otra\n1,2\n")
-    op = _csv("opciones", [f"MU261120C01000000,SIC:MU,OPRA,2026-11-20,1000,call,{t},10,11,10.5,50,,0.45,0.5,,,,x,y"])
+    v = (AHORA + timedelta(days=30)).date()  # vencimiento futuro: los contratos vencidos ya no se muestran
+    op = _csv("opciones", [f"MU{v:%y%m%d}C01000000,SIC:MU,OPRA,{v.isoformat()},1000,call,{t},10,11,10.5,50,,0.45,0.5,,,,x,y"])
     assert importar_csv.importar(con, "opciones", op)["guardados"] == 1
     assert servicio.optionflow(con, ajustes, "SIC:MU")["contratos"][0]["origen_iv"] == "importado"
 
@@ -271,3 +272,13 @@ def test_origen_conserva_el_punto_de_clases(con):
     """4-nov: «BRKB» sin punto devolvía 0 velas y HTTP 404 en Alpaca; «BRK.B» trae todo."""
     con.execute("UPDATE instrumentos SET listado_referencia='BRK.B', moneda_referencia='USD' WHERE id='SIC:MU'")
     assert servicio.origen_eeuu(con, "SIC:MU") == "BRK.B"
+
+
+
+def test_optionflow_omite_contratos_vencidos(con, ajustes):
+    t = H.isoformat()
+    futuro, pasado = (AHORA + timedelta(days=30)).date(), (AHORA - timedelta(days=3)).date()
+    filas = [f"MU{d:%y%m%d}C01000000,SIC:MU,OPRA,{d.isoformat()},1000,call,{t},10,11,10.5,50,,0.45,0.5,,,,x,y" for d in (futuro, pasado)]
+    importar_csv.importar(con, "opciones", _csv("opciones", filas))
+    o = servicio.optionflow(con, ajustes, "SIC:MU")
+    assert o["vencimientos"] == [futuro.isoformat()] and o["vencidos_omitidos"] == 1 and o["total"] == 1

@@ -79,16 +79,8 @@
       "url": "/?vista=tab-mercado"
     },
     {
-      "titulo": "Velas",
-      "url": "/?vista=tab-velas"
-    },
-    {
-      "titulo": "Order Flow",
-      "url": "/?vista=tab-orderflow"
-    },
-    {
-      "titulo": "Option Flow",
-      "url": "/?vista=tab-optionflow"
+      "titulo": "Ficha técnica",
+      "url": "/?vista=tab-ficha"
     },
     {
       "titulo": "Seguimiento",

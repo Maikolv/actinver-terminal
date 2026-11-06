@@ -16,7 +16,7 @@ def test_grafica_intervalo_y_enmarcado():
         # BMV: TradingView no muestra su precio en widgets gratuitos; se sirve un aviso local con alternativas, sin script.
         bmv = c.get("/grafica/BMV:AMX")
         assert bmv.status_code == 200 and "embed-widget" not in bmv.text and "SIN DATO · AMX/B" in bmv.text
-        assert "tab-velas" in bmv.text and "BMV-AMX%2FB" in bmv.text and "Esperando el marco" not in bmv.text
+        assert "tab-ficha" in bmv.text and "sub=velas" in bmv.text and "BMV-AMX%2FB" in bmv.text and "Esperando el marco" not in bmv.text
         assert c.get("/grafica/BMV:INEXISTENTE").status_code == 404
         for tipo in ("info", "panorama", "noticias-emisora"):
             r = c.get(f"/widget/{tipo}?simbolo=BMV:AMX")

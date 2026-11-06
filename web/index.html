@@ -65,9 +65,7 @@
     <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
     <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
     <button role="tab" data-grupo="mercado" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
-    <button role="tab" data-grupo="mercado" id="tab-velas" aria-controls="panel-velas" aria-selected="false" tabindex="-1">Velas</button>
-    <button role="tab" data-grupo="mercado" id="tab-orderflow" aria-controls="panel-orderflow" aria-selected="false" tabindex="-1">Order Flow</button>
-    <button role="tab" data-grupo="mercado" id="tab-optionflow" aria-controls="panel-optionflow" aria-selected="false" tabindex="-1">Option Flow</button>
+    <button role="tab" data-grupo="mercado" id="tab-ficha" aria-controls="panel-ficha" aria-selected="false" tabindex="-1">Ficha técnica</button>
     <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
     <button role="tab" data-grupo="mercado" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
     <button role="tab" data-grupo="investigar" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
@@ -338,6 +336,11 @@
     <div id="mercado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
   </section>
 
+  <section role="tabpanel" id="panel-ficha" aria-labelledby="tab-ficha" hidden>
+    <h1>Ficha técnica</h1>
+    <div id="ficha-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
   <section role="tabpanel" id="panel-investigacion" aria-labelledby="tab-investigacion" hidden>
     <h1>Investigación</h1>
     <p class="ayuda">Fundamentales, economía, energía y contexto para revisar su portafolio. Cada registro conserva su fuente y fecha. Las notas manuales reflejan lo que usted importó.</p>
@@ -362,23 +365,13 @@
     </details>
   </section>
 
-  <section role="tabpanel" id="panel-velas" aria-labelledby="tab-velas" hidden>
-    <h1>Velas</h1>
-    <p class="ayuda">Velas japonesas solo con apertura, máximo, mínimo, cierre y volumen reales de un proveedor o de un CSV que usted importe. Los cierres diarios locales nunca se convierten en velas. Indicadores descriptivos; no son señales.</p>
+  <!-- Contenidos de Velas, Order Flow y Option Flow: viven dentro de «Ficha técnica» (que los muestra en sus pestañas
+       internas); aquí solo esperan ocultos para que cada id exista una sola vez. -->
+  <div id="almacen-flujo" hidden>
     <div id="velas-contenido" aria-live="polite"></div>
-  </section>
-
-  <section role="tabpanel" id="panel-orderflow" aria-labelledby="tab-orderflow" hidden>
-    <h1>Order Flow</h1>
-    <p class="ayuda">Libro de órdenes, profundidad, cinta de operaciones, delta de volumen y perfil de volumen por precio, solo con datos reales. Si no hay fuente autorizada, el panel lo dice: nunca se simula flujo.</p>
     <div id="orderflow-contenido" aria-live="polite"></div>
-  </section>
-
-  <section role="tabpanel" id="panel-optionflow" aria-labelledby="tab-optionflow" hidden>
-    <h1>Option Flow</h1>
-    <p class="ayuda">Cadena de opciones por vencimiento y strike, curva y superficie de volatilidad y una regla descriptiva de volumen inusual. Solo informa: la terminal no opera opciones.</p>
     <div id="optionflow-contenido" aria-live="polite"></div>
-  </section>
+  </div>
 
   <section role="tabpanel" id="panel-riesgo" aria-labelledby="tab-riesgo" hidden>
     <h1>Riesgo</h1>

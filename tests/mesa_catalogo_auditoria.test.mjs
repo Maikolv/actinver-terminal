@@ -28,7 +28,7 @@ test('cada panel externo tiene ruta en el servidor y cada acceso apunta a una pe
     assert.ok(tipo === 'chart' || widgetsServidor.has(tipo), `${id}: el servidor no sirve /widget/${tipo}`);
   assert.ok(app.includes('@app.get("/grafica/{iid}"'), 'falta /grafica/{iid}');
   for (const [id, , tipo, destino] of CATALOGO.filter(c => c[2] === 'link'))
-    assert.ok(pestanas.has(destino), `${id}: la pestaña ${destino} no existe en index.html`);
+    assert.ok(pestanas.has(destino.split(':')[0]), `${id}: la pestaña ${destino} no existe en index.html`);  // «tab-ficha:optionflow» = pestaña + sub-vista
 });
 
 test('las disposiciones solo nombran paneles del catálogo y sin repetidos', () => {

@@ -2,9 +2,9 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {CATALOGO,AVISO_RIESGO,rutaVelas,planNQ} from '../web/static/mesa.mjs';
-test('Velas recibe el instrumento codificado sin añadir un panel',()=>{
+test('Las velas de la ficha técnica reciben el instrumento codificado sin añadir un panel',()=>{
  const simbolo='SIC:NVDA&vista=inyectada';const url=new URL(rutaVelas(simbolo),'http://127.0.0.1');
- assert.equal(url.searchParams.get('vista'),'tab-velas');assert.equal(url.searchParams.get('simbolo'),simbolo);
+ assert.equal(url.searchParams.get('vista'),'tab-ficha');assert.equal(url.searchParams.get('sub'),'velas');assert.equal(url.searchParams.get('simbolo'),simbolo);
  assert.equal(CATALOGO.length,22);assert.equal(CATALOGO.find(c=>c[0]==='grafica')[1],'Gráfica TradingView');
 });
 test('el escenario advierte gap y distingue tope de fill en JS y Pine',()=>{

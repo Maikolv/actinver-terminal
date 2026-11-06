@@ -85,13 +85,13 @@ if (typeof document !== 'undefined') {
   function guardar(k,v){try{localStorage.setItem(`oficina:${k}`,v);}catch{/* sin almacenamiento */}}
   function actualizarAccesos(){
     const id=$('simbolo').value, q=encodeURIComponent(id);
-    for(const [a,vista] of [['ir-velas','tab-velas'],['ir-orderflow','tab-orderflow'],['ir-optionflow','tab-optionflow']]){
-      $(a).href=id?`/?vista=${vista}&simbolo=${q}`:`/?vista=${vista}`;
+    for(const [a,sub] of [['ir-velas','velas'],['ir-orderflow','orderflow'],['ir-optionflow','optionflow']]){
+      $(a).href=id?`/?vista=tab-ficha&sub=${sub}&simbolo=${q}`:`/?vista=tab-ficha&sub=${sub}`;
       if(id)$(a).removeAttribute('aria-disabled');else $(a).setAttribute('aria-disabled','true');
     }
     $('accesos-ayuda').textContent=!id?'Elija un instrumento para ver sus accesos directos.'
-      :id.startsWith('SIC:')?'Abre la sección de la terminal con este instrumento ya elegido. El GEX está en Option Flow.'
-      :'Abre la sección con este instrumento. Option Flow y GEX solo existen para emisoras del SIC con opciones en EE. UU.';
+      :id.startsWith('SIC:')?'Abre la ficha técnica con este instrumento ya elegido. El GEX está en su pestaña Option Flow.'
+      :'Abre la ficha técnica con este instrumento. Option Flow y GEX solo existen para emisoras del SIC con opciones en EE. UU.';
   }
   $('simbolo').addEventListener('change',()=>{invalidarInforme();actualizarAccesos();$('consultar').disabled=!$('simbolo').value;if($('simbolo').value)consultar();});
   $('intervalo').addEventListener('change',()=>{invalidarInforme();guardar('intervalo',$('intervalo').value);if($('simbolo').value)consultar();});
