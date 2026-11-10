@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 9-nov-2026 — Captura 30, auditoría y arranque automático
+
+- Captura 30 del portal (9-nov 22:15): valuación $792,125.03, poder de compra $2,472.95, mismas posiciones (sin ventas ejecutadas); +$28,914 desde el 6-nov.
+- Auditoría: el servidor estuvo apagado del 6-nov 01:26 al 9-nov 22:40 (sin descargas, plan, GEX programado ni avisos). Ciclo tras reiniciar: ingesta 107 s, propuestas 1,196 s, investigación 562 s; vigencia 184 vigentes y 28 vencidos (EODHD: 20 consultas al día).
+- Arranque automático al iniciar sesión en Windows: `scripts/arranque-automatico.ps1` (mismo iniciador, solo 127.0.0.1, sin Tailscale; no hace nada si la terminal ya responde) y `scripts/instalar-arranque-automatico.ps1` (acceso en la carpeta Inicio; `-Quitar` lo elimina). Probado: con la terminal encendida regresa en 4 s sin reiniciarla.
+- Gestión de riesgo: el motivo dice «18% contra su costo» en lugar de «pierde -18%».
+- Almacenamiento: base de 1.43 GB; las operaciones de Order Flow (≈ 830 MB con índices) ya son solo la última sesión de cada emisora (tope de 10,000 por emisora), así que recortarlas a 2 días no libera espacio. Respaldos diarios: 14 copias completas en `data/respaldos` (5.6 GB).
+
 ## 6-nov-2026 — Captura 29 y órdenes del plan corregidas
 
 - Captura 29 del portal (6-nov 14:39): valuación $763,210.77, poder de compra $2,472.95, mismas 8 posiciones (sin ventas ejecutadas). La terminal valúa todo con los precios del portal: $763,274.

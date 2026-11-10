@@ -86,7 +86,7 @@ def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None)
         elif ind["bajista"] and perdida <= -r["perdida_costo"]:
             f["peso_objetivo"], f["regla"] = 0.0, "tendencia_perdida"
             f["motivos"].append(f"Tendencia bajista (precio < SMA{r['sma_corta']} < SMA{r['sma_larga']}) y pierde "
-                                f"{perdida:.0%} contra su costo.")
+                                f"{abs(perdida):.0%} contra su costo.")
         elif ind["bajista"]:
             f["peso_objetivo"], f["regla"] = peso / 2, "tendencia"
             f["motivos"].append(f"Tendencia bajista (precio < SMA{r['sma_corta']} < SMA{r['sma_larga']}): se reduce a la mitad.")
