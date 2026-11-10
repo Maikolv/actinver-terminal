@@ -68,7 +68,7 @@ def actualizar(_args) -> None:
 def respaldar(args) -> None:
     from . import db
     try:
-        destino = db.respaldar(conservar=args.conservar)
+        destino = db.respaldar(conservar=args.conservar or db.RESPALDOS_CONSERVAR)
     except RuntimeError as e:
         sys.exit(str(e))
     c = sqlite3.connect(destino)
@@ -591,7 +591,7 @@ def main() -> None:
     s.set_defaults(fn=iniciar)
     sub.add_parser("actualizar", help="actualiza datos de mercado").set_defaults(fn=actualizar)
     r = sub.add_parser("respaldar", help="crea un respaldo verificado de la base local")
-    r.add_argument("--conservar", type=int, default=14)
+    r.add_argument("--conservar", type=int, default=None, help="copias a conservar (predeterminado: 5)")
     r.set_defaults(fn=respaldar)
     g = sub.add_parser("reporte", help="genera un reporte en Markdown (preapertura, cierre o semanal)")
     g.add_argument("tipo", choices=["preapertura", "cierre", "semanal"])

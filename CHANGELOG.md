@@ -2,6 +2,11 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 10-nov-2026 — Cinco respaldos en lugar de 14
+
+- `db.RESPALDOS_CONSERVAR = 5` (decisión del usuario): lo usan el respaldo diario del motor y `terminal respaldar` (`--conservar` sigue disponible). Se borraron las 9 copias más viejas (14 al 29-oct): 5.44 → 3.59 GB.
+- Prueba: `tests/test_respaldo.py` aprobada.
+
 ## 9-nov-2026 — Captura 30, auditoría y arranque automático
 
 - Captura 30 del portal (9-nov 22:15): valuación $792,125.03, poder de compra $2,472.95, mismas posiciones (sin ventas ejecutadas); +$28,914 desde el 6-nov.

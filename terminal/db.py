@@ -229,7 +229,10 @@ def ruta_db() -> Path:
     return d / "terminal.db"
 
 
-def respaldar(origen: Path | None = None, conservar: int = 14) -> Path:
+RESPALDOS_CONSERVAR = 5  # 9-nov-2026, decisión del usuario: 14 copias completas ocupaban 5.6 GB con el disco al 89 %.
+
+
+def respaldar(origen: Path | None = None, conservar: int = RESPALDOS_CONSERVAR) -> Path:
     """Copia consistente (API de respaldo de SQLite) con verificación de integridad; conserva las `conservar` más recientes."""
     import time
     origen = Path(origen or ruta_db())
@@ -253,7 +256,7 @@ def respaldar(origen: Path | None = None, conservar: int = 14) -> Path:
     return destino
 
 
-def respaldo_diario(origen: Path | None = None, conservar: int = 14, horas: float = 20) -> Path | None:
+def respaldo_diario(origen: Path | None = None, conservar: int = RESPALDOS_CONSERVAR, horas: float = 20) -> Path | None:
     """Un respaldo verificado si el último tiene más de `horas`; lo llama el motor en cada ciclo."""
     import time
     origen = Path(origen or ruta_db())
