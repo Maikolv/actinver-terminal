@@ -250,9 +250,10 @@ export function nodoGuia(doc, k) {
   const el = (tag, props = {}, ...hijos) => { const n = doc.createElement(tag); Object.assign(n, props); n.append(...hijos); return n; };
   const det = el('details', { className: 'guia' });
   let abierta = true;
-  try { abierta = localStorage.getItem(clave(k)) !== 'cerrada'; } catch { /* sin almacenamiento */ }
+  // La portada (plan de acción) abre con la guía cerrada: lo primero que se ve es qué hacer hoy.
+  try { const v = localStorage.getItem(clave(k)); abierta = k === 'panel-resumen' ? v === 'abierta:usuario' : v !== 'cerrada'; } catch { /* sin almacenamiento */ }
   det.open = abierta;
-  det.addEventListener?.('toggle', () => { try { localStorage.setItem(clave(k), det.open ? 'abierta' : 'cerrada'); } catch { /* sin almacenamiento */ } });
+  det.addEventListener?.('toggle', () => { try { localStorage.setItem(clave(k), det.open ? (k === 'panel-resumen' ? 'abierta:usuario' : 'abierta') : 'cerrada'); } catch { /* sin almacenamiento */ } });
   det.append(el('summary', {}, `Guía: cómo usar «${g.titulo}»`),
     el('p', {}, el('strong', {}, 'Qué es: '), g.que),
     el('p', {}, el('strong', {}, 'Cómo usarla:')),

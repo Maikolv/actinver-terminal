@@ -102,3 +102,17 @@ def test_motivo_e_invalidacion_cortos():
     assert c["motivo_corto"].startswith("Cayó debajo de su stop ($100.00)") and "vuelve arriba de $100.00" in c["invalida"]
     m = g._corto({**f, "regla": None, "peso_objetivo": 0.4}, "mantener", R)
     assert m["motivo_corto"] == "Sin señal de riesgo." and m["invalida"].startswith("Vender si cae debajo de $100.00")
+
+
+def test_modo_suave_reduce_a_la_mitad_en_lugar_de_vender_todo(monkeypatch):
+    P = pd.DataFrame({"SIC:CAE": serie([(80, 0.004), (10, -0.03)]), "SIC:SUBE": serie([(90, 0.004)])})
+    monkeypatch.setattr(mercado, "precios_mxn", lambda con, aj, ids, ajustados=True: P[[i for i in ids if i in P]])
+    monkeypatch.setattr(mercado, "instrumentos", lambda con: {})
+    monkeypatch.setattr(reto, "activo", lambda: False)
+    cart = _cartera({"SIC:CAE": 0.40, "SIC:SUBE": 0.20})
+    r = g.evaluar(None, {"gestion_riesgo": {"vol_objetivo": 5.0, "modo_venta": "suave"}}, cart, None)
+    cae = next(f for f in r["posiciones"] if f["id"] == "SIC:CAE")
+    assert cae["regla"] == "stop" and cae["peso_objetivo"] == pytest.approx(0.20)
+    assert any("REDUCIR" in x for x in g.lineas(r)) and not any("VENDER TODO" in x for x in g.lineas(r))
+    fila = next(f for f in r["filas"] if f["id"] == "SIC:CAE")
+    assert "Modo suave" in fila["motivo_corto"]

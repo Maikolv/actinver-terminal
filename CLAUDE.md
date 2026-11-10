@@ -44,6 +44,18 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
+## Estado comprobado: mejora del 10-nov-2026
+
+Informe: `docs/mejora-fable-20261110.md`. Reglas de riesgo validadas fuera de muestra (`terminal/validacion_riesgo.py`,
+1,600 carteras, 2022 a sep-2026): las ventas por stop y tendencia reducen caídas pero rinden menos que mantener
+(−1 pp a 30 sesiones, IC 95 % sin cero); el plan lo dice con cifras y las reglas no se cambiaron (decisión del usuario).
+El ciclo del motor corre en un proceso aparte de prioridad baja (`terminal/motor_aislado.py`; `[app]
+motor_proceso_aparte`): plan 2.7–4.3 s y Option Flow 1.9 s durante el ciclo (antes 79 s y 24 s). Portada con «Qué hacer
+hoy» (vende/compra/mantén, igual que Telegram) y guía cerrada. Aviso de terminal apagada a los 90 min en el worker,
+sin desplegar (falta `npx wrangler login` del usuario). Dos modos de venta elegibles en el plan (estricta por defecto,
+suave reduce a la mitad). Interfaz sin emojis (solo la vista previa del plan los conserva). Respaldos: 5 copias. Arranque automático al iniciar sesión. Pendiente: GEX y vela en vivo con mercado
+abierto, perfil del recálculo de propuestas, retención de Order Flow y la directriz post-Reto (13-nov, 15:00).
+
 ## Estado comprobado: actualización acotada del 31-oct-2026
 
 Terminal profesional (1-nov): sistema negro/gris/blanco con rojo de identidad y contraste medido (`DESIGN.md`); Mesa con paleta de comandos, franja de Seguimiento, cuadrícula reordenable/ancha con migración, y Ficha, Noticias, Macro/resumen y Calendario nativos de solo lectura (`terminal/mesa_datos.py`). Verificación manual real: FRED DGS30, SIE SF61745/SP1/SF30057 (bono promedio mensual), 100 publicaciones SEC, tres estimaciones Alpha y 32 BPA. Conectores automáticos siguen apagados. Calendario distingue publicación SEC, estimación, BPA y revisión; moneda/base contable no informadas, hora exacta y revisiones no observadas siguen SIN DATO. Evidencia actual: `docs/avance-gratuitos-20261101.md`; informe inicial: `docs/proveedores-mesa-20261101.md`. Excel de Markowitz rediseñado sin cambios numéricos, revisión visual en Excel pendiente. Ver `docs/terminal-pro-20261101.md`.

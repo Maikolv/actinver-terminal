@@ -9,18 +9,23 @@ const estado = {
 };
 
 /* ---------- utilidades ---------- */
+// La interfaz no lleva emojis (10-nov-2026): los textos que comparte con Telegram se limpian al pintarlos. Solo la vista
+// previa del plan y de las boletas (clase «lectura-ocr») los conserva, porque es el mensaje tal como llega a Telegram.
+const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{2712}\u{2714}-\u{2716}\u{2718}-\u{27BF}\u{2B00}-\u{2BFF}\u{231A}-\u{23FF}\u{FE0F}\u{20E3}]\s?/gu;
+const sinEmoji = (v) => (typeof v === "string" ? v.replace(EMOJI, "") : v);
 function h(tag, attrs, ...hijos) {
   const el = document.createElement(tag);
+  const conEmoji = /lectura-ocr/.test((attrs && attrs.clase) || "");
   for (const [k, v] of Object.entries(attrs || {})) {
     if (v === null || v === undefined || v === false) continue;
     if (k === "clase") el.className = v;
-    else if (k === "texto") el.textContent = v;
+    else if (k === "texto") el.textContent = conEmoji ? v : sinEmoji(v);
     else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
     else el.setAttribute(k, v === true ? "" : v);
   }
   for (const c of hijos.flat()) {
     if (c === null || c === undefined || c === false) continue;
-    el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+    el.append(c instanceof Node ? c : document.createTextNode(conEmoji ? String(c) : sinEmoji(String(c))));
   }
   return el;
 }
@@ -370,6 +375,33 @@ function faltaCorta(a) {
   if (/confiable/.test(f)) return "Falta el precio exacto del simulador: no la toques hoy.";
   return `Falta: ${a.falta[0].split(" (")[0]}.`;
 }
+// «Qué hacer hoy»: las mismas órdenes que el mensaje de Telegram (ventas, compras, mantener), antes de la tabla completa.
+function bloqueHoy(plan) {
+  const limpio = (a) => a.clave.replace(" *", "");
+  const linea = (verbo, a, cantidad, etiqueta, precio, todas) => h("li", {},
+    h("strong", { texto: `${verbo} ${todas ? "TODAS tus " : ""}${num(cantidad)} ${limpio(a)}` }), ` · ${etiqueta} `,
+    h("span", { clase: "cifra", texto: mxn(precio, true) }), h("br"),
+    h("span", { clase: "suave", texto: `${a.motivo_corto || motivoCorto(a.motivo)} Precio del ${a.precio.fecha || "SIN DATO"}${a.precio.es_referencia ? " (referencia)" : ""}.` }));
+  const ventas = [], compras = [], mantener = [], sinDato = [];
+  for (const a of plan.acciones) {
+    const r = a.referencia, cond = a.decision === "pendiente" && r && r.titulos_aprox;
+    if (a.decision === "vender") ventas.push(linea("VENDE", a, a.cantidad, "límite", a.precio_limite, a.titulos_actuales && a.cantidad >= a.titulos_actuales));
+    else if (cond && r.lado_sugerido === "venta") ventas.push(linea("VENDE", a, r.titulos_aprox, "límite", r.precio_min, a.titulos_actuales && r.titulos_aprox >= a.titulos_actuales));
+    else if (a.decision === "comprar") compras.push(linea("COMPRA", a, a.cantidad, "máximo", a.precio_limite));
+    else if (cond) compras.push(linea("COMPRA", a, r.titulos_aprox, "máximo", r.precio_max));
+    else if (a.decision === "mantener") mantener.push(limpio(a));
+    else sinDato.push(limpio(a));
+  }
+  const col = (titulo, clase, items, vacio) => h("div", { clase: `hoy__col ${clase}` }, h("h3", { texto: `${titulo} (${items.length})` }),
+    items.length ? h("ol", {}, items) : h("p", { clase: "suave", texto: vacio }));
+  return h("section", { clase: "hoy", "aria-label": "Qué hacer hoy" },
+    col("1 · Vende primero", "hoy__col--venta", ventas, "Nada que vender hoy."),
+    col("2 · Después compra", "hoy__col--compra", compras, "Nada que comprar hoy."),
+    h("div", { clase: "hoy__col" }, h("h3", { texto: `Mantén (${mantener.length})` }),
+      h("p", { texto: mantener.join(", ") || "—" }),
+      sinDato.length ? h("p", { clase: "suave", texto: `No toques hoy (falta un dato): ${sinDato.join(", ")}.` }) : null,
+      h("p", { clase: "suave", texto: "Órdenes limitadas que tú capturas en el portal; la terminal no envía nada." })));
+}
 function tarjetaPlan(plan) {
   const c = plan.cuenta, r = plan.reglas || {}, res = plan.resumen;
   const cuenta = c.confirmada
@@ -384,14 +416,19 @@ function tarjetaPlan(plan) {
   const filas = plan.acciones;
   const g = plan.gestion_riesgo || {};
   const riesgo = g.activo ? h("div", { clase: g.ordenes ? "aviso-caja" : "", role: "status" },
-    h("strong", { texto: "🛡️ Gestión de riesgo: " }),
+    h("strong", { texto: "Gestión de riesgo: " }),
     `la cartera va ${pct(g.cartera.resultado_total)} desde el inicio; volatilidad ${pct(g.cartera.vol_actual)} al año`
       + (g.ordenes ? ` → ${pct(g.cartera.vol_despues)} con este plan. Las ventas por stop, tendencia o concentración mandan sobre la propuesta.`
         : ". Ninguna posición rompió su stop ni está en tendencia bajista: mantener es la decisión de riesgo."),
-    h("p", { clase: "suave", texto: `Reglas: stop = máximo de ${g.reglas.ventana_maximo} sesiones − ${g.reglas.k_sigma}× la volatilidad diaria y precio debajo de su SMA${g.reglas.sma_larga}; tendencia bajista (precio < SMA${g.reglas.sma_corta} < SMA${g.reglas.sma_larga}) reduce a la mitad o vende si pierde ≥ ${pct(g.reglas.perdida_costo)}; tope ${pct(g.reglas.peso_max)} por posición; volatilidad objetivo ${pct(g.reglas.vol_objetivo)}. ${g.nota}` })) : null;
+    h("p", { clase: "suave", texto: `Reglas: stop = máximo de ${g.reglas.ventana_maximo} sesiones − ${g.reglas.k_sigma}× la volatilidad diaria y precio debajo de su SMA${g.reglas.sma_larga}; tendencia bajista (precio < SMA${g.reglas.sma_corta} < SMA${g.reglas.sma_larga}) reduce a la mitad o vende si pierde ≥ ${pct(g.reglas.perdida_costo)}; tope ${pct(g.reglas.peso_max)} por posición; volatilidad objetivo ${pct(g.reglas.vol_objetivo)}. ${g.nota}` }),
+    h("p", { role: "group", "aria-label": "Reglas de venta" }, "Reglas de venta: ",
+      ...[["estricta", "Estricta: vende todo"], ["suave", "Suave: reduce a la mitad"]].flatMap(([m, t]) => [
+        h("button", { type: "button", clase: `boton ${(g.reglas.modo_venta || "estricta") === m ? "" : "boton--secundario"}`,
+          "aria-pressed": String((g.reglas.modo_venta || "estricta") === m),
+          onclick: async (ev) => { const b = ev.currentTarget; ocupado([b], true); try { await api("/api/gestion-riesgo/modo", { method: "PUT", json: { modo: m } }); notificar(`Reglas de venta: ${t}.`); await pintarResumen(); } catch (e) { notificar(e.message); ocupado([b], false); } } }, t), " "]))) : null;
   return h("section", { clase: "tarjeta", "aria-labelledby": "t-plan" },
     h("h2", { id: "t-plan", texto: plan.propuesta ? `Plan de acción — «${plan.propuesta.nombre}» (${plan.propuesta.puntuacion.toFixed(1)}/100, datos al ${plan.propuesta.datos_hasta})` : "Plan de acción" }),
-    cuenta, riesgo, reglas, ...avisos, faltan,
+    cuenta, bloqueHoy(plan), riesgo, reglas, ...avisos, faltan,
     h("div", { clase: "kpis" }, kpi("Compras", `${res.comprar} · ${mxn(res.monto_compras)}`), kpi("Ventas", `${res.vender} · ${mxn(res.monto_ventas)}`),
       kpi("Mantener", String(res.mantener)), kpi("Decisión pendiente", String(res.pendiente), res.pendiente ? "negativo" : "")),
     tabla([

@@ -120,7 +120,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
     cortos = {f["id"]: f for f in riesgo.get("filas") or []}  # motivo, invalidación y reemplazo en una línea
     ids = sorted({f["id"] for f in filas})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
-    acciones = []
+    acciones, series = [], None
     for f in filas:
         iid = f["id"]
         accion = f.get("accion", "mantener")
@@ -151,7 +151,9 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
                 fila["decision"], fila["falta"] = "pendiente", [FALTA_SALDO]
                 fila["invalidacion"] = "Cambian su cuenta del portal o la propuesta de referencia."
             else:
-                b = boleta.construir(con, ajustes, {**f, "nota": fila["motivo"]}, cart, ahora=ahora)
+                if series is None:  # una sola lectura de historia para todas las boletas
+                    series = mercado.precios_mxn(con, ajustes, sorted({x["id"] for x in filas}), ajustados="splits")
+                b = boleta.construir(con, ajustes, {**f, "nota": fila["motivo"]}, cart, ahora=ahora, series=series)
                 fila["invalidacion"] = "; ".join(b.get("invalidacion") or [])
                 fila["referencia"] = b.get("referencia_condicional")
                 if fila["referencia"] and accion == "vender" and not fila["peso_objetivo"] and tenencia:

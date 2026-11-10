@@ -18,8 +18,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, notificador, reto,
-               registro, servicios, tiempo_real, vigencia, webhook_tv)
+from . import (__version__, alertas, cartera, cotizaciones, db, espacios, importar, ingesta, mercado, motor_aislado, notificador,
+               registro, reto, servicios, tiempo_real, vigencia, webhook_tv)
 from .config import MODOS, RAIZ, cargar_ajustes, fijar_modo
 from .seguridad import TOKEN_CSRF, Seguridad
 
@@ -44,7 +44,7 @@ def disparar_motor(forzar: bool = True) -> None:
     """Recalcula en segundo plano tras un cambio (operación, importación, perfil). No bloquea la respuesta."""
     if os.environ.get("TERMINAL_SIN_MOTOR"):
         return
-    threading.Thread(target=servicios.ciclo_seguro, args=(AJUSTES, forzar), daemon=True).start()
+    threading.Thread(target=motor_aislado.ciclo_seguro, args=(AJUSTES, forzar), daemon=True).start()
 
 
 FLUJO: tiempo_real.FlujoVivo | None = None  # precios en vivo de EE. UU. (Alpaca IEX); None si el motor está apagado
@@ -83,12 +83,12 @@ def _programador(stop: threading.Event) -> None:
         if nueva != captura:  # captura nueva del portal: descargar ya los cierres del día, sin esperar al ciclo horario
             captura, siguiente = nueva, ahora
         if ahora >= siguiente:
-            if servicios.ciclo_seguro(AJUSTES) is not None and FLUJO:
+            if motor_aislado.ciclo_seguro(AJUSTES) is not None and FLUJO:
                 FLUJO.marcar_recalculo()
             abierto = vigencia.mercado_abierto("XMEX") or vigencia.mercado_abierto("XNYS")
             siguiente = time.monotonic() + int(prog["revisar_cada_min"] if abierto else prog["fuera_horario_min"]) * 60
         elif FLUJO and FLUJO.debe_recalcular():
-            if servicios.ciclo_seguro(AJUSTES, forzar=True, en_vivo=True) is not None:
+            if motor_aislado.ciclo_seguro(AJUSTES, forzar=True, en_vivo=True) is not None:
                 FLUJO.marcar_recalculo()
         _gex_programado()
         if time.monotonic() >= vigilancia:  # pérdida del día con precios en vivo, cada `vigilar_perdida_min`
@@ -251,6 +251,20 @@ def put_perfil(cuerpo: dict = Body(...), con=Depends(con_db)):
         db.auditar(con, "perfil", "perfil", "cambio", antes=antes, despues=p)
     disparar_motor()
     return {"perfil": p}
+
+
+@app.put("/api/gestion-riesgo/modo")
+def put_modo_venta(cuerpo: dict = Body(...), con=Depends(con_db)):
+    """Modo de las reglas de venta del plan: «estricta» (vende todo) o «suave» (reduce a la mitad). Solo cambia el plan."""
+    from . import gestion_riesgo
+    modo = (cuerpo or {}).get("modo")
+    if modo not in gestion_riesgo.MODOS_VENTA:
+        raise HTTPException(422, "modo no válido: use «estricta» o «suave»")
+    with db.transaccion(con):
+        con.execute("INSERT INTO ajustes_usuario VALUES ('gestion_riesgo', ?, ?) ON CONFLICT(clave) DO UPDATE SET "
+                    "valor=excluded.valor, actualizado_en=excluded.actualizado_en", (json.dumps({"modo_venta": modo}), db.ahora()))
+        db.auditar(con, "gestion_riesgo", "modo_venta", "cambio", despues={"modo_venta": modo})
+    return {"modo_venta": modo, "modos": gestion_riesgo.MODOS_VENTA}
 
 
 @app.get("/api/reto")

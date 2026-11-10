@@ -26,12 +26,21 @@ from . import mercado, reto
 from .config import Ajustes
 
 REGLAS = {"ventana_maximo": 22, "ventana_sigma": 20, "k_sigma": 3.0, "sma_corta": 20, "sma_larga": 50,
-          "perdida_costo": 0.15, "peso_max": 0.25, "vol_objetivo": 0.30, "peso_minimo_reto": 0.02}
+          "perdida_costo": 0.15, "peso_max": 0.25, "vol_objetivo": 0.30, "peso_minimo_reto": 0.02,
+          "modo_venta": "estricta"}
+MODOS_VENTA = {"estricta": "vende todo cuando rompe el stop", "suave": "reduce a la mitad en lugar de vender todo"}
 DIAS = 252
 
 
-def reglas(ajustes: Ajustes) -> dict:
-    return {**REGLAS, **(ajustes.get("gestion_riesgo") or {})}
+def reglas(ajustes: Ajustes, con=None) -> dict:
+    """Reglas vigentes: las de fábrica, la configuración y, si hay base, el modo de venta que eligió el usuario."""
+    r = {**REGLAS, **(ajustes.get("gestion_riesgo") or {})}
+    if con is not None:
+        f = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='gestion_riesgo'").fetchone()
+        if f:
+            import json
+            r.update({k: v for k, v in json.loads(f[0]).items() if k == "modo_venta" and v in MODOS_VENTA})
+    return r
 
 
 def _serie(P: pd.DataFrame, iid: str, precio: float | None) -> pd.Series:
@@ -57,7 +66,8 @@ def indicadores(s: pd.Series, r: dict) -> dict | None:
 
 
 def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None) -> dict:
-    r = reglas(ajustes)
+    r = reglas(ajustes, con)
+    suave = r["modo_venta"] == "suave"  # las señales de venta total reducen a la mitad
     total = float(cartera.get("valor_total") or 0)
     pos = [p for p in cartera.get("posiciones") or [] if (p.get("cantidad") or 0) > 0 and (p.get("valor_mxn") or 0) > 0
            and not str(p["instrumento_id"]).startswith("FONDO:")]
@@ -79,14 +89,15 @@ def evaluar(con, ajustes: Ajustes, cartera: dict, propuesta: dict | None = None)
             continue
         perdida = float(p.get("no_realizado_pct") or 0)
         if ind["precio"] < ind["stop"] and ind["precio"] < ind["sma_larga"]:
-            f["peso_objetivo"], f["regla"] = 0.0, "stop"
+            f["peso_objetivo"], f["regla"] = (peso / 2 if suave else 0.0), "stop"
             f["motivos"].append(f"Rompió su stop: precio {ind['precio']:,.2f} < {ind['stop']:,.2f} (máximo de "
                                 f"{r['ventana_maximo']} sesiones {ind['maximo']:,.2f} − {r['k_sigma']:g}× su volatilidad diaria "
-                                f"de {ind['sigma_diaria']:.1%}) y está debajo de su SMA{r['sma_larga']} ({ind['sma_larga']:,.2f}).")
+                                f"de {ind['sigma_diaria']:.1%}) y está debajo de su SMA{r['sma_larga']} ({ind['sma_larga']:,.2f})."
+                                + (" Modo suave: se reduce a la mitad." if suave else ""))
         elif ind["bajista"] and perdida <= -r["perdida_costo"]:
-            f["peso_objetivo"], f["regla"] = 0.0, "tendencia_perdida"
+            f["peso_objetivo"], f["regla"] = (peso / 2 if suave else 0.0), "tendencia_perdida"
             f["motivos"].append(f"Tendencia bajista (precio < SMA{r['sma_corta']} < SMA{r['sma_larga']}) y pierde "
-                                f"{abs(perdida):.0%} contra su costo.")
+                                f"{abs(perdida):.0%} contra su costo." + (" Modo suave: se reduce a la mitad." if suave else ""))
         elif ind["bajista"]:
             f["peso_objetivo"], f["regla"] = peso / 2, "tendencia"
             f["motivos"].append(f"Tendencia bajista (precio < SMA{r['sma_corta']} < SMA{r['sma_larga']}): se reduce a la mitad.")
@@ -187,6 +198,8 @@ def _corto(f: dict, accion: str, r: dict) -> dict:
               "tendencia": "Va a la baja (debajo de sus promedios de 20 y 50 días): reducir a la mitad.",
               "concentracion": f"Pesa {f['peso_actual']:.0%} de tu cartera; el tope es {r['peso_max']:.0%}.",
               "volatilidad": "Recorte para bajar la volatilidad de la cartera."}.get(regla, "Sin señal de riesgo.")
+    if r["modo_venta"] == "suave" and regla in ("stop", "tendencia_perdida") and accion == "vender":
+        motivo += " Modo suave: reducir a la mitad."
     if accion == "mantener" and f["peso_objetivo"] > 0 and any("mínimo de" in m for m in f["motivos"]):
         motivo = "Se conserva una parte para cumplir el mínimo de 5 emisoras del Reto."
     if accion == "vender":
@@ -253,4 +266,22 @@ def lineas(g: dict) -> list[str]:
             out.append(f"  • {f['clave'].replace(' *', '')}: {que}. {f['motivos'][0]}")
     if not g["ordenes"]:
         out.append("  • Ninguna posición rompió su stop ni está en tendencia bajista: mantener es la decisión de riesgo.")
+    elif e := evidencia(g["reglas"].get("modo_venta", "estricta")):
+        out.append(e)
     return out
+
+
+def evidencia(modo: str = "estricta") -> str | None:
+    """Lo medido fuera de muestra (`terminal.validacion_riesgo`): el plan dice cuánto cuesta y cuánto protege vender."""
+    import json
+    from pathlib import Path
+    try:
+        datos = json.loads((Path(__file__).resolve().parent.parent / "docs/evidencia/validacion-riesgo.json").read_text("utf-8"))
+        e = next(x for x in datos if x["perfil"] == "concentrada" and x["dias"] == 30)
+        m = e["variantes"]["mantener"]
+        v = e["variantes"]["reglas suaves + reinversión" if modo == "suave" else "reglas + reinversión"]
+    except (OSError, ValueError, KeyError, StopIteration):
+        return None
+    return (f"  ⚖️ Lo medido en {e['pruebas']} carteras del pasado a {e['dias']} sesiones: seguir estas ventas dejó en promedio "
+            f"{v['media']:+.1%} frente a {m['media']:+.1%} de mantener; a cambio, en un mal escenario (1 de cada 10) perdió "
+            f"{v['p10']:.1%} en lugar de {m['p10']:.1%}. Vender protege de caídas grandes, no aumenta la ganancia esperada.")

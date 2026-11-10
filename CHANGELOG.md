@@ -2,6 +2,22 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 10-nov-2026 — Reglas de riesgo validadas, motor en proceso aparte y «Qué hacer hoy»
+
+Informe con todas las cifras: `docs/mejora-fable-20261110.md`.
+
+- **Validación fuera de muestra** (`terminal/validacion_riesgo.py`, `uv run python -m terminal.validacion_riesgo`): 1,600 carteras al azar, 7-oct-2022 a 30-sep-2026, señal en t y orden en t+1 con comisión. Las ventas por stop y tendencia reducen la caída (peor 10 %: −7.8 % → −3.2 % a 30 sesiones) pero rinden menos que mantener (−1.1 pp, IC 95 % [−2.1, −0.1]; −9.7 pp a 126 sesiones). Concentración y volatilidad casi no cuestan a 30 sesiones. Sin ventaja demostrada; las reglas no se cambiaron (decisión del usuario). El plan de Telegram añade una línea con estas cifras cuando pide vender.
+- **Motor en proceso aparte** (`terminal/motor_aislado.py`, prioridad baja; `[app] motor_proceso_aparte = false` lo apaga): durante el ciclo, plan 2.7–4.3 s (antes 79 s), Option Flow 1.9 s (antes 24 s), estado/cartera/velas ≤ 0.2 s. Ciclo completo comprobado en el hijo (541 s). Registro en `data/terminal_motor.log`.
+- **Plan más rápido**: la historia de precios se lee una vez y no una por emisora (cálculo 4.99 → 1.75 s; boletas 3.85 → 0.40 s).
+- **Portada**: bloque «Qué hacer hoy» (1 · Vende primero, 2 · Después compra, Mantén) con cantidad, límite, motivo y fecha del precio, igual que Telegram; la guía de la portada abre cerrada. Sin desbordamiento a 375 px; contraste 16.7:1 y 9.4:1 en modo oscuro.
+- **Monitor en la nube**: aviso «tu terminal local no se reporta» a los 90 min sin latido con el mercado abierto (antes solo a las 26 h y en día hábil). Sin desplegar: requiere confirmación.
+- Ya existían y no se duplicaron: cola de descargas con cartera y propuesta primero (`ingesta.orden_cola`) y alerta de datos insuficientes por posición sin precio confiable.
+- Pendiente: GEX y vela de 1 min con mercado abierto, perfil del recálculo de propuestas, retención de Order Flow (propuesta en el informe), modo claro y teclado del bloque nuevo, directriz post-Reto (13-nov 15:00).
+- **Dos modos de venta** (decisión del usuario): «Estricta: vende todo» (por defecto) y «Suave: reduce a la mitad», elegibles en el Plan de acción (`PUT /api/gestion-riesgo/modo`, se guarda en la base y lo usa también Telegram). Validación a 30 sesiones, cartera concentrada: suave +1.1 % de media y −5.8 % en el peor 10 %, frente a +1.0 % y −6.3 % de la estricta y +1.8 % y −7.8 % de mantener; a 126 sesiones, +6.7 % frente a +6.0 % y +10.8 %. Ninguno supera a mantener en rendimiento.
+- **Interfaz sin emojis**: se quitaron los dos fijos y los textos compartidos con Telegram se limpian al pintarlos (`sinEmoji` en `app.js`); solo la vista previa del plan y de las boletas los conserva. Comprobado en la portada: 0 emojis. Oficina, Cuaderno y Mesa no tienen emojis propios; sus textos del servidor no pasan por ese filtro.
+- Cloudflare: sin publicar; `wrangler` pide iniciar sesión con la cuenta del usuario (`npx wrangler login`).
+- Pruebas: Python 950 de la suite completa sin fallas antes del modo de venta; después, 16 de riesgo, plan y simulador (incluye la nueva del modo suave), Node 52 y worker 20.
+
 ## 10-nov-2026 — Cinco respaldos en lugar de 14
 
 - `db.RESPALDOS_CONSERVAR = 5` (decisión del usuario): lo usan el respaldo diario del motor y `terminal respaldar` (`--conservar` sigue disponible). Se borraron las 9 copias más viejas (14 al 29-oct): 5.44 → 3.59 GB.

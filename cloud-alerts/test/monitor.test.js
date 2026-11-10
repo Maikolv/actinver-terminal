@@ -199,3 +199,13 @@ test("resumen diario: una vez por sesión, desde 35 min antes de la apertura de 
   await ejecutar(env, { ahora: new Date("2026-10-01T13:15:00Z"), fetchFn: f2, dormir: nada });
   assert.ok(!f2.mensajes().some((m) => /Resumen diario/.test(m)));
 });
+
+test("terminal apagada en plena sesión: avisa una vez tras 90 min sin latido, sin esperar las 26 h", async () => {
+  const env = await preparar({ syncEn: new Date(AHORA - 120 * 60000) });
+  const f = red();
+  await ejecutar(env, { ahora: AHORA, fetchFn: f, dormir: nada });
+  assert.ok(f.mensajes().some((m) => /no se reporta desde/.test(m)));
+  const f2 = red();
+  await ejecutar(env, { ahora: new Date(AHORA.getTime() + 15 * 60000), fetchFn: f2, dormir: nada });
+  assert.ok(!f2.mensajes().some((m) => /no se reporta desde/.test(m)));
+});

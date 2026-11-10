@@ -7,7 +7,8 @@ const MXN = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN",
 const PCT = (x) => `${x >= 0 ? "+" : ""}${(x * 100).toFixed(1)} %`;
 const horas = (a, b) => (a - b) / 3600000;
 const FX_MAX_DIAS = 4;
-export const FALLOS_PERSISTENTES = 3;   // 3 ejecuciones seguidas (≈45 min con el disparador de 15 min)
+const APAGADA_MIN = 90;                // con el mercado abierto, minutos sin latido de la terminal local antes de avisar
+export const FALLOS_PERSISTENTES = 3;  // 3 ejecuciones seguidas (≈45 min con el disparador de 15 min)
 
 export function fxUtil(fxBanxico, fxSync, ahora) {
   const hoy = fechaLocal(ahora);
@@ -58,6 +59,14 @@ export function evaluar(ctx) {
     avisos.push({ clave: `sync_vencida:${syncEn ? syncEn.toISOString() : "nunca"}`, tipo: "sync",
       texto: `⚠️ La terminal no sincroniza desde ${syncEn ? horaLocal(syncEn) : "nunca"} (más de ${u.sync_max_horas} h). `
         + "Se suspenden las recomendaciones de compra o venta basadas en ese saldo hasta una nueva sincronización." });
+  }
+  // 1b) Terminal apagada en plena sesión: un aviso por episodio sin esperar las sync_max_horas (del 6 al 9-nov-2026 la
+  // terminal estuvo apagada y el primer aviso habría llegado 26 h después, ya en fin de semana).
+  const abierto = mercados.XMEX.abierto || mercados.XNYS.abierto;
+  if (abierto && syncEn && !syncVencida && (ahora - syncEn) / 60000 > APAGADA_MIN) {
+    avisos.push({ clave: `local_apagada:${syncEn.toISOString()}`, tipo: "sync",
+      texto: `🔴 Tu terminal local no se reporta desde ${horaLocal(syncEn)} (más de ${APAGADA_MIN} min con el mercado abierto). `
+        + "Mientras siga apagada no hay descargas, plan del día ni avisos de pérdida: enciende la PC o abre «Actinver Terminal»." });
   }
   if (syncVencida) {
     sus("Compra/venta y variación de la cartera", `última sincronización hace ${syncEn ? horas(ahora, syncEn).toFixed(0) : "∞"} h`);

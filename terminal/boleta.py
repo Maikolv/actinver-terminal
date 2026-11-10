@@ -79,7 +79,7 @@ def _caducidad(ahora: datetime) -> datetime:
 
 
 def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict, ahora: datetime | None = None,
-              efectivo_supuesto: float | None = None) -> dict:
+              efectivo_supuesto: float | None = None, series=None) -> dict:
     """Boleta para una fila de cambios de una propuesta (id, accion, monto_mxn). Recalcula todo con datos actuales."""
     ahora = ahora or datetime.now(UTC)
     ins = mercado.instrumentos(con)
@@ -150,7 +150,8 @@ def construir(con: sqlite3.Connection, ajustes: Ajustes, fila: dict, cart: dict,
     valor_emisora_post = pos_valor.get(i["id"], 0) + signo * importe
     peso_post = valor_emisora_post / total if total > 0 else None
     advert = reto.verificar_compras([{"id": i["id"], "monto": importe}], total, pos_valor) if lado == "compra" and importe else []
-    serie = mercado.precios_mxn(con, ajustes, [i["id"]], ajustados="splits")
+    # `series`: historia ya leída por quien arma varias boletas (el plan leía la base una vez por emisora: 3.7 de 5 s)
+    serie = series if series is not None and i["id"] in series.columns else mercado.precios_mxn(con, ajustes, [i["id"]], ajustados="splits")
     h = max(reto.sesiones_restantes(ahora), 1)
     est = estimacion_historica(serie[i["id"]].dropna().values, h) if i["id"] in serie.columns else {"disponible": False,
                                                                                                     "motivo": "sin historia"}

@@ -486,3 +486,13 @@ tbody tr:hover td { background: var(--superficie-2); }
 .chip-comparar { display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .25rem .15rem .55rem; border: 1px solid var(--borde-control); border-radius: 999px; background: var(--superficie); font-variant-numeric: tabular-nums; }
 .chip-comparar button { border: 0; background: transparent; color: var(--texto); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 .3rem; min-width: 24px; min-height: 24px; }
 .chip-comparar button:hover, .chip-comparar button:focus-visible { color: var(--acento); }
+
+/* Portada: «Qué hacer hoy» antes de la tabla del plan (10-nov-2026) */
+.hoy { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 12px 0; }
+.hoy__col { border: 1px solid var(--borde); border-top: 3px solid var(--borde); border-radius: var(--radio); padding: 10px 12px; min-width: 0; }
+.hoy__col--venta { border-top-color: var(--marca); }
+.hoy__col--compra { border-top-color: var(--vigente); }
+.hoy__col h3 { margin: 0 0 6px; font-size: .95rem; }
+.hoy__col ol { margin: 0; padding-left: 1.3em; }
+.hoy__col li { margin-bottom: 8px; overflow-wrap: anywhere; }
+.hoy__col p { margin: 0 0 6px; }
