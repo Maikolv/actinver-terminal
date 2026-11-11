@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 11-nov-2026 — Compras con efectivo libre y emisoras del mismo sector
+
+- Capturas 31 (10-nov 15:00: vendidas MU y GMEXICO) y 32 (11-nov 10:36: compradas AC, FEMSA, KOF, LLY, MRK y TGT; valuación $789,189.36, efectivo $498,710.73).
+- `gestion_riesgo`: además del dinero de las ventas, el plan invierte hasta `efectivo_a_invertir` (10 %) del efectivo libre, y suma emisoras del mismo grupo SIC de la SEC que las posiciones (la que más subió en 3 meses por posición, máximo `afines_max` = 3), solo si van al alza y no rompieron su stop. El mensaje de Telegram explica el cambio y nombra las afines del día (11-nov: COST, MRNA, CVX).
+- Mensaje: sin líneas de «compra 0 acciones»; no pide esperar a las ventas si el efectivo alcanza.
+- Pendiente: una afín cuyo precio supera su monto (COST) se nombra pero no trae orden.
+- Pruebas: 26 de riesgo, plan y mensaje (una nueva de afines).
+
 ## 10-nov-2026 — Reglas de riesgo validadas, motor en proceso aparte y «Qué hacer hoy»
 
 Informe con todas las cifras: `docs/mejora-fable-20261110.md`.

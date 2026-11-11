@@ -141,7 +141,8 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     # Todas las ventas juntas y después todas las compras (6-nov: las ventas con precio de referencia salían después de una
     # compra y el paso 2 aparecía dos veces).
     c_venta = [a for a in cond if a["referencia"].get("lado_sugerido") == "venta"]
-    c_compra = [a for a in cond if a["referencia"].get("lado_sugerido", "compra") == "compra"]
+    c_compra = [a for a in cond if a["referencia"].get("lado_sugerido", "compra") == "compra"
+                and (a["referencia"].get("titulos_aprox") or 0) > 0]  # nunca «compra 0 acciones»
     reemplazo = lambda a: (f" Reemplázala con: {_reemplazos(a['reemplazo'])}." if a.get("reemplazo") not in (None, "—") else "")  # noqa: E731
     if ventas or c_venta:
         L.append("1️⃣ Primero VENDE (orden limitada; el precio límite evita vender demasiado barato):")
@@ -162,8 +163,12 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
             n += 1
             L.append(f"  {n}. {_nombre(a['clave'])}: COMPRA {a['cantidad']:,} acciones con el dinero que ya tienes. Precio máximo "
                      f"${a['precio_limite']:,.2f} (≈ {_dinero(a['monto'])}).")
-        if c_compra and (ventas or c_venta):
+        libre = float(c.get("efectivo_tras_compras") if c.get("efectivo_tras_compras") is not None else c.get("efectivo") or 0)
+        espera_ventas = sum(a["referencia"]["titulos_aprox"] * a["referencia"]["precio_max"] for a in c_compra) > libre
+        if c_compra and (ventas or c_venta) and espera_ventas:
             L.append("  En cuanto el dinero de las ventas aparezca en tu poder de compra:")
+        elif c_compra:
+            L.append("  También con el dinero que ya tienes (precio de referencia: confírmalo en el portal):")
         for a in c_compra:
             n += 1
             r = a["referencia"]

@@ -116,3 +116,8 @@ def test_modo_suave_reduce_a_la_mitad_en_lugar_de_vender_todo(monkeypatch):
     assert any("REDUCIR" in x for x in g.lineas(r)) and not any("VENDER TODO" in x for x in g.lineas(r))
     fila = next(f for f in r["filas"] if f["id"] == "SIC:CAE")
     assert "Modo suave" in fila["motivo_corto"]
+
+
+def test_afines_del_mismo_sector_sec():
+    af = g._afines(["SIC:XOM"])
+    assert "SIC:CVX" in af and af["SIC:CVX"]["de"] == "SIC:XOM" and "SIC:XOM" not in af
