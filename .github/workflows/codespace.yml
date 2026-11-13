@@ -1,0 +1,40 @@
+# Verifica el contenedor de Codespaces: misma imagen, mismo postCreate, arranque demo y dominio reenviado.
+name: codespace
+
+on:
+  push:
+    branches: [main]
+    paths: [".devcontainer/**", "terminal/seguridad.py", "pyproject.toml", "uv.lock", ".github/workflows/codespace.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contenedor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/devcontainers/python:3.12
+    env:
+      CODESPACES: "true"
+      CODESPACE_NAME: prueba-cs
+      GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN: app.github.dev
+    steps:
+      - uses: actions/checkout@v4
+      - name: postCreate (igual que devcontainer.json)
+        run: |
+          pip install --user uv
+          export PATH="$HOME/.local/bin:$PATH"
+          uv sync --frozen
+          cp -n .env.example .env || true
+      - name: Arranca la demo y prueba el dominio reenviado
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv run terminal demo --sin-navegador > demo.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:8765/api/estado >/dev/null && break; sleep 2; done
+          curl -sf http://127.0.0.1:8765/ >/dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: prueba-cs-8765.app.github.dev' http://127.0.0.1:8765/api/estado)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: otro-cs-8765.app.github.dev' http://127.0.0.1:8765/api/estado)" = 400
+          echo "Codespace OK"
+      - if: failure()
+        run: cat demo.log || true
