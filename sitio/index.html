@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Help Quote Terminal</title>
+<meta name="description" content="Terminal local de análisis de portafolios: propuestas, riesgo, Markowitz y estación de mercado. Solo informa y simula.">
+<style>
+:root { --fondo:#f6f5f2; --panel:#fff; --texto:#15171c; --tenue:#4a505a; --borde:#d9d7d1; --marca:#b3261e; --enlace:#0b5cad; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fondo:#0e1014; --panel:#16191f; --texto:#eceef2; --tenue:#a9b0bb; --borde:#2a2e36; --marca:#f2777a; --enlace:#8ab8ff; } }
+:root[data-theme="dark"] { --fondo:#0e1014; --panel:#16191f; --texto:#eceef2; --tenue:#a9b0bb; --borde:#2a2e36; --marca:#f2777a; --enlace:#8ab8ff; }
+* { box-sizing:border-box }
+body { margin:0; background:var(--fondo); color:var(--texto); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif }
+main { max-width:1040px; margin:0 auto; padding:32px 16px 64px }
+header { border-top:4px solid var(--marca); padding-top:20px }
+h1 { font-size:2rem; margin:0 0 6px } h2 { margin:40px 0 12px; font-size:1.3rem }
+.sub { color:var(--tenue); margin:0 0 20px; max-width:70ch }
+.acciones { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 }
+.btn { display:inline-block; padding:10px 16px; border:1px solid var(--borde); border-radius:6px; background:var(--panel); color:var(--texto); text-decoration:none; font-weight:600 }
+.btn.prim { background:var(--marca); border-color:var(--marca); color:#fff }
+a { color:var(--enlace) }
+img { width:100%; height:auto; border:1px solid var(--borde); border-radius:6px; display:block }
+figure { margin:0 0 20px } figcaption { color:var(--tenue); font-size:.9rem; margin-top:6px }
+.rejilla { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px }
+table { width:100%; border-collapse:collapse; background:var(--panel); font-size:.95rem }
+th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--borde); vertical-align:top }
+.aviso { background:var(--panel); border-left:4px solid var(--marca); padding:12px 16px; color:var(--tenue) }
+code { font-family:ui-monospace,Consolas,monospace; font-size:.9em }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Help Quote Terminal</h1>
+  <p class="sub">Terminal local de análisis de portafolios (FastAPI + SQLite, sin build). Compara propuestas contra la cartera real, mide riesgo, optimiza con Markowitz y muestra una estación de mercado. <strong>Solo informa y simula: no envía órdenes.</strong></p>
+  <div class="acciones">
+    <a class="btn prim" href="estacion.html">Abrir la estación (demo)</a>
+    <a class="btn" href="https://codespaces.new/Maikolv/actinver-terminal?quickstart=1">Correr la terminal completa en Codespaces</a>
+    <a class="btn" href="https://github.com/Maikolv/actinver-terminal">Código en GitHub</a>
+  </div>
+  <p class="aviso">Esta página pública usa <strong>datos simulados</strong>. Los datos reales se descargan con sus propias claves gratuitas, en su PC o en su Codespace privado; no se publican aquí porque las licencias de los proveedores no permiten redistribuirlos.</p>
+</header>
+
+<h2>Capturas (modo demostración)</h2>
+<figure><img src="capturas/mercado-despues-demo-1440.jpg" alt="Estación de Mercado: monitor, gráfico con proyección 10–90 % e inspector" loading="lazy"><figcaption>Estación de Mercado: monitor, gráfico con proyección 10–90 % e inspector.</figcaption></figure>
+<div class="rejilla">
+  <figure><img src="capturas/inicio.png" alt="Plan de acción" loading="lazy"><figcaption>Plan de acción: vende, compra, mantén.</figcaption></figure>
+  <figure><img src="capturas/propuestas.png" alt="Propuestas" loading="lazy"><figcaption>Propuestas con puntuación explicada.</figcaption></figure>
+  <figure><img src="capturas/portafolios.png" alt="Mis portafolios" loading="lazy"><figcaption>Mis portafolios: Markowitz, Solver y Black-Litterman.</figcaption></figure>
+  <figure><img src="capturas/riesgo.png" alt="Riesgo" loading="lazy"><figcaption>Riesgo: VaR/CVaR y reglas validadas fuera de muestra.</figcaption></figure>
+</div>
+
+<h2>Qué hace</h2>
+<table>
+<tr><th>Bloque</th><th>Resultado</th></tr>
+<tr><td>Plan del día</td><td>Vende / compra / mantén con cantidad, precio límite y motivo; el mismo texto por Telegram</td></tr>
+<tr><td>Propuestas</td><td>Solo acciones y acciones + ETF + fondos, con validación fuera de muestra frente a 1/N</td></tr>
+<tr><td>Mis portafolios</td><td>Markowitz con Ledoit-Wolf, máximo Sharpe, topes por sector, Black-Litterman y Excel con Solver</td></tr>
+<tr><td>Riesgo</td><td>VaR/CVaR, contribución, dos modos de venta y validación en 1,600 carteras</td></tr>
+<tr><td>Estación de Mercado</td><td>Monitor ordenable, gráfico con banda 10–90 %, inspector y teclado</td></tr>
+<tr><td>Flujo</td><td>Velas, Order Flow (footprint, TPO) y Option Flow (Heston, GEX)</td></tr>
+<tr><td>Laboratorio</td><td>Permutación, Holm, preregistro y holdout único</td></tr>
+</table>
+
+<h2>Cómo correr</h2>
+<p><strong>En su PC (Windows):</strong> instale <a href="https://docs.astral.sh/uv/">uv</a> y ejecute <code>start.bat</code>, o <code>uv run terminal demo</code>. Se abre en <code>http://127.0.0.1:8765</code>.</p>
+<p><strong>Desde GitHub:</strong> el botón de Codespaces crea un contenedor con todo instalado; ahí corra <code>uv run terminal demo --sin-navegador</code> o, con su <code>.env</code>, <code>uv run terminal iniciar --sin-navegador</code>. El puerto queda privado a su cuenta.</p>
+
+<p class="aviso">Herramienta de análisis personal. No es asesoría de inversión; los rendimientos esperados son estimaciones inciertas y ningún modelo tiene ventaja demostrada.</p>
+</main>
+</body>
+</html>

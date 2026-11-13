@@ -162,3 +162,15 @@ def test_pruebas_no_cargan_el_env_real(tmp_path, monkeypatch):
     monkeypatch.delenv("TERMINAL_SIN_ENV")
     config._cargar_env_local()
     assert os.environ.pop("CLAVE_DE_PRUEBA_ENV") == "valor"
+
+
+def test_host_codespace_solo_el_propio(monkeypatch):
+    from terminal.seguridad import host_codespace
+    assert not host_codespace("mi-cs-8765.app.github.dev")  # fuera de Codespaces
+    monkeypatch.setenv("CODESPACES", "true")
+    monkeypatch.setenv("CODESPACE_NAME", "mi-cs")
+    monkeypatch.setenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+    assert host_codespace("mi-cs-8765.app.github.dev")
+    assert not host_codespace("otro-cs-8765.app.github.dev")
+    assert not host_codespace("mi-cs-8765.app.github.dev.evil.com")
+    assert not host_codespace("mi-cs-x.app.github.dev")

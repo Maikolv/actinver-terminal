@@ -1,0 +1,38 @@
+# Publica en GitHub Pages la portada y la estación de Mercado con DATOS SIMULADOS (sitio/ + capturas).
+# Sin secretos ni datos de proveedores: los datos reales nunca salen de la PC o del Codespace del usuario.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["sitio/**", "docs/capturas/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p _sitio/capturas
+          cp sitio/*.html _sitio/
+          cp docs/capturas/*.png docs/capturas/*.jpg _sitio/capturas/
+          touch _sitio/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _sitio
+      - id: despliegue
+        uses: actions/deploy-pages@v4

@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 13-nov-2026 — Página del repositorio, GitHub Pages y Codespaces
+
+- README reescrito con el formato de coatl (sitio, capturas, «Qué hace», cómo correr/probar, estructura, seguridad); se quitó «Formación y recursos (18-oct-2026)».
+- Seis capturas nuevas en modo demostración (`docs/capturas/`), sin datos de la cuenta.
+- `sitio/` + `.github/workflows/pages.yml`: portada y estación de Mercado con DATOS SIMULADOS en GitHub Pages (los datos reales no se redistribuyen).
+- `.devcontainer/` y `docs/codespaces.md`: la terminal completa corre en Codespaces; `seguridad.host_codespace` acepta solo el dominio reenviado exacto del propio Codespace cuando `CODESPACES=true` (1 prueba nueva; 17 de seguridad y 52 de Node aprobadas).
+- Artifact privado actualizado con la foto real del 13-nov (212 instrumentos, 36 series, 58 pronósticos).
+
 ## 13-nov-2026 — Estación de Mercado (monitor · gráfico · inspector)
 
 - Capturas 33 (12-nov 09:15) y 34 (12-nov 22:54: ABBV, AC, CVX, FEMSA, KOF, LLY, MRK, MRNA, NVAX, PFE, TGT, XOM; valuación $784,440.07, efectivo $379,012.14).

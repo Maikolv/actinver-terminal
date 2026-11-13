@@ -63,6 +63,20 @@ def acceso_remoto_valido(host: str | None, usuario: str | None) -> bool:
     return not usuarios or usuario.strip().lower() in usuarios
 
 
+def host_codespace(host: str | None) -> bool:
+    """Solo dentro de GitHub Codespaces: acepta el dominio reenviado EXACTO de este Codespace
+    (`<CODESPACE_NAME>-<puerto>.<dominio de reenvio>`). GitHub exige iniciar sesion con la cuenta duena
+    mientras el puerto sea privado (predeterminado). Fuera de Codespaces nunca aplica."""
+    import os
+    if os.environ.get("CODESPACES") != "true" or not host:
+        return False
+    nombre, dominio = os.environ.get("CODESPACE_NAME", ""), os.environ.get("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "")
+    if not nombre or not dominio:
+        return False
+    h = host.split(":")[0].lower()
+    return h.startswith(nombre.lower() + "-") and h.endswith("." + dominio.lower()) and h[len(nombre) + 1:-len(dominio) - 1].isdigit()
+
+
 def _host_local(host: str | None) -> bool:
     if not host:
         return False
@@ -92,7 +106,7 @@ class Seguridad(BaseHTTPMiddleware):
             return await self._webhook(request, call_next)
         host = request.headers.get("host")
         remoto = not _host_local(host)
-        if remoto and not acceso_remoto_valido(host, request.headers.get("tailscale-user-login")):
+        if remoto and not (acceso_remoto_valido(host, request.headers.get("tailscale-user-login")) or host_codespace(host)):
             return JSONResponse({"error": "Host no permitido"}, status_code=400)
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             origen = request.headers.get("origin")
