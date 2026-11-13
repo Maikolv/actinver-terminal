@@ -10,7 +10,7 @@
 <title>Actinver Terminal</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/app.css">
-<script src="/static/app.js" defer></script>
+<script src="/static/app.js" defer></script><script src="/static/estacion.js" defer></script>
 <link rel="stylesheet" href="/static/navegacion.css"><script type="module" src="/static/navegacion.mjs"></script><script type="module" src="/static/guias.mjs"></script></head>
 <body>
 <a class="saltar" href="#principal">Saltar al contenido</a>
@@ -331,9 +331,15 @@
 
   <section role="tabpanel" id="panel-mercado" aria-labelledby="tab-mercado" hidden>
     <h1>Mercado</h1>
-    <div id="mercado-widgets"></div>
-    <div id="mercado-visualizaciones" aria-live="polite"></div>
-    <div id="mercado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    <div id="estacion" class="estacion"></div>
+    <div class="estacion-secundarias" role="tablist" aria-label="Vistas secundarias de Mercado" id="mercado-vistas">
+      <button type="button" role="tab" id="mv-mapa" aria-controls="mercado-visualizaciones" aria-selected="true">Mapa de calor</button>
+      <button type="button" role="tab" id="mv-agenda" aria-controls="mercado-contenido" aria-selected="false" tabindex="-1">Calendario, titulares e insiders</button>
+      <button type="button" role="tab" id="mv-panorama" aria-controls="mercado-widgets" aria-selected="false" tabindex="-1">Panorama TradingView</button>
+    </div>
+    <div id="mercado-visualizaciones" role="tabpanel" aria-labelledby="mv-mapa" aria-live="polite"></div>
+    <div id="mercado-contenido" role="tabpanel" aria-labelledby="mv-agenda" hidden><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    <div id="mercado-widgets" role="tabpanel" aria-labelledby="mv-panorama" hidden></div>
   </section>
 
   <section role="tabpanel" id="panel-ficha" aria-labelledby="tab-ficha" hidden>

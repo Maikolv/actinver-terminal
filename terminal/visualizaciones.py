@@ -24,7 +24,11 @@ def _cierres(con: sqlite3.Connection, demo: bool, instrumento_id: str | None = N
     """Un cierre por instrumento y fecha (fuente prioritaria), con precio ajustado por splits en la columna `p`."""
     filtro = "proveedor = 'demo_sintetico'" if demo else "proveedor <> 'demo_sintetico'"
     tipos = "tipo_dato = 'sintetico'" if demo else "tipo_dato IN ('cierre', 'nav')"
-    args: list = [(date.today() - timedelta(days=dias)).isoformat()]
+    # Ventana anclada al último cierre guardado (no a hoy): una base sin descargas recientes —como la demo— sigue
+    # mostrando sus cierres, cada uno con su fecha real; con datos al día equivale a contar desde hoy.
+    ultimo = con.execute(f"SELECT MAX(fecha) FROM precios WHERE {filtro} AND {tipos}").fetchone()[0]
+    ancla = min(date.today(), date.fromisoformat(ultimo[:10])) if ultimo else date.today()
+    args: list = [(ancla - timedelta(days=dias)).isoformat()]
     extra = ""
     if instrumento_id:
         extra, args = "AND instrumento_id = ?", [*args, instrumento_id]

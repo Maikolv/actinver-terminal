@@ -77,8 +77,10 @@ Rechazado tras medir: `#d94848` como texto sobre superficie (4.36) y elevada (3.
 - **Excel de Markowitz:** banda negra con título blanco y borde rojo, encabezados gris oscuro con texto blanco, cuerpo
   blanco (imprime legible). Entrada = relleno muy claro + **borde rojo punteado**; resultado = gris + **negritas + doble
   línea**: se distinguen por forma, no solo por color. Sin macros ni vínculos externos.
-- **Tipografía:** una sola familia en toda la terminal, Mesa, Oficina, Cuaderno, páginas de widgets y Excel: Segoe UI (con
+- **Tipografía:** una sola familia sans en toda la terminal, Mesa, Oficina, Cuaderno, páginas de widgets y Excel: Segoe UI (con
   respaldo del sistema). `--mono` apunta a la misma familia; las cifras se alinean con `font-variant-numeric: tabular-nums`.
+  Única excepción (12-nov-2026): `--mono-simbolo` (monoespaciada del sistema) solo para las claves de los instrumentos en la
+  estación de Mercado, donde ayuda a escanear.
   Sin fuentes externas. Excepción: el texto DENTRO de los widgets de TradingView usa la fuente del proveedor.
 - **Cuadrícula:** gutter de 16 px; tres cortes: ≤ 720 px, 721–1024 px y > 1024 px.
 
@@ -87,6 +89,29 @@ Rechazado tras medir: `#d94848` como texto sobre superficie (4.36) y elevada (3.
 - **Tarjetas de espacio:** PASADO (borde gris), PRESENTE (borde verde) y FUTURO (borde violeta discontinuo).
 - **Ficha de revisión en cada alerta:** qué ocurrió, qué datos lo sustentan, qué falta confirmar, costos, riesgos y opciones para revisar. **No hay botones de operar.**
 - **Esqueletos de carga:** tres pulsos como máximo; se respeta la preferencia de movimiento reducido del sistema.
+
+## Estación de Mercado (12-nov-2026)
+
+Organización tomada de las estaciones financieras profesionales (sin su marca ni recursos): franja de sesión y
+procedencia siempre visible, monitor de instrumentos a la izquierda, gráfico principal al centro e inspector a la
+derecha (`web/static/estacion.js`). Debajo, pestañas para las vistas secundarias que ya existían: mapa de calor,
+calendario/titulares/insiders y panorama de TradingView.
+
+- **Monitor:** símbolo en `--mono-simbolo`, último cierre y variación alineados a la derecha con signo, flecha y color;
+  chip del dato según metadatos reales (Cierre = última sesión de su mercado, Desactualizado, SIN DATO, SIMULADO).
+  Ordena por columna (`aria-sort`), filtra por texto y universo (Todos, Mi cartera, BMV, SIC, ETF). Desplazamiento
+  local, nunca de la página. ● = en su cartera.
+- **Gráfico:** histórico en línea sólida; la proyección (banda 10–90 % violeta discontinua y mediana) empieza en un
+  límite temporal rotulado con la fecha del cierre que la generó. Intervalos 1M, 3M, 6M y 1A. Sin pronóstico vigente,
+  se dice.
+- **Inspector:** tres bloques que nunca se ven igual: cotización observada (borde verde), referencia de origen (borde
+  gris, «estimado», no es cotización del SIC) y FUTURO (borde violeta discontinuo). Más su posición y accesos a Mi
+  portafolio Actinver y a la Ficha técnica completa.
+- **Teclado:** «/» busca, ↑ ↓ cambian de fila, Enter abre, Escape limpia; pestañas secundarias con flechas, Inicio y Fin.
+- **Estado:** cada selección invalida las respuestas anteriores (`turno`), así que gráfico e inspector siempre muestran
+  el instrumento activo aunque lleguen fuera de orden. Densidad compacta/cómoda, universo, intervalo y selección se
+  guardan en este navegador; «Restaurar preferencias» los borra.
+- **Móvil (≤ 720 px):** pestañas Monitor · Gráfico · Detalle; elegir una fila lleva al gráfico conservando el instrumento.
 
 ## Accesibilidad
 

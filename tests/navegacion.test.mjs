@@ -7,7 +7,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const config=JSON.parse(readFileSync(root+'web/static/navegacion.json','utf8'));
 test('el selector cubre todas las pestañas reales de la terminal',()=>{
  const html=readFileSync(root+'web/index.html','utf8');
- const ids=[...html.matchAll(/<button[^>]*role="tab"[^>]*id="([^"]+)"/g)].map(m=>m[1]);
+ const ids=[...html.matchAll(/<button[^>]*role="tab"[^>]*id="(tab-[^"]+)"/g)].map(m=>m[1]);  // secciones; las pestañas internas no
  assert.deepEqual(config.secciones.map(s=>new URL(s.url,'http://localhost').searchParams.get('vista')).sort(),ids.sort());
 });
 test('todas las áreas independientes existen y comparten navegación',()=>{

@@ -42,7 +42,7 @@ if(typeof document!=='undefined') {
   document.querySelectorAll('iframe').forEach(vigilar);
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==='IFRAME')vigilar(n);else n.querySelectorAll?.('iframe').forEach(vigilar);}))).observe(document.body,{childList:true,subtree:true});
   function actualizar() {
-    const tab=document.querySelector('[role="tab"][aria-selected="true"]');
+    const tab=document.querySelector('#lista-pestanas [role="tab"][aria-selected="true"]');
     const actual=location.pathname==='/' ? '/?vista='+(tab?.id || new URLSearchParams(location.search).get('vista') || 'tab-resumen') : location.pathname;
     selector.value=[...selector.options].some(o=>o.value===actual)?actual:location.pathname;
     for(const enlace of nav.querySelectorAll('a')) {

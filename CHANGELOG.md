@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 13-nov-2026 — Estación de Mercado (monitor · gráfico · inspector)
+
+- Capturas 33 (12-nov 09:15) y 34 (12-nov 22:54: ABBV, AC, CVX, FEMSA, KOF, LLY, MRK, MRNA, NVAX, PFE, TGT, XOM; valuación $784,440.07, efectivo $379,012.14).
+- Mercado abre con una estación de trabajo (`web/static/estacion.js`): franja de sesión y procedencia, monitor de 212 instrumentos (orden por columna, filtro por texto y universo, moneda por fila, chip del dato según metadatos), gráfico con histórico y proyección 10–90 % separados por un límite rotulado, e inspector en tres bloques (observado, referencia de origen, FUTURO) más su posición y accesos a Mi portafolio Actinver y a la Ficha técnica. Teclado: «/», ↑ ↓, Enter, Escape. Móvil: pestañas Monitor · Gráfico · Detalle. Preferencias locales con «Restaurar».
+- Vistas secundarias de Mercado en pestañas (mapa de calor; calendario, titulares e insiders; panorama TradingView).
+- `/api/visualizaciones/mercado` con caché por marca de datos: 12–23 s → 0.2 s en tibio.
+- Corregido antes de publicar: el monitor mostraba el precio en USD de las SIC sin unidad.
+- DESIGN.md: sección de la estación y token `--mono-simbolo` (única monoespaciada, solo claves); pruebas de estética y navegación ajustadas.
+- Verificado en navegador a 1440, 1024, 390 y 320 px (sin desbordamiento de página); selección rápida de tres instrumentos termina en el último.
+- Segunda tanda: el código general de pestañas solo toma la barra principal (`#lista-pestanas`); antes, las pestañas internas de Mercado y las de móvil de la estación podían ocultar la sección completa. Tablas compactas en toda la terminal (filas de 5 px, encabezado fijo, resaltado de fila) y sin la sombra decorativa de la paleta de comandos.
+- El mapa de Mercado ancla su ventana al último cierre guardado: en demo (datos al 21-sep) el monitor estaba vacío; ahora muestra 174 instrumentos con chip SIMULADO. Sin filas, la estación muestra un estado vacío en lugar de pedir una ficha inexistente. Variaciones de ±0.0 % sin flecha.
+- Verificado: demo (DATOS SIMULADOS en franja, monitor e inspector), modo claro (contraste ≥ 6.5:1 en franja, símbolos, unidades, variaciones y sello FUTURO), las 21 pestañas sin cajas de error nuevas ni desbordamiento. Capturas antes/después en `docs/capturas/` (datos sintéticos).
+- Pendiente: lector de pantalla real y revisión visual de cada sección con el patrón de estación (hoy comparten tokens y densidad, no la disposición en tres columnas).
+
 ## 11-nov-2026 — Compras con efectivo libre y emisoras del mismo sector
 
 - Capturas 31 (10-nov 15:00: vendidas MU y GMEXICO) y 32 (11-nov 10:36: compradas AC, FEMSA, KOF, LLY, MRK y TGT; valuación $789,189.36, efectivo $498,710.73).

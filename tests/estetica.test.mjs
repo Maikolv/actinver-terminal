@@ -8,7 +8,8 @@ const hojas = ['web/static/app.css', 'web/static/mesa.css', 'web/static/navegaci
 
 test('una sola familia tipográfica: --mono es la misma fuente y no hay monoespaciadas sueltas', () => {
   assert.match(leer('web/static/app.css'), /--mono: var\(--fuente\)/);
-  for (const h of hojas) assert.doesNotMatch(leer(h), /monospace|Consolas|Courier|Menlo/i, h);
+  // Única excepción (12-nov-2026): el token --mono-simbolo, reservado a las claves de los instrumentos.
+  for (const h of hojas) assert.doesNotMatch(leer(h).replace(/^\s*--mono-simbolo:.*$/m, ''), /monospace|Consolas|Courier|Menlo/i, h);
 });
 
 test('los widgets de terceros siempre se piden en tema oscuro', () => {

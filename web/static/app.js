@@ -158,8 +158,8 @@ listaPestanas.addEventListener("scroll", flechasPestanas, { passive: true });
 window.addEventListener("resize", flechasPestanas);
 function activarPestana(tab, enfocar, cargar = true) {
   elegirGrupo(tab.dataset.grupo); ultimaDeGrupo[tab.dataset.grupo] = tab.id;
-  const previo = document.querySelector('[role="tabpanel"]:not([hidden])');
-  document.querySelectorAll('[role="tab"]').forEach((t) => {
+  const previo = document.querySelector('section[role="tabpanel"]:not([hidden])');
+  document.querySelectorAll('#lista-pestanas [role="tab"]').forEach((t) => {
     const sel = t === tab;
     t.setAttribute("aria-selected", sel); t.tabIndex = sel ? 0 : -1;
     document.getElementById(t.getAttribute("aria-controls")).hidden = !sel;
@@ -173,13 +173,13 @@ function activarPestana(tab, enfocar, cargar = true) {
   if (cargar && CARGAS[tab.id]) CARGAS[tab.id]();
 }
 document.getElementById("lista-pestanas").addEventListener("keydown", (ev) => {
-  const tabs = [...document.querySelectorAll('[role="tab"]')].filter((t) => getComputedStyle(t).display !== "none");
+  const tabs = [...document.querySelectorAll('#lista-pestanas [role="tab"]')].filter((t) => getComputedStyle(t).display !== "none");
   const i = tabs.indexOf(document.activeElement);
   if (i < 0) return;
   const mapa = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 };
   if (ev.key in mapa) { ev.preventDefault(); activarPestana(tabs[(mapa[ev.key] + tabs.length) % tabs.length], true); }
 });
-document.querySelectorAll('[role="tab"]').forEach((t) => t.addEventListener("click", () => activarPestana(t)));
+document.querySelectorAll('#lista-pestanas [role="tab"]').forEach((t) => t.addEventListener("click", () => activarPestana(t)));
 const irA = (id) => activarPestana(document.getElementById(id));
 const pestanaVisible = (id) => !document.getElementById(id).hidden;
 
@@ -1770,7 +1770,7 @@ async function iniciar() {
   await cargarEstado(valor(e) || undefined);
   ajustarCampos();
   pintarResumen();
-  const tab = document.querySelector('[role="tab"][aria-selected="true"]');
+  const tab = document.querySelector('#lista-pestanas [role="tab"][aria-selected="true"]');
   if (tab && tab.id !== "tab-resumen") activarPestana(tab);
   setInterval(() => { if (!document.hidden) cargarEstado(); }, 60000); // detecta ciclos del motor y alertas nuevas
   document.addEventListener("visibilitychange", () => { if (!document.hidden) cargarEstado(); });

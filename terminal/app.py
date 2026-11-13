@@ -1697,13 +1697,24 @@ def flujo_plantilla(tipo: str):
                              headers={"Content-Disposition": f'attachment; filename="plantilla-{tipo}.csv"'})
 
 
+_MAPA_CACHE: dict = {}  # (base, ventana, marca de datos) → mapa
+
+
 @app.get("/api/visualizaciones/mercado")
 def mapa_mercado(ventana: int = 1, con=Depends(con_db)):
-    from . import visualizaciones
-    try:
-        datos = visualizaciones.mapa(con, AJUSTES, ventana)
-    except ValueError as e:
-        raise HTTPException(422, str(e)) from None
+    from . import ranking, visualizaciones
+    # Caché por marca de datos (la misma del Ranking): el mapa tardaba ≈ 12 s y lo piden el mapa de calor y la estación.
+    clave = (con.execute("PRAGMA database_list").fetchone()[2], ventana, ranking._marca(con))
+    datos = _MAPA_CACHE.get(clave)
+    if datos is None:
+        try:
+            datos = visualizaciones.mapa(con, AJUSTES, ventana)
+        except ValueError as e:
+            raise HTTPException(422, str(e)) from None
+        for k in [k for k in _MAPA_CACHE if k[2] != clave[2]]:  # datos nuevos: se descartan los mapas viejos
+            del _MAPA_CACHE[k]
+        _MAPA_CACHE[clave] = datos
+    datos = {**datos, "celdas": [dict(c) for c in datos["celdas"]]}
     ins = mercado.instrumentos(con)
     for celda in datos["celdas"]:
         celda["grafica"] = bool(simbolo_tradingview(ins.get(celda["id"])))
