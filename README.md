@@ -4,7 +4,7 @@ Terminal local de análisis de portafolios: compara propuestas de inversión con
 
 **Solo informa y simula.** Ninguna ruta envía órdenes a una casa de bolsa ni al simulador del Reto.
 
-**Sitio (demo pública):** https://maikolv.github.io/actinver-terminal/ · **Correr desde GitHub:** [![Abrir en Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Maikolv/actinver-terminal?quickstart=1)
+**Sitio (demo pública):** https://maikolv.github.io/help-quote-terminal/ · **Correr desde GitHub:** [![Abrir en Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Maikolv/help-quote-terminal?quickstart=1)
 
 ![Estación de Mercado](docs/capturas/mercado-despues-demo-1440.jpg)
 
@@ -58,7 +58,7 @@ El puerto 8765 queda privado a su cuenta. Guía, seguridad y costo (gratis dentr
 
 ### En el navegador, sin instalar
 
-- [Demo pública en GitHub Pages](https://maikolv.github.io/actinver-terminal/): estación de Mercado con datos simulados.
+- [Demo pública en GitHub Pages](https://maikolv.github.io/help-quote-terminal/): estación de Mercado con datos simulados.
 - Artifact de Claude (privado del autor): foto de la estación con cierres reales.
 
 Los datos reales no se publican en Pages: las licencias gratuitas de los proveedores no permiten redistribuirlos.
