@@ -1,4 +1,4 @@
-# DESIGN.md — sistema visual de Actinver Terminal
+# DESIGN.md — sistema visual de Help Quote Terminal
 
 Formato inspirado en la colección `awesome-design-md` y en los criterios de `hallmark`: sin estética genérica y con contraste verificado.
 

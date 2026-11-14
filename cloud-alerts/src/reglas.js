@@ -66,7 +66,7 @@ export function evaluar(ctx) {
   if (abierto && syncEn && !syncVencida && (ahora - syncEn) / 60000 > APAGADA_MIN) {
     avisos.push({ clave: `local_apagada:${syncEn.toISOString()}`, tipo: "sync",
       texto: `🔴 Tu terminal local no se reporta desde ${horaLocal(syncEn)} (más de ${APAGADA_MIN} min con el mercado abierto). `
-        + "Mientras siga apagada no hay descargas, plan del día ni avisos de pérdida: enciende la PC o abre «Actinver Terminal»." });
+        + "Mientras siga apagada no hay descargas, plan del día ni avisos de pérdida: enciende la PC o abre «Help Quote Terminal»." });
   }
   if (syncVencida) {
     sus("Compra/venta y variación de la cartera", `última sincronización hace ${syncEn ? horas(ahora, syncEn).toFixed(0) : "∞"} h`);

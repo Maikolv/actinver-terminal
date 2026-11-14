@@ -1,5 +1,5 @@
 @echo off
-rem Actinver Terminal: instala dependencias (primera vez) y abre la terminal en http://127.0.0.1:8765
+rem Help Quote Terminal: instala dependencias (primera vez) y abre la terminal en http://127.0.0.1:8765
 rem Uso:  start.bat          -> datos reales (con las claves de .env; sin claves, solo tipo de cambio)
 rem       start.bat demo     -> datos SINTÉTICOS etiquetados, base separada en data\demo
 setlocal

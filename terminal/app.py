@@ -148,7 +148,7 @@ async def vida(app: FastAPI):
         FLUJO.detener()
 
 
-app = FastAPI(title="Actinver Terminal", version=__version__, docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="Help Quote Terminal", version=__version__, docs_url=None, redoc_url=None, openapi_url=None,
               lifespan=vida)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(Seguridad)
@@ -1184,7 +1184,7 @@ def probar_notificaciones():
                 "motivo": "Cambio detectado: (ejemplo) Efectivo 1,000,000.00 → 912,250.00. " + texto,
                 "accion": "Nada que hacer: es una prueba de entrega.", "fuente": "prueba de canales de la terminal",
                 "ts": db.ahora()}]
-    return {"resultado": notificador.enviar("Actinver Terminal — prueba de avisos", texto, cfg,
+    return {"resultado": notificador.enviar("Help Quote Terminal — prueba de avisos", texto, cfg,
                                             detalle=notificador.detalle(ejemplo))}
 
 
@@ -1759,11 +1759,11 @@ LOGO_SVG = ('<svg class="marca__logo" aria-hidden="true" width="18" height="18" 
 def _pagina_tv(titulo: str, tema: str, cuerpo: str, cabecera: str = "", esperando: bool = True) -> str:
     """Página aislada para un widget de TradingView, con el logo y los colores de la terminal."""
     clase = ("tema-claro" if tema == "light" else "tema-oscuro") + ("" if cabecera else " sin-cabecera")
-    barra = (f'<header><a class="marca" href="/" target="_top">{LOGO_SVG}<span>Actinver Terminal</span></a> {cabecera}</header>'
+    barra = (f'<header><a class="marca" href="/" target="_top">{LOGO_SVG}<span>Help Quote Terminal</span></a> {cabecera}</header>'
              if cabecera else "")
     return f"""<!doctype html><html lang="es-MX"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<title>{html.escape(titulo)} · Actinver Terminal</title><link rel="icon" href="/static/favicon.svg">
+<title>{html.escape(titulo)} · Help Quote Terminal</title><link rel="icon" href="/static/favicon.svg">
 <link rel="stylesheet" href="/static/grafica.css"></head><body class="{clase}">
 {barra}
 {'<div class="estado-marco" role="status">SIN DATO · Esperando el marco de TradingView.</div>' if esperando else ''}

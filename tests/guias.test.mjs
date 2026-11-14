@@ -36,7 +36,7 @@ test('la oficina lista primero los instrumentos con datos guardados', () => {
 });
 
 test('todas las áreas comparten logo, cabecera y la misma barra de navegación', () => {
-  const marca = (h) => h.match(/<a class="marca[^"]*" href="\/"[^>]*>\s*(<svg class="marca__logo"[\s\S]*?<\/svg>)\s*<span>Actinver Terminal<\/span>/)?.[1];
+  const marca = (h) => h.match(/<a class="marca[^"]*" href="\/"[^>]*>\s*(<svg class="marca__logo"[\s\S]*?<\/svg>)\s*<span>Help Quote Terminal<\/span>/)?.[1];
   const accesos = (h) => h.match(/<div class="nav-global__accesos">([\s\S]*?)<\/div>/)?.[1];
   const base = leer('web/index.html');
   for (const r of PAGINAS) {

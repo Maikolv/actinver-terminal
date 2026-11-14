@@ -4,7 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\arranque-al-iniciar-sesion.ps1 -Quitar  -> quitar
 param([switch]$Quitar)
 $repo = Split-Path -Parent $PSScriptRoot
-$lnk = Join-Path ([Environment]::GetFolderPath("Startup")) "Actinver Terminal (local).lnk"
+$lnk = Join-Path ([Environment]::GetFolderPath("Startup")) "Help Quote Terminal (local).lnk"
 if ($Quitar) {
     if (Test-Path $lnk) { Remove-Item $lnk; "Acceso directo quitado: $lnk" } else { "No había acceso directo." }
     return

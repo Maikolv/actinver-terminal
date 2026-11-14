@@ -1,9 +1,9 @@
 param([switch]$Quitar)
 $ErrorActionPreference = 'Stop'
-# Registra (o con -Quitar, elimina) el acceso «Actinver Terminal (arranque)» en la carpeta Inicio del usuario, que
+# Registra (o con -Quitar, elimina) el acceso «Help Quote Terminal (arranque)» en la carpeta Inicio del usuario, que
 # Windows ejecuta al iniciar sesión. Sin permisos de administrador. Ver scripts\arranque-automatico.ps1.
 $inicio = [Environment]::GetFolderPath('Startup')
-$lnk = Join-Path $inicio 'Actinver Terminal (arranque).lnk'
+$lnk = Join-Path $inicio 'Help Quote Terminal (arranque).lnk'
 if ($Quitar) {
     if (Test-Path -LiteralPath $lnk) { Remove-Item -LiteralPath $lnk -Force }
     Write-Output "Arranque automatico quitado: $lnk"

@@ -86,7 +86,7 @@ def _encabezado(ws, titulo: str, columnas: int, subtitulo: str | None = None) ->
     logo.width = logo.height = 30
     ws.add_image(logo, "A1")
     ws.row_dimensions[1].height = 32
-    ws["A1"] = f"Actinver Terminal · {titulo}"
+    ws["A1"] = f"Help Quote Terminal · {titulo}"
     ws["A1"].font = TITULO
     ws["A1"].alignment = Alignment(vertical="center", indent=3)
     for c in range(1, columnas + 1):

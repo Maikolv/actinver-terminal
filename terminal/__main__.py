@@ -147,7 +147,7 @@ def telegram(_args) -> None:
         _fijar_env("TELEGRAM_CHAT_ID", chat)
         os.environ["TELEGRAM_CHAT_ID"] = chat
         print(f"Chat detectado ({chats[0]['nombre']}) y guardado en .env como TELEGRAM_CHAT_ID.")
-    r = notificador.telegram("Actinver Terminal — Telegram conectado",
+    r = notificador.telegram("Help Quote Terminal — Telegram conectado",
                              "Desde ahora recibirá aquí las alertas con su motivo y la acción sugerida "
                              "(en horario de la BMV). Solo informativo: no se envían órdenes.")
     print("Mensaje de prueba enviado." if r == "enviada" else f"No se pudo enviar el mensaje de prueba ({r}).")

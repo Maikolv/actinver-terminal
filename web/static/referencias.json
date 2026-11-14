@@ -1,5 +1,5 @@
 {
-  "aviso": "Recursos citados en la construcción de Actinver Terminal. Cada fuente de datos se usa según sus condiciones; las marcas pertenecen a sus dueños. tests/test_referencias.py comprueba que toda dependencia del proyecto y todo proveedor de datos del código aparezcan aquí.",
+  "aviso": "Recursos citados en la construcción de Help Quote Terminal. Cada fuente de datos se usa según sus condiciones; las marcas pertenecen a sus dueños. tests/test_referencias.py comprueba que toda dependencia del proyecto y todo proveedor de datos del código aparezcan aquí.",
   "grupos": [
 {
   "titulo": "Conectores opcionales de Mesa (1-nov-2026)",
