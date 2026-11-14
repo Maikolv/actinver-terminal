@@ -34,16 +34,17 @@ Las capturas usan **datos simulados** (modo demostración).
 
 ## Cómo correr
 
+**[Guía paso a paso](docs/ruta-de-inicio.md)** para abrir la demo pública, usar Codespaces o instalar la terminal en Windows.
+
 ### En su PC (Windows)
 
 Requisito: [uv](https://docs.astral.sh/uv/) (`winget install astral-sh.uv`).
 
-```bat
-start.bat            :: datos reales
-start.bat demo       :: datos sintéticos etiquetados, base separada en data/demo/
+```powershell
+.\start.bat demo
 ```
 
-Equivalentes: `uv run terminal iniciar` / `uv run terminal demo`. Se abre `http://127.0.0.1:8765`.
+La demo usa datos simulados en `data/demo/` y se abre en `http://127.0.0.1:8765`. Para datos reales, use `.\start.bat` después de configurar sus fuentes.
 
 ### Desde GitHub (Codespaces)
 

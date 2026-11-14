@@ -1,5 +1,10 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Help Quote Terminal</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 /* Estación de mercado: monitor | gráfico | inspector. Grafito con rojo de selección; violeta discontinuo = FUTURO. */
 :root {
@@ -21,7 +26,7 @@
   --vigente-fondo: #12291d; --vencido: #f2777a; --vencido-fondo: #3a1719; --sin-datos: #b4bac4; --sin-datos-fondo: #23262d;
   --futuro: #c3a8f0; --futuro-fondo: #2b2340; --foco: #f3f4f6; color-scheme: dark; }
 * { box-sizing: border-box; }
-body { background: var(--fondo); color: var(--texto); font: 14px/1.45 var(--sans); font-variant-numeric: tabular-nums;
+body { margin: 0; background: var(--fondo); color: var(--texto); font: 14px/1.45 var(--sans); font-variant-numeric: tabular-nums;
   padding-block: 12px 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 h1 { font-size: 1.15rem; margin: 0; font-weight: 650; letter-spacing: .01em; }
 .cabeza { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-bottom: 8px; }
@@ -81,12 +86,15 @@ dt { color: var(--texto-2); } dd { margin: 0; text-align: right; overflow-wrap: 
   .movil button { flex: 1; background: var(--superficie); border: none; padding: 10px; min-height: 44px; color: var(--texto-2); }
   .movil button[aria-selected="true"] { background: var(--acento-solido); color: var(--acento-texto); font-weight: 650; }
   .cuerpo { display: block; }
+  th, td { padding-inline: 4px; }
   [data-vista="monitor"] .p-graf, [data-vista="monitor"] .insp, [data-vista="grafico"] .p-mon, [data-vista="grafico"] .insp,
   [data-vista="detalle"] .p-mon, [data-vista="detalle"] .p-graf { display: none; }
   .insp { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 </style>
+</head>
+<body>
 
 <div class="cabeza">
   <h1>Help Quote Terminal</h1>
@@ -137,6 +145,7 @@ function sv(tag, attrs, texto) { const e = document.createElementNS(NS, tag); fo
 function estadoDe(c) {
   const ses = c.mercado === "BMV" ? D.ultima_sesion.BMV : D.ultima_sesion.NYSE;
   if (c.cierre == null) return ["c-sin", "SIN DATO"];
+  if (D.modo === "demo") return ["c-sin", "SIMULADO"];
   return c.fecha >= ses ? ["c-vigente", "Cierre"] : ["c-vencido", "Desactualizado"];
 }
 
@@ -146,7 +155,7 @@ function franja() {
     el("span", {}, "Foto del ", el("b", { texto: D.generado }), " · últimas sesiones BMV ", el("b", { texto: D.ultima_sesion.BMV }), " · NYSE ", el("b", { texto: D.ultima_sesion.NYSE })),
     el("span", {}, "USD/MXN ", el("b", { texto: n2(f.valor) }), ` ${f.fecha || ""} · ${f.proveedor || ""}`),
     s ? el("span", {}, el("b", { class: "sim", texto: s.clave.replace(" *", "") }), ` · ${s.precio.proveedor} · ${s.precio.etiqueta}`) : null,
-    el("span", { texto: "Cierres diarios: nada es tiempo real ni cotización vigente" }));
+    el("span", {}, el("b", { texto: "DATOS SIMULADOS" }), " · Cierres diarios"));
 }
 
 function filas() {
@@ -220,8 +229,9 @@ function detalle() {
   if (!s) {
     $("grafico").replaceChildren(el("div", { class: "titulo" }, el("h2", {}, el("span", { class: "sim", texto: c.clave.replace(" *", "") }), ` ${c.nombre || ""}`)),
       el("p", { class: "vacio", texto: "Esta foto solo incluye la serie histórica de 36 instrumentos (◆). Su último cierre está en el monitor y en el inspector." }));
-    $("insp").replaceChildren(el("section", { class: "bloque obs" }, el("h3", { texto: "Último cierre en la foto" }),
+    $("insp").replaceChildren(el("section", { class: "bloque obs" }, el("h3", { texto: "Último cierre simulado" }),
       el("p", { class: "precio" }, n2(c.cierre), el("span", { class: "u", texto: ` ${c.moneda}` })),
+      el("span", { class: "chip c-sin", texto: "DATOS SIMULADOS" }),
       el("dl", {}, fila("Fecha", c.fecha), fila("Fuente", c.proveedor), fila("Var. 1 día", pc(c.variacion)), fila("Mercado", c.mercado))));
     return;
   }
@@ -229,12 +239,12 @@ function detalle() {
   const seg = el("div", { class: "seg", role: "radiogroup", "aria-label": "Intervalo" }, [[21, "1M"], [63, "3M"], [126, "6M"], [252, "1A"]].map(([n, t]) =>
     el("button", { type: "button", role: "radio", "aria-checked": String(st.n === n), texto: t, onclick: () => { st.n = n; detalle(); } })));
   $("grafico").replaceChildren(el("div", { class: "titulo" }, el("h2", {}, el("span", { class: "sim", texto: s.clave.replace(" *", "") }), ` ${s.nombre}`),
-    el("p", { texto: `Cierres diarios en MXN · ${s.perfil.mercado || ""} · dato: ${p.etiqueta}` }), seg), grafica(s, pr));
+    el("p", { texto: `Cierres diarios simulados en MXN · ${s.perfil.mercado || ""}` }), seg), grafica(s, pr));
   const ref = p.precio_origen && p.moneda_origen && p.moneda_origen !== "MXN";
   $("insp").replaceChildren(
-    el("section", { class: "bloque obs", "aria-label": "Cotización observada" }, el("h3", { texto: "Cotización observada" }),
+    el("section", { class: "bloque obs", "aria-label": "Cotización simulada" }, el("h3", { texto: "Cotización simulada" }),
       el("p", { class: "precio" }, n2(p.precio_mxn), el("span", { class: "u", texto: " MXN" })),
-      el("span", { class: `chip ${p.vigencia === "vigente" ? "c-vigente" : "c-vencido"}`, texto: p.etiqueta }),
+      el("span", { class: "chip c-sin", texto: "DATOS SIMULADOS" }),
       el("dl", { style: "margin-top:6px" }, fila("Fuente", p.proveedor), fila("Fecha del dato", `${p.fecha} (cierre)`), fila("Var. 1 día", pc(v["1d"])),
         fila("Var. 1 mes", pc(v["1m"])), fila("Var. 1 año", pc(v["1a"])), fila("Rango 52 semanas", `${n2(s.min52)} – ${n2(s.max52)} MXN`))),
     el("section", { class: "bloque ref", "aria-label": "Referencia de origen" }, el("h3", { texto: "Referencia de origen" }),
@@ -274,3 +284,5 @@ document.addEventListener("keydown", (e) => {
 st.sel = D.series["SIC:XOM"] ? "SIC:XOM" : Object.keys(D.series)[0];
 monitor(); detalle();
 </script>
+</body>
+</html>

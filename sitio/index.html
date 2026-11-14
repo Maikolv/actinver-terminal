@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Help Quote Terminal</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="description" content="Terminal local de análisis de portafolios: propuestas, riesgo, Markowitz y estación de mercado. Solo informa y simula.">
 <style>
 :root { --fondo:#f6f5f2; --panel:#fff; --texto:#15171c; --tenue:#4a505a; --borde:#d9d7d1; --marca:#b3261e; --enlace:#0b5cad; }
@@ -36,9 +37,10 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:.9em }
   <div class="acciones">
     <a class="btn prim" href="estacion.html">Abrir la estación (demo)</a>
     <a class="btn" href="https://codespaces.new/Maikolv/help-quote-terminal?quickstart=1">Correr la terminal completa en Codespaces</a>
+    <a class="btn" href="https://github.com/Maikolv/help-quote-terminal/blob/main/docs/ruta-de-inicio.md">Guía paso a paso</a>
     <a class="btn" href="https://github.com/Maikolv/help-quote-terminal">Código en GitHub</a>
   </div>
-  <p class="aviso">Esta página pública usa <strong>datos simulados</strong>. Los datos reales se descargan con sus propias claves gratuitas, en su PC o en su Codespace privado; no se publican aquí porque las licencias de los proveedores no permiten redistribuirlos.</p>
+  <p class="aviso"><strong>DATOS SIMULADOS.</strong> Los datos reales se descargan con sus propias claves gratuitas, en su PC o en su Codespace privado.</p>
 </header>
 
 <h2>Capturas (modo demostración)</h2>
@@ -63,7 +65,7 @@ code { font-family:ui-monospace,Consolas,monospace; font-size:.9em }
 </table>
 
 <h2>Cómo correr</h2>
-<p><strong>En su PC (Windows):</strong> instale <a href="https://docs.astral.sh/uv/">uv</a> y ejecute <code>start.bat</code>, o <code>uv run terminal demo</code>. Se abre en <code>http://127.0.0.1:8765</code>.</p>
+<p><strong>En su PC (Windows):</strong> instale <a href="https://docs.astral.sh/uv/">uv</a> y ejecute <code>.\start.bat demo</code> en PowerShell. Se abre en <code>http://127.0.0.1:8765</code>.</p>
 <p><strong>Desde GitHub:</strong> el botón de Codespaces crea un contenedor con todo instalado; ahí corra <code>uv run terminal demo --sin-navegador</code> o, con su <code>.env</code>, <code>uv run terminal iniciar --sin-navegador</code>. El puerto queda privado a su cuenta.</p>
 
 <p class="aviso">Herramienta de análisis personal. No es asesoría de inversión; los rendimientos esperados son estimaciones inciertas y ningún modelo tiene ventaja demostrada.</p>

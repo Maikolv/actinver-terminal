@@ -44,6 +44,10 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
+## Estado comprobado: ruta de inicio del 13-nov-2026
+
+La [guía de inicio](docs/ruta-de-inicio.md) cubre GitHub Pages, Codespaces y Windows. La demo pública tiene 174 instrumentos simulados y se revisó a 1440 y 390 px. En una copia limpia, el primer arranque en Windows respondió en el puerto 8765 solo por loopback. El workflow de Codespaces pasó. El reenvío privado en un Codespace real requiere el permiso `codespace`. Mediciones en [el historial](docs/historial-estado.md#ruta-de-inicio--13-nov-2026).
+
 ## Estado comprobado: mejora del 10-nov-2026
 
 Informe: `docs/mejora-fable-20261110.md`. Reglas de riesgo validadas fuera de muestra (`terminal/validacion_riesgo.py`,

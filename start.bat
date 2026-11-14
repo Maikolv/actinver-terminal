@@ -1,7 +1,7 @@
 @echo off
 rem Help Quote Terminal: instala dependencias (primera vez) y abre la terminal en http://127.0.0.1:8765
 rem Uso:  start.bat          -> datos reales (con las claves de .env; sin claves, solo tipo de cambio)
-rem       start.bat demo     -> datos SINTÉTICOS etiquetados, base separada en data\demo
+rem       start.bat demo [--sin-navegador] -> datos SINTÉTICOS, base separada en data\demo
 setlocal
 cd /d "%~dp0"
 where uv >nul 2>nul
@@ -12,7 +12,11 @@ if errorlevel 1 (
 )
 uv sync --quiet || exit /b 1
 if /i "%~1"=="demo" (
-  uv run terminal demo
+  if /i "%~2"=="--sin-navegador" (
+    uv run terminal demo --sin-navegador
+  ) else (
+    uv run terminal demo
+  )
 ) else (
   uv run terminal iniciar
 )

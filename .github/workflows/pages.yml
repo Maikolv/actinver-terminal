@@ -5,7 +5,7 @@ name: pages
 on:
   push:
     branches: [main]
-    paths: ["sitio/**", "docs/capturas/**", ".github/workflows/pages.yml"]
+    paths: ["sitio/**", "docs/capturas/**", "web/static/favicon.svg", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -28,6 +28,7 @@ jobs:
       - run: |
           mkdir -p _sitio/capturas
           cp sitio/*.html _sitio/
+          cp web/static/favicon.svg _sitio/
           cp docs/capturas/*.png docs/capturas/*.jpg _sitio/capturas/
           touch _sitio/.nojekyll
       - uses: actions/configure-pages@v5

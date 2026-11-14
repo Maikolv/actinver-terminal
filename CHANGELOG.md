@@ -2,6 +2,14 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 13-nov-2026 — Guía de inicio y validación de las demos
+
+- Guía paso a paso enlazada desde el README y GitHub Pages. Incluye el primer arranque en PowerShell 5.1, la revisión de las pestañas, el puerto alternativo y el reenvío privado en Codespaces.
+- Demo de Pages con 174 instrumentos etiquetados como simulados, favicon y vista móvil. Se revisaron la portada, el monitor, el teclado y las pestañas a 1440 y 390 px.
+- En Windows, el clon limpio tomó 43 s y `uv sync`, 2 min 26 s con Git y uv instalados. La primera respuesta de `/api/estado` en la demo tomó 2 min 29 s. `start.bat demo --sin-navegador` ahora pasa la opción a la terminal.
+- El workflow de Codespaces pasó en 47 s. Queda pendiente comprobar el reenvío privado en un Codespace real con el permiso `codespace`.
+- Pruebas locales: 52 de Node y 17 de seguridad aprobadas.
+
 ## 13-nov-2026 — Página del repositorio, GitHub Pages y Codespaces
 
 - README reescrito con el formato de coatl (sitio, capturas, «Qué hace», cómo correr/probar, estructura, seguridad); se quitó «Formación y recursos (18-oct-2026)».

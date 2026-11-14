@@ -1,5 +1,9 @@
 # Historial de estado de actinver-terminal
 
+## Ruta de inicio — 13-nov-2026
+
+GitHub Pages mostraba 174 instrumentos simulados con la etiqueta «Desactualizado» y Chrome registraba un 404 del favicon. La corrección se revisó a 1440 y 390 px, con teclado y pestañas móviles. En Windows con PowerShell 5.1, el clon tomó 43 s, `uv sync` tomó 2 min 26 s y la primera respuesta 200 de `/api/estado` llegó en 2 min 29 s. El script por lotes ahora admite `demo --sin-navegador`. El workflow de Codespaces pasó en 47 s. Para comprobar el puerto reenviado en un Codespace real hace falta el permiso `codespace` de la cuenta.
+
 ## Cierre de muestras Excel — 1-nov-2026
 
 La revisión en Excel 2013 abarcó diez hojas y todas las páginas de ambas muestras sintéticas. Se observaron contraste de entradas corregido, Método completo en Resumen y gráficos dentro del ancho de página. Se conservaron capturas por página sin imprimir, ejecutar Solver ni guardar desde Excel. La suite completa posterior a las correcciones terminó con 859 aprobadas, cero fallidas, una advertencia, 1097.18 s y salida 0. Registros en docs/excel-presentacion-20261101.md y docs/verificacion-conjunto-20261101.md. Alcance limitado a muestras y formato Carta; no prueba física ni validación de estrategia. Objetivo general aún abierto por pendientes externos.
