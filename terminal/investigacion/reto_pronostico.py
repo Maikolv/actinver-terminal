@@ -212,7 +212,7 @@ def cartera(cart: dict, emisoras: list[dict], capital: float | None = None) -> d
         "conciliada": conciliada, "fuente": cart.get("fuente"),
         "hora_portal": (cart.get("captura") or {}).get("hora_portal"),
         "aviso": (None if conciliada else "Cartera NO conciliada con el portal de Actinver: se usa el registro local de la "
-                  "terminal. Capture su portafolio en «Mi portafolio Actinver» para usar sus posiciones y efectivo reales."),
+                  "terminal. Capture su portafolio en «Mi portafolio» para usar sus posiciones y efectivo reales."),
         "valor_actual": round(valor, 2), "efectivo_y_por_liquidar": round(resto, 2),
         "central": round(c50, 2), "p10": round(c10, 2), "p90": round(c90, 2),
         "ganancia_central": round(c50 - cap, 2), "capital": cap, "posiciones": filas, "sin_pronostico": sin,

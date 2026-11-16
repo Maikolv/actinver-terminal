@@ -40,7 +40,7 @@ def test_cumplimiento():
 ACC = ["SIC:AAPL", "SIC:MSFT", "SIC:KO", "SIC:JNJ", "BMV:WALMEX", "BMV:GFNORTE", "BMV:AMX", "SIC:XOM", "SIC:PG", "SIC:V"]
 
 
-def test_lentes_cumplen_reglas_y_difieren(con, ajustes):
+def test_lentes_cumplen_reglas_y_difieren(reto_activo, con, ajustes):
     sembrar_precios(con, ACC + ["SIC:IVV", "FONDO:ACTIGOB", "FONDO:ACTIMED"])
     perfil = {**ajustes["perfil"], "capital": 1_000_000}
     r = optimizador.proponer(con, ajustes, perfil, "acciones", VACIA, lente="rendimiento")
@@ -54,12 +54,12 @@ def test_lentes_cumplen_reglas_y_difieren(con, ajustes):
     assert r["reproducibilidad"]["aversion_riesgo_lambda"] < a["reproducibilidad"]["aversion_riesgo_lambda"]
 
 
-def test_costo_del_reto_en_cambios(con, ajustes):
+def test_costo_del_reto_en_cambios(reto_activo, con, ajustes):
     ins = mercado.instrumentos(con)
     assert optimizador.costo_unitario(ins["BMV:WALMEX"], ajustes) == pytest.approx(0.00116 + 0.0020)
 
 
-def test_universo_del_simulador_restringe(con, ajustes):
+def test_universo_del_simulador_restringe(reto_activo, con, ajustes):
     sembrar_precios(con, ACC)
     csv = "clave,tipo\nWALMEX *,accion\nAAPL *,accion\nMSFT *,accion\nKO *,accion\nJNJ *,accion\nXYZINVENTADA,accion\n".encode()
     prev = importar.importar(con, csv, "sim.csv", "universo", mercado.instrumentos(con))

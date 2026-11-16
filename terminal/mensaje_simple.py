@@ -200,6 +200,9 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
                  + (" Ojo: " + ", ".join(_nombre(a["clave"]) for a in retrasado[:5])
                     + " tienen precio aproximado." if retrasado else ""))
         L.append("• Si el portal no te deja (precio fuera del máximo o falta dinero), no lo fuerces: déjala para mañana.")
+    pp = plan.get("propuesta") or {}
+    if pp.get("origen") == "mis_portafolios":
+        L.append(f"• 🎯 Objetivo: tu portafolio principal «{pp.get('nombre')}» de Mis portafolios.")
     r = plan.get("reglas") or {}
     if r.get("errores"):
         L += [f"• ⚠️ Regla del Reto: {x}" for x in r["errores"][:2]]
@@ -220,7 +223,7 @@ def construir(plan: dict | None, propuesta: dict | None, eventos: list[dict], ah
     if not mm and esc.get("central_p50") is not None and esc.get("adverso_p10") is not None:
         media = (esc["media_anual_usada"] * esc["horizonte_anios"] if esc.get("media_anual_usada") is not None
                  and esc.get("horizonte_anios") is not None else None)
-        L += ["", "📈 Pronóstico del modelo al cierre del Reto (estimación, no promesa): "
+        L += ["", "📈 Pronóstico del modelo en el horizonte (estimación, no promesa): "
                   + (f"en promedio {media:+.1%}; " if media is not None else "")
                   + f"lo más común {esc['central_p50']:+.1%}; en un mal escenario (1 de cada 10) {esc['adverso_p10']:+.1%}."]
     rb = propuesta.get("robustez") or {}

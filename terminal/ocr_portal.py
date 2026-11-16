@@ -1,4 +1,4 @@
-"""Capturas de pantalla del portafolio del Reto → texto para «Mi portafolio Actinver».
+"""Capturas de pantalla del portafolio del Reto → texto para «Mi portafolio».
 
 Por qué así:
 - El reglamento (§17) prohíbe programas en el portal: la terminal no lo abre ni lo lee. El participante toma la captura

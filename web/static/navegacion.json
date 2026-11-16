@@ -27,7 +27,7 @@
       "url": "/?vista=tab-resumen"
     },
     {
-      "titulo": "Mi portafolio Actinver",
+      "titulo": "Mi portafolio",
       "url": "/?vista=tab-cartera"
     },
     {
@@ -43,7 +43,7 @@
       "url": "/?vista=tab-alertas"
     },
     {
-      "titulo": "Reto y perfil",
+      "titulo": "Perfil",
       "url": "/?vista=tab-perfil"
     },
     {

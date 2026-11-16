@@ -2,6 +2,27 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 14-nov-2026 — Portafolio principal y escenario real (sin reglas del Reto)
+
+- **Portafolio principal:**
+  - En «Mis portafolios», cada portafolio guardado tiene el botón «Usar como principal».
+  - Con uno elegido, el plan de acción, Telegram y el monitor en la nube llevan la cartera a esos pesos, con banda de no-rebalanceo.
+  - La gestión de riesgo solo agrega ventas (stop roto, tendencia bajista); sus compras de reinversión ya no se suman.
+  - Sin portafolio principal se usa la propuesta automática, como antes.
+  - Archivos: `terminal/portafolio_principal.py`, `PUT /api/portafolios/{id}/principal`, `DELETE /api/portafolio-principal`.
+- **Reglas del Reto apagadas** (`config/reto.yaml: activo: false`):
+  - sin mínimo de 5 emisoras, tope de 50 %, catálogo del simulador ni horario del Reto;
+  - la comisión sale de `[costos]` de su contrato;
+  - la cartera registrada por el usuario cuenta como confirmada (ya no exige captura del portal).
+  - Los datos del Reto se conservan.
+- **Interfaz:** «Mi portafolio Actinver» → «Mi portafolio»; «Reto y perfil» → «Perfil». El plan dice qué portafolio sigue.
+- **Corrección:** el plan ya no repite filas del mismo instrumento cuando la propuesta y la gestión de riesgo hablan de él.
+- **Corrección:** el horario del día no falla en días sin sesión (fin de semana) fuera del Reto.
+- **Pruebas:**
+  - 17 pruebas de reglas del Reto se conservan con el ajuste `reto_activo` (reactiva las reglas solo dentro de la prueba);
+  - 1 prueba nueva del portafolio principal;
+  - Node 52.
+
 ## 13-nov-2026 — Guía de inicio y validación de las demos
 
 - Guía paso a paso enlazada desde el README y GitHub Pages. Incluye el primer arranque en PowerShell 5.1, la revisión de las pestañas, el puerto alternativo y el reenvío privado en Codespaces.

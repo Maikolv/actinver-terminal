@@ -253,3 +253,9 @@ diversificacion = 0.15
 liquidez = 0.10
 costos = 0.10
 calidad_datos = 0.20
+
+[asistente]
+# Gemini (Google AI Studio) como motor del asistente y de Telegram. Requiere GEMINI_API_KEY en .env.
+# Capa gratuita: no cobra, pero Google puede usar el texto enviado (incluye datos de su cartera) para mejorar sus
+# productos. Use una clave de un proyecto SIN facturación para que nunca haya cobro. Apagado por defecto.
+gemini = false

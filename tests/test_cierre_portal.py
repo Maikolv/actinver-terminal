@@ -7,7 +7,7 @@ def _pos():
             {"instrumento_id": "BMV:GMEXICO", "precio": None}]
 
 
-def test_despues_del_cierre_guarda_solo_bmv(con):
+def test_despues_del_cierre_guarda_solo_bmv(reto_activo, con):
     ins = mercado.instrumentos(con)
     assert portal.cierres_desde_captura(con, "2026-10-20T14:10:00-06:00", _pos(), ins) == 1      # SIC y sin precio: no
     f = con.execute("SELECT fecha, cierre, proveedor, tipo_dato FROM precios WHERE instrumento_id='BMV:ALPEK'").fetchone()

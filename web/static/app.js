@@ -405,10 +405,10 @@ function bloqueHoy(plan) {
 function tarjetaPlan(plan) {
   const c = plan.cuenta, r = plan.reglas || {}, res = plan.resumen;
   const cuenta = c.confirmada
-    ? h("p", {}, chip("vigente", "Cuenta confirmada"), ` Portal ${plan.cuenta_hora_texto}: valuación ${mxn(c.valor_total)} · poder de compra ${mxn(c.efectivo)}`
+    ? h("p", {}, chip("vigente", "Cuenta confirmada"), ` ${c.fuente === "portal" ? `Portal ${plan.cuenta_hora_texto}` : "Su registro"}: valuación ${mxn(c.valor_total)} · poder de compra ${mxn(c.efectivo)}`
       + (c.por_liquidar ? ` · por liquidar ${mxn(c.por_liquidar)}` : "") + (c.efectivo_tras_compras !== null ? ` · efectivo tras las compras sugeridas ${mxn(c.efectivo_tras_compras)}` : ""))
     : h("div", { clase: "aviso-caja" }, h("strong", { texto: "Cuenta NO confirmada. " }),
-      "La terminal no conoce sus títulos ni su efectivo del portal: todas las decisiones quedan pendientes y los montos son orientativos. ",
+      "La terminal no conoce sus títulos ni su efectivo: registre su cartera (operaciones o importación). Mientras tanto las decisiones quedan pendientes y los montos son orientativos. ",
       h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-cartera") }, "Capturar mi portafolio"));
   const reglas = r.activo ? h("p", { clase: "suave", texto: `Reglas verificadas (bases consultadas ${r.consultado}): ≥${r.min_emisoras} emisoras · ≤${pct(r.max_peso_emisora)} por emisora · comisión ${(r.comision * 100).toFixed(3)} % con IVA · catálogo del simulador: ${r.catalogo} instrumentos · competencia ${r.competencia}.` }) : null;
   const avisos = [...(r.errores || []), ...(r.avisos || [])].map((a) => h("div", { clase: "aviso-caja", texto: a }));
@@ -427,7 +427,13 @@ function tarjetaPlan(plan) {
           "aria-pressed": String((g.reglas.modo_venta || "estricta") === m),
           onclick: async (ev) => { const b = ev.currentTarget; ocupado([b], true); try { await api("/api/gestion-riesgo/modo", { method: "PUT", json: { modo: m } }); notificar(`Reglas de venta: ${t}.`); await pintarResumen(); } catch (e) { notificar(e.message); ocupado([b], false); } } }, t), " "]))) : null;
   return h("section", { clase: "tarjeta", "aria-labelledby": "t-plan" },
-    h("h2", { id: "t-plan", texto: plan.propuesta ? `Plan de acción — «${plan.propuesta.nombre}» (${plan.propuesta.puntuacion.toFixed(1)}/100, datos al ${plan.propuesta.datos_hasta})` : "Plan de acción" }),
+    h("h2", { id: "t-plan", texto: !plan.propuesta ? "Plan de acción"
+      : plan.propuesta.origen === "mis_portafolios" ? `Plan de acción — sigue su portafolio principal «${plan.propuesta.nombre}»`
+      : `Plan de acción — «${plan.propuesta.nombre}» (${(plan.propuesta.puntuacion ?? 0).toFixed(1)}/100, datos al ${plan.propuesta.datos_hasta})` }),
+    plan.propuesta && plan.propuesta.origen !== "mis_portafolios"
+      ? h("p", { clase: "suave" }, "Sigue la propuesta automática del motor. Para seguir uno suyo: ",
+        h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-portafolios") }, "Mis portafolios → Usar como principal"))
+      : null,
     cuenta, bloqueHoy(plan), riesgo, reglas, ...avisos, faltan,
     h("div", { clase: "kpis" }, kpi("Compras", `${res.comprar} · ${mxn(res.monto_compras)}`), kpi("Ventas", `${res.vender} · ${mxn(res.monto_ventas)}`),
       kpi("Mantener", String(res.mantener)), kpi("Decisión pendiente", String(res.pendiente), res.pendiente ? "negativo" : "")),
@@ -761,7 +767,7 @@ async function leerCapturas(archivos) {
   zona.addEventListener("dragover", (ev) => { ev.preventDefault(); zona.classList.add("encima"); });
   zona.addEventListener("dragleave", () => zona.classList.remove("encima"));
   zona.addEventListener("drop", (ev) => { ev.preventDefault(); zona.classList.remove("encima"); leerCapturas(ev.dataTransfer.files); });
-  document.addEventListener("paste", (ev) => {  // Ctrl+V de una captura mientras se ve «Mi portafolio Actinver»
+  document.addEventListener("paste", (ev) => {  // Ctrl+V de una captura mientras se ve «Mi portafolio»
     if (document.getElementById("panel-cartera").hidden) return;
     const imgs = [...(ev.clipboardData ? ev.clipboardData.files : [])].filter((a) => a.type.startsWith("image/"));
     if (imgs.length) { ev.preventDefault(); leerCapturas(imgs); }
@@ -1081,7 +1087,7 @@ function pintarPresente(p) {
         { c: "Efectivo / poder de compra", p: p.saldo_portal.efectivo, t: p.efectivo },
         { c: "Invertido", p: p.saldo_portal.invertido, t: p.valor_estimado - p.efectivo },
         { c: "Por liquidar (solo portal)", p: p.saldo_portal.por_liquidar, t: 0 }],
-      { caption: "Si el efectivo o lo invertido difieren, capture sus posiciones del portal en «Mi portafolio Actinver»: las propuestas usan esta cartera." }))
+      { caption: "Si el efectivo o lo invertido difieren, capture sus posiciones del portal en «Mi portafolio»: las propuestas usan esta cartera." }))
       : h("p", { clase: "suave", texto: "Aún no se captura el saldo del portal." }),
     tabla([
       { t: "Posición confirmada", f: (f) => h("strong", { texto: f.clave_operable || f.instrumento_id }) },
@@ -3150,13 +3156,18 @@ function pintarPortafolios() {
 
 function tablaGuardados() {
   return tabla([
-    { t: "Portafolio", f: (p) => h("span", {}, h("strong", { texto: p.nombre }), h("br"), h("span", { clase: "suave", texto: `${p.objetivo_nombre || "—"} · ${p.metodo_nombre || "—"}` })) },
+    { t: "Portafolio", f: (p) => h("span", {}, h("strong", { texto: p.nombre }),
+      p.id === pf.meta?.principal ? h("span", { clase: "chip chip--vigente", texto: "Principal" }) : null,
+      h("br"), h("span", { clase: "suave", texto: `${p.objetivo_nombre || "—"} · ${p.metodo_nombre || "—"}` })) },
     { t: "E(r) anual", f: (p) => pct(p.metricas?.rend), num: true },
     { t: "Riesgo σ", f: (p) => pct(p.metricas?.riesgo), num: true },
     { t: "Sharpe", f: (p) => (vacio(p.metricas?.sharpe) ? "—" : p.metricas.sharpe.toFixed(2)), num: true },
     { t: "Activos", f: (p) => p.n_activos ?? "—", num: true },
     { t: "Actualizado", f: (p) => fechaLocal(p.actualizado_en) },
     { t: "Acciones", f: (p) => h("span", { clase: "fila-controles" },
+      p.id === pf.meta?.principal
+        ? h("button", { type: "button", clase: "boton boton--secundario", texto: "Quitar principal", onclick: () => elegirPrincipal(null) })
+        : h("button", { type: "button", clase: "boton", texto: "Usar como principal", title: "El plan de acción llevará su cartera a estos pesos", onclick: () => elegirPrincipal(p) }),
       h("button", { type: "button", clase: "boton boton--secundario", texto: "Abrir", onclick: () => abrirPortafolio(p, false) }),
       h("button", { type: "button", clase: "boton boton--secundario", texto: "Duplicar", onclick: () => abrirPortafolio(p, true) }),
       h("a", { clase: "boton boton--secundario", href: `/api/portafolios/${p.id}/excel`, download: "", texto: "Excel" }),
@@ -3175,6 +3186,15 @@ function abrirPortafolio(p, copia) {
   for (const k of ["activos", "pesos", "origen", "firma_cuenta"]) delete pf.g[k];
   pintarPortafolios(); generarPropuesta();
   document.getElementById("panel-portafolios")?.scrollIntoView({ behavior: "smooth" });
+}
+// Portafolio principal: el plan de acción, Telegram y el seguimiento comparan su cartera contra estos pesos.
+async function elegirPrincipal(p) {
+  try {
+    if (p) await api(`/api/portafolios/${p.id}/principal`, { method: "PUT", json: {} });
+    else await api("/api/portafolio-principal", { method: "DELETE", json: {} });
+    notificar(p ? `«${p.nombre}» es ahora su portafolio principal: el plan de acción lo sigue.` : "Sin portafolio principal: el plan vuelve a la propuesta automática.");
+    cargarPortafolios();
+  } catch (e) { notificar(e.message); }
 }
 async function eliminarPortafolio(p) {
   if (!window.confirm(`¿Eliminar el portafolio «${p.nombre}»? Esta acción no se puede deshacer.`)) return;

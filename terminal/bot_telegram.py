@@ -177,7 +177,7 @@ def texto_cartera(con, ajustes) -> str:
     if c.get("fuente") == "portal":
         cab = f"✅ Cuenta del Reto (captura del portal {_hora(c['captura']['hora_portal'])}); valuación estimada con cierres."
     else:
-        cab = "⚠️ Registro LOCAL de la terminal: NO es un saldo confirmado del portal. Capture su cuenta en «Mi portafolio Actinver»."
+        cab = "⚠️ Registro LOCAL de la terminal: NO es un saldo confirmado del portal. Capture su cuenta en «Mi portafolio»."
     lineas = [cab, f"Valor {c['valor_total']:,.2f} · efectivo {c['efectivo']:,.2f} · {len(c['posiciones'])} posiciones"]
     for p in c["posiciones"][:10]:
         lineas.append(f"• {p['instrumento_id'].split(':')[-1]}: {p['cantidad']:,.0f} títulos"
@@ -279,6 +279,12 @@ def costo_aprobado(servicio: str) -> bool:
         return False
 
 
+def gemini_habilitado(ajustes) -> bool:
+    """Gemini solo si el usuario lo activa ([asistente] gemini = true) y hay GEMINI_API_KEY en .env. La capa gratuita de
+    Google AI Studio no cobra, pero puede usar el texto enviado para mejorar sus productos: se envía contexto de la cartera."""
+    return bool((ajustes.get("asistente") or {}).get("gemini", False) and os.environ.get("GEMINI_API_KEY"))
+
+
 class Chatbot:
     """Respuestas a preguntas libres. El cliente de Claude es opcional e inyectable (pruebas)."""
 
@@ -310,6 +316,8 @@ class Chatbot:
     def motor(self) -> str:
         if self._cliente_claude() is not None:
             return "claude"
+        if gemini_habilitado(self.ajustes):
+            return "gemini"
         return "ollama" if os.environ.get("OLLAMA_URL") else "local"
 
     def _cupo(self) -> bool:
@@ -354,6 +362,25 @@ class Chatbot:
             return "No puedo responder esa pregunta. Pruebe /plan, /estado o pregunte por una emisora."
         return "".join(b.text for b in r.content if getattr(b, "type", "") == "text").strip() or None
 
+    def _preguntar_gemini(self, pregunta: str, ctx: dict) -> str | None:
+        """Gemini por su API REST (sin SDK). Solo con GEMINI_API_KEY y `[asistente] gemini = true`."""
+        modelo = os.environ.get("GEMINI_MODELO", "gemini-2.5-flash")
+        try:
+            r = httpx.post(f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent", timeout=60,
+                           headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]}, json={
+                               "systemInstruction": {"parts": [{"text": SISTEMA}]},
+                               "contents": [{"role": "user", "parts": [{"text": f"<terminal>{json.dumps(ctx, ensure_ascii=False, default=str)}"
+                                                                                f"</terminal>\nPregunta: {pregunta}"}]}]})
+            if r.status_code in (401, 403):
+                log.warning("chatbot: clave de Gemini rechazada; se usan respuestas locales")
+                return None
+            r.raise_for_status()
+            partes = ((r.json().get("candidates") or [{}])[0].get("content") or {}).get("parts") or []
+            return "".join(p.get("text", "") for p in partes).strip() or None
+        except (httpx.HTTPError, ValueError, KeyError, IndexError):
+            log.warning("chatbot: Gemini no disponible")
+            return None
+
     def _preguntar_ollama(self, pregunta: str, ctx: dict) -> str | None:
         try:
             r = httpx.post(os.environ["OLLAMA_URL"].rstrip("/") + "/api/chat", timeout=90, json={
@@ -372,7 +399,7 @@ class Chatbot:
         motor = self.motor()
         if motor != "local" and self._cupo():
             ctx = {**contexto(con, self.ajustes, emisoras), **(extra or {})}
-            texto = self._preguntar_claude(pregunta, ctx) if motor == "claude" else self._preguntar_ollama(pregunta, ctx)
+            texto = {"claude": self._preguntar_claude, "gemini": self._preguntar_gemini}.get(motor, self._preguntar_ollama)(pregunta, ctx)
             if texto:
                 return texto
         if emisoras:

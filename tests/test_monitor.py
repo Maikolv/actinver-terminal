@@ -197,14 +197,14 @@ def test_limite_de_compra_del_cincuenta_por_ciento():
     assert reto.verificar_compras([{"id": "D", "monto": 500_000}], 1_000_000, {}) == []   # exactamente 50 %: permitido
 
 
-def test_propuesta_advierte_compra_mayor_al_limite():
+def test_propuesta_advierte_compra_mayor_al_limite(reto_activo):
     p = {"pesos": [{"id": "X", "monto_estimado": 600_000}, {"id": "Y", "monto_estimado": 400_000}], "capital": 1_000_000,
          "cambios": {"filas": []}}
     servicios.advertir_compras(p, {"valor_total": 0, "posiciones": []})
     assert [a["id"] for a in p["advertencias_reto"]] == ["X"]
 
 
-def test_practica_y_competencia_separadas(con):
+def test_practica_y_competencia_separadas(reto_activo, con):
     from terminal import cartera
     ins = _ins(con)
     assert ins  # catálogo cargado

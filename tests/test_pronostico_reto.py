@@ -61,7 +61,7 @@ def test_historia_insuficiente_se_informa():
 
 
 # ---------------------------------------------------------------- horizonte y calendarios
-def test_horizonte_hasta_el_cierre_del_reto_cuenta_sesiones_bmv():
+def test_horizonte_hasta_el_cierre_del_reto_cuenta_sesiones_bmv(reto_activo):
     assert rp.horizonte_reto(desde=date(2026, 11, 10))["H"] == 3          # 11, 12 y 13 de noviembre
     assert rp.horizonte_reto(desde=date(2026, 11, 7))["H"] == 5           # sábado: 9 al 13
     cerrado = rp.horizonte_reto(desde=date(2026, 11, 13))

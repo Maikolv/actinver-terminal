@@ -573,7 +573,7 @@ def _riesgos(pesos: pd.Series, elegibles: dict, m: dict, esc: dict, excluidos: l
     usd_max = float(perfil.get("max_exposicion_usd", 1.0))
     if usd > usd_max + 0.005 and perfil.get("mercado_acciones", "ambos") != "extranjeras":
         out.insert(0, f"NO CUMPLE SU PERFIL: {usd:.0%} en dólares frente al máximo de {usd_max:.0%}; el universo disponible no "
-                      "tiene suficientes instrumentos en pesos con precio. Amplíe el universo o ajuste el máximo en «Reto y perfil».")
+                      "tiene suficientes instrumentos en pesos con precio. Amplíe el universo o ajuste el máximo en «Perfil».")
     if m.get("sesiones") and m["sesiones"] < 126:
         out.append(f"Validación corta: solo {m['sesiones']} sesiones fuera de muestra (menos de medio año); la puntuación "
                    "no se puede verificar bien con los datos actuales.")
@@ -782,7 +782,7 @@ def proponer(con: sqlite3.Connection, ajustes: Ajustes, perfil: dict, tipo: str,
     if len(elegibles_l) < MIN_ACTIVOS:
         motivos_susp.append(f"Sin datos suficientes: {len(elegibles_l)} instrumentos elegibles (mínimo {MIN_ACTIVOS}). "
                             "Configure un proveedor de precios (pestaña Datos; ver README) o importe precios/valor "
-                            "liquidativo desde «Mi portafolio Actinver» → sección avanzada → «Importar», y pulse «Actualizar datos».")
+                            "liquidativo desde «Mi portafolio» → sección avanzada → «Importar», y pulse «Actualizar datos».")
     if motivos_susp:
         return {**base, "estado": "suspendida", "motivos": motivos_susp}
 

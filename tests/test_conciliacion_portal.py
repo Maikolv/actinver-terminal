@@ -34,7 +34,7 @@ def test_sin_desglose_se_compara_solo_lo_disponible(con):
     assert not _cond(con).activa  # solo el total (−0.49 %) por debajo del umbral
 
 
-def test_plan_trae_hora_para_consultar_el_portal_y_para_retirarse():
+def test_plan_trae_hora_para_consultar_el_portal_y_para_retirarse(reto_activo):
     antes = resumen.horario_del_dia(date(2026, 10, 1))
     assert "07:30" in antes and "14:15" in antes and "14:00" in antes
     despues = resumen.horario_del_dia(date(2026, 11, 4))

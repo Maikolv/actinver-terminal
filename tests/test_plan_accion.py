@@ -47,7 +47,7 @@ def _capturar(con, efectivo):
     assert r["confirmado"], r["errores"]
 
 
-def test_sin_saldo_confirmado_todo_queda_pendiente(con, ajustes):
+def test_sin_saldo_confirmado_todo_queda_pendiente(reto_activo, con, ajustes):
     _base(con)
     plan = plan_accion.calcular(con, ajustes, propuesta=PROP)
     assert not plan["cuenta"]["confirmada"] and plan["faltan"][0].startswith("Saldo confirmado")
@@ -55,7 +55,7 @@ def test_sin_saldo_confirmado_todo_queda_pendiente(con, ajustes):
     assert all("Saldo confirmado" in a["falta"][0] for a in plan["acciones"])
 
 
-def test_con_saldo_confirmado_compra_bmv_y_sic_queda_pendiente_con_referencia(con, ajustes):
+def test_con_saldo_confirmado_compra_bmv_y_sic_queda_pendiente_con_referencia(reto_activo, con, ajustes):
     _base(con)
     _capturar(con, 982_500.0)
     plan = plan_accion.calcular(con, ajustes, propuesta=PROP)
@@ -82,14 +82,14 @@ def test_las_compras_no_exceden_el_efectivo_confirmado(con, ajustes):
     assert plan["cuenta"]["efectivo_tras_compras"] >= -0.01
 
 
-def test_propuesta_fuera_del_catalogo_es_error_de_reglas(con, ajustes):
+def test_propuesta_fuera_del_catalogo_es_error_de_reglas(reto_activo, con, ajustes):
     _base(con)
     p = {**PROP, "pesos": PROP["pesos"] + [{"id": "SIC:QQQ", "peso": 0.1}]}
     plan = plan_accion.calcular(con, ajustes, propuesta=p)
     assert any("fuera del catálogo" in e for e in plan["reglas"]["errores"]) and any("SIC:QQQ" in f for f in plan["faltan"])
 
 
-def test_telegram_y_plan_de_accion_coinciden(con, ajustes):
+def test_telegram_y_plan_de_accion_coinciden(reto_activo, con, ajustes):
     """El mensaje del plan del día se arma con el MISMO plan de acción que muestra la interfaz (/api/plan-accion)."""
     from terminal import resumen
     _base(con)
@@ -133,3 +133,22 @@ def test_integracion_riesgo_vende_aunque_la_propuesta_diga_mantener(con, ajustes
     amx = next(a for a in plan["acciones"] if a["instrumento_id"] == "BMV:AMX")
     assert amx["accion_propuesta"] == "vender" and "stop" in amx["motivo"] and plan["mantener_mejor"] is None
     assert plan["propuesta"]["por_que"].startswith("Gestión de riesgo")
+
+
+def test_portafolio_principal_manda_sobre_la_propuesta(con, ajustes):
+    """El portafolio elegido en «Mis portafolios» es el objetivo del plan, aunque se pase otra propuesta."""
+    import json
+
+    from terminal import db, portafolio_principal
+    _base(con)
+    res = {"activos": [{"id": "BMV:WALMEX", "clave": "WALMEX *", "peso": 0.6}, {"id": "BMV:AMX", "clave": "AMX B", "peso": 0.4}],
+           "metricas": {"sharpe": 1.0}, "calculado_en": "2026-11-14"}
+    pid = con.execute("INSERT INTO portafolios_usuario (nombre, especificacion, resultado, creado_en, actualizado_en) "
+                      "VALUES ('Mi largo plazo', '{}', ?, ?, ?)", (json.dumps(res), db.ahora(), db.ahora())).lastrowid
+    portafolio_principal.elegir(con, pid)
+    plan = plan_accion.calcular(con, ajustes, propuesta=PROP)
+    assert plan["propuesta"]["origen"] == "mis_portafolios" and plan["propuesta"]["nombre"] == "Mi largo plazo"
+    objetivos = {a["instrumento_id"]: a["peso_objetivo"] for a in plan["acciones"]}
+    assert objetivos.get("BMV:WALMEX") == pytest.approx(0.6) and "SIC:AAPL" not in objetivos
+    portafolio_principal.elegir(con, None)
+    assert plan_accion.calcular(con, ajustes, propuesta=PROP)["propuesta"]["origen"] == "motor"

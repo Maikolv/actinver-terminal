@@ -11,7 +11,7 @@ def _utc(y, m, d, h, mi):  # hora de la Ciudad de México (UTC−6, sin horario 
     return datetime(y, m, d, h + 6, mi, tzinfo=UTC)
 
 
-def test_bmv_cierra_a_las_14_hasta_el_2_de_noviembre():
+def test_bmv_cierra_a_las_14_hasta_el_2_de_noviembre(reto_activo):
     assert vigencia.ultima_sesion_cerrada("XMEX", _utc(2026, 9, 30, 14, 30)) == date(2026, 9, 30)
     assert vigencia.ultima_sesion_cerrada("XMEX", _utc(2026, 9, 30, 13, 59)) == date(2026, 9, 29)
     assert not vigencia.mercado_abierto("XMEX", _utc(2026, 9, 30, 14, 30))

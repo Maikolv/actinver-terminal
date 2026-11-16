@@ -2,7 +2,7 @@
 a mano en el simulador del Reto.
 
 Reglas de honestidad:
-- Sin saldo confirmado del portal (captura vigente en «Mi portafolio Actinver»), TODO queda en «decisión pendiente»:
+- Sin saldo confirmado del portal (captura vigente en «Mi portafolio»), TODO queda en «decisión pendiente»:
   la terminal no conoce sus títulos ni su efectivo reales y no genera órdenes aparentemente ejecutables.
 - Sin cotización confiable de la serie exacta (todas las del SIC y las BMV con cierre atrasado), la decisión queda
   pendiente; a lo sumo se da la referencia (bolsa de origen × tipo de cambio) para comparar con el portal.
@@ -20,12 +20,12 @@ from datetime import UTC, date, datetime
 
 import pandas as pd
 
-from . import boleta, gestion_riesgo, mercado, reto, servicios
+from . import boleta, gestion_riesgo, mercado, portafolio_principal, reto, servicios
 from .config import Ajustes
 
 ZONA = "America/Mexico_City"
 ORDEN = {"vender": 0, "comprar": 1, "mantener": 2}
-FALTA_SALDO = ("Saldo confirmado del portal: capture su cuenta en «Mi portafolio Actinver» (posiciones, poder de compra, "
+FALTA_SALDO = ("Saldo confirmado del portal: capture su cuenta en «Mi portafolio» (posiciones, poder de compra, "
                "valuación total y hora del portal).")
 
 
@@ -65,6 +65,14 @@ def verificar_reglas(con: sqlite3.Connection, p: dict | None, ahora: datetime) -
             "mayor_peso_propuesta": round(max_w, 4), "avisos": avisos, "errores": errores}
 
 
+def costo_operacion(ajustes: Ajustes) -> float:
+    """Comisión + IVA por peso operado: la del Reto mientras esté activo; si no, la de su contrato ([costos])."""
+    if reto.activo() and reto.costo_operacion() is not None:
+        return float(reto.costo_operacion())
+    c = ajustes.get("costos") or {}
+    return float(c.get("comision_pct") or 0) * (1 + float(c.get("iva") or 0))
+
+
 def _precio(q: dict | None, iid: str) -> dict:
     q = q or {}
     return {"fuente": q.get("proveedor"), "fecha": q.get("fecha"), "estado": q.get("estado"),
@@ -78,17 +86,24 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
     """Plan de acción con la propuesta de referencia (la del plan del día) y la cartera confirmada."""
     from . import resumen
     ahora = ahora or datetime.now(UTC)
+    cart = cartera if cartera is not None else servicios.cartera_actual(con, ajustes)
+    banda = float(ajustes["optimizacion"].get("banda_rebalanceo_pp", 2.0))
+    # El portafolio principal de «Mis portafolios» manda sobre la propuesta automática en todas las vistas del plan
+    # (portada, Telegram, monitor en la nube): un solo objetivo para la cartera.
+    principal_p = portafolio_principal.propuesta(con, cart, banda)
+    if principal_p is not None:
+        propuesta = principal_p
     if propuesta is None:
         perfil = servicios.perfil_actual(con, ajustes)
         propuesta = resumen.propuesta_referencia(servicios.propuestas_guardadas(con, ajustes, perfil))
-    cart = cartera if cartera is not None else servicios.cartera_actual(con, ajustes)
     p = propuesta
-    confirmada = cart.get("fuente") == "portal"
+    principal = bool(p and p.get("origen") == "mis_portafolios")
+    # Escenario real (sin Reto): la cartera es la que el usuario registra; la captura del portal ya no es requisito.
+    confirmada = cart.get("fuente") == "portal" or (not reto.activo() and bool(cart.get("posiciones") or cart.get("efectivo")))
     reglas = verificar_reglas(con, p, ahora)
     faltan = ([] if confirmada else [FALTA_SALDO]) + reglas["errores"]
     if not p:
         faltan.append("Propuesta vigente: se está recalculando o faltan datos (vea «¿En qué puedo confiar hoy?»).")
-    banda = float(ajustes["optimizacion"].get("banda_rebalanceo_pp", 2.0))
     ins = mercado.instrumentos(con)
     filas = list((p.get("cambios") or {}).get("filas") or []) if p else []
     vistos = {f["id"] for f in filas}
@@ -99,7 +114,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
             filas.append({"id": iid, "clave_operable": x.get("clave_operable"), "peso_actual": x.get("peso") or 0,
                           "peso_objetivo": objetivo.get(iid, 0.0), "delta_pp": 0.0, "monto_mxn": 0.0, "accion": "mantener",
                           "nota": "Posición de su cuenta que la propuesta no evalúa: revise antes de operar."})
-    mantener_mejor = resumen.mantener_es_mejor(p, (p.get("perfil") or {}).get("criterio_plan", "puntuacion"),
+    mantener_mejor = None if principal else resumen.mantener_es_mejor(p, (p.get("perfil") or {}).get("criterio_plan", "puntuacion"),
                                                 float(ajustes["optimizacion"].get("margen_mejora_mantener", resumen.MARGEN_MANTENER))) if p else None
     if mantener_mejor and confirmada:  # cambiar no mejora la ganancia esperada: se conserva lo que hay, sin operar
         nota = ("La propuesta no supera a mantener su cartera (" + (
@@ -112,11 +127,25 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
     # Gestión de riesgo primero: stops, tendencia, concentración y volatilidad de la cartera mandan sobre «mantener»
     riesgo = (gestion_riesgo.evaluar(con, ajustes, cart, p) if (ajustes.get("gestion_riesgo") or {}).get("activo", True)
               else {"activo": False, "filas": [], "ordenes": False})
-    if riesgo.get("ordenes"):
+    if riesgo.get("ordenes") and principal:
+        # Con portafolio principal: sus pesos son el objetivo; de la gestión de riesgo solo cuentan las ventas (stop roto,
+        # tendencia bajista), que mandan sobre el objetivo. Sus compras de reinversión no se suman al principal.
+        ventas = {f["id"]: f for f in riesgo["filas"] if f.get("accion") == "vender"}
+        filas = [ventas.get(f["id"], f) for f in filas] + [v for i, v in ventas.items() if i not in {f["id"] for f in filas}]
+        objetivo = {f["id"]: f["peso_objetivo"] for f in filas}
+        faltan = [x for x in faltan if not x.startswith("Propuesta vigente")]
+    elif riesgo.get("ordenes"):
         filas = list(riesgo["filas"])
         objetivo = {f["id"]: f["peso_objetivo"] for f in filas}
         mantener_mejor = None
         faltan = [x for x in faltan if not x.startswith("Propuesta vigente")]
+    # Una fila por instrumento: si dos fuentes (propuesta y gestión de riesgo) hablan del mismo, gana la que pide operar.
+    unicas: dict = {}
+    for f in filas:
+        previa = unicas.get(f["id"])
+        if previa is None or (previa.get("accion", "mantener") == "mantener" and f.get("accion", "mantener") != "mantener"):
+            unicas[f["id"]] = f
+    filas = list(unicas.values())
     cortos = {f["id"]: f for f in riesgo.get("filas") or []}  # motivo, invalidación y reemplazo en una línea
     ids = sorted({f["id"] for f in filas})
     cot = mercado.cotizaciones(con, ajustes, ids) if ids else {}
@@ -176,7 +205,7 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
     acciones.sort(key=lambda a: (ORDEN.get(a["accion_propuesta"], 3), -abs(a["delta_pp"])))
     # Efectivo confirmado para las compras, en orden de prioridad (las ventas no se suponen liquidadas)
     efectivo = float(cart.get("efectivo") or 0) if confirmada else 0.0
-    costo_op = float(reto.costo_operacion() or 0)
+    costo_op = costo_operacion(ajustes)
     for a in acciones:
         if a["decision"] != "comprar":
             continue
@@ -192,7 +221,8 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         efectivo -= a["monto"] * (1 + costo_op)
     for i, a in enumerate(acciones, 1):
         a["prioridad"] = i
-    cuenta = {"confirmada": confirmada, "fuente": "portal" if confirmada else "registro local (no confirmado)",
+    cuenta = {"confirmada": confirmada, "fuente": ("portal" if cart.get("fuente") == "portal" else "registro de su cartera") if confirmada
+              else "registro local (no confirmado)",
               "hora_portal": (cart.get("captura") or {}).get("hora_portal"), "efectivo": cart.get("efectivo"),
               "por_liquidar": cart.get("por_liquidar"), "valor_total": cart.get("valor_total"),
               "efectivo_tras_compras": round(efectivo, 2) if confirmada else None}
@@ -201,16 +231,19 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
         cuenta_txt = pd.Timestamp(cuenta["hora_portal"]).tz_convert(ZONA).strftime("%d-%m-%Y %H:%M")
     return {
         "generado_en": ahora.isoformat(timespec="seconds"), "reglas": reglas, "cuenta": cuenta, "cuenta_hora_texto": cuenta_txt,
-        "propuesta": ({"clave": p["clave"], "nombre": p["nombre"], "puntuacion": p["puntuacion"]["total"],
-                       "datos_hasta": p.get("datos_hasta"),
-                       "por_que": ("Gestión de riesgo: hay posiciones con stop roto, tendencia bajista o exceso de riesgo; "
+        "propuesta": ({"clave": p.get("clave") or ("principal" if principal else None), "nombre": p["nombre"],
+                       "puntuacion": (p.get("puntuacion") or {}).get("total"), "origen": p.get("origen") or "motor",
+                       "portafolio_id": p.get("portafolio_id"), "datos_hasta": p.get("datos_hasta") or p.get("calculado_en"),
+                       "por_que": ("Su portafolio principal de «Mis portafolios»: el plan lleva su cartera a esos pesos "
+                                   "(banda de no-rebalanceo para no pagar comisiones de más)." if principal else
+                                   "Gestión de riesgo: hay posiciones con stop roto, tendencia bajista o exceso de riesgo; "
                                    "lo liberado se reinvierte en emisoras de esta propuesta con tendencia alcista."
                                    if riesgo.get("ordenes") else
                                    "Portafolio de máximo Sharpe de Markowitz (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "markowitz"
-                                   else "Mayor ganancia media esperada al cierre del Reto (criterio elegido en su perfil)."
+                                   else "Mayor ganancia media esperada en el horizonte (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "ganancia"
-                                   else "Mayor plusvalía esperada al cierre del Reto (criterio elegido en su perfil)."
+                                   else "Mayor plusvalía esperada en el horizonte (criterio elegido en su perfil)."
                                    if (p.get("perfil") or {}).get("criterio_plan") == "plusvalia"
                                    else "Es la propuesta vigente con mayor puntuación (criterio del plan del día).")} if p else None),
         "acciones": acciones, "faltan": faltan, "mantener_mejor": mantener_mejor if confirmada else None,

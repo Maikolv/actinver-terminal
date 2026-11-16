@@ -58,7 +58,8 @@ def apertura_sesion(codigo: str, sesion) -> pd.Timestamp:
     h = _horario_reto(s.date()) if codigo == "XMEX" else None
     if h:
         return pd.Timestamp(f"{s.date().isoformat()} {h[0]}", tz="America/Mexico_City").tz_convert("UTC")
-    return calendario(codigo).session_open(s)
+    cal = calendario(codigo)
+    return cal.session_open(s if cal.is_session(s) else cal.date_to_session(s, direction="next"))
 
 
 def cierre_sesion(codigo: str, sesion) -> pd.Timestamp:
@@ -66,7 +67,8 @@ def cierre_sesion(codigo: str, sesion) -> pd.Timestamp:
     h = _horario_reto(s.date()) if codigo == "XMEX" else None
     if h:
         return pd.Timestamp(f"{s.date().isoformat()} {h[1]}", tz="America/Mexico_City").tz_convert("UTC")
-    return calendario(codigo).session_close(s)
+    cal = calendario(codigo)
+    return cal.session_close(s if cal.is_session(s) else cal.date_to_session(s, direction="next"))
 
 
 def ultima_sesion_cerrada(codigo: str, ahora: datetime | None = None) -> date:

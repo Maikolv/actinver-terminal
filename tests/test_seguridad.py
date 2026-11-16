@@ -174,3 +174,12 @@ def test_host_codespace_solo_el_propio(monkeypatch):
     assert not host_codespace("otro-cs-8765.app.github.dev")
     assert not host_codespace("mi-cs-8765.app.github.dev.evil.com")
     assert not host_codespace("mi-cs-x.app.github.dev")
+
+
+def test_gemini_apagado_por_defecto(monkeypatch):
+    from terminal.bot_telegram import gemini_habilitado
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+    assert not gemini_habilitado({"asistente": {}})
+    assert gemini_habilitado({"asistente": {"gemini": True}})
+    monkeypatch.delenv("GEMINI_API_KEY")
+    assert not gemini_habilitado({"asistente": {"gemini": True}})

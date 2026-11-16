@@ -157,7 +157,7 @@ def test_sesion_objetivo():
     assert resumen.sesion_objetivo(datetime(2026, 10, 3, 18, 0, tzinfo=UTC)).isoformat() == "2026-10-05"  # sábado → lunes
 
 
-def test_plan_corregido_si_el_recalculo_cambia_las_ordenes_antes_de_la_apertura(con, ajustes, monkeypatch):
+def test_plan_corregido_si_el_recalculo_cambia_las_ordenes_antes_de_la_apertura(reto_activo, con, ajustes, monkeypatch):
     enviados = []
     monkeypatch.setattr(notificador, "enviar", lambda t, x, c, detalle=None: enviados.append(t) or {"telegram": "enviada"})
     cart = {"fuente": "local", "posiciones": []}

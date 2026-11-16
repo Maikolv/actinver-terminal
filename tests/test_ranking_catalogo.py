@@ -4,7 +4,7 @@ from terminal import ranking, reto, vigencia
 from conftest import sembrar_precios
 
 
-def test_ranking_excluye_lo_que_no_esta_en_el_catalogo_del_simulador(con, ajustes):
+def test_ranking_excluye_lo_que_no_esta_en_el_catalogo_del_simulador(reto_activo, con, ajustes):
     ids = ["BMV:AMX", "SIC:AAPL", "SIC:QQQ"]
     sembrar_precios(con, ids, fin=vigencia.ultima_sesion_cerrada("XNYS"), sesiones=200, proveedor="archivo")
     con.executemany("INSERT INTO universo_simulador VALUES (?,?,?)",

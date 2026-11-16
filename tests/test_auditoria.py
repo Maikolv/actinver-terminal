@@ -55,7 +55,7 @@ def test_plan_de_propuesta_de_noche_queda_para_el_plan_del_dia(con, monkeypatch)
     assert con.execute("SELECT notificada FROM alertas").fetchone()[0] == "incluida_en_plan_del_dia"
 
 
-def test_cambio_de_etapa_deja_de_usar_la_captura_de_practica(con, ajustes, monkeypatch):
+def test_cambio_de_etapa_deja_de_usar_la_captura_de_practica(reto_activo, con, ajustes, monkeypatch):
     monkeypatch.setattr(reto, "etapa_operativa", lambda *a, **k: "practica")  # no depende de la fecha real
     portal.guardar(con, TEXTO, "2026-09-28T14:05", mercado.instrumentos(con), confirmar=True)
     assert servicios.captura_vigente(con) is not None

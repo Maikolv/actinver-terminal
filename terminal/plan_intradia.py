@@ -146,7 +146,7 @@ def calcular(con, ajustes, perdida_dia_mxn: float | None = None, ahora: datetime
              "requiere": "Proveedor de tiempo real (p. ej. SIP/OPRA en vivo) o importación de barras con retraso declarado; "
                          "el feed gratuito de Alpaca llega con ≥ 15 min de retraso."},
             {"dato": "Captura vigente del portal", "estado": "ok" if confirmada else "falta",
-             "requiere": "Capture su cuenta en «Mi portafolio Actinver»."},
+             "requiere": "Capture su cuenta en «Mi portafolio»."},
             {"dato": "P&L intradía del día", "estado": "ok" if perdida_dia_mxn is not None else "falta",
              "requiere": "Indique manualmente la pérdida del día; la terminal no accede al portal ni a su cuenta."},
         ],

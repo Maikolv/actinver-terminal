@@ -788,7 +788,7 @@ def get_captura_portal(con=Depends(con_db)):
     c = portal.captura(con)
     if not c:
         return {"captura": None, "cambios": [], "vigente": False,
-                "aviso": "Sin captura del portal: «Mi portafolio Actinver» muestra el registro local de la terminal."}
+                "aviso": "Sin captura del portal: «Mi portafolio» muestra el registro local de la terminal."}
     return {"captura": c, "cambios": portal.cambios(portal.anterior(con, c), c),
             "vigente": servicios.captura_vigente(con) is not None, "fuente": portal.FUENTE}
 
@@ -879,7 +879,7 @@ def post_saldo_portal(cuerpo: dict = Body(...), con=Depends(con_db)):
 def get_ordenes(todas: bool = False, con=Depends(con_db)):
     return {"ordenes": registro.ordenes(con, not todas),
             "nota": "Referencia de órdenes capturadas por usted en el portal. No cambian posiciones ni efectivo: solo una "
-                    "operación CONFIRMADA registrada en «Mi portafolio Actinver» lo hace. La terminal no envía órdenes."}
+                    "operación CONFIRMADA registrada en «Mi portafolio» lo hace. La terminal no envía órdenes."}
 
 
 @app.post("/api/pendientes-portal")
@@ -1056,7 +1056,7 @@ def _cuenta_al_dia(con) -> dict | None:
 
 @app.get("/api/portafolios")
 def get_portafolios(con=Depends(con_db)):
-    from . import markowitz
+    from . import markowitz, portafolio_principal
     cuenta = _cuenta_al_dia(con)
     resumen = [{"id": p["id"], "nombre": p["nombre"], "actualizado_en": p["actualizado_en"], "especificacion": p["especificacion"],
                 **({k: p["resultado"].get(k) for k in ("metricas", "metodo_nombre", "objetivo_nombre", "calculado_en")}
@@ -1064,7 +1064,7 @@ def get_portafolios(con=Depends(con_db)):
                for p in markowitz.listar(con)]
     return {"portafolios": resumen, "objetivos": markowitz.OBJETIVOS, "metodos": markowitz.METODOS,
             "ventanas": markowitz.VENTANAS, "aviso": markowitz.AVISO, "tasa_libre": markowitz.tasa_libre(con, AJUSTES),
-            "covarianzas": markowitz.COVARIANZAS, "cuenta": cuenta}
+            "covarianzas": markowitz.COVARIANZAS, "cuenta": cuenta, "principal": portafolio_principal.obtener_id(con)}
 
 
 @app.get("/api/portafolios/cuenta")
@@ -1139,6 +1139,25 @@ def delete_portafolio(pid: int, con=Depends(con_db)):
     if not markowitz.eliminar(con, pid):
         raise HTTPException(404, "Portafolio no encontrado")
     return {"eliminado": pid}
+
+
+@app.put("/api/portafolios/{pid}/principal")
+def put_portafolio_principal(pid: int, con=Depends(con_db)):
+    """Elige el portafolio de «Mis portafolios» que sigue el plan de acción (objetivo de su cartera real)."""
+    from . import portafolio_principal
+    try:
+        portafolio_principal.elegir(con, pid)
+    except KeyError:
+        raise HTTPException(404, "Portafolio no encontrado") from None
+    return {"principal": pid}
+
+
+@app.delete("/api/portafolio-principal")
+def delete_portafolio_principal(con=Depends(con_db)):
+    """Quita el portafolio principal: el plan vuelve a la propuesta automática del motor."""
+    from . import portafolio_principal
+    portafolio_principal.elegir(con, None)
+    return {"principal": None}
 
 
 @app.get("/api/portafolios/{pid}/excel")

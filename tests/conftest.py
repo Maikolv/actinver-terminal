@@ -58,3 +58,12 @@ def sembrar_precios(con, ids, fin=None, sesiones=900, semilla=7, proveedor="prue
                         [(f.date().isoformat(), 17.0 + 0.001 * i, "fred", "fx", db.ahora()) for i, f in enumerate(fechas)])
     con.commit()
     return fechas
+
+
+@pytest.fixture
+def reto_activo(monkeypatch):
+    """Vuelve a encender las reglas archivadas del Reto 2026 solo dentro de la prueba (la terminal las tiene apagadas
+    desde el 13-nov-2026, directriz post-Reto). Así se conservan las pruebas de esas reglas sin reactivarlas."""
+    from terminal import reto
+    base = dict(reto.config())
+    monkeypatch.setattr(reto, "config", lambda: {**base, "activo": True})

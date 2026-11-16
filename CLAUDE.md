@@ -44,6 +44,21 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
+## Estado comprobado: portafolio principal y escenario real (14-nov-2026)
+
+Reglas del Reto apagadas (`config/reto.yaml: activo: false`); los datos del Reto se conservan. La comisión sale de
+`[costos]` y la cartera registrada por el usuario cuenta como confirmada.
+
+El usuario elige un **portafolio principal** en «Mis portafolios» (`terminal/portafolio_principal.py`, clave
+`portafolio_principal` en `ajustes_usuario`). El plan de acción, Telegram y la nube siguen sus pesos. La gestión de
+riesgo solo agrega ventas; sin portafolio principal se usa la propuesta automática.
+
+Las pruebas de reglas del Reto usan el ajuste `reto_activo` de `tests/conftest.py`.
+
+Pendiente:
+- renombrar la carpeta (`scripts/renombrar-carpeta.ps1`, con Claude y Codex cerrados);
+- textos del Reto en los módulos internos (pronóstico «al cierre del Reto», etapas).
+
 ## Estado comprobado: ruta de inicio del 13-nov-2026
 
 La [guía de inicio](docs/ruta-de-inicio.md) cubre GitHub Pages, Codespaces y Windows. La demo pública tiene 174 instrumentos simulados y se revisó a 1440 y 390 px. En una copia limpia, el primer arranque en Windows respondió en el puerto 8765 solo por loopback. El workflow de Codespaces pasó. El reenvío privado en un Codespace real requiere el permiso `codespace`. Mediciones en [el historial](docs/historial-estado.md#ruta-de-inicio--13-nov-2026).

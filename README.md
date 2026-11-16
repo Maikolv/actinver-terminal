@@ -8,7 +8,7 @@ Terminal local de análisis de portafolios: compara propuestas de inversión con
 
 ![Estación de Mercado](docs/capturas/mercado-despues-demo-1440.jpg)
 
-![Plan de acción](docs/capturas/inicio.png)
+**[Ver la terminal en el navegador →](https://maikolv.github.io/help-quote-terminal/estacion.html)** · [Capturas](#capturas) · [Guía paso a paso](docs/ruta-de-inicio.md)
 
 ## Qué hace
 
@@ -23,14 +23,24 @@ Terminal local de análisis de portafolios: compara propuestas de inversión con
 | Laboratorio | Permutación, Holm, preregistro y holdout único; TSM mensual y anomalías de volumen |
 | Datos y fuentes | Fuente, moneda, retraso y vigencia de cada dato; un precio vencido nunca se presenta como vigente |
 | Alertas | Telegram y escritorio: pérdida del día, cambios entre capturas y avisos por emisora |
+| Portafolio principal | Elija en «Mis portafolios» el portafolio que su cartera debe seguir; el plan, Telegram y la nube lo usan como objetivo |
+| Asistente | Preguntas en lenguaje natural sobre su cartera y la documentación; motor Claude, **Gemini** (opcional, gratis), Ollama local o respuestas sin IA |
 
-| Propuestas | Mis portafolios |
+## Capturas
+
+Todas en modo demostración con **datos simulados**: no muestran ninguna cuenta real.
+
+| Estación de Mercado (1440 px) | Estación en celular (375 px) |
 |---|---|
+| ![Estación de Mercado](docs/capturas/mercado-despues-demo-1440.jpg) | ![Estación en celular](docs/capturas/estacion-movil.jpg) |
+| **Estación en modo claro** | **Plan de acción** |
+| ![Modo claro](docs/capturas/mercado-despues-demo-claro-1440.jpg) | ![Plan de acción](docs/capturas/inicio.png) |
+| **Propuestas** | **Mis portafolios y portafolio principal** |
 | ![Propuestas](docs/capturas/propuestas.png) | ![Mis portafolios](docs/capturas/portafolios.png) |
 | **Riesgo** | **Ranking** |
 | ![Riesgo](docs/capturas/riesgo.png) | ![Ranking](docs/capturas/ranking.png) |
-
-Las capturas usan **datos simulados** (modo demostración).
+| **Antes del rediseño** | **Mercado (widgets)** |
+| ![Antes](docs/capturas/mercado-antes-demo-1440.jpg) | ![Mercado](docs/capturas/mercado.png) |
 
 ## Cómo correr
 

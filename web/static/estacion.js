@@ -179,7 +179,7 @@ function inspector(f, pr, celda) {
     pos ? h("dl", {}, fila("Títulos", num(pos.titulos)), fila("Peso en cartera", pct(pos.peso)),
       fila("Plusvalía", `${mxn(pos.plusvalia, true)} (${signoPct(pos.plusvalia_pct)})`)) : h("p", { clase: "suave", texto: "No la tiene en su cartera." }),
     h("div", { clase: "fila-controles" },
-      h("button", { type: "button", clase: "boton boton--secundario", texto: "Mi portafolio Actinver", onclick: () => irA("tab-cartera") }),
+      h("button", { type: "button", clase: "boton boton--secundario", texto: "Mi portafolio", onclick: () => irA("tab-cartera") }),
       h("button", { type: "button", clase: "boton boton--secundario", texto: "Ficha técnica completa", onclick: () => abrirFicha(f.id) })));
   return [obs, ref, fut, posicion];
 }

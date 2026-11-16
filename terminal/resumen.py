@@ -100,7 +100,7 @@ def metrica_plan(p: dict, criterio: str) -> float | None:
 
 
 def criterio_plan(propuestas: dict) -> str:
-    """Criterio elegido en el perfil («Reto y perfil»): cada propuesta guarda el perfil con que se calculó."""
+    """Criterio elegido en el perfil («Perfil»): cada propuesta guarda el perfil con que se calculó."""
     for p in propuestas.values():
         if p and p.get("perfil"):
             c = p["perfil"].get("criterio_plan", "puntuacion")
@@ -182,7 +182,7 @@ def horario_del_dia(sesion: date) -> str:
     lineas = [f"🕖 Consulta el portal a las {abre:%H:%M} (apertura de la BMV): revisa precios, compáralos con las boletas y "
               "captura las órdenes limitadas del día.",
               f"🕑 Puedes retirarte a las {retiro:%H:%M}: la BMV cierra a las {cierra:%H:%M} y las órdenes limitadas que no se "
-              "ejecutaron vencen al cierre. Antes, copia tu cuenta en «Mi portafolio Actinver → Actualizar desde el portal»."]
+              "ejecutaron vencen al cierre. Antes, copia tu cuenta en «Mi portafolio → Actualizar desde el portal»."]
     fin = (reto.config().get("fechas") or {}).get("competencia_fin") if reto.activo() else None
     if fin and str(fin)[:10] == sesion.isoformat():
         lineas.append(f"🏁 Hoy cierra el Reto a las {str(fin)[11:16]}: después ya no se puede operar.")
@@ -293,7 +293,7 @@ def bloque_acciones(plan: dict, max_lineas: int = 8) -> list[str]:
     out = ["🧭 Acciones por prioridad:"]
     if not plan["cuenta"]["confirmada"]:
         out.append("⚠️ Cuenta NO confirmada: todo queda como «decisión pendiente» hasta que pegues tu portafolio en la terminal "
-                   "(«Mi portafolio Actinver»). Los montos son orientativos.")
+                   "(«Mi portafolio»). Los montos son orientativos.")
     ejec = [a for a in acc if a["decision"] in ("comprar", "vender")]
     for a in ejec[:max_lineas]:
         icono = "🔴 Vender" if a["decision"] == "vender" else "🟢 Comprar"

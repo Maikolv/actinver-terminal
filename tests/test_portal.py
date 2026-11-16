@@ -129,7 +129,7 @@ def test_alerta_de_plan_de_propuesta_solo_cuando_cambia_el_plan(con, monkeypatch
     assert len(enviados) == 2 and "Vender AAPL *" in enviados[1] and "tu cuenta del Reto" in enviados[1]
 
 
-def test_recordatorio_de_captura_al_cierre(con):
+def test_recordatorio_de_captura_al_cierre(reto_activo, con):
     despues = datetime(2026, 9, 28, 21, 30, tzinfo=UTC)                                  # 15:30 CDMX, lunes de práctica
     conds = [c for c in alertas.reglas_portal(con, despues) if c.regla == "captura_pendiente"]
     assert conds and conds[0].activa
