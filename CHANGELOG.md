@@ -2,6 +2,21 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 15-nov-2026 — Sin espacios en blanco, apariencia, aviso legal, reporte ejecutivo, video y stand
+
+- **Estación de Mercado (escritorio):** las tres columnas miden lo mismo. Monitor e inspector se desplazan por dentro: no queda el hueco que dejaba la columna más corta.
+- **Apariencia** (Datos y ayuda → Apariencia, `web/static/apariencia.js`):
+  - tema, tamaño de letra, densidad y movimiento, guardados en el navegador;
+  - un asistente de estética que sugiere ajustes según la pantalla y la hora, y responde preguntas con el asistente de la terminal.
+- **Grupo «Legal» → Aviso legal:** qué es y qué no es la terminal, riesgos, datos, privacidad, limitación de responsabilidad, marcas y ley aplicable. Es una plantilla sin revisión de abogado.
+- **Asistente con Gemini** (opcional y apagado por defecto: `GEMINI_API_KEY` + `[asistente] gemini = true`).
+- **Documentos y materiales:**
+  - reporte ejecutivo HTML y PDF (`docs/reporte-ejecutivo/`);
+  - video narrado de 2 min 4 s (`docs/video/`, `scripts/video_terminal.py`);
+  - propuesta de stand (`docs/propuesta-stand.md`);
+  - prompt para Codex (`docs/prompt-codex-stand-video-20261115.md`).
+- **Pruebas:** el ajuste `reto_activo` limpia la memoria de horarios de `vigencia`, que hacía fallar 2 pruebas según el orden. Node 52; 37 pruebas de Python dirigidas.
+
 ## 14-nov-2026 — Portafolio principal y escenario real (sin reglas del Reto)
 
 - **Portafolio principal:**

@@ -212,6 +212,19 @@ export const GUIAS = {
       'Revise «Referencias y créditos» para las fuentes, librerías y métodos citados.'],
     terminos: [['Simulación', 'Ninguna sección envía órdenes; usted decide y opera en el portal.']],
   },
+  'panel-apariencia': {
+    titulo: 'Apariencia',
+    que: 'Tema, tamaño de letra, densidad y movimiento de la terminal, con un asistente que sugiere ajustes para su pantalla y la hora.',
+    pasos: ['Elija tema, letra y densidad; se guardan solo en este navegador.', 'Aplique las sugerencias del asistente o pregúntele.',
+      'Use «Restaurar apariencia» para volver a lo predeterminado.'],
+    terminos: [['Densidad', 'Altura de las filas de las tablas: compacta muestra más datos; cómoda es más fácil de tocar.']],
+  },
+  'panel-legal': {
+    titulo: 'Aviso legal',
+    que: 'Qué es y qué no es la terminal, sus riesgos, el origen de los datos, su privacidad y la limitación de responsabilidad.',
+    pasos: ['Léalo antes de usar la terminal.', 'Muéstrelo a evaluadores o inversionistas cuando presente la terminal.'],
+    terminos: [['Asesoría de inversión', 'Recomendación personalizada de un profesional registrado; la terminal no la ofrece.']],
+  },
   '/static/recursos/oficina-inversion.html': {
     titulo: 'Oficina de inversión',
     que: 'Una revisión rápida de un instrumento con seis mesas (Datos, Cuantitativo, Order Flow, Crítico, Riesgo y Coordinación) sobre los datos ya guardados.',

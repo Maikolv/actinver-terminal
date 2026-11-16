@@ -105,6 +105,14 @@
     {
       "titulo": "Ayuda",
       "url": "/?vista=tab-ayuda"
+    },
+    {
+      "titulo": "Apariencia",
+      "url": "/?vista=tab-apariencia"
+    },
+    {
+      "titulo": "Aviso legal",
+      "url": "/?vista=tab-legal"
     }
   ]
 }

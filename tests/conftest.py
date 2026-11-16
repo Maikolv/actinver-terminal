@@ -67,3 +67,10 @@ def reto_activo(monkeypatch):
     from terminal import reto
     base = dict(reto.config())
     monkeypatch.setattr(reto, "config", lambda: {**base, "activo": True})
+    from terminal import vigencia  # sus memos dependen del horario del Reto: limpiarlos al entrar y al salir
+    memos = (vigencia._ultima_sesion, vigencia.cierre_de_sesion)
+    for m in memos:
+        m.cache_clear()
+    yield
+    for m in memos:
+        m.cache_clear()

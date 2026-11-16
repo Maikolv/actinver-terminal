@@ -129,6 +129,10 @@ docs/            diseño, auditorías, metodología, decisiones y capturas
 
 | Documento | Contenido |
 |---|---|
+| [Reporte ejecutivo (PDF)](docs/reporte-ejecutivo/reporte-ejecutivo.pdf) | Cómo funciona, metodología y conceptos para usarla |
+| [Video explicativo](docs/video/help-quote-terminal.mp4) | Recorrido narrado de 2 minutos (datos simulados) |
+| [Propuesta de stand](docs/propuesta-stand.md) | Recursos, presupuesto y guion para presentar la terminal |
+| [Auditoría de incorporaciones](docs/auditoria-incorporaciones-20261115.md) | Asistente con Gemini y otras ideas, con costo y riesgo |
 | [Resumen ejecutivo](docs/resumen-ejecutivo.md) | Qué es, estado y decisiones pendientes |
 | [Arquitectura](docs/initial-audit.md) · [DESIGN.md](DESIGN.md) | Flujo de datos y sistema visual |
 | [Metodología cuantitativa](docs/quant-methodology.md) · [Model card](docs/model-card.md) | Resultados fuera de muestra |

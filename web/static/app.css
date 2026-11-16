@@ -117,6 +117,7 @@ a:hover { text-decoration-thickness: 2px; }
 .pestanas[data-grupo="mercado"] [role="tab"]:not([data-grupo="mercado"]),
 .pestanas[data-grupo="investigar"] [role="tab"]:not([data-grupo="investigar"]),
 .pestanas[data-grupo="sistema"] [role="tab"]:not([data-grupo="sistema"]) { display: none; }
+.pestanas[data-grupo="legal"] [role="tab"]:not([data-grupo="legal"]) { display: none; }
 details.tarjeta > summary { cursor: pointer; font-weight: 600; }
 .zona-capturas { display: grid; gap: 4px; border: 2px dashed var(--borde); border-radius: var(--radio); padding: 16px; margin: 10px 0;
   cursor: pointer; background: var(--superficie); }
@@ -565,3 +566,20 @@ tbody tr:hover td { background: var(--superficie-2); }
   .estacion-inspector { display: grid; grid-template-columns: 1fr; }
   .estacion-tabla { max-height: 60vh; }
 }
+/* Escritorio: las tres columnas miden lo mismo (la del gráfico manda); monitor e inspector se desplazan por dentro,
+   sin huecos en blanco debajo de la columna más corta. */
+@media (min-width: 1101px) {
+  .estacion-cuerpo { align-items: stretch; }
+  .estacion-centro { min-height: 560px; }
+  .estacion-monitor, .estacion-inspector { height: 0; min-height: 100%; overflow: auto; }
+  .estacion-monitor { display: flex; flex-direction: column; overflow: hidden; }
+  #estacion-monitor-tabla { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  #estacion-monitor-tabla .estacion-tabla { flex: 1; min-height: 0; max-height: none; }
+}
+/* Apariencia (apariencia.js) */
+:root[data-movimiento="reducido"] *, :root[data-movimiento="reducido"] *::before, :root[data-movimiento="reducido"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+:root[data-densidad="comoda"] th, :root[data-densidad="comoda"] td { padding: 9px 10px; }
+.apariencia-grupo { border: 1px solid var(--borde); border-radius: 4px; padding: 8px 10px; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.apariencia-grupo legend { padding: 0 4px; font-weight: 650; }
+.apariencia-grupo [aria-pressed="true"] { outline: 2px solid var(--acento-grafico); outline-offset: -2px; font-weight: 650; }
