@@ -1,0 +1,823 @@
+{
+ "preambulo": "# Changelog\n\nFormato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.\n\n",
+ "versiones": [
+  {
+   "version": "101",
+   "fecha": "17-nov-2026",
+   "titulo": "Terminal completa en GitHub Pages y prácticas de COATL",
+   "commit": null,
+   "cifras": {
+    "pytest": 962,
+    "node": 55,
+    "axe": 0
+   },
+   "texto": "## 17-nov-2026 — Terminal completa en GitHub Pages y prácticas de COATL\r\n\r\n- **Terminal completa sin servidor:**\r\n  - https://maikolv.github.io/help-quote-terminal/terminal/ con datos simulados;\r\n  - `scripts/exportar_estatico.cjs` graba 220 respuestas de la demo en las 23 pestañas;\r\n  - `web/static/estatico.js` las sirve; escribir, calcular u operar responde con un aviso.\r\n- **Indicador «cálculo listo»** (`<html data-calculo>`).\r\n- **Historial único** `docs/versiones.json` → CHANGELOG y `docs/VERSIONES.md` (`scripts/versiones.py`).\r\n- **Escenario de referencia** con cifras fijas (`terminal/escenario_referencia.py`).\r\n- **Reporte del plan imprimible con QR** (`#r=`, solo parámetros del escenario).\r\n- **Accesibilidad:** axe WCAG 2.1 AA en 0 violaciones (Estación, plan y portafolios a 1440, 375 y 812 px).\r\n- **Reporte ejecutivo** generado desde el motor y compuesto con Chromium.\r\n- **CSP de la gráfica:** imágenes solo de TradingView.\r\n- **Informe:** `docs/mejoras-desde-coatl.md`.\r\n- **Pruebas:** pytest 962 (961 + 1 corregida), Node 55 y axe 0.\r\n\r\n"
+  },
+  {
+   "version": "100",
+   "fecha": "15-nov-2026",
+   "titulo": "Sin espacios en blanco, apariencia, aviso legal, reporte ejecutivo, video y stand",
+   "commit": "96daead",
+   "cifras": {
+    "pytest": "954 + 2 por orden (corregido)",
+    "node": 52
+   },
+   "texto": "## 15-nov-2026 — Sin espacios en blanco, apariencia, aviso legal, reporte ejecutivo, video y stand\n\n- **Estación de Mercado (escritorio):** las tres columnas miden lo mismo. Monitor e inspector se desplazan por dentro: no queda el hueco que dejaba la columna más corta.\n- **Apariencia** (Datos y ayuda → Apariencia, `web/static/apariencia.js`):\n  - tema, tamaño de letra, densidad y movimiento, guardados en el navegador;\n  - un asistente de estética que sugiere ajustes según la pantalla y la hora, y responde preguntas con el asistente de la terminal.\n- **Grupo «Legal» → Aviso legal:** qué es y qué no es la terminal, riesgos, datos, privacidad, limitación de responsabilidad, marcas y ley aplicable. Es una plantilla sin revisión de abogado.\n- **Asistente con Gemini** (opcional y apagado por defecto: `GEMINI_API_KEY` + `[asistente] gemini = true`).\n- **Documentos y materiales:**\n  - reporte ejecutivo HTML y PDF (`docs/reporte-ejecutivo/`);\n  - video narrado de 2 min 4 s (`docs/video/`, `scripts/video_terminal.py`);\n  - propuesta de stand (`docs/propuesta-stand.md`);\n  - prompt para Codex (`docs/prompt-codex-stand-video-20261115.md`).\n- **Pruebas:** el ajuste `reto_activo` limpia la memoria de horarios de `vigencia`, que hacía fallar 2 pruebas según el orden. Node 52; 37 pruebas de Python dirigidas.\n\n"
+  },
+  {
+   "version": "99",
+   "fecha": "14-nov-2026",
+   "titulo": "Portafolio principal y escenario real (sin reglas del Reto)",
+   "commit": "545d9dd",
+   "cifras": {
+    "pytest": 953,
+    "node": 52
+   },
+   "texto": "## 14-nov-2026 — Portafolio principal y escenario real (sin reglas del Reto)\n\n- **Portafolio principal:**\n  - En «Mis portafolios», cada portafolio guardado tiene el botón «Usar como principal».\n  - Con uno elegido, el plan de acción, Telegram y el monitor en la nube llevan la cartera a esos pesos, con banda de no-rebalanceo.\n  - La gestión de riesgo solo agrega ventas (stop roto, tendencia bajista); sus compras de reinversión ya no se suman.\n  - Sin portafolio principal se usa la propuesta automática, como antes.\n  - Archivos: `terminal/portafolio_principal.py`, `PUT /api/portafolios/{id}/principal`, `DELETE /api/portafolio-principal`.\n- **Reglas del Reto apagadas** (`config/reto.yaml: activo: false`):\n  - sin mínimo de 5 emisoras, tope de 50 %, catálogo del simulador ni horario del Reto;\n  - la comisión sale de `[costos]` de su contrato;\n  - la cartera registrada por el usuario cuenta como confirmada (ya no exige captura del portal).\n  - Los datos del Reto se conservan.\n- **Interfaz:** «Mi portafolio Actinver» → «Mi portafolio»; «Reto y perfil» → «Perfil». El plan dice qué portafolio sigue.\n- **Corrección:** el plan ya no repite filas del mismo instrumento cuando la propuesta y la gestión de riesgo hablan de él.\n- **Corrección:** el horario del día no falla en días sin sesión (fin de semana) fuera del Reto.\n- **Pruebas:**\n  - 17 pruebas de reglas del Reto se conservan con el ajuste `reto_activo` (reactiva las reglas solo dentro de la prueba);\n  - 1 prueba nueva del portafolio principal;\n  - Node 52.\n\n"
+  },
+  {
+   "version": "98",
+   "fecha": "13-nov-2026",
+   "titulo": "Guía de inicio y validación de las demos",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 13-nov-2026 — Guía de inicio y validación de las demos\n\n- Guía paso a paso enlazada desde el README y GitHub Pages. Incluye el primer arranque en PowerShell 5.1, la revisión de las pestañas, el puerto alternativo y el reenvío privado en Codespaces.\n- Demo de Pages con 174 instrumentos etiquetados como simulados, favicon y vista móvil. Se revisaron la portada, el monitor, el teclado y las pestañas a 1440 y 390 px.\n- En Windows, el clon limpio tomó 43 s y `uv sync`, 2 min 26 s con Git y uv instalados. La primera respuesta de `/api/estado` en la demo tomó 2 min 29 s. `start.bat demo --sin-navegador` ahora pasa la opción a la terminal.\n- El workflow de Codespaces pasó en 47 s. Queda pendiente comprobar el reenvío privado en un Codespace real con el permiso `codespace`.\n- Pruebas locales: 52 de Node y 17 de seguridad aprobadas.\n\n"
+  },
+  {
+   "version": "97",
+   "fecha": "13-nov-2026",
+   "titulo": "Página del repositorio, GitHub Pages y Codespaces",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 13-nov-2026 — Página del repositorio, GitHub Pages y Codespaces\n\n- README reescrito con el formato de coatl (sitio, capturas, «Qué hace», cómo correr/probar, estructura, seguridad); se quitó «Formación y recursos (18-oct-2026)».\n- Seis capturas nuevas en modo demostración (`docs/capturas/`), sin datos de la cuenta.\n- `sitio/` + `.github/workflows/pages.yml`: portada y estación de Mercado con DATOS SIMULADOS en GitHub Pages (los datos reales no se redistribuyen).\n- `.devcontainer/` y `docs/codespaces.md`: la terminal completa corre en Codespaces; `seguridad.host_codespace` acepta solo el dominio reenviado exacto del propio Codespace cuando `CODESPACES=true` (1 prueba nueva; 17 de seguridad y 52 de Node aprobadas).\n- Artifact privado actualizado con la foto real del 13-nov (212 instrumentos, 36 series, 58 pronósticos).\n\n"
+  },
+  {
+   "version": "96",
+   "fecha": "13-nov-2026",
+   "titulo": "Estación de Mercado (monitor · gráfico · inspector)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 13-nov-2026 — Estación de Mercado (monitor · gráfico · inspector)\n\n- Capturas 33 (12-nov 09:15) y 34 (12-nov 22:54: ABBV, AC, CVX, FEMSA, KOF, LLY, MRK, MRNA, NVAX, PFE, TGT, XOM; valuación $784,440.07, efectivo $379,012.14).\n- Mercado abre con una estación de trabajo (`web/static/estacion.js`): franja de sesión y procedencia, monitor de 212 instrumentos (orden por columna, filtro por texto y universo, moneda por fila, chip del dato según metadatos), gráfico con histórico y proyección 10–90 % separados por un límite rotulado, e inspector en tres bloques (observado, referencia de origen, FUTURO) más su posición y accesos a Mi portafolio Actinver y a la Ficha técnica. Teclado: «/», ↑ ↓, Enter, Escape. Móvil: pestañas Monitor · Gráfico · Detalle. Preferencias locales con «Restaurar».\n- Vistas secundarias de Mercado en pestañas (mapa de calor; calendario, titulares e insiders; panorama TradingView).\n- `/api/visualizaciones/mercado` con caché por marca de datos: 12–23 s → 0.2 s en tibio.\n- Corregido antes de publicar: el monitor mostraba el precio en USD de las SIC sin unidad.\n- DESIGN.md: sección de la estación y token `--mono-simbolo` (única monoespaciada, solo claves); pruebas de estética y navegación ajustadas.\n- Verificado en navegador a 1440, 1024, 390 y 320 px (sin desbordamiento de página); selección rápida de tres instrumentos termina en el último.\n- Segunda tanda: el código general de pestañas solo toma la barra principal (`#lista-pestanas`); antes, las pestañas internas de Mercado y las de móvil de la estación podían ocultar la sección completa. Tablas compactas en toda la terminal (filas de 5 px, encabezado fijo, resaltado de fila) y sin la sombra decorativa de la paleta de comandos.\n- El mapa de Mercado ancla su ventana al último cierre guardado: en demo (datos al 21-sep) el monitor estaba vacío; ahora muestra 174 instrumentos con chip SIMULADO. Sin filas, la estación muestra un estado vacío en lugar de pedir una ficha inexistente. Variaciones de ±0.0 % sin flecha.\n- Verificado: demo (DATOS SIMULADOS en franja, monitor e inspector), modo claro (contraste ≥ 6.5:1 en franja, símbolos, unidades, variaciones y sello FUTURO), las 21 pestañas sin cajas de error nuevas ni desbordamiento. Capturas antes/después en `docs/capturas/` (datos sintéticos).\n- Pendiente: lector de pantalla real y revisión visual de cada sección con el patrón de estación (hoy comparten tokens y densidad, no la disposición en tres columnas).\n\n"
+  },
+  {
+   "version": "95",
+   "fecha": "11-nov-2026",
+   "titulo": "Compras con efectivo libre y emisoras del mismo sector",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 11-nov-2026 — Compras con efectivo libre y emisoras del mismo sector\n\n- Capturas 31 (10-nov 15:00: vendidas MU y GMEXICO) y 32 (11-nov 10:36: compradas AC, FEMSA, KOF, LLY, MRK y TGT; valuación $789,189.36, efectivo $498,710.73).\n- `gestion_riesgo`: además del dinero de las ventas, el plan invierte hasta `efectivo_a_invertir` (10 %) del efectivo libre, y suma emisoras del mismo grupo SIC de la SEC que las posiciones (la que más subió en 3 meses por posición, máximo `afines_max` = 3), solo si van al alza y no rompieron su stop. El mensaje de Telegram explica el cambio y nombra las afines del día (11-nov: COST, MRNA, CVX).\n- Mensaje: sin líneas de «compra 0 acciones»; no pide esperar a las ventas si el efectivo alcanza.\n- Pendiente: una afín cuyo precio supera su monto (COST) se nombra pero no trae orden.\n- Pruebas: 26 de riesgo, plan y mensaje (una nueva de afines).\n\n"
+  },
+  {
+   "version": "94",
+   "fecha": "10-nov-2026",
+   "titulo": "Reglas de riesgo validadas, motor en proceso aparte y «Qué hacer hoy»",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 10-nov-2026 — Reglas de riesgo validadas, motor en proceso aparte y «Qué hacer hoy»\n\nInforme con todas las cifras: `docs/mejora-fable-20261110.md`.\n\n- **Validación fuera de muestra** (`terminal/validacion_riesgo.py`, `uv run python -m terminal.validacion_riesgo`): 1,600 carteras al azar, 7-oct-2022 a 30-sep-2026, señal en t y orden en t+1 con comisión. Las ventas por stop y tendencia reducen la caída (peor 10 %: −7.8 % → −3.2 % a 30 sesiones) pero rinden menos que mantener (−1.1 pp, IC 95 % [−2.1, −0.1]; −9.7 pp a 126 sesiones). Concentración y volatilidad casi no cuestan a 30 sesiones. Sin ventaja demostrada; las reglas no se cambiaron (decisión del usuario). El plan de Telegram añade una línea con estas cifras cuando pide vender.\n- **Motor en proceso aparte** (`terminal/motor_aislado.py`, prioridad baja; `[app] motor_proceso_aparte = false` lo apaga): durante el ciclo, plan 2.7–4.3 s (antes 79 s), Option Flow 1.9 s (antes 24 s), estado/cartera/velas ≤ 0.2 s. Ciclo completo comprobado en el hijo (541 s). Registro en `data/terminal_motor.log`.\n- **Plan más rápido**: la historia de precios se lee una vez y no una por emisora (cálculo 4.99 → 1.75 s; boletas 3.85 → 0.40 s).\n- **Portada**: bloque «Qué hacer hoy» (1 · Vende primero, 2 · Después compra, Mantén) con cantidad, límite, motivo y fecha del precio, igual que Telegram; la guía de la portada abre cerrada. Sin desbordamiento a 375 px; contraste 16.7:1 y 9.4:1 en modo oscuro.\n- **Monitor en la nube**: aviso «tu terminal local no se reporta» a los 90 min sin latido con el mercado abierto (antes solo a las 26 h y en día hábil). Sin desplegar: requiere confirmación.\n- Ya existían y no se duplicaron: cola de descargas con cartera y propuesta primero (`ingesta.orden_cola`) y alerta de datos insuficientes por posición sin precio confiable.\n- Pendiente: GEX y vela de 1 min con mercado abierto, perfil del recálculo de propuestas, retención de Order Flow (propuesta en el informe), modo claro y teclado del bloque nuevo, directriz post-Reto (13-nov 15:00).\n- **Dos modos de venta** (decisión del usuario): «Estricta: vende todo» (por defecto) y «Suave: reduce a la mitad», elegibles en el Plan de acción (`PUT /api/gestion-riesgo/modo`, se guarda en la base y lo usa también Telegram). Validación a 30 sesiones, cartera concentrada: suave +1.1 % de media y −5.8 % en el peor 10 %, frente a +1.0 % y −6.3 % de la estricta y +1.8 % y −7.8 % de mantener; a 126 sesiones, +6.7 % frente a +6.0 % y +10.8 %. Ninguno supera a mantener en rendimiento.\n- **Interfaz sin emojis**: se quitaron los dos fijos y los textos compartidos con Telegram se limpian al pintarlos (`sinEmoji` en `app.js`); solo la vista previa del plan y de las boletas los conserva. Comprobado en la portada: 0 emojis. Oficina, Cuaderno y Mesa no tienen emojis propios; sus textos del servidor no pasan por ese filtro.\n- Cloudflare: sin publicar; `wrangler` pide iniciar sesión con la cuenta del usuario (`npx wrangler login`).\n- Pruebas: Python 950 de la suite completa sin fallas antes del modo de venta; después, 16 de riesgo, plan y simulador (incluye la nueva del modo suave), Node 52 y worker 20.\n\n"
+  },
+  {
+   "version": "93",
+   "fecha": "10-nov-2026",
+   "titulo": "Cinco respaldos en lugar de 14",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 10-nov-2026 — Cinco respaldos en lugar de 14\n\n- `db.RESPALDOS_CONSERVAR = 5` (decisión del usuario): lo usan el respaldo diario del motor y `terminal respaldar` (`--conservar` sigue disponible). Se borraron las 9 copias más viejas (14 al 29-oct): 5.44 → 3.59 GB.\n- Prueba: `tests/test_respaldo.py` aprobada.\n\n"
+  },
+  {
+   "version": "92",
+   "fecha": "9-nov-2026",
+   "titulo": "Captura 30, auditoría y arranque automático",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 9-nov-2026 — Captura 30, auditoría y arranque automático\n\n- Captura 30 del portal (9-nov 22:15): valuación $792,125.03, poder de compra $2,472.95, mismas posiciones (sin ventas ejecutadas); +$28,914 desde el 6-nov.\n- Auditoría: el servidor estuvo apagado del 6-nov 01:26 al 9-nov 22:40 (sin descargas, plan, GEX programado ni avisos). Ciclo tras reiniciar: ingesta 107 s, propuestas 1,196 s, investigación 562 s; vigencia 184 vigentes y 28 vencidos (EODHD: 20 consultas al día).\n- Arranque automático al iniciar sesión en Windows: `scripts/arranque-automatico.ps1` (mismo iniciador, solo 127.0.0.1, sin Tailscale; no hace nada si la terminal ya responde) y `scripts/instalar-arranque-automatico.ps1` (acceso en la carpeta Inicio; `-Quitar` lo elimina). Probado: con la terminal encendida regresa en 4 s sin reiniciarla.\n- Gestión de riesgo: el motivo dice «18% contra su costo» en lugar de «pierde -18%».\n- Almacenamiento: base de 1.43 GB; las operaciones de Order Flow (≈ 830 MB con índices) ya son solo la última sesión de cada emisora (tope de 10,000 por emisora), así que recortarlas a 2 días no libera espacio. Respaldos diarios: 14 copias completas en `data/respaldos` (5.6 GB).\n\n"
+  },
+  {
+   "version": "91",
+   "fecha": "6-nov-2026",
+   "titulo": "Captura 29 y órdenes del plan corregidas",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 6-nov-2026 — Captura 29 y órdenes del plan corregidas\n\n- Captura 29 del portal (6-nov 14:39): valuación $763,210.77, poder de compra $2,472.95, mismas 8 posiciones (sin ventas ejecutadas). La terminal valúa todo con los precios del portal: $763,274.\n- Boleta: si la captura es de un día posterior a la cotización «vigente» de la terminal, el precio de referencia es el del portal (GMEXICO: límite de venta 218.57 con el cierre del 5-nov, arriba de 218.02 del portal; ahora 217.58). Con objetivo 0 % se venden todos los títulos (salía 648 de 650).\n- Mensaje del plan: todas las ventas juntas en 1️⃣ y todas las compras en 2️⃣ (las que esperan el dinero de las ventas, marcadas); antes salía «➕ VENDE» después de una compra y el paso 2 dos veces.\n- Pruebas: `tests/test_mensaje_simple.py` actualizada; 42 de mensaje, boleta y plan aprobadas.\n\n"
+  },
+  {
+   "version": "90",
+   "fecha": "5-nov-2026",
+   "titulo": "Sin pestañas redundantes: Velas, Order Flow y Option Flow solo dentro de la Ficha técnica",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 5-nov-2026 — Sin pestañas redundantes: Velas, Order Flow y Option Flow solo dentro de la Ficha técnica\n\n- Mercado y flujo queda en Mercado, Ficha técnica, Seguimiento y Movimientos públicos. Los contenidos de Velas, Order Flow y Option Flow esperan ocultos en `#almacen-flujo` y se muestran completos en las pestañas internas de la ficha.\n- Quitada también la ficha pequeña del mapa de calor (`fichaCelda`, «Ver cierres e indicadores», «Abrir velas OHLCV»): la ficha técnica ya trae esa información.\n- La guía de la ficha suma los términos de las tres guías retiradas (OHLCV, SIP/IEX, delta, POC, VAH/VAL, GEX, OI y spot); la cobertura por sección pasa a una sola entrada `tab-ficha`.\n- Enlaces: la dirección canónica es `?vista=tab-ficha&simbolo=…&sub=velas|orderflow|optionflow`; las viejas (`?vista=tab-velas…`) redirigen a la ficha. Mesa, Oficina y el aviso BMV apuntan a la ficha.\n- Pruebas ajustadas: `tests/guias.test.mjs`, `tests/mesa_catalogo_auditoria.test.mjs`, `tests/mesa_pendientes.test.mjs` y `tests/test_grafica_vivo.py`. Suite completa: 943 Python y 52 Node aprobadas.\n\n"
+  },
+  {
+   "version": "89",
+   "fecha": "5-nov-2026",
+   "titulo": "Ficha técnica por emisora (Mercado y flujo)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 5-nov-2026 — Ficha técnica por emisora (Mercado y flujo)\n\n- Nueva pestaña «Ficha técnica» junto a Mercado; cada celda del mapa de calor abre la ficha de su emisora. Las consultadas quedan en una lista (preferencia del navegador).\n- `terminal/ficha_tecnica.py` y `/api/ficha-tecnica` (+ `/api/ficha-tecnica/flujo`): precio con su vigencia (tiempo real solo con el flujo IEX; el del portal cuando la captura es más reciente), variaciones 1 día–1 año, rango de 52 semanas, sector, capitalización y su posición; análisis técnico sobre cierres (SMA 20/50/200, EMA 20/50, RSI, MACD, Bollinger, volatilidad, stop por volatilidad) con señales y lectura; velas OHLCV o, sin ellas, la línea de cierres; Order Flow (libro IEX y operaciones SIP); Option Flow (contratos, vencimientos, IV ATM a ≥ 7 días, put/call, volumen inusual, GEX aparte); fundamentales, noticias y los widgets de TradingView disponibles (BMV: técnico, perfil y finanzas). Precio en vivo por SSE en el SIC con el flujo IEX activo.\n- Rendimiento: la ficha base no carga scipy (antes 4.6 s solo por leer el sector) y Order/Option Flow y el GEX llegan después de mostrar lo demás: 3–4 s con el motor tranquilo. Durante la etapa de investigación del motor todas las rutas pesadas se vuelven lentas (optionflow 24 s, plan 79 s): pendiente de auditoría.\n- Corregido antes de publicar: el nombre `pintarFicha` ya existía (ficha de Seguimiento); la nueva es `pintarFichaTecnica`.\n- Velas, Order Flow y Option Flow completos dentro de la ficha (pestañas internas): sus paneles se mueven a la ficha con la emisora elegida (mismos controles, indicadores, libro, footprint, DOM, subasta, TPO, cinta, cadena, superficie de IV, Heston, volumen inusual, GEX, Skylit, importación y actualización) y regresan a su pestaña al visitarla; sin código ni ids duplicados. Sustituyen a los resúmenes de flujo de la ficha.\n- Option Flow y GEX omiten contratos vencidos (la curva de IV de MU abría en el 14-oct, de una cadena del 12-oct; 1,970 contratos vencidos ya no se muestran). La prueba con vencimiento fijo al 20-nov pasa a ser relativa a hoy.\n- Pruebas: `tests/test_ficha_tecnica.py` (3), una nueva en `tests/test_flujo.py`; 65 de flujo y Node 52 aprobadas.\n\n"
+  },
+  {
+   "version": "88",
+   "fecha": "5-nov-2026",
+   "titulo": "Reemplazos y textos cortos en el plan de acción",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 5-nov-2026 — Reemplazos y textos cortos en el plan de acción\n\n- Columna «Reemplazo» en la tabla del plan: el dinero de cada venta se asigna a las compras como flujo de efectivo (de la venta mayor a la menor), con instrumento, monto aproximado y porqué (tendencia, rendimiento de 3 meses y volatilidad frente a la vendida); cada compra dice a quién reemplaza. Telegram añade «Reemplázala con: …» a cada venta.\n- «Motivo» y «Falta o se invalida si» en una línea, con el precio exacto que cambia la decisión (stop, promedio de 20 o 50 días); para lo que se mantiene, el precio al que habría que vender. El detalle completo queda al pasar el cursor.\n- Pruebas: dos nuevas en `tests/test_gestion_riesgo.py`; 59 del plan y 52 de Node aprobadas. Suite completa previa: 935 aprobadas.\n\n"
+  },
+  {
+   "version": "87",
+   "fecha": "5-nov-2026",
+   "titulo": "Plan explícito, captura 28 y auditoría",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 5-nov-2026 — Plan explícito, captura 28 y auditoría\n\n- Captura 28 del portal registrada como 5-nov 14:30 (el usuario la fechó 04/11; sus precios corresponden al 5-nov: MU 12,330 = 657 USD, AMD 7,580 = 404 USD, NVDA 3,409 = 181.6 USD). Valuación $734,482.07, poder de compra $2,472.95, 8 acciones; ACTDUAL ya no aparece.\n- Valuación: un precio de la terminal de un día anterior a la captura ya no gana sobre el del portal (GMEXICO 225.21 del 4-nov frente a 219.01 del portal; ALPEK 14.85 frente a 13.51). La cuenta pasó de $742,043 a $733,465 en la terminal (portal $734,482; la diferencia es el SIC en vivo).\n- Mensaje del plan explícito: «VENDE TODAS tus 25 acciones. Precio límite …», «COMPRA 31 acciones. Precio máximo …» y «✋ MANTÉN (no las vendas): …», sin «revisa primero»; el precio límite es la protección.\n- Auditoría: `mercado.cotizaciones` recorría el último precio de todos los instrumentos aunque se pidiera uno (0.17 s × 15 boletas del plan); con una lista corta filtra antes de agrupar (0.003 s, mismos resultados). Las excepciones del registro eran del 3-nov (sandbox) y no se repiten; el resto son cortes de red con reconexión.\n- Precio límite de las órdenes: si la posición se valuó con el precio del portal, la referencia es ese (GMEXICO pasaba de límite de venta 220.71 —no se ejecutaba con 219.01— a 214.63). El aviso «precios atrasados» ya no nombra posiciones valuadas con la captura del día.\n- Con el criterio Markowitz y sus propuestas recalculándose, el plan espera en lugar de tomar otra lente (`resumen.propuesta_referencia`; antes salía «acciones_rendimiento» a medio recálculo).\n- Pruebas: `tests/test_mensaje_simple.py` y `tests/test_portal.py` ampliadas; 54 + 12 aprobadas en el conjunto afectado.\n\n"
+  },
+  {
+   "version": "86",
+   "fecha": "5-nov-2026",
+   "titulo": "Gestión de riesgo en el plan de acción: vender, reducir o mantener",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 5-nov-2026 — Gestión de riesgo en el plan de acción: vender, reducir o mantener\n\n- Nuevo `terminal/gestion_riesgo.py`, primero en el plan: por posición, stop por volatilidad confirmado por tendencia (máximo de 22 sesiones − 3σ diaria y precio < SMA50 ⇒ vender), tendencia bajista (precio < SMA20 < SMA50 ⇒ reducir a la mitad; con pérdida ≥ 15 % contra el costo ⇒ vender), tope de 25 % por posición y volatilidad objetivo de la cartera de 30 % anual. Respeta el mínimo de 5 emisoras del Reto. Lo liberado se reinvierte en emisoras de la propuesta de referencia con tendencia alcista (precio > SMA50 y SMA20 > SMA50), nunca en las que vende.\n- Las ventas por riesgo mandan sobre «mantener» de la comparación con la propuesta. El mensaje de Telegram y la pestaña Plan de acción abren con «🛡️ Gestión de riesgo» (resultado desde el inicio, volatilidad actual y la que quedaría, y la regla con cifras de cada venta). Parámetros en `[gestion_riesgo]` de la configuración.\n- Con la cartera del 5-nov (−25.8 %, volatilidad 41 %): vender MU, AMD, NVDA, GMEXICO y NVAX (stop roto con tendencia bajista), conservar ALPEK, XOM y PFE y reinvertir en USO, SIGMAF, FIBRAMQ, ALPEK, TGT, FEMSA, KOF, MRK y LLY; volatilidad estimada 12 %. Sin la confirmación por SMA50, la caída general del día vendía también XOM y ALPEK.\n- Pruebas nuevas: `tests/test_gestion_riesgo.py` (3) y la integración en `tests/test_plan_accion.py`. Son reglas de control de pérdidas, no un pronóstico; ninguna garantiza utilidad.\n\n"
+  },
+  {
+   "version": "85",
+   "fecha": "5-nov-2026",
+   "titulo": "Verificación completa",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 5-nov-2026 — Verificación completa\n\n- Suite: 928 pruebas de Python y 52 de Node aprobadas (33 min con el motor corriendo).\n- Recorrido de las 23 secciones: todas con contenido, sin cajas de error.\n- Auditoría de flujo con el mercado abierto (214 instrumentos): los 143 del SIC con velas 1Day/1Hour/15Min/5Min/1Min al día e indicadores completos en la última vela, libro, operaciones, footprint, TPO y cadena con IV. BMV (46) y fondos (25): sin fuente gratuita de flujo, SIN DATO.\n- GEX calculable en MU y NVDA (OI del 23 al 27-oct); AMD y XOM sin OI unido. La tarea programada lo actualiza en la siguiente sesión con la terminal encendida.\n- Ciclo del motor completo: propuestas 1,295 s (con la suite en paralelo y las lentes Markowitz), investigación 462 s.\n\n"
+  },
+  {
+   "version": "84",
+   "fecha": "4-nov-2026",
+   "titulo": "Velas, Order Flow y Option Flow para todo el SIC",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 4-nov-2026 — Velas, Order Flow y Option Flow para todo el SIC\n\n- Las vistas Velas, Order Flow y Option Flow piden solas al proveedor (Alpaca gratuito) lo que falta o está viejo, una vez por instrumento y tipo; antes solo con el botón «Actualizar», y solo 5 de 143 instrumentos SIC tenían velas guardadas.\n- `scripts/rellenar_flujo.py`: carga inicial de los 143 SIC (velas 1Day/1Hour/15Min/5Min/1Min, libro IEX, operaciones SIP, OI y cadena de opciones). Resultado: 142–143 con datos en cada tipo; los huecos fueron cortes de red reintentados.\n- Fuera de sesión, las operaciones se piden y se muestran terminando en el último cierre (antes la ventana «últimos 60/240 min» salía vacía).\n- BRKB: Alpaca exige «BRK.B»; se quitaba el punto y no había velas ni cotización.\n- `/api/flujo/estado`: de 24 s a 0.25 s con millones de operaciones (lista de símbolos por salto de índice en vez de DISTINCT).\n- GEX: solo calculable con el mercado abierto (spot a ≤ 60 s de la cadena); la tarea programada se activó en `config/local.toml` para las emisoras SIC en cartera. BMV y fondos siguen sin fuente gratuita de flujo intradía ni opciones.\n\n"
+  },
+  {
+   "version": "83",
+   "fecha": "4-nov-2026",
+   "titulo": "Propuestas y plan de acción con la teoría de Markowitz",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 4-nov-2026 — Propuestas y plan de acción con la teoría de Markowitz\n\n- Nuevo criterio del plan «Markowitz: máximo Sharpe» (Reto y perfil), ahora el del usuario (antes «mayor ganancia»). El plan toma, entre las propuestas de la lente «Markowitz (Solver)», la de mayor Sharpe medido con el mismo método que la cartera actual (`resumen.sharpe_plan`).\n- Cambiar o mantener se decide por Sharpe: la propuesta, con la comisión de cambiar descontada de su rendimiento en el horizonte, debe superar el Sharpe de mantener la cartera por 0.10 (`resumen.MARGEN_SHARPE`). `_frente_a_mantener` reporta media anual, volatilidad y Sharpe sobre CETES 28 para ambas; todas las lentes guardan la tasa libre de riesgo usada.\n- El mensaje de Telegram, la nota del plan de acción y la boleta del plan del día explican la decisión en Sharpe (`resumen.texto_mantener`); «Por qué esta» describe el portafolio de máximo Sharpe.\n- Con el criterio Markowitz, la propuesta del día fijada solo puede ser de la lente Markowitz (si se está recalculando, el plan espera) y entre sesiones se cambia solo si el Sharpe mejora en 0.10 o más.\n- Propuestas abre en la lente «Markowitz (Solver)». Pruebas nuevas en `tests/test_referencia_plan.py`.\n\n"
+  },
+  {
+   "version": "82",
+   "fecha": "3-nov-2026",
+   "titulo": "Solver de Markowitz, horizonte de predicción y la «Matriz de precios» del usuario",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 3-nov-2026 — Solver de Markowitz, horizonte de predicción y la «Matriz de precios» del usuario\n\n- **Mis portafolios**: bloque «Solver de Markowitz» con el portafolio de máximo Sharpe bajo las mismas restricciones (suma 100 %, tope/mínimo por instrumento, topes por moneda y sector), su diferencia con el elegido y un botón para usar sus pesos. Horizonte de la predicción en días, semanas, meses o años (`horizonte_valor` + `horizonte_unidad`; 1 semana = 5 sesiones, 1 mes = 21, 1 año = 252) con rendimiento esperado, rango del 90 %, probabilidad de pérdida y valores en MXN para el elegido, el Solver y 1/N (`markowitz.proyeccion`: E·t, σ·√t, normal; extrapola la historia, no la predice).\n- **Excel**: cada hoja de modelo trae el modelo de Solver guardado (nombres ocultos `solver_*`: maximizar el Sharpe cambiando los pesos, suma = 1, tope y mínimo, GRG Nonlinear): Datos → Solver → Resolver. Columna «Peso Solver (terminal)» y bloque de proyección con lista de unidades. La plantilla suma la hoja «Matriz de precios» del documento del usuario (AAL, ABNB, MU, XOM, MSFT, 12–30-oct-2026, en `config/markowitz_matriz_ejemplo.csv`), con su misma estructura completada: covarianzas, rendimiento/varianza/σ del portafolio, anualización, Sharpe, proyección y Solver. Fórmulas verificadas con un evaluador externo (`formulas`) contra numpy: idénticas.\n- **Propuestas**: cuarta lente «Markowitz (Solver)» = portafolio tangente (`MeanRisk` MAXIMIZE_RATIO con r_f = CETES 28 de Banxico), mismas restricciones, validación y comparación que las demás. Con datos reales: 21 s (acciones) y 38 s (mixta) más por ciclo del motor. Horizonte del perfil en días, semanas, meses o años (mínimo 1 día).\n- Corregido: la descarga de Excel de portafolios guardados antes de este cambio fallaba (404) porque su especificación no traía el horizonte nuevo; ahora se usa la especificación normalizada. Las tres descargas (plantilla, todos, uno) verificadas desde el servidor y el navegador.\n- Pruebas nuevas en `tests/test_markowitz.py` (horizonte, Solver, nombres de Solver en el Excel, validación del perfil, Excel de un guardado antiguo) y `tests/test_optimizador.py` (lente Markowitz). Node 52/52.\n\n"
+  },
+  {
+   "version": "81",
+   "fecha": "3-nov-2026",
+   "titulo": "Excel «Benchmarks_time_series» como dato histórico absoluto",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 3-nov-2026 — Excel «Benchmarks_time_series» como dato histórico absoluto\n\n- Es el mismo archivo importado el 7-oct (sha256 idéntico). Hasta hoy solo lo usaban la validación V1 con historia larga y el TSM mensual; el generador y el resto de la terminal no.\n- `historia_externa.empalmar`/`precios_largos`: hasta el 9-oct-2025 mandan los rendimientos del Excel (todas las columnas mapeadas, no solo las verificadas); después, la serie local; el precio de hoy no cambia. Huecos ≤ 25 sesiones se informan como «sin cambio»; más largos (ACTDUAL) no se empalman. No entra a `precios`.\n- Mis portafolios: ventanas de 5 y 10 años (2,520 sesiones desde feb-2017 con tu cuenta) y prueba fuera de muestra más larga (167 meses con ventana de 1 año). Seguimiento › Comparar: 5 y 10 años.\n- Prueba nueva en `tests/test_historia_externa.py`; `test_historia_externa`, `test_markowitz`, `test_etapa3`: 29 aprobadas. Detalle en `docs/historia-externa.md`.\n\n"
+  },
+  {
+   "version": "80",
+   "fecha": "3-nov-2026",
+   "titulo": "«Mi cuenta principal» en Mis portafolios",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 3-nov-2026 — «Mi cuenta principal» en Mis portafolios\n\n- Decidir › Mis portafolios › 1. Perfil tiene un quinto perfil, **Mi cuenta principal**: pega las posiciones y los pesos por valor (sin efectivo) de la cartera de la cuenta, la misma de «Cartera» (captura vigente del portal o registro local). Método «Pesos actuales de su cuenta»; cualquier otro método reparte los mismos instrumentos para comparar. Capital a simular = valor de la cuenta.\n- Se actualiza solo: el servidor lee la cartera en cada cálculo; la interfaz compara una firma (posiciones + captura) al entrar a la sección y cada minuto mientras está a la vista. Los portafolios guardados con ese origen se recalculan al listar o descargar en Excel cuando la cartera cambió, conservando los instrumentos agregados aparte.\n- Instrumentos sin historia (ACTDUAL B) quedan fuera y los pesos se reescalan con aviso; los topes por moneda/sector se informan en lugar de rechazar la cuenta. Solo simula: no envía órdenes.\n- Rutas: `/api/portafolios` incluye `cuenta`; nueva `GET /api/portafolios/cuenta`. Prueba nueva en `tests/test_markowitz.py`.\n\n"
+  },
+  {
+   "version": "79",
+   "fecha": "3-nov-2026",
+   "titulo": "Revisión de los 21 widgets de TradingView",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 3-nov-2026 — Revisión de los 21 widgets de TradingView\n\n- Se abrieron uno por uno los 21 tipos de widget y la gráfica con SIC (MU, SPY) y BMV (GMEXICO, ALPEK, WALMEX, NAFTRAC).\n- Medidor técnico del S&P 500: el CFD `FOREXCOM:SPXUSD` no tiene análisis técnico en el widget gratuito («Aquí todavía no existen datos»); ahora usa `AMEX:SPY`.\n- Perfil de la empresa: TradingView no publica la descripción en español (MU, GMEXICO salían vacíos); el widget de perfil se pide en inglés.\n- BMV: TradingView reserva para su plataforma la gráfica, el precio, el panorama y las noticias de **todas** las emisoras (no solo AMX/SMARTRC). `/grafica` y esos widgets devuelven un aviso local con enlaces a Velas y a TradingView; Velas, la ficha y Mesa ya no muestran marcos vacíos. Perfil, fundamentales y técnico de la BMV sí se muestran.\n- Pruebas: `test_grafica_vivo`, `test_seguridad`, `test_etapa3` 25 aprobadas; Node 52.\n\n"
+  },
+  {
+   "version": "78",
+   "fecha": "3-nov-2026",
+   "titulo": "Seguimiento: comparación de varios instrumentos y captura 27",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 3-nov-2026 — Seguimiento: comparación de varios instrumentos y captura 27\n\n- Comparación: un solo selector de 1 a 8 instrumentos (casillas de la lista, buscador por clave con Enter, atajos «Mi cartera», «Toda la lista» y «Limpiar»), con etiquetas que se quitan con ×. Antes las casillas y la lista múltiple (Ctrl+clic) se sobrescribían entre sí y exigían 2 como mínimo.\n- `/api/comparar` acepta 1 instrumento (siempre contra la referencia) y omite, avisando, los que no tienen historia suficiente en lugar de fallar toda la comparación. `tests/test_etapa3.py` 7 aprobadas; Node 52; suite completa previa 916 aprobadas.\n- Captura del portal 3-nov 14:27 (registro 27): valuación $872,402.68, poder de compra $2,472.95, GMEXICO B 650 títulos.\n- Se sube también el trabajo de Codex del 1 al 3-nov (proveedores gratuitos, cuarentena de cierres, Retry-After, lecturas ligeras, BEA/BLS); auditoría en la respuesta de la sesión.\n\n"
+  },
+  {
+   "version": "77",
+   "fecha": "[2026-11-01",
+   "titulo": "comprobación manual gratuita de proveedores]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 — comprobación manual gratuita de proveedores]\n\n- Verificados por API FRED DGS30 y Banxico SF61745, SP1 y SF30057; este último conserva su frecuencia de promedio mensual. Importación independiente H.15 con fuente y huellas propias.\n- SEC: cien publicaciones de cuatro emisoras; XOM actual identificado como CIK 2115436, sin mezclar el histórico rechazado.\n- Alpha: tres estimaciones y 32 BPA históricos guardados. Primeras capturas locales, moneda/base contable no informadas; ventana pre/post-market separada de hora exacta. Reacción y revisiones no observadas SIN DATO.\n- Ocho consultas iniciales y seis adicionales autorizadas con el cargador habitual solo en memoria; no se imprimieron ni copiaron claves. Conectores automáticos apagados, sin operaciones, mensajes externos, commit o push.\n- Recorrido aislado de Mesa: 1440/390 px, claro/oscuro, sin errores JS ni desbordamiento; 379 observaciones públicas, sin precios/cartera/claves. Pruebas y límites finales en `docs/avance-gratuitos-20261101.md`.\n\n"
+  },
+  {
+   "version": "76",
+   "fecha": "[2026-11-01",
+   "titulo": "conectores opcionales de Mesa, sin activar proveedores]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 — conectores opcionales de Mesa, sin activar proveedores]\n\n- DGS30 agregado al conector FRED; el requisito desaparece con observaciones disponibles al corte.\n- Banxico SIE optativo valida identidad antes de solicitar datos; bono M10 e INPC sin ID confirmado siguen SIN DATO.\n- Calendario de investigación con publicación SEC separada del anuncio, estimaciones versionadas y tres campos BPA distintos; conectores SEC/Alpha apagados por defecto. Sin permiso de plan comprobado.\n- Diagnóstico Twelve de una petición, sin activar respaldo BMV ni cambiar la cola. Sin claves disponibles por mecanismos permitidos: comprobaciones reales pendientes, sin leer `.env`.\n- Pruebas y bloqueos en `docs/proveedores-mesa-20261101.md`; sin operaciones, mensajes externos, commit o push.\n\n"
+  },
+  {
+   "version": "75",
+   "fecha": "[2026-11-01 (mañana, 5)",
+   "titulo": "documentos de la terminal solo sobre Actinver Terminal]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 (mañana, 5) — documentos de la terminal solo sobre Actinver Terminal]\n\n- **Borrados** de `web/static/recursos/` (18): prompts de trabajo de otras sesiones, documentos de futuros (Lucid, NQ,\n  preregistro y resultados), la compatibilidad Quantower/TradingView, el prompt de práctica de futuros en TradingView,\n  el PDF y los documentos de integración del 25-oct (más de un tercio trataba de futuros), y sus entradas del catálogo de\n  aprendizaje. Siguen en el historial de git.\n- **Limpiados** a mano: guía AMT (sin Lucid ni vectores C#), incorporación del 28-oct (tabla sin la columna retirada y\n  comandos con `uv run --with`), oficina, reels del 20 y 31-oct, laboratorio de backtesting, `reels-20261031-fuentes.json`,\n  `config/amt-recursos-locales.json` y los ZIP. Cero menciones de Quantower, futuros-lab, Lucid, Rithmic o Tradovate en lo\n  que sirve la terminal.\n- Pruebas: Node 43/43; Python 16/16 (recursos, inventario y referencias).\n\n"
+  },
+  {
+   "version": "74",
+   "fecha": "[2026-11-01 (mañana, 4)",
+   "titulo": "sin futuros-lab en la terminal y acceso directo con el logo]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 (mañana, 4) — sin futuros-lab en la terminal y acceso directo con el logo]\n\n- **Quitado**: futuros-lab de la terminal. La guía AMT reproduce todo con Velas › Importar CSV, Order Flow, la API\n  `/api/flujo/perfiles` y `tests/test_subasta.py`; el Cuaderno describe la revisión de datos de futuros con Velas, Order\n  Flow y Mesa; el ZIP de AMT trae solo el módulo de la terminal, su prueba, el Pine y la guía. 13 documentos de archivo\n  no enlazados conservan la mención histórica.\n- **Nuevo**: `launcher/actinver-terminal.ico` (mismo logo que `favicon.svg`), incrustado en `ActinverTerminal.exe` y en\n  el acceso «Actinver Terminal» del Escritorio. `crear-acceso-directo.ps1` compila el iniciador si falta. El iniciador\n  enciende la terminal si no responde y abre el navegador; probado con la terminal encendida (código 0).\n\n"
+  },
+  {
+   "version": "73",
+   "fecha": "[2026-11-01 (mañana, 3)",
+   "titulo": "sin Quantower, Python aplicado dentro del Cuaderno y más indicadores de terminal]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 (mañana, 3) — sin Quantower, Python aplicado dentro del Cuaderno y más indicadores de terminal]\n\n- **Quitado**: Quantower de la terminal. Order Flow «Cómo leerlo y usarlo en la terminal»; guía AMT con una tabla de\n  equivalencias (TPO, perfil de volumen, footprint, libro, cinta, delta, indicadores, riesgo NQ, alertas, backtesting y\n  Mesa); ZIP de AMT sin proyecto/DLL de Quantower; prompt de Quantower y sus entradas del catálogo de aprendizaje\n  eliminados. 19 documentos de archivo no enlazados en `recursos/` conservan la mención histórica.\n- **Cambiado**: «Python aplicado» es la sección 04 del Cuaderno financiero (sin página aparte).\n- **Nuevo**: Mercado con gráfica comparada de índices y dólar (línea neutra) y medidor técnico del S&P 500; barra común\n  con estado de sesión NYSE/BMV (punto + texto, cada minuto solo con la página visible) y línea de acento en la cabecera.\n- Pruebas: Node 43/43; Python específicas 10/10 (widgets y recursos).\n\n"
+  },
+  {
+   "version": "72",
+   "fecha": "[2026-11-01 (mañana, 2)",
+   "titulo": "sin cripto, mapas de calor verde/rojo/gris y aprobación de cualquier cobro]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 (mañana, 2) — sin cripto, mapas de calor verde/rojo/gris y aprobación de cualquier cobro]\n\n- **Quitado**: cripto de la interfaz (mapa y tabla de TradingView, grupo de cotizaciones, cinta, panel de Mesa —22\n  tipos—, selectores de Velas/Order Flow, guías y Cuaderno). `flujo.cripto.activo = false` por defecto; el conector se\n  conserva solo para sus pruebas.\n- **Cambiado**: mapas de calor propios en verde (positivo), rojo (negativo) y gris (neutro o sin dato) con `colorCalor`.\n- **Nuevo**: `terminal/costos.py` y Datos y fuentes › «Servicios con costo». Ningún servicio que cobre se usa sin\n  aprobación: la API de Claude (pago por uso) queda sin usar aunque haya credencial, se alerta (escritorio y Telegram)\n  y se aprueba o desiste con botones (POST con CSRF). Revisión del 1-nov: nada cobra hoy (todo en planes gratuitos,\n  Asistente en motor local, Cloudflare Free sin tarjeta).\n- Pruebas: específicas 17/17 (costos, bot, alertas) y 22/22 (bot, flujo); Node 43/43. Suite completa en evidencia.\n\n"
+  },
+  {
+   "version": "71",
+   "fecha": "[2026-11-01 (mañana)",
+   "titulo": "widgets siempre negros, una sola tipografía, ningún widget cortado y proveedores para Codex]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 (mañana) — widgets siempre negros, una sola tipografía, ningún widget cortado y proveedores para Codex]\n\n- **Cambiado**: los widgets de TradingView se piden siempre en tema oscuro (negro), en cualquier modo de la terminal.\n- **Cambiado**: una sola familia tipográfica (Segoe UI) en terminal, Mesa, Oficina, Cuaderno, Formación, widgets y Excel;\n  las cifras se alinean con números tabulares.\n- **Corregido**: widgets cortados. El rótulo «Datos de TradingView» medía 36 px en un hueco de 32; la gráfica perdía 22 px\n  por una cabecera de 62 px con 40 fijos; la ficha «info» necesitaba 211 px y tenía 190; la cinta, 116 y tenía 76. Ahora\n  `navegacion.mjs` agranda cada marco hasta su contenido (tope 2000 px) y los tableros de cotizaciones caben completos.\n  Medido en 22 marcos: contenido = alto interior, sin corte ni bucle.\n- **Nuevo**: `docs/prompt-codex-proveedores-20261101.md` con proveedores gratuitos (FRED, Banxico SIE, INEGI, SEC EDGAR,\n  Alpha Vantage, Finnhub, Twelve Data), prompt para Codex y lista de pago por calidad/precio.\n- Pruebas: Node 43/43; Python específicas 20/20 (grafica, mesa, formación). Suite completa no repetida.\n\n"
+  },
+  {
+   "version": "70",
+   "fecha": "[2026-11-01 (madrugada)",
+   "titulo": "terminal profesional negro/gris/rojo, Mesa con funciones de OpenTerminal y Excel con la misma identidad]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 (madrugada) — terminal profesional negro/gris/rojo, Mesa con funciones de OpenTerminal y Excel con la misma identidad]\n\n- **Cambiado**: sistema visual único con tokens medidos (WCAG AA) en `DESIGN.md`: negro y grises, texto blanco, rojo de\n  identidad (texto, sólido y gráfico separados), enlaces blancos con subrayado rojo, variaciones con signo y flecha.\n  Logo, favicon, widgets (transparentes) y Excel de Markowitz con el mismo rojo.\n- **Nuevo en Mesa**: paleta de comandos (instrumentos, secciones, paneles, disposiciones), franja de Seguimiento con la\n  misma lista, «Ancho» y arrastre con equivalente por teclado, disposiciones con nombre y migración de las anteriores;\n  Ficha con gráfica nativa (línea/velas/volumen/SMA/rango), noticias deduplicadas, panel macro y resumen fechado, y\n  calendario económico. Backend de solo lectura `terminal/mesa_datos.py` y rutas `/api/mesa/*`.\n- **Bloqueado**: resultados empresariales (sin fuente autorizada; contrato y cálculo sin fuga listos y probados).\n- **Excel**: 0 cambios en fórmulas, números y formatos (comparación celda por celda); revisión en Excel pendiente.\n- **Antes, el mismo día**: se quitó el Laboratorio de alfa de la interfaz, pestañas ordenadas por grupo, botones con\n  nombres consistentes, opciones precargadas en el Cuaderno y widgets macro y cripto.\n- Pruebas: Python 762/762 (10 min 19 s), Node 40/40. Detalle: `docs/terminal-pro-20261101.md`.\n\n"
+  },
+  {
+   "version": "69",
+   "fecha": "[2026-11-01",
+   "titulo": "una sola identidad visual, laboratorio en Datos y fuentes y ejemplos listos]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-11-01 — una sola identidad visual, laboratorio en Datos y fuentes y ejemplos listos]\n\n- **Cambiado**: las cinco áreas (terminal, Oficina, Laboratorio de alfa, Cuaderno y Mesa) comparten logo, cabecera y\n  barra de navegación; una prueba lo exige. Los títulos de cada sección coinciden con su pestaña y las guías usan un\n  lenguaje más claro. Mesa ya tiene guía.\n- **Quitado**: la página «Laboratorio de bots»; su contenido vive en Datos y fuentes › Recursos de backtesting.\n- **Nuevo**: escenarios listos con lectura en palabras simples en la calculadora NQ de Mesa y ejemplos listos en\n  Modelos. Principio de diseño en `DESIGN.md`: toda calculadora abre con un resultado válido y ejemplos predefinidos.\n- Se sube también el trabajo pendiente de las sesiones del 31-oct (Mesa, reels, optimización y TradingView).\n- Pruebas: Python 741/741 (8 min 8 s), Node 34/34.\n\n"
+  },
+  {
+   "version": "68",
+   "fecha": "[2026-10-31",
+   "titulo": "auditoría de procesos: CI dependiente de la hora, ventana del GEX y arranque de la terminal]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-31 — auditoría de procesos: CI dependiente de la hora, ventana del GEX y arranque de la terminal]\n\n- **Corregido**: `reportes._seccion_motor` usa la hora del reporte y tolera un motor sin ciclo previo. El CI del 29-oct\n  falló (4 pruebas, `KeyError: 'ultimo_ciclo'`) solo porque corrió con el mercado abierto; la prueba ahora fija ese caso.\n- **Corregido**: los contratos Paper (OI) piden la misma ventana de vencimientos que la cadena (`DIAS_CADENA = 60`); antes\n  pedían 183 días con tope de 3 páginas y MU solo usaba 957 de 3,294 contratos (29 %). Prueba nueva en\n  `tests/test_contratos_paper.py`.\n- **Nuevo**: `scripts/arranque-al-iniciar-sesion.ps1` (lo ejecuta el usuario; `-Quitar` lo revierte). El 30-oct la\n  terminal estuvo apagada: sin ciclo, avisos ni respaldo.\n- AMD sin cierre del 30-oct por Tiingo (0 barras); recuperado con `terminal actualizar`. 26 emisoras BMV siguen sin el\n  cierre del 30-oct por la cuota de EODHD.\n- Pruebas: Python 725/725 (10 min 7 s), Node 31/31, worker 19/19. Pendientes y prompt de Codex en\n  ese mismo documento.\n\n"
+  },
+  {
+   "version": "67",
+   "fecha": "[2026-10-29 (mañana)",
+   "titulo": "la cola de EODHD ya no se atasca; aviso del motor corregido]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-29 (mañana) — la cola de EODHD ya no se atasca; aviso del motor corregido]\n\n### Corregido\n- **31 emisoras BMV sin cierre, algunas desde el 5-oct.** El cupo de EODHD (18 consultas al día) se gastaba siempre\n  en las mismas: 15 de cartera y propuestas y, con las 3 restantes, «el dato más viejo primero» (SMARTRC, TERRA,\n  LASITE), que EODHD no actualiza; nunca avanzaba a WALMEX, AMX, CEMEX, etc. Ahora la cola registra cada intento\n  (`intentos_precio`) y rota por el último intento; un nunca cargado sin datos en 7 días pierde su reserva.\n- El aviso «Motor sin ciclo» ya no sale mientras un ciclo recién iniciado está corriendo, y muestra la hora local.\n\n"
+  },
+  {
+   "version": "66",
+   "fecha": "[2026-10-29",
+   "titulo": "caché de estado, procedencia por sección y vistas Black-Litterman]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-29 — caché de estado, procedencia por sección y vistas Black-Litterman]\n\n- `/api/estado` usa cotizaciones en caché por la marca del Ranking y las actualiza en segundo plano; el estado y el\n  Ranking se precalientan al arrancar. La prueba tibia respondió en menos de 1 s ante una lectura simulada de 1.2 s.\n- «Datos y fuentes» muestra dato, fuente, retraso y vigencia de las 24 secciones desde una declaración del código;\n  una prueba exige declaración al agregar una sección.\n- El generador acepta vistas anuales propias, absolutas o relativas, y confianza para Black-Litterman. La prueba\n  fuera de muestra recalcula esos pesos con el tramo de entrenamiento y los compara con 1/N.\n- scikit-learn quedó como dependencia directa; referencias de software registran licencia por paquete y una prueba\n  la contrasta con `importlib.metadata` de los paquetes instalados. Las guías describen las funciones actuales.\n- Verificación final: 717 pruebas Python aprobadas en 13 min 08 s, 1 advertencia de Starlette; Node 13/13.\n  Falta comprobar GEX con mercado abierto, el libro en Excel y los widgets en un navegador que los cargue.\n\n\n"
+  },
+  {
+   "version": "65",
+   "fecha": "[2026-10-29 (madrugada)",
+   "titulo": "barra de estado rápida, Ranking precalentado, sectores de ETF y licencias verificadas]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-29 (madrugada) — barra de estado rápida, Ranking precalentado, sectores de ETF y licencias verificadas]\n\nTrabajo repartido con una sesión de Codex en paralelo (decisión del usuario): Codex hizo la tabla de cobertura por\nsección, Black-Litterman y la revisión de guías; esta sesión, los puntos de abajo.\n\n### Corregido\n- `/api/estado` usa una caché de cotizaciones solo para la barra de estado: responde con el cálculo anterior y lo\n  recalcula en segundo plano si cambiaron los datos (a lo sumo cada 15 s) o pasó 1 min; nunca con más de 10 min. En\n  proceso, 0.18 s con la caché caliente. En el servidor, 0.75–1.2 s con el motor corriendo y un pico de 3.2 s mientras\n  la PC también corría la suite de Codex.\n- El Ranking se precalienta al arrancar, en segundo plano: la primera visita tardó 0.36 s (antes 19–42 s).\n\n### Agregado\n- `config/sectores.csv` con columna `grupo` y una fila por instrumento: 104 acciones de EE. UU. por grupo SIC de la SEC,\n  14 ETF con el sector que declara su nombre oficial (XLE, XLF, XLK, XLV, VGT, SOXX, VNQ, GDX, ICLN, QCLN, TAN, LIT,\n  BOTZ, KWEB) y filas vacías con su motivo: ETF amplios, de bonos o materias primas, y las 44 emisoras BMV. La\n  clasificación oficial de la BMV existe en cada ficha de bmv.com.mx, pero la lista que da los identificadores está\n  protegida contra robots (F5) y no se automatiza. Las taxonomías no se mezclan entre sí.\n- Licencias por paquete en `web/static/referencias.json` y prueba contra `importlib.metadata`. Se corrigió NumPy:\n  `BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0`.\n- `scikit-learn>=1.5` como dependencia directa (antes llegaba por skfolio).\n\n### Verificación final (03:50, tras terminar Codex)\n- 718 pruebas de Python y 13 de Node aprobadas; las 24 pestañas con guía y sin cajas de error.\n- `/api/estado` 0.02–0.06 s con el motor en espera y 0.03–0.35 s durante un recálculo de propuestas.\n- Black-Litterman de Codex revisado; la nota fuera de muestra ahora avisa que las vistas de hoy aplicadas al pasado\n  favorecen a la propuesta.\n- GEX con el mercado abierto: pendiente (el mercado de EE. UU. abre a las 07:30 CDMX).\n\n"
+  },
+  {
+   "version": "64",
+   "fecha": "[2026-10-29",
+   "titulo": "guía en cada sección, referencias citadas, Oficina optimizada]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-29 — guía en cada sección, referencias citadas, Oficina optimizada]\n\n### Agregado\n- **Guía al inicio de cada sección, sin excepción**: las 24 pestañas de la terminal y las páginas Oficina de\n  inversión, Laboratorio de bots y Cuaderno financiero (`web/static/guias.mjs`). Cada guía dice qué es la sección, cómo\n  usarla paso a paso y qué significan sus términos; se puede plegar y recuerda su estado. `tests/guias.test.mjs`\n  falla si una sección nueva no tiene guía.\n- **Referencias y créditos** en Ayuda (`web/static/referencias.json`): 23 fuentes de datos, 5 servicios, 25 entradas\n  de software con su licencia y 24 publicaciones y métodos (Markowitz, Sharpe, Ledoit-Wolf, 1/N, Black-Scholes,\n  Merton, Heston, Holm, Diebold-Mariano, Newey-West, Brier, Platt, TSM, CVaR, SPP, Wilder, Bollinger, MACD,\n  estocástico, Market Profile, GEX y Skylit). `tests/test_referencias.py` comprueba que toda dependencia del proyecto\n  y todo proveedor de datos del código estén citados.\n- `docs/prompt-pendientes-2026-10-29.md`: lo que necesita el usuario y los prompts para Claude Code y para Codex.\n\n### Cambiado\n- **Oficina de inversión**: la consulta se hace sola al elegir el instrumento o el intervalo; recuerda la última\n  selección y acepta `?simbolo=`; los instrumentos con datos guardados aparecen primero; nueva tarjeta «Abrir este\n  instrumento en» (Velas, Order Flow, Option Flow con GEX y Ranking). La terminal acepta `?simbolo=` para abrir esas\n  secciones con el instrumento elegido.\n- Se retiraron de la interfaz los documentos de trabajo: la tarjeta «Documentos de trabajo» de la Oficina y los\n  enlaces a prompts internos del Laboratorio de bots. Los archivos siguen en el repositorio.\n- El texto de requisitos del GEX explica el flujo actual («Preparar GEX» y spot unido a ≤ 60 s).\n\n### Verificación\n- Suite: 707 pruebas de Python y 13 de Node aprobadas.\n- Navegador: las 24 pestañas cargan sin errores ni mensajes de consola; las 3 páginas de área muestran su guía; la\n  Oficina consulta NVDA sola y abre Option Flow con NVDA elegido; sin desbordamiento a 375 px.\n- GEX: la sección aparece y explica qué falta; la cadena guardada es del 28-oct (antes de la unión del spot), así que\n  sigue «no calculable» hasta preparar una cadena nueva con el mercado abierto.\n\n"
+  },
+  {
+   "version": "63",
+   "fecha": "[2026-10-28 (noche)",
+   "titulo": "pendientes de las auditorías: motor, Ranking, CETES, GEX, fuera de muestra y vela en vivo]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-28 (noche) — pendientes de las auditorías: motor, Ranking, CETES, GEX, fuera de muestra y vela en vivo]\n\n### Corregido\n- **Generador lento con el motor corriendo.** Medido contra la terminal real durante un ciclo completo: 0.4–1.0 s en\n  ingesta, contexto y propuestas (antes 4–18 s; la espera de más de 2 min del 28-oct no se reprodujo). Derivadas\n  exactas en el optimizador (de 0.93 s a 0.2 s), la matriz de precios se lee una sola vez y queda en caché hasta que\n  entran datos nuevos.\n- Escrituras breves con reintento ante «database is locked» (`db.escribir`): estado del motor, nube y CETES.\n\n### Agregado\n- **Motor:** guarda en la base el inicio y cada etapa del ciclo (cartera, ingesta, contexto, propuestas,\n  investigación, alertas); la barra de estado muestra la etapa en curso y «Motor sin ciclo desde …» si pasan más de\n  2 h con el mercado abierto. Un ciclo fallido queda cerrado con su error.\n- **Ranking en caché** por marca de datos (precios, tipo de cambio, calificaciones, capitalización): 0.1 s en tibio\n  (antes 5–30 s); tolera 2 min de atraso del flujo en vivo y se renueva cada 15 min por la vigencia.\n- **Tasa libre de riesgo** inicial del generador: CETES 28 días de Banxico SIE (serie SF43936, confirmada en el\n  catálogo; 6.22 % al 29-oct), con fecha y fuente visibles. Sin dato: la última guardada; sin ninguna, 7 % y lo dice.\n- **GEX, opción (a):** a la cadena de Alpaca se une el spot de la última operación de la acción (SIP o IEX) a ≤ 60 s\n  de la cotización más reciente, solo para los contratos cotizados a ≤ 60 s de ella, con procedencia en la nota.\n  Tarea opcional del motor (`[flujo.gex_programado]`, apagada): OI antes de la apertura y cadena a las 10:00 y 14:00\n  NY para los subyacentes SIC en cartera.\n- **Generador:** prueba fuera de muestra frente a 1/N (walk-forward, rebalanceo mensual, comisión del Reto) junto al\n  resultado; covarianza Ledoit-Wolf opcional; topes opcionales en dólares (SIC) y por sector (grupo SIC de 2 dígitos\n  de la SEC, `config/sectores.csv`, 104 emisoras; `scripts/sectores_sec.py`).\n- **Cola de EODHD:** los portafolios guardados entran con las propuestas, tras la cartera; la barra de estado cuenta\n  las emisoras BMV sin cierre de la última sesión.\n- **Proveedores:** antigüedad del último error («error hace 34 días») y «sin uso reciente» si no corre en 7 días.\n- **Velas:** con el flujo IEX activo, la última vela de 1 minuto se actualiza por SSE (`/api/flujo/vela-viva`) con\n  la etiqueta «IEX en vivo, volumen parcial»; se arma en memoria y nunca se escribe en la base.\n\n### Cambiado\n- `testpaths = [\"tests\"]`: `uv run pytest` ya no recoge `tools/`. Se retiraron los estilos `.accesos--relacionados`\n  (sin uso en HTML ni JS). `VACUUM` mensual tras el respaldo verificado, con los mercados cerrados. Los registros\n  `data/terminal_*.log` pasan a `data/logs/` con fecha al arrancar desde el lanzador y se conservan 14 días.\n- Bonos de EE. UU. en el widget de cotizaciones: ETF del Tesoro (SHY, IEF, TLT, precio) en lugar de los rendimientos\n  TVC, que el widget gratuito no muestra.\n- El libro de Excel avisa cuando un portafolio se calculó con Ledoit-Wolf o con topes (el libro usa covarianza\n  muestral sin topes).\n\n### Verificación\n- Excel: no se abrió (control de Excel no autorizado en esta sesión; la automatización sigue respondiendo «ocupado»).\n  Fórmulas evaluadas con `formulas`: 0 errores en la plantilla y en un libro del generador; E 30.74 %, σ 14.17 %,\n  Sharpe 1.676, iguales a la terminal.\n- Chrome: los 6 widgets nuevos se ven en oscuro y la tabla de cotizaciones en claro. Los ETF de bonos no se vieron\n  dibujados: al final TradingView dejó de enviar datos a la pestaña (también a widgets sin cambios).\n- GEX: probado con respuestas simuladas; con el mercado abierto aún no se ha comprobado con NVDA.\n- Suite: 704 pruebas de Python (1 falló por WinError 1450 de Windows con la PC cargada y pasó al repetirla) y 9 de Node. Tras reiniciar, la primera llamada al Ranking tarda 19–42 s (caché fría).\n\n"
+  },
+  {
+   "version": "62",
+   "fecha": "[2026-10-28",
+   "titulo": "diseño unificado, generador de portafolios en tiempo real, Excel con marca y más widgets]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-28 — diseño unificado, generador de portafolios en tiempo real, Excel con marca y más widgets]\n\n### Agregado\n- **Generador de propuestas** en Mis portafolios (`markowitz.generar`, `POST /api/portafolios/generar`):\n  - cada cambio de especificación recalcula la mejor propuesta tras 0.5 s;\n  - completa los instrumentos fijados por el usuario con los mejores del Ranking que no se mueven igual (ρ ≤ 0.85);\n  - sugerencias de la terminal con acción de un clic: quitar lo que no recibe peso, subir el tope, cambiar a máximo\n    Sharpe o mínima varianza, quitar pares redundantes; además, otros candidatos listos;\n  - caché de 5 min de las filas del Ranking: 25 s la primera vez, 1.6–3.7 s después.\n- Seis widgets gratuitos de TradingView en Mercado: cotizaciones por grupo, destacados de EE. UU., mapa de ETF, tipos de\n  cambio cruzados, mapa de divisas y mapa de cripto. Widgets y gráfica siguen el modo claro/oscuro.\n- `docs/auditoria-2026-10-28.md` y `docs/prompt-pendientes-2026-10-28.md` (lo que necesita el usuario y el prompt con\n  los pendientes de las auditorías del 18 al 28-oct). Dependencia nueva: `pillow` (logo en Excel).\n\n### Cambiado\n- Perfiles Conservador, Moderado, Crecimiento y Agresivo en lugar de la pirámide de Maslow; los portafolios guardados\n  con los nombres anteriores se leen con su equivalente.\n- Un solo logo (el de `favicon.svg`, color fijo `--marca`) en la terminal, Oficina, Laboratorio de bots, Cuaderno, 404\n  y páginas de TradingView; títulos «Sección · Actinver Terminal».\n- Excel: logo en cada hoja, Segoe UI y colores de la terminal, hoja «Guía» con pasos numerados y celdas exactas\n  (incluido Solver).\n\n### Retirado\n- Pestaña «Aprender y recursos» (se conservan `config/aprendizaje.json` y `/api/aprendizaje`).\n\n### Verificación\n- Fórmulas de Excel evaluadas en Python (`formulas`): 0 errores; E 59.60 %, σ 15.50 %, Sharpe 3.392, iguales a la\n  terminal. No se abrió en Excel: la automatización no respondió ni con un libro vacío.\n- Recorrido del generador en el navegador interno; capturas del logo en las seis páginas.\n- Widgets nuevos: scripts con HTTP 200; no se vieron dibujados (el navegador interno bloquea scripts externos).\n- GEX con mercado abierto: no calculable (0 de 902 contratos completos).\n- Suite: 688 pruebas aprobadas (`uv run pytest tests`) y 9 de Node.\n\n"
+  },
+  {
+   "version": "61",
+   "fecha": "[2026-10-27",
+   "titulo": "constructor de portafolios con Markowitz, capitalización bursátil y GEX listo]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-27 — constructor de portafolios con Markowitz, capitalización bursátil y GEX listo]\n\n### Agregado\n- **Mis portafolios (Markowitz)**, en la pestaña Mi cuenta (`terminal/markowitz.py`):\n  - Portafolios ilimitados, aparte de la cuenta del Reto: crear, abrir, editar, duplicar y eliminar.\n  - Objetivos según la pirámide de Maslow (compilado de Acelera Academy).\n  - Seis métodos: máximo Sharpe, mínima varianza, rendimiento objetivo, riesgo objetivo, utilidad y 1/N.\n  - Resultados: frontera eficiente, CAL, y*, comparación con 1/N, pesos, montos, títulos y correlaciones.\n  - «Sugerir instrumentos» toma lo mejor del Ranking y evita pares con correlación > 0.85.\n  - Solo simula; no envía órdenes.\n- **Excel de Markowitz con fórmulas vivas** (`terminal/excel_markowitz.py`):\n  - Plantilla paramétrica del taller de Acelera, con las fórmulas `#REF!` del original corregidas.\n  - Libro de uno o de todos los portafolios guardados: precios, rendimientos, E, σ, covarianzas, correlaciones, pesos editables, frontera y gráfica.\n  - Verificado en Excel: 0 errores; da los mismos E, σ y Sharpe que la terminal.\n- **Ranking por capitalización bursátil** (`terminal/capitalizacion.py`):\n  - Columna, filtro y explicación de mega, large, mid, small y micro cap.\n  - EE. UU.: acciones en circulación de la SEC (10-K/10-Q). Con varias series se usa el capital flotante del 10-K, marcado «aprox.».\n  - Los ADR no se clasifican.\n  - BMV: `config/capitalizacion_bmv.csv`, que llena el usuario.\n  - Resultado: 76 verificadas, 21 aproximadas y 39 sin dato (sobre todo BMV).\n- **GEX:** botón «Preparar GEX: OI y luego cadena» en Option Flow. Contratos Paper de solo lectura activados en `config/local.toml`, con la autorización del usuario.\n- `docs/auditoria-2026-10-27.md`: estado medido, 10 mejoras y alternativas de datos y API, con costos de referencia. No se contrató nada.\n- 10 pruebas nuevas (`tests/test_markowitz.py`); suite completa: 687 aprobadas. Dependencia nueva: `openpyxl`.\n\n### Corregido\n- CLAUDE.md, brecha 3: ya no cita la captura del 16-oct.\n\n### Limitaciones comprobadas\n- Fuera de horario el GEX no se calcula: la cadena conserva las cotizaciones del cierre, anteriores al OI consultado (regla anti-fuga).\n- `/api/ranking` tarda de 10 a 30 s: queda como mejora 2 de la auditoría.\n\n"
+  },
+  {
+   "version": "60",
+   "fecha": "[2026-10-25",
+   "titulo": "velas en movimiento y widgets gratuitos de TradingView]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-25 — velas en movimiento y widgets gratuitos de TradingView]\n\n### Agregado\n- **Velas:** gráfica de TradingView dentro de la pestaña (1 min, 5 min, 15 min, 1 h o diario) y ficha de la emisora: precio del día, panorama, perfil, datos fundamentales, noticias y resumen técnico de TradingView, este último con aviso de que no es una recomendación.\n- **Mercado:** «Panorama de TradingView» con cinta de tus posiciones de EE. UU., resumen de índices, dólar y materias primas, mapa de calor (Nasdaq 100 / S&P 500), calendario económico de EE. UU. y México, filtro de acciones (EE. UU. / México) y noticias.\n- Ruta `/widget/{tipo}` con lista cerrada de tipos y parámetros, CSP propia y enmarcable solo desde la terminal. Los widgets solo muestran: nada entra en cálculos ni se guarda. 2 pruebas nuevas (`tests/test_grafica_vivo.py`).\n- `docs/auditoria-2026-10-25.md`: hallazgos y prompt de mejoras.\n- `docs/directriz-post-reto.md` (referida en CLAUDE.md): desde el 13-nov-2026 15:00 la terminal pasa a «help-quote-terminal», sin reglas del Reto, con todas sus funciones y los mismos límites duros.\n\n### Corregido\n- `terminal.__version__` decía 0.1.0 y así sellaba backtests y evaluaciones; ahora se lee de `pyproject.toml` (0.31.0).\n\n### Limitaciones comprobadas\n- Los widgets gratuitos muestran error con símbolos de la BMV (ALPEK, GMEXICO, IPC): se excluyen de la cinta y del resumen. EE. UU. sale de Cboe One en USD.\n\n"
+  },
+  {
+   "version": "59",
+   "fecha": "[2026-10-20",
+   "titulo": "cierre BMV de respaldo con la captura del portal]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-20 — cierre BMV de respaldo con la captura del portal]\n\n### Agregado\n- `portal.cierres_desde_captura`: una captura tomada después del cierre de la BMV guarda el precio de cada emisora local como cierre de ese día (proveedor `actinver_portal`, prioridad 13, por debajo de EODHD). Antes del cierre, en días sin sesión, en el SIC y en fondos no guarda nada.\n- Aplicado a las capturas existentes: 29 cierres. El plan ya no usa precios del 16-oct por falta del cierre de ALPEK, que EODHD no bajó por el cupo de 20 consultas al día. 3 pruebas nuevas.\n- `docs/auditoria-funcionamiento-total-2026-10-20.md`: qué falta para que todo funcione y quién lo resuelve.\n\n"
+  },
+  {
+   "version": "58",
+   "fecha": "[2026-10-19",
+   "titulo": "avisos de pérdida del día con precios en vivo]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-19 — avisos de pérdida del día con precios en vivo]\n\n### Agregado\n- Regla `perdida_dia` (`terminal/alertas.py`): variación de hoy frente al cierre anterior con los precios en vivo del SIC (IEX × FIX). Avisa a Telegram por escalones: cartera −0.5 %, −1.0 %…; posición −1 %, −2 %…\n  - Un aviso por escalón nuevo; no se silencia tras el cierre de la BMV, porque EE. UU. sigue abierto.\n  - Las posiciones BMV sin precio de hoy se listan, no se estiman.\n- El motor revisa esta regla cada 2 minutos con los mercados abiertos (`vigilar_perdida_min`), sin consultar proveedores. También corre en cada ciclo completo.\n- Tarjeta «Hoy frente al cierre anterior» en Plan intradía y ruta `/api/variacion-dia`.\n- Solo informa: ninguna regla compra, vende ni toca el portal. 3 pruebas nuevas.\n\n"
+  },
+  {
+   "version": "57",
+   "fecha": "[2026-10-19",
+   "titulo": "ranking de acciones, ETF y fondos]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-19 — ranking de acciones, ETF y fondos]\n\n### Cambiado\n- El Ranking tiene un selector de clase (Acciones / ETF / Fondos), con percentiles dentro de la clase elegida. Antes, los ETF iban mezclados con las acciones y los fondos no aparecían. Con datos reales: 134 acciones, 40 ETF y 25 fondos.\n- Los fondos solo tienen ≈ 15 sesiones de NAV oficial: se ordenan con ventanas cortas (la mitad y el total disponible, mínimo 11 sesiones) y cada fila lleva el chip «historia corta».\n- Nueva prueba en `tests/test_puntuacion_ranking.py`.\n\n"
+  },
+  {
+   "version": "56",
+   "fecha": "[2026-10-19",
+   "titulo": "asistente dentro de la terminal]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-19 — asistente dentro de la terminal]\n\n### Agregado\n- Pestaña **Asistente** (grupo «Investigar y aprender», atajo `/ASI`, acceso en el Plan de acción) y rutas `/api/asistente` y `/api/asistente/notas`.\n- Reutiliza el chatbot del bot de Telegram: Claude si hay credencial, Ollama si hay `OLLAMA_URL` y, si no, respuestas locales.\n- Suma búsqueda BM25 en la documentación (`scripts/indice_contexto.py`) y notas del usuario (`/nota`, `/notas`, `/olvidar`), citadas como no verificadas. Sin credencial de LLM, las dudas se responden con fragmentos originales de la documentación.\n- 5 pruebas nuevas; 26 aprobadas con las del bot y el resumen. Verificado en el navegador con datos reales.\n\n### Datos\n- Captura del portal del 19-oct a las 10:05 registrada: valuación $929,338.13 (−7.07 %).\n\n"
+  },
+  {
+   "version": "55",
+   "fecha": "[2026-10-19",
+   "titulo": "navegación por tareas y cabecera móvil]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-19 — navegación por tareas y cabecera móvil]\n\n### Cambiado\n- Las 23 pestañas se agrupan en 5 tareas: Mi cuenta, Decidir, Mercado y flujo, Investigar y aprender, Datos y ayuda. Cada grupo recuerda su última pestaña; los comandos y accesos cambian de grupo solos. Sustituye al botón «Más».\n- Celular: precios y tipo de cambio (con vigencia) siempre visibles; el resto del estado pasa a «Ver detalle de datos». Botones compactos y la Oficina en la fila de pestañas. El contenido empieza en 469 px a 390 px de ancho (antes ≈ 585).\n\n### Datos\n- Captura del portal del 19-oct 03:00 registrada: valuación $906,431.05 y poder de compra $4,077.53. Mismos precios que el cierre del viernes 16-oct.\n\n"
+  },
+  {
+   "version": "54",
+   "fecha": "[2026-10-19",
+   "titulo": "auditoría técnica, estética y de utilidad]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-19 — auditoría técnica, estética y de utilidad]\n\n### Corregido\n- Order Flow y Option Flow ya no pintan respuestas antiguas al cambiar rápido de instrumento (`turno()`).\n- El sondeo de «Movimientos públicos» se detiene si falla.\n- El estado del motor no se consulta con la pestaña oculta.\n- El instrumento pasa entre Velas, Order Flow y Option Flow también desde la navegación principal.\n- `cartera.serie_historica`: 0.265 s → 0.022 s con salida idéntica (`/api/cartera`).\n\n### Retirado\n- 6 accesos del Plan de acción y 7 barras «Análisis relacionados» que repetían la navegación principal.\n- En ≤ 720 px, la línea de atajos de teclado de la cabecera.\n\n### Verificación\n- 41 pruebas de Python y 6 de la oficina; sin desbordamiento horizontal a 390 px en 8 vistas (demo).\n- Informe en `docs/auditoria-2026-10-19.md`.\n\n"
+  },
+  {
+   "version": "53",
+   "fecha": "[2026-10-18]",
+   "titulo": "contratos Paper y Colab de múltiples estrategias",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-18] — contratos Paper y Colab de múltiples estrategias\n\n- Consulta autorizada exclusiva de contratos Alpaca Paper, apagada por defecto, sin órdenes ni pagos; acceso comprobado con una petición mínima.\n- OI fechado de cierre previo y multiplicador con cortes temporales y procedencia por campo; avisos visibles en GEX. Skylit conserva NBBO/patas no evaluables.\n- Notebook del tema 3 con semilla/versiones fijas, holdout congelado, Holm y exportaciones protegidas; ejecución sintética local sin ventaja demostrada.\n- Pruebas aisladas de la configuración local; documentación de alternativas gratuitas y límites comprobados.\n\n"
+  },
+  {
+   "version": "52",
+   "fecha": "[0.31.0]",
+   "titulo": "2026-10-18 (dependencias, integración continua y documentación)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.31.0] — 2026-10-18 (dependencias, integración continua y documentación)\n\nEste número de versión también cubre las entregas fechadas del 16 y 17-oct que aparecen abajo. `pyproject.toml` pasa de 0.1.0 a 0.31.0.\n\n### Seguridad\n- `multidict` 6.7.1 → 6.9.1 (PYSEC-2026-4244; llegaba por ccxt → aiohttp). `pip-audit`: sin vulnerabilidades conocidas.\n\n### Dependencias\n- ccxt 4.5.85 → 4.5.88\n- fastapi 0.141.1 → 0.143.3\n- uvicorn 0.53.0 → 0.54.0\n- websockets 17.1 → 17.2\n- pypdf 6.19.0 → 6.21.1\n- anthropic 1.9.0 → 1.15.0 (agrega `opentelemetry-api` 1.45.1)\n- **skfolio 1.3.0 → 1.9.4**:\n  - se revisó su changelog (cambios en ShrunkMu Bodnar-Okhrin, ratios, drawdown y VaR);\n  - la terminal usa ShrunkMu con James-Stein por omisión, MeanRisk con utilidad y varianza, y CVaR y RiskBudgeting en el comparador;\n  - `comparar-modelos` en demo dio salida **idéntica** a 1.3.0 (0 diferencias numéricas);\n  - 26 pruebas del optimizador, comparador, robustez y catálogo aprobadas.\n- numpy **se queda en 2.5.3**: 2.5.4 rompe `tests/test_notebook_tema3.py`, que exige versiones fijas.\n- Worker: wrangler 4.145.0 → 4.151.1. 19 pruebas aprobadas y `npm audit` sin vulnerabilidades. No se desplegó.\n\n### Agregado\n- Suite local: 639 aprobadas; 3 fallas del trabajo ajeno sin commitear (notebook del tema 3 y dominio paper de Alpaca).\n- `.github/workflows/pruebas.yml`: pytest en Ubuntu con `TERMINAL_SIN_ENV=1` y pruebas del Worker; sin secretos. Las pruebas de OCR de Windows se omiten solas fuera de Windows.\n\n### Documentación\n- `CLAUDE.md` reducido a lo vigente (de 300 a 120 líneas). El detalle por fecha pasa sin cambios a `docs/historial-estado.md`.\n- `docs/acciones-requeridas-usuario.md`: la etapa 2 queda aprobada y se agregan las decisiones abiertas de la auditoría.\n\n"
+  },
+  {
+   "version": "51",
+   "fecha": "[2026-10-17",
+   "titulo": "TSM mensual educativo y anomalías de volumen sin repintado]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-17 — TSM mensual educativo y anomalías de volumen sin repintado]\n\n### Agregado\n- `terminal/tsm_mensual.py`, investigación A elegida por el usuario. Reglas:\n  - pasos públicos del reel, más supuestos propios marcados como tales;\n  - señal al cierre de mes, ejecución en la sesión siguiente;\n  - L ∈ {3, 6, 12} elegido por mercado solo con el entrenamiento;\n  - holdout de un solo uso, con huellas;\n  - Holm sobre las 18 variantes.\n\n  Rutas `/api/investigacion/tsm`, `/tsm/preregistro` y `/tsm/{id}/evaluar`. Protocolo en `docs/tsm-mensual.md`.\n- `terminal/anomalias.py`: z de log-volumen contra las n barras anteriores, solo con barras cerradas. Ruta\n  `/api/investigacion/anomalias`. Hipótesis en `docs/anomalias-volumen.md`. No equivale al indicador privado del reel.\n\n### Resultado (preregistro #1, holdout feb-2018 a sep-2025)\n- TSM no supera a comprar y mantener en ningún mercado (p de Holm = 1.000 en los seis).\n- Redujo la caída máxima en QQQ, EEM y NAFTRAC.\n- Sin ventaja demostrada. La estrategia activa no cambia.\n\n### Verificación\n- 7 pruebas nuevas, entre ellas: sin fuga temporal, sin repintado, sin anticipación, holdout único y API protegida.\n- Suite completa: 639 aprobadas. Las 3 que fallan pertenecen al trabajo sin commitear de otra sesión (`test_notebook_tema3.py` y `test_tiempo_real.py`).\n\n"
+  },
+  {
+   "version": "50",
+   "fecha": "[2026-10-17",
+   "titulo": "investigación de posts y formación]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-17 — investigación de posts y formación]\n\n- Nueve fichas de Instagram y ejercicios en Aprender y recursos, con fuentes y límites: terminal gratuita, arbitraje, anomalías y momentum mensual.\n- Formación ampliada con condiciones de certificado; corrección de gratuidad LSE, CFI y Columbia+; distinción de licencia de código/pesos FinBERT.\n- Se reutilizan los módulos de investigación/backtesting, sin modificar cartera, reglas activas ni añadir órdenes.\n- 8 pruebas enfocadas aprobadas; sintaxis JS y respuesta API comprobadas. Documentación: docs/instagram-2026-10-17.md.\n\n"
+  },
+  {
+   "version": "49",
+   "fecha": "[2026-10-16",
+   "titulo": "cierre de verificación final]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-16 — cierre de verificación final]\n\n- Revisión final completada en demo a 375 px: campo OCC, Tab/Enter y desplazamiento de tablas con flechas.\n- Laboratorio mantiene la huella del holdout al reabrirlo con otros datos. TPO y Skylit revisados; cero errores de consola.\n- Suite completa sobre la versión final: 610 pruebas aprobadas. Sintaxis JavaScript correcta y sin patrones de secretos.\n- Navegador restaurado y servidor temporal detenido. TradingView ajeno preservado; contratos Alpaca y Colab siguen condicionados.\n\n"
+  },
+  {
+   "version": "48",
+   "fecha": "[2026-10-16",
+   "titulo": "cinta indicativa y perfiles de sesión]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-16 — cinta indicativa y perfiles de sesión]\n\n### Agregado\n- Cinta histórica Alpaca Market Data indicativa con corte de 16 minutos, campos originales y procedencia.\n  Selección explícita de hasta 100 contratos guardados, paginación acotada y caché por selección.\n- Evaluación Skylit sobre cinta persistida además del CSV. Sin NBBO prestado, patas u OI inventados;\n  comparación temporal con nanosegundos. La interfaz explica por qué el filtro completo no se aplicó.\n- TPO observado sobre OHLC guardados, periodos de 30 minutos por sesión y zona horaria explícita,\n  sin interpolación. POC/VAH/VAL del perfil de volumen, algoritmo del 70 % documentado y nulos sin datos.\n- Límites de lectura HTTP y foco de teclado en tablas desplazables.\n\n### Verificado\n- HTTP falso, persistencia, cortes sin fuga, aislamiento sintético, cálculos numéricos y rutas seguras.\n- Preregistro demo: guardar → evaluar → cambiar datos → reevaluar devuelve lo guardado → exportar.\n- Laboratorio, Skylit y TPO revisados a 375 px; detalles de pruebas y consola en\n  `docs/verificacion-pendientes-2026-10-16.md`.\n- Revisión oficial: Twelve Data Basic sin BMV general; límites gratuitos Finnhub aún no confirmados.\n- Arranque normal sí carga credenciales; omisión con TERMINAL_SIN_ENV intencional, sin alterar seguridad.\n\n### Pendiente\n- Endpoint de contratos Alpaca sin implementar por falta de autorización textual; Colab sin tema elegido.\n- Sin datos nuevos para GEX ni ventaja predictiva demostrada. Ninguna cuenta, pago u orden activados.\n\n"
+  },
+  {
+   "version": "47",
+   "fecha": "[2026-10-16",
+   "titulo": "preregistro, filtro de Skylit y proveedores gratuitos]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-16 — preregistro, filtro de Skylit y proveedores gratuitos]\n\n### Agregado\n- Laboratorio: preregistro con huella sha256 (hipótesis, estrategias, costos, fuentes, walk-forward, B, semilla, α, bloque, holdout y embargo).\n  - Evaluación en tramos cronológicos (exploración | embargo | holdout) con permutación y Holm en cada uno.\n  - Holdout de un solo uso: una segunda evaluación devuelve lo guardado.\n  - Exportación JSON.\n  - Rutas `/api/laboratorio/preregistro`, `/experimentos`, `/experimentos/{id}/evaluar` y `/experimentos/{id}/exportar`.\n- Option Flow: perfil EXPERIMENTAL del filtro de Skylit sobre un CSV de operaciones de opciones (`/api/flujo/skylit` y su plantilla).\n  - Siete criterios; cada uno es cumple, no cumple o «no evaluable».\n  - Prima, volumen y OI se muestran por separado.\n  - No guarda datos.\n- `docs/proveedores-gratuitos.md`: tabla de proveedores con enlaces oficiales y fecha, matriz por herramienta, combinación gratuita mínima, guía de claves y disponibilidad comprobada con una consulta mínima por fuente.\n- `docs/proyecto-colab.md`: secuencia de los reels y tres temas recomendados, en espera de su elección.\n\n### Verificación\n- Suite completa: 591 pruebas aprobadas, 17 de ellas nuevas en `tests/test_preregistro_skylit.py`.\n- `node --check` correcto; revisión de patrones de secretos sin hallazgos.\n- Navegador: filtro con un ejemplo SINTÉTICO (pasa / no evaluable) y formulario de preregistro, sin errores de consola.\n\n### Pendiente o decisión suya\n- OI y tamaño desde el endpoint de contratos de Alpaca. Está en la API de trading, así que no se implementó sin su autorización.\n- NBBO histórico y patas de opciones: sin fuente gratuita verificada.\n- TPO y POC/VAH/VAL: calculables, sin implementar.\n\n"
+  },
+  {
+   "version": "46",
+   "fecha": "[2026-10-16",
+   "titulo": "recursos educativos y microestructura]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-16 — recursos educativos y microestructura]\n\n- Catálogo de cuatro PDF y diez capturas: precisiones de indicadores, recursos de YouTube y condiciones de certificados; panel Aprender y recursos y API de lectura.\n- Footprint de cinco minutos con volumen/delta y heatmap de snapshots guardados, separados por feed y con ausencia de datos explícita.\n- Captura personal de cotizaciones únicamente en data local ignorado; sin valorar cartera ni publicar originales.\n- 83 pruebas enfocadas aprobadas; documentación en docs/recursos-educativos.md.\n\n"
+  },
+  {
+   "version": "45",
+   "fecha": "[2026-10-16",
+   "titulo": "indicadores, GEX, permutaciones e intradía]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [2026-10-16 — indicadores, GEX, permutaciones e intradía]\n\n### Agregado\n- Indicadores EMA 20/50, MACD 12/26/9, estocástico 14/3/3 y SAR parabólico en `/api/flujo/velas` y en Velas (paneles separados), con nulos en el calentamiento.\n- Accesos prominentes a Mercado, Velas, Order Flow, Option Flow, Riesgo y Laboratorio, y enlaces entre análisis.\n- GEX por strike y vencimiento (`/api/flujo/gex`) solo con gamma, interés abierto, multiplicador y spot de la misma cadena; vista de disponibilidad cuando faltan. Columnas opcionales `multiplicador, spot, moneda` en la importación de opciones.\n- Laboratorio de alfa: permutación de signos por bloques con Holm (`/api/laboratorio/permutacion`).\n- Plan intradía defensivo e informativo (`/api/plan-intradia`), sin órdenes.\n- `docs/mejoras-intradia-permutaciones.md` y `tests/test_mejoras_intradia.py`.\n\n"
+  },
+  {
+   "version": "44",
+   "fecha": "[0.30.0]",
+   "titulo": "2026-10-12 (etapa 3: riesgo, seguimiento y backtesting reproducible)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.30.0] — 2026-10-12 (etapa 3: riesgo, seguimiento y backtesting reproducible)\n\n### Agregado\n- **Riesgo** (`terminal/riesgo.py`, Más → Riesgo), con los pesos actuales y los supuestos visibles:\n  - volatilidad, caída máxima, VaR y CVaR históricos al 95 y 99 % (1 día y horizonte), y VaR paramétrico;\n  - exposición por emisora, mercado, clase y moneda, contribución al riesgo y concentración (HHI);\n  - escenarios hipotéticos, históricos y de estrés.\n- **Seguimiento** (`terminal/seguimiento.py`, Más → Seguimiento):\n  - lista unificada con la de «Movimientos públicos»;\n  - ficha con noticias y estados financieros;\n  - comparación de 2 a 8 instrumentos con una referencia (curva base 100, beta y correlación).\n- **Backtesting reproducible** (`terminal/backtest.py`, Más → Backtesting):\n  - 4 estrategias versionadas;\n  - señal en t y ejecución en t+1, comisión del Reto + deslizamiento y banda de 1 punto;\n  - referencia de comprar y mantener;\n  - registro con huellas sha256 de configuración y datos, historial y exportación CSV.\n- `docs/riesgo-seguimiento-backtesting.md`; 7 pruebas nuevas (`tests/test_etapa3.py`).\n\n"
+  },
+  {
+   "version": "43",
+   "fecha": "[0.29.0]",
+   "titulo": "2026-10-12 (etapa 2: adaptadores de repositorios)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.29.0] — 2026-10-12 (etapa 2: adaptadores de repositorios)\n\n### Agregado\n- **Heston** (`terminal/flujo/heston.py`): pricer con la función característica de Albrecher y calibración por mínimos\n  cuadrados ponderados por vega. Código propio desde los artículos publicados: el repositorio `Heston-Calibration`\n  no tiene licencia y solo se leyó.\n  - Reproduce Black-Scholes (< 1e-5) y recupera parámetros sintéticos.\n  - Avisa cuando no cumple Feller o un parámetro queda en su límite.\n  - Botón en Option Flow.\n- **Exportación a `hftbacktest`** (MIT): libro y operaciones guardados → `.npz` con su `event_dtype`, sin importar su\n  código. Botón en Order Flow y `GET /api/flujo/hftbacktest`.\n- **Importación de velas de TradingView, OpenBB y Yahoo/Excel** (`terminal/flujo/externos.py`): detecta las columnas\n  y pasa por la misma validación todo o nada que la plantilla propia.\n- Interruptores `[flujo.heston]`, `[flujo.hftbacktest]` y `[flujo.externos]`; límites de tasa en las rutas nuevas.\n- `scipy` como dependencia explícita (antes llegaba por `skfolio`).\n- 6 pruebas nuevas (`tests/test_flujo_etapa2.py`).\n\n"
+  },
+  {
+   "version": "42",
+   "fecha": "[0.28.0]",
+   "titulo": "2026-10-12 (etapa 1: velas OHLCV, Order Flow, Option Flow y mapa de calor mejorado)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.28.0] — 2026-10-12 (etapa 1: velas OHLCV, Order Flow, Option Flow y mapa de calor mejorado)\n\n### Agregado\n- **`terminal/flujo/`** (`docs/flujo-ordenes-opciones.md`):\n  - contratos normalizados (barras, libro, operaciones y opciones) con procedencia completa;\n  - tablas propias con `disponible_desde` (sin fuga temporal);\n  - importación CSV todo o nada.\n- **Adaptadores** bajo demanda, con interruptor y límite por símbolo:\n  - Alpaca: OHLCV y cinta SIP con ≥ 15 min de retraso, bid/ask IEX y opciones con el feed indicativo;\n  - cripto vía `ccxt` (MIT): Bitso, con BTC, ETH, SOL y XRP en MXN.\n- **Vistas nuevas** (Más → Velas / Order Flow / Option Flow; atajos `/VEL`, `/OF`, `/OPC`):\n  - velas con volumen, SMA20, Bollinger, VWAP y RSI de Wilder;\n  - libro, profundidad, desequilibrio, cinta, delta (solo con lado informado) y perfil de volumen;\n  - cadena de opciones con filtros, curva y superficie de IV, regla descriptiva de volumen inusual y paso al modelo\n    BSM.\n- **Estados honestos:** sin fuente autorizada, los paneles lo dicen y no simulan nada.\n- `docs/acciones-requeridas-usuario.md`.\n\n### Cambiado\n- **Mapa de calor:**\n  - prioridad única de fuentes (`mercado.PRIORIDAD_FUENTE`) y precio ajustado por splits;\n  - ventanas de 1, 5 y 20 sesiones;\n  - filtros por mercado, clase, sector y proveedor;\n  - escala azul y naranja apta para daltonismo;\n  - ficha de la celda con método, cierres, fuente, captura, rezago y calidad, y enlace a velas.\n\n  Cierra los hallazgos 3, 4 y 5 de la auditoría del 12-oct.\n- **RSI de Wilder** en la serie de Mercado; antes usaba promedio simple.\n- La ruta de Order Flow se llama `/api/flujo/libro-operaciones`, para que la prueba que prohíbe rutas de «órdenes»\n  siga estricta.\n\n"
+  },
+  {
+   "version": "41",
+   "fecha": "[0.27.0]",
+   "titulo": "2026-10-12 (centro de investigación, mapa, opciones y correcciones P0 de la auditoría)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.27.0] — 2026-10-12 (centro de investigación, mapa, opciones y correcciones P0 de la auditoría)\n\n### Agregado (trabajo de otra sesión del 11–12 oct, confirmado ahora)\n- **Más → Investigación:** FRED macro, BLS, EIA, Alpha Vantage (`INCOME_STATEMENT`) y CoinGecko, con disponibilidad conservadora y revisiones; importación CSV de hallazgos de otras herramientas (`docs/centro-investigacion.md`).\n- **Mercado:** mapa de calor de los dos últimos cierres con filtro por mercado; serie local de 120 cierres con SMA20 y RSI14; enlace al widget oficial de TradingView.\n- **Modelos:** opciones europeas Black-Scholes-Merton con griegas y volatilidad implícita (entradas manuales).\n- **Barra de comandos** (`Ctrl+K`).\n\n### Corregido (P0 de `docs/auditoria-2026-10-12.md`)\n- **Pruebas aisladas del `.env` real** (`TERMINAL_SIN_ENV`): `test_fred_csv_ignora_festivos` fallaba en la suite completa porque las pruebas cargaban `FRED_API_KEY`.\n- **Alpha Vantage:** pausa de 1.2 s entre símbolos; guarda los que respondan y se detiene ante un aviso de límite, en vez de anular los cuatro.\n\n### Documentación\n- `docs/integracion-repositorios.md`: etapa 0 (matriz de repositorios, licencias, arquitectura propuesta). Pendiente de aprobación.\n- 479 pruebas en verde.\n\n"
+  },
+  {
+   "version": "40",
+   "fecha": "[0.26.1]",
+   "titulo": "2026-10-12 (concentración y precios del día en el plan)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.26.1] — 2026-10-12 (concentración y precios del día en el plan)\n\n### Agregado\n- **Plan del día:** si una emisora pesa 35 % o más de la cartera, lo dice en palabras sencillas (p. ej. «MU es el 47 % de tu cartera: si MU baja 10 %, tu cartera baja ≈ 4.7 % solo por ella»). Es un dato de riesgo, no una orden.\n- **Plan del día:** avisa cuando la valuación todavía usa precios de una sesión anterior al último cierre.\n- **Motor:** al confirmar una captura nueva del portal, adelanta el ciclo para descargar los cierres del día en lugar de esperar hasta 60 min fuera de horario.\n\n"
+  },
+  {
+   "version": "39",
+   "fecha": "[0.26.0]",
+   "titulo": "2026-10-07 (historia externa del usuario y Finviz Elite)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.26.0] — 2026-10-07 (historia externa del usuario y Finviz Elite)\n\n### Agregado\n- **Historia externa** (`terminal/historia_externa.py`, `scripts/historia_externa.py`, `docs/historia-externa.md`, D-61):\n  importa el Excel «Benchmarks_time_series» del usuario (1962 → 9-oct-2025, 226 instrumentos y 3 perfiles índice).\n  - Se verifica columna por columna contra Tiingo/EODHD: 148 verificadas (137 SIC idénticas en ~1,000 sesiones y 11 BMV en 11 sesiones), 5 rechazadas y 56 sin verificar (fondos sin solape). «AC» sin .MX es Associated Capital, no Arca Continental.\n  - Solo las verificadas extienden rendimientos hacia atrás; nunca entra a la tabla de precios.\n  - Validación V1 desde 2004 (5,690 sesiones fuera de muestra, antes 1,099): «acciones · máximo rendimiento» +30.5 % anual frente a 1/N +18.7 %, IC 90 % del exceso [+3.6 %, +23.8 %], caída máxima −70 %. Con fuerte sesgo de supervivencia: no se declara ventaja ni cambian las propuestas.\n- **Finviz Elite** (`terminal/finviz.py`, `terminal finviz`, `[finviz]` en ajustes): conector en lote de precios de EE. UU., **apagado** sin `FINVIZ_AUTH_TOKEN`.\n  - Elite es de pago; el plan gratuito no exporta y su robots.txt lo prohíbe a programas.\n  - Sin hora del último hecho, sus precios quedan como «retrasado» / UNKNOWN y el cierre oficial los reemplaza.\n- 9 pruebas nuevas; 348 en verde.\n\n"
+  },
+  {
+   "version": "38",
+   "fecha": "[0.25.1]",
+   "titulo": "2026-10-06 (mandato de autonomía, versión 2)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.25.1] — 2026-10-06 (mandato de autonomía, versión 2)\n\n### Cambiado\n- **Mandato vigente:** `docs/mandato-autonomia-v2.txt`, aprobado por el usuario (D-60). La v1 se conserva intacta. Cambios:\n  - objetivo sin promesa de tiempo real ni de rendimiento;\n  - precedencia de las restricciones posteriores;\n  - el portal del Reto nunca se automatiza;\n  - pre-apertura a las 07:00 hasta el 2-nov;\n  - borrar fuera del repositorio requiere confirmación;\n  - sin la referencia al archivo inexistente;\n  - acceso remoto autorizado solo por Tailscale Serve en la red privada;\n  - otras sesiones en paralelo;\n  - boletas solo informativas.\n\n"
+  },
+  {
+   "version": "37",
+   "fecha": "[0.25.0]",
+   "titulo": "2026-10-06 (alternativa gratuita a EODHD y revisión del mandato)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.25.0] — 2026-10-06 (alternativa gratuita a EODHD y revisión del mandato)\n\n### Añadido\n- **Proxy ADR**, la alternativa gratuita para la historia BMV (`terminal/proxy_adr.py`, `scripts/historia_adr.py`): los rendimientos del ADR en MXN (FIX de cada fecha, solo splits) extienden hacia atrás 8 emisoras validadas (correlación diaria ≥ 0.80: AMX, FEMSA, CEMEX, ASUR, GAP, KOF, GFNORTE y KIMBER). BIMBO y GMEXICO se rechazan. Nunca se guarda como precio. Se usa en `terminal robustez --proxy-adr`, una corrida aparte y exploratoria (enmienda 2).\n- **Fuentes gratuitas revisadas** (`docs/bmv-licencia.md`): Marketstack, Alpha Vantage, FMP, Stooq, publicaciones de BMV, DataBursatil y Yahoo. Ninguna da varios años de la BMV gratis con términos compatibles.\n- **Revisión del mandato** (`docs/mandato-autonomia.md`): 9 choques o desactualizaciones con propuestas. El texto original no se modifica.\n- **Decisión D-59:** se mantiene el máximo rendimiento aceptando su riesgo de cola. Se guarda fuera del perfil y el plan por Telegram lo menciona.\n\n### Resultados\n- Con el proxy ADR, la conclusión se sostiene: meseta amplia (59 % y 86 %); la selección anidada no supera a la configuración vigente; el máximo rendimiento queda en el límite de riesgo de cola (caída p5 de −20.2 % y −21.2 %).\n\n### Pruebas\n- 3 nuevas: `tests/test_proxy_adr.py` (2) y el riesgo aceptado en `tests/test_mensaje_simple.py`.\n\n"
+  },
+  {
+   "version": "36",
+   "fecha": "[0.24.0]",
+   "titulo": "2026-10-06 (protocolo de robustez)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.24.0] — 2026-10-06 (protocolo de robustez)\n\n### Añadido\n- **Protocolo de robustez** (`terminal/robustez/`, `docs/robustez.md`, preregistrado antes de ejecutar):\n  - cuadrícula λ × tope × historia de 150 combinaciones por universo, todas evaluadas;\n  - **estabilidad** con fórmula e índice publicados;\n  - **detección de picos aislados**;\n  - **Monte Carlo de 500 simulaciones en cada combinación**, con bloques de 10 sesiones, costos, deslizamiento y diferencial del SIC perturbados, y horizonte al cierre del Reto;\n  - **SPP con mapas de calor por pares** y **regiones contiguas** (búsqueda en anchura, vecindad de von Neumann; meseta de 5 o más combinaciones);\n  - **walk-forward anidado** con selección solo en la ventana previa y un tramo final intacto de 63 sesiones;\n  - etiqueta «evidencia insuficiente» cuando no alcanza la historia.\n- **Ejecución por lotes y reanudable** (`uv run terminal robustez`). Cada combinación se guarda con su semilla y huella de preregistro.\n- **Vista «Robustez»** (en «Más») y `/api/robustez`: fechas, cobertura, combinaciones, simulaciones, mapas con filtro de la tercera dimensión, walk-forward y motivos de aprobación o rechazo.\n- **Propuestas, reporte y Telegram** separan ESTIMACIÓN (modelo), HISTÓRICO (fuera de muestra) y SIMULACIÓN (Monte Carlo). Cada propuesta lleva su estado de robustez: robusta, no aprobada o frágil. Una propuesta frágil (pico aislado o inestable) no puede ser la referencia del plan si hay alternativa.\n\n### Resultados (datos al 5-oct-2026)\n- **Mesetas amplias:** 66 % de la cuadrícula aprueba en acciones y 79 % en mixta, con una dispersión de unos 6 puntos.\n- **Configuración vigente de máximo rendimiento:** estable, pero no aprobada por riesgo de cola (caída p5 de −23 % y −24 % en simulación).\n- **Walk-forward anidado:** la selección del protocolo no supera a la configuración vigente (+33 % frente a +39/+47 % anual encadenado), así que los parámetros no se cambian (ver `docs/robustez.md`).\n\n### Pruebas\n- 9 nuevas (`tests/test_robustez.py`):\n  - reproducibilidad;\n  - sin filtración futura;\n  - Monte Carlo en las 150 combinaciones;\n  - picos aislados frente a meseta;\n  - separación de ventanas del walk-forward y tramo intacto;\n  - reanudación;\n  - referencia sin propuestas frágiles;\n  - estado por combinación más cercana.\n\n"
+  },
+  {
+   "version": "35",
+   "fecha": "[0.23.0]",
+   "titulo": "2026-10-06 (auditoría de siete mejoras)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.23.0] — 2026-10-06 (auditoría de siete mejoras)\n\n### Añadido\n- **Mandato de autonomía versionado.** `docs/mandato-autonomia.txt` contiene el texto exacto que el usuario pegó el 23-sep-2026, con sha256. `docs/mandato-autonomia.md` explica su procedencia y precedencia. Enlazado desde `CLAUDE.md`, README y `docs/seguridad.md`. La confirmación del usuario está pendiente (D-53).\n- **Validación extendida V1.** Panel dinámico 168/21 con 1,099 sesiones fuera de muestra, frente a 87 antes. Se eligió con un preregistro escrito antes de calcular (`docs/historia-y-horizonte.md`, `scripts/comparar_historia.py`). Cada propuesta la incluye en `validacion_extendida`, con exceso frente a 1/N e IC 90 %. Ninguna lente muestra ventaja demostrada, así que propuestas y ranking no cambian (D-54).\n- **Auditoría de series** (`scripts/calidad_series.py`):\n  - 0 mezclas de divisas, 0 huecos y ningún split sin ajustar;\n  - 44 saltos de más de 30 %, revisados;\n  - 6 claves con problemas, ya marcadas.\n- **Calibración de la probabilidad de subida** (`terminal/investigacion/calibracion.py`): Brier frente a la frecuencia base, isotónica y Platt ajustadas en validación, e IC por fechas. En H = 1, 5 y 28 queda peor que la frecuencia base, así que se marca EXPERIMENTAL con menos prominencia en Telegram y en la web (D-55).\n- **Fuentes BMV con licencia** (`docs/bmv-licencia.md`): comparación con costos confirmados en los sitios de cada proveedor y una recomendación. Conector `EodhdDiferidoProvider` (apagado) con retraso medido por la hora del evento y pruebas simuladas. No se contrató nada.\n- **Kronos con memoria acotada.** `--lote`, `--max-fechas` y pico de memoria en el experimento. Corrida completa: 494 MB, 95 min; SIN VENTAJA DEMOSTRADA (D-56).\n- **Titulares** (`scripts/evaluar_titulares.py`, `docs/titulares-llm.md`): 161 titulares etiquetados para comparar el léxico con Qwen 0.5B y 1.5B locales. Se conserva el léxico (D-57).\n- **Búsqueda de documentación con BM25** (`scripts/indice_contexto.py`): 13/15 frente a 4/15, citando archivo, línea y fecha. La semántica e5-small (12/15) no se adopta. Memoria conversacional: no se agrega (`docs/memoria-y-busqueda.md`).\n\n### Pruebas\n- 8 nuevas: calibración (3), validación extendida (2) y EODHD diferido (3). Suite completa: 329 en verde.\n\n"
+  },
+  {
+   "version": "34",
+   "fecha": "[0.22.0]",
+   "titulo": "2026-10-05 (no operar si no mejora a mantener)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.22.0] — 2026-10-05 (no operar si no mejora a mantener)\n\n### Corregido\n- **El plan sugería rotar la cartera sin mejora demostrada** (D-52). Los escenarios de la propuesta (+2.2 %) y los de la cartera actual se medían con métodos distintos. Medidas igual: cartera actual +7.6 %, propuesta +7.0 % al cierre del Reto.\n  - Ahora cada propuesta guarda `frente_a_mantener`, con ambas medidas con el mismo método en dos ventanas: la de validación y la más reciente. Cuenta la menos favorable para la propuesta, porque desplazar la ventana unos días cambiaba al ganador.\n  - Con criterio de ganancia, si la propuesta no supera a mantener por 1 punto después de comisiones (`optimizacion.margen_mejora_mantener`), el plan dice «hoy no cambies nada» y muestra las dos cifras y los escenarios malos, y `/boletas` no genera órdenes.\n\n### Pruebas\n- 3 nuevas (`tests/test_mensaje_simple.py`, `tests/test_referencia_plan.py`, `tests/test_optimizador.py`); 321 en verde.\n\n"
+  },
+  {
+   "version": "33",
+   "fecha": "[0.21.0]",
+   "titulo": "2026-10-05 (criterio «mayor ganancia» y precios del portal)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.21.0] — 2026-10-05 (criterio «mayor ganancia» y precios del portal)\n\n### Añadido\n- **Criterio del plan `ganancia`** (D-50, decisión del usuario): elige la propuesta con mayor ganancia media esperada al cierre del Reto (media anual × años que faltan), no la mediana, que castigaba la volatilidad. Activado en el perfil y disponible en «Reto y perfil». El plan de Telegram muestra el promedio, lo más común y el mal escenario.\n- **`terminal precios-portal <pdf>`** (`terminal/precios_portal.py`, D-51): lee el PDF de la pestaña «Acciones» que arma el participante. Las BMV se guardan como cierre del día (proveedor «archivo»). El SIC solo se compara con la referencia origen × tipo de cambio, sin mezclar MXN con la serie en USD. El 5-oct: 43 BMV importadas, diferencia mediana del SIC 0.32 %. Las BMV del catálogo sin precio pasan de 19 a 6.\n- **6 emisoras del portal que faltaban** (`scripts/incorporar_acciones_portal.py`): B (Barrick), BYND, ROKU, TWLO, WYNN y SIGMAF A. Universo 236, catálogo 233.\n\n### Pruebas\n- 4 nuevas: `tests/test_precios_portal.py` (3) y el criterio `ganancia` en `tests/test_referencia_plan.py`.\n\n"
+  },
+  {
+   "version": "32",
+   "fecha": "[0.20.0]",
+   "titulo": "2026-10-05 (fondos del portal, mensajes sencillos, auditoría)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.20.0] — 2026-10-05 (fondos del portal, mensajes sencillos, auditoría)\n\n### Añadido\n- **Fondos del simulador (capturas del 5-oct):** ACTIRVT (B, renta variable, venta anual) y PROTEGE (B-1, deuda, diaria) en el universo, en `config/fondos_actinver.csv` y en el catálogo. Se reimportaron las hojas oficiales ya guardadas para asignarles NAV del 28-sep al 2-oct. Ahora hay 25/25 fondos con precio y un universo de 230. `config/simulador_etf.csv` pasa a `config/simulador_portal.csv` (ETF y fondos vistos en el portal).\n- **Mensajes de Telegram en lenguaje sencillo** (`terminal/mensaje_simple.py`, D-49):\n  - `/plan` y el envío diario dicen solo qué hacer: vender primero, luego comprar, con precio límite;\n  - si el precio es aproximado, dan el rango para revisarlo en el portal;\n  - avisan si el efectivo no alcanza sin las ventas, si la captura está vieja o si se rompe una regla del Reto;\n  - incluyen el próximo evento macro de alto impacto (48 h) y el rango esperado al cierre del Reto.\n- **Boletas sencillas:** `/boletas` en el mismo formato, con las ventas primero. El formato técnico sigue en `/completo`, `/detalle` y `/boletas detalle`; `alertas.formato_plan = \"completo\"` restaura el envío anterior.\n- **Auditoría** `docs/auditoria-2026-10-05.md`:\n  - noticias y macro: qué entra al portafolio (nada) y qué entra como aviso;\n  - 19 emisoras BMV sin ningún precio por el cupo de EODHD;\n  - fondos con 5 sesiones de historia;\n  - decisiones pendientes.\n\n### Corregido\n- **El plan del día ya no conserva una propuesta dominada:** cambia si otra tiene más escenario central y al menos 2 puntos menos de pérdida adversa. El 6-oct era +0.9 %/−19.7 % frente a +1.6 %/−5.9 %. Antes de la apertura aplica la regla entre sesiones.\n\n### Pruebas\n- 11 nuevas: `tests/test_mensaje_simple.py` (8), 2 en `tests/test_referencia_plan.py` y `test_fondos_del_portal_del_simulador` (25 fondos).\n\n"
+  },
+  {
+   "version": "31",
+   "fecha": "[0.19.1]",
+   "titulo": "2026-10-05 (plan del día estable)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.19.1] — 2026-10-05 (plan del día estable)\n\n### Corregido\n- **El plan del día saltaba de propuesta con los precios en vivo.** Con el criterio «plusvalía», el plan elegía la propuesta con mayor escenario central, y esa estimación cambia con cada precio. El 5-oct, a la apertura, una diferencia de ruido (+0.9 % frente a +1.3 %) cambiaba toda la cartera del plan.\n- **Regla nueva (`servicios._fijar_referencia`):**\n  - la propuesta elegida al inicio de la sesión queda fija toda la sesión, con su misma versión;\n  - si esa versión caduca por un recálculo, se usa la versión nueva de la misma propuesta, y mientras se recalcula el plan espera en vez de saltar a otra;\n  - entre sesiones, solo cambia si otra la supera por 2 puntos de escenario central (o 5 de puntuación);\n  - cambiar el criterio del perfil vuelve a elegir.\n- **Pruebas:** 5 nuevas (`tests/test_referencia_plan.py`).\n\n"
+  },
+  {
+   "version": "30",
+   "fecha": "[0.19.0]",
+   "titulo": "2026-10-01 (movimientos públicos: 13F e insiders con SEC EDGAR)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.19.0] — 2026-10-01 (movimientos públicos: 13F e insiders con SEC EDGAR)\n\n### Añadido\n- **Módulo `terminal/movimientos/`, sección «Movimientos públicos»** ([docs/movimientos-publicos.md](docs/movimientos-publicos.md)), con fuente oficial SEC EDGAR:\n  - Form 4 de las emisoras del SIC de su cartera, propuestas y seguimiento;\n  - 13F de 8 gestores con CIK verificado.\n- **Cada fila trae:** documento original, fechas separadas (operación o corte, publicación con hora de aceptación, y cuándo la conoció la terminal) y una explicación de sus límites.\n- **Form 4:** distingue compra o venta discrecional (P/S) de adjudicación, ejercicio, retención de impuestos, donación, plan 10b5-1 y venta tras ejercicio el mismo día; también titularidad directa o indirecta y relación del declarante.\n- **13F:** clasifica nueva posición, aumento, reducción, salida o sin cambio. Advierte que el cambio se infiere de dos fotografías trimestrales.\n- **Casos difíciles con documentos reales:**\n  - 4/A sin duplicar y con el original marcado «corregido por»;\n  - 13F/A NEW HOLDINGS y RESTATEMENT aplicados solo desde su publicación;\n  - split ajustado con `eventos_corporativos`, o «no comparable» si no está registrado;\n  - CUSIP con varias clases sin atribuir;\n  - VALUE declarado en miles reescalado y anotado (Baupost y Duquesne).\n- **Grupos:** cartera, propuesta, seguimiento, operable en el Reto, fuera del catálogo y sin identificar. El precio del Form 4 en pesos se etiqueta «referencia EE. UU. × tipo de cambio; no es cotización del SIC».\n- **Lista de seguimiento** (`seguimiento`), con API `POST/DELETE /api/seguimiento`.\n- **Alertas «movimiento_publico»**, solo nuevas y materiales y sin duplicados:\n  - compra discrecional ≥ 100 000 USD;\n  - venta discrecional ≥ 1 000 000 USD;\n  - nueva posición o salida en 13F.\n\n  Siempre como contexto: no crean órdenes ni boletas.\n- **Reporte diario, Telegram y línea de comandos:** sección fechada en el reporte, `/movimientos` en Telegram y `uv run terminal movimientos actualizar|resumen`.\n- **Peso en la puntuación: 0.** No entra a la puntuación (no hay evidencia fuera de muestra). El 13F del 30-sep-2026 vence el 16-nov-2026, después del cierre del Reto.\n\n### Cambiado\n- **Consulta de Form 4:** la de `fuentes_web.SecEdgar` queda sustituida por el módulo nuevo (incremental, ≤ 5 peticiones/s, reintentos ante 429 o 5xx).\n- **Migraciones 8 y 9:** tablas `mp_*` y `seguimiento`, y corrección de la escala del valor en documentos ya guardados.\n\n### Verificado\n- **Primera carga real:** 614 consultas a la SEC en 2 min 48 s (501 Form 4 y 25 13F). La segunda pasada hace 37 consultas y no repite documentos.\n- **Pruebas:** 14 nuevas (`tests/test_movimientos.py`) con documentos reales de la SEC en `tests/fixtures/sec/`. Suite: 299 de Python y 19 del Worker en verde.\n\n"
+  },
+  {
+   "version": "29",
+   "fecha": "[0.18.0]",
+   "titulo": "2026-10-01 (monitor de alertas en la nube, Cloudflare Workers Free)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.18.0] — 2026-10-01 (monitor de alertas en la nube, Cloudflare Workers Free)\n\n### Añadido\n- **`cloud-alerts/`: monitor independiente en Cloudflare Workers con D1**, en el plan gratuito y sin tarjeta. Envía avisos por Telegram aunque la PC esté apagada:\n  - movimientos de posiciones SIC (Alpaca IEX × FIX, etiquetado como referencia y no como precio del SIC);\n  - variación estimada de la cartera;\n  - condiciones del plan validado;\n  - cartera sin sincronizar, que además suspende compra y venta;\n  - fallas persistentes de datos y posibles splits no registrados;\n  - un resumen diario antes de la apertura de la BMV.\n- **Relevo sin duplicados.** La terminal sincroniza cada 10 min, y esa sincronización funciona como latido. Mientras llegue, la nube no envía nada; tras 20 min sin latido toma el relevo. Cada aviso tiene una clave única en D1. La nube solo usa `sendMessage` y no lee el chat, así que no compite con el bot local.\n- **Sincronización segura (`terminal/nube.py`).** Viaja la carga mínima (~11 KB), firmada con HMAC-SHA256 y con:\n  - ventana de 5 min;\n  - nonce de un solo uso;\n  - secuencia creciente;\n  - límite de 64 KB y validación estricta (cualquier campo desconocido se rechaza).\n\n  Nunca suben la base, `.env`, claves, costos ni documentos del portal.\n- **Estado en la terminal.** En «Alertas» → «Monitor en la nube»: activo o inactivo, última sincronización y ejecución, próxima revisión, quién envía las alertas y por qué se suspende cada una. También están `uv run terminal nube estado|sincronizar|prueba|carga|secreto`, `GET /api/nube/estado` y `POST /api/nube/sincronizar`.\n- **Despliegue.** `cloud-alerts/scripts/desplegar.py` crea la D1, migra, despliega y carga los secretos desde `.env` sin imprimirlos; `--desactivar` quita el cron.\n- **Pruebas.** 19 del Worker (`npm test`, con D1 simulada sobre `node:sqlite`) y 7 de Python (`tests/test_nube.py`). La firma usa un vector compartido entre Python y JS, y la carga real pasa el validador del Worker.\n\n### Pendiente\n- Desplegar requiere iniciar sesión en Cloudflare: `npx wrangler login`, lo hace el usuario. Hasta comprobar un aviso real enviado desde la nube, el acceso permanente no se da por completado.\n\n"
+  },
+  {
+   "version": "28",
+   "fecha": "[0.17.0]",
+   "titulo": "2026-10-01 (pronóstico al cierre del Reto, con barrera)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.17.0] — 2026-10-01 (pronóstico al cierre del Reto, con barrera)\n\n### Añadido\n- **Pronóstico al cierre del Reto** (`terminal/investigacion/reto_pronostico.py`, [docs/pronostico-reto.md](docs/pronostico-reto.md)). Además de 1 y 5 sesiones, emite un horizonte dinámico: sesiones de la BMV desde la última sesión cerrada hasta el 13-nov (31 el 30-sep). Todo va en pesos: el SIC se multiplica por el USD/MXN de su fecha, y solo si ya estaba publicado a la hora de emisión. Cada pronóstico guarda el precio base, la estimación, el rango 10–90 %, la probabilidad de subida, la fecha de emisión, el último cierre usado, la fecha objetivo y la versión del modelo (migración 7).\n- **FUTURO en «Boletas e historial»** separa tres cosas:\n  - cierre OBSERVADO;\n  - ESTIMACIÓN al objetivo;\n  - ESCENARIOS 10/90 %.\n\n  Muestra cada emisora y la cartera de la captura del portal; si no hay captura, avisa «Cartera NO conciliada». También muestra:\n  - la comparación de cada propuesta con el pronóstico: neto de comisión + IVA, exposición al SIC con tipo de cambio, reglas del Reto y catálogo del simulador;\n  - los cambios frente a la emisión anterior;\n  - la calidad por mercado (BMV y SIC) y la calibración;\n  - las emisoras sin historia suficiente o sin precios, que no se ocultan.\n- **Barrera verificable.** El pronóstico solo puede influir en compras, ventas o boletas si cumple todo esto:\n  - la prueba final está intacta y es suficiente;\n  - su error es menor que el de cada referencia, con Diebold-Mariano p < 0.05;\n  - su resultado neto de costos es mejor que mantener, que pesos iguales y que la **estrategia actual** (nueva referencia: media histórica, como el optimizador);\n  - no hay deterioro.\n\n  Si no, aparece «señal experimental: sin ventaja demostrada» y el plan sigue el método actual. Una prueba comprueba que el plan, las boletas y el optimizador no leen los pronósticos.\n- **Telegram y reporte.** Nuevo comando `/pronostico`, botón «Enviar pronóstico por Telegram», sección en el reporte diario, `uv run terminal pronostico`, `GET /api/pronostico` y `POST /api/pronostico/telegram`.\n- **Emisión automática.** Una vez por sesión cerrada, en segundo plano: unos 140 s y 0.36 GB de memoria pico. Se desactiva con `[investigacion] emitir_diario = false`.\n- **Métricas nuevas.** Calibración por tramos, error y dirección por mercado, días de prueba y lista de historia insuficiente.\n\n### Cambiado\n- **Rango por emisora.** Los residuos se estandarizan con la volatilidad de 60 sesiones × √H. Antes, un bono (AGG) y una acción volátil recibían el mismo rango.\n- La línea de comandos escribe en UTF-8: la consola de Windows fallaba con emojis.\n\n### Resultados reales (datos al 30-sep, 130 instrumentos)\n- **SIN VENTAJA DEMOSTRADA** en 1, 5 y 31 sesiones:\n  - el error relativo a «sin cambio» es de 1.000, 1.001 y 1.009;\n  - Diebold-Mariano da p = 0.45, 0.63 y 0.72;\n  - el neto del modelo es −35.4 %, −4.4 % y −0.0 %, frente a +8.8 %, +12.6 % y +4.5 % de mantener.\n- **La probabilidad de subida está mal calibrada.** Cuando estimaba ≥ 70 %, la emisora subió el 49 % de las veces. La terminal y Telegram lo advierten.\n- **Kronos no se añadió**: no hay una prueba medida que quepa en memoria y mejore fuera de muestra.\n- **Pruebas:** 11 nuevas (`tests/test_pronostico_reto.py`).\n\n"
+  },
+  {
+   "version": "27",
+   "fecha": "[0.16.1]",
+   "titulo": "2026-09-30 (boletas coherentes con el plan)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.16.1] — 2026-09-30 (boletas coherentes con el plan)\n\n### Corregido\n- **Boletas invalidadas al instante por punto flotante:** 7,994 × 14.91 ÷ 14.91 = 7,993.999… hacía «cambiar la cantidad» al recalcular. La boleta guarda ahora la acción y el monto originales, y redondea con tolerancia. En el plan del 1-oct faltaban ALPEK y FIBRAPL 14.\n- **Las boletas «investigar» del SIC perdían su banda de referencia al recalcular.**\n- **«Mantener» ya no se presenta como «investigar»** cuando falta cotización confiable.\n- **Venta total en el SIC:** la guía indica los títulos que se tienen (LLY 1, JNJ 5), no los que resultan de dividir entre el precio máximo de la banda.\n\n"
+  },
+  {
+   "version": "26",
+   "fecha": "[0.16.0]",
+   "titulo": "2026-09-30 (capturas de pantalla del portafolio)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.16.0] — 2026-09-30 (capturas de pantalla del portafolio)\n\n### Añadido\n- **Capturas de pantalla en «Mi portafolio Actinver».** Se arrastran, se eligen o se pegan con Ctrl+V. El OCR de Windows (español) las lee en esta PC, en un proceso aparte (sus bibliotecas chocan con las de scipy), sin guardar ni enviar las imágenes. El texto resultante pasa por la misma vista previa y confirmación que el texto pegado.\n- **Robustez frente al OCR:**\n  - dos lecturas (tamaño original y ampliada) que se combinan;\n  - montos reconstruidos con sus centavos («$611.62509» → 611,625.09) y confusiones del «$» (3, 5, S, «SI» = «$1») resueltas por coherencia de la fila: costo ÷ costo unitario ≈ títulos y precio ≈ costo;\n  - un título ilegible se deduce del costo;\n  - encabezados por aproximación y filas ancladas en «Ver Detalle»;\n  - «Ver lo que leyó el OCR» muestra la lectura tal cual.\n- Paquetes `winrt-*` (MIT) solo en Windows.\n\n### Seguridad\n- Una captura cuyas posiciones difieren más de 1 % de «Inversiones» del portal ya no se puede guardar.\n- Si no se lee la «Valuación total», se calcula con el resumen del portal y no con las filas leídas, para que el cuadre sí detecte un título o precio mal leído.\n- Límite de 30 MB solo para la ruta de capturas; el resto sigue en 1 MB.\n\n"
+  },
+  {
+   "version": "25",
+   "fecha": "[0.15.1]",
+   "titulo": "2026-09-30 (criterio «mayor plusvalía» y tabla real del portal)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.15.1] — 2026-09-30 (criterio «mayor plusvalía» y tabla real del portal)\n\n### Añadido\n- **Criterio del plan de acción** en «Reto y perfil». «Máxima puntuación» queda por omisión; «Mayor plusvalía esperada al cierre del Reto» elige la propuesta con mayor ganancia esperada (escenario central) y declara su riesgo (escenario adverso). Lo usan por igual el plan de acción, Telegram, las boletas y la alerta «Posible movimiento».\n\n### Corregido\n- **Tabla de posiciones del portal:** la columna «Valor al Costo» es el costo unitario; antes se tomaba como valor de mercado.\n- **`/plan` y la muestra después del cierre** muestran la próxima sesión de la BMV (por ejemplo, jue 01-10) en vez de la de hoy.\n- **Venta total en el SIC** (objetivo 0 %): la referencia indica todos los títulos que se tienen.\n\n"
+  },
+  {
+   "version": "24",
+   "fecha": "[0.15.0]",
+   "titulo": "2026-09-30 (plan de acción, «Mi portafolio Actinver», interfaz simplificada, Telegram)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.15.0] — 2026-09-30 (plan de acción, «Mi portafolio Actinver», interfaz simplificada, Telegram)\n\n### Añadido\n- **Plan de acción** (`terminal/plan_accion.py`, `/api/plan-accion`, primera sección de la interfaz). Para cada instrumento indica comprar, vender, mantener o «decisión pendiente», con cantidad, precio límite, monto, peso actual y objetivo, fuente y fecha del precio, motivo e invalidación, ordenado por prioridad. Antes de calcular verifica las reglas: fecha de consulta de las bases, comisión, al menos 5 emisoras, máximo 50 % y catálogo del simulador. Sin saldo confirmado del portal, sin cotización confiable (el SIC es referencia) o sin efectivo, la decisión queda pendiente y dice qué falta; las compras se limitan al poder de compra confirmado, en orden de prioridad.\n- **«Mi portafolio Actinver»** (antes «Mi cartera»). Reconoce el recuadro «Tu inversión» del portal (Valuación Total Ahora, Inversiones, Poder de compra, Movimientos por liquidar) más la tabla de «Ver detalle de mi inversión». El cuadre incluye lo por liquidar (migración 6). La vista previa muestra diferencias frente a la captura anterior y al registro local y avisa de duplicados; se confirma con «Confirmar y guardar mi portafolio». Muestra la hora de la última actualización. No existe integración oficial: el simulador no ofrece API y el reglamento §17 prohíbe programas en el portal.\n- **Telegram:** el plan del día incluye las propuestas con máxima puntuación (desglose, rendimiento esperado, rango, validación fuera de muestra frente a pesos iguales), cuál alimenta el plan y por qué, la de mayor rendimiento esperado cuando es otra (con la diferencia de riesgo) y un resumen de compras, ventas, mantener y pendientes. Nuevos comandos `/detalle` y `/propuestas`, y enlace privado de Tailscale. Sin cuenta confirmada no da órdenes con títulos.\n\n### Cambiado\n- **Navegación:** cinco secciones principales (Plan de acción, Mi portafolio Actinver, Propuestas, Alertas, Reto y perfil). Boletas e historial, Ranking, Mercado, Datos y fuentes y Ayuda pasan a «Más». La comparación de lentes que se repetía en el resumen se quitó de allí; sigue en «Propuestas». El registro local y la importación quedan en una sección avanzada. No se borró ningún dato.\n\n"
+  },
+  {
+   "version": "23",
+   "fecha": "[0.14.0]",
+   "titulo": "2026-09-30 (auditoría: horario BMV, escenarios, alertas, respaldos, lanzador)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.14.0] — 2026-09-30 (auditoría: horario BMV, escenarios, alertas, respaldos, lanzador)\n\n### Corregido\n- **Horario de la BMV.** `exchange_calendars` fija XMEX en 08:30–15:00 todo el año; las bases del Reto dicen 07:30–14:00 hasta el 2-nov-2026. Entre 14:00 y 15:00 la terminal creía abierta la bolsa y no daba por cerrada la sesión; de 07:30 a 08:30 la creía cerrada. `vigencia.apertura_sesion` y `cierre_sesion` usan ahora `horario_bmv` de `config/reto.yaml`, y los festivos siguen saliendo del calendario.\n- **Escenarios demasiado estrechos.** Usaban la volatilidad dentro de muestra de pesos ya optimizados, sesgada a la baja: en «Mixta · Ajuste», 16.6 % frente a 42.5 % fuera de muestra, con un adverso de −2.8 % en vez de −11.7 %. Ahora se toma la mayor volatilidad y la menor media entre dentro y fuera de muestra; el escenario informa qué fuente usó.\n- **Media robusta en el optimizador.** Cada activo acota sus saltos de un solo día a máx(10 %, 5 σ robusta) al estimar la media; la covarianza sigue usando la serie completa. MRNA (+175 % el 19-ago) salió de las propuestas principales, donde tenía 11.9 %.\n- **Alertas «Posible movimiento» acumuladas.** Cada recálculo dejaba otra como «nueva»; ahora la última reemplaza a las anteriores.\n- **El Ranking mostraba instrumentos que el simulador no ofrece** (QQQ era 5.º). Ahora se filtra por el catálogo del simulador, como las propuestas, y avisa cuántos omite.\n- **El iniciador no arrancaba la terminal si fallaba Tailscale.** Ahora arranca en local y avisa que el acceso remoto no está activo.\n- **Precio SIC sin marcar.** En «Propuestas» y en la simulación, las filas del SIC ahora llevan «*» (referencia: bolsa de origen × tipo de cambio) y «≈» en los títulos.\n- **Boletas.** Etiqueta explícita por estado (Capturable, Solo guía, Invalidada, Vencida, Descartada, Ejecutada); las capturables van primero y las demás se atenúan. En móvil, las filas pasan de más de 142 px a 80–99 px.\n\n### Añadido\n- Respaldo diario verificado de la base desde el ciclo del motor (`data/respaldos`, 14 copias). Antes no existía ningún respaldo.\n- Riesgo «No supera a la referencia simple» cuando la propuesta rinde menos que 1/N fuera de muestra.\n- `config/reto.yaml`: bases re-verificadas el 30-sep; el criterio es «mayor ganancia absoluta».\n\n"
+  },
+  {
+   "version": "22",
+   "fecha": "[0.14.1]",
+   "titulo": "2026-09-30 (conciliación de efectivo e invertido; horario en el plan del día)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.14.1] — 2026-09-30 (conciliación de efectivo e invertido; horario en el plan del día)\n\n### Añadido\n- **Alerta «Diferencia con el portal»:** ahora compara el efectivo y lo invertido además del total, cada uno en puntos del valor del portal. Con la captura de las 14:45 el total difería 0.49 % y no alertaba, pero el efectivo difería +77.4 % y lo invertido −61.5 %. Nuevas columnas `invertido` y `por_liquidar` en `saldos_portal` (migración 5), con campos en el formulario y un desglose en «Presente».\n- **Plan del día por Telegram:** indica a qué hora consultar el portal (la apertura: 07:30, o 08:30 desde el 3-nov) y a qué hora retirarse (cierre + 15 min: 14:15, o 15:15), además de recordar que las órdenes limitadas vencen al cierre y que hay que copiar la cuenta. El 13-nov avisa que cierra el Reto.\n\n"
+  },
+  {
+   "version": "21",
+   "fecha": "[Sin publicar]",
+   "titulo": "[Sin publicar]",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [Sin publicar]\n\n### Añadido\n- **Puente TradingView por vía oficial.** Indicador Pine `tradingview/actinver_cruce_nivel.pine` cuyas alertas usan el formato del webhook existente, prueba `tests/test_tradingview_pine.py` y guía `docs/tradingview-puente.md`. El repo `tradingviewmcp` se usa solo para desarrollar e instalar el Pine; no se leen precios de la interfaz.\n\n"
+  },
+  {
+   "version": "20",
+   "fecha": "[0.13.0]",
+   "titulo": "2026-09-30 (auditoría integral)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.13.0] — 2026-09-30 (auditoría integral)\n\n### Corregido (crítico)\n- **Splits sin ajustar en el Reto.** Para excluir dividendos, que el Reto no paga, se usaba el cierre sin ajustar. Eso también dejaba los splits sin ajustar, aunque las bases dicen que sí se replican. El *reverse split* 1:10 de FUBO (24-mar-2026) aparecía como +994 % y el optimizador le daba 11–20 % en todas las propuestas; la «máxima puntuación» de 95.7 estaba inflada por ese salto. Otros saltos ficticios: WMT, NVDA, AVGO, NFLX, SPCE y LCID. Ahora se usa precio ajustado **solo por splits** (`precios_mxn(..., ajustados=\"splits\")`) en el optimizador, el ranking, las boletas y las alertas. La valuación de la cartera sigue usando el cierre real.\n- **Escenarios irreales.** Antes daban +162 % / −37 % a 0.25 años. Ahora usan el horizonte real al 13-nov (29 sesiones, sin piso de 0.25 años). La media histórica se contrae 50 % por sesgo de selección y los días de salto único se acotan a ±10 %. Se informan la volatilidad con saltos y los saltos acotados.\n- **La hoja de fondos tiraba el ciclo completo.** El User-Agent contenía «pública» (no ASCII) y httpx lo rechazaba, así que no se recalculaban propuestas. Se corrigió la cabecera y un fallo de esa fuente ya no detiene el ciclo.\n\n### Añadido\n- `uv run terminal catalogo-simulador [--confirmar]`: limita el universo del Reto a lo que muestra el simulador del participante (transcripción de «Datos Actinver.pdf», 22-sep-2026: 146 acciones y 23 fondos). Quedan fuera AGG, IAU, IEF, IVV, QQQ, SHV, VEA, VNQ, VOO, VWO y SMARTRC; antes la variante extranjera ponía 47 % en cinco de esos ETF. Si el catálogo cambia, las propuestas se recalculan.\n- **Boletas SIC condicionales.** Sin cotización confiable del SIC, la boleta sigue en «investigar» (no ejecutable), pero trae títulos aproximados y una banda de ±2 % alrededor de la referencia (cierre de origen × tipo de cambio, con fuente y fecha). Solo se captura si el precio del portal cae dentro de la banda.\n- **Plan corregido.** Si un recálculo cambia las órdenes después de enviado el plan del día y antes de la apertura del Reto (07:30; 08:30 desde el 3-nov), se reenvía una vez marcado «🔁 PLAN CORREGIDO», con un máximo de 2 por sesión.\n- `config/reto.yaml`: bases re-verificadas el 29-sep. Queda registrada la discrepancia: las bases no mencionan el SIC ni publican catálogo.\n\n"
+  },
+  {
+   "version": "19",
+   "fecha": "[0.12.2]",
+   "titulo": "2026-09-29 (iniciador remoto)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.12.2] — 2026-09-29 (iniciador remoto)\n\n### Corregido\n- `iniciar-remoto.bat` encuentra Tailscale aunque no esté en `PATH`, obtiene el host y usuario de la sesión privada, actualiza solo esas dos claves de `.env` y reutiliza la terminal cuando ya acepta ese acceso. Si necesita aplicar la configuración, reinicia únicamente el proceso de esta terminal.\n- La guía de acceso remoto describe la instalación oficial para Windows cuando `winget` no está disponible.\n- El acceso remoto no se activa si Tailscale no ha iniciado sesión; se comprobó este fallo seguro y el rechazo de un host no autorizado. La conexión real entre dispositivos queda pendiente del inicio de sesión del usuario.\n\n"
+  },
+  {
+   "version": "18",
+   "fecha": "[0.12.1]",
+   "titulo": "2026-09-29 (serie exacta de JPMRVUS)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.12.1] — 2026-09-29 (serie exacta de JPMRVUS)\n\n### Corregido\n- `JPMRVUS` ahora usa la serie **B-1** y la clave operable `JPMRVUS B-1`, coherentes con el identificador oficial `52_JPMRVUS_B-1`. Se volvió a importar la hoja oficial conservada del 28-sep-2026: 23 de 23 fondos con NAV, incluido `JPMRVUS` a 1.344672 MXN.\n- Se actualizó la prueba de coincidencia exacta de series. La suite completa pasó: 203 pruebas. Cobertura observada: 148 de 174 instrumentos con precio; 26 emisoras BMV sin datos. El millón inicial sigue siendo un registro local, sin captura confirmada del portal; no hay cotización BMV/SIC en tiempo real.\n\n"
+  },
+  {
+   "version": "17",
+   "fecha": "[0.12.0]",
+   "titulo": "2026-09-29 (cobertura de precios)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.12.0] — 2026-09-29 (cobertura de precios)\n\n### Corregido\n- **EODHD pedía Peñoles como «PEOLES»:** su código es `PE&OLES`; ahora se conserva el `&` (codificado en la URL). El resto del mapeo se verificó contra la lista oficial de la BMV en EODHD.\n- **Las emisoras BMV nunca cargadas no recibían cupo:** las actualizaciones diarias consumían las 18 consultas. Ahora se reservan 6 por día para emisoras nuevas.\n- **Zona horaria:** un precio con solo fecha se tomaba como medianoche UTC (el día anterior en CDMX) y se marcaba obsoleto. Ahora usa la hora de cierre de la sesión.\n- **Desempate entre fuentes con la misma fecha:** antes era alfabético; ahora sigue una prioridad explícita (`PRIORIDAD_FUENTE`).\n- Si se agota el cupo de una fuente, se prueba la siguiente que cubra el instrumento.\n\n### Añadido\n- **Hoja oficial de precios de los fondos Actinver** (`terminal/fondos_actinver.py`):\n  - 22 de 23 fondos con NAV y fecha de valuación del propio documento, huella SHA-256 y copia local del PDF;\n  - descarga diaria automática, subida manual en «Datos» o `uv run terminal fondos [--archivo PDF]`.\n- **Twelve Data** (`TwelveData`):\n  - alternativa de cierre diario para la BMV (plan Pro);\n  - solo para los 37 símbolos verificados con `uv run terminal cobertura-twelvedata`, y solo con `TWELVEDATA_API_KEY`.\n- **Fuentes confiables para boletas** `twelvedata_bmv` y `actinver_pdf`: la cobertura se verifica al descargar la serie exacta.\n- **Boletas** (pantalla y Telegram) muestran fuente, moneda, fecha y hora, y tipo (tiempo real, retrasado o cierre diario); sin cotización fiable muestran «Sin datos» y no calculan la orden.\n- Documentación de Grupo BMV INTRA: qué contrato, infraestructura y contacto requiere.\n\n"
+  },
+  {
+   "version": "16",
+   "fecha": "[0.11.0]",
+   "titulo": "2026-09-29 (auditoría integral)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.11.0] — 2026-09-29 (auditoría integral)\n\n### Añadido (boletas)\n- **Bot de Telegram** (`terminal/bot_telegram.py`):\n  - atiende solo al chat de `TELEGRAM_CHAT_ID`;\n  - comandos `/plan`, `/boletas` (genera y envía las del plan del día), `/estado`, `/alertas`, `/cartera` y `/ayuda`, con menú en la app;\n  - responde preguntas libres con Claude (`claude-opus-5-5` con `fallbacks: \"default\"`; opcional: `uv add anthropic` y credencial), con Ollama o con los datos de la terminal (ficha por emisora);\n  - tope de 20 consultas por hora; nunca ejecuta órdenes.\n- **Boletas del plan del día:**\n  - se generan con el botón «Generar boletas del plan del día» (Propuestas), con `uv run terminal boletas` o con `POST /api/boletas/generar {\"propuesta\": \"plan_del_dia\"}`;\n  - usan la misma propuesta que el mensaje de Telegram y reemplazan las boletas vigentes anteriores para no duplicar órdenes.\n\n### Corregido\n- **Plan del día:**\n  - un envío fallido ya no cuenta como enviado: se reintenta cada 10 minutos, hasta 12 veces al día;\n  - la base de comparación es el último plan que sí llegó;\n  - si las propuestas se están recalculando, espera hasta 60 minutos para no mandar un plan viejo.\n- **Las propuestas se recalculan solas al cambiar el código o la configuración:**\n  - cada propuesta guarda `huella_calculo`, un sha256 de `optimizador`, `servicios`, `mercado`, `portal`, `reto`, `vigencia`, `config/reto.yaml` y las secciones de configuración del cálculo;\n  - si no coincide, la propuesta deja de ser actual y el motor la recalcula en su siguiente ciclo.\n  - Solo disparan recálculo los avisos que se resuelven recalculando (código, perfil o datos). El bloqueo por captura incompleta ya no provoca un recálculo en cada ciclo.\n- **Seeking Alpha colapsaba todos los titulares de una emisora en uno:**\n  - el enlace del RSS es genérico y servía como identificador;\n  - ahora se usa el `guid` y el enlace real de la nota;\n  - se descartan notas que no mencionan la emisora y se registran las otras emisoras mencionadas;\n  - el tipo se clasifica como noticia, análisis o transcripción.\n- **Titulares y cola de precios quedaban vacíos sin posiciones:**\n  - titulares, insiders y la cola usan también las emisoras de las propuestas;\n  - un ciclo sin emisoras ya no se reporta como «ok».\n- **Cola de precios alfabética:**\n  - el orden es cartera → propuestas → atrasadas (la más antigua primero) → nunca cargadas;\n  - así rinden los cupos de EODHD (20 al día) y Tiingo.\n\n### Añadido\n- **«¿En qué puedo confiar hoy?»** (`/api/estado-informacion`, en Resumen): confirmado, estimado, vencido o falta, con la acción concreta.\n- **Bloqueos:**\n  - una captura del portal con posiciones sin precio bloquea propuestas, boletas y avisos de movimiento;\n  - no se generan boletas con propuestas que tengan avisos.\n- «Riesgos» advierte la validación corta (menos de 126 sesiones).\n- El aviso «Posible movimiento» no se envía de noche (21:00–07:00): lo incluye el plan del día.\n- Resumen rotula la cartera como «Confirmado» (captura del portal) o «Local» (registro de la terminal).\n- Nueva guía para personas no técnicas: `docs/guia-rapida.md`.\n\n"
+  },
+  {
+   "version": "15",
+   "fecha": "[0.10.0]",
+   "titulo": "2026-09-29",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.10.0] — 2026-09-29\n\n### Añadido\n- **Plan del día por Telegram** (`terminal/resumen.py`): cada sesión hábil de la BMV a las 07:00 (CDMX, configurable en\n  `resumen_matutino_hora`), una sola vez, con:\n  - las órdenes de la propuesta mejor puntuada, con títulos enteros, precio y monto;\n  - los cambios frente al plan del día anterior;\n  - el porqué (criterios de la puntuación, motivo por emisora y riesgo principal).\n  - `POST /api/resumen/muestra` envía una muestra en cualquier momento; los mensajes largos se parten en varios.\n- **Cuenta del Reto según el portal** (`terminal/portal.py`, `GET/POST /api/portal/captura`):\n  - el participante copia la tabla de su cuenta y la pega en «Mi cartera», con vista previa, cuadre y detección de duplicados;\n  - la terminal nunca entra al portal (reglamento §17);\n  - propuestas y alertas usan esa captura mientras sea la información más reciente;\n  - el registro local (p. ej., la aportación virtual de práctica) se rotula aparte y nunca como saldo confirmado.\n- **Alertas nuevas**, sin duplicados por clave y entregadas aunque la BMV esté cerrada:\n  - `cambio_portal`: saldo, efectivo y títulos entre capturas;\n  - `captura_pendiente`: recordatorio al cierre si no hay captura del día;\n  - `plan_propuesta`: una sola vez por cada conjunto de órdenes distinto de la propuesta mejor puntuada.\n- Cada aviso de Telegram y correo trae la hora de detección (CDMX) y la fuente de los datos.\n- `notificar_correo` activo por omisión: solo envía si `SMTP_HOST` y `ALERTAS_CORREO_DESTINO` están en `.env`.\n- La prueba de canales usa el formato real de las alertas.\n\n### Corregido\n- La captura del portal rechaza emisoras no reconocidas, efectivo ausente, descuadres mayores al 1 %, títulos inválidos\n  y capturas anteriores a la última guardada. Si falta una cotización de la terminal, conserva el valor copiado del portal.\n- Los recordatorios distinguen una captura anterior del registro local y la pantalla explica cuándo cambia la etapa.\n- Si falla un canal de alerta, la terminal reintenta ese canal tras diez minutos mientras el aviso siga vigente;\n  los canales que ya confirmaron la entrega no reciben copias.\n- El tope de exposición en dólares del perfil se ignoraba cuando la preselección dejaba pocas acciones en pesos.\n\n"
+  },
+  {
+   "version": "14",
+   "fecha": "[0.9.0]",
+   "titulo": "2026-09-29",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.9.0] — 2026-09-29\n\n### Añadido\n- **Plan de órdenes en cada propuesta** (`ordenes`: total, compras, ventas, emisoras finales, costo y órdenes del SIC):\n  - `consolidar_ordenes` elimina las posiciones menores a la banda de rebalanceo (2 %), que nunca llegarían a\n    ejecutarse, y reparte su peso sin romper topes ni el mínimo de 5 emisoras;\n  - el número de órdenes aparece en las tarjetas, en el detalle («Plan de órdenes») y al generar boletas.\n- **`InfoselProvider` implementado con la API pública de Infosel Market v3**: último hecho BMV y SIC en MXN, hora del\n  hecho en la Ciudad de México convertida a UTC, posturas de compra/venta, verificación de serie exacta y token rechazado\n  explicado. Solo requiere `INFOSEL_URL_BASE` e `INFOSEL_API_KEY`.\n- **Conectores contratados** `InfoselProvider` (APIs de Infosel / Infosel HUB, tiempo real BMV y BIVA) y `EdimexProvider`:\n  - quedan «pendiente» con la lista exacta de lo que falta;\n  - `BmvLicensedProvider` documenta que SiBolsa se consume vía los Web Services de Grupo BMV.\n- **Importador de calificaciones de Seeking Alpha** (`calificaciones_sa`): se muestran en el Ranking como contexto fechado.\n\n"
+  },
+  {
+   "version": "13",
+   "fecha": "[0.8.0]",
+   "titulo": "2026-09-24",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.8.0] — 2026-09-24\n\n### Añadido\n- **Lente «Máxima puntuación»** (`acciones_puntuacion`, `mixta_puntuacion`):\n  - busca en una rejilla de 12 candidatos (aversión × tope por emisora ≤ 50 %);\n  - elige con la 1.ª mitad del periodo fuera de muestra y verifica con la 2.ª;\n  - con datos reales: acciones 83.7 (verificación 90.8), mixta 87.1 (verificación 88.9).\n- **Mercado de emisoras** en «Reto y perfil»: nacionales y extranjeras, solo nacionales (BMV) o solo extranjeras (SIC).\n- **Pestaña Ranking** (`terminal/ranking.py`, `GET /api/ranking`):\n  - ordena todas las acciones, FIBRA y ETF con ≥ 61 sesiones, sin depender de la cartera;\n  - puntuación por percentiles (rendimiento a 20 y 60 sesiones, estabilidad y tendencia);\n  - filtro por mercado; se refresca cada minuto.\n- **Alertas diferidas:** las silenciadas fuera de horario se entregan (escritorio y Telegram) al abrir la BMV.\n\n"
+  },
+  {
+   "version": "12",
+   "fecha": "[0.7.0]",
+   "titulo": "2026-09-24 (rama `boleta-decision`)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.7.0] — 2026-09-24 (rama `boleta-decision`)\n\n### Añadido\n- **Boleta de decisión** (`terminal/boleta.py`, `/api/boletas`), para captura manual:\n  - serie exacta, cantidad entera y precio límite;\n  - costos con deslizamiento y caso de no ejecución;\n  - efecto en efectivo y concentración, rango histórico y pérdida plausible;\n  - liquidez, alternativa, invalidación y caducidad;\n  - recálculo antes de presentarla y marcado manual de la ejecución con folio.\n- **Órdenes:** estados enviada/pendiente/ejecutada/cancelada/expirada; «ejecutada» solo con la operación confirmada.\n- **Precios:** calidad `STALE` y `ForeignMarketLicensedProvider`, que cubre la bolsa de origen y nunca la serie SIC.\n- **Importadores** con plantilla: confirmaciones con folio, saldos del portal, notas de Seeking Alpha y exportación de InsiderFinance.\n- **Calendario macro versionado** (`eventos_macro_versiones`) y `macro_conocido_en(T)`, que oculta el dato efectivo antes de publicarse.\n- **Alertas:** prioridad, caducidad, impacto en MXN y ruptura de tesis (nivel de invalidación en la bitácora).\n- **Banco de estrategias simples** (`terminal/investigacion/estrategias.py`) frente a efectivo, pesos iguales y comprar y mantener. Con índices reales de FRED: **VENTAJA NO DEMOSTRADA** (28 configuraciones registradas).\n- **Documentos:** decision-workflow, data-providers e instrument-mapping; model-card, quant-methodology y actinver-rules actualizados.\n- `tests/test_boleta.py` (15 pruebas; 146 en total).\n\n"
+  },
+  {
+   "version": "11",
+   "fecha": "[0.6.0]",
+   "titulo": "2026-09-23 (rama `ampliacion-integral`)",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.6.0] — 2026-09-23 (rama `ampliacion-integral`)\n\n### Añadido\n- **Reglas del Reto versionadas** (`terminal/registro.py`, tabla `versiones_reglas`): aviso de discrepancia y los cálculos guardados conservan su versión. Las bases se re-verificaron el 23-sep (docs/actinver-rules.md).\n- **Entidades nuevas:**\n  - correspondencia de símbolos (MIC, serie, origen);\n  - órdenes pendientes solo como referencia, sin efecto en la tenencia;\n  - bitácora de decisiones humanas (método de LuxAlgo/trade-journal);\n  - instantáneas de cartera, versiones de modelo y licencias de fuente.\n- **Migraciones v2 y v3:**\n  - `ingested_at` en todas las tablas de hechos;\n  - **disparadores de SQLite** que rechazan una noticia disponible antes de publicarse, un precio disponible antes del evento, `REAL_TIME` sin latencia medida ≤ 15 s y una cotización BMV o SIC fuera de MXN;\n  - autor y tipo de contenido de Seeking Alpha;\n  - fecha de presentación y marca «NO CUBRE BMV» en insiders.\n- **Control de clasificación** (`terminal/clasificacion.py`): los CFD (ficha de Dukascopy) y los criptoactivos (formato de ccxt) nunca valúan el Reto.\n- **Alertas:**\n  - inhibición de las alertas direccionales sin precio confiable o con noticias contradictorias, con una alerta de datos en su lugar;\n  - **ficha de revisión**: qué ocurrió, datos, qué falta confirmar, costos, riesgos y opciones.\n- **Investigación:**\n  - variable de noticias sujeta a `available_at` y caída de 20 sesiones;\n  - estrategias de referencia «mantener» y «pesos iguales»;\n  - caída máxima, exposición y sensibilidad a costos (×0, ×1, ×2, ×5);\n  - **Diebold-Mariano con Newey-West** y veredicto «SIN VENTAJA DEMOSTRADA».\n- **Verificación cruzada con backtrader**, que coincide exactamente con el cálculo independiente. **Candidato Kronos** con verificación de disponibilidad.\n- **Experimento con índices reales de FRED** (`scripts/experimento_indices_fred.py`): sin ventaja demostrada en H=1 ni en H=5.\n- **Escenarios de estrés** (`terminal/escenarios.py`).\n- **Política de tokens** (`scripts/indice_contexto.py`, índice con hashes y caché) y uso de `codebase-memory-mcp`.\n- **Documentos:** initial-audit, actinver-rules, source-matrix con `sources/` (7 fichas), instrument-matrix, repository-adoption-matrix (63 repositorios), quant-methodology, model-card, token-budget, arquitectura y DESIGN.md.\n- **Interfaz:** bitácora, órdenes pendientes, ficha en cada alerta, veredicto en FUTURO, aviso de reglas y la banda «DATOS SIMULADOS».\n- `tests/test_ampliacion.py` (23 pruebas; 129 en total), incluidas pruebas que **deben fallar** ante una noticia futura en el pasado, un precio de EE. UU. como serie SIC o un dato de cierre marcado como tiempo real.\n\n"
+  },
+  {
+   "version": "10",
+   "fecha": "[0.5.0]",
+   "titulo": "2026-09-23",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.5.0] — 2026-09-23\n\n### Añadido\n- **Proveedores intercambiables** (`terminal/cotizaciones.py`):\n  - Interfaz `MarketDataProvider`, con `BmvLicensedProvider`, `LsegProvider` e `IceProvider` (por especificación del contrato; hoy pendientes), `ManualOrCsvProvider`, `DemoProvider`, `EodhdBmvProvider` y `ReferenciaOrigenProvider`.\n  - Registro de cotizaciones con proveedor, símbolo de origen y normalizado, bolsa, precio, moneda, hora del evento, hora de recepción, latencia declarada y medida, y estado REAL_TIME/DELAYED/EOD/UNKNOWN.\n  - Caché, límite de consultas, métricas de fallos, reconexión, obsolescencia, conmutación solo con cobertura verificada y «SIN PRECIO CONFIABLE».\n- **Cobertura por símbolo:** `uv run terminal cobertura`, botón «Verificar cobertura» y `docs/cobertura.md`.\n- **Webhook de TradingView** (`TradingViewAlertReceiver`): secreto, símbolo, moneda, hora, duplicados y valores atípicos; `uv run terminal webhook-secreto`.\n- **Migraciones versionadas** con `event_time` / `available_at` y etapa de cada operación (práctica o competencia, con saldo reiniciado).\n- **Pestaña Pasado · Presente · Futuro:**\n  - Hechos con su disponibilidad.\n  - Precio BMV frente a referencia externa y a la valuación estimada.\n  - Captura del saldo del portal.\n  - Pronósticos etiquetados como estimaciones.\n- **Investigación predictiva** (`terminal/investigacion/`, `uv run terminal investigar`, `docs/investigacion.md`):\n  - División 70/15/15 con embargo y purga.\n  - Walk-forward purgado; filtro de correlación, PCA y Ridge ajustados solo con el entrenamiento.\n  - Prueba intacta y registro de experimentos.\n  - Tres referencias simples; métricas de error, calibración, estabilidad, rotación y resultado neto.\n  - Pronósticos con resultado observado posterior.\n- **Reglas del Reto:**\n  - Cinco acciones operadas.\n  - Advertencia de compra mayor al 50 % en propuestas y simulaciones.\n  - Comisión 0.10 % + IVA desglosada; ganancia absoluta y porcentual con comisión de salida estimada.\n- **Alertas nuevas:** cambio brusco, concentración, falta de cinco acciones, diferencia con el portal, pérdida máxima propia, evento corporativo, deterioro del modelo y eventos de TradingView. Todas invitan a «REVISAR» e incluyen cálculo e incertidumbre.\n- **Documentación y ejemplos:** `ejemplos/` (CSV y mensaje de alerta ficticios) y `docs/proveedores.md`.\n- **Pruebas:** `tests/test_monitor.py` y `tests/test_investigacion.py` (22 pruebas; 106 en total).\n\n### Cambiado\n- Los `INSERT` a tablas existentes nombran sus columnas: requisito para las columnas nuevas.\n- Los textos de acción de las alertas dejaron de sugerir vender o comprar; ahora invitan a revisar.\n\n"
+  },
+  {
+   "version": "9",
+   "fecha": "[0.4.0]",
+   "titulo": "2026-09-23",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.4.0] — 2026-09-23\n\n### Añadido\n- `uv run terminal comparar-modelos`: walk-forward de modelo vigente, 1/N, inversa de volatilidad, mínimo CVaR, paridad de riesgo y HRP (D-33); sin ganador con datos demo. `tests/test_comparador_modelos.py` (2 pruebas; 84 en total).\n- **Precio en vivo para emisoras del SIC y ETF** (`terminal/tiempo_real.py`): WebSocket IEX de Alpaca (plan gratuito, 30 símbolos, solo datos), respaldo por consulta REST, persistencia cada 15 s como dato `tiempo_real` y recálculo automático de propuestas y alertas cada 5 min o ante movimientos ≥ 1 %.\n- Adaptador `Alpaca` de barras diarias (crudas y ajustadas; SIP con respaldo IEX) como alternativa gratuita a Tiingo.\n- Telegram con detalle (motivo y acción) por defecto cuando está configurado; `uv run terminal telegram` detecta el chat y prueba el envío; `uv run terminal alpaca` comprueba las claves.\n- Botón «Enviar aviso de prueba» y estado de canales y del flujo en vivo en la interfaz; `/api/estado` informa `tiempo_real` y `notificaciones`.\n- `tests/test_tiempo_real.py` (13 pruebas; 82 en total), incluida una que impide rutas de la API de operaciones de Alpaca.\n\n### Cambiado\n- Vigencia de datos `tiempo_real`: vigente ≤ 120 s; con mercado abierto, retrasado ≤ 20 min y vencido después; con mercado cerrado se evalúa como cierre de sesión.\n- El cierre oficial reemplaza las cotizaciones en vivo del mismo día.\n\n"
+  },
+  {
+   "version": "8",
+   "fecha": "[0.3.0]",
+   "titulo": "2026-09-23",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.3.0] — 2026-09-23\n\n### Añadido\n- Reportes automáticos en Markdown (`terminal/reportes.py`, comando `terminal reporte preapertura|cierre|semanal`): Reto, motor, cartera con vigencia por posición, seguimiento (semanal), propuestas y alertas recientes. Una propuesta suspendida o desactualizada se reporta como tal y no emite recomendación; base vacía no inventa cifras. Se guardan en `data/reportes/` (o `data/demo/reportes/` en modo demo, sin mezclar datos sintéticos con reales) y quedan fuera de Git.\n- `scripts/programar_tareas.ps1` registra tres tareas más: pre-apertura 08:00 y cierre 15:15 (lun–vie) y semanal (sáb 09:00).\n- `tests/test_reportes.py` (7 pruebas; 70 en total).\n\n"
+  },
+  {
+   "version": "7",
+   "fecha": "[0.2.0]",
+   "titulo": "2026-09-23",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.2.0] — 2026-09-23\n\n### Añadido\n- Reglas del Reto Actinver 2026 como configuración versionada (`config/reto.yaml` + `terminal/reto.py`): capital 1 000 000 actipesos, práctica 28 sep–2 oct, competencia 5 oct–13 nov 15:00, comisión 0.10 % + IVA, ≥ 5 emisoras, ≤ 50 % por emisora, sin dividendos (sí splits), horario BMV 07:30–14:00 hasta el 2 nov y 08:30–15:00 desde el 3 nov. Regla no publicada = `null` con aviso «regla sin confirmar».\n- Cuatro propuestas: «Solo acciones» y «Acciones + ETF + fondos», cada una con lente **máximo rendimiento** (agresiva, riesgo explícito, tope 20 % ⇒ ≥ 5 emisoras) y **ajuste a su perfil y cartera**.\n- Horizonte automático = sesiones de la BMV hasta el cierre del Reto; precios sin ajustar por dividendos.\n- Motor automático en segundo plano: adquisición → recálculo si hay datos nuevos / cambió el perfil / no hay propuestas → alertas; también se dispara tras operaciones, importaciones y cambios de perfil.\n- Motor de alertas (`terminal/alertas.py`): deriva con histéresis (5 pp / rearme 3 pp) y mejora esperada neta de costos, stop-loss, toma de utilidad, caída desde máximo, evento macro USD/MXN, insider, noticia de alto impacto, dato vencido / fuente caída / propuesta suspendida. Enfriamiento, agrupación y silencio fuera de horario. Botón «Simular cambio».\n- Notificación de escritorio de Windows sin dependencias (`terminal/notificador.py`); correo SMTP y Telegram opcionales vía `.env`.\n- Contexto de mercado (`terminal/fuentes_web.py`): calendario ForexFactory (feed de exportación), titulares Seeking Alpha (RSS público por emisora), insiders SEC EDGAR Formulario 4 (requiere `SEC_USER_AGENT`), Barchart OnDemand (requiere contrato). Clasificación léxica; LLM local opcional (Ollama).\n- Widget oficial de TradingView en página aislada `/grafica/<id>` con CSP propia.\n- Simulación de cambios con títulos enteros, comisión del Reto y verificación de reglas.\n- Importación de la lista de instrumentos del simulador (restringe el universo del Reto).\n- Seguimiento: caída desde máximo y comparación con IPC (ACTIVAR), S&P 500 (IVV) y 60/40.\n- Interfaz: pestañas Alertas y Mercado, franja de alertas en el resumen, tareas pendientes del Reto, cifras monoespaciadas, esqueletos de carga, punto de ruptura de tableta.\n- `start.bat`, `scripts/escanear_secretos.py` (historial completo de Git), `detect-secrets` y `pip-audit` en desarrollo, `docs/repos.md` (64 fichas), `patches/README.md`.\n- Pruebas: `test_reto.py`, `test_alertas.py`, `test_fuentes_web.py` (63 en total).\n- `CLAUDE.md` raíz con mandato, estado y brechas para continuar entre sesiones.\n\n### Cambiado\n- Repositorio y paquete renombrados a `actinver-terminal`; renders del PDF en `_renders/` (fuera de Git).\n- Documentos con nombre pedido: `docs/repos.md`, `fuentes.md`, `decisiones.md`, `seguridad.md`, `matriz.md`, `diseno.md`.\n- El ajuste final usa un μ global (contracción sobre todo el universo) para optimizar y evaluar con el mismo estimador.\n- Con el Reto activo, la comisión del simulador aplica a toda orden (incluidos fondos).\n- Rendimiento: modo inyectado por el servidor, universo diferido, una consulta SQL para cotizaciones, calendarios memoizados, cliente HTTP perezoso.\n\n### Seguridad\n- Historial de Git y árbol sin secretos (escáner propio + `detect-secrets`); `pip-audit` sin vulnerabilidades conocidas.\n- Informes crudos de Lighthouse fuera de Git (contienen el token CSRF efímero de la página).\n\n"
+  },
+  {
+   "version": "6",
+   "fecha": "[0.1.0]",
+   "titulo": "2026-09-22",
+   "commit": null,
+   "cifras": {},
+   "texto": "## [0.1.0] — 2026-09-22\n- Primera versión funcional: libro de operaciones, importación CSV, vigencia de datos, universo verificado (Nasdaq Trader + BMV + Actinver), optimizador media-varianza (skfolio) con validación walk-forward y escenarios, interfaz local en `127.0.0.1:8765`, modo demo con datos sintéticos aislados, botón para cambiar a datos reales, cartera demo de 1 000 000.\n\n"
+  },
+  {
+   "version": "5",
+   "fecha": "Recursos y formación",
+   "titulo": "18-oct-2026",
+   "commit": null,
+   "cifras": {},
+   "texto": "## Recursos y formación — 18-oct-2026\n\n- Catálogo maestro de 92 fichas por área y condición de coste, PDF/CSV y enlaces de doce posts.\n- Accesos informativos TheBenchmark, Flickflow, Quantower y TradingView; prompts locales de configuración.\n- Práctica sin red de tesis, DCF/reverse DCF y volatilidad; 13 comprobaciones JS aprobadas.\n- Auditoría del uso real de Dej_B7_MXrX; sin afirmar integración de yfinance/FinBERT al motor.\n- 8 pruebas de recursos/microestructura aprobadas y JS válido; suite completa no repetida.\n\n\n### NQ — aporte Codex20/oct/2026\n\nFicha añadida a Aprender y recursos, con guía, prerregistro y resultados agregados. Replay offline en futuros-lab:6901barras,5RTH completas,4sesiones desarrollo,0trades;6tests específicos aprobados. Sin ventaja demostrada; sin forward ni prueba real de OCO. No se alteró la interfaz ni se desplegó Quantower. Coordinación con Claude mediante documento local; expediente futuros-lab/entregables/nq-investigacion-20261020.\n\n\n"
+  },
+  {
+   "version": "4",
+   "fecha": "Auditoría de continuidad",
+   "titulo": "31-oct-2026",
+   "commit": null,
+   "cifras": {},
+   "texto": "## Auditoría de continuidad — 31-oct-2026\n\nMesa: catálogo ausente muestra SIN DATO, foco y orden accesibles, disposición persistente e invalidación del cálculo al editar. Riesgo manual NQ valida unidades, finitud y límites de estudio; núcleo C# puro y Pine informativo sincronizados. 14 pruebas Node y 23 Python aprobadas; 12 vectores JS/C# coinciden, más rechazo de no finitos; 10 recorridos UI en Chromium aislado. Cuatro comprobaciones adicionales del catálogo aprobadas. Mapa Actinver: 239 archivos, 127 rutas. Ver docs/auditoria-reels-20261031.md y docs/pendientes-reels-20261031.json. Pine sigue sin compilación en plataforma; tres proveedores cargaron sin acreditar vigencia; cuatro observaciones de procedencia/licencia pendientes. Ningún trade ni adaptador iniciado; candados apagados, sin diario disponible ni ventaja demostrada.\n\n\n### Optimización medida — 31-oct-2026\n\nCatálogo ligero sin precios, deduplicación GET en curso, polling de Ranking/SEC suspendido al ocultar, búsqueda por teclado y paneles conservados al reordenar. Tres repeticiones antes/después con copia fija offline; resultados, limitaciones y capturas en docs/optimizacion-medida-20261031.md. 22 pruebas Node, 19 Python y cuatro recorridos UI aprobados. Ningún trade ni adaptador iniciado; no se cambió estrategia ni backtest.\n\n\n### Continuación de procesos — 31-oct-2026\n\nRespaldo de una fuente para cartera con cero barras tras cierre, historial aditivo de intentos y reloj inyectado en cola/reportes. Plan local nombra precios atrasados por emisora/fecha y calendario. Propuesta de proveedores no aplicada: 143 SIC con historia Alpaca; configuración efectiva intacta. GEX no modificado por condición posterior al 2-nov aún pendiente. Suite completa 738 aprobadas (7m46s, una advertencia); 32 regresiones posteriores, Node31 y worker19 aprobadas. Informe y diff propios en docs/continuacion-procesos-20261031.md y docs/procesos-20261031-evidencia/. Sin trades ni mensajes externos.\n\n\n### Formación Python JPMorgan — 1-nov-2026\n\nClon único Apache-2.0 fijado a 0c536090508181dcfcd64fbcfbfa507cda2db93c. Cuaderno enlaza prácticas originales de series y validación de velas de futuros; dos notebooks ejecutados offline, 21 pruebas específicas, cinco de referencias y nueve Node aprobadas. Seis vistas de navegador y caso SIN DATO comprobados. Sin instalar el entorno upstream ni modificar modelos, estrategia, proveedores o candados. Informe: docs/integracion-python-training-20261101.md. No es certificación ni aval del banco.\n\n\n### 2-nov-2026 · Credencial Twelve y política gratuita\n\nCredencial importada al mecanismo local ignorado por Git y aceptada por /api_usage (una consulta, un crédito), sin cotizaciones. XMEX exige Pro: no consultado ni activado. Política solo_proveedores_gratuitos=true bloquea Twelve BMV/Barchart y Claude API frente a claves o permisos antiguos. 34 + 21 pruebas específicas aprobadas; una advertencia Starlette en la segunda selección, sin nueva suite completa. Sin compras, cuentas nuevas, motor, Telegram u operaciones. Evidencia sin secretos: docs/politica-proveedores-gratuitos-20261102.md.\n\n"
+  },
+  {
+   "version": "3",
+   "fecha": "2-nov-2026",
+   "titulo": "Regresión gratuita y Mesa",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 2-nov-2026 — Regresión gratuita y Mesa\n\nSe conservó altura automática por decisión humana y se corrigió el ancho de paneles reutilizados al cambiar disposición guardada. Navegador móvil/escritorio aprobado con proveedores simulados; Node 51 aprobadas. Se corrigieron el respaldo macro por fecha mensual y CPI interanual exacto, y la entrega CSRF de Mesa sin caché: 27 pruebas específicas aprobadas. OCR reforzado sin persistencia: una aprobada. Pantalla de costos verificada en cuatro contextos con servicios de pago bloqueados. La suite completa posterior está en ejecución; no se afirma aprobación global. Registro de pendientes reconciliado con evidencia existente de Excel, paleta y Seguimiento. Sin operaciones ni notificaciones.\n\n"
+  },
+  {
+   "version": "2",
+   "fecha": "2-nov-2026",
+   "titulo": "Retry-After persistente",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 2-nov-2026 — Retry-After persistente\n\nEl adaptador común conserva la espera del proveedor en el registro local existente; 429/503 con Retry-After no reintentan ni duermen el servidor, y consultas siguientes no consumen cuota hasta vencer la pausa. Doce casos nuevos y regresión: 47 aprobadas en 17.64 s. Suite completa anterior: 866 aprobadas; nueva corrida posterior en retry-after-conjunto-20261102.txt, aún pendiente. PERF31-06 sigue parcial por procedencia y clientes fuera del método común. Sin red real ni operaciones. Detalle: docs/retry-after-persistente-20261102.md.\n\n\n"
+  },
+  {
+   "version": "1",
+   "fecha": "2-nov-2026",
+   "titulo": "Lecturas sin motores matemáticos",
+   "commit": null,
+   "cifras": {},
+   "texto": "## 2-nov-2026 — Lecturas sin motores matemáticos\n\nSe separaron cuatro funciones de lectura/presentación y las importaciones de cálculo, sin cambiar fórmulas, ventanas, semillas o umbrales en el alcance AST revisado. Regresión específica: 74 aprobadas; suite completa: 881 aprobadas, cero fallidas, una advertencia, 569.91 s. Node 51 y worker 19 aprobadas. Tres repeticiones controladas: arranque mediano 15087.16 a 7053.57 ms y memoria privada servidor 213.47 a 122.41 MiB; primera respuesta de Estado, Universo, RSS y memoria de navegador no acreditan mejora general. Pasado/Futuro ya no cargan los motores al leer datos guardados. Informe, tabla completa, parche y hashes en docs/optimizacion-lecturas-20261102.md. PERF31-04/05 cerrados solo como perfil/medición, no como aprobación financiera; PERF31-06 y bloqueos externos permanecen abiertos. No operaciones, compras, mensajes, commit ni push.\n"
+  }
+ ]
+}

@@ -27,6 +27,8 @@ SECCIONES = {
     "tab-intradia": ("Contexto informativo", "Datos IEX parciales o barras disponibles", "Según feed; IEX parcial", "Sin señal con dato diario o diferido"),
     "tab-universo": ("Cobertura y procedencia", "Registro de proveedores y catálogo local", "Según última consulta", "Vigencia por instrumento"),
     "tab-ayuda": ("Guías y referencias", "Documentación local", "Según versión de la terminal", "No contiene cotizaciones"),
+    "tab-apariencia": ("Preferencias de apariencia", "Navegador del usuario", "Al cambiarlas", "No contiene cotizaciones"),
+    "tab-legal": ("Aviso legal y términos de uso", "Documento de la terminal", "Versión del aviso", "No contiene cotizaciones"),
 }
 
 

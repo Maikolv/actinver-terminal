@@ -67,7 +67,28 @@ function api(ruta, opciones = {}) {
   if (!consultasPendientes.has(ruta)) consultasPendientes.set(ruta, consultarApi(ruta).finally(() => consultasPendientes.delete(ruta)));
   return consultasPendientes.get(ruta);
 }
+/* Indicador «cálculo listo» (como en COATL): <html data-calculo="pendiente|listo" data-calculo-version="n">.
+   «listo» cuando no queda ninguna consulta en curso y la vista ya se pintó; las pruebas esperan este atributo
+   en lugar de tiempos fijos. data-calculo-version cuenta las veces que llegó a «listo». */
+let consultasEnCurso = 0, versionCalculo = 0;
+const raizCalculo = globalThis.document?.documentElement;  // sin página (pruebas de Node) no hay indicador
+if (raizCalculo) raizCalculo.dataset.calculo = "pendiente";
+function marcarCalculo(delta) {
+  consultasEnCurso += delta;
+  if (!raizCalculo) return;
+  if (consultasEnCurso > 0) { raizCalculo.dataset.calculo = "pendiente"; return; }
+  // setTimeout y no requestAnimationFrame: rAF se pausa con la pestaña oculta y el indicador nunca llegaría a «listo».
+  setTimeout(() => {
+    if (consultasEnCurso) return;
+    raizCalculo.dataset.calculo = "listo";
+    raizCalculo.dataset.calculoVersion = String(++versionCalculo);
+  }, 0);
+}
 async function consultarApi(ruta, opciones = {}) {
+  marcarCalculo(1);
+  try { return await consultarApiSinMarca(ruta, opciones); } finally { marcarCalculo(-1); }
+}
+async function consultarApiSinMarca(ruta, opciones = {}) {
   const o = { signal: /^\/api\/(?:estado|universo)(?:\?|$)/.test(ruta) ? AbortSignal.timeout(15000) : undefined,
     ...opciones, headers: { ...(opciones.headers || {}) } };
   if (o.method && o.method !== "GET") o.headers["X-CSRF-Token"] = CSRF;
@@ -430,6 +451,8 @@ function tarjetaPlan(plan) {
     h("h2", { id: "t-plan", texto: !plan.propuesta ? "Plan de acción"
       : plan.propuesta.origen === "mis_portafolios" ? `Plan de acción — sigue su portafolio principal «${plan.propuesta.nombre}»`
       : `Plan de acción — «${plan.propuesta.nombre}» (${(plan.propuesta.puntuacion ?? 0).toFixed(1)}/100, datos al ${plan.propuesta.datos_hasta})` }),
+    h("div", { clase: "fila-controles no-imprimir" }, h("button", { type: "button", clase: "boton boton--secundario",
+      texto: "Imprimir o guardar PDF (con QR)", onclick: () => window.HQTReporte?.imprimirPlan(plan) })),
     plan.propuesta && plan.propuesta.origen !== "mis_portafolios"
       ? h("p", { clase: "suave" }, "Sigue la propuesta automática del motor. Para seguir uno suyo: ",
         h("button", { type: "button", clase: "boton boton--texto", onclick: () => irA("tab-portafolios") }, "Mis portafolios → Usar como principal"))
@@ -995,14 +1018,16 @@ function pintarMapaMercado() {
   const selVentana = h("select", { "aria-label": "Ventana de la variación" }, visuales.ventanas.map((v) => h("option", { value: v }, v === 1 ? "1 sesión" : `${v} sesiones`)));
   selVentana.value = String(filtroMapa.ventana);
   selVentana.addEventListener("change", () => { filtroMapa.ventana = Number(selVentana.value); cargarVisualizacionesMercado(); });
-  const tarjetas = visibles.map((c) => h("button", {
-    type: "button", clase: `mercado-tile mercado-tile--${intensidadMapa(c.variacion)}`,
-    title: `${c.nombre || c.clave}. Fuente ${c.proveedor}; cierre ${c.fecha}; rezago ${c.dias_calendario} día(s) calendario.`,
-    "aria-label": `${c.clave}: ${c.variacion == null ? "variación no disponible" : pct(c.variacion)} en ${filtroMapa.ventana} sesión(es); cierre del ${c.fecha}`,
-    onclick: () => abrirFicha(c.id),  // la ficha técnica completa vive en su propia pestaña, junto a Mercado
-  }, h("strong", { texto: c.clave || c.id }),
-  h("span", { texto: c.variacion == null ? "—" : `${c.variacion > 0 ? "+" : ""}${pct(c.variacion)}` }),
-  h("small", { texto: c.fecha })));
+  const tarjetas = visibles.map((c) => {
+    const clave = c.clave || c.id, cambio = c.variacion == null ? "—" : `${c.variacion > 0 ? "+" : ""}${pct(c.variacion)}`;
+    return h("button", {
+      type: "button", clase: `mercado-tile mercado-tile--${intensidadMapa(c.variacion)}`,
+      title: `${c.nombre || c.clave}. Fuente ${c.proveedor}; cierre ${c.fecha}; rezago ${c.dias_calendario} día(s) calendario.`,
+      // la etiqueta empieza con el texto visible (WCAG 2.5.3) y agrega el contexto
+      "aria-label": `${clave} ${cambio} ${c.fecha}: ${c.variacion == null ? "variación no disponible" : "variación"} en ${filtroMapa.ventana} sesión(es)`,
+      onclick: () => abrirFicha(c.id),  // la ficha técnica completa vive en su propia pestaña, junto a Mercado
+    }, h("strong", { texto: clave }), h("span", { texto: cambio }), h("small", { texto: c.fecha }));
+  });
   const escala = h("div", { clase: "escala-mapa", "aria-label": "Escala de colores" }, h("span", { clase: "suave", texto: "Escala:" }),
     ...[["baja-3", "≤ −4 %"], ["baja-2", "−4 a −1.5 %"], ["baja-1", "−1.5 a −0.25 %"], ["plano", "±0.25 %"], ["sube-1", "0.25 a 1.5 %"], ["sube-2", "1.5 a 4 %"], ["sube-3", "≥ 4 %"], ["sin-dato", "sin dato"]]
       .map(([k, t]) => h("span", { clase: `mercado-tile--${k}`, texto: t })),

@@ -1,0 +1,11 @@
+//@version=6
+indicator("Actinver · SMA20/50 de referencia", overlay=true)
+rapida = ta.sma(close, 20)
+lenta = ta.sma(close, 50)
+sube = ta.crossover(rapida, lenta)
+baja = ta.crossunder(rapida, lenta)
+plot(rapida, "SMA20", color=color.blue)
+plot(lenta, "SMA50", color=color.orange)
+plotshape(barstate.isconfirmed and sube, title="Cruce confirmado sobre SMA50", style=shape.triangleup, location=location.belowbar, color=color.blue, size=size.tiny)
+plotshape(barstate.isconfirmed and baja, title="Cruce confirmado bajo SMA50", style=shape.triangledown, location=location.abovebar, color=color.orange, size=size.tiny)
+// Sólo referencia visual. No strategy.*, alert() ni webhook. Sin alfa demostrado.

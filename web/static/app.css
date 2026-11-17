@@ -155,7 +155,7 @@ main:focus { outline: none; }
 .chip--sin_datos { background: var(--sin-datos-fondo); color: var(--sin-datos); }
 .chip--sintetico, .chip--demostracion { background: var(--sintetico-fondo); color: var(--sintetico); }
 .chip--calculada { background: var(--vigente-fondo); color: var(--vigente); }
-tr.fila-inactiva td { opacity: .62; }
+tr.fila-inactiva td { color: var(--texto-2); } /* atenuada por color, no por opacidad: conserva el contraste AA */
 tr.fila-inactiva td:nth-child(-n+2) { opacity: 1; } /* emisora y estado siempre legibles */
 @media (max-width: 720px) { #boletas-lista td:nth-last-child(2), #boletas-lista td:nth-last-child(3) { min-width: 15rem; } } /* precio y faltantes: menos altura en móvil */
 
@@ -583,3 +583,17 @@ tbody tr:hover td { background: var(--superficie-2); }
 .apariencia-grupo { border: 1px solid var(--borde); border-radius: 4px; padding: 8px 10px; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; }
 .apariencia-grupo legend { padding: 0 4px; font-weight: 650; }
 .apariencia-grupo [aria-pressed="true"] { outline: 2px solid var(--acento-grafico); outline-offset: -2px; font-weight: 650; }
+/* Reporte para imprimir (reporte.js): en pantalla no se ve; al imprimir solo se ve él. */
+.reporte-impreso { display: none; }
+@media print {
+  html.imprimiendo body > *:not(.reporte-impreso) { display: none !important; }
+  html.imprimiendo .reporte-impreso { display: block; color: #000; background: #fff; font-size: 10pt; }
+  .reporte-cabecera { display: grid; grid-template-columns: 1fr 120px; gap: 4px 16px; border-top: 4px solid #b3261e; padding-top: 8px; }
+  .reporte-cabecera h1 { margin: 0; font-size: 16pt; }
+  .reporte-qr { grid-column: 2; grid-row: 1 / span 2; margin: 0; text-align: center; font-size: 7pt; }
+  .reporte-qr svg { width: 110px; height: 110px; }
+  .reporte-impreso table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .reporte-impreso th, .reporte-impreso td { border-bottom: 1px solid #999; padding: 3px 5px; text-align: left; vertical-align: top; }
+  .reporte-aviso { margin-top: 10px; font-size: 8pt; }
+}
+.apariencia-pregunta input { flex: 1; }

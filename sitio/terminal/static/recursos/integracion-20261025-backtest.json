@@ -1,0 +1,167 @@
+{
+  "protocolo_sha256": "f9cd0488b86631b5b970cd1a8db69b61a4c562e666496eec16d5de962e9f749e",
+  "datos_sha256": "3d00e8254d2bd9c1b88f0a1bf4576ff1b8d094a8b416a472613114f3d997ca9f",
+  "codigo_sha256": "59c699db978da6619c3faaddb15a5f76c276ff69e07d893e74a9fab59436b725",
+  "clasificacion": "HISTORICO RETRASADO / DESARROLLO / NO FORWARD",
+  "principal": {
+    "id": "B_NQ_FLUJO",
+    "estado": "NO EVALUABLE",
+    "motivo": "sin agresor histórico"
+  },
+  "comparacion": "B_NQ_SIN_DELTA",
+  "calidad": {
+    "barras": 6901,
+    "inicio": "2026-10-12T22:36:00+00:00",
+    "fin": "2026-10-19T22:36:00+00:00",
+    "duplicados": 0,
+    "descensos_orden_original": 6900,
+    "orden_normalizado": "ascendente",
+    "sesiones": [
+      {
+        "fecha": "2026-10-13",
+        "barras": 390,
+        "faltantes_rth": 0,
+        "completa": true
+      },
+      {
+        "fecha": "2026-10-14",
+        "barras": 390,
+        "faltantes_rth": 0,
+        "completa": true
+      },
+      {
+        "fecha": "2026-10-15",
+        "barras": 390,
+        "faltantes_rth": 0,
+        "completa": true
+      },
+      {
+        "fecha": "2026-10-16",
+        "barras": 390,
+        "faltantes_rth": 0,
+        "completa": true
+      },
+      {
+        "fecha": "2026-10-19",
+        "barras": 390,
+        "faltantes_rth": 0,
+        "completa": true
+      }
+    ],
+    "agresor_historico": false,
+    "spread_historico": false,
+    "profundidad": false
+  },
+  "escenarios": [
+    {
+      "slippage_ticks_lado": 2,
+      "coste_rt_modelado_usd": 30,
+      "trades": [],
+      "pnl_sesiones": {
+        "2026-10-14": 0.0,
+        "2026-10-15": 0.0,
+        "2026-10-16": 0.0,
+        "2026-10-19": 0.0
+      },
+      "omitidas": {
+        "sin_referencia": 1
+      },
+      "metricas": {
+        "operaciones": 0,
+        "sesiones": 4,
+        "neto_total_modelado_usd": 0,
+        "expectativa_trade_usd": null,
+        "expectativa_sesion_usd": 0.0,
+        "distribucion_trade_usd": [],
+        "drawdown_cierres_usd": 0.0,
+        "duracion_drawdown_trades": 0,
+        "peor_sesion_usd": 0.0,
+        "mae_peor_trade_cota_usd": null,
+        "perdida_intradía_exacta_usd": null,
+        "bootstrap_sesion_95_descriptivo": null,
+        "concentracion_mayor_ganancia": null,
+        "por_direccion": {},
+        "por_hora": {},
+        "minutos_exposicion_cota": 0,
+        "rotacion_contratos": 0
+      }
+    },
+    {
+      "slippage_ticks_lado": 4,
+      "coste_rt_modelado_usd": 50,
+      "trades": [],
+      "pnl_sesiones": {
+        "2026-10-14": 0.0,
+        "2026-10-15": 0.0,
+        "2026-10-16": 0.0,
+        "2026-10-19": 0.0
+      },
+      "omitidas": {
+        "sin_referencia": 1
+      },
+      "metricas": {
+        "operaciones": 0,
+        "sesiones": 4,
+        "neto_total_modelado_usd": 0,
+        "expectativa_trade_usd": null,
+        "expectativa_sesion_usd": 0.0,
+        "distribucion_trade_usd": [],
+        "drawdown_cierres_usd": 0.0,
+        "duracion_drawdown_trades": 0,
+        "peor_sesion_usd": 0.0,
+        "mae_peor_trade_cota_usd": null,
+        "perdida_intradía_exacta_usd": null,
+        "bootstrap_sesion_95_descriptivo": null,
+        "concentracion_mayor_ganancia": null,
+        "por_direccion": {},
+        "por_hora": {},
+        "minutos_exposicion_cota": 0,
+        "rotacion_contratos": 0
+      }
+    },
+    {
+      "slippage_ticks_lado": 8,
+      "coste_rt_modelado_usd": 90,
+      "trades": [],
+      "pnl_sesiones": {
+        "2026-10-14": 0.0,
+        "2026-10-15": 0.0,
+        "2026-10-16": 0.0,
+        "2026-10-19": 0.0
+      },
+      "omitidas": {
+        "sin_referencia": 1
+      },
+      "metricas": {
+        "operaciones": 0,
+        "sesiones": 4,
+        "neto_total_modelado_usd": 0,
+        "expectativa_trade_usd": null,
+        "expectativa_sesion_usd": 0.0,
+        "distribucion_trade_usd": [],
+        "drawdown_cierres_usd": 0.0,
+        "duracion_drawdown_trades": 0,
+        "peor_sesion_usd": 0.0,
+        "mae_peor_trade_cota_usd": null,
+        "perdida_intradía_exacta_usd": null,
+        "bootstrap_sesion_95_descriptivo": null,
+        "concentracion_mayor_ganancia": null,
+        "por_direccion": {},
+        "por_hora": {},
+        "minutos_exposicion_cota": 0,
+        "rotacion_contratos": 0
+      }
+    }
+  ],
+  "no_operar": {
+    "pnl_usd": 0,
+    "operaciones": 0
+  },
+  "variantes_preregistradas": 2,
+  "variantes_evaluadas": 1,
+  "ablaciones": "Solo eliminación delta evaluable. A y aportación incremental de delta/flujo no evaluables. Ningún contraste causal atribuido.",
+  "permutacion": "No ejecutada: intercambiabilidad no defendible en esta muestra.",
+  "oos": false,
+  "forward_sesiones": 0,
+  "veredicto": "SIN VENTAJA DEMOSTRADA"
+}

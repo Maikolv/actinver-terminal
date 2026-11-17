@@ -1,0 +1,118 @@
+{
+  "areas": [
+    {
+      "titulo": "Terminal principal",
+      "url": "/"
+    },
+    {
+      "titulo": "Oficina de inversión",
+      "url": "/help-quote-terminal/terminal/static/recursos/oficina-inversion.html"
+    },
+    {
+      "titulo": "Cuaderno financiero",
+      "url": "/help-quote-terminal/terminal/static/recursos/practica-proyectos-financieros.html"
+    },
+    {
+      "titulo": "Mesa de investigación",
+      "url": "/help-quote-terminal/terminal/static/mesa.html"
+    },
+    {
+      "titulo": "Laboratorio de secuencias",
+      "url": "/help-quote-terminal/terminal/static/recursos/lab-secuencias.html"
+    }
+  ],
+  "secciones": [
+    {
+      "titulo": "Plan de acción",
+      "url": "/help-quote-terminal/terminal/?vista=tab-resumen"
+    },
+    {
+      "titulo": "Mi portafolio",
+      "url": "/help-quote-terminal/terminal/?vista=tab-cartera"
+    },
+    {
+      "titulo": "Riesgo",
+      "url": "/help-quote-terminal/terminal/?vista=tab-riesgo"
+    },
+    {
+      "titulo": "Boletas e historial",
+      "url": "/help-quote-terminal/terminal/?vista=tab-tiempo"
+    },
+    {
+      "titulo": "Alertas",
+      "url": "/help-quote-terminal/terminal/?vista=tab-alertas"
+    },
+    {
+      "titulo": "Perfil",
+      "url": "/help-quote-terminal/terminal/?vista=tab-perfil"
+    },
+    {
+      "titulo": "Propuestas",
+      "url": "/help-quote-terminal/terminal/?vista=tab-propuestas"
+    },
+    {
+      "titulo": "Mis portafolios",
+      "url": "/help-quote-terminal/terminal/?vista=tab-portafolios"
+    },
+    {
+      "titulo": "Ranking",
+      "url": "/help-quote-terminal/terminal/?vista=tab-ranking"
+    },
+    {
+      "titulo": "Robustez",
+      "url": "/help-quote-terminal/terminal/?vista=tab-robustez"
+    },
+    {
+      "titulo": "Backtesting",
+      "url": "/help-quote-terminal/terminal/?vista=tab-backtesting"
+    },
+    {
+      "titulo": "Modelos",
+      "url": "/help-quote-terminal/terminal/?vista=tab-modelos"
+    },
+    {
+      "titulo": "Plan intradía",
+      "url": "/help-quote-terminal/terminal/?vista=tab-intradia"
+    },
+    {
+      "titulo": "Mercado",
+      "url": "/help-quote-terminal/terminal/?vista=tab-mercado"
+    },
+    {
+      "titulo": "Ficha técnica",
+      "url": "/help-quote-terminal/terminal/?vista=tab-ficha"
+    },
+    {
+      "titulo": "Seguimiento",
+      "url": "/help-quote-terminal/terminal/?vista=tab-seguimiento"
+    },
+    {
+      "titulo": "Movimientos públicos",
+      "url": "/help-quote-terminal/terminal/?vista=tab-movimientos"
+    },
+    {
+      "titulo": "Investigación",
+      "url": "/help-quote-terminal/terminal/?vista=tab-investigacion"
+    },
+    {
+      "titulo": "Asistente",
+      "url": "/help-quote-terminal/terminal/?vista=tab-asistente"
+    },
+    {
+      "titulo": "Datos y fuentes",
+      "url": "/help-quote-terminal/terminal/?vista=tab-universo"
+    },
+    {
+      "titulo": "Ayuda",
+      "url": "/help-quote-terminal/terminal/?vista=tab-ayuda"
+    },
+    {
+      "titulo": "Apariencia",
+      "url": "/help-quote-terminal/terminal/?vista=tab-apariencia"
+    },
+    {
+      "titulo": "Aviso legal",
+      "url": "/help-quote-terminal/terminal/?vista=tab-legal"
+    }
+  ]
+}

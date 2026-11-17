@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Help Quote Terminal — Reporte ejecutivo</title>
+<style>
+  @page { size: Letter; margin: 18mm 16mm; }
+  body { font: 10.5pt/1.5 "Segoe UI", system-ui, sans-serif; color: #15171c; margin: 0; }
+  h1 { font-size: 22pt; margin: 0 0 4px; border-top: 5px solid #b3261e; padding-top: 10px; }
+  h2 { font-size: 13pt; margin: 18px 0 6px; color: #b3261e; break-after: avoid; }
+  h3 { font-size: 11pt; margin: 12px 0 4px; break-after: avoid; }
+  p, li { margin: 3px 0; }
+  .sub { color: #4a505a; margin: 0 0 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9.5pt; break-inside: avoid; }
+  th, td { text-align: left; vertical-align: top; padding: 4px 6px; border-bottom: 1px solid #d9d7d1; }
+  th { background: #f1efea; }
+  img { width: 100%; border: 1px solid #d9d7d1; border-radius: 4px; margin: 6px 0; }
+  figure { margin: 0 0 8px; break-inside: avoid; } figcaption { font-size: 8.5pt; color: #4a505a; }
+  .aviso { border-left: 4px solid #b3261e; background: #f6f5f2; padding: 8px 10px; margin: 10px 0; }
+  .salto { break-before: page; }
+  code { font-family: Consolas, monospace; font-size: 9pt; }
+  .cabecera-qr { display: grid; grid-template-columns: 1fr 110px; align-items: start; gap: 12px; }
+  .cabecera-qr svg { width: 100px; height: 100px; }
+</style>
+</head>
+<body>
+
+<h1>Help Quote Terminal</h1>
+<div class="cabecera-qr"><p class="sub">Reporte ejecutivo · Terminal local de análisis de portafolios · {{fecha}} · versión {{version}}</p>{{qr}}</div>
+
+<div class="aviso"><strong>Resumen en una línea.</strong> Una terminal de análisis que compara su cartera real contra portafolios optimizados, mide el riesgo y le dice qué vender, comprar o mantener, mostrando siempre de dónde viene cada dato y cuánta incertidumbre tiene. Solo informa y simula: nunca ejecuta órdenes.</div>
+
+<h2>1. El problema y la propuesta</h2>
+<p>El inversionista individual decide con información dispersa (portal de su casa de bolsa, noticias, hojas de cálculo) y sin forma de saber si una idea es mejor que mantener lo que ya tiene. Las plataformas profesionales (Bloomberg, Refinitiv) cuestan miles de dólares al mes.</p>
+<p>Help Quote Terminal reúne en una sola estación, con fuentes gratuitas y legales: datos de mercado con su procedencia, optimización de portafolios, gestión de riesgo, un plan de acción diario y un asistente de IA. Nació para el Reto Actinver 2026 y hoy funciona para un escenario real de largo plazo e intradía.</p>
+
+<h2>2. Cómo funciona</h2>
+<table>
+<tr><th>Paso</th><th>Qué hace la terminal</th></tr>
+<tr><td>1. Datos</td><td>Descarga cierres y cotizaciones de FRED, Banxico, Tiingo, EODHD, Alpaca y la SEC, respetando los límites gratuitos. Cada dato guarda fuente, fecha, retraso y vigencia.</td></tr>
+<tr><td>2. Cartera</td><td>Usted registra su cartera (operaciones, importación o captura). La terminal la valúa en MXN con el tipo de cambio de Banxico.</td></tr>
+<tr><td>3. Portafolios</td><td>El motor calcula propuestas automáticas y usted crea los suyos en «Mis portafolios» (Markowitz, máximo Sharpe, Black-Litterman). Elige uno como <strong>portafolio principal</strong>.</td></tr>
+<tr><td>4. Riesgo</td><td>VaR/CVaR, contribución al riesgo, stops y tendencia. Las ventas por riesgo mandan sobre el objetivo.</td></tr>
+<tr><td>5. Plan de acción</td><td>Compara la cartera con el portafolio principal y produce, por instrumento: vender, comprar, mantener o pendiente, con cantidad, precio límite, motivo y qué lo invalidaría. Llega también por Telegram.</td></tr>
+<tr><td>6. Seguimiento</td><td>Alertas de pérdida, cambios de cartera, avisos por emisora y un monitor en la nube.</td></tr>
+</table>
+
+<figure><img src="{{capturas}}mercado-despues-demo-1440.jpg" alt="Estación de Mercado"><figcaption>Estación de Mercado: monitor de instrumentos, gráfico con proyección 10–90 % e inspector (datos simulados).</figcaption></figure>
+
+<h2>3. Módulos</h2>
+<table>
+<tr><th>Módulo</th><th>Para qué sirve</th></tr>
+<tr><td>Plan de acción</td><td>Qué hacer hoy, en orden de prioridad.</td></tr>
+<tr><td>Mis portafolios</td><td>Construir, comparar y guardar portafolios; exportar a Excel con Solver.</td></tr>
+<tr><td>Propuestas y Ranking</td><td>Propuestas automáticas con puntuación explicada; ranking por capitalización.</td></tr>
+<tr><td>Estación de Mercado</td><td>Monitor, gráfico, inspector, teclado y vista de celular.</td></tr>
+<tr><td>Flujo</td><td>Velas, Order Flow (footprint, TPO) y Option Flow (Heston, GEX).</td></tr>
+<tr><td>Laboratorio y Backtesting</td><td>Probar ideas con el pasado sin engañarse: permutación, Holm, preregistro y holdout.</td></tr>
+<tr><td>Asistente</td><td>Preguntas en lenguaje natural sobre su cartera y la documentación (Claude, Gemini, Ollama o sin IA).</td></tr>
+<tr><td>Apariencia y Aviso legal</td><td>Tema, letra y densidad con un asistente de estética; términos de uso y deslinde de responsabilidad.</td></tr>
+</table>
+
+<h2 class="salto">4. Metodología</h2>
+<h3>4.1 Optimización de portafolios (Markowitz)</h3>
+<p>Se busca la combinación de pesos <em>w</em> que maximiza el índice de Sharpe: (E[r<sub>p</sub>] − r<sub>f</sub>) / σ<sub>p</sub>, con E[r<sub>p</sub>] = wᵀμ y σ<sub>p</sub> = √(wᵀΣw). La tasa libre de riesgo r<sub>f</sub> es CETES 28 días (Banxico). La covarianza Σ se estima con <strong>Ledoit-Wolf</strong>, que reduce el error de estimación con historia corta. Hay topes por instrumento, moneda y sector.</p>
+<h3>4.2 Black-Litterman</h3>
+<p>Combina el equilibrio del mercado con las opiniones del usuario («espero que X suba 10 % al año», con su confianza). El resultado es un portafolio que se mueve hacia esas vistas solo en proporción a la confianza declarada.</p>
+<h3>4.3 Validación fuera de muestra</h3>
+<p>Toda propuesta se compara contra la referencia más simple: <strong>1/N</strong> (mismo peso en todo). Se usa <em>walk-forward</em>: se calcula con datos hasta una fecha y se evalúa con los posteriores, sin ver el futuro, e incluyendo comisiones. <strong>Si no supera a 1/N, la terminal lo dice.</strong> A la fecha, ningún modelo tiene ventaja demostrada.</p>
+<h3>4.4 Riesgo</h3>
+<p><strong>VaR 95 %</strong>: pérdida que no se supera en 95 de cada 100 días. <strong>CVaR</strong>: pérdida promedio en el 5 % de los peores días. <strong>Contribución al riesgo</strong>: cuánto del riesgo total aporta cada posición. Las reglas de venta (stop y tendencia) se validaron en 1,600 carteras de 2022 a 2026: reducen caídas pero rinden ≈ 1 punto menos que mantener; la terminal lo informa con cifras y deja elegir modo estricto o suave.</p>
+<h3>4.5 Pronósticos</h3>
+<p>Los pronósticos se muestran como <strong>rango 10–90 %</strong> (8 de cada 10 resultados caen dentro), nunca como un número único. Se etiquetan como estimación experimental.</p>
+<h3>4.6 Honestidad de datos</h3>
+<p>Cada dato lleva su estado: vigente, retrasado, vencido, sin datos o simulado. Un precio vencido nunca se presenta como actual; si falta un dato, la decisión queda «pendiente» y se dice qué falta.</p>
+
+<h3>4.7 Escenario de referencia (cifras del motor)</h3>
+<p>Cartera demo con rendimientos sintéticos fijos, calculada con el mismo motor de la terminal. Una prueba automática vigila estas cifras: si el modelo cambia, la prueba falla hasta que se documente el porqué.</p>
+{{escenario}}
+
+<h2>5. Conceptos clave para usarla</h2>
+<table>
+<tr><th>Concepto</th><th>Significado</th></tr>
+<tr><td>Rendimiento esperado E(r)</td><td>Promedio anual estimado con la historia; no es una promesa.</td></tr>
+<tr><td>Riesgo σ (volatilidad)</td><td>Cuánto varía el rendimiento; más alto, más incierto.</td></tr>
+<tr><td>Sharpe</td><td>Rendimiento extra por unidad de riesgo; más alto es mejor.</td></tr>
+<tr><td>Banda de no-rebalanceo</td><td>Si una posición está a menos de ±2 puntos de su objetivo, no se opera: evita pagar comisiones de más.</td></tr>
+<tr><td>Portafolio principal</td><td>El portafolio que usted elige como objetivo de su cartera real.</td></tr>
+<tr><td>Fuera de muestra</td><td>Probado con datos que el modelo no vio al calcularse.</td></tr>
+<tr><td>Precio límite</td><td>El precio máximo (compra) o mínimo (venta) que usted captura en su casa de bolsa.</td></tr>
+</table>
+
+<h2>6. Uso diario en 5 minutos</h2>
+<ol>
+<li>Abra la terminal (<code>start.bat</code>) o reciba el plan por Telegram.</li>
+<li>Revise «Plan de acción»: primero ventas, luego compras.</li>
+<li>Verifique cada precio con su casa de bolsa y capture usted las órdenes.</li>
+<li>Registre las operaciones hechas en «Mi portafolio».</li>
+<li>Cuando quiera cambiar de estrategia, cree otro portafolio y márquelo como principal.</li>
+</ol>
+
+<h2>7. Tecnología y seguridad</h2>
+<p>Python (FastAPI, SQLite, pandas, scikit-learn, skfolio) e interfaz HTML/CSS/JS sin compilación. Corre en <code>127.0.0.1</code>; claves solo en <code>.env</code>; política de seguridad de contenido estricta y protección CSRF. {{pruebas}}; integración continua en GitHub. Se puede probar en el navegador (demo con datos simulados) o en GitHub Codespaces.</p>
+
+<h2>8. Límites</h2>
+<ul>
+<li>Sin datos en tiempo real verdadero: las fuentes gratuitas tienen retraso.</li>
+<li>Las emisoras locales de la BMV dependen de 20 consultas gratuitas al día.</li>
+<li>Ningún modelo tiene ventaja demostrada frente a 1/N.</li>
+</ul>
+
+<div class="aviso">Herramienta educativa y de análisis personal. No es asesoría de inversión ni recomendación. Invertir implica riesgo de pérdida. Vea el «Aviso legal» dentro de la terminal.</div>
+</body>
+</html>

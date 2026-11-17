@@ -73,10 +73,10 @@
       fila.append(`${texto} `, b); caja.append(fila);
     }
     const form = document.createElement("form");
-    form.className = "fila-controles";
+    form.className = "fila-controles apariencia-pregunta";
     const inp = document.createElement("input");
     inp.type = "text"; inp.placeholder = "Pregunte, p. ej. «¿qué tema conviene para presentar en un proyector?»";
-    inp.setAttribute("aria-label", "Pregunta al asistente de estética"); inp.style.flex = "1";
+    inp.setAttribute("aria-label", "Pregunta al asistente de estética");
     const env = document.createElement("button"); env.type = "submit"; env.className = "boton"; env.textContent = "Preguntar";
     const resp = document.createElement("p"); resp.className = "suave"; resp.setAttribute("aria-live", "polite");
     form.append(inp, env);

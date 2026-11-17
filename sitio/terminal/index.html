@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<script src="/help-quote-terminal/terminal/static/estatico.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf" content="D_cIhz0DogeoSrteLZtGNMik-vHebDRp6Dm9SteMfko">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Terminal local para el Reto Actinver: dos propuestas de portafolio, seguimiento de la cartera y alertas. Solo informa; no envía órdenes.">
+<meta name="theme-color" content="#141517">
+<title>Help Quote Terminal</title>
+<link rel="icon" href="/help-quote-terminal/terminal/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/help-quote-terminal/terminal/static/app.css">
+<script src="/help-quote-terminal/terminal/static/app.js" defer></script><script src="/help-quote-terminal/terminal/static/estacion.js" defer></script>
+<script src="/help-quote-terminal/terminal/static/apariencia.js" defer></script>
+<script src="/help-quote-terminal/terminal/static/vendor/qrcode.js" defer></script>
+<script src="/help-quote-terminal/terminal/static/reporte.js" defer></script>
+<link rel="stylesheet" href="/help-quote-terminal/terminal/static/navegacion.css"><script type="module" src="/help-quote-terminal/terminal/static/navegacion.mjs"></script><script type="module" src="/help-quote-terminal/terminal/static/guias.mjs"></script></head>
+<body>
+<a class="saltar" href="#principal">Saltar al contenido</a>
+<header class="cabecera">
+  <div class="cabecera__fila">
+    <a class="marca" href="/help-quote-terminal/terminal/" aria-label="Help Quote Terminal, inicio">
+      <svg class="marca__logo" aria-hidden="true" width="26" height="26" viewBox="0 0 32 32"><rect width="32" height="32" rx="6"/><path d="M6 25h20M8 20l5-6 4 3 7-9"/></svg>
+      <span>Help Quote Terminal</span>
+    </a>
+    <div class="acciones-cabecera">
+      <form id="form-comandos" class="comandos-cabecera" role="search" autocomplete="off">
+        <label class="oculto-visual" for="barra-comandos">Ir a una sección o abrir la gráfica de un símbolo</label>
+        <input id="barra-comandos" type="search" placeholder="Símbolo o /INV · Ctrl+K" maxlength="40" aria-describedby="ayuda-comandos">
+        <button type="submit" class="boton boton--secundario">Ir</button>
+      </form>
+      <button type="button" class="boton boton--secundario boton--real" id="btn-modo" data-destino="real">Usar datos reales y vigentes</button>
+      <button type="button" class="boton boton--secundario" id="btn-actualizar" title="Consulta fuentes (respetando límites), recalcula si hay datos nuevos y evalúa alertas">Actualizar datos</button>
+      <button type="button" class="boton boton--primario" id="btn-calcular">Recalcular propuestas</button>
+    </div>
+  </div>
+  <p id="ayuda-comandos" class="ayuda-comandos">Accesos: /INV investigación · /MOD modelos · /MER mercado · /ROB robustez · /CAR cartera · /DAT fuentes. Un símbolo abre su gráfica local.</p>
+  <div class="estado-datos" id="estado-datos" role="status" aria-live="polite">
+    <span class="esqueleto esqueleto--linea" aria-hidden="true"></span><span class="oculto-visual">Cargando estado de datos</span>
+  </div>
+  <button type="button" class="boton boton--texto" id="btn-detalle-datos" aria-expanded="false" aria-controls="estado-datos">Ver detalle de datos</button>
+  <div class="aviso-demo" id="aviso-demo" >
+    <strong>DATOS SIMULADOS — modo demostración.</strong> Todas las cifras de mercado son sintéticas y no corresponden a ningún instrumento real.
+  </div>
+</header><nav class="nav-global" aria-label="Navegación entre áreas"><div class="nav-global__interior"><div class="nav-global__accesos"><a href="/help-quote-terminal/terminal/" aria-label="Terminal principal"><span class="nav-global__texto-largo">Terminal principal</span><span class="nav-global__texto-corto" aria-hidden="true">Terminal</span></a><a href="/help-quote-terminal/terminal/static/recursos/oficina-inversion.html" aria-label="Oficina de inversión"><span class="nav-global__texto-largo">Oficina de inversión</span><span class="nav-global__texto-corto" aria-hidden="true">Oficina</span></a><a href="/help-quote-terminal/terminal/static/recursos/practica-proyectos-financieros.html" aria-label="Cuaderno financiero"><span class="nav-global__texto-largo">Cuaderno financiero</span><span class="nav-global__texto-corto" aria-hidden="true">Cuaderno</span></a><a href="/help-quote-terminal/terminal/static/mesa.html" aria-label="Mesa de investigación"><span class="nav-global__texto-largo">Mesa de investigación</span><span class="nav-global__texto-corto" aria-hidden="true">Mesa</span></a></div><div class="nav-global__selector"><label for="destino-global">Ir a cualquier sección</label><select id="destino-global" disabled><option>Cargando destinos…</option></select></div></div></nav>
+
+<nav class="pestanas" aria-label="Secciones" data-grupo="cuenta">
+  <div class="grupos-nav" role="group" aria-label="Tareas">
+    <button type="button" data-grupo="cuenta" aria-pressed="false">Mi cuenta</button>
+    <button type="button" data-grupo="decidir" aria-pressed="false">Decidir</button>
+    <button type="button" data-grupo="mercado" aria-pressed="false">Mercado y flujo</button>
+    <button type="button" data-grupo="investigar" aria-pressed="false">Investigar</button>
+    <button type="button" data-grupo="sistema" aria-pressed="false">Datos y ayuda</button>
+    <button type="button" data-grupo="legal" aria-pressed="false">Legal</button>
+  </div>
+  <button type="button" class="desplazar-pestanas" data-dir="-1" aria-label="Ver pestañas anteriores" hidden>‹</button>
+  <div role="tablist" id="lista-pestanas">
+    <button role="tab" data-grupo="cuenta" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">Plan de acción</button>
+    <button role="tab" data-grupo="cuenta" id="tab-cartera" aria-controls="panel-cartera" aria-selected="false" tabindex="-1">Mi portafolio</button>
+    <button role="tab" data-grupo="cuenta" id="tab-riesgo" aria-controls="panel-riesgo" aria-selected="false" tabindex="-1">Riesgo</button>
+    <button role="tab" data-grupo="cuenta" id="tab-tiempo" aria-controls="panel-tiempo" aria-selected="false" tabindex="-1">Boletas e historial</button>
+    <button role="tab" data-grupo="cuenta" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" tabindex="-1">Alertas <span class="contador" id="contador-alertas" hidden></span></button>
+    <button role="tab" data-grupo="cuenta" id="tab-perfil" aria-controls="panel-perfil" aria-selected="false" tabindex="-1">Perfil</button>
+    <button role="tab" data-grupo="decidir" id="tab-propuestas" aria-controls="panel-propuestas" aria-selected="false" tabindex="-1">Propuestas</button>
+    <button role="tab" data-grupo="decidir" id="tab-portafolios" aria-controls="panel-portafolios" aria-selected="false" tabindex="-1">Mis portafolios</button>
+    <button role="tab" data-grupo="decidir" id="tab-ranking" aria-controls="panel-ranking" aria-selected="false" tabindex="-1">Ranking</button>
+    <button role="tab" data-grupo="decidir" id="tab-robustez" aria-controls="panel-robustez" aria-selected="false" tabindex="-1">Robustez</button>
+    <button role="tab" data-grupo="decidir" id="tab-backtesting" aria-controls="panel-backtesting" aria-selected="false" tabindex="-1">Backtesting</button>
+    <button role="tab" data-grupo="decidir" id="tab-modelos" aria-controls="panel-modelos" aria-selected="false" tabindex="-1">Modelos</button>
+    <button role="tab" data-grupo="decidir" id="tab-intradia" aria-controls="panel-intradia" aria-selected="false" tabindex="-1">Plan intradía</button>
+    <button role="tab" data-grupo="mercado" id="tab-mercado" aria-controls="panel-mercado" aria-selected="false" tabindex="-1">Mercado</button>
+    <button role="tab" data-grupo="mercado" id="tab-ficha" aria-controls="panel-ficha" aria-selected="false" tabindex="-1">Ficha técnica</button>
+    <button role="tab" data-grupo="mercado" id="tab-seguimiento" aria-controls="panel-seguimiento" aria-selected="false" tabindex="-1">Seguimiento</button>
+    <button role="tab" data-grupo="mercado" id="tab-movimientos" aria-controls="panel-movimientos" aria-selected="false" tabindex="-1">Movimientos públicos</button>
+    <button role="tab" data-grupo="investigar" id="tab-investigacion" aria-controls="panel-investigacion" aria-selected="false" tabindex="-1">Investigación</button>
+    <button role="tab" data-grupo="investigar" id="tab-asistente" aria-controls="panel-asistente" aria-selected="false" tabindex="-1">Asistente</button>
+    <button role="tab" data-grupo="sistema" id="tab-universo" aria-controls="panel-universo" aria-selected="false" tabindex="-1">Datos y fuentes</button>
+    <button role="tab" data-grupo="sistema" id="tab-ayuda" aria-controls="panel-ayuda" aria-selected="false" tabindex="-1">Ayuda</button>
+    <button role="tab" data-grupo="sistema" id="tab-apariencia" aria-controls="panel-apariencia" aria-selected="false" tabindex="-1">Apariencia</button>
+    <button role="tab" data-grupo="legal" id="tab-legal" aria-controls="panel-legal" aria-selected="false" tabindex="-1">Aviso legal</button>
+  </div>
+  <button type="button" class="desplazar-pestanas" data-dir="1" aria-label="Ver más pestañas" hidden>›</button>
+</nav>
+
+<main id="principal" tabindex="-1">
+  <section role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
+    <h1 class="oculto-visual">Plan de acción</h1>
+    <nav class="accesos" aria-label="Accesos frecuentes">
+      <button type="button" class="boton boton--secundario" data-ir="tab-asistente">Preguntar al asistente</button>
+      <button type="button" class="boton boton--secundario" data-ir="tab-portafolios">Generar un portafolio</button>
+      <button type="button" class="boton boton--secundario" data-ir="tab-intradia">Plan intradía</button>
+    </nav>
+    <div id="resumen-contenido">
+      <div class="rejilla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="panel-portafolios" aria-labelledby="tab-portafolios" hidden>
+    <h1>Mis portafolios</h1>
+    <p class="ayuda">Cree tantos portafolios como quiera, aparte de su cuenta del Reto. El generador arma la mejor propuesta para sus especificaciones con la teoría media-varianza de Markowitz, la terminal le sugiere mejoras y puede descargar el modelo en Excel. Es una simulación: no envía órdenes.</p>
+    <div id="portafolios-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-propuestas" aria-labelledby="tab-propuestas" hidden>
+    <h1>Propuestas</h1>
+    <div class="selectores">
+      <div class="segmentado" role="radiogroup" aria-label="Universo" id="selector-universo">
+        <button type="button" role="radio" aria-checked="true" data-valor="acciones">Solo acciones</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="mixta">Acciones + ETF + fondos</button>
+      </div>
+      <div class="segmentado" role="radiogroup" aria-label="Lente" id="selector-lente">
+        <button type="button" role="radio" aria-checked="false" data-valor="rendimiento">Máximo rendimiento</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="ajuste">Ajuste a su perfil</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="puntuacion">Máxima puntuación</button>
+        <button type="button" role="radio" aria-checked="true" data-valor="markowitz">Markowitz (Solver)</button>
+      </div>
+      <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-mercado-propuesta" hidden>
+        <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales (BMV)</button>
+        <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras (SIC)</button>
+      </div>
+    </div>
+    <div id="propuesta-detalle"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-tiempo" aria-labelledby="tab-tiempo" hidden>
+    <h1>Boletas e historial</h1>
+    <p class="ayuda">Tres espacios separados: lo que ya ocurrió (con la hora en que se supo), lo observable ahora y lo que se estima. Un pronóstico nunca aparece como precio, y un precio externo nunca aparece como el precio o saldo de Actinver.</p>
+    <section class="espacio espacio--pasado" aria-labelledby="h-pasado">
+      <h2 id="h-pasado"><span class="sello">PASADO</span> Hechos observados</h2>
+      <div id="pasado-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+      <h3>Bitácora de decisiones</h3>
+      <p class="ayuda">Tesis, fuentes y la decisión que tomó USTED. La terminal no decide ni opera.</p>
+      <form id="form-bitacora" class="formulario" novalidate>
+        <div class="campos">
+          <label>Tipo<select name="tipo"><option value="tesis">Tesis</option><option value="entrada">Entrada</option><option value="salida">Salida</option><option value="revision">Revisión</option><option value="error">Error</option><option value="leccion">Lección</option></select></label>
+          <label>Instrumento (id)<input type="text" name="instrumento_id" maxlength="40" placeholder="BMV:AMX"></label>
+          <label>Tesis<input type="text" name="tesis" maxlength="2000"></label>
+          <label>Decisión humana<input type="text" name="decision_humana" maxlength="1000" required></label>
+          <label>Fuentes (URL https, separadas por espacio)<input type="text" name="fuentes" maxlength="2000"></label>
+        </div>
+        <button class="boton boton--secundario" type="submit">Registrar decisión</button>
+      </form>
+      <div id="bitacora-lista"></div>
+    </section>
+    <section class="espacio espacio--presente" aria-labelledby="h-presente">
+      <h2 id="h-presente"><span class="sello">PRESENTE</span> Estado observable ahora</h2>
+      <div id="presente-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+      <h3>Boletas de decisión</h3>
+      <p class="ayuda">Propuestas completas para que USTED capture la orden en el portal. Se recalculan al mostrarse y se invalidan si el precio deja de ser confiable o se mueve más de 1 %. Ninguna se envía.</p>
+      <p><button type="button" class="boton" id="btn-boletas-plan">Generar boletas del plan del día</button>
+        <button type="button" class="boton boton--secundario" id="btn-boletas">Generar boletas de la propuesta seleccionada</button>
+        <button type="button" class="boton boton--secundario" id="btn-boletas-telegram">Enviar boletas vigentes por Telegram</button></p>
+      <p class="ayuda">«Plan del día» usa la misma propuesta que el mensaje de Telegram (la vigente con mayor puntuación) y reemplaza las boletas vigentes anteriores. También desde la consola: <code>uv run terminal boletas</code>.</p>
+      <div id="boletas-lista"></div>
+      <h3>Órdenes pendientes (referencia)</h3>
+      <form id="form-orden" class="formulario" novalidate>
+        <div class="campos">
+          <label>Instrumento (id)<input type="text" name="instrumento_id" maxlength="40" required placeholder="BMV:AMX"></label>
+          <label>Lado<select name="lado"><option value="compra">Compra</option><option value="venta">Venta</option></select></label>
+          <label>Tipo<select name="tipo_orden"><option value="limitada">Limitada</option><option value="mercado">Mercado</option></select></label>
+          <label>Cantidad<input type="number" name="cantidad" min="1" step="1" required></label>
+          <label>Precio límite<input type="number" name="precio_limite" min="0" step="0.0001"></label>
+        </div>
+        <button class="boton boton--secundario" type="submit">Registrar referencia</button>
+      </form>
+      <div id="ordenes-lista"></div>
+      <h3>Saldo que muestra el portal de Actinver</h3>
+      <p class="ayuda">Cópielo a mano desde el portal (la terminal no entra al portal ni extrae datos de él). Sirve para comparar la estimación con la valuación oficial: el total, el efectivo y lo invertido (la alerta avisa si cualquiera difiere 1 % del valor o más).</p>
+      <form id="form-portal" class="formulario" novalidate>
+        <div class="campos">
+          <label>Valor del portafolio (MXN)<input type="number" name="valor_portafolio" min="0" step="0.01" required></label>
+          <label>Efectivo / poder de compra (MXN)<input type="number" name="efectivo" min="0" step="0.01"></label>
+          <label>Inversiones (MXN)<input type="number" name="invertido" min="0" step="0.01"></label>
+          <label>Movimientos por liquidar (MXN)<input type="number" name="por_liquidar" min="0" step="0.01"></label>
+          <label>Fecha y hora en el portal<input type="datetime-local" name="hora_portal" required></label>
+          <label>Nota<input type="text" name="nota" maxlength="200"></label>
+        </div>
+        <button class="boton boton--secundario" type="submit">Guardar saldo del portal</button>
+      </form>
+    </section>
+    <section class="espacio espacio--futuro" aria-labelledby="h-futuro">
+      <h2 id="h-futuro"><span class="sello sello--estimacion">FUTURO · ESTIMACIONES</span> Escenarios y pronósticos</h2>
+      <p><button type="button" class="boton boton--secundario" id="btn-investigar">Calcular investigación y pronósticos</button>
+        <button type="button" class="boton boton--secundario" id="btn-pronostico-telegram">Enviar pronóstico por Telegram</button>
+        <span class="suave" id="investigacion-estado"></span></p>
+      <div id="futuro-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    </section>
+  </section>
+
+  <section role="tabpanel" id="panel-movimientos" aria-labelledby="tab-movimientos" hidden>
+    <h1>Movimientos públicos</h1>
+    <p class="ayuda">Compras y ventas declaradas por insiders (Form 4) y cambios de cartera de fondos institucionales (13F), con
+      el documento original de la SEC. Es contexto de investigación: no son cotizaciones ni recomendaciones, y ningún movimiento
+      crea por sí solo una orden o boleta.</p>
+    <div id="mov-fuentes"></div>
+    <form id="form-mov" class="filtros">
+      <label>Emisora <input name="emisora" list="mov-emisoras" placeholder="SIC:KO" autocomplete="off"></label>
+      <datalist id="mov-emisoras"></datalist>
+      <label>Gestor (13F) <select name="gestor" id="mov-gestor"><option value="">Todos</option></select></label>
+      <label>Tipo <select name="tipo">
+        <option value="">Todos (sin «sin cambio»)</option>
+        <optgroup label="Form 4"><option value="compra_mercado">Compra en mercado</option><option value="venta_mercado">Venta en mercado</option>
+          <option value="no_discrecional">No discrecional (adjudicación, ejercicio, impuestos, 10b5-1…)</option></optgroup>
+        <optgroup label="13F"><option value="nueva">Nueva posición</option><option value="aumento">Aumento</option>
+          <option value="reduccion">Reducción</option><option value="salida">Salida</option><option value="no_comparable">No comparable (posible split)</option></optgroup>
+      </select></label>
+      <label>Desde <input type="date" name="desde"></label>
+      <button class="boton boton--secundario" type="submit">Filtrar</button>
+      <button class="boton boton--secundario" type="button" id="btn-mov-actualizar">Consultar la SEC ahora</button>
+    </form>
+    <p class="suave"><span id="mov-seguimiento"></span>
+      <input id="mov-seg-id" list="mov-emisoras" placeholder="SIC:NVDA" aria-label="Emisora para la lista de seguimiento" size="12">
+      <button type="button" class="boton boton--secundario" id="btn-mov-seguir">Añadir a seguimiento</button></p>
+    <div id="mov-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-ranking" aria-labelledby="tab-ranking" hidden>
+    <h1>Ranking</h1>
+    <p class="ayuda" id="ranking-aviso"></p>
+    <div class="segmentado" role="radiogroup" aria-label="Clase de instrumento" id="selector-ranking-clase">
+      <button type="button" role="radio" aria-checked="true" data-valor="acciones">Acciones</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="etf">ETF</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="fondos">Fondos</button>
+    </div>
+    <div class="segmentado" role="radiogroup" aria-label="Mercado" id="selector-ranking">
+      <button type="button" role="radio" aria-checked="true" data-valor="ambos">Nacionales y extranjeras</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="nacionales">Solo nacionales (BMV)</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="extranjeras">Solo extranjeras (SIC)</button>
+    </div>
+    <p class="suave" id="ranking-hora"></p>
+    <div id="ranking-capitalizacion"></div>
+    <div id="ranking-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-robustez" aria-labelledby="tab-robustez" hidden>
+    <h1>Robustez</h1>
+    <p class="ayuda">¿Los parámetros del optimizador funcionan en una región amplia o solo en un punto con suerte? Estabilidad
+      ante cambios pequeños, Monte Carlo en cada combinación, mapas por pares (SPP) y walk-forward anidado. Es
+      <strong>histórico fuera de muestra</strong> y <strong>simulación</strong> (remuestreo del pasado), no pronóstico ni garantía.
+      Diseño y umbrales: <code>docs/robustez.md</code>. Se recalcula con <code>uv run terminal robustez</code>.</p>
+    <div class="segmentado" role="radiogroup" aria-label="Universo" id="selector-robustez">
+      <button type="button" role="radio" aria-checked="true" data-valor="acciones">Solo acciones</button>
+      <button type="button" role="radio" aria-checked="false" data-valor="mixta">Acciones + ETF + fondos</button>
+    </div>
+    <div id="robustez-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-alertas" aria-labelledby="tab-alertas" hidden>
+    <h1>Alertas</h1>
+    <p class="ayuda" id="alertas-config"></p>
+    <p class="ayuda"><span id="canales"></span> <button type="button" class="boton boton--secundario" id="btn-probar-avisos">Enviar aviso de prueba</button></p>
+    <div class="tarjeta" id="nube-estado" aria-live="polite"><h2>Monitor en la nube</h2><p class="suave">Consultando…</p></div>
+    <div id="alertas-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-cartera" aria-labelledby="tab-cartera" hidden>
+    <h1>Mi portafolio</h1>
+    <section class="tarjeta" aria-labelledby="h-portal">
+      <h2 id="h-portal">Cuenta del Reto confirmada por el portal</h2>
+      <div id="portal-resumen"><p class="cargando">Cargando…</p></div>
+      <details id="portal-captura" open>
+        <summary>Actualizar desde el portal (copiar y pegar)</summary>
+        <p class="ayuda">No existe una integración oficial: el simulador no ofrece API ni exportación y el reglamento (§17) prohíbe robots y programas en el portal, así que la terminal no entra a él. En el portal: 1) en el Dashboard copie el recuadro <strong>«Tu inversión»</strong> (Valuación Total Ahora, Inversiones, Poder de compra y Movimientos por liquidar); 2) abra <strong>«Ver detalle de mi inversión»</strong> y copie la tabla de posiciones <strong>con sus encabezados</strong>. Pegue ambas aquí, escriba la hora que muestra el portal y pulse «Vista previa». Nada se guarda hasta que confirme.</p>
+        <div id="zona-capturas" class="zona-capturas" tabindex="0" role="button" aria-describedby="ayuda-capturas">
+          <strong>Subir o pegar capturas de pantalla del portal</strong>
+          <span>Arrástrelas aquí, pulse para elegirlas o pegue con Ctrl+V una captura hecha con Win+Shift+S: el recuadro «Tu inversión» (o «Portafolio») y la tabla de «Ver detalle de mi inversión» (puede subir varias páginas).</span>
+          <input type="file" id="archivo-capturas" accept="image/png,image/jpeg" multiple hidden>
+        </div>
+        <p class="ayuda" id="ayuda-capturas">Se leen en esta PC con el reconocimiento de texto de Windows y no se guardan ni se envían a ningún servicio. El texto leído aparece abajo para que lo compare con su captura; nada se guarda hasta que confirme.</p>
+        <div id="resultado-capturas" aria-live="polite"></div>
+        <form id="form-captura" class="formulario" novalidate>
+          <label>Contenido copiado del portal<textarea name="texto" rows="9" maxlength="200000" placeholder="Valuación Total Ahora	$995,116.81&#10;Inversiones	$611,625.09&#10;Poder de compra	$229,883.38&#10;Movimientos por liquidar	$153,608.34&#10;Emisora	Serie	Títulos	Costo promedio	Precio actual	Valor de mercado&#10;ALPEK	A	20,000	14.90	14.78	295,600.00"></textarea></label>
+          <div class="campos">
+            <label>Fecha y hora que muestra el portal<input type="datetime-local" name="hora_portal" required></label>
+            <label>Poder de compra / efectivo (si no venía)<input type="number" name="efectivo" min="0" step="0.01"></label>
+            <label>Movimientos por liquidar (si no venía)<input type="number" name="por_liquidar" min="0" step="0.01"></label>
+            <label>Valuación total (si no venía)<input type="number" name="valor_portafolio" min="0" step="0.01"></label>
+          </div>
+          <button class="boton" type="submit" data-accion="previa">Vista previa</button>
+        </form>
+        <div id="captura-previa"></div>
+      </details>
+    </section>
+    <details class="tarjeta secundaria-detalle">
+    <summary>Registro local de la terminal, operaciones manuales e importación de archivos (avanzado)</summary>
+    <p class="ayuda">Esto NO es su saldo del portal: es lo que se registró a mano en la terminal. Solo se usa si no hay una captura vigente del portal.</p>
+    <h2>Registro de la terminal</h2>
+    <div id="cartera-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    <h2>Registrar una operación</h2>
+    <form id="form-operacion" class="formulario" novalidate>
+      <div class="campos">
+        <label>Fecha<input type="date" name="fecha" required></label>
+        <label>Tipo
+          <select name="tipo" required>
+            <option value="aportacion">Aportación</option><option value="retiro">Retiro</option>
+            <option value="compra">Compra</option><option value="venta">Venta</option>
+            <option value="dividendo">Dividendo / distribución</option><option value="comision">Comisión</option>
+            <option value="impuesto">Impuesto</option><option value="split">Split (factor)</option>
+          </select>
+        </label>
+        <label data-para="instrumento">Instrumento<input name="instrumento_id" list="lista-instrumentos" autocomplete="off" placeholder="p. ej. BMV:WALMEX o SIC:IVV" maxlength="40"></label>
+        <label data-para="cantidad">Cantidad<input name="cantidad" inputmode="decimal" placeholder="Títulos o factor de split"></label>
+        <label data-para="precio">Precio por título<input name="precio" inputmode="decimal"></label>
+        <label data-para="monto">Monto<input name="monto" inputmode="decimal" placeholder="Aportación, retiro, dividendo…"></label>
+        <label data-para="comision">Comisión con IVA<input name="comision" inputmode="decimal" value="0"></label>
+        <label data-para="impuesto">Impuesto / retención<input name="impuesto" inputmode="decimal" value="0"></label>
+        <label>Moneda<select name="moneda"><option>MXN</option><option>USD</option></select></label>
+        <label data-para="tipo_cambio">Tipo de cambio<input name="tipo_cambio" inputmode="decimal" value="1"></label>
+        <label class="ancho">Nota (opcional)<input name="nota" maxlength="200"></label>
+      </div>
+      <p class="ayuda" id="ayuda-comision"></p>
+      <div class="errores" id="errores-operacion" role="alert" aria-live="assertive"></div>
+      <button class="boton boton--primario" type="submit">Guardar operación</button>
+    </form>
+    <datalist id="lista-instrumentos"></datalist>
+
+    <h2>Importar desde archivo</h2>
+    <form id="form-importar" class="formulario" novalidate>
+      <div class="campos">
+        <label>Tipo de archivo
+          <select name="tipo">
+            <option value="transacciones">Operaciones</option><option value="posiciones">Posiciones iniciales</option>
+            <option value="precios">Precios / valor liquidativo</option><option value="universo">Lista de instrumentos del simulador</option>
+            <option value="confirmaciones">Confirmaciones del simulador (con folio)</option><option value="saldos">Saldos del portal</option>
+            <option value="notas_sa">Notas de Seeking Alpha</option><option value="calificaciones_sa">Calificaciones de Seeking Alpha (exportación)</option><option value="insiderfinance">Exportación de InsiderFinance</option>
+          </select>
+        </label>
+        <label>Archivo CSV (máx. 1 MB)<input type="file" name="archivo" accept=".csv,text/csv" required></label>
+      </div>
+      <p class="ayuda">Primero verá una vista previa; nada se guarda hasta que confirme. <a href="/api/plantilla/transacciones" id="enlace-plantilla">Descargar plantilla</a>.</p>
+      <div id="resultado-importacion" aria-live="polite"></div>
+      <button class="boton boton--secundario" type="submit">Revisar archivo</button>
+    </form>
+    </details>
+  </section>
+
+  <section role="tabpanel" id="panel-mercado" aria-labelledby="tab-mercado" hidden>
+    <h1>Mercado</h1>
+    <div id="estacion" class="estacion"></div>
+    <div class="estacion-secundarias" role="tablist" aria-label="Vistas secundarias de Mercado" id="mercado-vistas">
+      <button type="button" role="tab" id="mv-mapa" aria-controls="mercado-visualizaciones" aria-selected="true">Mapa de calor</button>
+      <button type="button" role="tab" id="mv-agenda" aria-controls="mercado-contenido" aria-selected="false" tabindex="-1">Calendario, titulares e insiders</button>
+      <button type="button" role="tab" id="mv-panorama" aria-controls="mercado-widgets" aria-selected="false" tabindex="-1">Panorama TradingView</button>
+    </div>
+    <div id="mercado-visualizaciones" role="tabpanel" aria-labelledby="mv-mapa" aria-live="polite"></div>
+    <div id="mercado-contenido" role="tabpanel" aria-labelledby="mv-agenda" hidden><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    <div id="mercado-widgets" role="tabpanel" aria-labelledby="mv-panorama" hidden></div>
+  </section>
+
+  <section role="tabpanel" id="panel-ficha" aria-labelledby="tab-ficha" hidden>
+    <h1>Ficha técnica</h1>
+    <div id="ficha-contenido"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+  </section>
+
+  <section role="tabpanel" id="panel-investigacion" aria-labelledby="tab-investigacion" hidden>
+    <h1>Investigación</h1>
+    <p class="ayuda">Fundamentales, economía, energía y contexto para revisar su portafolio. Cada registro conserva su fuente y fecha. Las notas manuales reflejan lo que usted importó.</p>
+    <form id="form-investigacion-filtro" class="formulario">
+      <label>Símbolo de referencia (opcional)<input name="simbolo" maxlength="24" placeholder="MU, AMD, NVDA, XOM…" autocomplete="off"></label>
+      <label><input type="checkbox" name="historial">Mostrar historial de registros</label>
+      <button type="submit" class="boton boton--secundario">Filtrar</button>
+      <button type="button" id="btn-investigacion-actualizar" class="boton boton--primario">Actualizar investigación</button>
+      <a id="investigacion-exportar" href="/api/centro-investigacion/exportar" class="boton boton--secundario">Descargar registros</a>
+    </form>
+    <div id="investigacion-estado" role="status" aria-live="polite"></div>
+    <div id="investigacion-contenido"></div>
+    <details>
+      <summary>Importar hallazgos de una herramienta</summary>
+      <p class="ayuda">Descargue la plantilla y copie únicamente los datos que puede exportar o consultar con su acceso. Una fila por indicador o nota: fuente (identificador de la lista), símbolo, serie (ej. ROIC), título, período, valor con punto decimal, unidad, nota y enlace HTTPS de la herramienta. Para una nota puede dejar valor y unidad vacíos. Máximo 1000 filas, CSV UTF-8, 1 MB. No incluya claves de API.</p>
+      <p class="ayuda">La importación guarda los registros desde el momento actual; no acredita que se conocieran en una fecha anterior. No sustituye cotizaciones ni cambia las propuestas.</p>
+      <a href="/api/centro-investigacion/plantilla">Descargar plantilla vacía</a>
+      <form id="form-investigacion-importar" class="formulario">
+        <label>Archivo CSV<input type="file" name="archivo" accept=".csv,text/csv" required></label>
+        <button type="submit" class="boton boton--secundario">Importar registros</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- Contenidos de Velas, Order Flow y Option Flow: viven dentro de «Ficha técnica» (que los muestra en sus pestañas
+       internas); aquí solo esperan ocultos para que cada id exista una sola vez. -->
+  <div id="almacen-flujo" hidden>
+    <div id="velas-contenido" aria-live="polite"></div>
+    <div id="orderflow-contenido" aria-live="polite"></div>
+    <div id="optionflow-contenido" aria-live="polite"></div>
+  </div>
+
+  <section role="tabpanel" id="panel-riesgo" aria-labelledby="tab-riesgo" hidden>
+    <h1>Riesgo</h1>
+    <p class="ayuda">Exposición, concentración, volatilidad, caídas, VaR, CVaR y escenarios con los pesos actuales. Los supuestos se listan al final. Describe el riesgo con datos pasados; no es una recomendación.</p>
+    <div id="riesgo-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-seguimiento" aria-labelledby="tab-seguimiento" hidden>
+    <h1>Seguimiento</h1>
+    <p class="ayuda">Lista de seguimiento con variaciones, RSI y noticias; ficha con noticias y estados financieros; comparación de instrumentos con correlación y beta.</p>
+    <div id="seguimiento-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-backtesting" aria-labelledby="tab-backtesting" hidden>
+    <h1>Backtesting</h1>
+    <p class="ayuda">Pruebas históricas reproducibles con comisiones, deslizamiento y datos disponibles a cada fecha. Cada corrida queda registrada con sus parámetros, la huella de los datos y el resultado.</p>
+    <div id="backtesting-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-asistente" aria-labelledby="tab-asistente" hidden>
+    <h1>Asistente</h1>
+    <p class="ayuda">Responde con los datos de la terminal, su documentación y lo que tú le enseñes con <code>/nota</code>. No envía órdenes ni da asesoría personalizada: las decisiones son tuyas.</p>
+    <div id="asistente-motor" class="ayuda" role="status"></div>
+    <div id="asistente-conversacion" class="asistente-conversacion" role="log" aria-live="polite" aria-label="Conversación con el asistente" tabindex="0"></div>
+    <form id="form-asistente" class="asistente-form" autocomplete="off">
+      <label class="oculto-visual" for="asistente-texto">Pregunta, comando o nota</label>
+      <textarea id="asistente-texto" rows="2" maxlength="4010" placeholder="Pregunta algo, usa /plan o enséñame con /nota …"></textarea>
+      <button type="submit" class="boton boton--primario">Enviar</button>
+    </form>
+    <div class="asistente-sugerencias" aria-label="Preguntas sugeridas">
+      <button type="button" class="boton boton--secundario" data-pregunta="/plan">Plan de hoy</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="/cartera">Mi cartera</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="/estado">Estado de los datos</button>
+      <button type="button" class="boton boton--secundario" data-pregunta="/notas">Mis notas</button>
+    </div>
+  </section>
+
+
+  <section role="tabpanel" id="panel-intradia" aria-labelledby="tab-intradia" hidden>
+    <h1>Plan intradía</h1>
+    <p class="ayuda">Separado del plan de acción. No genera órdenes ni modifica su cartera: muestra contexto, disciplina y si hay datos para hablar de una señal. Los datos diarios o retrasados la inhiben.</p>
+    <div id="intradia-contenido" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-modelos" aria-labelledby="tab-modelos" hidden>
+    <h1>Modelos</h1>
+    <p class="ayuda">Precio y sensibilidades teóricas Black-Scholes-Merton para una opción europea. Ingrese sus propias hipótesis; este cálculo no incorpora cotizaciones, Option Flow ni órdenes.</p>
+    <form id="form-opciones" class="formulario formulario-modelos">
+      <label class="ancho">Ejemplo listo<select id="ejemplos-opciones"></select></label>
+      <label>Tipo<select name="tipo"><option value="call">Call</option><option value="put">Put</option></select></label>
+      <label>Precio subyacente<input name="spot" type="number" min="0.0001" step="any" value="100" required></label>
+      <label>Precio de ejercicio<input name="strike" type="number" min="0.0001" step="any" value="100" required></label>
+      <label>Días al vencimiento<input name="dias" type="number" min="1" max="3650" step="any" value="30" required></label>
+      <label>Volatilidad anual %<input name="volatilidad_pct" type="number" min="0.01" max="500" step="any" value="20" required></label>
+      <label>Tasa anual %<input name="tasa_pct" type="number" min="-20" max="100" step="any" value="5" required></label>
+      <label>Dividendo anual %<input name="dividendo_pct" type="number" min="0" max="100" step="any" value="0" required></label>
+      <label>Prima de mercado (opcional)<input name="prima_mercado" type="number" min="0" step="any" placeholder="Para inferir volatilidad"></label>
+      <button type="submit" class="boton boton--primario">Calcular opción</button>
+    </form>
+    <p class="ayuda">Si introduce una prima, se estima la volatilidad implícita y se usa para todas las griegas; en otro caso se usa la volatilidad anual ingresada. Vega y rho son por 1 punto porcentual; theta es por día. Las cifras son por unidad del subyacente, sin multiplicador de contrato.</p>
+    <div id="modelo-opciones-resultado" role="status" aria-live="polite"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-universo" aria-labelledby="tab-universo" hidden>
+    <h1>Datos y fuentes</h1>
+    <h2>Servicios con costo</h2>
+      <p class="ayuda">La terminal usa solo recursos gratuitos. Los servicios que requieren pago aparecen bloqueados; una clave o aprobación antigua no autoriza facturación.</p>
+    <div id="costos-servicios"></div>
+      <h2>Cobertura por sección</h2>
+      <p class="ayuda">Cada sección declara qué dato usa, su fuente, retraso y criterio de vigencia. Consulte la fecha de cada precio antes de usarlo.</p>
+      <div id="cobertura-secciones"></div>
+    <div id="proveedores"></div>
+    <h2>Fondos Actinver: hoja oficial de precios</h2>
+    <p class="ayuda">La terminal lee la hoja pública «Reporte Diario» de actinver.com (PDF) una vez al día y asigna el precio por fondo y serie exactos, con la fecha de valuación que declara el documento (valor por unidad del día hábil anterior). Si la descarga falla, descargue el PDF en actinver.com/fondos («Hoja de precios y rendimientos») y súbalo aquí.</p>
+    <form id="form-hoja-fondos" class="formulario" novalidate>
+      <label>PDF de la hoja de precios<input type="file" name="archivo" accept="application/pdf,.pdf"></label>
+      <button type="submit" class="boton boton--secundario">Importar PDF</button>
+      <button type="button" class="boton boton--secundario" id="btn-hoja-descargar">Descargar la hoja de hoy</button>
+    </form>
+    <div id="hoja-fondos-resultado"></div>
+    <h2>Cobertura por símbolo del catálogo</h2>
+    <p class="ayuda">Una fuente se usa para un instrumento solo si una consulta real confirmó ese instrumento exacto (serie, moneda MXN y mercado BMV local o SIC). Si no, el precio aparece como «SIN PRECIO CONFIABLE».</p>
+    <p><button type="button" class="boton boton--secundario" id="btn-cobertura">Verificar cobertura</button></p>
+    <div id="cobertura-contenido"></div>
+    <h2>Universo verificado</h2>
+    <div class="filtros">
+      <label>Buscar<input type="search" id="filtro-texto" placeholder="Clave o nombre"></label>
+      <label>Clase<select id="filtro-clase"><option value="">Todas</option></select></label>
+      <label>Vigencia<select id="filtro-vigencia"><option value="">Todas</option><option value="vigente">Vigente</option><option value="retrasado">Retrasado</option><option value="vencido">Vencido</option><option value="sin_datos">Sin datos</option><option value="sintetico">Sintético</option></select></label>
+    </div>
+    <div id="universo-tabla"><div class="tarjeta esqueleto esqueleto--bloque" aria-hidden="true"></div></div>
+    <details class="recursos-backtesting">
+      <summary>Recursos de backtesting (sin conexión)</summary>
+      <p class="ayuda">Un proyecto de ejemplo para probar reglas de compra y venta sobre datos pasados con backtesting.py. Funciona sin internet y con datos sintéticos (inventados para la prueba): no se conecta a ningún bróker, no envía órdenes y no demuestra que una estrategia gane.</p>
+      <ol>
+        <li>Descargue el proyecto y lea la guía de instalación.</li>
+        <li>Ejecute la demostración en su entorno aislado y revise el informe.</li>
+        <li>Solo después de entender sus límites, cambie los datos de ejemplo por datos con permiso de uso.</li>
+      </ol>
+      <p><a href="/help-quote-terminal/terminal/static/recursos/laboratorio-reel-bots.zip">Descargar proyecto (ZIP)</a> · <a href="/help-quote-terminal/terminal/static/recursos/reel-bots-guia.md">Guía de instalación y uso</a> · <a href="/help-quote-terminal/terminal/static/recursos/reel-bots-demo.json">Informe de la demostración</a> · <a href="/help-quote-terminal/terminal/static/recursos/sma-referencia-reel.pine">Indicador Pine de referencia</a></p>
+      <div class="tabla-contenedor"><table><caption>Motores de backtesting revisados</caption><thead><tr><th scope="col">Proyecto</th><th scope="col">Estado en este equipo</th><th scope="col">Para qué sirve y límites</th><th scope="col">Licencia</th></tr></thead><tbody>
+        <tr><th scope="row"><a href="https://github.com/kernc/backtesting.py" rel="noopener noreferrer" target="_blank">backtesting.py</a></th><td>Instalado en entorno aislado (0.6.5)</td><td>Motor del ejemplo; probado con datos sintéticos.</td><td>AGPL-3.0</td></tr>
+        <tr><th scope="row"><a href="https://github.com/QuantConnect/Lean" rel="noopener noreferrer" target="_blank">QuantConnect LEAN</a></th><td>Descargado, sin iniciar</td><td>Motor para varios tipos de activo (C#/Python); necesita compilar y datos propios.</td><td>Apache-2.0</td></tr>
+        <tr><th scope="row"><a href="https://github.com/freqtrade/freqtrade" rel="noopener noreferrer" target="_blank">Freqtrade</a></th><td>Solo revisado</td><td>Bot de cripto; útil como referencia de simulación sin dinero. No se conecta a futuros CME.</td><td>GPL-3.0</td></tr>
+        <tr><th scope="row"><a href="https://github.com/polakowo/vectorbt" rel="noopener noreferrer" target="_blank">vectorbt</a></th><td>Solo revisado</td><td>Prueba muchas combinaciones a la vez; no instalado.</td><td>Apache-2.0 con Commons Clause</td></tr>
+        <tr><th scope="row"><a href="https://github.com/nautechsystems/nautilus_trader" rel="noopener noreferrer" target="_blank">NautilusTrader</a></th><td>Solo revisado</td><td>Motor por eventos (Rust/Python); sin adaptadores activos.</td><td>LGPL-3.0</td></tr>
+      </tbody></table></div>
+      <p class="ayuda">Para comparar reglas use Backtesting y Robustez de esta terminal sobre las mismas barras; en TradingView pueden reescribirse en Pine. Estos motores no se instalan dentro de la terminal y ninguno se conecta a un bróker. El ejemplo no modela márgenes ni cambios de contrato de futuros. Origen: <a href="https://www.instagram.com/p/DepEDXbRMRF/" rel="noopener noreferrer" target="_blank">publicación del 19-oct-2026</a>.</p>
+    </details>
+  </section>
+
+  <section role="tabpanel" id="panel-perfil" aria-labelledby="tab-perfil" hidden>
+    <h1>Perfil</h1>
+    <div id="reto-contenido"></div>
+    <h2>Perfil y criterios</h2>
+    <p class="ayuda">Definen qué es «mejor» para usted. Al guardarlos, las propuestas se recalculan solas.</p>
+    <form id="form-perfil" class="formulario" novalidate>
+      <fieldset class="segmentado-campo"><legend>Perfil de riesgo</legend>
+        <label><input type="radio" name="riesgo" value="conservador"> Conservador</label>
+        <label><input type="radio" name="riesgo" value="moderado"> Moderado</label>
+        <label><input type="radio" name="riesgo" value="agresivo"> Agresivo</label>
+      </fieldset>
+      <div class="campos">
+        <label class="casilla"><input type="checkbox" name="horizonte_reto"> Usar como horizonte las sesiones que faltan para el cierre del Reto</label>
+        <label>Horizonte propio de la predicción<span class="fila-controles"><input name="horizonte_valor" inputmode="decimal" required aria-label="Cantidad" size="6">
+          <select name="horizonte_unidad" aria-label="Unidad del horizonte"><option value="dias">días</option><option value="semanas">semanas</option><option value="meses">meses</option><option value="anios">años</option></select></span></label>
+        <label>Capital a invertir (MXN)<input name="capital" inputmode="decimal" required></label>
+        <label>Peso máximo por activo (%)<input name="max_peso_activo" inputmode="decimal" required></label>
+        <label>Exposición máxima a dólar (%)<input name="max_exposicion_usd" inputmode="decimal" required></label>
+        <label>Escenario de mercado
+          <select name="escenario"><option value="base">Base (historia)</option><option value="adverso">Adverso</option><option value="favorable">Favorable</option></select>
+        </label>
+        <label>Emisoras con las que opera
+          <select name="mercado_acciones"><option value="ambos">Nacionales y extranjeras</option><option value="nacionales">Solo nacionales (BMV)</option><option value="extranjeras">Solo extranjeras (SIC)</option></select>
+        </label>
+        <label>Criterio del plan de acción
+          <select name="criterio_plan"><option value="puntuacion">Máxima puntuación (más equilibrio, menos riesgo)</option><option value="plusvalia">Mayor plusvalía esperada al cierre del Reto (más riesgo)</option><option value="ganancia">Mayor ganancia media esperada (máximo rendimiento, el mayor riesgo)</option><option value="markowitz">Markowitz: máximo Sharpe (mejor rendimiento por unidad de riesgo)</option></select></label>
+        <label class="casilla"><input type="checkbox" name="incluir_etf_por_confirmar"> Incluir ETF cuya disponibilidad no está confirmada</label>
+        <label class="ancho">Excluir instrumentos (ids separados por coma)<input name="excluir" placeholder="SIC:TSLA, BMV:GMEXICO"></label>
+      </div>
+      <div class="errores" id="errores-perfil" role="alert" aria-live="assertive"></div>
+      <button class="boton boton--primario" type="submit">Guardar perfil</button>
+    </form>
+    <div id="criterios"></div>
+  </section>
+
+  <section role="tabpanel" id="panel-apariencia" aria-labelledby="tab-apariencia" hidden>
+    <h1>Apariencia</h1>
+    <div id="apariencia"><p class="suave">Cargando preferencias…</p></div>
+  </section>
+  <section role="tabpanel" id="panel-legal" aria-labelledby="tab-legal" hidden>
+    <h1>Aviso legal y términos de uso</h1>
+    <div class="texto">
+      <p><strong>Lea esto antes de usar la terminal.</strong> Al usarla, usted acepta estas condiciones.</p>
+      <h2>1. Qué es y qué no es</h2>
+      <ul>
+        <li>Help Quote Terminal es una <strong>herramienta personal de análisis y simulación</strong>, de uso educativo e informativo.</li>
+        <li><strong>No es asesoría de inversión</strong>, recomendación personalizada, oferta, solicitud ni invitación a comprar o vender valores. Sus autores no son asesores de inversión, casa de bolsa ni intermediarios registrados ante la CNBV, la SEC u otra autoridad.</li>
+        <li><strong>No ejecuta operaciones.</strong> Ninguna función envía órdenes a una casa de bolsa. Toda decisión y operación la toma y ejecuta usted, bajo su responsabilidad.</li>
+      </ul>
+      <h2>2. Riesgos</h2>
+      <ul>
+        <li>Invertir implica riesgo, incluida la <strong>pérdida total del capital</strong>. Rendimientos pasados no garantizan rendimientos futuros.</li>
+        <li>Los pronósticos, rangos 10–90 %, puntuaciones y portafolios son <strong>estimaciones estadísticas inciertas</strong>. Ningún modelo de la terminal tiene ventaja demostrada fuera de muestra.</li>
+        <li>Las respuestas de los asistentes de IA (Claude, Gemini, Ollama) pueden contener errores y no constituyen asesoría.</li>
+      </ul>
+      <h2>3. Datos</h2>
+      <ul>
+        <li>Los datos provienen de terceros (FRED, Banxico, Tiingo, EODHD, Alpaca, SEC, TradingView, entre otros), con retrasos y posibles errores. <strong>No hay garantía de exactitud, integridad ni oportunidad.</strong> Verifique cada precio con su intermediario antes de operar.</li>
+        <li>Cada dato muestra su fuente, fecha y vigencia. Un dato vencido o simulado nunca se presenta como vigente.</li>
+        <li>Los datos de cada proveedor se rigen por sus propios términos y no se redistribuyen. La demostración pública usa datos simulados.</li>
+      </ul>
+      <h2>4. Sus datos y privacidad</h2>
+      <ul>
+        <li>La terminal corre en su equipo (127.0.0.1). Su cartera y sus claves se quedan en su computadora; las claves solo en el archivo <code>.env</code>.</li>
+        <li>Si usted activa un asistente de IA en la nube, el contexto de su pregunta se envía a ese proveedor según sus términos.</li>
+        <li>No recopila datos personales de terceros ni usa cookies de seguimiento.</li>
+      </ul>
+      <h2>5. Limitación de responsabilidad</h2>
+      <p>La terminal se ofrece «tal cual», sin garantías de ningún tipo. En la máxima medida que permita la ley aplicable, sus autores y colaboradores no son responsables de pérdidas, daños, decisiones de inversión ni consecuencias derivadas de su uso, de errores en los datos o de la interrupción del servicio.</p>
+      <h2>6. Marcas y relación con terceros</h2>
+      <p>Actinver, Bloomberg, TradingView y demás nombres son marcas de sus titulares. Esta terminal es independiente: <strong>no está afiliada, patrocinada ni avalada</strong> por ellos. El «Reto Actinver 2026» se menciona solo como contexto histórico del proyecto.</p>
+      <h2>7. Ley aplicable</h2>
+      <p>Este aviso se interpreta conforme a las leyes de los Estados Unidos Mexicanos. Si una cláusula resultara inválida, las demás siguen vigentes.</p>
+      <p class="suave">Versión del 15-nov-2026. Este texto es una plantilla preparada sin revisión de un abogado; para un uso comercial o público, haga que un profesional lo revise.</p>
+    </div>
+  </section>
+  <section role="tabpanel" id="panel-ayuda" aria-labelledby="tab-ayuda" hidden>
+    <h1>Ayuda</h1>
+    <div class="texto">
+      <h2>Qué hace esta terminal</h2>
+      <p><strong>Cómo usarla cada día:</strong> 1) copie su cuenta del portal en «Mi portafolio» (sin eso, todo queda como «decisión pendiente»); 2) revise «Plan de acción»: comprar, vender, mantener o pendiente por instrumento, con cantidad, precio, fuente, motivo e invalidación; 3) verifique cada precio en el portal y capture usted las órdenes. Las secciones técnicas están en «Más».</p>
+      <p>Calcula en todo momento dos carteras —solo acciones, y acciones con ETF y fondos—, cada una con cuatro lentes: <strong>máximo rendimiento esperado</strong> (agresiva, con su riesgo explícito), <strong>ajuste a su perfil y cartera</strong>, <strong>máxima puntuación</strong> (elige con la primera mitad de la validación y se reporta con la segunda; por eso puede quedar debajo de «Ajuste») y <strong>Markowitz (Solver)</strong>: el portafolio tangente de máximo Sharpe, el mismo que resuelve Solver en el Excel. Además hay variantes solo nacionales y solo extranjeras. Las compara con su cartera registrada y le avisa cuando conviene cambiar algo. <strong>No envía órdenes</strong>: las operaciones se capturan en el simulador del Reto.</p>
+      <h2>Estado de los datos</h2>
+      <dl class="glosario">
+        <dt><span class="chip chip--vigente">Vigente</span></dt><dd>Corresponde a la última sesión esperada para su tipo (cierre, valor liquidativo o tipo de cambio).</dd>
+        <dt><span class="chip chip--retrasado">Dato retrasado</span></dt><dd>Atraso dentro de la tolerancia. Se usa, pero baja la calidad de datos.</dd>
+        <dt><span class="chip chip--vencido">Dato vencido</span></dt><dd>Atraso mayor a la tolerancia: el instrumento se excluye y se suspenden las recomendaciones que dependan de él.</dd>
+        <dt><span class="chip chip--sin_datos">Sin datos suficientes</span></dt><dd>No hay historia suficiente para estimar su riesgo.</dd>
+        <dt><span class="chip chip--sintetico">Sintético</span></dt><dd>Dato de demostración; nunca se presenta como actual.</dd>
+      </dl>
+      <h2>Tiempo real</h2>
+      <p>El simulador del Reto usa precios de la BMV en tiempo real. <strong>No hay fuente gratuita de tiempo real para las emisoras locales de la BMV</strong>: se usan sus cierres diarios. Para las emisoras del SIC y los ETF, con claves de Alpaca (gratis) la terminal recibe el último precio de IEX en vivo (hasta 30 símbolos), lo convierte a pesos con el tipo de cambio más reciente y recalcula propuestas y alertas cuando el precio se mueve. Cada dato indica su tipo y retraso en «Datos».</p>
+      <h2>Alertas</h2>
+      <p>Se disparan una sola vez al cumplirse la condición, esperan un periodo de enfriamiento antes de repetirse y no le notifican fuera del horario de la BMV. «Simular cambio» calcula el efecto de la acción sugerida sin enviar nada.</p>
+      <h2>CFD y apalancamiento</h2>
+      <p>Los CFD son contratos por diferencias con apalancamiento (<a href="https://www.dukascopy.com/swiss/spanish/cfd/what-are-cfds/" rel="noopener noreferrer" target="_blank">explicación de Dukascopy</a>). Quedan fuera de ambas carteras y del Reto.</p>
+      <h2>Referencias y créditos</h2>
+      <p class="ayuda">Fuentes de datos, servicios, software y publicaciones con que se construyó la terminal, con su uso y sus condiciones.</p>
+      <div id="referencias-lista"><p class="suave">Cargando referencias…</p></div>
+      <h2>Limitaciones</h2>
+      <ul>
+        <li>Las emisoras del SIC se valoran con el cierre de su bolsa de origen convertido a pesos; el simulador puede diferir.</li>
+        <li>El Reto no paga dividendos: las propuestas usan precios sin ajustar por dividendos.</li>
+        <li>Los fondos se valoran con el valor liquidativo que usted importe.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<dialog id="dialogo-simulacion" aria-labelledby="titulo-simulacion">
+  <div class="dialogo__cabecera"><h2 id="titulo-simulacion">Simulación de cambio</h2>
+    <button type="button" class="boton boton--texto" id="cerrar-simulacion" aria-label="Cerrar simulación">Cerrar</button></div>
+  <div id="simulacion-contenido"></div>
+</dialog>
+<div class="barra-movil">
+  <button type="button" class="boton boton--primario" id="btn-calcular-movil">Recalcular propuestas</button>
+</div>
+<div class="notificacion" id="notificacion" role="status" aria-live="polite" hidden></div>
+<footer class="pie">
+  <p>Uso local y personal. Información con fines de análisis; no es asesoría de inversión ni recomendación. Sin operaciones reales habilitadas.</p>
+</footer>
+</body>
+</html>

@@ -2,6 +2,22 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 17-nov-2026 — Terminal completa en GitHub Pages y prácticas de COATL
+
+- **Terminal completa sin servidor:**
+  - https://maikolv.github.io/help-quote-terminal/terminal/ con datos simulados;
+  - `scripts/exportar_estatico.cjs` graba 220 respuestas de la demo en las 23 pestañas;
+  - `web/static/estatico.js` las sirve; escribir, calcular u operar responde con un aviso.
+- **Indicador «cálculo listo»** (`<html data-calculo>`).
+- **Historial único** `docs/versiones.json` → CHANGELOG y `docs/VERSIONES.md` (`scripts/versiones.py`).
+- **Escenario de referencia** con cifras fijas (`terminal/escenario_referencia.py`).
+- **Reporte del plan imprimible con QR** (`#r=`, solo parámetros del escenario).
+- **Accesibilidad:** axe WCAG 2.1 AA en 0 violaciones (Estación, plan y portafolios a 1440, 375 y 812 px).
+- **Reporte ejecutivo** generado desde el motor y compuesto con Chromium.
+- **CSP de la gráfica:** imágenes solo de TradingView.
+- **Informe:** `docs/mejoras-desde-coatl.md`.
+- **Pruebas:** pytest 962 (961 + 1 corregida), Node 55 y axe 0.
+
 ## 15-nov-2026 — Sin espacios en blanco, apariencia, aviso legal, reporte ejecutivo, video y stand
 
 - **Estación de Mercado (escritorio):** las tres columnas miden lo mismo. Monitor e inspector se desplazan por dentro: no queda el hueco que dejaba la columna más corta.

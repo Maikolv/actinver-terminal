@@ -8,7 +8,7 @@ Terminal local de análisis de portafolios: compara propuestas de inversión con
 
 ![Estación de Mercado](docs/capturas/mercado-despues-demo-1440.jpg)
 
-**[Ver la terminal en el navegador →](https://maikolv.github.io/help-quote-terminal/estacion.html)** · [Capturas](#capturas) · [Guía paso a paso](docs/ruta-de-inicio.md)
+**[Abrir la terminal completa en el navegador (demo, sin instalar) →](https://maikolv.github.io/help-quote-terminal/terminal/)** · [Capturas](#capturas) · [Guía paso a paso](docs/ruta-de-inicio.md)
 
 ## Qué hace
 
@@ -132,6 +132,7 @@ docs/            diseño, auditorías, metodología, decisiones y capturas
 | [Reporte ejecutivo (PDF)](docs/reporte-ejecutivo/reporte-ejecutivo.pdf) | Cómo funciona, metodología y conceptos para usarla |
 | [Video explicativo](docs/video/help-quote-terminal.mp4) | Recorrido narrado de 2 minutos (datos simulados) |
 | [Propuesta de stand](docs/propuesta-stand.md) | Recursos, presupuesto y guion para presentar la terminal |
+| [Mejoras desde COATL](docs/mejoras-desde-coatl.md) | Indicador de cálculo, historial único, escenario de referencia, QR, axe y documentos generados |
 | [Auditoría de incorporaciones](docs/auditoria-incorporaciones-20261115.md) | Asistente con Gemini y otras ideas, con costo y riesgo |
 | [Resumen ejecutivo](docs/resumen-ejecutivo.md) | Qué es, estado y decisiones pendientes |
 | [Arquitectura](docs/initial-audit.md) · [DESIGN.md](DESIGN.md) | Flujo de datos y sistema visual |

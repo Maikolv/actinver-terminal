@@ -1,0 +1,30 @@
+/* Tokens, tipografía y componentes compartidos con la terminal: app.css. */
+.cuaderno-marca { color: var(--texto); text-decoration: none; }
+.cuaderno-intro { margin-bottom: 20px; }
+.cuaderno-contexto { color: var(--texto-2); font-size: .8rem; margin-bottom: 6px; }
+.cuaderno-intro h2 { margin: 0 0 8px; }
+.cuaderno-intro > p, .cuaderno-seccion > p { color: var(--texto-2); max-width: 95ch; }
+.cuaderno-secciones { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 0; }
+.cuaderno-secciones a { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 14px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); text-decoration: none; font-weight: 600; }
+.cuaderno-secciones a:hover { background: var(--superficie-2); }
+.cuaderno-seccion { margin-top: 16px; scroll-margin-top: 16px; }
+.cuaderno-seccion h2 { margin: 4px 0 12px; }
+.cuaderno .numero { color: var(--texto-2); font: .75rem var(--mono); }
+.cuaderno .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 16px; margin: 16px 0; }
+.cuaderno label { display: grid; gap: 4px; font-size: .85rem; font-weight: 600; min-width: 0; }
+.cuaderno .ancho { grid-column: 1 / -1; }
+.cuaderno textarea { width: 100%; min-height: 112px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--fondo); color: var(--texto); padding: 8px 10px; font: inherit; resize: vertical; }
+.cuaderno input { font: inherit; }
+.cuaderno .acciones { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.cuaderno .resultado { background: var(--superficie-2); border-left: 3px solid var(--acento); border-radius: var(--radio); padding: 12px 16px; margin: 16px 0 8px; white-space: pre-line; overflow-wrap: anywhere; }
+.cuaderno .resultado.error { background: var(--vencido-fondo); color: var(--vencido); border-color: var(--vencido); }
+.cuaderno small { display: block; color: var(--texto-2); font-size: .8rem; line-height: 1.55; }
+.cuaderno .nota { border-left: 2px solid var(--borde); padding-left: 12px; margin: 16px 0 0; font-size: .85rem; }
+.cuaderno details { overflow-wrap: anywhere; }
+.cuaderno-pie { border-top: 1px solid var(--borde); margin-top: 24px; padding-top: 16px; color: var(--texto-2); font-size: .85rem; }
+@media (max-width:600px) { .cuaderno .grid { grid-template-columns: 1fr; } .cuaderno .acciones .boton { width: 100%; } }
+@media print { .cuaderno { --fondo: white; --superficie: white; --superficie-2: white; --texto: black; --texto-2: #333; --borde: #999; } .cuaderno nav, .cuaderno button, .cuaderno .saltar { display: none; } .cuaderno main { padding: 16px 0; } .cuaderno-seccion { break-inside: avoid; } }
+.cuaderno .precarga { margin-top: 4px; font: inherit; font-weight: 400; font-size: .85rem; min-height: 36px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); color: var(--texto); padding: 6px 8px; max-width: 100%; }
+.cuaderno .escenario { min-width: min(100%, 320px); }
+.cuaderno .escenario select { min-height: 40px; font: inherit; }
+.cuaderno textarea, .cuaderno input { font-weight: 400; }

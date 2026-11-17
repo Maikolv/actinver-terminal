@@ -1,0 +1,260 @@
+[
+  {
+    "nombre": "aider",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\aider",
+    "url": "https://github.com/Aider-AI/aider.git",
+    "commit": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE.txt"
+    ]
+  },
+  {
+    "nombre": "Superalgos",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\Superalgos",
+    "url": "https://github.com/Superalgos/Superalgos.git",
+    "commit": "9f0fb59edd4bae7afa08d06c366e0bcb48103aec",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "alpaca-py",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\alpaca-py",
+    "url": "https://github.com/alpacahq/alpaca-py.git",
+    "commit": "66f2ffd797d3cb0e5202daf36d178b67aff89915",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "TradingView-Webhook-Bot",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingView-Webhook-Bot",
+    "url": "https://github.com/fabston/TradingView-Webhook-Bot.git",
+    "commit": "7eff8f9e9e13f350d7a3f258329285eb3a0bbd37",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "defuddle",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\defuddle",
+    "url": "https://github.com/kepano/defuddle.git",
+    "commit": "3e8bde9f5f855bc968e95837a750c5968a9fe639",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "mattpocock-skills",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\mattpocock-skills",
+    "url": "https://github.com/mattpocock/skills.git",
+    "commit": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "addyosmani-agent-skills",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\addyosmani-agent-skills",
+    "url": "https://github.com/addyosmani/agent-skills.git",
+    "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "OpenBB",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\OpenBB",
+    "url": "https://github.com/openbq-org/OpenBB.git",
+    "commit": "3e071fcc2cd9f891cac6040ae60296dba76dab46",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "FinceptTerminal",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\FinceptTerminal",
+    "url": "https://github.com/Fincept-Corporation/FinceptTerminal.git",
+    "commit": "b7d850b49dc033bb133e6e5d2476444ac5c422b1",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "Vibe-Trading",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\Vibe-Trading",
+    "url": "https://github.com/HKUDS/Vibe-Trading.git",
+    "commit": "b705d188b08013cc3fa904be72d40a41798181e8",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "Lean",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\Lean",
+    "url": "https://github.com/QuantConnect/Lean.git",
+    "commit": "d4cac37514427c84d40064cecbf3f0e6be4b0137",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "paperswithbacktest-awesome-systematic-trading",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\paperswithbacktest-awesome-systematic-trading",
+    "url": "https://github.com/paperswithbacktest/awesome-systematic-trading.git",
+    "commit": "ddfee8bb548bd6914191cb8fdb695d533ae16b0d",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": []
+  },
+  {
+    "nombre": "awesome-systematic-trading",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\awesome-systematic-trading",
+    "url": "https://github.com/wangzhe3224/awesome-systematic-trading.git",
+    "commit": "424df5f4acc98dcc3880107188d20f5fa4897653",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "Agent-Reach",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\Agent-Reach",
+    "url": "https://github.com/Panniantong/Agent-Reach.git",
+    "commit": "a19a171fa980a0785849596492e0af4db800c82f",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "humanizer",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\humanizer",
+    "url": "https://github.com/blader/humanizer.git",
+    "commit": "8c307f367c91bd974002f10f2be2965d642c13df",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "codebase-memory-mcp",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\codebase-memory-mcp",
+    "url": "https://github.com/DeusData/codebase-memory-mcp.git",
+    "commit": "92abefa3f57a94591a92bcecd6a6f102da373575",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "Anthropic-Cybersecurity-Skills",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\Anthropic-Cybersecurity-Skills",
+    "url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills.git",
+    "commit": "54a798831d2266a3ca61ce68a7acb80b81160d57",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "quant-models",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\quant-models",
+    "url": "https://github.com/davidalmeida90/quant-models.git",
+    "commit": "1796df756edbfabc352cc38ec9490c3e1eb7112d",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "QuantLib",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\QuantLib",
+    "url": "https://github.com/lballabio/QuantLib.git",
+    "commit": "bf35b19a4f3ffdfa2dcb2f0b48a82ef8a675371b",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE.TXT"
+    ]
+  },
+  {
+    "nombre": "TradingAgents_TauricResearch",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\TradingAgents_TauricResearch",
+    "url": "https://github.com/vongchu/TradingAgents_TauricResearch.git",
+    "commit": "01477f9afb7a47b849ed4c9259d3a9a4738d9fda",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "vectorbt",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\vectorbt",
+    "url": "https://github.com/polakowo/vectorbt.git",
+    "commit": "f54802a5982c9fd8123d85c3b5a1d06a80b2726a",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE.md"
+    ]
+  },
+  {
+    "nombre": "freqtrade",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\freqtrade",
+    "url": "https://github.com/freqtrade/freqtrade.git",
+    "commit": "06831520bab8e0399b48a2d335775e667105fc83",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "backtesting.py",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\backtesting.py",
+    "url": "https://github.com/kernc/backtesting.py.git",
+    "commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE.md"
+    ]
+  },
+  {
+    "nombre": "nautilus_trader",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\nautilus_trader",
+    "url": "https://github.com/nautechsystems/nautilus_trader.git",
+    "commit": "da61fdf81238b32a60c67ed672054cdc1bf3efd4",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "tradingview-mcp-reel",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\tradingview-mcp-reel",
+    "url": "https://github.com/atilaahmettaner/tradingview-mcp.git",
+    "commit": "16ba25589c455123b888cf6ac847bf5a06a7f010",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  },
+  {
+    "nombre": "ib_async",
+    "ruta": "C:\\Users\\MIKE\\Desktop\\Repos\\ib_async",
+    "url": "https://github.com/ib-api-reloaded/ib_async.git",
+    "commit": "ab629f34c1823ea4c1542f32f07377208a86bdfd",
+    "estado": "Clon local; no se afirma servicio iniciado ni dependencia instalada",
+    "licencia_archivos": [
+      "LICENSE"
+    ]
+  }
+]

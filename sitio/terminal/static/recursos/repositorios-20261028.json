@@ -1,0 +1,47 @@
+[
+  {
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\tvdatafeed",
+    "remote": "https://github.com/rongardF/tvdatafeed.git",
+    "commit": "e6f6aaa7de439ac6e454d9b26d2760ded8dc4923",
+    "licencias": [
+      "LICENSE"
+    ],
+    "estado": "clonado; entorno aislado e import comprobado"
+  },
+  {
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\ta",
+    "remote": "https://github.com/bukosabino/ta.git",
+    "commit": "a890410710a6e483c9ba08da7f3dd5089e4b9dff",
+    "licencias": [
+      "LICENSE"
+    ],
+    "estado": "clonado; entorno aislado e import comprobado"
+  },
+  {
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\smart-money-concepts",
+    "remote": "https://github.com/joshyattridge/smart-money-concepts.git",
+    "commit": "1b62fd6c41e1f508e7ed76831a039fa4c82d42f6",
+    "licencias": [
+      "LICENSE"
+    ],
+    "estado": "clonado; entorno aislado e import comprobado"
+  },
+  {
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\pynecore",
+    "remote": "https://github.com/PyneSys/pynecore.git",
+    "commit": "eb7cff8696183bcf20ad2f008e0975b295449825",
+    "licencias": [
+      "LICENSE"
+    ],
+    "estado": "clonado; entorno aislado e import comprobado"
+  },
+  {
+    "path": "C:\\Users\\MIKE\\Desktop\\Repos\\tradingview-webhooks-bot-robswc",
+    "remote": "https://github.com/robswc/tradingview-webhooks-bot.git",
+    "commit": "a164fc88edafbe2e877c6193dd17afb4f76f1236",
+    "licencias": [
+      "LICENSE"
+    ],
+    "estado": "clonado y README revisado; servidor y acciones no activados"
+  }
+]

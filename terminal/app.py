@@ -1768,7 +1768,7 @@ def simbolo_tradingview(ins: dict) -> str | None:
 
 CSP_GRAFICA = ("default-src 'none'; script-src https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; "
                "frame-src https://s.tradingview.com https://www.tradingview-widget.com https://*.tradingview.com; "
-               "img-src 'self' data: https:; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'")
+               "img-src 'self' data: https://*.tradingview.com; connect-src https://*.tradingview.com; base-uri 'none'; frame-ancestors 'self'")
 INTERVALOS_TV = {"1", "5", "15", "60", "D"}  # minutos de TradingView; «D» = diario
 TEMAS_TV = {"dark", "light"}  # el navegador pide el mismo modo claro/oscuro que usa la terminal
 LOGO_SVG = ('<svg class="marca__logo" aria-hidden="true" width="18" height="18" viewBox="0 0 32 32"><rect width="32" height="32" '
