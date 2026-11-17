@@ -16,9 +16,7 @@ def test_ida_y_vuelta_sin_perder_texto():
 
 def test_changelog_y_resumen_salen_del_json():
     datos = json.loads((RAIZ / "docs" / "versiones.json").read_text(encoding="utf-8"))
-    lf = lambda t: t.replace("
-", "
-")  # noqa: E731 - Git puede cambiar CRLF/LF al clonar (Windows frente a Linux)
+    lf = lambda t: t.replace(chr(13) + chr(10), chr(10))  # noqa: E731 - Git puede cambiar CRLF/LF al clonar (Windows frente a Linux)
     assert lf((RAIZ / "CHANGELOG.md").read_bytes().decode("utf-8")) == lf(versiones.changelog(datos))
     resumen = versiones.resumen(datos)
     assert all(f"| {v['version']} |" in resumen for v in datos["versiones"])
