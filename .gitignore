@@ -51,3 +51,5 @@ data/
 ~$*.docx
 ~$*.pptx
 node_modules/
+data/archivo/
+data/medios/

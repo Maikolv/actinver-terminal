@@ -2,6 +2,16 @@
  "preambulo": "# Changelog\n\nFormato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.\n\n",
  "versiones": [
   {
+   "version": "102",
+   "fecha": "17-nov-2026",
+   "titulo": "Perfil reiniciado tras el Reto y auditoría para el escenario real",
+   "commit": null,
+   "cifras": {
+    "node": 55
+   },
+   "texto": "## 17-nov-2026 — Perfil reiniciado tras el Reto y auditoría para el escenario real\r\n\r\n- **Reinicio del perfil, a pedido del usuario:**\r\n  - se vaciaron cuenta, capturas del portal (34), posiciones y saldos, transacciones, boletas (299), alertas (340), tareas y catálogo del simulador;\r\n  - también perfil, decisiones, referencia del plan, modo de venta y portafolio principal.\r\n- **Datos de mercado, modelos y «Mis portafolios»:** se conservan.\r\n- **Archivo, no borrado:** `data/archivo/reto-actinver-2026-20261117.db` (copia completa, integridad verificada, fuera de la rotación de respaldos), con registro en la auditoría.\r\n- **Auditoría y mejoras:**\r\n  - el plan ya no pide la «captura del portal»: guía a registrar la cartera y elegir un portafolio principal;\r\n  - el perfil oculta el horizonte «hasta el cierre del Reto»;\r\n  - guías, criterio del plan y aviso del Reto escritos para un escenario real.\r\n\r\n"
+  },
+  {
    "version": "101",
    "fecha": "17-nov-2026",
    "titulo": "Terminal completa en GitHub Pages y prácticas de COATL",

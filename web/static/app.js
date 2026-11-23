@@ -1656,7 +1656,7 @@ async function cargarReto() {
   try {
     const r = await api("/api/reto");
     estado.reto = r;
-    if (!r.activo) return limpiar("reto-contenido", h("p", { clase: "vacio", texto: "Reglas del Reto desactivadas (config/reto.yaml → activo: false)." }));
+    if (!r.activo) return limpiar("reto-contenido", h("p", { clase: "vacio", texto: "El Reto Actinver 2026 terminó el 13-nov-2026: sus reglas y datos quedaron archivados. La terminal trabaja con su cartera real." }));
     const reglas = Object.entries(r.reglas || {});
     limpiar("reto-contenido", avisoReglas(r),
       h("div", { clase: "rejilla" },
@@ -1682,7 +1682,9 @@ async function cargarPerfil() {
     const d = await api("/api/perfil");
     const f = document.getElementById("form-perfil");
     f.querySelectorAll('input[name="riesgo"]').forEach((r) => { r.checked = r.value === d.perfil.riesgo; });
-    f.elements.horizonte_reto.checked = d.perfil.horizonte_reto !== false;
+    // Sin Reto activo no hay «sesiones hasta el cierre»: la casilla se oculta y manda el horizonte propio.
+    f.elements.horizonte_reto.closest("label").hidden = !d.reto_activo;
+    f.elements.horizonte_reto.checked = d.reto_activo && d.perfil.horizonte_reto !== false;
     f.elements.horizonte_valor.value = d.perfil.horizonte_valor ?? d.perfil.horizonte_anios;
     f.elements.horizonte_unidad.value = d.perfil.horizonte_unidad || "anios";
     f.elements.capital.value = d.perfil.capital;

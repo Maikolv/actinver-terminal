@@ -27,6 +27,8 @@ ZONA = "America/Mexico_City"
 ORDEN = {"vender": 0, "comprar": 1, "mantener": 2}
 FALTA_SALDO = ("Saldo confirmado del portal: capture su cuenta en «Mi portafolio» (posiciones, poder de compra, "
                "valuación total y hora del portal).")
+FALTA_CARTERA = ("Registre su cartera: en «Mi portafolio» anote su efectivo inicial (aportación) y sus posiciones, o "
+                 "impórtelas. Después elija un portafolio principal en «Mis portafolios».")
 
 
 def verificar_reglas(con: sqlite3.Connection, p: dict | None, ahora: datetime) -> dict:
@@ -101,7 +103,8 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
     # Escenario real (sin Reto): la cartera es la que el usuario registra; la captura del portal ya no es requisito.
     confirmada = cart.get("fuente") == "portal" or (not reto.activo() and bool(cart.get("posiciones") or cart.get("efectivo")))
     reglas = verificar_reglas(con, p, ahora)
-    faltan = ([] if confirmada else [FALTA_SALDO]) + reglas["errores"]
+    falta_cuenta = FALTA_SALDO if reto.activo() else FALTA_CARTERA  # escenario real: no hay portal del Reto
+    faltan = ([] if confirmada else [falta_cuenta]) + reglas["errores"]
     if not p:
         faltan.append("Propuesta vigente: se está recalculando o faltan datos (vea «¿En qué puedo confiar hoy?»).")
     ins = mercado.instrumentos(con)
@@ -171,13 +174,13 @@ def calcular(con: sqlite3.Connection, ajustes: Ajustes, ahora: datetime | None =
             fila["invalidacion"] = (f"El peso se aleja más de {banda:g} pp del objetivo, cambia la propuesta de referencia "
                                     "o su cuenta del portal.")
             if not confirmada:
-                fila["decision"], fila["falta"] = "pendiente", [FALTA_SALDO]
+                fila["decision"], fila["falta"] = "pendiente", [falta_cuenta]
         else:
             if not fila["motivo"]:
                 fila["motivo"] = (f"{'Subir' if accion == 'comprar' else 'Bajar'} el peso de {fila['peso_actual']:.1%} a "
                                   f"{fila['peso_objetivo']:.1%} ({fila['delta_pp']:+.1f} pp) según «{p['nombre']}».")
             if not confirmada:
-                fila["decision"], fila["falta"] = "pendiente", [FALTA_SALDO]
+                fila["decision"], fila["falta"] = "pendiente", [falta_cuenta]
                 fila["invalidacion"] = "Cambian su cuenta del portal o la propuesta de referencia."
             else:
                 if series is None:  # una sola lectura de historia para todas las boletas

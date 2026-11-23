@@ -3,11 +3,11 @@
 export const GUIAS = {
   'panel-resumen': {
     titulo: 'Plan de acción',
-    que: 'Lo que conviene revisar hoy con su cuenta del Reto: comprar, vender, mantener o «decisión pendiente» por instrumento, con cantidad, precio de referencia, fuente, motivo e invalidación.',
+    que: 'Lo que conviene revisar hoy con su cartera: comprar, vender, mantener o «decisión pendiente» por instrumento, con cantidad, precio de referencia, fuente, motivo e invalidación.',
     pasos: ['Registre primero su cuenta en «Mi portafolio»; sin captura reciente, todo queda como decisión pendiente.',
       'Lea primero «Gestión de riesgo»: si una posición rompió su stop, está en tendencia bajista o concentra demasiado, el plan la vende o reduce antes de seguir la propuesta, y reinvierte en emisoras en tendencia alcista.',
       'Lea cada fila: acción, cantidad, precio límite sugerido y por qué.',
-      'Verifique el precio en el portal del Reto y capture usted la orden; la terminal no envía nada.',
+      'Verifique el precio con su casa de bolsa y capture usted la orden; la terminal no envía nada.',
       'Si algo no le convence, pregunte al Asistente o revise Propuestas y Riesgo.'],
     terminos: [['Decisión pendiente', 'Falta un dato confiable (captura, precio vigente o regla) para proponer algo.'],
       ['Invalidación', 'Condición que anula la sugerencia (p. ej., el precio se movió más de 1 %).'],
@@ -15,7 +15,7 @@ export const GUIAS = {
   },
   'panel-cartera': {
     titulo: 'Mi portafolio',
-    que: 'Su cuenta del Reto tal como la muestra el portal, más el registro manual de la terminal. Es la base con la que se comparan el plan y las propuestas.',
+    que: 'Su cartera real: lo que registra a mano o importa, o una captura del portal de su casa de bolsa. Es la base con la que se comparan el plan y las propuestas.',
     pasos: ['En el portal, copie el recuadro de Portafolio y la tabla de Acciones (o suba las capturas de pantalla).',
       'Péguelo o súbalo aquí y revise la vista previa; nada se guarda hasta que confirme.',
       'Use «Registrar una operación» o «Importar desde archivo» solo si quiere llevar un registro propio.'],
@@ -25,7 +25,7 @@ export const GUIAS = {
   },
   'panel-portafolios': {
     titulo: 'Mis portafolios',
-    que: 'Arma carteras de prueba, aparte de su cuenta del Reto: reparte el dinero buscando el mejor equilibrio entre ganancia esperada y riesgo (método de Markowitz). Si tiene una opinión propia sobre una emisora, puede sumarla (Black-Litterman). Se recalcula con cada cambio.',
+    que: 'Arma carteras de prueba, aparte de su cartera: reparte el dinero buscando el mejor equilibrio entre ganancia esperada y riesgo (método de Markowitz). Si tiene una opinión propia sobre una emisora, puede sumarla (Black-Litterman). Se recalcula con cada cambio.',
     pasos: ['Elija un perfil (Conservador, Moderado, Crecimiento o Agresivo), o «Mi cuenta principal» para partir de su cartera actual; esta se actualiza sola cuando registra una captura u operación.',
       'Ajuste qué instrumentos considerar, cuántos y el tope por instrumento; fije los que usted quiera.',
       'Elija el horizonte de la predicción (días, semanas, meses o años): verá el rendimiento esperado, su rango del 90 % y la probabilidad de pérdida a ese plazo.',
@@ -64,11 +64,11 @@ export const GUIAS = {
   },
   'panel-perfil': {
     titulo: 'Perfil',
-    que: 'Las reglas del Reto y su perfil de inversión. Definen qué es «mejor» para usted en propuestas y plan.',
-    pasos: ['Revise las reglas y fechas del Reto.',
+    que: 'Su perfil de inversión: define qué es «mejor» para usted en propuestas y plan.',
+    pasos: ['Escriba el capital que de verdad va a invertir: los montos del plan salen de ahí.',
       'Elija perfil de riesgo, horizonte, capital, topes por activo y por dólar, y el criterio del plan.',
       'Guarde: las propuestas se recalculan solas.'],
-    terminos: [['Peso máximo por activo', 'Tope de una sola emisora en la cartera (el Reto exige ≤ 50 %).'],
+    terminos: [['Peso máximo por activo', 'Tope de una sola emisora en la cartera; diversificar reduce el riesgo de una sola empresa.'],
       ['Exposición a dólar', 'Parte de la cartera en emisoras del SIC, cotizadas en dólares en su bolsa de origen.']],
   },
   'panel-mercado': {

@@ -597,3 +597,4 @@ tbody tr:hover td { background: var(--superficie-2); }
   .reporte-aviso { margin-top: 10px; font-size: 8pt; }
 }
 .apariencia-pregunta input { flex: 1; }
+label.casilla[hidden] { display: none; }

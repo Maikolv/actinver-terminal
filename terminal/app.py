@@ -234,11 +234,12 @@ def validar_perfil(p: dict, ids_validos: set[str]) -> dict:
 
 @app.get("/api/perfil")
 def get_perfil(con=Depends(con_db)):
+    from . import reto
     from .optimizador import perfil_efectivo
     p = servicios.perfil_actual(con, AJUSTES)
     return {"perfil": p, "perfil_efectivo": perfil_efectivo(p), "perfiles": AJUSTES["perfiles"],
             "puntuacion": AJUSTES["puntuacion"], "costos": AJUSTES["costos"], "optimizacion": AJUSTES["optimizacion"],
-            "alertas": AJUSTES["alertas"]}
+            "alertas": AJUSTES["alertas"], "reto_activo": reto.activo()}
 
 
 @app.put("/api/perfil")
