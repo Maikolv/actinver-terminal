@@ -89,7 +89,7 @@ def test_api_velas_incluye_indicadores_con_nulos_en_calentamiento(con, ajustes):
 
 
 # --- GEX -----------------------------------------------------------------------------------------------------------
-def _opc(strike, tipo, venc="2026-11-20", gamma=0.02, oi=100, mult=100, spot=50.0, moneda="USD", inst="2026-10-16T15:00:00+00:00"):
+def _opc(strike, tipo, venc="2027-11-20", gamma=0.02, oi=100, mult=100, spot=50.0, moneda="USD", inst="2026-10-16T15:00:00+00:00"):
     return {"contrato": f"{tipo}{strike}{venc}", "vencimiento": venc, "strike": strike, "tipo": tipo, "gamma": gamma,
             "interes_abierto": oi, "multiplicador": mult, "spot": spot, "moneda": moneda, "instante": inst}
 
@@ -129,20 +129,20 @@ def test_gex_no_mezcla_referencias_de_spot_ni_monedas():
 
 def test_gex_servicio_alpaca_sin_oi_no_es_fiable_y_csv_si(con, ajustes):
     t = (AHORA - timedelta(hours=1)).isoformat()
-    almacen.guardar_opciones(con, [ContratoOpcion("A1", "SIC:MU", "2026-11-20", 100, "call", t, gamma=0.01, iv=0.4)],
+    almacen.guardar_opciones(con, [ContratoOpcion("A1", "SIC:MU", "2027-11-20", 100, "call", t, gamma=0.01, iv=0.4)],
                              Procedencia("alpaca", "x", "EE. UU.", feed="indicative"))
     con.commit()
     r = servicio.gex(con, ajustes, "SIC:MU")
     assert not r["disponible"] and r["descartados"] == {"sin interés abierto": 1} and "OPRA" in r["requisito"]
     cab = ",".join(importar_csv.COLUMNAS["opciones"] + importar_csv.EXTRA_OPCIONES)
-    fila = f"B1,SIC:MU,OPRA,2026-11-20,100,put,{t},1,1.1,1,50,5,0.4,-0.4,0.01,,,x,y,100,98.5,USD"
+    fila = f"B1,SIC:MU,OPRA,2027-11-20,100,put,{t},1,1.1,1,50,5,0.4,-0.4,0.01,,,x,y,100,98.5,USD"
     assert importar_csv.importar(con, "opciones", f"{cab}\n{fila}\n".encode())["guardados"] == 1
     r = servicio.gex(con, ajustes, "SIC:MU")
     assert r["disponible"] and r["contratos_usados"] == 1 and r["totales"]["puts"] == pytest.approx(0.01 * 5 * 100 * 98.5 ** 2 * 0.01)
     assert r["totales"]["firmada"] < 0
     # formato anterior (sin las tres columnas) sigue aceptado
     base = ",".join(importar_csv.COLUMNAS["opciones"])
-    assert importar_csv.importar(con, "opciones", f"{base}\nC1,SIC:MU,OPRA,2026-11-20,105,call,{t},1,1.1,1,50,5,0.4,0.4,0.01,,,x,y\n".encode())["guardados"] == 1
+    assert importar_csv.importar(con, "opciones", f"{base}\nC1,SIC:MU,OPRA,2027-11-20,105,call,{t},1,1.1,1,50,5,0.4,0.4,0.01,,,x,y\n".encode())["guardados"] == 1
     with pytest.raises(ValueError, match="multiplicador"):
         importar_csv.importar(con, "opciones", f"{cab}\n{fila.replace(',100,98.5,USD', ',-1,98.5,USD')}\n".encode())
 

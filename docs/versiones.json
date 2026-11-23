@@ -2,6 +2,16 @@
  "preambulo": "# Changelog\n\nFormato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.\n\n",
  "versiones": [
   {
+   "version": "103",
+   "fecha": "23-nov-2026",
+   "titulo": "Regreso a Actinver Terminal, informe del concurso, guiones del video y auditoría",
+   "commit": null,
+   "cifras": {
+    "node": 55
+   },
+   "texto": "## 23-nov-2026 — Regreso a Actinver Terminal, informe del concurso, guiones del video y auditoría\r\n\r\n- **Nombre visible «Actinver Terminal» restaurado** en la interfaz, el lanzador, los scripts, Telegram, el Excel, Pages, el README y el reporte ejecutivo, con el aviso «proyecto independiente, no afiliado a Grupo Actinver».\r\n- **Pendiente externo:** renombrar el repositorio en GitHub (el permiso de `gh repo rename` quedó bloqueado).\r\n- **Informe del Concurso Finanzas IA** (`entregables/Informe_Concurso_Finanzas_IA.docx` y PDF de revisión, 12 páginas):\r\n  - formato UVM de la plantilla;\r\n  - cifras reales del archivo del Reto: inicial, octubre −10.84 %, final −21.56 %, VaR, NAFTRAC +10.90 % y técnico de MU;\r\n  - pendientes marcados sin inventar.\r\n- **Video:**\r\n  - guiones A y B del TikTok con storyboard, tomas, caption, permisos y subtítulos .srt;\r\n  - montajes provisionales rotulados (9:16 y 16:9);\r\n  - capturas de la demo y video explicativo regenerados con el nombre restaurado (`docs/video/actinver-terminal.mp4`).\r\n- **Auditoría** `docs/auditoria-actinver-20261123.md`: paridad local frente a Pages, cobertura de precios por mercado, checklist de Infosel y acciones prohibidas confirmadas como no realizadas.\r\n- **Prueba nueva:** cuota EODHD en cero (no consulta y el saldo no queda negativo).\r\n\r\n"
+  },
+  {
    "version": "102",
    "fecha": "17-nov-2026",
    "titulo": "Perfil reiniciado tras el Reto y auditoría para el escenario real",

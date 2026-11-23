@@ -36,7 +36,7 @@
     const hoja = el("section", "reporte-impreso");
     hoja.setAttribute("aria-label", "Reporte para imprimir");
     const cab = el("header", "reporte-cabecera");
-    cab.append(el("h1", null, "Help Quote Terminal · Plan de acción"),
+    cab.append(el("h1", null, "Actinver Terminal · Plan de acción"),
       el("p", null, `Generado ${fecha}${demo ? " · DATOS SIMULADOS (demostración)" : ""} · ${plan.propuesta ? `Objetivo: «${plan.propuesta.nombre}»` : "Sin propuesta vigente"}`));
     const qr = el("figure", "reporte-qr");
     qr.append(svgQR(url), el("figcaption", null, "Escanee para reabrir esta vista"));

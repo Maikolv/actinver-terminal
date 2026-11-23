@@ -1,6 +1,8 @@
-# Help Quote Terminal · Actinver Terminal
+# Actinver Terminal
 
 Terminal local de análisis de portafolios: compara propuestas de inversión contra la cartera real, mide el riesgo, optimiza con Markowitz y muestra una estación de mercado. Nació para el **Reto Actinver 2026** y sigue como herramienta de largo plazo e intradía. Declara su incertidumbre en lugar de prometer certeza.
+
+> Proyecto independiente y educativo: **no está afiliado, patrocinado ni avalado por Grupo Actinver**. El nombre recuerda el Reto Actinver 2026 en el que nació.
 
 **Solo informa y simula.** Ninguna ruta envía órdenes a una casa de bolsa ni al simulador del Reto.
 
@@ -130,7 +132,9 @@ docs/            diseño, auditorías, metodología, decisiones y capturas
 | Documento | Contenido |
 |---|---|
 | [Reporte ejecutivo (PDF)](docs/reporte-ejecutivo/reporte-ejecutivo.pdf) | Cómo funciona, metodología y conceptos para usarla |
-| [Video explicativo](docs/video/help-quote-terminal.mp4) | Recorrido narrado de 2 minutos (datos simulados) |
+| [Guiones del video (TikTok/YouTube)](docs/video/guiones-tiktok.md) | Versiones A y B, storyboard, subtítulos y permisos |
+| [Auditoría 23-nov-2026](docs/auditoria-actinver-20261123.md) | Nombre, paridad con Pages, cobertura de precios e Infosel |
+| [Video explicativo](docs/video/actinver-terminal.mp4) | Recorrido narrado de 2 minutos (datos simulados) |
 | [Propuesta de stand](docs/propuesta-stand.md) | Recursos, presupuesto y guion para presentar la terminal |
 | [Mejoras desde COATL](docs/mejoras-desde-coatl.md) | Indicador de cálculo, historial único, escenario de referencia, QR, axe y documentos generados |
 | [Auditoría de incorporaciones](docs/auditoria-incorporaciones-20261115.md) | Asistente con Gemini y otras ideas, con costo y riesgo |

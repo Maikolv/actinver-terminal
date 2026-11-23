@@ -1,5 +1,5 @@
 {
-  "name": "Help Quote Terminal",
+  "name": "Actinver Terminal",
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
   "postCreateCommand": "pip install --user uv && uv sync --frozen && cp -n .env.example .env || true",
   "forwardPorts": [8765],

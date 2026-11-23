@@ -1,0 +1,55 @@
+1
+00:00:00,000 --> 00:00:03,000
+Valeria: ¿Confiarías en un precio sin saber de dónde viene?
+
+2
+00:00:03,000 --> 00:00:07,000
+Camila: Nosotras tampoco. Por eso hicimos Actinver Terminal.
+
+3
+00:00:07,000 --> 00:00:12,000
+Miguel: Abres, buscas una emisora con la diagonal y la eliges.
+
+4
+00:00:12,000 --> 00:00:17,000
+Daniela: A la derecha: proveedor, fecha del cierre y si está vigente o retrasado.
+
+5
+00:00:17,000 --> 00:00:22,000
+Valeria: Aquí dice DATOS SIMULADOS: es la demo, no un precio real.
+
+6
+00:00:22,000 --> 00:00:27,000
+Camila: Y si falta un precio confiable, el plan se queda en pendiente.
+
+7
+00:00:27,000 --> 00:00:32,000
+Miguel: En Riesgo ves cuánto podrías perder en un mal día.
+
+8
+00:00:32,000 --> 00:00:37,000
+Daniela: Y el escenario adverso, antes de que pase.
+
+9
+00:00:37,000 --> 00:00:42,000
+Valeria: En el Reto concentramos casi la mitad en una acción y perdimos veintiún por ciento.
+
+10
+00:00:42,000 --> 00:00:47,000
+Camila: Ahora armas tu portafolio y lo marcas como principal.
+
+11
+00:00:47,000 --> 00:00:52,000
+Miguel: La terminal solo analiza: las operaciones reales están deshabilitadas.
+
+12
+00:00:52,000 --> 00:00:56,000
+Daniela: Es gratis y de código abierto.
+
+13
+00:00:56,000 --> 00:00:58,000
+Valeria: Liga en el perfil.
+
+14
+00:00:58,000 --> 00:00:60,000
+Camila: ¡Y no es asesoría!

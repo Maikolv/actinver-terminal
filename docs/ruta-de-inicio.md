@@ -1,4 +1,4 @@
-# Guía paso a paso para abrir Help Quote Terminal
+# Guía paso a paso para abrir Actinver Terminal
 
 [Repositorio en GitHub](https://github.com/Maikolv/help-quote-terminal)
 

@@ -18,7 +18,7 @@ internal static class ActinverTerminal
         if (!File.Exists(script))
         {
             MessageBox.Show("No encuentro el iniciador junto a este ejecutable. Mantenga el archivo .exe en la carpeta launcher del proyecto.",
-                "Help Quote Terminal", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                "Actinver Terminal", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
@@ -36,7 +36,7 @@ internal static class ActinverTerminal
             catch (Exception ex)
             {
                 MessageBox.Show("No pude iniciar la terminal: " + ex.Message,
-                    "Help Quote Terminal", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    "Actinver Terminal", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -47,7 +47,7 @@ internal static class ActinverTerminal
         if (!IsHealthy())
         {
             MessageBox.Show("La terminal no respondio. Abra iniciar-remoto.bat en el proyecto para ver el motivo, o revise data\\terminal_errores.log.",
-                "Help Quote Terminal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                "Actinver Terminal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -58,7 +58,7 @@ internal static class ActinverTerminal
         catch (Exception ex)
         {
             MessageBox.Show("La terminal esta encendida, pero no pude abrir el navegador: " + ex.Message + "\n" + LocalUrl,
-                "Help Quote Terminal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                "Actinver Terminal", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 

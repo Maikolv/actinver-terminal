@@ -1,4 +1,4 @@
-/* Help Quote Terminal — interfaz. Sin dependencias.
+/* Actinver Terminal — interfaz. Sin dependencias.
    Regla de seguridad: los datos nunca se insertan como HTML; todo se crea con textContent. */
 "use strict";
 

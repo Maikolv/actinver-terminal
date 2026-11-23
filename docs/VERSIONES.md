@@ -4,6 +4,7 @@ Generado por `scripts/versiones.py` desde `docs/versiones.json`; no lo edite a m
 
 | Versión | Fecha | Commit | Cambios | Cifras de referencia |
 |---|---|---|---|---|
+| 103 | 23-nov-2026 | — | Regreso a Actinver Terminal, informe del concurso, guiones del video y auditoría | node: 55 |
 | 102 | 17-nov-2026 | — | Perfil reiniciado tras el Reto y auditoría para el escenario real | node: 55 |
 | 101 | 17-nov-2026 | — | Terminal completa en GitHub Pages y prácticas de COATL | pytest: 962 · node: 55 · axe: 0 |
 | 100 | 15-nov-2026 | 96daead | Sin espacios en blanco, apariencia, aviso legal, reporte ejecutivo, video y stand | pytest: 954 + 2 por orden (corregido) · node: 52 |

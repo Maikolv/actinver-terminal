@@ -128,16 +128,16 @@ def test_alpaca_barras_y_opciones_con_respuesta_simulada(con, ajustes):
             return httpx.Response(200, json={"bars": {"MU": [{"t": H.isoformat().replace("+00:00", "Z"), "o": 10, "h": 12, "l": 9,
                                                                  "c": 11, "v": 1000, "vw": 10.5}]}})
         return httpx.Response(200, json={"snapshots": {
-            "MU261120C00010000": {"latestQuote": {"bp": 1.0, "ap": 1.2, "t": H.isoformat()}, "dailyBar": {"v": 300},
+            "MU271120C00010000": {"latestQuote": {"bp": 1.0, "ap": 1.2, "t": H.isoformat()}, "dailyBar": {"v": 300},
                                   "impliedVolatility": 0.4, "greeks": {"delta": 0.5}},
-            "MU261120P00010000": {"latestQuote": {"bp": 0.9, "ap": 1.1, "t": H.isoformat()}}}})
+            "MU271120P00010000": {"latestQuote": {"bp": 0.9, "ap": 1.1, "t": H.isoformat()}}}})
     env = {"ALPACA_API_KEY_ID": "id", "ALPACA_API_SECRET_KEY": "secreto"}
     a = Alpaca(ajustes, env, httpx.Client(transport=httpx.MockTransport(responder)))
     barras, p = a.barras("MU", "SIC:MU", "1Day", 30)
     assert barras[0].vwap == 10.5 and p.feed == "sip" and p.retraso_s >= 900
     contratos, p = a.cadena("MU", 10.0, 4.0)
     por = {c.tipo: c for c in contratos}
-    assert por["call"].origen_iv == "proveedor" and por["call"].strike == 10.0 and por["call"].vencimiento == "2026-11-20"
+    assert por["call"].origen_iv == "proveedor" and por["call"].strike == 10.0 and por["call"].vencimiento == "2027-11-20"
     assert por["put"].origen_iv == "calculado" and por["put"].iv > 0               # IV propia, rotulada
     assert all("secreto" not in str(r.url) for r in vistos)                         # la clave va en cabecera
 
@@ -202,13 +202,13 @@ def test_cadena_une_spot_de_la_misma_referencia_y_el_gex_se_calcula(ajustes):
         q = lambda t: {"latestQuote": {"bp": 5.0, "ap": 5.2, "t": t.isoformat()},  # noqa: E731
                        "impliedVolatility": 0.45, "greeks": {"gamma": 0.012}}
         return httpx.Response(200, json={"snapshots": {
-            "NVDA261120C00190000": q(ref), "NVDA261120P00190000": q(ref - timedelta(seconds=40)),
-            "NVDA261120C00250000": q(ref - timedelta(minutes=5))}})       # cotización vieja: no comparte referencia
+            "NVDA271120C00190000": q(ref), "NVDA271120P00190000": q(ref - timedelta(seconds=40)),
+            "NVDA271120C00250000": q(ref - timedelta(minutes=5))}})       # cotización vieja: no comparte referencia
     a = Alpaca(ajustes, {"ALPACA_API_KEY_ID": "id", "ALPACA_API_SECRET_KEY": "s"}, httpx.Client(transport=httpx.MockTransport(responder)))
     contratos, p = a.cadena("NVDA", 190.0, 4.0)
     spots = {c.contrato: (c.spot, c.moneda) for c in contratos}
-    assert spots["NVDA261120C00190000"] == spots["NVDA261120P00190000"] == (190.5, "USD")
-    assert spots["NVDA261120C00250000"] == (None, None) and "unido a 2 de 3" in p.nota
+    assert spots["NVDA271120C00190000"] == spots["NVDA271120P00190000"] == (190.5, "USD")
+    assert spots["NVDA271120C00250000"] == (None, None) and "unido a 2 de 3" in p.nota
     filas = [{**asdict(c), "interes_abierto": 1000, "multiplicador": 100} for c in contratos]   # OI fechado de Paper
     r = gex.calcular(filas)
     assert r["disponible"] and r["contratos_usados"] == 2 and r["spot"] == 190.5
@@ -222,7 +222,7 @@ def test_cadena_sin_operacion_cercana_no_inventa_spot(ajustes):
     def responder(r):
         if r.url.path.endswith("/trades"):
             return httpx.Response(200, json={"trades": []})
-        return httpx.Response(200, json={"snapshots": {"NVDA261120C00190000": {"latestQuote": {"bp": 5.0, "ap": 5.2, "t": ref.isoformat()}}}})
+        return httpx.Response(200, json={"snapshots": {"NVDA271120C00190000": {"latestQuote": {"bp": 5.0, "ap": 5.2, "t": ref.isoformat()}}}})
     a = Alpaca(ajustes, {"ALPACA_API_KEY_ID": "id", "ALPACA_API_SECRET_KEY": "s"}, httpx.Client(transport=httpx.MockTransport(responder)))
     contratos, p = a.cadena("NVDA", 190.0, 4.0)
     assert contratos[0].spot is None and "sin spot" in p.nota.lower()

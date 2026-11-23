@@ -104,3 +104,12 @@ def test_fred_usa_api_oficial_con_clave_y_filtra_rango(con, monkeypatch):
     c2, _ = cliente([(200, "observation_date,DEXMXUS\n1993-11-08,3.1520\n2026-09-17,17.18\n")])
     b2 = Fred(con, {"peticiones_por_dia": 5}, cliente=c2).historico({"id": "FX:USDMXN"}, date(2026, 9, 1), date(2026, 9, 18))
     assert [x.fecha for x in b2] == ["2026-09-17"]   # la historia completa que devuelve FRED se recorta al rango
+
+
+def test_cuota_cero_no_consulta_y_restantes_no_es_negativo(con):
+    """Caso límite de la cuota EODHD: con 0 peticiones al día no se llama al proveedor y el saldo no baja de 0."""
+    c, llamadas = cliente([(200, [])])
+    a = Eodhd(con, {"peticiones_por_dia": 0}, SECRETO, cliente=c)
+    with pytest.raises(LimiteAlcanzado):
+        a.historico({"clave": "WALMEX", "serie": "*", "mercado_operable": "BMV", "clase": "accion"}, date(2026, 1, 1), date(2026, 1, 2))
+    assert llamadas == [] and a.peticiones_restantes() == 0

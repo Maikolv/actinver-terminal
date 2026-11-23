@@ -1,5 +1,5 @@
 """Video explicativo de la terminal: diapositivas con capturas (datos simulados) y narración con la voz de Windows.
-Uso: uv run python scripts/video_terminal.py  → docs/video/help-quote-terminal.mp4 (requiere ffmpeg en PATH)."""
+Uso: uv run python scripts/video_terminal.py  → docs/video/actinver-terminal.mp4 (requiere ffmpeg en PATH)."""
 import subprocess
 import tempfile
 from pathlib import Path
@@ -8,10 +8,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 RAIZ = Path(__file__).resolve().parents[1]
 CAP = RAIZ / "docs" / "capturas"
-SALIDA = RAIZ / "docs" / "video" / "help-quote-terminal.mp4"
+SALIDA = RAIZ / "docs" / "video" / "actinver-terminal.mp4"
 W, H = 1920, 1080
 ESCENAS = [
-    (None, "Help Quote Terminal", "Terminal local de análisis de portafolios. Compara su cartera real contra portafolios optimizados, mide el riesgo y le dice qué vender, comprar o mantener. Solo informa y simula: nunca ejecuta órdenes."),
+    (None, "Actinver Terminal", "Terminal local de análisis de portafolios. Compara su cartera real contra portafolios optimizados, mide el riesgo y le dice qué vender, comprar o mantener. Solo informa y simula: nunca ejecuta órdenes."),
     ("inicio.png", "Plan de acción", "El plan de acción ordena por prioridad qué hacer hoy: primero las ventas, luego las compras, con cantidad, precio límite, motivo y la condición que invalidaría cada sugerencia. El mismo plan llega por Telegram."),
     ("mercado-despues-demo-1440.jpg", "Estación de Mercado", "La estación de mercado reúne un monitor de instrumentos, un gráfico con su proyección de diez a noventa por ciento y un inspector. Cada dato muestra su fuente, fecha y vigencia; un dato vencido nunca se presenta como actual."),
     ("portafolios.png", "Mis portafolios", "En Mis portafolios usted construye portafolios con Markowitz, máximo Sharpe o Black-Litterman, y elige uno como portafolio principal. A partir de ahí, el plan lleva su cartera a esos pesos."),
@@ -42,7 +42,7 @@ def lamina(img, titulo, destino):
         fondo.paste(cap, ((W - cap.width) // 2, 170))
     else:
         d.text((80, 480), "Datos simulados · solo informa y simula", font=fuente(48), fill=(169, 176, 187))
-    d.text((80, H - 60), "Help Quote Terminal · capturas con datos simulados", font=fuente(28), fill=(169, 176, 187))
+    d.text((80, H - 60), "Actinver Terminal · capturas con datos simulados", font=fuente(28), fill=(169, 176, 187))
     fondo.save(destino)
 
 
