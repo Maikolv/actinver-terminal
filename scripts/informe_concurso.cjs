@@ -147,7 +147,6 @@ const portada = [
 ];
 
 const indice = [h1("Índice"), new TableOfContents("Índice", { hyperlink: true, headingStyleRange: "1-2" }),
-  p([new TextRun({ text: "Al abrir en Word: clic derecho en el índice → Actualizar campo → Actualizar toda la tabla, para ver los números de página.", italics: true, size: 16, color: GRIS })]),
   new Paragraph({ children: [new PageBreak()] })];
 
 const resumen = [h1("1. Resumen ejecutivo"),
@@ -255,16 +254,18 @@ const final = [h1("4. Informe final (Entregable 3)"),
   p("Todas las cifras de este informe se comprobaron contra las capturas del portal y fuentes oficiales (SEC EDGAR, Banxico y la ficha de Actinver), y las interpretaciones, conclusiones y errores son responsabilidad del equipo. Usamos la IA para trabajar más rápido y con más orden, no para sustituir nuestro criterio."),
   new Paragraph({ children: [new PageBreak()] })];
 
+// APA 7: orden alfabético, sangría francesa y cursivas marcadas con *…*.
 const refs = [h1("5. Referencias"),
-  ...["Actinver. (2026). Reto Actinver 2026: bases y mecánica. https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica",
-    "Markowitz, H. (1952). Portfolio selection. The Journal of Finance, 7(1), 77–91. https://doi.org/10.2307/2975974",
-    "Ledoit, O., & Wolf, M. (2004). Honey, I shrunk the sample covariance matrix. The Journal of Portfolio Management, 30(4), 110–119. https://doi.org/10.3905/jpm.2004.110",
-    "DeMiguel, V., Garlappi, L., & Uppal, R. (2009). Optimal versus naive diversification: How inefficient is the 1/N portfolio strategy? The Review of Financial Studies, 22(5), 1915–1953. https://doi.org/10.1093/rfs/hhm075",
-    "Wilder, J. W. (1978). New concepts in technical trading systems. Trend Research.",
-    "Micron Technology, Inc. (2026). Form 10-K for the fiscal year ended September 3, 2026. U.S. Securities and Exchange Commission. https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000723125",
-    "TechRules / Actinver. (2026). Ficha de análisis de MU *, datos al cierre del 13 de noviembre de 2026. Catálogo de instrumentos del Reto Actinver.",
-    "U.S. Securities and Exchange Commission. (2026). EDGAR full-text search and company filings. https://www.sec.gov/edgar"]
-    .map((x) => new Paragraph({ spacing: { after: 120 }, indent: { left: 720, hanging: 720 }, children: [new TextRun(x)] })),
+  ...["Actinver. (2026). *Reto Actinver 2026: bases y mecánica*. https://www.retoactinver.com/web/reto-actinver/bases-y-mecanica",
+    "DeMiguel, V., Garlappi, L., & Uppal, R. (2009). Optimal versus naive diversification: How inefficient is the 1/N portfolio strategy? *The Review of Financial Studies, 22*(5), 1915–1953. https://doi.org/10.1093/rfs/hhm075",
+    "Ledoit, O., & Wolf, M. (2004). Honey, I shrunk the sample covariance matrix. *The Journal of Portfolio Management, 30*(4), 110–119. https://doi.org/10.3905/jpm.2004.110",
+    "Markowitz, H. (1952). Portfolio selection. *The Journal of Finance, 7*(1), 77–91. https://doi.org/10.2307/2975974",
+    "Micron Technology, Inc. (2026). *Form 10-K for the fiscal year ended September 3, 2026*. U.S. Securities and Exchange Commission. https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000723125",
+    "TechRules & Actinver. (2026). *Ficha de análisis de Micron Technology (MU), datos al cierre del 13 de noviembre de 2026* [Ficha de instrumento]. Catálogo de instrumentos del Reto Actinver.",
+    "U.S. Securities and Exchange Commission. (2026). *EDGAR: Company filings*. https://www.sec.gov/edgar",
+    "Wilder, J. W. (1978). *New concepts in technical trading systems*. Trend Research."]
+    .map((x) => new Paragraph({ spacing: { after: 120 }, indent: { left: 720, hanging: 720 },
+      children: x.split("*").map((t, k) => new TextRun({ text: t, italics: k % 2 === 1 })) })),
   new Paragraph({ children: [new PageBreak()] })];
 
 const anexos = [h1("Anexos"),
