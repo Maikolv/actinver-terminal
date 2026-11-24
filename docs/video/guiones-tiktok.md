@@ -1,5 +1,7 @@
 # Guion del video — Actinver Terminal · Finanzas en la era de la IA
 
+**Equipo:** Lynx Market (por los mercados alcista y bajista: bull y bear market).
+
 **Voces (en off, nadie aparece a cámara):** Miguel, Daniela, Valeria y Camila.
 
 **Formato:** grabación de la pantalla de la terminal con voz en off; 1920×1080 para la presentación y 1080×1920 para TikTok. Duración: 2 min 30 s.
@@ -43,7 +45,13 @@
 
 ## Video final (24-nov-2026)
 
-Las voces se grabaron y el video está montado: `uv run python scripts/video_final.py` produce cuatro archivos en `entregables/video/` (4 integrantes y Miguel y Daniela, en 16:9 y 9:16). Los audios van en `data/medios/video/voces/` y las capturas de la demo se toman con `node scripts/capturas_video.cjs`.
+Las voces se grabaron y el video está montado con estética de terminal financiera (negro, ámbar, Consolas), en cuatro archivos en `entregables/video/`: 4 integrantes y Miguel y Daniela, cada uno en 16:9 y en 9:16.
+
+1. `node scripts/grabar_terminal.cjs` graba en video la demo pública (datos simulados) y anota en qué segundo queda lista cada vista.
+2. `uv run --with matplotlib python scripts/video_paneles.py` rehace con el mismo diseño las gráficas y tablas del informe (datos reales del Reto).
+3. `uv run python scripts/video_final.py` compone cada bloque. Lleva barra de funciones y título deslizante, la grabación o el panel con revelado y acercamiento, y el panel de datos clave fila por fila. Abajo van la cinta de datos y los subtítulos sincronizados con la voz.
+
+Los audios van en `data/medios/video/voces/` (privado).
 
 ## Cómo grabar (referencia)
 

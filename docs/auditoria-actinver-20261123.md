@@ -70,6 +70,20 @@ URL: https://maikolv.github.io/help-quote-terminal/terminal/ (versión estática
   - Bruno «15-versiones» dice «13 versiones»;
   - Miguel «6» dice «coeficientes sin microdatos».
 
+### Auditoría de mejoras contra el formato oficial (24-nov)
+
+| Requisito del formato | Hallazgo | Mejora aplicada |
+|---|---|---|
+| Portada completa | Faltaban equipo, matrículas, fecha y asignatura | Equipo Lynx Market, matrículas, Finanzas Internacionales y entrega el 7-dic-2026 (archivo privado `data/medios/equipo.json`) |
+| Resumen ejecutivo de máximo media cuartilla | Pasaba de 200 palabras y no nombraba la plataforma | Reducido a unas 140 palabras, con objetivo, estrategia, plataforma y hallazgos |
+| 3.2 Relación costo-beneficio | No estaba | Rendimiento por utilidades (1 ÷ P/E = 9.6 %) frente a CETES 28 (6.19 %) |
+| 4.1 Comparación con el mercado (asignatura de Finanzas Internacionales) | Sin análisis cambiario | Riesgo cambiario con el FIX de Banxico: el peso se depreció 2.67 %, lo que amortiguó la caída de las emisoras del SIC |
+| 4.2 Justificación de mantener o vender, y conclusiones por activo | Todas decían «Mantener» y faltaban las vendidas | Conclusión por posición final y tabla de las 9 posiciones vendidas, con su resultado y motivo |
+| Anexo B, código y nickname | Pendiente | Nombre del equipo y matrículas; el código y el nickname del Reto siguen pendientes |
+| Video | Sin nombre del equipo | «Equipo Lynx Market» en la portada y en los créditos de los cuatro renders |
+
+Las referencias no incluyen los libros de la asignatura que están en Descargas: sus PDF no permiten comprobar el autor y el año completos.
+
 ### Actualización del 24-nov: video con las voces reales
 
 - **Audios:** el equipo entregó 20 grabaciones, que cubren los 13 bloques del guion de solo pantalla en las dos versiones. Se transcribieron con faster-whisper para asignar cada audio a su bloque.

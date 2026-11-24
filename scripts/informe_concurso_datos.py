@@ -84,6 +84,22 @@ def main() -> None:
                  "rend": (p["precio"] / p["costo_promedio"] - 1) if p.get("precio") and p.get("costo_promedio") else None}
                 for p in pos[cid]]
 
+    # Posiciones cerradas: última captura en la que aparecían (precio del portal en ese momento, no el de la venta).
+    finales = {p["instrumento_id"] for p in pos[final["id"]]}
+    ultima = {}
+    for c in caps:
+        for p in pos[c["id"]]:
+            ultima[p["instrumento_id"]] = (c["hora_portal"][:10], p)
+    cerradas = [{"instrumento": i, "ultima_captura": f, "costo_promedio": p["costo_promedio"], "precio": p["precio"],
+                 "rend": (p["precio"] / p["costo_promedio"] - 1) if p.get("precio") and p.get("costo_promedio") else None,
+                 "salida": next((m["fecha"] for m in todos if m["instrumento"] == i and m["a"] == 0), None)}
+                for i, (f, p) in sorted(ultima.items()) if i not in finales]
+
+    # Finanzas internacionales: tipo de cambio FIX (Banxico) del inicio al cierre y tasa CETES 28 registrada.
+    fx = [(f, v) for f, v in con.execute("SELECT fecha, valor FROM fx WHERE par='USDMXN' AND fecha BETWEEN ? AND ? ORDER BY fecha",
+                                         (inicial["hora_portal"][:10], final["hora_portal"][:10]))]
+    cetes = con.execute("SELECT valor FROM ajustes_usuario WHERE clave='cetes28'").fetchone()
+
     corte_oct = max((c for c in caps if c["hora_portal"][:10] <= "2026-10-31"), key=lambda c: c["hora_portal"])
     datos = {"archivo": ARCHIVO.name, "capital_inicial": CAPITAL, "capturas": len(caps),
              "inicial": {"hora": inicial["hora_portal"], "valor": inicial["valor_portafolio"], "efectivo": inicial["efectivo"],
@@ -94,6 +110,9 @@ def main() -> None:
              "final": {"hora": final["hora_portal"], "valor": final["valor_portafolio"], "efectivo": final["efectivo"],
                        "rend": final["valor_portafolio"] / CAPITAL - 1, "posiciones": tabla(final["id"])},
              "movimientos_octubre": movs, "movimientos_todos": todos, "riesgo": riesgo, "benchmark": bench,
+             "cerradas": cerradas,
+             "fx": {"fuente": "Banxico, tipo de cambio FIX", "inicio": fx[0], "fin": fx[-1], "variacion": fx[-1][1] / fx[0][1] - 1} if len(fx) > 1 else None,
+             "cetes28": json.loads(cetes[0]) if cetes else None,
              "serie": [{"fecha": d.date().isoformat(), "valor": float(v)} for d, v in s.items()]}
 
     # Gráfica 1: evolución del portafolio frente a NAFTRAC (base 100).
