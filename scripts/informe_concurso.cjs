@@ -7,7 +7,7 @@ const fs = require("node:fs"), path = require("node:path");
 const JSZip = require("jszip");
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, AlignmentType, ImageRun,
-  ShadingType, BorderStyle, PageBreak, TableOfContents, Header, Footer, LevelFormat, PageNumber,
+  ShadingType, BorderStyle, PageBreak, TableOfContents, Header, Footer, LevelFormat, PageNumber, ExternalHyperlink,
 } = require("docx");
 
 const RAIZ = path.resolve(__dirname, "..");
@@ -72,6 +72,25 @@ const cuadricula = (items) => {
   for (let i = 0; i < items.length; i += 2)
     filas.push(new TableRow({ cantSplit: true, children: i + 1 < items.length ? [celda(items[i]), celda(items[i + 1])] : [celda(items[i], 2)] }));
   return new Table({ width: { size: ANCHO, type: WidthType.DXA }, columnWidths: [ANCHO / 2, ANCHO / 2], alignment: AlignmentType.CENTER, rows: filas });
+};
+// Videos publicados (YouTube no listado, TikTok privado): enlaces en el archivo privado, no en el repositorio.
+const VIDEOS = eq.videos || [];
+const qr = (url) => { const q = require("qrcode-generator")(0, "M"); q.addData(url); q.make();
+  return Buffer.from(q.createDataURL(4, 8).split(",")[1], "base64"); };
+const tablaVideos = () => {
+  const borde = { style: BorderStyle.SINGLE, size: 4, color: "BFBFBF" };
+  const bordes = { top: borde, bottom: borde, left: borde, right: borde };
+  const anchos = [2300, 4738, 1800];
+  const txt = (t, o = {}) => new Paragraph({ children: [new TextRun({ text: t, size: 17, ...o })] });
+  const celda = (hijos, i, fondo) => new TableCell({ width: { size: anchos[i], type: WidthType.DXA }, borders: bordes,
+    verticalAlign: "center", margins: { top: 60, bottom: 60, left: 90, right: 90 },
+    shading: fondo ? { fill: "1F2229", type: ShadingType.CLEAR, color: "auto" } : undefined, children: hijos });
+  return new Table({ width: { size: ANCHO, type: WidthType.DXA }, columnWidths: anchos, alignment: AlignmentType.CENTER, rows: [
+    new TableRow({ tableHeader: true, children: ["Versión", "Plataforma y enlace", "Código QR"].map((t, i) => celda([txt(t, { bold: true, color: "FFFFFF" })], i, true)) }),
+    ...VIDEOS.map(([v, pl, url]) => new TableRow({ cantSplit: true, children: [
+      celda([txt(v, { bold: true })], 0),
+      celda([txt(pl), new Paragraph({ children: [new ExternalHyperlink({ link: url, children: [new TextRun({ text: url, size: 15, style: "Hyperlink" })] })] })], 1),
+      celda([new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ type: "gif", data: qr(url), transformation: { width: 96, height: 96 } })] })], 2)] }))] });
 };
 const fm = JSON.parse(fs.readFileSync(path.join(INF, "fundamentales_mu.json"), "utf8"));
 const usd = (x) => `${(x / 1e9).toLocaleString("es-MX", { maximumFractionDigits: 1 })} mil millones USD`;
@@ -222,7 +241,7 @@ const final = [h1("4. Informe final (Entregable 3)"),
   ...captura("p124_0.png", "Figura 8. Portafolio el 10-nov-2026 tras iniciar la rotación (corte O37, evidencia E068)."),
   ...captura("p126_0.png", "Figura 9. Portafolio el 11-nov-2026, 10:36 (corte O38, evidencia E070)."),
   p("Nota: las pantallas del portal no muestran el nombre del equipo; el código y el nickname se anotan en el anexo B."),
-  p("La gráfica general del comportamiento del portafolio está en la sección 4.1."),
+  p("La gráfica general del comportamiento del portafolio está en la sección 4.1. El video del proyecto, en sus cuatro versiones, está en el anexo F con enlace y código QR."),
   h2("4.4 Reflexión final"),
   vineta([b("Decisiones clave: "), "concentrar casi 50 % en MU al inicio (mayor impacto negativo) y rotar a consumo y salud en la última semana (redujo la volatilidad, pero tarde)."]),
   vineta([b("Errores: "), "no limitar el peso por emisora por debajo del tope del Reto; reaccionar a la caída del sector después y no antes; tomar posiciones pequeñas de bajo valor informativo (SLV, ACTDUAL, PFE)."]),
@@ -266,7 +285,11 @@ const anexos = [h1("Anexos"),
     fuente(`constancias en PDF emitidas por ${eq.constancias.emisor}; no muestran la fecha de emisión.`),
     cuadricula(eq.constancias.cursos.map(([c], k) => [`c${k}.png`, `${k + 1}. ${c}`]))]
     : [p("Sección opcional según el formato; el equipo no incluye evidencias de asesorías.")]),
-  h2("E. Herramienta de apoyo"), p("Actinver Terminal (proyecto independiente, sin afiliación con Grupo Actinver): https://github.com/Maikolv/help-quote-terminal. Solo informa y simula; no envía órdenes.")];
+  h2("E. Herramienta de apoyo"), p("Actinver Terminal (proyecto independiente, sin afiliación con Grupo Actinver): https://github.com/Maikolv/help-quote-terminal. Solo informa y simula; no envía órdenes."),
+  ...(VIDEOS.length ? [h2("F. Videos del proyecto"),
+  p("El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal (demo con datos simulados) y las gráficas del informe (datos reales del Reto). Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok. Escanea el código QR o abre el enlace."),
+  tablaVideos(),
+  fuente("YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también se entregan en el ZIP.")] : [])];
 
 const doc = new Document({
   creator: "Equipo Reto Actinver 2026", title: "Informe escrito — Concurso Finanzas IA",
