@@ -1,113 +1,54 @@
-# Guiones del video de Actinver Terminal (TikTok 9:16 y YouTube 16:9)
+# Guion del video — Actinver Terminal · Finanzas en la era de la IA
 
-**Versión del producto filmada:** rama `main` del repositorio a partir del commit que incluye este archivo. Nombre visible «Actinver Terminal».
+**Voces (en off, nadie aparece a cámara):** Miguel, Daniela, Valeria y Camila.
 
-**Advertencia en pantalla (obligatoria):** «Proyecto escolar independiente. No afiliado a Grupo Actinver. No es asesoría de inversión.»
+**Formato:** grabación de la pantalla de la terminal con voz en off; 1920×1080 para la presentación y 1080×1920 para TikTok. Duración: 2 min 30 s.
 
-## Antes de grabar
+**Advertencia fija en pantalla:** «Proyecto escolar independiente. No afiliado a Grupo Actinver. No es asesoría de inversión.»
 
-- **Tendencias:** no consulté TikTok Creative Center: pide iniciar sesión y no se verificó desde este equipo. Antes de publicar, revisen en https://ads.tiktok.com/creative/creativeCenter/trends:
-  - un formato vigente para México en Finanzas o Tecnología;
-  - el sonido que se use, con su licencia comercial («Commercial Music Library»).
-  Ningún guion depende de un sonido específico.
-- **Sin promesas:** no se mencionan ganancias, rendimientos futuros ni «la mejor inversión».
-- **Cifras:** las del Reto son reales y vienen del informe. Quedamos −21.56 %, frente a +10.90 % del NAFTRAC.
-- **Grabación de pantalla:** solo la demo con **DATOS SIMULADOS** (`start.bat demo`) o la versión pública. Nunca la cuenta real.
+**Cifras:** todas son reales, del archivo del Reto Actinver 2026 y del informe escrito. La pantalla de la terminal se graba en modo demostración, con datos simulados.
 
-## Funciones que se muestran (todas comprobadas en la terminal)
+## Guion
 
-| # | Función | Dónde |
-|---|---|---|
-| F1 | Abrir la terminal | `start.bat demo` o https://maikolv.github.io/help-quote-terminal/terminal/ |
-| F2 | Estación de Mercado: buscar con «/», elegir instrumento | Mercado y flujo → Mercado |
-| F3 | Proveedor, fecha y vigencia junto al precio | Inspector («Fuente», «Fecha del dato») |
-| F4 | «SIN PRECIO CONFIABLE» / decisión pendiente | Plan de acción |
-| F5 | Riesgo: VaR, CVaR, escenarios | Mi cuenta → Riesgo |
-| F6 | Mis portafolios → «Usar como principal» | Decidir → Mis portafolios |
-| F7 | Solo análisis: «Operaciones reales: deshabilitadas» | Franja superior |
-| F8 | Simulado frente a confirmado («DATOS SIMULADOS», chip «SIMULADO») | Monitor e inspector |
+| Tiempo | Voz | Texto | Pantalla |
+|---|---|---|---|
+| 0:00–0:08 | Miguel | «En el Reto Actinver 2026 manejamos un millón de pesos simulados durante seis semanas. Para decidir con datos y no con corazonadas, construimos con inteligencia artificial nuestra propia terminal: Actinver Terminal.» | Portada de la terminal con el nombre y la advertencia |
+| 0:08–0:18 | Daniela | «La programamos con asistentes de IA, Claude y Codex: ellos escribieron y probaron el código, y nosotros revisamos cada decisión. Corre en nuestra computadora, usa solo fuentes de datos gratuitas y legales, y nunca envía órdenes: las operaciones se capturan a mano.» | Franja superior: «Operaciones reales: deshabilitadas»; pestaña Ayuda |
+| 0:18–0:30 | Valeria | «Primero, el plan de inversión inicial. Elegimos seis instrumentos de tres sectores: semiconductores, con Micron, AMD y Applied Materials; el ETF del Nasdaq; y dos emisoras mexicanas, Grupo México y Alpek.» | Mis portafolios: lista de instrumentos con su sector |
+| 0:30–0:42 | Camila | «Nuestro perfil fue agresivo, con horizonte de seis semanas. La terminal reparte el capital con el modelo de Markowitz: busca el mejor rendimiento por unidad de riesgo y respeta el tope del Reto de cincuenta por ciento por emisora.» | Mis portafolios: generador con perfil «Agresivo», máximo Sharpe y gráfica de distribución |
+| 0:42–0:52 | Miguel | «Cada precio dice de dónde viene: proveedor, fecha del cierre y si está vigente o retrasado. Si no hay un precio confiable, la terminal no inventa uno: marca «sin precio confiable» y deja la decisión pendiente.» | Estación de Mercado: buscar con «/», elegir un instrumento; acercamiento a «Fuente» y «Fecha del dato» |
+| 0:52–1:04 | Daniela | «Segundo, el seguimiento. Registramos treinta y cuatro capturas del portal. Entre el 6 y el 31 de octubre hicimos nueve movimientos: entraron NVIDIA, Exxon y Novavax, y salieron el ETF y Applied Materials. Al 30 de octubre íbamos en menos diez punto ocho por ciento.» | Boletas e historial; tabla de movimientos |
+| 1:04–1:16 | Valeria | «El análisis técnico de Micron, nuestra mayor posición: el precio cayó por debajo de sus medias de veinte y cincuenta días, el MACD quedó bajo su señal y el RSI en cuarenta y dos. Es una tendencia bajista, sin sobreventa.» | Velas de MU con medias móviles, RSI y MACD |
+| 1:16–1:26 | Camila | «Para el análisis fundamental, la terminal abre la ficha de cada emisora con sus reportes en la SEC; de ahí salen la liquidez, el apalancamiento, la rentabilidad y la razón precio-utilidad.» | Ficha técnica de MU; Mesa de investigación con publicaciones de la SEC |
+| 1:26–1:40 | Miguel | «Tercero, el riesgo. La terminal mide la desviación estándar y el VaR: en diecinueve de cada veinte días, la pérdida diaria no pasó de cinco punto tres por ciento. Esa volatilidad venía de concentrar casi la mitad del dinero en una sola acción.» | Pestaña Riesgo: VaR, CVaR, contribución por emisora |
+| 1:40–1:54 | Daniela | «El resultado final: el portafolio cerró en setecientos ochenta y cuatro mil pesos, menos veintiuno punto seis por ciento. En el mismo periodo, el NAFTRAC, que replica al índice de la Bolsa Mexicana, subió diez punto nueve por ciento. El mercado nos ganó.» | Gráfica de evolución del portafolio frente a NAFTRAC |
+| 1:54–2:06 | Valeria | «En la última semana rotamos hacia consumo y salud: FEMSA, Coca-Cola FEMSA, Arca Continental, Merck y Eli Lilly. Hoy la terminal permite elegir un portafolio principal y el plan dice qué vender, comprar o mantener, con su motivo.» | Mis portafolios → «Usar como principal»; Plan de acción |
+| 2:06–2:20 | Camila | «Lo que aprendimos: la IA acelera el análisis, pero no adivina el futuro. Ningún modelo superó fuera de muestra a repartir el dinero en partes iguales, y la terminal lo dice. El riesgo de concentración se mide antes de buscar rendimiento.» | Pestaña Robustez o Modelos: comparación contra 1/N |
+| 2:20–2:30 | Miguel | «Actinver Terminal: datos con procedencia, riesgo medido y decisiones informadas. Pruébala gratis en GitHub. No es asesoría de inversión.» | Página pública en GitHub Pages; advertencia legal |
 
----
+## Correspondencia con el proyecto «Finanzas en la era de la IA»
 
-## Versión A — Miguel y Daniela (60 s; corte corto de 30 s marcado con ✂)
+| Requisito del informe | Dónde lo cubre el video |
+|---|---|
+| Resumen y uso de IA | 0:00–0:18 |
+| Plan inicial: al menos cinco acciones, sector, perfil, horizonte y distribución | 0:18–0:42 |
+| Plataforma y monitoreo | 0:42–0:52 |
+| Seguimiento del 6 al 31 de octubre: movimientos y rentabilidad | 0:52–1:04 |
+| Análisis técnico (medias, RSI, MACD) | 1:04–1:16 |
+| Análisis fundamental (liquidez, apalancamiento, rentabilidad, P/E) | 1:16–1:26 |
+| Riesgo (desviación estándar, VaR) | 1:26–1:40 |
+| Resultado final y comparación contra el mercado | 1:40–1:54 |
+| Decisiones por acción | 1:54–2:06 |
+| Reflexión, errores y aprendizaje con IA | 2:06–2:20 |
 
-| Tiempo | Plano y encuadre | Quién | Texto hablado (exacto) | En pantalla / B-roll | Sobreimpreso |
-|---|---|---|---|---|---|
-| 0–3 ✂ | Primer plano, cámara frontal | Daniela | «Perdimos veintiún por ciento en el Reto Actinver… y por eso construimos esto.» | Daniela mira a cámara; corte seco a la terminal | «−21.56 % 😬» |
-| 3–8 ✂ | Plano medio, los dos | Miguel | «Una terminal que te dice de dónde viene cada precio. Y cuándo no confiar en él.» | Grabación de pantalla: F1 | «Actinver Terminal · proyecto escolar» |
-| 8–16 ✂ | Pantalla completa | Daniela (voz en off) | «Buscas una emisora con la diagonal, la eliges y a la derecha ves la fuente, la fecha y si el dato está vigente.» | F2 → F3: teclear «/», «MU», Enter; zoom al inspector | «Fuente · fecha · vigencia» |
-| 16–24 | Pantalla + Miguel en esquina | Miguel | «Si no hay un precio confiable, no te inventa uno: te dice SIN PRECIO CONFIABLE y no te sugiere comprar.» | F4: plan con «pendiente» | «Sin dato = sin orden» |
-| 24–34 | Pantalla completa | Daniela | «Aquí está el riesgo: cuánto podrías perder en un mal día y qué pasa en un escenario adverso.» | F5: VaR/CVaR y escenarios | «VaR = pérdida en 1 de cada 20 días» |
-| 34–44 | Plano medio | Miguel | «Nuestro error fue meter casi la mitad del dinero en una sola acción. Ahora la terminal te avisa la concentración antes.» | B-roll: gráfica del informe (evolución vs NAFTRAC) | «Concentración = riesgo» |
-| 44–52 | Pantalla | Daniela | «Armas tu portafolio, lo marcas como principal y el plan te dice qué vender, comprar o mantener.» | F6: botón «Usar como principal» → plan | «Solo informa y simula» |
-| 52–57 | Plano medio, los dos | Miguel | «Y no envía órdenes: solo analiza. La decisión siempre es tuya.» | F7: zoom a «Operaciones reales: deshabilitadas» | «0 órdenes enviadas» |
-| 57–60 ✂ | Los dos a cámara | Daniela y Miguel | «Pruébala gratis, liga en el perfil.» | Portada del sitio | CTA + advertencia legal |
+## Video final (24-nov-2026)
 
-**Corte de 30 s (✂):** 0–8 + 8–16 + 57–60, más un puente de Miguel: «Y si no hay dato, no te inventa nada.» sobre F4 (4 s).
+Las voces se grabaron y el video está montado: `uv run python scripts/video_final.py` produce cuatro archivos en `entregables/video/` (4 integrantes y Miguel y Daniela, en 16:9 y 9:16). Los audios van en `data/medios/video/voces/` y las capturas de la demo se toman con `node scripts/capturas_video.cjs`.
 
-## Versión B — Miguel, Daniela, Valeria y Camila (60 s; intervenciones equilibradas: 4 cada quien)
+## Cómo grabar (referencia)
 
-| Tiempo | Plano | Quién | Texto hablado (exacto) | Pantalla / B-roll | Sobreimpreso |
-|---|---|---|---|---|---|
-| 0–3 | Primer plano | Valeria | «¿Confiarías en un precio sin saber de dónde viene?» | Valeria a cámara | «¿De dónde sale ese precio?» |
-| 3–7 | Plano medio grupal | Camila | «Nosotras tampoco. Por eso hicimos Actinver Terminal.» | Corte a portada | Advertencia legal |
-| 7–12 | Pantalla | Miguel | «Abres, buscas una emisora con la diagonal y la eliges.» | F1 → F2 | «/ para buscar» |
-| 12–17 | Pantalla, zoom | Daniela | «A la derecha: proveedor, fecha del cierre y si está vigente o retrasado.» | F3 | «Procedencia visible» |
-| 17–22 | Pantalla | Valeria | «Aquí dice DATOS SIMULADOS: es la demo, no un precio real.» | F8 | «Simulado ≠ confirmado» |
-| 22–27 | Pantalla | Camila | «Y si falta un precio confiable, el plan se queda en pendiente.» | F4 | «Sin dato = sin orden» |
-| 27–32 | Pantalla | Miguel | «En Riesgo ves cuánto podrías perder en un mal día.» | F5 VaR | «VaR 95 %» |
-| 32–37 | Pantalla | Daniela | «Y el escenario adverso, antes de que pase.» | F5 escenarios | — |
-| 37–42 | Plano medio | Valeria | «En el Reto concentramos casi la mitad en una acción y perdimos veintiún por ciento.» | B-roll gráfica del informe | «Lección: diversificar» |
-| 42–47 | Pantalla | Camila | «Ahora armas tu portafolio y lo marcas como principal.» | F6 | — |
-| 47–52 | Pantalla | Miguel | «La terminal solo analiza: las operaciones reales están deshabilitadas.» | F7 | «Solo análisis» |
-| 52–56 | Plano grupal | Daniela | «Es gratis y de código abierto.» | Repositorio de GitHub | — |
-| 56–58 | Grupal | Valeria | «Liga en el perfil.» | Portada | CTA |
-| 58–60 | Grupal | Camila | «¡Y no es asesoría!» (risa) | Logo + advertencia | Advertencia legal |
-
-**Corte de 30 s:** 0–12, 17–27 y 52–60.
-
-## Storyboard (cuadros clave)
-
-1. **Gancho:** rostro a cámara con la cifra real (A: −21.56 %; B: pregunta).
-2. **Portada** de la terminal con la advertencia legal.
-3. **Búsqueda con «/»** en la Estación (zoom al campo de búsqueda).
-4. **Inspector** con el recuadro rojo en «Fuente» y «Fecha del dato».
-5. **Plan** con «pendiente» / «SIN PRECIO CONFIABLE».
-6. **Riesgo** (VaR / escenarios).
-7. **Mis portafolios** → «Usar como principal».
-8. **Franja** «Operaciones reales: deshabilitadas».
-9. **CTA** y advertencia.
-
-## Lista de tomas y utilería
-
-- Cámara de teléfono a 1080×1920 (vertical) y 1920×1080 (horizontal), por separado; **reencuadrar, no recortar**.
-- Grabación de pantalla con OBS: 1920×1080 para la versión horizontal y 1080×1920 para la vertical (ventana del navegador a 540×960 con zoom de 200 %).
-- Laptop con la demo, micrófono de solapa o el del teléfono a 15 cm, luz frontal suave, fondo neutro.
-- Playera o ropa negra o gris (paleta de la terminal).
-
-## Subtítulos
-
-`docs/video/A-60s.srt` y `docs/video/B-60s.srt`, generados con los tiempos de arriba.
-
-## Caption y hashtags
-
-«Perdimos 21 % en el Reto Actinver y construimos una terminal que te dice de dónde viene cada precio (y cuándo no confiar). Proyecto escolar, gratis, sin afiliación con Actinver; no es asesoría. #finanzas #inversiones #IA #educacionfinanciera #UVM»
-
-## Créditos
-
-- **Equipo:** Miguel, Daniela, Valeria y Camila. PENDIENTE: apellidos.
-- **Herramienta:** Actinver Terminal (código abierto).
-- **Música:** PENDIENTE; solo de la biblioteca comercial de TikTok o con licencia libre.
-
-## Permisos
-
-- [ ] Consentimiento de imagen y voz firmado por cada integrante.
-- [ ] Música con licencia comercial (TikTok Commercial Music Library o CC0).
-- [ ] Ningún logo de Actinver ni de Bloomberg en pantalla, salvo el nombre del proyecto con su advertencia.
-- [ ] Publicar en TikTok o enviar el video fuera del equipo requiere autorización específica.
-
-## Estado de producción
-
-- **Guiones, storyboard, lista de tomas, caption y subtítulos:** listos.
-- **Cuatro videos finales** (A vertical, A horizontal, B vertical, B horizontal): **no se pueden producir todavía**, porque no hay grabaciones de Miguel, Daniela, Valeria y Camila para esta terminal. Los audios que hay en `Downloads` son de COATL.
-- **Montajes provisionales:** en `docs/video/provisional/` hay uno vertical y uno horizontal de la versión A, rotulados «MONTAJE PROVISIONAL — voz sintética», para ensayar ritmos y encuadres. No son los videos finales.
+- **Pantalla:** OBS o la grabadora de Windows (Win + Alt + R), con la terminal en modo demostración (`start.bat demo`). Nunca la cuenta real.
+- **Voces:** cada quien graba sus líneas en un lugar sin eco, con el teléfono a 15 cm, un archivo por línea, nombrado con el tiempo y el nombre (por ejemplo `0-00_Miguel.m4a`).
+- **Gráficas del Reto** (evolución frente a NAFTRAC y técnico de MU): salen del informe escrito; se muestran como imagen en sus segmentos.
+- **Música:** solo de la biblioteca comercial de TikTok o con licencia libre, a volumen bajo.
+- **Publicar** en TikTok o fuera del equipo requiere autorización.

@@ -15,6 +15,9 @@ const INF = path.join(RAIZ, "data", "medios", "informe");
 const PLANTILLA = path.join(RAIZ, "data", "medios", "plantilla", "plantilla.docx");
 const SALIDA = path.join(RAIZ, "entregables", "Informe_Concurso_Finanzas_IA.docx");
 const d = JSON.parse(fs.readFileSync(path.join(INF, "datos.json"), "utf8"));
+// Datos personales del equipo: archivo privado fuera del repositorio (data/medios/equipo.json).
+const RUTA_EQ = path.join(RAIZ, "data", "medios", "equipo.json");
+const eq = fs.existsSync(RUTA_EQ) ? JSON.parse(fs.readFileSync(RUTA_EQ, "utf8")) : {};
 
 const FUENTE = "Century Gothic", ROJO = "B3261E", GRIS = "4A505A";
 const mxn = (x) => x == null ? "—" : `$${Number(x).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -49,6 +52,16 @@ function tabla(cab, filas, anchos) {
 const imagen = (archivo, ancho, alto) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 60 },
   children: [new ImageRun({ type: "png", data: fs.readFileSync(path.join(INF, archivo)), transformation: { width: ancho, height: alto } })] });
 
+// Capturas originales del portal: extraídas de la «Cronología integral» del equipo (data/medios/informe/portal).
+const captura = (archivo, pie, ancho = 560) => {
+  const buf = fs.readFileSync(path.join(INF, "portal", archivo));
+  const w = buf.readUInt32BE(16), hh = buf.readUInt32BE(20);
+  return [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 }, keepNext: true,
+    children: [new ImageRun({ type: "png", data: buf, transformation: { width: ancho, height: Math.round(hh * ancho / w) } })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: pie, italics: true, size: 16, color: GRIS })] })];
+};
+const fm = JSON.parse(fs.readFileSync(path.join(INF, "fundamentales_mu.json"), "utf8"));
+const usd = (x) => `${(x / 1e9).toLocaleString("es-MX", { maximumFractionDigits: 1 })} mil millones USD`;
 const ini = d.inicial, oct = d.corte_octubre, fin = d.final, r = d.riesgo, bm = d.benchmark, t = d.tecnico_mu;
 const ARGUMENTO = {
   "SIC:MU": "Líder en memoria (DRAM/HBM) para centros de datos de IA; mayor rendimiento esperado del ranking de la terminal en la fecha de elección.",
@@ -64,8 +77,11 @@ const portada = [
     children: [new TextRun({ text: "Concurso Finanzas IA — Reto Actinver 2026", bold: true, size: 40, color: ROJO })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 }, children: [new TextRun({ text: "Informe escrito", size: 30 })] }),
   ...[["Nombre del concurso", "Reto Actinver 2026 — Concurso Finanzas IA"],
-    ["Nombre del equipo", null], ["Nombres completos de los integrantes", null], ["Matrículas y carrera", null],
-    ["Campus", null], ["Fecha de entrega", null], ["Nombre del docente", null], ["Asignatura", null]].map(([k, v]) =>
+    ["Nombre del equipo", null],
+    ["Nombres completos de los integrantes", eq.integrantes && eq.integrantes.join(", ").replace(/, ([^,]+)$/, " y $1")],
+    ["Carrera", eq.carrera], ["Matrículas", eq.matriculas],
+    ["Campus", eq.campus], ["Fecha de entrega", eq.fecha_entrega],
+    ["Nombre del docente", eq.docente], ["Asignatura", eq.asignatura]].map(([k, v]) =>
     new Paragraph({ spacing: { after: 140 }, children: [b(`${k}: `), v ? new TextRun(v) : pend("completar (dato del equipo; no se inventa)")] })),
   new Paragraph({ children: [new PageBreak()] }),
 ];
@@ -94,7 +110,9 @@ const plan = [h1("2. Plan de inversión inicial (Entregable 1)"),
   imagen("distribucion_inicial.png", 400, 277),
   fuente("captura del portal del 5-oct-2026; gráfica generada por la terminal."),
   h2("2.4 Simulación y monitoreo"),
-  p([pend("capturas de pantalla iniciales de la plataforma Actinver — insertar aquí las imágenes del portal del 5-oct-2026 que el equipo tomó (la terminal guardó el texto de la captura, no la imagen).")]),
+  p("Capturas iniciales del portal del Reto (primer día de la competencia):"),
+  ...captura("p068_0.png", "Figura 1. Portafolio al 5-oct-2026, 15:08: valuación $999,136.55 (corte O07, evidencia E012)."),
+  ...captura("p069_0.png", "Figura 2. Detalle de posiciones al 5-oct-2026 (corte O07, evidencia E013)."),
   p(`Observaciones: en el primer día el portafolio pasó de ${mxn(ini.valor)} a ${mxn(d.serie[1]?.valor)}; MU concentraba ${pct(ini.posiciones[0].peso, 1)} del valor, cerca del tope de 50 % del Reto. El 6 y 7 de octubre se vendieron QQQ y AMAT y se compraron NVIDIA, Exxon Mobil y Novavax para ajustar la tesis.`),
   new Paragraph({ children: [new PageBreak()] })];
 
@@ -105,16 +123,21 @@ const seg = [h1("3. Informe de seguimiento intermedio (Entregable 2)"),
   p([b("Valor de la cartera al corte: "), `${mxn(oct.valor)} (${fecha(oct.hora)}). `, b("Rentabilidad acumulada: "), pct(oct.rend), "."]),
   tabla(["Instrumento", "Títulos", "Costo prom.", "Precio", "Valor", "Rend."], oct.posiciones.map((x) => [sym(x.instrumento), num(x.titulos), mxn(x.costo_promedio), mxn(x.precio), mxn(x.valor), pct(x.rend, 1)]), [1300, 1000, 1550, 1550, 1838, 1600]),
   fuente("captura del portal del 30-oct-2026 registrada en la terminal (precios en MXN; SIC convertido por el portal)."),
+  ...captura("p114_0.png", "Figura 3. Portafolio al 30-oct-2026, 14:00 (corte O32, evidencia E058)."),
+  ...captura("p115_0.png", "Figura 4. Posiciones al 30-oct-2026 (corte O32, evidencia E059)."),
   h2("3.2 Análisis fundamental — Micron Technology (MU)"),
-  p("Se eligió MU por ser la mayor posición. Indicadores solicitados:"),
-  tabla(["Indicador", "Valor", "Fuente"], [
-    ["Liquidez (razón circulante)", "PENDIENTE", "10-K/10-Q de MU en SEC EDGAR"],
-    ["Apalancamiento (deuda/capital)", "PENDIENTE", "10-K/10-Q de MU en SEC EDGAR"],
-    ["Operatividad (rotación de activos)", "PENDIENTE", "10-K/10-Q de MU en SEC EDGAR"],
-    ["Rentabilidad (margen neto, ROE)", "PENDIENTE", "10-K/10-Q de MU en SEC EDGAR"],
-    ["P/E", "PENDIENTE", "precio ÷ utilidad por acción de 12 meses (SEC + cierre)"],
-    ["Crecimiento en ventas y utilidades", "PENDIENTE", "comparar los dos últimos 10-K"]], [3200, 1800, 3838]),
-  p([pend("estos valores no se guardaron en la terminal; obtenerlos del último 10-K de Micron (sec.gov/edgar, CIK 0000723125) y anotar fecha y fórmula. No se inventan.")]),
+  p(`Se eligió MU por ser la mayor posición. Las razones se calcularon con el reporte anual 10-K del ejercicio terminado el ${fm.ejercicio} (presentado ante la SEC el ${fm.presentado}): ventas de ${usd(fm.ventas)} y utilidad neta de ${usd(fm.utilidad_neta)}.`),
+  tabla(["Indicador", "Valor", "Cálculo"], [
+    ["Liquidez (razón circulante)", `${fm.razon_circulante.toFixed(2)} veces`, `activo circulante ${usd(fm.activo_circulante)} ÷ pasivo circulante ${usd(fm.pasivo_circulante)}`],
+    ["Apalancamiento (pasivo/capital)", `${fm.pasivo_capital.toFixed(2)} veces`, `pasivo total ${usd(fm.pasivos)} ÷ capital contable ${usd(fm.capital)}; deuda de largo plazo ${usd(fm.deuda_largo_plazo)}`],
+    ["Operatividad (rotación de activos)", `${fm.rotacion_activos.toFixed(2)} veces`, "ventas ÷ activo total promedio de los dos últimos cierres"],
+    ["Rentabilidad: margen neto", pct(fm.margen_neto, 1), "utilidad neta ÷ ventas"],
+    ["Rentabilidad: ROE", pct(fm.roe, 1), "utilidad neta ÷ capital contable promedio"],
+    ["P/E", `${(t.cierre / fm.bpa_diluido_usd).toFixed(1)} veces`, `cierre de ${num(t.cierre)} USD (${t.hasta}) ÷ utilidad diluida por acción de ${num(fm.bpa_diluido_usd)} USD`],
+    ["Crecimiento en ventas", pct(fm.crec_ventas, 1), `ejercicio ${fm.ejercicio.slice(0, 4)} frente a ${fm.ejercicio_anterior.slice(0, 4)}`],
+    ["Crecimiento en utilidad neta", pct(fm.crec_utilidad, 1), `de ${usd(fm.utilidad_anterior)} a ${usd(fm.utilidad_neta)}`]], [2700, 1500, 4638]),
+  fuente(`${fm.fuente}, número de acceso ${fm.accn}; cierre de MU guardado por Actinver Terminal (Tiingo/Alpaca).`),
+  p("Interpretación: Micron tenía liquidez holgada (más de tres dólares de activo circulante por cada dólar de deuda de corto plazo), apalancamiento bajo y una rentabilidad excepcional por el auge de la memoria para inteligencia artificial; con un P/E cercano a 10 veces, la acción no se veía cara por utilidades. El problema no fue la empresa sino el precio: un negocio cíclico en su punto más alto de utilidades suele cotizar con múltiplos bajos justo antes de una corrección, y la cartera dependía demasiado de esa sola acción."),
   h2("3.3 Análisis técnico — MU, últimos 3 meses"),
   imagen("tecnico_mu.png", 560, 420),
   fuente(`${t.fuente}; ${t.desde} a ${t.hasta}.`),
@@ -123,6 +146,8 @@ const seg = [h1("3. Informe de seguimiento intermedio (Entregable 2)"),
     ["Media móvil 20 / 50", `${num(t.sma20)} / ${num(t.sma50)} USD`, t.cierre < t.sma20 && t.sma20 < t.sma50 ? "Precio debajo de ambas medias y la de 20 bajo la de 50: tendencia bajista" : "Tendencia mixta"],
     ["RSI 14 (Wilder)", num(t.rsi14), t.rsi14 < 30 ? "Sobreventa" : t.rsi14 > 70 ? "Sobrecompra" : "Zona neutral, sin sobreventa"],
     ["MACD (12-26-9)", `${num(t.macd)} / señal ${num(t.senal)}`, t.macd < t.senal ? "MACD bajo su señal: impulso negativo" : "MACD sobre su señal: impulso positivo"]], [2600, 2600, 3638]),
+  p("La ficha de Actinver (TechRules) del 13-nov-2026 coincide con esta lectura: tendencia de corto y mediano plazo «muy bajista», riesgo «extremo», volatilidad de 73.74 %, beta de 1.80 frente al índice de mercados desarrollados, VaR a una semana de −15.60 % y un retroceso de −32.11 % desde el máximo anual."),
+  fuente("Catálogo de fichas Actinver / TechRules, recopilación del 18-nov-2026 (ficha de MU, datos al cierre del 13-nov-2026)."),
   p("Interpretación: a mediados de noviembre MU seguía en tendencia bajista (precio bajo sus medias y MACD negativo), sin señal de sobreventa extrema; técnicamente no había razón para aumentar la posición, lo que respalda la decisión de reducir la concentración en tecnología."),
   new Paragraph({ children: [new PageBreak()] })];
 
@@ -145,7 +170,12 @@ const final = [h1("4. Informe final (Entregable 3)"),
   vineta([b("Ganadoras: "), "Exxon Mobil (+7.5 % sobre costo), Arca Continental y Chevron (≈ +2 %)."]),
   vineta([b("Perdedoras: "), "Novavax (−19.3 %) y Moderna (−8.1 %). En tecnología, MU era la posición de mayor peso cuando cayó el sector (ver la caída del 3 al 5 de noviembre en la serie del anexo C)."]),
   h2("4.3 Capturas y evidencias"),
-  p([pend("evidencia del portafolio final con nombre visible del equipo y capturas clave de operaciones — insertar las imágenes del portal del 12-nov-2026 y de las operaciones del 10–12 de noviembre.")]),
+  ...captura("p131_0.png", "Figura 5. Portafolio final al 12-nov-2026, 22:54: valuación $784,440.07, −21.56 % (corte O40, evidencia E075)."),
+  ...captura("p132_0.png", "Figura 6. Posiciones finales al 12-nov-2026 (corte O40, evidencia E076)."),
+  ...captura("p133_0.png", "Figura 7. Continuación de las posiciones finales (corte O40, evidencia E077)."),
+  ...captura("p124_0.png", "Figura 8. Portafolio el 10-nov-2026 tras iniciar la rotación (corte O37, evidencia E068)."),
+  ...captura("p126_0.png", "Figura 9. Portafolio el 11-nov-2026, 10:36 (corte O38, evidencia E070)."),
+  p("Nota: las pantallas del portal no muestran el nombre del equipo; el código y el nickname se anotan en el anexo B."),
   p("La gráfica general del comportamiento del portafolio está en la sección 4.1."),
   h2("4.4 Reflexión final"),
   vineta([b("Decisiones clave: "), "concentrar casi 50 % en MU al inicio (mayor impacto negativo) y rotar a consumo y salud en la última semana (redujo la volatilidad, pero tarde)."]),
@@ -160,12 +190,18 @@ const refs = [h1("5. Referencias"),
     "Ledoit, O., & Wolf, M. (2004). Honey, I shrunk the sample covariance matrix. The Journal of Portfolio Management, 30(4), 110–119. https://doi.org/10.3905/jpm.2004.110",
     "DeMiguel, V., Garlappi, L., & Uppal, R. (2009). Optimal versus naive diversification: How inefficient is the 1/N portfolio strategy? The Review of Financial Studies, 22(5), 1915–1953. https://doi.org/10.1093/rfs/hhm075",
     "Wilder, J. W. (1978). New concepts in technical trading systems. Trend Research.",
+    "Micron Technology, Inc. (2026). Form 10-K for the fiscal year ended September 3, 2026. U.S. Securities and Exchange Commission. https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000723125",
+    "TechRules / Actinver. (2026). Ficha de análisis de MU *, datos al cierre del 13 de noviembre de 2026. Catálogo de instrumentos del Reto Actinver.",
     "U.S. Securities and Exchange Commission. (2026). EDGAR full-text search and company filings. https://www.sec.gov/edgar"]
     .map((x) => new Paragraph({ spacing: { after: 120 }, indent: { left: 720, hanging: 720 }, children: [new TextRun(x)] })),
   new Paragraph({ children: [new PageBreak()] })];
 
 const anexos = [h1("Anexos"),
-  h2("A. Capturas completas de la plataforma Actinver"), p([pend("insertar las capturas del portal (el archivo de la terminal tiene 34 registros de texto del 30-sep al 12-nov-2026).")]),
+  h2("A. Capturas completas de la plataforma Actinver"),
+  p("El expediente completo está en la «Cronología integral de mi portafolio» (277 páginas): 40 cortes fechados del 30-sep al 12-nov-2026, con 77 imágenes originales del portal (evidencias E001 a E077), el calendario diario y las fichas de los 31 instrumentos. Aquí se incluyen las capturas del 12-nov por la mañana, antes del cierre final."),
+  ...captura("p128_0.png", "Figura A1. Portafolio al 12-nov-2026, 09:15 (corte O39, evidencia E072)."),
+  ...captura("p129_0.png", "Figura A2. Posiciones al 12-nov-2026, 09:15 (corte O39, evidencia E073)."),
+  ...captura("p130_0.png", "Figura A3. Continuación de las posiciones al 12-nov-2026, 09:15 (corte O39, evidencia E074)."),
   h2("B. Códigos de equipo y nickname"), p([pend("código del equipo y nickname en el Reto.")]),
   h2("C. Serie del valor del portafolio (última captura de cada día)"),
   tabla(["Fecha", "Valor (MXN)", "Rend. acumulado"], d.serie.map((x) => [x.fecha, mxn(x.valor), pct(x.valor / d.capital_inicial - 1)]), [2800, 3200, 2838]),

@@ -36,11 +36,12 @@ Sistema visual (DESIGN.md, sin cambios):
 | MU al 13-nov | RSI 42.5; precio bajo las medias de 20 y 50 días; MACD bajo su señal |
 
 - **Movimientos:** 9 entre el 6 y el 31 de octubre; la rotación del 10–12 de noviembre, completa.
-- **PENDIENTE (no se inventa):**
-  - portada: equipo, nombres completos, matrículas, carrera, campus, fecha, docente y asignatura;
-  - capturas del portal (la terminal guardó el texto, no la imagen);
-  - indicadores fundamentales de MU (último 10-K en SEC EDGAR);
-  - código del equipo y nickname.
+- **Completado el 24-nov** con los archivos que entregó el equipo:
+  - portada: nombres completos, carrera, campus y docente, tomados del reporte del Proyecto Integral IA;
+  - 14 capturas originales del portal (5-oct, 30-oct, 10, 11 y 12-nov), extraídas de la «Cronología integral» (`data/medios/informe/portal/`);
+  - fundamentales de MU desde el 10-K del ejercicio 2026 en SEC EDGAR (`scripts/informe_fundamentales_mu.py`): razón circulante 3.31, pasivo/capital 0.42, rotación de activos 0.96, margen neto 63.8 %, ROE 88.3 %, P/E 10.5;
+  - lectura de la ficha TechRules de MU del 13-nov (riesgo extremo, beta 1.80, VaR semanal −15.60 %).
+- **PENDIENTE (no aparece en ningún archivo; no se inventa):** nombre del equipo, matrículas, fecha de entrega, asignatura, código del equipo y nickname.
 
 ## (c) Paridad local frente a GitHub Pages
 
@@ -68,6 +69,14 @@ URL: https://maikolv.github.io/help-quote-terminal/terminal/ (versión estática
 - **COATL:** el video final con las voces reales ya lo generó otra sesión (`coatl/entregables/COATL_Video.mp4`, 04:08 del 23-nov). Dos grabaciones quedaron fuera por desactualizadas, y no se usaron para no afirmar datos falsos:
   - Bruno «15-versiones» dice «13 versiones»;
   - Miguel «6» dice «coeficientes sin microdatos».
+
+### Actualización del 24-nov: video con las voces reales
+
+- **Audios:** el equipo entregó 20 grabaciones, que cubren los 13 bloques del guion de solo pantalla en las dos versiones. Se transcribieron con faster-whisper para asignar cada audio a su bloque.
+- **Generador:** `scripts/video_final.py` produce cuatro renders en `entregables/video/`: 4 integrantes y Miguel y Daniela, cada uno en horizontal (1920×1080) y vertical (1080×1920).
+- **Contenido de cada cuadro:** subtítulos del guion y una etiqueta que distingue «DATOS REALES DEL RETO» de «DEMO · DATOS SIMULADOS».
+- **Créditos:** muestran a los cuatro integrantes sin atribuir cada voz. No se pudo comprobar de quién son las grabaciones «Calle Bosques de México», que corresponden a los bloques 4, 8 y 12.
+- **Capturas de la demo:** se tomaron de la demo pública con `scripts/capturas_video.cjs`.
 
 ## (e) Recursos incorporados
 
