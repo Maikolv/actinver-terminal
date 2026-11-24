@@ -28,11 +28,14 @@ GUION = RAIZ / "docs" / "video" / "guiones-tiktok.md"
 MED = RAIZ / "data" / "medios"
 VOCES, GRAB, PAN = MED / "video" / "voces", MED / "video" / "grabaciones", MED / "video" / "paneles"
 SAL = RAIZ / "entregables" / "video"
-FPS = 30
+FPS = 25  # igual que las grabaciones: sin cuadros duplicados
 
-NEGRO, BARRA, AMBAR, BLANCO, GRIS, LINEA = (0, 0, 0), (18, 18, 18), (255, 160, 40), (232, 232, 232), (138, 138, 138), (48, 48, 48)
-VERDE, ROJO, AZUL = (74, 246, 195), (255, 67, 61), (79, 195, 247)
-REAL, DEMO = ("DATOS REALES DEL RETO", VERDE), ("DEMO · DATOS SIMULADOS", AMBAR)
+# Paleta de Actinver Terminal (DESIGN.md, tema oscuro): fondos casi negros, rojo de identidad y texto claro.
+NEGRO, BARRA, LINEA = (9, 10, 12), (18, 20, 25), (52, 57, 66)  # --fondo, --superficie, --borde
+AMBAR, SOLIDO, MARCA = (240, 106, 106), (180, 38, 38), (217, 72, 72)  # --acento (texto), --acento-solido, --acento-grafico
+BLANCO, GRIS = (243, 244, 246), (180, 186, 196)  # --texto, --texto-2
+VERDE, ROJO, AZUL = (76, 195, 138), (242, 119, 122), (243, 244, 246)  # --positivo, --negativo; la terminal no usa azul
+REAL, DEMO = ("DATOS REALES DEL RETO", VERDE), ("DEMO · DATOS SIMULADOS", GRIS)
 
 VERSIONES = {
     "4_integrantes": ["Miguel 1", "Audio pt1", "valeria min 018-030", "Calle Bosques de México", "Miguel 2", "Audio pt2",
@@ -42,8 +45,6 @@ VERSIONES = {
                          "Audio pt2", "Miguel v Daniela 4", "Cuarta Privada Moras 6", "Miguel v Daniela 5", "Audio pt3",
                          "Miguel v Daniela 6", "Cuarta Privada Moras 7", "Miguel v Daniela 7"],
 }
-# Recorte horizontal de cada grabación (1600×900): x inicial; el ancho útil es 1240 px.
-RECORTE_X = {"inicio": 180, "mercado": 100}
 
 _EQ = MED / "equipo.json"
 EQ = json.loads(_EQ.read_text(encoding="utf-8")) if _EQ.exists() else {}
@@ -100,7 +101,7 @@ def bloques() -> list[dict]:
                     ("NAFTRAC", pct(bm["rendimiento"]), VERDE), ("DIFERENCIA", f"{(fin['rend'] - bm['rendimiento']) * 100:+.2f} pp", ROJO)]),
         dict(cod="PORT", titulo="ROTACIÓN · CONSUMO Y SALUD", origen=REAL, items=[("panel", "rotacion"), ("rec", "plan")],
              datos=[(sym(x["instrumento"]), f"{x['peso'] * 100:.1f} %", col(x["rend"] or 0)) for x in finales]),
-        dict(cod="BACK", titulo="LO QUE APRENDIMOS", origen=DEMO, items=[("rec", "propuestas"), ("rec", "robustez")],
+        dict(cod="BACK", titulo="LO QUE APRENDIMOS", origen=DEMO, items=[("rec", "propuestas"), ("rec", "backtesting")],
              datos=[("VENTAJA vs 1/N", "NO DEMOSTRADA", ROJO), ("LA IA", "ACELERA, NO ADIVINA", AMBAR),
                     ("PRIMERO", "MEDIR CONCENTRACIÓN", BLANCO), ("DESPUÉS", "BUSCAR RENDIMIENTO", BLANCO)]),
         dict(cod="HELP", titulo="PRUÉBALA GRATIS EN GITHUB", origen=DEMO, items=[("rec", "inicio")],
@@ -170,7 +171,7 @@ def geometria(W, H):
     if W > H:
         return dict(W=W, H=H, barra=56, tit_y=70, tit_h=50, win=(40, 138, 1060, 770), pan=(1128, 138, 752, 770), fila_h=78,
                     sub=(40, 922, 1840, 92), sub_f=34, cinta_y=1024, cinta_h=34, aviso_y=1062, aviso_f=14, max_sub=150)
-    return dict(W=W, H=H, barra=84, tit_y=100, tit_h=62, win=(20, 186, 1040, 756), pan=(20, 966, 1040, 420), fila_h=68,
+    return dict(W=W, H=H, barra=84, tit_y=100, tit_h=62, win=(10, 186, 1060, 770), pan=(10, 976, 1060, 420), fila_h=68,
                 sub=(30, 1410, 1020, 360), sub_f=46, cinta_y=1798, cinta_h=46, aviso_y=1862, aviso_f=22, max_sub=80)
 
 
@@ -179,7 +180,7 @@ def chrome(g, destino):
     W, H = g["W"], g["H"]
     im = Image.new("RGB", (W, H), NEGRO); d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W, g["barra"]], fill=BARRA)
-    d.rectangle([0, g["barra"], W, g["barra"] + 3], fill=AMBAR)
+    d.rectangle([0, g["barra"], W, g["barra"] + 3], fill=MARCA)
     f = fuente(26 if W > H else 34)
     d.text((22, g["barra"] // 2), "ACTINVER TERMINAL", font=f, fill=AMBAR, anchor="lm")
     der = f"{NOMBRE_EQUIPO.upper()}  │  RETO ACTINVER 2026  │  UVM" if NOMBRE_EQUIPO else "RETO ACTINVER 2026  │  UVM"
@@ -187,13 +188,13 @@ def chrome(g, destino):
     x, y, w, h = g["win"]
     d.rectangle([x - 3, y - 3, x + w + 2, y + h + 2], outline=LINEA, width=2)
     for (cx, cy) in ((x - 3, y - 3), (x + w + 2, y - 3), (x - 3, y + h + 2), (x + w + 2, y + h + 2)):
-        d.rectangle([cx - 5, cy - 5, cx + 5, cy + 5], fill=AMBAR)  # esquinas de la ventana
+        d.rectangle([cx - 5, cy - 5, cx + 5, cy + 5], fill=MARCA)  # esquinas de la ventana
     px, py, pw, ph = g["pan"]
     d.rectangle([px, py, px + pw, py + ph], outline=LINEA, width=2)
     d.rectangle([px, py, px + pw, py + 40], fill=BARRA)
     d.text((px + 16, py + 20), "DATOS CLAVE", font=fuente(20 if W > H else 24), fill=AMBAR, anchor="lm")
     sx, sy, sw, sh = g["sub"]
-    d.rectangle([sx, sy, sx + 6, sy + sh], fill=AMBAR)
+    d.rectangle([sx, sy, sx + 6, sy + sh], fill=MARCA)
     d.rectangle([0, g["cinta_y"], W, g["cinta_y"] + g["cinta_h"]], fill=BARRA)
     d.line([(0, g["cinta_y"]), (W, g["cinta_y"])], fill=LINEA)
     for i, l in enumerate(envolver(d, AVISO, fuente(g["aviso_f"], False), W - 40)):
@@ -209,8 +210,8 @@ def tira_titulo(b, g, destino):
     w_cod, w_tit, w_etq = tmp.textlength(cod, font=f), tmp.textlength(tit, font=f), tmp.textlength(etq, font=fe) + 24
     ancho = int(w_cod + w_tit + 30 + w_etq) + 4
     im = Image.new("RGBA", (ancho, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    d.rectangle([0, 0, w_cod, h], fill=AMBAR)
-    d.text((0, h // 2), cod, font=f, fill=NEGRO, anchor="lm")
+    d.rectangle([0, 0, w_cod, h], fill=SOLIDO, outline=MARCA, width=2)
+    d.text((0, h // 2), cod, font=f, fill=BLANCO, anchor="lm")
     d.rectangle([w_cod, 0, w_cod + w_tit + 16, h], fill=BARRA)
     d.text((w_cod, h // 2), tit, font=f, fill=BLANCO, anchor="lm")
     x = w_cod + w_tit + 30
@@ -307,17 +308,16 @@ def contenido(items, D, cw, ch, t, destino):
         if tipo == "rec":
             src = GRAB / f"{nombre}.webm"
             ss = marcas.get(nombre, 0)
-            util = max(1.0, duracion(src) - ss - 0.2)
-            lento = min(1.6, max(1.0, d / util))
-            ff("-ss", ss, "-i", src, "-vf", f"crop=1240:900:{RECORTE_X.get(nombre, 0)}:0,scale={cw}:{ch}:flags=lanczos,setpts={lento:.3f}*PTS,"
-               f"fps={FPS},tpad=stop_mode=clone:stop_duration={d + 1},fade=t=in:st=0:d=0.35",
+            # La grabación ya tiene el tamaño de la ventana y dura lo necesario: sin recorte, escala ni cámara lenta.
+            ff("-ss", ss, "-i", src, "-vf", f"scale={cw}:{ch}:flags=lanczos,fps={FPS},"
+               f"tpad=stop_mode=clone:stop_duration={d + 1},fade=t=in:st=0:d=0.35",
                "-t", f"{d:.3f}", "-an", *CODEC, out)
         else:
             png = PAN / f"{nombre}.png"
             n = int(d * FPS)
             ff("-loop", 1, "-framerate", FPS, "-t", f"{d:.3f}", "-i", png,
-               "-f", "lavfi", "-t", f"{d:.3f}", "-i", f"color=c=black:s={cw}x{ch}:r={FPS}",
-               "-f", "lavfi", "-t", f"{d:.3f}", "-i", f"color=c=0xFFA028:s=4x{ch}:r={FPS}",
+               "-f", "lavfi", "-t", f"{d:.3f}", "-i", f"color=c=0x090A0C:s={cw}x{ch}:r={FPS}",
+               "-f", "lavfi", "-t", f"{d:.3f}", "-i", f"color=c=0xD94848:s=4x{ch}:r={FPS}",
                "-filter_complex",
                f"[0:v]scale={cw * 2}:-2,zoompan=z='1+0.05*on/{n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={cw}x{ch}:fps={FPS}[z];"
                f"[z][1:v]overlay=x='{cw}*min(max((t-0.15)/1.1,0),1)':y=0[a];"
@@ -362,7 +362,7 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
         fil.append(f"[{ultimo}][{n}:v]overlay=x={sx + 22}:y={sy}:enable='between(t,{t_ini:.3f},{fin:.3f})'[s{j}]")
         ultimo, n, t_ini = f"s{j}", n + 1, t_ini + dur
     cursor = (22 + int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength("ACTINVER TERMINAL", font=fuente(26 if W > H else 34))) + 10)
-    fil.append(f"[{ultimo}]drawbox=x={cursor}:y={g['barra'] // 2 - 12}:w=12:h=24:color=0xFFA028:t=fill:enable='lt(mod(t,1),0.5)',"
+    fil.append(f"[{ultimo}]drawbox=x={cursor}:y={g['barra'] // 2 - 12}:w=12:h=24:color=0xD94848:t=fill:enable='lt(mod(t,1),0.5)',"
                f"fade=t=in:st=0:d=0.25,format=yuv420p[out]")
     entradas += ["-i", wav]
     ff(*entradas, "-filter_complex", ";".join(fil), "-map", "[out]", "-map", f"{n}:a", "-t", f"{D:.3f}",
@@ -373,7 +373,7 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
 def tarjeta_video(lineas, seg, g, t, nombre, destino):
     capas = tarjeta(lineas, g, t / nombre)
     W, H = g["W"], g["H"]
-    entradas = ["-f", "lavfi", "-t", seg, "-i", f"color=c=black:s={W}x{H}:r={FPS}"]
+    entradas = ["-f", "lavfi", "-t", seg, "-i", f"color=c=0x090A0C:s={W}x{H}:r={FPS}"]
     fil, ultimo = [], "0:v"
     for k, (p, y) in enumerate(capas):
         entradas += ["-loop", 1, "-framerate", FPS, "-t", seg, "-i", p]
@@ -381,7 +381,7 @@ def tarjeta_video(lineas, seg, g, t, nombre, destino):
         fil.append(f"[{ultimo}][{k + 1}:v]overlay=x=0:y='{y}+max(0,{t0 + 0.3}-t)*60':enable='gte(t,{t0})'[l{k}]")
         ultimo = f"l{k}"
     # Línea ámbar que crece de izquierda a derecha.
-    entradas += ["-f", "lavfi", "-t", seg, "-i", f"color=c=0xFFA028:s={W}x4:r={FPS}"]
+    entradas += ["-f", "lavfi", "-t", seg, "-i", f"color=c=0xD94848:s={W}x4:r={FPS}"]
     fil.append(f"[{ultimo}][{len(capas) + 1}:v]overlay=x='-W+W*min(t/1.2,1)':y={int(H * 0.30)}[a]")
     fil.append(f"[a]fade=t=in:st=0:d=0.3,fade=t=out:st={seg - 0.4}:d=0.4,format=yuv420p[out]")
     silencio(seg, t / f"{nombre}.wav")
@@ -427,7 +427,22 @@ def render(version: str, W: int, H: int):
     print(destino, f"{duracion(destino):.1f} s", flush=True)
 
 
+def necesidades():
+    """Segundos que debe durar cada grabación (la versión más larga manda) → grabaciones/necesarios.json."""
+    disp, out = voces(), {}
+    for archivos in VERSIONES.values():
+        for b, arch in zip(bloques(), archivos):
+            d = (duracion(disp[arch]) + 0.5) / len(b["items"])
+            for tipo, nombre in b["items"]:
+                if tipo == "rec":
+                    out[nombre] = round(max(out.get(nombre, 0), d), 2)
+    (GRAB / "necesarios.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    print(out)
+
+
 if __name__ == "__main__":
+    if "necesidades" in sys.argv:
+        necesidades(); sys.exit()
     formatos = [a for a in sys.argv[1:] if a in ("horizontal", "vertical")] or ["horizontal", "vertical"]
     versiones = [a for a in sys.argv[1:] if a in VERSIONES] or list(VERSIONES)
     for version in versiones:

@@ -25,7 +25,7 @@
 | 1:26–1:40 | Miguel | «Tercero, el riesgo. La terminal mide la desviación estándar y el VaR: en diecinueve de cada veinte días, la pérdida diaria no pasó de cinco punto tres por ciento. Esa volatilidad venía de concentrar casi la mitad del dinero en una sola acción.» | Pestaña Riesgo: VaR, CVaR, contribución por emisora |
 | 1:40–1:54 | Daniela | «El resultado final: el portafolio cerró en setecientos ochenta y cuatro mil pesos, menos veintiuno punto seis por ciento. En el mismo periodo, el NAFTRAC, que replica al índice de la Bolsa Mexicana, subió diez punto nueve por ciento. El mercado nos ganó.» | Gráfica de evolución del portafolio frente a NAFTRAC |
 | 1:54–2:06 | Valeria | «En la última semana rotamos hacia consumo y salud: FEMSA, Coca-Cola FEMSA, Arca Continental, Merck y Eli Lilly. Hoy la terminal permite elegir un portafolio principal y el plan dice qué vender, comprar o mantener, con su motivo.» | Mis portafolios → «Usar como principal»; Plan de acción |
-| 2:06–2:20 | Camila | «Lo que aprendimos: la IA acelera el análisis, pero no adivina el futuro. Ningún modelo superó fuera de muestra a repartir el dinero en partes iguales, y la terminal lo dice. El riesgo de concentración se mide antes de buscar rendimiento.» | Pestaña Robustez o Modelos: comparación contra 1/N |
+| 2:06–2:20 | Camila | «Lo que aprendimos: la IA acelera el análisis, pero no adivina el futuro. Ningún modelo superó fuera de muestra a repartir el dinero en partes iguales, y la terminal lo dice. El riesgo de concentración se mide antes de buscar rendimiento.» | Propuestas y Backtesting: estrategia de pesos iguales (1/N) |
 | 2:20–2:30 | Miguel | «Actinver Terminal: datos con procedencia, riesgo medido y decisiones informadas. Pruébala gratis en GitHub. No es asesoría de inversión.» | Página pública en GitHub Pages; advertencia legal |
 
 ## Correspondencia con el proyecto «Finanzas en la era de la IA»
@@ -45,9 +45,9 @@
 
 ## Video final (24-nov-2026)
 
-Las voces se grabaron y el video está montado con estética de terminal financiera (negro, ámbar, Consolas), en cuatro archivos en `entregables/video/`: 4 integrantes y Miguel y Daniela, cada uno en 16:9 y en 9:16.
+Las voces se grabaron y el video está montado con estética de terminal financiera y la paleta de Actinver Terminal (`DESIGN.md`, tema oscuro: fondos #090a0c y #121419, rojo de identidad #d94848, texto #f3f4f6), en cuatro archivos en `entregables/video/`: 4 integrantes y Miguel y Daniela, cada uno en 16:9 y en 9:16.
 
-1. `node scripts/grabar_terminal.cjs` graba en video la demo pública (datos simulados) y anota en qué segundo queda lista cada vista.
+1. `uv run python scripts/video_final.py necesidades` calcula cuántos segundos pide cada bloque; `node scripts/grabar_terminal.cjs` graba la demo pública (datos simulados) a 1060×770, el tamaño exacto de la ventana del video, sin recorte, escala ni cámara lenta, y anota en qué segundo queda lista cada vista.
 2. `uv run --with matplotlib python scripts/video_paneles.py` rehace con el mismo diseño las gráficas y tablas del informe (datos reales del Reto).
 3. `uv run python scripts/video_final.py` compone cada bloque. Lleva barra de funciones y título deslizante, la grabación o el panel con revelado y acercamiento, y el panel de datos clave fila por fila. Abajo van la cinta de datos y los subtítulos sincronizados con la voz.
 

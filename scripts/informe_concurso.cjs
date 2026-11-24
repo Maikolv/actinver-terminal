@@ -1,7 +1,8 @@
 // Informe escrito del Concurso Finanzas IA (formato UVM) con datos REALES del archivo del Reto Actinver 2026.
 // Cifras: data/medios/informe/datos.json (scripts/informe_concurso_datos.py). Encabezado y pie: los de la plantilla
 // original (logos UVM). Lo que no existe en el archivo queda como «PENDIENTE: dato — fuente».
-//   node scripts/informe_concurso.cjs   → entregables/Informe_Concurso_Finanzas_IA.docx
+//   node scripts/informe_concurso.cjs [4|2]   → entregables/Informe_Concurso_Finanzas_IA[_4_integrantes|_2_integrantes].docx
+//   (4 o 2: el anexo F solo lleva los videos de esa versión de voz)
 "use strict";
 const fs = require("node:fs"), path = require("node:path");
 const JSZip = require("jszip");
@@ -13,7 +14,8 @@ const {
 const RAIZ = path.resolve(__dirname, "..");
 const INF = path.join(RAIZ, "data", "medios", "informe");
 const PLANTILLA = path.join(RAIZ, "data", "medios", "plantilla", "plantilla.docx");
-const SALIDA = path.join(RAIZ, "entregables", "Informe_Concurso_Finanzas_IA.docx");
+const VERSION = { 4: "Equipo completo", 2: "Versión de 2" }[process.argv[2]];
+const SALIDA = path.join(RAIZ, "entregables", `Informe_Concurso_Finanzas_IA${VERSION ? `_${process.argv[2]}_integrantes` : ""}.docx`);
 const d = JSON.parse(fs.readFileSync(path.join(INF, "datos.json"), "utf8"));
 // Datos personales del equipo: archivo privado fuera del repositorio (data/medios/equipo.json).
 const RUTA_EQ = path.join(RAIZ, "data", "medios", "equipo.json");
@@ -74,7 +76,7 @@ const cuadricula = (items) => {
   return new Table({ width: { size: ANCHO, type: WidthType.DXA }, columnWidths: [ANCHO / 2, ANCHO / 2], alignment: AlignmentType.CENTER, rows: filas });
 };
 // Videos publicados (YouTube no listado, TikTok privado): enlaces en el archivo privado, no en el repositorio.
-const VIDEOS = eq.videos || [];
+const VIDEOS = (eq.videos || []).filter(([v]) => !VERSION || v.startsWith(VERSION));
 const qr = (url) => { const q = require("qrcode-generator")(0, "M"); q.addData(url); q.make();
   return Buffer.from(q.createDataURL(4, 8).split(",")[1], "base64"); };
 const tablaVideos = () => {
@@ -287,7 +289,7 @@ const anexos = [h1("Anexos"),
     : [p("Sección opcional según el formato; el equipo no incluye evidencias de asesorías.")]),
   h2("E. Herramienta de apoyo"), p("Actinver Terminal (proyecto independiente, sin afiliación con Grupo Actinver): https://github.com/Maikolv/help-quote-terminal. Solo informa y simula; no envía órdenes."),
   ...(VIDEOS.length ? [h2("F. Videos del proyecto"),
-  p("El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal (demo con datos simulados) y las gráficas del informe (datos reales del Reto). Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok. Escanea el código QR o abre el enlace."),
+  p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal (demo con datos simulados) y las gráficas del informe (datos reales del Reto). ${VERSION ? "Esta versión del informe enlaza el video" + (process.argv[2] === "4" ? " con las voces de los cuatro integrantes" : " narrado por dos integrantes") + ", en formato horizontal para YouTube y vertical para TikTok." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
   tablaVideos(),
   fuente("YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también se entregan en el ZIP.")] : [])];
 

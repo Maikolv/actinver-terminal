@@ -5,7 +5,8 @@ const { chromium } = require("playwright");
 const fs = require("node:fs"), path = require("node:path");
 const ORIGEN = process.env.ORIGEN || "https://maikolv.github.io/help-quote-terminal/";
 const DIR = path.resolve(__dirname, "..", "data", "medios", "video", "grabaciones");
-const W = 1600, H = 900;
+// Mismo tamaño que la ventana del video (1060×770): se usa 1:1, sin recorte ni escala.
+const W = 1060, H = 770;
 
 const pausa = (p, ms) => p.waitForTimeout(ms);
 async function desplazar(p, total, pasos = 40, ms = 60) {  // desplazamiento suave, como una persona con la rueda
@@ -40,14 +41,19 @@ const ESCENAS = {
   },
   tiempo: async (p) => { await vista(p, "tiempo"); await pausa(p, 1000); await desplazar(p, 1000, 60, 90); await pausa(p, 1000); },
   ficha: async (p) => {
-    await vista(p, "mercado"); await pausa(p, 800);
-    await p.locator("#estacion tbody tr").nth(2).click({ timeout: 2000 }).catch(() => {}); await pausa(p, 1200);
-    await vista(p, "ficha"); await pausa(p, 1200); await desplazar(p, 1200, 60, 90); await pausa(p, 1000);
+    // Se escribe MU en el buscador de la ficha (sin emisora elegida la ficha sale vacía).
+    await vista(p, "ficha"); await pausa(p, 600);
+    const caja = p.locator("#panel-ficha input").first();
+    await caja.click({ timeout: 2000 }).catch(() => {}); await caja.pressSequentially("MU", { delay: 220 }).catch(() => {});
+    await pausa(p, 500); await p.locator("#panel-ficha button", { hasText: "Ver ficha" }).click({ timeout: 2000 }).catch(() => {});
+    await pausa(p, 2500); await desplazar(p, 850, 70, 90); await pausa(p, 1200);  // termina en la gráfica, antes de los widgets que la demo no trae
   },
   investigacion: async (p) => { await vista(p, "investigacion"); await pausa(p, 1000); await desplazar(p, 1100, 60, 90); await pausa(p, 1000); },
   riesgo: async (p) => { await vista(p, "riesgo"); await pausa(p, 1200); await desplazar(p, 1300, 70, 90); await pausa(p, 1200); },
   propuestas: async (p) => { await vista(p, "propuestas"); await pausa(p, 1200); await desplazar(p, 1200, 70, 90); await pausa(p, 1000); },
-  robustez: async (p) => { await vista(p, "modelos"); await pausa(p, 1000); await desplazar(p, 800, 50, 90); await vista(p, "robustez"); await pausa(p, 1500); },
+  // Deja a la vista la estrategia de pesos iguales (1/N).
+  backtesting: async (p) => { await vista(p, "backtesting"); await pausa(p, 1500); await desplazar(p, 330, 50, 90); await pausa(p, 1200); },
+  robustez: async (p) => { await vista(p, "robustez"); await pausa(p, 1200); await desplazar(p, 900, 60, 90); await pausa(p, 1000); },
 };
 
 (async () => {
@@ -56,11 +62,20 @@ const ESCENAS = {
   const b = await chromium.launch({ channel: process.env.CANAL || "msedge", headless: true });
   const rutaMarcas = path.join(DIR, "marcas.json");
   const marcas = fs.existsSync(rutaMarcas) ? JSON.parse(fs.readFileSync(rutaMarcas, "utf8")) : {};
+  // Segundos que pide cada bloque del video (python scripts/video_final.py necesidades).
+  const rutaNec = path.join(DIR, "necesarios.json");
+  const necesarios = fs.existsSync(rutaNec) ? JSON.parse(fs.readFileSync(rutaNec, "utf8")) : {};
   for (const n of nombres) {
     const c = await b.newContext({ viewport: { width: W, height: H }, colorScheme: "dark", recordVideo: { dir: DIR, size: { width: W, height: H } } });
     const p = await c.newPage();
     p._t0 = Date.now();
     await ESCENAS[n](p);
+    // Si la escena terminó antes de lo que dura la voz, se sigue leyendo la página con movimientos suaves.
+    const meta = (p._marca ?? 0) + (necesarios[n] ?? 0) + 1;
+    for (let i = 0; (Date.now() - p._t0) / 1000 < meta; i++) {
+      await p.mouse.move(300 + (i % 5) * 90, 300 + (i % 3) * 60, { steps: 8 });
+      await desplazar(p, i % 4 < 2 ? 160 : -160, 16, 70);
+    }
     marcas[n] = Math.max(0, (p._marca ?? 0) - 0.3);
     fs.writeFileSync(rutaMarcas, JSON.stringify(marcas, null, 1));
     const v = p.video(); await c.close();

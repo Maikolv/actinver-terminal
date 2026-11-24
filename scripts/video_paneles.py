@@ -1,4 +1,4 @@
-"""Paneles del video con estética de terminal (negro, ámbar, Consolas): las gráficas y tablas del informe rehechas con
+"""Paneles del video con estética de terminal (fondos oscuros y rojo de Actinver Terminal, Consolas): las gráficas y tablas del informe rehechas con
 el mismo diseño, colores y fuente del video. Datos reales del Reto (data/medios/informe/*.json, privados).
 
     uv run --with matplotlib python scripts/video_paneles.py   → data/medios/video/paneles/*.png (1060×770)
@@ -18,8 +18,9 @@ RAIZ = Path(__file__).resolve().parents[1]
 INF = RAIZ / "data" / "medios" / "informe"
 SAL = RAIZ / "data" / "medios" / "video" / "paneles"
 W, H = 1060, 770
-NEGRO, PANEL, AMBAR, BLANCO, GRIS, LINEA = "#000000", "#0b0b0b", "#ffa028", "#e6e6e6", "#8a8a8a", "#2a2a2a"
-VERDE, ROJO, AZUL = "#4af6c3", "#ff433d", "#4fc3f7"
+# Paleta de Actinver Terminal (DESIGN.md, tema oscuro); AMBAR conserva el nombre pero es el rojo de identidad.
+NEGRO, PANEL, AMBAR, BLANCO, GRIS, LINEA = "#090a0c", "#121419", "#d94848", "#f3f4f6", "#b4bac4", "#343942"
+VERDE, ROJO, AZUL = "#4cc38a", "#f2777a", "#c9ced6"
 FONDO_DIR = Path("C:/Windows/Fonts")
 for f in ("consola.ttf", "consolab.ttf"):
     if (FONDO_DIR / f).exists():
@@ -69,7 +70,7 @@ def main() -> None:
     ini = d["inicial"]["posiciones"]
     fig = figura(); encabezado(fig, "DISTRIBUCIÓN INICIAL DEL CAPITAL", "CAPTURA DEL PORTAL · 05-OCT-2026")
     ax = fig.add_axes([0.03, 0.06, 0.5, 0.82]); ax.set_facecolor(NEGRO)
-    col = [AMBAR, AZUL, VERDE, "#b388ff", "#ff8a65", "#90a4ae"]
+    col = [AMBAR, BLANCO, "#7c828d", "#b42626", "#f06a6a", "#4a505a"]
     ax.pie([x["valor"] for x in ini], colors=col, startangle=90, counterclock=False,
            wedgeprops={"width": 0.33, "edgecolor": NEGRO, "linewidth": 3})
     ax.text(0, 0.08, "$1,000,000", ha="center", fontsize=22, weight="bold", color=BLANCO)
@@ -98,7 +99,7 @@ def main() -> None:
     for i, m in enumerate(d["movimientos_octubre"]):
         y = 240 + i * 55
         if i % 2:
-            dr.rectangle([22, y - 8, W - 22, y + 42], fill="#111111")
+            dr.rectangle([22, y - 8, W - 22, y + 42], fill="#1b1e24")
         c = VERDE if m["tipo"] == "compra" else ROJO
         dr.text((xs[0], y), m["fecha"], font=fuente(22), fill=BLANCO)
         dr.text((xs[1], y), sym(m["instrumento"]), font=fuente(22, True), fill=BLANCO)
@@ -122,7 +123,7 @@ def main() -> None:
     a1, a2, a3 = fig.add_subplot(g[0]), fig.add_subplot(g[1]), fig.add_subplot(g[2])
     a1.plot(mu[v].index, mu[v], color=AMBAR, lw=2.2, label="CIERRE")
     a1.plot(mu[v].index, mu.rolling(20).mean()[v], color=AZUL, lw=1.4, label="SMA 20")
-    a1.plot(mu[v].index, mu.rolling(50).mean()[v], color="#b388ff", lw=1.4, label="SMA 50")
+    a1.plot(mu[v].index, mu.rolling(50).mean()[v], color="#f06a6a", lw=1.4, label="SMA 50")
     a1.legend(frameon=False, fontsize=12, loc="upper left", labelcolor=BLANCO, ncol=3)
     a1.annotate(f"{mu.iloc[-1]:.2f}", (mu.index[-1], mu.iloc[-1]), color=NEGRO, fontsize=12, weight="bold",
                 xytext=(-10, 14), textcoords="offset points", ha="right", va="center", bbox={"boxstyle": "square,pad=0.2", "fc": AMBAR, "ec": AMBAR})
@@ -150,7 +151,7 @@ def main() -> None:
     for i, (cat, nom, val, c) in enumerate(filas):
         y = 86 + i * 82
         if i % 2 == 0:
-            dr.rectangle([22, y - 6, W - 22, y + 70], fill="#101010")
+            dr.rectangle([22, y - 6, W - 22, y + 70], fill="#1b1e24")
         dr.text((40, y + 4), cat, font=fuente(17), fill=GRIS)
         dr.text((40, y + 28), nom, font=fuente(28, True), fill=BLANCO)
         dr.text((W - 44, y + 18), val, font=fuente(40, True), fill=c, anchor="ra")
