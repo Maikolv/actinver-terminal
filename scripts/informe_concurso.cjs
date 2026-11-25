@@ -322,7 +322,7 @@ const anexos = [h1("Anexos"),
   ...(VIDEOS.length ? [h2("F. Videos del proyecto"),
   p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal en la computadora del equipo (solo lectura) y las gráficas del informe (datos reales del Reto). ${VERSION ? "Esta versión del informe enlaza el video" + (process.argv[2] === "4" ? " con las voces de los cuatro integrantes" : " narrado por dos integrantes") + ", en formato horizontal para YouTube y vertical para TikTok." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
   tablaVideos(),
-  fuente("YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también están en la carpeta de Google Drive del equipo: https://drive.google.com/drive/folders/1tatoVACnQq_VcOcivg3F87vqH_jHTvce")] : [])];
+  fuente(`YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también están en ${eq.drive ? `la carpeta de Google Drive del equipo: ${eq.drive}` : "el ZIP"}.`)] : [])];
 
 const doc = new Document({
   creator: "Equipo Reto Actinver 2026", title: "Informe escrito — Concurso Finanzas IA",
