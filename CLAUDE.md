@@ -44,6 +44,17 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
+## Estado comprobado: entrega del concurso (25-nov-2026)
+
+- **Video:** grabado en la terminal local (`scripts/grabar_terminal.cjs`).
+- **Propuesta de Markowitz** sobre la última captura del Reto:
+  - en «Mis portafolios» (id 6, no es el principal);
+  - en la sección 4.6 del informe;
+  - en `entregables/Propuesta_Markowitz_Lynx_Market.xlsx`;
+  - detalle en `docs/propuesta-markowitz-20261125.md`.
+- **Entregables en Google Drive:** carpeta compartida por enlace (solo lectura).
+- **Pendiente del usuario:** subir los 4 MP4 a Drive, YouTube y TikTok. Las herramientas solo suben hasta 10 MB.
+
 ## Estado comprobado: portafolio principal y escenario real (14-nov-2026)
 
 Reglas del Reto apagadas (`config/reto.yaml: activo: false`); los datos del Reto se conservan. La comisión sale de

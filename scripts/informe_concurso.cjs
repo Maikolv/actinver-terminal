@@ -132,6 +132,35 @@ const VENTA = {
   "BMV:ALPEK": "Química con resultados débiles; se vendió con −14.0 % para concentrar el efectivo en consumo.",
 };
 
+// 4.6 Propuesta de Markowitz: resultado de markowitz.guardar (data/medios/propuesta/resultado.json, privado).
+function propuesta() {
+  const ruta = path.join(RAIZ, "data", "medios", "propuesta", "resultado.json");
+  if (!fs.existsSync(ruta)) return [];
+  const pr = JSON.parse(fs.readFileSync(ruta, "utf8")), m = pr.metricas, n1 = pr.metricas_1n, s = pr.especificacion;
+  const oos = pr.fuera_de_muestra, py = pr.proyeccion.elegido;
+  const antes = Object.fromEntries(fin.posiciones.map((x) => [x.instrumento, x.peso]));
+  const filas = [...pr.activos].sort((a, b) => b.peso - a.peso);
+  return [h2("4.6 Propuesta del mejor portafolio con la plantilla de Markowitz"),
+    p(`Con el último registro confirmado (captura del 12-nov-2026, valor ${mxn(fin.valor)}) repartimos los mismos ${filas.length} instrumentos con la plantilla de Markowitz de la terminal (Teoría Moderna de Portafolios): máximo Sharpe, covarianza muestral de ${pr.datos.sesiones} sesiones (${pr.datos.inicio} a ${pr.datos.fin}), tasa libre de riesgo CETES 28 de Banxico (${pct(s.rf)}) y tope de ${pct(s.peso_max, 0)} por emisora (perfil agresivo del equipo). Es el mismo cálculo que hace Solver en el Excel entregado (Propuesta_Markowitz_Lynx_Market.xlsx) y queda guardado en «Mis portafolios» de Actinver Terminal.`),
+    imagen("propuesta_markowitz.png", 520, 303),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: "Figura 10. Pesos del último registro frente a la propuesta de Markowitz.", italics: true, size: 16, color: GRIS })] }),
+    tabla(["Instrumento", "Peso 12-nov", "Peso propuesto", "Títulos", "Monto", "E(r) anual", "σ anual"],
+      filas.map((a) => [a.id.split(":")[1], pct(antes[a.id], 1), pct(a.peso, 1), String(a.titulos), mxn(a.invertido), pct(a.rend, 1), pct(a.riesgo, 1)]),
+      [1250, 1150, 1300, 900, 1538, 1350, 1350]),
+    fuente(`Actinver Terminal, «Mis portafolios» (portafolio «${s.nombre}»); precios MXN ajustados; capital ${mxn(s.capital)}; efectivo sin invertir por títulos enteros ${mxn(pr.efectivo_restante)}.`),
+    tabla(["Métrica (ventana de 1 año)", "Propuesta (máx. Sharpe)", "Mínima varianza", "1/N (referencia)"],
+      [["Rendimiento esperado anual", pct(m.rend, 1), pct(pr.min_varianza.rend, 1), pct(n1.rend, 1)],
+       ["Riesgo (σ anual)", pct(m.riesgo, 1), pct(pr.min_varianza.riesgo, 1), pct(n1.riesgo, 1)],
+       ["Sharpe", m.sharpe.toFixed(2), pr.min_varianza.sharpe.toFixed(2), n1.sharpe.toFixed(2)]],
+      [3238, 2000, 1800, 1800]),
+    fuente("estimación con la historia de un año; no es un pronóstico."),
+    vineta([b("Qué cambia: "), "sube Target, Arca Continental, Chevron y Exxon (más rendimiento por unidad de riesgo y baja correlación entre sí) y baja FEMSA, Novavax y Eli Lilly; Merck y Pfizer quedan en cero porque, con estos datos, no mejoran el portafolio."]),
+    vineta([b("Riesgo: "), `σ anual de ${pct(m.riesgo, 1)} frente a ${pct(n1.riesgo, 1)} de repartir en partes iguales; caída máxima en la ventana ${pct(pr.caida_maxima, 1)} y peor día ${pct(pr.peor_dia, 1)}. Moderna aporta ${pct(filas.find((a) => a.id === "SIC:MRNA")?.contribucion_riesgo ?? 0, 0)} del riesgo con solo ${pct(filas.find((a) => a.id === "SIC:MRNA")?.peso ?? 0, 1)} del dinero: es la posición a vigilar.`]),
+    vineta([b("Prueba fuera de muestra (honestidad): "), `de ${oos.inicio} a ${oos.fin}, rebalanceando cada mes, la propuesta rindió ${pct(oos.propuesta.rend_total, 1)} contra ${pct(oos["1/N"].rend_total, 1)} de 1/N, pero con más riesgo: su Sharpe fue ${oos.propuesta.sharpe.toFixed(2)} contra ${oos["1/N"].sharpe.toFixed(2)} de 1/N. Un solo periodo no demuestra ventaja.`]),
+    vineta([b("Proyección a un año: "), `con capital de ${mxn(s.capital)}, valor esperado ${mxn(py.valor)} y rango del 90 % de ${mxn(py.valor_bajo)} a ${mxn(py.valor_alto)}. Los rendimientos de un año tan bueno para estas emisoras no se repiten necesariamente: es una extrapolación, no una promesa.`]),
+    p("Conclusión: si el Reto continuara, esta sería nuestra cartera de partida, por el mejor rendimiento por unidad de riesgo con los mismos instrumentos. La mantendríamos junto a la referencia 1/N y la revisaríamos cada mes, porque la evidencia fuera de muestra aún no la favorece en riesgo. No es asesoría de inversión.")];
+}
+
 const portada = [
   new Paragraph({ spacing: { before: 1400, after: 300 }, alignment: AlignmentType.CENTER,
     children: [new TextRun({ text: "Concurso Finanzas IA — Reto Actinver 2026", bold: true, size: 40, color: ROJO })] }),
@@ -252,6 +281,7 @@ const final = [h1("4. Informe final (Entregable 3)"),
   h2("4.5 Nota sobre el uso de la inteligencia artificial"),
   p("La inteligencia artificial fue una herramienta de apoyo, no la autora del trabajo. El equipo definió el perfil de inversión, eligió las emisoras, decidió cada compra y venta, y la capturó a mano en el simulador del Reto; ninguna operación la ejecutó una IA. Los asistentes (Claude y Codex) nos ayudaron a programar Actinver Terminal, a calcular indicadores y a ordenar los datos y la redacción."),
   p("Todas las cifras de este informe se comprobaron contra las capturas del portal y fuentes oficiales (SEC EDGAR, Banxico y la ficha de Actinver), y las interpretaciones, conclusiones y errores son responsabilidad del equipo. Usamos la IA para trabajar más rápido y con más orden, no para sustituir nuestro criterio."),
+  ...propuesta(),
   new Paragraph({ children: [new PageBreak()] })];
 
 // APA 7: orden alfabético, sangría francesa y cursivas marcadas con *…*.
@@ -290,9 +320,9 @@ const anexos = [h1("Anexos"),
     : [p("Sección opcional según el formato; el equipo no incluye evidencias de asesorías.")]),
   h2("E. Herramienta de apoyo"), p("Actinver Terminal (proyecto independiente, sin afiliación con Grupo Actinver): https://github.com/Maikolv/help-quote-terminal. Solo informa y simula; no envía órdenes."),
   ...(VIDEOS.length ? [h2("F. Videos del proyecto"),
-  p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal (demo con datos simulados) y las gráficas del informe (datos reales del Reto). ${VERSION ? "Esta versión del informe enlaza el video" + (process.argv[2] === "4" ? " con las voces de los cuatro integrantes" : " narrado por dos integrantes") + ", en formato horizontal para YouTube y vertical para TikTok." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
+  p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal en la computadora del equipo (solo lectura) y las gráficas del informe (datos reales del Reto). ${VERSION ? "Esta versión del informe enlaza el video" + (process.argv[2] === "4" ? " con las voces de los cuatro integrantes" : " narrado por dos integrantes") + ", en formato horizontal para YouTube y vertical para TikTok." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
   tablaVideos(),
-  fuente("YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también se entregan en el ZIP.")] : [])];
+  fuente("YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también están en la carpeta de Google Drive del equipo: https://drive.google.com/drive/folders/1tatoVACnQq_VcOcivg3F87vqH_jHTvce")] : [])];
 
 const doc = new Document({
   creator: "Equipo Reto Actinver 2026", title: "Informe escrito — Concurso Finanzas IA",

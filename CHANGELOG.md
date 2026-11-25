@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 25-nov-2026 — Video grabado en la terminal local y propuesta de Markowitz
+
+- **Video:** las 10 escenas se graban en la terminal local (`scripts/grabar_terminal.cjs`, solo lectura). Antes salían de la demo de GitHub Pages.
+  - Un píxel invisible mantiene el reloj del video y se espera a que no quede ningún marcador de carga.
+  - Como la cuenta del Reto está archivada, «Riesgo» y «Plan» se muestran con Propuestas y Mis portafolios.
+  - Las gráficas de resultados conservan su diseño.
+  - Cuatro MP4 regenerados (225 s).
+- **Propuesta de Markowitz:** los 12 instrumentos de la última captura del Reto (12-nov), optimizados con máximo Sharpe, covarianza muestral y CETES 28.
+  - Guardada en «Mis portafolios» (id 6), sin marcarla como principal.
+  - Excel `Propuesta_Markowitz_Lynx_Market.xlsx` con el modelo de Solver.
+  - Nueva sección 4.6 del informe (22 páginas).
+  - Detalle: `docs/propuesta-markowitz-20261125.md`.
+- **Entrega en la nube:** carpeta de Google Drive con los informes en Docs y PDF, el Excel, los guiones y las constancias. Los videos (más de 10 MB) se suben a mano.
+
 ## 23-nov-2026 — Regreso a Actinver Terminal, informe del concurso, guiones del video y auditoría
 
 - **Nombre visible «Actinver Terminal» restaurado** en la interfaz, el lanzador, los scripts, Telegram, el Excel, Pages, el README y el reporte ejecutivo, con el aviso «proyecto independiente, no afiliado a Grupo Actinver».

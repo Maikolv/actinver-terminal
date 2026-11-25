@@ -1,7 +1,7 @@
 """Video final del concurso «Finanzas en la era de la IA» con estética de terminal financiera y las VOCES REALES del equipo.
 
 Solo pantalla y voz en off. Cada bloque del guion combina:
-  - grabaciones en video de la demo pública (scripts/grabar_terminal.cjs, datos simulados), o
+  - grabaciones en video de la terminal local del equipo (scripts/grabar_terminal.cjs), o
   - paneles con los datos reales del Reto rehechos con el mismo diseño (scripts/video_paneles.py),
 más barra de funciones, título que entra deslizándose, panel de datos clave fila por fila, cinta de datos en movimiento
 y subtítulos sincronizados con la voz.
@@ -35,7 +35,7 @@ NEGRO, BARRA, LINEA = (9, 10, 12), (18, 20, 25), (52, 57, 66)  # --fondo, --supe
 AMBAR, SOLIDO, MARCA = (240, 106, 106), (180, 38, 38), (217, 72, 72)  # --acento (texto), --acento-solido, --acento-grafico
 BLANCO, GRIS = (243, 244, 246), (180, 186, 196)  # --texto, --texto-2
 VERDE, ROJO, AZUL = (76, 195, 138), (242, 119, 122), (243, 244, 246)  # --positivo, --negativo; la terminal no usa azul
-REAL, DEMO = ("DATOS REALES DEL RETO", VERDE), ("DEMO · DATOS SIMULADOS", GRIS)
+REAL, DEMO = ("DATOS REALES DEL RETO", VERDE), ("TERMINAL PROPIA · 127.0.0.1", AZUL)
 
 VERSIONES = {
     "4_integrantes": ["Miguel 1", "Audio pt1", "valeria min 018-030", "Calle Bosques de México", "Miguel 2", "Audio pt2",
@@ -104,7 +104,7 @@ def bloques() -> list[dict]:
         dict(cod="BACK", titulo="LO QUE APRENDIMOS", origen=DEMO, items=[("rec", "propuestas"), ("rec", "backtesting")],
              datos=[("VENTAJA vs 1/N", "NO DEMOSTRADA", ROJO), ("LA IA", "ACELERA, NO ADIVINA", AMBAR),
                     ("PRIMERO", "MEDIR CONCENTRACIÓN", BLANCO), ("DESPUÉS", "BUSCAR RENDIMIENTO", BLANCO)]),
-        dict(cod="HELP", titulo="PRUÉBALA GRATIS EN GITHUB", origen=DEMO, items=[("rec", "inicio")],
+        dict(cod="HELP", titulo="PRUÉBALA GRATIS EN GITHUB", origen=DEMO, items=[("rec", "mesa")],
              datos=[("CÓDIGO", "GITHUB", AMBAR), ("DEMO", "GITHUB PAGES", BLANCO), ("ÓRDENES", "NINGUNA", BLANCO),
                     ("ASESORÍA", "NO ES ASESORÍA", ROJO)]),
     ]
@@ -419,7 +419,7 @@ def render(version: str, W: int, H: int):
         tarjeta_video([(f"EQUIPO {NOMBRE_EQUIPO.upper()}".strip(), 44, AMBAR), *[(n.upper(), 26, BLANCO) for n in EQUIPO],
                        ("LIC. EN CONTADURÍA Y FINANZAS PÚBLICAS · UVM CAMPUS HISPANO", 20, GRIS),
                        ("GITHUB.COM/MAIKOLV/HELP-QUOTE-TERMINAL", 24, AMBAR),
-                       ("PANTALLAS DE LA TERMINAL: DEMO CON DATOS SIMULADOS · CIFRAS DEL RETO: REALES", 18, GRIS),
+                       ("PANTALLAS: GRABADAS EN NUESTRA TERMINAL · CIFRAS DEL RETO: REALES", 18, GRIS),
                        (AVISO.upper(), 16, GRIS)], 6.0, g, t, "fin", partes[-1])
         lista = t / "lista.txt"
         lista.write_text("".join(f"file '{p.as_posix()}'\n" for p in partes), encoding="utf-8")

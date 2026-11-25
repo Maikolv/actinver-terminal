@@ -1,9 +1,10 @@
-// Grabaciones en video de la DEMO PÚBLICA (datos simulados) para el video del concurso. Nunca usa la cuenta real.
+// Grabaciones en video de la terminal LOCAL del equipo (127.0.0.1:8765) para el video del concurso.
+// Solo lee: no pulsa botones que guarden o envíen nada y nunca abre la cuenta de Actinver.
 //   node scripts/grabar_terminal.cjs [nombre…]   → data/medios/video/grabaciones/<nombre>.webm
 "use strict";
 const { chromium } = require("playwright");
 const fs = require("node:fs"), path = require("node:path");
-const ORIGEN = process.env.ORIGEN || "https://maikolv.github.io/help-quote-terminal/";
+const ORIGEN = process.env.ORIGEN || "http://127.0.0.1:8765/";
 const DIR = path.resolve(__dirname, "..", "data", "medios", "video", "grabaciones");
 // Mismo tamaño que la ventana del video (1060×770): se usa 1:1, sin recorte ni escala.
 const W = 1060, H = 770;
@@ -12,9 +13,17 @@ const pausa = (p, ms) => p.waitForTimeout(ms);
 async function desplazar(p, total, pasos = 40, ms = 60) {  // desplazamiento suave, como una persona con la rueda
   for (let i = 0; i < pasos; i++) { await p.mouse.wheel(0, total / pasos); await pausa(p, ms); }
 }
+// La terminal real tarda más que la demo: se espera a que no quede ningún marcador de carga visible.
+const listo = (p) => p.waitForFunction(() => document.documentElement.dataset.calculo === "listo"
+  && ![...document.querySelectorAll("section[role=tabpanel]:not([hidden]) :is(.esqueleto, .cargando)")].some((e) => e.offsetParent),
+  null, { timeout: 150000, polling: 500 }).catch(() => {});
 async function vista(p, tab) {
-  await p.goto(`${ORIGEN}terminal/?vista=tab-${tab}`, { waitUntil: "networkidle" }).catch(() => {});
-  await p.waitForFunction(() => document.documentElement.dataset.calculo === "listo", null, { timeout: 45000 }).catch(() => {});
+  await p.goto(`${ORIGEN}?vista=tab-${tab}`, { waitUntil: "networkidle" }).catch(() => {});
+  await listo(p); await pausa(p, 1500); await listo(p);
+  // Si el servidor estaba ocupado y quedó una caja de error, se recarga (hasta dos veces).
+  for (let i = 0; i < 2 && await p.locator("section[role=tabpanel]:not([hidden]) .error-caja").first().isVisible().catch(() => false); i++) {
+    await p.reload({ waitUntil: "networkidle" }).catch(() => {}); await listo(p); await pausa(p, 1500); await listo(p);
+  }
   await p.evaluate((id) => {
     document.querySelectorAll("details[open]").forEach((d) => { d.open = false; });
     const el = document.getElementById(id);
@@ -23,20 +32,53 @@ async function vista(p, tab) {
   await pausa(p, 900);
   if (p._marca == null) p._marca = (Date.now() - p._t0) / 1000;  // segundo en que la vista ya está lista
 }
+async function irA(p, panel, prefijo) {
+  await p.waitForFunction(([panel, prefijo]) => [...document.querySelectorAll(`#panel-${panel} :is(h2, h3)`)]
+    .some((x) => x.textContent.trim().startsWith(prefijo)), [panel, prefijo], { timeout: 60000 }).catch(() => {});
+  await p.evaluate(([panel, prefijo]) => {
+    const h = [...document.querySelectorAll(`#panel-${panel} :is(h2, h3)`)].find((x) => x.textContent.trim().startsWith(prefijo));
+    if (h) window.scrollTo({ top: h.getBoundingClientRect().top + window.scrollY - 8 });
+  }, [panel, prefijo]);
+  await pausa(p, 1200);
+}
+async function agresivo(p) {
+  await p.locator("#panel-portafolios").getByText("Agresivo", { exact: true }).first().click({ timeout: 3000 }).catch(() => {});
+  await pausa(p, 1500); await listo(p); await pausa(p, 800);
+}
 // Cada escena: lo que se hace frente a la cámara (12–20 s).
 const ESCENAS = {
-  inicio: async (p) => { await p.goto(ORIGEN, { waitUntil: "networkidle" }); await pausa(p, 1500); p._marca = (Date.now() - p._t0) / 1000; await pausa(p, 1000); await desplazar(p, 1400, 60, 90); await pausa(p, 1500); },
-  plan: async (p) => { await vista(p, "resumen"); await pausa(p, 1500); await desplazar(p, 900, 50, 90); await pausa(p, 1500); },
-  legal: async (p) => { await vista(p, "legal"); await pausa(p, 1200); await desplazar(p, 1100, 60, 90); await pausa(p, 1000); },
+  // Ranking del universo con capitalización y vigencia de cada dato.
+  inicio: async (p) => { await vista(p, "ranking"); await pausa(p, 1500); await desplazar(p, 1400, 60, 90); await pausa(p, 1500); },
+  // Mesa de investigación: paleta de comandos y cuadrícula de paneles.
+  mesa: async (p) => {
+    await p.goto(`${ORIGEN}static/mesa.html`, { waitUntil: "networkidle" }).catch(() => {});
+    await pausa(p, 2500); p._marca = (Date.now() - p._t0) / 1000;
+    await desplazar(p, 900, 60, 90); await pausa(p, 1200);
+  },
+  // Plan de órdenes de la propuesta: qué vender, comprar o mantener y por qué.
+  plan: async (p) => { await vista(p, "propuestas"); await irA(p, "propuestas", "Plan de órdenes"); p._marca = (Date.now() - p._t0) / 1000; await pausa(p, 1500); await desplazar(p, 900, 60, 90); await pausa(p, 1500); },
+  // Datos y fuentes: cada proveedor gratuito con su retraso y vigencia.
+  legal: async (p) => { await vista(p, "universo"); await pausa(p, 1200); await desplazar(p, 1100, 60, 90); await pausa(p, 1000); },
   portafolios: async (p) => {
     await vista(p, "portafolios"); await pausa(p, 1200);
-    for (const t of ["Agresivo", "Crecimiento", "Agresivo"]) { await p.getByText(t, { exact: true }).first().click({ timeout: 2000 }).catch(() => {}); await pausa(p, 1300); }
-    await desplazar(p, 900, 50, 90); await pausa(p, 1200);
+    await agresivo(p);
+    await desplazar(p, 1100, 60, 90); await pausa(p, 1500); await desplazar(p, 900, 60, 90); await pausa(p, 1200);
   },
   mercado: async (p) => {
     await vista(p, "mercado"); await pausa(p, 1200);
-    // Sin clics en otras emisoras: en la demo estática solo el instrumento inicial tiene gráfica grabada.
-    await p.mouse.move(800, 450); await pausa(p, 1500);
+    // Busca MU con «/» como lo haría una persona.
+    // La estación se vuelve a pintar al llegar datos: se reintenta hasta que el filtro quede escrito.
+    for (let i = 0; i < 3; i++) {
+      const caja = p.locator("#estacion-buscar");
+      await caja.click({ timeout: 3000 }).catch(() => {}); await caja.pressSequentially("MU", { delay: 220 }).catch(() => {});
+      await pausa(p, 900);
+      if (await caja.inputValue().catch(() => "") === "MU") {
+        await p.locator('#estacion-monitor-tabla tr[data-id="SIC:MU"]').click({ timeout: 3000 }).catch(() => caja.press("Enter").catch(() => {}));
+        break;
+      }
+      await caja.fill("").catch(() => {});
+    }
+    await pausa(p, 2500);
     await desplazar(p, 450, 40, 90); await pausa(p, 1500); await desplazar(p, -450, 40, 90); await pausa(p, 1500);
   },
   tiempo: async (p) => { await vista(p, "tiempo"); await pausa(p, 1000); await desplazar(p, 1000, 60, 90); await pausa(p, 1000); },
@@ -44,13 +86,21 @@ const ESCENAS = {
     // Se escribe MU en el buscador de la ficha (sin emisora elegida la ficha sale vacía).
     await vista(p, "ficha"); await pausa(p, 600);
     const caja = p.locator("#panel-ficha input").first();
-    await caja.click({ timeout: 2000 }).catch(() => {}); await caja.pressSequentially("MU", { delay: 220 }).catch(() => {});
+    await caja.click({ timeout: 2000 }).catch(() => {}); await caja.fill("MU").catch(() => {}); await caja.press("Escape").catch(() => {});
     await pausa(p, 500); await p.locator("#panel-ficha button", { hasText: "Ver ficha" }).click({ timeout: 2000 }).catch(() => {});
+    await p.waitForFunction(() => /MICRON/i.test(document.getElementById("panel-ficha")?.innerText || ""), null, { timeout: 60000 }).catch(() => {});
+    await pausa(p, 800);
+    await p.evaluate(() => { const e = [...document.querySelectorAll("#panel-ficha *")].find((x) => x.children.length === 0 && /MICRON TECHNOLOGY/i.test(x.textContent));
+      if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 60 }); });
+    p._marca = (Date.now() - p._t0) / 1000;
     await pausa(p, 2500); await desplazar(p, 850, 70, 90); await pausa(p, 1200);  // termina en la gráfica, antes de los widgets que la demo no trae
   },
   investigacion: async (p) => { await vista(p, "investigacion"); await pausa(p, 1000); await desplazar(p, 1100, 60, 90); await pausa(p, 1000); },
-  riesgo: async (p) => { await vista(p, "riesgo"); await pausa(p, 1200); await desplazar(p, 1300, 70, 90); await pausa(p, 1200); },
-  propuestas: async (p) => { await vista(p, "propuestas"); await pausa(p, 1200); await desplazar(p, 1200, 70, 90); await pausa(p, 1000); },
+  // «Riesgo» necesita posiciones y la cuenta del Reto está archivada: se muestra el riesgo medido de un portafolio en «Mis portafolios».
+  // «Riesgo» necesita posiciones y la cuenta del Reto está archivada: se muestran el riesgo y los escenarios de la propuesta.
+  riesgo: async (p) => { await vista(p, "propuestas"); await pausa(p, 1500); await desplazar(p, 700, 60, 90); await pausa(p, 2500); await desplazar(p, 500, 50, 90); await pausa(p, 1500); },
+  // Prueba fuera de muestra frente a 1/N en «Mis portafolios».
+  propuestas: async (p) => { await vista(p, "portafolios"); await irA(p, "portafolios", "Prueba fuera de muestra"); p._marca = (Date.now() - p._t0) / 1000; await pausa(p, 1500); await desplazar(p, 600, 60, 90); await pausa(p, 1500); },
   // Deja a la vista la estrategia de pesos iguales (1/N).
   backtesting: async (p) => { await vista(p, "backtesting"); await pausa(p, 1500); await desplazar(p, 330, 50, 90); await pausa(p, 1200); },
   robustez: async (p) => { await vista(p, "robustez"); await pausa(p, 1200); await desplazar(p, 900, 60, 90); await pausa(p, 1000); },
@@ -67,6 +117,13 @@ const ESCENAS = {
   const necesarios = fs.existsSync(rutaNec) ? JSON.parse(fs.readFileSync(rutaNec, "utf8")) : {};
   for (const n of nombres) {
     const c = await b.newContext({ viewport: { width: W, height: H }, colorScheme: "dark", recordVideo: { dir: DIR, size: { width: W, height: H } } });
+    // Playwright solo graba cuadros cuando la página cambia: un píxel invisible que parpadea mantiene el reloj del video
+    // igual al reloj real, para que las marcas de «vista lista» caigan en el segundo correcto.
+    await c.addInitScript(() => addEventListener("DOMContentLoaded", () => {
+      const d = Object.assign(document.createElement("div"), { style: "position:fixed;left:0;bottom:0;width:1px;height:1px;z-index:99999;pointer-events:none" });
+      document.body.append(d); let k = 0;
+      (function tic() { d.style.background = k++ % 2 ? "#090a0c" : "#0a0b0d"; requestAnimationFrame(tic); })();
+    }));
     const p = await c.newPage();
     p._t0 = Date.now();
     await ESCENAS[n](p);

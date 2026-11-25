@@ -8,7 +8,7 @@
 
 **Advertencia fija en pantalla:** «Proyecto escolar independiente. No afiliado a Grupo Actinver. No es asesoría de inversión.»
 
-**Cifras:** todas son reales, del archivo del Reto Actinver 2026 y del informe escrito. La pantalla de la terminal se graba en modo demostración, con datos simulados.
+**Cifras:** todas son reales, del archivo del Reto Actinver 2026 y del informe escrito. Las pantallas se graban en la terminal local del equipo (127.0.0.1:8765, solo lectura); como la cuenta del Reto está archivada, «Riesgo» y «Plan» se muestran con la propuesta y Mis portafolios.
 
 ## Guion
 
@@ -47,7 +47,7 @@
 
 Las voces se grabaron y el video está montado con estética de terminal financiera y la paleta de Actinver Terminal (`DESIGN.md`, tema oscuro: fondos #090a0c y #121419, rojo de identidad #d94848, texto #f3f4f6), en cuatro archivos en `entregables/video/`: 4 integrantes y Miguel y Daniela, cada uno en 16:9 y en 9:16.
 
-1. `uv run python scripts/video_final.py necesidades` calcula cuántos segundos pide cada bloque; `node scripts/grabar_terminal.cjs` graba la demo pública (datos simulados) a 1060×770, el tamaño exacto de la ventana del video, sin recorte, escala ni cámara lenta, y anota en qué segundo queda lista cada vista.
+1. `uv run python scripts/video_final.py necesidades` calcula cuántos segundos pide cada bloque; `node scripts/grabar_terminal.cjs` graba la terminal local (http://127.0.0.1:8765/, solo lectura: no pulsa botones que guarden o envíen) a 1060×770, el tamaño exacto de la ventana del video, sin recorte, escala ni cámara lenta, y anota en qué segundo queda lista cada vista.
 2. `uv run --with matplotlib python scripts/video_paneles.py` rehace con el mismo diseño las gráficas y tablas del informe (datos reales del Reto).
 3. `uv run python scripts/video_final.py` compone cada bloque. Lleva barra de funciones y título deslizante, la grabación o el panel con revelado y acercamiento, y el panel de datos clave fila por fila. Abajo van la cinta de datos y los subtítulos sincronizados con la voz.
 
@@ -55,7 +55,7 @@ Los audios van en `data/medios/video/voces/` (privado).
 
 ## Cómo grabar (referencia)
 
-- **Pantalla:** OBS o la grabadora de Windows (Win + Alt + R), con la terminal en modo demostración (`start.bat demo`). Nunca la cuenta real.
+- **Pantalla:** OBS o la grabadora de Windows (Win + Alt + R), con la terminal local en marcha (`start.bat`). Nunca la cuenta de Actinver.
 - **Voces:** cada quien graba sus líneas en un lugar sin eco, con el teléfono a 15 cm, un archivo por línea, nombrado con el tiempo y el nombre (por ejemplo `0-00_Miguel.m4a`).
 - **Gráficas del Reto** (evolución frente a NAFTRAC y técnico de MU): salen del informe escrito; se muestran como imagen en sus segmentos.
 - **Música:** solo de la biblioteca comercial de TikTok o con licencia libre, a volumen bajo.
