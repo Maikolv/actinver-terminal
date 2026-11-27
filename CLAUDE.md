@@ -48,7 +48,7 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 
 - **Solo la versión de 4 integrantes.** La de Miguel y Daniela se retiró.
 - **Video:** grabado en la terminal local a pantalla completa (`FORMATO=horizontal|vertical node scripts/grabar_terminal.cjs`).
-  - El bloque de Telegram espera el audio «Miguel 5» (`data/medios/video/voces/`). Sin él, `video_final.py` lo omite y lo avisa.
+  - Incluye el bloque de Telegram con el audio «Miguel 5» (4 min 3 s).
 - **Portafolio idóneo** (Markowitz sobre el último registro del Reto):
   - en «Mis portafolios», id 7 (no es el principal); el de 12 instrumentos es el id 6;
   - en la sección 4.6 del informe;

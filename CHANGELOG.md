@@ -13,7 +13,7 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
   - La terminal ocupa todo el ancho, con barra de dirección 127.0.0.1:8765 y fichas de datos bajo la ventana. El panel lateral se retiró.
   - Grabaciones separadas para 16:9 (1880×680) y 9:16 (1060×1100).
   - Escenas nuevas: análisis técnico de MU, portafolios guardados y Alertas.
-  - Bloque de Telegram en el guion; falta el audio «Miguel 5».
+  - Bloque de Telegram con el audio de Miguel (video final de 4 min 3 s). Los videos de 2 integrantes también se borraron de YouTube y TikTok.
 - **Versión de Miguel y Daniela retirada:** videos, ZIP, informe y guion de 2 integrantes, y opciones `2`/`dos` de los generadores.
 
 ## 25-nov-2026 — Video grabado en la terminal local y propuesta de Markowitz
