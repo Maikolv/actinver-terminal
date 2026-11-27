@@ -51,6 +51,13 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
+## Estado comprobado: demo pública y cierre del desarrollo (27-nov-2026)
+
+El usuario dio por concluido el desarrollo por el momento. La demo de GitHub Pages (`sitio/terminal/`, `npm run
+estatico` contra el servidor demo del puerto 8767) tiene las 23 secciones y cálculos precalculados: Mis portafolios por
+perfil y clase, simulaciones de Propuestas, backtests y Asistente (10 preguntas y botones rápidos). Para auditarla:
+`node scripts/auditar_estatico.cjs` (0 faltantes en la última corrida). Detalle en `CHANGELOG.md`.
+
 ## Estado comprobado: entrega del concurso (27-nov-2026)
 
 - **Solo la versión de 4 integrantes.** La de Miguel y Daniela se retiró.

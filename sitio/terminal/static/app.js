@@ -2836,6 +2836,9 @@ async function cargarBacktesting() {
     if (!B.ids.length) {
       try { B.ids = (await api("/api/lista-seguimiento")).instrumentos.map((i) => i.instrumento_id).slice(0, 10); } catch { /* lista vacía */ }
     }
+    if (!B.ids.length) {  // sin lista de seguimiento: las posiciones de la cartera, para poder calcular de inmediato
+      try { B.ids = (await api("/api/cartera")).posiciones.map((x) => x.instrumento_id).slice(0, 10); } catch { /* sin cartera */ }
+    }
     const est = meta.estrategias[B.estrategia];
     const params = Object.entries(est.parametros).map(([k, def]) => {
       const i = h("input", { type: "number", min: meta.limites[k][0], max: meta.limites[k][1], step: 1, size: 5 });

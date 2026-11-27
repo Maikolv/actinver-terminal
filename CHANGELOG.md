@@ -2,6 +2,25 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 27-nov-2026 — Demo pública con los cálculos interactivos y cierre del desarrollo (por ahora)
+
+- **Demo de GitHub Pages más cercana a la terminal local:** además de las 23 secciones, ahora funcionan con respuestas
+  precalculadas en modo demo (datos simulados):
+  - el generador de Mis portafolios con cada perfil y cada clase, partiendo del estado inicial;
+  - «Simular estos cambios» en cada universo, lente y mercado de Propuestas;
+  - el backtest del estado inicial y de cada estrategia;
+  - diez preguntas de ejemplo al Asistente y sus botones rápidos `/plan`, `/cartera`, `/estado` y `/notas`.
+  - Con otras especificaciones, la demo lo dice y remite a la terminal local. Guardar, registrar y enviar siguen
+    bloqueados.
+- `scripts/exportar_estatico.cjs` graba esos cálculos con su método, ruta y cuerpo, incluidos los rechazos (p. ej. 422)
+  con su mensaje real. Ya no publica el token CSRF del servidor demo, y vacía la salida sin borrar carpetas abiertas.
+- `scripts/auditar_estatico.cjs` (nuevo) sirve `sitio/` como GitHub Pages y lista, por pestaña, las consultas sin
+  respuesta grabada y los errores. Resultado: 23 pestañas, Mesa y Oficina sin faltantes, errores ni cajas de error.
+- Backtesting arranca con las posiciones de la cartera si la lista de seguimiento está vacía (antes pedía elegir
+  instrumentos).
+- 275 respuestas grabadas (antes 220). Pruebas Node: 55 aprobadas.
+- Heston no se precalcula: la base demo no tiene cadena de opciones.
+
 ## 27-nov-2026 — Nombre definitivo «Actinver Terminal», versión de TikTok y miniaturas
 
 - **Nombre definitivo:** «Actinver Terminal»; el nombre «help-quote-terminal» queda retirado.

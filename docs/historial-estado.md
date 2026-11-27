@@ -1,5 +1,14 @@
 # Historial de estado de actinver-terminal
 
+## Demo pública completa y cierre del desarrollo — 27-nov-2026
+
+La exportación estática graba 275 respuestas (antes 220), incluidos los cálculos interactivos del modo demo: el
+generador de Mis portafolios con 5 perfiles × 4 clases en ambos órdenes (40 recorridos), las simulaciones de cada vista
+de Propuestas, el backtest inicial y el de cada estrategia, diez preguntas del Asistente y sus cuatro botones rápidos. La
+exportación tarda unos 5 min con el servidor demo en el puerto 8767. `scripts/auditar_estatico.cjs` recorrió las 23
+pestañas, Mesa y Oficina sin consultas faltantes, errores de consola ni cajas de error. El desarrollo queda concluido por
+el momento, por decisión del usuario.
+
 ## Ruta de inicio — 13-nov-2026
 
 GitHub Pages mostraba 174 instrumentos simulados con la etiqueta «Desactualizado» y Chrome registraba un 404 del favicon. La corrección se revisó a 1440 y 390 px, con teclado y pestañas móviles. En Windows con PowerShell 5.1, el clon tomó 43 s, `uv sync` tomó 2 min 26 s y la primera respuesta 200 de `/api/estado` llegó en 2 min 29 s. El script por lotes ahora admite `demo --sin-navegador`. El workflow de Codespaces pasó en 47 s. Para comprobar el puerto reenviado en un Codespace real hace falta el permiso `codespace` de la cuenta.
