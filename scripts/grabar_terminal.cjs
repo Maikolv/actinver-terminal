@@ -140,6 +140,8 @@ const ESCENAS = {
       document.body.append(d); let k = 0;
       (function tic() { d.style.background = k++ % 2 ? "#090a0c" : "#0a0b0d"; requestAnimationFrame(tic); })();
     }));
+    // En 16:9 la página de la terminal tiene ancho máximo: con zoom de 130 % ocupa toda la ventana y el texto se lee.
+    if (FORMATO === "horizontal") await c.addInitScript(() => addEventListener("DOMContentLoaded", () => { document.documentElement.style.zoom = "1.3"; }));
     const p = await c.newPage();
     p._t0 = Date.now();
     await ESCENAS[n](p);
