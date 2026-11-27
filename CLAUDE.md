@@ -54,14 +54,14 @@ El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal
 ## Estado comprobado: entrega del concurso (27-nov-2026)
 
 - **Solo la versión de 4 integrantes.** La de Miguel y Daniela se retiró.
-- **Video:** grabado en la terminal local a pantalla completa (`FORMATO=horizontal|vertical node scripts/grabar_terminal.cjs`).
+- **Video:** grabado en la terminal local a pantalla completa (`FORMATO=horizontal|vertical|tiktok node scripts/grabar_terminal.cjs`). La versión `tiktok` va centrada y dentro de la zona segura de TikTok.
   - Incluye el bloque de Telegram con el audio «Miguel 5» (4 min 3 s).
 - **Portafolio idóneo** (Markowitz sobre el último registro del Reto):
   - en «Mis portafolios», id 7 (no es el principal); el de 12 instrumentos es el id 6;
   - en la sección 4.6 del informe;
   - en `entregables/Propuesta_Markowitz_Lynx_Market.xlsx`;
   - detalle en `docs/propuesta-markowitz-20261125.md`.
-- **Google Drive:** carpeta compartida por enlace (solo lectura). Los MP4 los sube el usuario, porque las herramientas solo suben hasta 10 MB.
+- **Publicado:** YouTube no listado con miniatura y TikTok «Solo yo» (versión centrada) con portada. En Drive hay una carpeta compartida por enlace con los videos horizontal, vertical y TikTok y las dos imágenes. Los enlaces están en el archivo privado `data/medios/equipo.json`. Los MP4 de más de 10 MB se suben en partes y se comprueba el SHA-256.
 
 ## Estado comprobado: portafolio principal y escenario real (14-nov-2026)
 
