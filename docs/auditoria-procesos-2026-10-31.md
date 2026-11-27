@@ -36,7 +36,7 @@ sesión (`docs/optimizacion-medida-20261031.md`, `docs/auditoria-reels-20261031.
 3. Decidir EODHD de pago (≈ 20 USD/mes) o seguir con cobertura BMV parcial.
 4. Pendientes previos sin cambio: revisión visual del Excel de Markowitz, cotizaciones de bonos en Chrome, capitalización
    y sectores BMV, clave del Asistente, 9 propuestas del mandato, referencia frente a 1/N y confirmar el renombre a
-   help-quote-terminal el 13-nov.
+   actinver-terminal el 13-nov.
 
 ## Prompt para Codex
 

@@ -2,14 +2,14 @@
 // Recorre todas las pestañas con un navegador, graba cada respuesta GET de la API y copia la interfaz con rutas
 // reescritas. Nunca usar con la base real: verifica que /api/estado diga modo demo y aborta si no.
 //   1) TERMINAL_MODO=demo TERMINAL_SIN_MOTOR=1 uv run uvicorn terminal.app:app --host 127.0.0.1 --port 8767
-//   2) npm run estatico            (ORIGEN=http://127.0.0.1:8767  PREFIJO=/help-quote-terminal/terminal/)
+//   2) npm run estatico            (ORIGEN=http://127.0.0.1:8767  PREFIJO=/actinver-terminal/terminal/)
 "use strict";
 const { chromium } = require("playwright");
 const fs = require("node:fs"), path = require("node:path");
 
 const RAIZ = path.resolve(__dirname, "..");
 const ORIGEN = process.env.ORIGEN || "http://127.0.0.1:8767";
-const PREFIJO = process.env.PREFIJO || "/help-quote-terminal/terminal/";
+const PREFIJO = process.env.PREFIJO || "/actinver-terminal/terminal/";
 const SALIDA = path.join(RAIZ, "sitio", "terminal");
 const hash = (s) => { let h = 0x811c9dc5; for (const c of Buffer.from(s, "utf8")) { h ^= c; h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, "0"); };
 

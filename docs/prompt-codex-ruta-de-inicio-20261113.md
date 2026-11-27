@@ -4,7 +4,7 @@ Copie todo lo que está debajo de la línea en Codex, abierto en la carpeta del 
 
 ---
 
-Trabajas en `help-quote-terminal` (https://github.com/Maikolv/help-quote-terminal; FastAPI + SQLite + HTML/JS sin
+Trabajas en `actinver-terminal` (https://github.com/Maikolv/actinver-terminal; FastAPI + SQLite + HTML/JS sin
 build). Responde y documenta en español, con lenguaje sencillo. Lee primero `CLAUDE.md` y `docs/ruta-de-inicio.md`.
 
 ## Objetivo
@@ -15,13 +15,13 @@ ver la terminal funcionando. Hazlo en sus tres rutas. Corrige lo que falle y dej
 ## Tareas
 
 1. **Ruta A — demo en el navegador.**
-   - Abre https://maikolv.github.io/help-quote-terminal/ y `estacion.html`.
+   - Abre https://maikolv.github.io/actinver-terminal/ y `estacion.html`.
    - Confirma que cargan sin errores de consola, que el monitor muestra instrumentos y que todo dice «DATOS SIMULADOS».
    - Comprueba que se ve bien a 390 px de ancho.
 
 2. **Ruta C — PC con Windows, desde cero.**
    - Clona en una carpeta temporal **distinta** (por ejemplo `%TEMP%\hqt-prueba`):
-     `git clone https://github.com/Maikolv/help-quote-terminal.git`.
+     `git clone https://github.com/Maikolv/actinver-terminal.git`.
    - Ejecuta exactamente los comandos de la guía:
      - `uv sync`;
      - `copy .env.example .env`;

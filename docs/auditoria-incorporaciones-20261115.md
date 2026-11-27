@@ -1,6 +1,6 @@
 # Auditoría de incorporaciones — 15-nov-2026
 
-Qué se puede sumar a Help Quote Terminal, con costo, riesgo y estado. Regla vigente: **solo recursos gratuitos**.
+Qué se puede sumar a Actinver Terminal, con costo, riesgo y estado. Regla vigente: **solo recursos gratuitos**.
 
 ## 1. Asistente con la API de Gemini — implementado (apagado por defecto)
 

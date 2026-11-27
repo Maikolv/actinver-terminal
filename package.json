@@ -1,5 +1,5 @@
 {
-  "name": "help-quote-terminal-herramientas",
+  "name": "actinver-terminal-herramientas",
   "private": true,
   "description": "Herramientas de desarrollo: exportación estática, accesibilidad (axe) y QR. La terminal no las necesita para correr.",
   "scripts": {

@@ -2002,7 +2002,7 @@ function graficaTradingView(v) {
 const AVISO_TV = "Datos de TradingView: EE. UU. con la cotización gratuita de Cboe en USD; de la BMV solo hay perfil, fundamentales y análisis técnico (sin precio ni noticias) en estos widgets gratuitos. Pueden diferir del simulador del Reto. Solo informa.";
 // Los widgets y la gráfica de TradingView siguen el modo claro/oscuro del sistema, igual que la terminal.
 const TEMA_TV = "dark";  // los widgets de terceros siempre en negro, en cualquier modo de la terminal
-const urlWidget = (tipo, params = {}) => `/help-quote-terminal/terminal/widget/${tipo}?${new URLSearchParams({ ...params, tema: TEMA_TV })}`;
+const urlWidget = (tipo, params = {}) => `/actinver-terminal/terminal/widget/${tipo}?${new URLSearchParams({ ...params, tema: TEMA_TV })}`;
 function marcoWidget(tipo, params, alto, titulo) {
   const m = h("iframe", { clase: "widget-tv", title: titulo, loading: "lazy", src: urlWidget(tipo, params) });
   m.style.height = `${alto}px`;  // por CSSOM: la CSP bloquea el atributo style
@@ -2356,9 +2356,9 @@ function pintarSubasta(d, procedencia) {
       : h("p", { clase: "vacio", texto: "Sin barras intradía suficientes. Importe o actualice barras de 5 minutos en Velas." }),
     h("details", {}, h("summary", { texto: "Cómo leerlo y usarlo en la terminal" }),
       h("p", { clase: "ayuda", texto: "Aceptación: dos cierres consecutivos fuera del valor previo. Rechazo: la última barra explora fuera y cierra dentro. Rotación: cierre dentro sin barrido. Son hipótesis, no evidencia de ventaja. La sesión es RTH 09:30–16:00 de Nueva York; no es la sesión Globex." }),
-      h("a", { href: "/help-quote-terminal/terminal/static/recursos/auction-market-theory.md", texto: "Guía, fuentes y límites del módulo" }),
-      h("p", {}, h("a", { href: "/help-quote-terminal/terminal/static/recursos/actinver_amt.pine", download: "actinver_amt.pine", texto: "Descargar indicador AMT para TradingView" })),
-      h("p", {}, h("a", { href: "/help-quote-terminal/terminal/static/recursos/amt-proyectos-financieros.zip", download: "amt-proyectos-financieros.zip", texto: "Descargar fuentes y pruebas del módulo AMT" }))));
+      h("a", { href: "/actinver-terminal/terminal/static/recursos/auction-market-theory.md", texto: "Guía, fuentes y límites del módulo" }),
+      h("p", {}, h("a", { href: "/actinver-terminal/terminal/static/recursos/actinver_amt.pine", download: "actinver_amt.pine", texto: "Descargar indicador AMT para TradingView" })),
+      h("p", {}, h("a", { href: "/actinver-terminal/terminal/static/recursos/amt-proyectos-financieros.zip", download: "amt-proyectos-financieros.zip", texto: "Descargar fuentes y pruebas del módulo AMT" }))));
 }
 
 function pintarTpo(d) {

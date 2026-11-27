@@ -225,7 +225,7 @@ export const GUIAS = {
     pasos: ['Léalo antes de usar la terminal.', 'Muéstrelo a evaluadores o inversionistas cuando presente la terminal.'],
     terminos: [['Asesoría de inversión', 'Recomendación personalizada de un profesional registrado; la terminal no la ofrece.']],
   },
-  '/help-quote-terminal/terminal/static/recursos/oficina-inversion.html': {
+  '/actinver-terminal/terminal/static/recursos/oficina-inversion.html': {
     titulo: 'Oficina de inversión',
     que: 'Una revisión rápida de un instrumento con seis mesas (Datos, Cuantitativo, Order Flow, Crítico, Riesgo y Coordinación) sobre los datos ya guardados.',
     pasos: ['Elija un instrumento; los que tienen datos guardados aparecen primero. La consulta se hace sola.',
@@ -235,7 +235,7 @@ export const GUIAS = {
     terminos: [['Mesa', 'Una perspectiva de revisión con reglas descriptivas; no es un agente autónomo.'],
       ['Lectura local', 'Velas de 7 días y operaciones de 60 minutos ya guardadas; no consulta proveedores.']],
   },
-  '/help-quote-terminal/terminal/static/mesa.html': {
+  '/actinver-terminal/terminal/static/mesa.html': {
     titulo: 'Mesa de investigación',
     que: 'Un tablero que usted arma a su medida: gráficas, contexto y herramientas de un mismo instrumento en una sola pantalla.',
     pasos: ['Busque el instrumento (Ctrl+K) o elíjalo de la lista.',
@@ -245,7 +245,7 @@ export const GUIAS = {
     terminos: [['Panel', 'Un recuadro con una sola herramienta o gráfica.'],
       ['Precio externo', 'Viene de un widget de terceros, puede tener retraso y no alimenta los cálculos de la terminal.']],
   },
-  '/help-quote-terminal/terminal/static/recursos/practica-proyectos-financieros.html': {
+  '/actinver-terminal/terminal/static/recursos/practica-proyectos-financieros.html': {
     titulo: 'Cuaderno financiero',
     que: 'Práctica guiada sin conexión: tesis de inversión, valoración por DCF y DCF inverso, y volatilidad, con ejemplos sintéticos.',
     pasos: ['Escriba su tesis y qué la invalidaría, o elija una opción precargada en la lista de cada campo.', 'Elija un escenario listo de valoración (calcula solo) o escriba sus supuestos.',
@@ -294,7 +294,7 @@ export async function montarReferencias(doc) {
   const cont = doc.getElementById('referencias-lista');
   if (!cont) return;
   try {
-    const d = await (await fetch('/help-quote-terminal/terminal/static/referencias.json', { cache: 'no-store' })).json();
+    const d = await (await fetch('/actinver-terminal/terminal/static/referencias.json', { cache: 'no-store' })).json();
     const el = (tag, props = {}, ...hijos) => { const n = doc.createElement(tag); Object.assign(n, props); n.append(...hijos); return n; };
     cont.replaceChildren(el('p', { className: 'ayuda' }, d.aviso), ...d.grupos.map((g) => el('details', { className: 'referencias__grupo', open: true },
       el('summary', {}, `${g.titulo} (${g.items.length})`),

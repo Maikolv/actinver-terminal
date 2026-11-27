@@ -168,9 +168,16 @@ def trozos(texto: str, maximo: int) -> list[str]:
     return out + [actual] if actual else out
 
 
-def geometria(W, H):
-    """La ventana de la terminal ocupa todo el ancho; arriba, su barra de dirección (127.0.0.1:8765); abajo, fichas de datos."""
-    if W > H:
+def geometria(W, H, modo=None):
+    """La ventana de la terminal ocupa todo el ancho; arriba, su barra de dirección (127.0.0.1:8765); abajo, fichas de datos.
+
+    modo «tiktok»: todo centrado (x 120–960) y dentro de la zona segura de TikTok (y 190–1480): fuera de la barra
+    superior «Siguiendo / Para ti», de los botones de la derecha y de la descripción de abajo."""
+    if modo == "tiktok":
+        g = dict(W=W, H=H, barra=84, tit_y=196, tit_h=54, tit_f=28, win=(120, 268, 840, 872), url_h=40,
+                 fichas=(120, 1150, 840, 128), cols=3, sub=(120, 1288, 840, 190), sub_f=36, cinta_y=1500, cinta_h=40,
+                 aviso_y=1550, aviso_f=20, max_sub=58, grab="tiktok", centro=W // 2)
+    elif W > H:
         g = dict(W=W, H=H, barra=56, tit_y=70, tit_h=50, win=(20, 128, 1880, 724), url_h=44, fichas=(20, 860, 1880, 62), cols=6,
                  sub=(20, 930, 1880, 90), sub_f=32, cinta_y=1024, cinta_h=34, aviso_y=1062, aviso_f=14, max_sub=150, grab="horizontal")
     else:
@@ -188,9 +195,13 @@ def chrome(g, destino):
     d.rectangle([0, 0, W, g["barra"]], fill=BARRA)
     d.rectangle([0, g["barra"], W, g["barra"] + 3], fill=MARCA)
     f = fuente(26 if W > H else 34)
-    d.text((22, g["barra"] // 2), "ACTINVER TERMINAL", font=f, fill=AMBAR, anchor="lm")
+    if g.get("centro"):
+        d.text((g["centro"], g["barra"] // 2), "ACTINVER TERMINAL", font=f, fill=AMBAR, anchor="mm")
+    else:
+        d.text((22, g["barra"] // 2), "ACTINVER TERMINAL", font=f, fill=AMBAR, anchor="lm")
     der = f"{NOMBRE_EQUIPO.upper()}  │  RETO ACTINVER 2026  │  UVM" if NOMBRE_EQUIPO else "RETO ACTINVER 2026  │  UVM"
-    d.text((W - 22, g["barra"] // 2), der, font=fuente(18 if W > H else 20, False), fill=GRIS, anchor="rm")
+    if not g.get("centro"):
+        d.text((W - 22, g["barra"] // 2), der, font=fuente(18 if W > H else 20, False), fill=GRIS, anchor="rm")
     x, y, w, h = g["win"]
     d.rectangle([x - 2, y - 2, x + w + 1, y + h + 1], outline=LINEA, width=2)
     d.rectangle([x, y, x + w, y + g["url_h"]], fill=BARRA)  # barra del navegador
@@ -212,12 +223,16 @@ def chrome(g, destino):
 
 
 def tira_titulo(b, g, destino):
-    f, h = fuente(30 if g["W"] > g["H"] else 34), g["tit_h"]
+    f, h = fuente(g.get("tit_f") or (30 if g["W"] > g["H"] else 34)), g["tit_h"]
     cod, tit, (etq, cetq) = f" {b['cod']} ", f"  {b['titulo']}", b["origen"]
     tmp = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     fe = fuente(16 if g["W"] > g["H"] else 20)
     w_cod, w_tit, w_etq = tmp.textlength(cod, font=f), tmp.textlength(tit, font=f), tmp.textlength(etq, font=fe) + 24
     ancho = int(w_cod + w_tit + 30 + w_etq) + 4
+    while ancho > g["win"][2] and f.size > 18:  # se achica hasta caber en la ventana: nada queda cortado
+        f, fe = fuente(f.size - 1), fuente(max(12, fe.size - 1))
+        w_cod, w_tit, w_etq = tmp.textlength(cod, font=f), tmp.textlength(tit, font=f), tmp.textlength(etq, font=fe) + 24
+        ancho = int(w_cod + w_tit + 30 + w_etq) + 4
     im = Image.new("RGBA", (ancho, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
     d.rectangle([0, 0, w_cod, h], fill=SOLIDO, outline=MARCA, width=2)
     d.text((0, h // 2), cod, font=f, fill=BLANCO, anchor="lm")
@@ -252,7 +267,11 @@ def subtitulo(texto, g, destino):
     alto = len(lineas) * int(f.size * 1.3)
     y = (sh - alto) // 2
     for l in lineas:
-        d.text((12, y), l, font=f, fill=BLANCO); y += int(f.size * 1.3)
+        if g.get("centro"):
+            d.text(((sw - 30) // 2, y), l, font=f, fill=BLANCO, anchor="ma")
+        else:
+            d.text((12, y), l, font=f, fill=BLANCO)
+        y += int(f.size * 1.3)
     im.save(destino)
 
 
@@ -277,9 +296,9 @@ def tarjeta(lineas, g, destino):
     capas = []
     y = H * 0.34
     for i, (texto, tam, color) in enumerate(lineas):
-        f = fuente(tam if W > H else int(tam * 1.2), negrita=tam >= 30)
+        f = fuente(tam if W > H or g.get("centro") else int(tam * 1.2), negrita=tam >= 30)
         im = Image.new("RGBA", (W, int(f.size * 1.5) + 8), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-        d.text((W // 2, 4), texto, font=f, fill=color, anchor="mt")
+        d.text((g.get("centro", W // 2), 4), texto, font=f, fill=color, anchor="mt")
         p = Path(f"{destino}_{i}.png"); im.save(p); capas.append((p, int(y)))
         y += f.size * 1.5 + 14
     return capas
@@ -348,11 +367,12 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
     wx, wy, cw, ch = g["cont"]
     contenido(b["items"], D, cw, ch, t, t / "contenido.mp4", GRAB / g["grab"])
     ancho_tit = tira_titulo(b, g, t / "titulo.png")
+    tx = (W - ancho_tit) // 2 if g.get("centro") else g.get("tit_x", 22)
     entradas = ["-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", base["chrome"], "-i", t / "contenido.mp4",
                 "-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", t / "titulo.png",
                 "-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", base["cinta"]]
     fil = [f"[0:v][1:v]overlay={wx}:{wy}[v0]",
-           f"[v0][2:v]overlay=x='if(lt(t,0.45),-w+({ancho_tit}+22)*t/0.45,22)':y={g['tit_y']}[v1]",
+           f"[v0][2:v]overlay=x='if(lt(t,0.45),-w+({ancho_tit}+{tx})*t/0.45,{tx})':y={g['tit_y']}[v1]",
            f"[v1][3:v]overlay=x='-mod((t+{offset:.3f})*110,{base['seg']})':y={g['cinta_y']}[v2]"]
     n, ultimo = 4, "v2"
     fx, fy, fw, fh = g["fichas"]
@@ -365,6 +385,9 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
         entradas += ["-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", p]
         t0 = 0.6 + k * 0.25
         x0, y0 = fx + (k % cols) * (aw + gap), fy + (k // cols) * (ah + gap)
+        if g.get("centro"):  # la última fila incompleta también queda centrada
+            en_fila = min(cols, len(b["datos"]) - (k // cols) * cols)
+            x0 += (fw - (en_fila * aw + (en_fila - 1) * gap)) // 2
         fil.append(f"[{ultimo}][{n}:v]overlay=x={x0}:y='{y0}+max(0,{t0 + 0.25}-t)*120':enable='gte(t,{t0})'[f{k}]")
         ultimo, n = f"f{k}", n + 1
     partes = trozos(texto, g["max_sub"])
@@ -376,9 +399,10 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
         dur = (D - 0.5) * len(parte) / total
         entradas += ["-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", p]
         fin = D if j == len(partes) - 1 else t_ini + dur
-        fil.append(f"[{ultimo}][{n}:v]overlay=x={sx + 22}:y={sy}:enable='between(t,{t_ini:.3f},{fin:.3f})'[s{j}]")
+        fil.append(f"[{ultimo}][{n}:v]overlay=x={sx + (15 if g.get('centro') else 22)}:y={sy}:enable='between(t,{t_ini:.3f},{fin:.3f})'[s{j}]")
         ultimo, n, t_ini = f"s{j}", n + 1, t_ini + dur
-    cursor = (22 + int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength("ACTINVER TERMINAL", font=fuente(26 if W > H else 34))) + 10)
+    largo = int(ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength("ACTINVER TERMINAL", font=fuente(26 if W > H else 34)))
+    cursor = g["centro"] + largo // 2 + 10 if g.get("centro") else 22 + largo + 10
     fil.append(f"[{ultimo}]drawbox=x={cursor}:y={g['barra'] // 2 - 12}:w=12:h=24:color=0xD94848:t=fill:enable='lt(mod(t,1),0.5)',"
                f"fade=t=in:st=0:d=0.25,format=yuv420p[out]")
     entradas += ["-i", wav]
@@ -407,15 +431,15 @@ def tarjeta_video(lineas, seg, g, t, nombre, destino):
        *CODEC, "-c:a", "aac", "-b:a", "192k", "-ar", 48000, destino)
 
 
-def render(version: str, W: int, H: int):
+def render(version: str, W: int, H: int, modo=None):
     archivos = VERSIONES[version]
     disponibles = voces()
     falta = [a for a in archivos if a not in disponibles and a not in OPCIONALES]
     if falta:
         sys.exit(f"Faltan audios en {VOCES}: {falta}")
     SAL.mkdir(parents=True, exist_ok=True)
-    destino = SAL / f"Video_Actinver_Terminal_{version}_{'vertical' if H > W else 'horizontal'}.mp4"
-    g = geometria(W, H)
+    destino = SAL / f"Video_Actinver_Terminal_{version}_{modo or ('vertical' if H > W else 'horizontal')}.mp4"
+    g = geometria(W, H, modo)
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
         base = {"chrome": t / "chrome.png", "cinta": t / "cinta.png"}
@@ -438,7 +462,7 @@ def render(version: str, W: int, H: int):
         partes.append(t / "fin.mp4")
         tarjeta_video([(f"EQUIPO {NOMBRE_EQUIPO.upper()}".strip(), 44, AMBAR), *[(n.upper(), 26, BLANCO) for n in EQUIPO],
                        ("LIC. EN CONTADURÍA Y FINANZAS PÚBLICAS · UVM CAMPUS HISPANO", 20, GRIS),
-                       ("GITHUB.COM/MAIKOLV/HELP-QUOTE-TERMINAL", 24, AMBAR),
+                       ("GITHUB.COM/MAIKOLV/ACTINVER-TERMINAL", 24, AMBAR),
                        ("PANTALLAS: GRABADAS EN NUESTRA TERMINAL · CIFRAS DEL RETO: REALES", 18, GRIS),
                        (AVISO.upper(), 16, GRIS)], 6.0, g, t, "fin", partes[-1])
         lista = t / "lista.txt"
@@ -463,10 +487,12 @@ def necesidades():
 if __name__ == "__main__":
     if "necesidades" in sys.argv:
         necesidades(); sys.exit()
-    formatos = [a for a in sys.argv[1:] if a in ("horizontal", "vertical")] or ["horizontal", "vertical"]
+    formatos = [a for a in sys.argv[1:] if a in ("horizontal", "vertical", "tiktok")] or ["horizontal", "vertical", "tiktok"]
     versiones = [a for a in sys.argv[1:] if a in VERSIONES] or list(VERSIONES)
     for version in versiones:
         if "horizontal" in formatos:
             render(version, 1920, 1080)
         if "vertical" in formatos:
             render(version, 1080, 1920)
+        if "tiktok" in formatos:
+            render(version, 1080, 1920, "tiktok")

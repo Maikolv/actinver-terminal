@@ -8,7 +8,7 @@
   "live_habilitado": false,
   "fuentes": "fuentes.json",
   "repositorios": "repositorios.json",
-  "interfaz_actinver": "/help-quote-terminal/terminal/static/mesa.html",
+  "interfaz_actinver": "/actinver-terminal/terminal/static/mesa.html",
   "pine": "mesa_riesgo_nq.pine",
   "cuantower": "Documentación y funciones puras existentes; sin DLL nueva ni despliegue",
   "pendientes": [

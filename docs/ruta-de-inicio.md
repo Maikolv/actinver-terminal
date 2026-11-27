@@ -1,6 +1,6 @@
 # Guía paso a paso para abrir Actinver Terminal
 
-[Repositorio en GitHub](https://github.com/Maikolv/help-quote-terminal)
+[Repositorio en GitHub](https://github.com/Maikolv/actinver-terminal)
 
 | Ruta | Cuándo elegirla | Datos |
 |---|---|---|
@@ -10,7 +10,7 @@
 
 ## Ruta A — Demo en el navegador
 
-1. Abra la [portada pública](https://maikolv.github.io/help-quote-terminal/) y busque el aviso **DATOS SIMULADOS**.
+1. Abra la [portada pública](https://maikolv.github.io/actinver-terminal/) y busque el aviso **DATOS SIMULADOS**.
 2. Pulse **Abrir la estación (demo)**. El monitor muestra los instrumentos y la columna **Dato** marca sus precios como **SIMULADO**.
 3. Pulse `/` para enfocar **Buscar instrumento**. Escriba, por ejemplo, `XOM` y pulse Enter para seleccionar la primera coincidencia. Use ↑ y ↓ para cambiar de fila. El filtro **Con gráfico en esta foto** deja solo los instrumentos con serie histórica.
 4. En el celular verá **Monitor**, **Gráfico** y **Detalle**. Toque una fila para abrir **Gráfico**.
@@ -58,8 +58,8 @@ Cierre y vuelva a abrir PowerShell. Compruebe que `git --version` y `uv --versio
 $repos = Join-Path $env:USERPROFILE 'Repos'
 New-Item -ItemType Directory -Path $repos -Force | Out-Null
 Set-Location -LiteralPath $repos
-git clone https://github.com/Maikolv/help-quote-terminal.git
-Set-Location -LiteralPath .\help-quote-terminal
+git clone https://github.com/Maikolv/actinver-terminal.git
+Set-Location -LiteralPath .\actinver-terminal
 uv sync
 if (-not (Test-Path -LiteralPath .env)) { copy .env.example .env }
 ```

@@ -1,4 +1,10 @@
-# Directriz post-Reto: de «actinver-terminal» a «help-quote-terminal»
+# Directriz post-Reto y nombre definitivo «Actinver Terminal»
+
+> **27-nov-2026:** el usuario fijó el nombre definitivo **Actinver Terminal**. El nombre «help-quote-terminal» queda retirado.
+> - Repositorio: `Maikolv/actinver-terminal`.
+> - Página: `https://maikolv.github.io/actinver-terminal/`.
+> - Rama de respaldo: `respaldo-pre-reto`.
+
 
 Dictada por el usuario el 25-oct-2026. **Se activa cuando termine la competencia del Reto Actinver 2026:
 13-nov-2026 a las 15:00 (Ciudad de México)**, según `config/reto.yaml` (`competencia_fin`). Antes de esa fecha no se
@@ -6,11 +12,11 @@ aplica nada de esto: el Reto sigue rigiendo la terminal.
 
 ## Qué hacer a partir de esa fecha
 
-1. **Nuevo nombre: `help-quote-terminal`** (nombre visible: «Help Quote Terminal»). Debe cambiar en:
+1. **Nuevo nombre: `actinver-terminal`** (nombre visible: «Actinver Terminal»). Debe cambiar en:
    - el código: paquete en `pyproject.toml`, títulos de la interfaz, Telegram, reportes, lanzador y scripts de arranque;
    - toda la documentación local: README, CLAUDE.md, `docs/`, CHANGELOG (nueva entrada; el historial anterior se conserva
      tal cual);
-   - GitHub: el repositorio `Maikolv/actinver-terminal` pasa a `help-quote-terminal`;
+   - GitHub: el repositorio `Maikolv/actinver-terminal` pasa a `actinver-terminal`;
    - la carpeta local, las notas de memoria de Claude y cualquier otro archivo o chat local que nombre la terminal.
 2. **Quitar todas las reglas del Reto:**
    - mínimo de 5 emisoras y máximo de 50 % por emisora;
@@ -44,7 +50,7 @@ aplica nada de esto: el Reto sigue rigiendo la terminal.
 ## Cómo ejecutarla (para Claude Code, Codex u otra sesión)
 
 1. Comprobar que ya pasó `competencia_fin` y avisar al usuario que se va a aplicar esta directriz.
-2. Respaldo verificado de `data/` y rama `pre-help-quote` en GitHub.
+2. Respaldo verificado de `data/` y rama `respaldo-pre-reto` en GitHub.
 3. Renombre en código y documentos, con la suite completa en verde.
 4. Desactivar las reglas del Reto: en `config/reto.yaml` dejar `activo: false` o equivalente, y quitar sus validaciones
    y textos. Las pruebas que dependan del Reto se adaptan al nuevo objetivo; no se borran sin reemplazo.

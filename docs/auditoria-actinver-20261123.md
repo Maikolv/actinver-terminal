@@ -8,7 +8,7 @@
 | Telegram, Excel de Markowitz, lanzador (`launcher/`), scripts de arranque, `start.bat`, Worker | Restaurado |
 | README, DESIGN.md, Codespaces, portada de Pages, reporte ejecutivo, guía de inicio, propuesta de stand | Restaurado + aviso «no afiliado a Grupo Actinver» |
 | CHANGELOG, historial, prompts y auditorías anteriores | Sin cambios (registros de su época) |
-| **Repositorio en GitHub** (`Maikolv/help-quote-terminal`) | **PENDIENTE (paso externo).** El sistema de permisos bloqueó `gh repo rename`. Comando para el usuario: `gh repo rename actinver-terminal -R Maikolv/help-quote-terminal --yes`, y luego `git remote set-url origin https://github.com/Maikolv/actinver-terminal.git`. Al hacerlo, la URL de Pages pasa a `maikolv.github.io/actinver-terminal/` y hay que volver a exportar con `PREFIJO=/actinver-terminal/terminal/ npm run estatico` y reemplazar los enlaces. |
+| **Repositorio en GitHub** (`Maikolv/actinver-terminal`) | **PENDIENTE (paso externo).** El sistema de permisos bloqueó `gh repo rename`. Comando para el usuario: `gh repo rename actinver-terminal -R Maikolv/actinver-terminal --yes`, y luego `git remote set-url origin https://github.com/Maikolv/actinver-terminal.git`. Al hacerlo, la URL de Pages pasa a `maikolv.github.io/actinver-terminal/` y hay que volver a exportar con `PREFIJO=/actinver-terminal/terminal/ npm run estatico` y reemplazar los enlaces. |
 | Carpeta local | Ya se llama `actinver-terminal` (no requiere cambio) |
 
 Sistema visual (DESIGN.md, sin cambios):
@@ -45,7 +45,7 @@ Sistema visual (DESIGN.md, sin cambios):
 
 ## (c) Paridad local frente a GitHub Pages
 
-URL: https://maikolv.github.io/help-quote-terminal/terminal/ (versión estática, **DEMO PÚBLICA con datos simulados**).
+URL: https://maikolv.github.io/actinver-terminal/terminal/ (versión estática, **DEMO PÚBLICA con datos simulados**).
 
 | Función local | Depende de | En Pages | Estado |
 |---|---|---|---|

@@ -1,14 +1,15 @@
 // Grabaciones en video de la terminal LOCAL del equipo (127.0.0.1:8765) para el video del concurso.
 // Solo lee: no pulsa botones que guarden o envíen nada y nunca abre la cuenta de Actinver.
-//   FORMATO=horizontal|vertical node scripts/grabar_terminal.cjs [nombre…]   → data/medios/video/grabaciones/<formato>/<nombre>.webm
+//   FORMATO=horizontal|vertical|tiktok node scripts/grabar_terminal.cjs [nombre…]   → data/medios/video/grabaciones/<formato>/<nombre>.webm
 "use strict";
 const { chromium } = require("playwright");
 const fs = require("node:fs"), path = require("node:path");
 const ORIGEN = process.env.ORIGEN || "http://127.0.0.1:8765/";
 const BASE = path.resolve(__dirname, "..", "data", "medios", "video", "grabaciones");
 // Mismo tamaño que el área de la terminal en el video (video_final.geometria «cont»): se usa 1:1, sin recorte ni escala.
-const FORMATO = process.env.FORMATO === "vertical" ? "vertical" : "horizontal";
-const [W, H] = FORMATO === "vertical" ? [1060, 1100] : [1880, 680];
+const FORMATO = ["vertical", "tiktok"].includes(process.env.FORMATO) ? process.env.FORMATO : "horizontal";
+// tiktok: zona segura de TikTok (sin la barra superior, los botones de la derecha ni la descripción de abajo).
+const [W, H] = { horizontal: [1880, 680], vertical: [1060, 1100], tiktok: [840, 832] }[FORMATO];
 const DIR = path.join(BASE, FORMATO);
 
 const pausa = (p, ms) => p.waitForTimeout(ms);

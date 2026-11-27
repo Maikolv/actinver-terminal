@@ -212,7 +212,7 @@ if(typeof document!=='undefined') {
     const caja=$('mesa-seguimiento');if(!caja)return;
     try{
       const r=await obtener('/api/lista-seguimiento');
-      if(!r.instrumentos.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'Seguimiento: SIN DATO · su lista está vacía. '),el('a',{href:'/help-quote-terminal/terminal/?vista=tab-seguimiento'},'Agregar instrumentos en Seguimiento'));return;}
+      if(!r.instrumentos.length){caja.replaceChildren(el('p',{clase:'sin-dato'},'Seguimiento: SIN DATO · su lista está vacía. '),el('a',{href:'/actinver-terminal/terminal/?vista=tab-seguimiento'},'Agregar instrumentos en Seguimiento'));return;}
       caja.replaceChildren(el('div',{clase:'tabla-contenedor'},el('table',{clase:'mesa-seguimiento'},el('caption',{},'Seguimiento · misma lista que la sección Seguimiento. Seleccione una fila para usar ese instrumento.'),
         el('thead',{},el('tr',{},...['Instrumento','Último (MXN)','Var. 1 sesión','Fecha','Proveedor','Estado'].map(t=>el('th',{scope:'col'},t)))),
         el('tbody',{},r.instrumentos.map(f=>{const valida=f.ultimo_mxn!=null&&f.vigencia&&f.vigencia!=='sin_datos';const v=valida?f.variacion?.[1]:null;
@@ -275,7 +275,7 @@ if(typeof document!=='undefined') {
           if(!d.open){control?.abort();control=null;d.querySelector('iframe')?.remove();aviso.textContent='';return;}
           if(d.querySelector('iframe')||control)return;
           const actual=new AbortController();control=actual;aviso.textContent='Comprobando disponibilidad del marco…';
-          const ruta=tipo==='chart'?`/grafica/${encodeURIComponent(simbolo)}?tema=${tema}`:`/help-quote-terminal/terminal/widget/${tipo}?${new URLSearchParams({simbolo,tema})}`;
+          const ruta=tipo==='chart'?`/grafica/${encodeURIComponent(simbolo)}?tema=${tema}`:`/actinver-terminal/terminal/widget/${tipo}?${new URLSearchParams({simbolo,tema})}`;
           try{const r=await fetch(ruta,{signal:AbortSignal.any([actual.signal,AbortSignal.timeout(15000)])});
             if(!d.open||!card.isConnected||actual.signal.aborted)return;
             if(!r.ok){aviso.textContent=`SIN DATO · el servidor no ofrece este panel (HTTP ${r.status}). Use la alternativa local.`;return;}
@@ -321,7 +321,7 @@ if(typeof document!=='undefined') {
     else if(r.tipo==='panel'){if(!activos.includes(r.valor)){activos.push(r.valor);$('mesa-preset').value='guardada';guardar();dibujar();}buscador.value='';filtrar();const h=document.querySelector(`[data-panel="${r.valor}"] h2`);h?.scrollIntoView({block:'center'});h?.focus();}
     else if(r.tipo==='disposicion'){buscador.value='';filtrar();aplicarDisposicion(r.valor);}
   }
-  buscador.addEventListener('input',()=>{filtrar();pintarPaleta();if(!pedidas){pedidas=true;obtener('/help-quote-terminal/terminal/static/navegacion.json').then(d=>{secciones=[...d.areas,...d.secciones];if(buscador.value)pintarPaleta();}).catch(()=>{pedidas=false;});}});
+  buscador.addEventListener('input',()=>{filtrar();pintarPaleta();if(!pedidas){pedidas=true;obtener('/actinver-terminal/terminal/static/navegacion.json').then(d=>{secciones=[...d.areas,...d.secciones];if(buscador.value)pintarPaleta();}).catch(()=>{pedidas=false;});}});
   buscador.addEventListener('blur',()=>setTimeout(cerrarPaleta,150));
   buscador.addEventListener('keydown',e=>{
     if(e.key==='ArrowDown'&&resultados.length){e.preventDefault();marcar((activo+1)%resultados.length);}

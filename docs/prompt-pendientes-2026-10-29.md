@@ -15,14 +15,14 @@ para Codex. Ambos prompts cubren lo mismo y difieren solo en cómo trabaja cada 
 | 6 | Energía de Windows sin suspender de 07:00 a 15:30 y la terminal al iniciar sesión | Sin terminal encendida no hay datos, avisos ni plan | Gratis |
 | 7 | Clave de Anthropic u Ollama local para el Asistente | Respuestas redactadas | Pago por uso u Ollama gratis |
 | 8 | Las 9 propuestas de revisión del mandato y la referencia del plan frente a 1/N | Pendientes desde septiembre y octubre | — |
-| 9 | Confirmar el renombre a help-quote-terminal (13-nov 15:00) | La directriz post-Reto exige su confirmación para renombrar carpeta y repositorio | — |
+| 9 | Confirmar el renombre a actinver-terminal (13-nov 15:00) | La directriz post-Reto exige su confirmación para renombrar carpeta y repositorio | — |
 | 10 | Autorizar el commit y la subida a GitHub | Respaldo y CI | — |
 
 ## B. Prompt para Claude Code
 
 ```text
 Trabaja en C:\Users\MIKE\Desktop\Repos\actinver-terminal (Actinver Terminal; desde el 13-nov-2026 15:00 se llamará
-help-quote-terminal según docs/directriz-post-reto.md). Lee CLAUDE.md, docs/auditoria-2026-10-28.md y
+actinver-terminal según docs/directriz-post-reto.md). Lee CLAUDE.md, docs/auditoria-2026-10-28.md y
 docs/historial-estado.md (entrada del 28-oct, noche) antes de empezar. Responde en español sencillo.
 
 Límites (mandato v2, no negociables): sin dinero real ni órdenes; secretos solo en .env (nunca en logs, commits ni

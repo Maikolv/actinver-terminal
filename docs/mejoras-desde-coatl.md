@@ -12,7 +12,7 @@ Ocho prácticas de COATL revisadas. Antes de cada una se buscó si ya existía a
   - las lecturas salen de `api/<hash>.json`, con un índice para no pedir archivos que no existen;
   - escribir, calcular u operar responde con un aviso;
   - la vela en vivo queda apagada.
-- Publicada en https://maikolv.github.io/help-quote-terminal/terminal/ por `.github/workflows/pages.yml`.
+- Publicada en https://maikolv.github.io/actinver-terminal/terminal/ por `.github/workflows/pages.yml`.
 
 ## Resultado por práctica
 

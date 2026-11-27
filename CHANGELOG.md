@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 27-nov-2026 — Nombre definitivo «Actinver Terminal», versión de TikTok y miniaturas
+
+- **Nombre definitivo:** «Actinver Terminal»; el nombre «help-quote-terminal» queda retirado.
+  - Repositorio de GitHub renombrado a `Maikolv/actinver-terminal`, con descripción, página y temas nuevos.
+  - Página: `https://maikolv.github.io/actinver-terminal/`.
+  - Rama de respaldo: `respaldo-pre-reto`.
+  - 40 archivos actualizados.
+  - Se retiró `scripts/renombrar-carpeta.ps1`.
+- **Video para TikTok:** todo centrado (x 120–960) y dentro de la zona segura, fuera de la barra superior, los botones de la derecha y la descripción de abajo.
+  - Grabaciones 1:1 a 840×832.
+  - Las gráficas conservan su proporción.
+  - Los títulos se ajustan para no cortarse.
+- **Miniaturas:** YouTube (1280×720) y portada de TikTok (1080×1920), con una captura real de la terminal (`scripts/miniaturas.py`).
+
 ## 27-nov-2026 — Portafolio idóneo, terminal a pantalla completa en el video y versión única de 4 integrantes
 
 - **Portafolio idóneo** (Mis portafolios, id 7). El generador de la terminal y el Solver de la plantilla de Markowitz se aplicaron sobre los 12 instrumentos del último registro.
@@ -60,7 +74,7 @@ Formato libre en español (inspirado en Keep a Changelog). Fecha = día del comm
 ## 17-nov-2026 — Terminal completa en GitHub Pages y prácticas de COATL
 
 - **Terminal completa sin servidor:**
-  - https://maikolv.github.io/help-quote-terminal/terminal/ con datos simulados;
+  - https://maikolv.github.io/actinver-terminal/terminal/ con datos simulados;
   - `scripts/exportar_estatico.cjs` graba 220 respuestas de la demo en las 23 pestañas;
   - `web/static/estatico.js` las sirve; escribir, calcular u operar responde con un aviso.
 - **Indicador «cálculo listo»** (`<html data-calculo>`).
@@ -601,7 +615,7 @@ sección, Black-Litterman y la revisión de guías; esta sesión, los puntos de 
 - **Mercado:** «Panorama de TradingView» con cinta de tus posiciones de EE. UU., resumen de índices, dólar y materias primas, mapa de calor (Nasdaq 100 / S&P 500), calendario económico de EE. UU. y México, filtro de acciones (EE. UU. / México) y noticias.
 - Ruta `/widget/{tipo}` con lista cerrada de tipos y parámetros, CSP propia y enmarcable solo desde la terminal. Los widgets solo muestran: nada entra en cálculos ni se guarda. 2 pruebas nuevas (`tests/test_grafica_vivo.py`).
 - `docs/auditoria-2026-10-25.md`: hallazgos y prompt de mejoras.
-- `docs/directriz-post-reto.md` (referida en CLAUDE.md): desde el 13-nov-2026 15:00 la terminal pasa a «help-quote-terminal», sin reglas del Reto, con todas sus funciones y los mismos límites duros.
+- `docs/directriz-post-reto.md` (referida en CLAUDE.md): desde el 13-nov-2026 15:00 la terminal pasa a «actinver-terminal», sin reglas del Reto, con todas sus funciones y los mismos límites duros.
 
 ### Corregido
 - `terminal.__version__` decía 0.1.0 y así sellaba backtests y evaluaciones; ahora se lee de `pyproject.toml` (0.31.0).

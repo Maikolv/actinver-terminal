@@ -86,7 +86,7 @@ if (typeof document !== 'undefined') {
   function actualizarAccesos(){
     const id=$('simbolo').value, q=encodeURIComponent(id);
     for(const [a,sub] of [['ir-velas','velas'],['ir-orderflow','orderflow'],['ir-optionflow','optionflow']]){
-      $(a).href=id?`/help-quote-terminal/terminal/?vista=tab-ficha&sub=${sub}&simbolo=${q}`:`/help-quote-terminal/terminal/?vista=tab-ficha&sub=${sub}`;
+      $(a).href=id?`/actinver-terminal/terminal/?vista=tab-ficha&sub=${sub}&simbolo=${q}`:`/actinver-terminal/terminal/?vista=tab-ficha&sub=${sub}`;
       if(id)$(a).removeAttribute('aria-disabled');else $(a).setAttribute('aria-disabled','true');
     }
     $('accesos-ayuda').textContent=!id?'Elija un instrumento para ver sus accesos directos.'

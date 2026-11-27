@@ -10,7 +10,7 @@ const qrcode = require("qrcode-generator");
 
 const RAIZ = path.resolve(__dirname, "..");
 const DIR = path.join(RAIZ, "docs", "reporte-ejecutivo");
-const URL_TERMINAL = "https://maikolv.github.io/help-quote-terminal/terminal/";
+const URL_TERMINAL = "https://maikolv.github.io/actinver-terminal/terminal/";
 const pct = (x, d = 2) => `${(x * 100).toFixed(d)} %`;
 
 function cifrasMotor() {

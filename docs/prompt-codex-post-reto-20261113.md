@@ -4,13 +4,13 @@ Copie todo lo que está debajo de la línea en Codex, abierto en la carpeta del 
 
 ---
 
-Trabajas en el repositorio `help-quote-terminal` (antes `actinver-terminal`; FastAPI + SQLite + HTML/JS sin build).
+Trabajas en el repositorio `actinver-terminal` (antes `actinver-terminal`; FastAPI + SQLite + HTML/JS sin build).
 Lee primero `CLAUDE.md`, `docs/directriz-post-reto.md` y `docs/resumen-ejecutivo.md`. Responde y documenta en español.
 
 ## Ya hecho (no lo repitas)
-- Repositorio de GitHub renombrado a `Maikolv/help-quote-terminal`; `origin` actualizado; rama `pre-help-quote` subida.
+- Repositorio de GitHub renombrado a `Maikolv/actinver-terminal`; `origin` actualizado; rama `respaldo-pre-reto` subida.
 - Respaldo verificado de `data/` en `data/respaldos/` (13-nov, después de las 15:00).
-- Nombre visible «Help Quote Terminal» en interfaz, Telegram, lanzador, scripts, Excel y Worker.
+- Nombre visible «Actinver Terminal» en interfaz, Telegram, lanzador, scripts, Excel y Worker.
 - README, GitHub Pages (`sitio/`), Codespaces (`.devcontainer/`, `docs/codespaces.md`).
 
 ## Tu tarea: pasos 2–4 y 6 de `docs/directriz-post-reto.md`
@@ -25,7 +25,7 @@ Lee primero `CLAUDE.md`, `docs/directriz-post-reto.md` y `docs/resumen-ejecutivo
    - Siempre contra 1/N y fuera de muestra; si no hay ventaja demostrada, dilo.
 3. **Textos:**
    - quita «Reto» de títulos, guías (`web/static/guias.mjs`), Telegram (`mensaje_simple.py`, `bot_telegram.py`) y reportes;
-   - renombra el paquete en `pyproject.toml` a `help-quote-terminal`, sin romper el comando `terminal`;
+   - renombra el paquete en `pyproject.toml` a `actinver-terminal`, sin romper el comando `terminal`;
    - renombra `launcher/ActinverTerminal.cs` → `HelpQuoteTerminal.cs`, y el `.ico`, si no rompe el lanzador.
 4. **Archiva, no borres:**
    - capturas, transacciones y backtests del Reto se quedan en la base, etiquetados «Reto 2026»;

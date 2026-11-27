@@ -23,7 +23,7 @@ if(typeof document!=='undefined') {
   pedirSesion();setInterval(pedirSesion,60000);document.addEventListener('visibilitychange',pedirSesion);
   const cinta=document.createElement('iframe');cinta.className='cinta-global';cinta.loading='lazy';
   cinta.title='Cinta de indicadores: índices, VIX, bono a 10 años, dólar, oro y petróleo (TradingView, con retraso)';
-  cinta.src='/help-quote-terminal/terminal/widget/cinta-macro.html?tema=dark';
+  cinta.src='/actinver-terminal/terminal/widget/cinta-macro.html?tema=dark';
   nav.after(cinta);
   // Ningún widget cortado: los marcos /widget y /grafica son del mismo origen, así que se mide su contenido real y el
   // marco crece hasta mostrarlo completo (nunca baja de su alto configurado). El contenido de TradingView vive en un
@@ -43,7 +43,7 @@ if(typeof document!=='undefined') {
   new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==='IFRAME')vigilar(n);else n.querySelectorAll?.('iframe').forEach(vigilar);}))).observe(document.body,{childList:true,subtree:true});
   function actualizar() {
     const tab=document.querySelector('#lista-pestanas [role="tab"][aria-selected="true"]');
-    const actual=location.pathname==='/' ? '/help-quote-terminal/terminal/?vista='+(tab?.id || new URLSearchParams(location.search).get('vista') || 'tab-resumen') : location.pathname;
+    const actual=location.pathname==='/' ? '/actinver-terminal/terminal/?vista='+(tab?.id || new URLSearchParams(location.search).get('vista') || 'tab-resumen') : location.pathname;
     selector.value=[...selector.options].some(o=>o.value===actual)?actual:location.pathname;
     for(const enlace of nav.querySelectorAll('a')) {
       const activa=enlace.getAttribute('href')===actual || (enlace.getAttribute('href')==='/' && location.pathname==='/');
@@ -64,7 +64,7 @@ if(typeof document!=='undefined') {
   document.addEventListener('terminal:pestana',actualizar);
   (async()=>{
     try {
-      const r=await fetch('/help-quote-terminal/terminal/static/navegacion.json',{signal:AbortSignal.timeout(10000)});
+      const r=await fetch('/actinver-terminal/terminal/static/navegacion.json',{signal:AbortSignal.timeout(10000)});
       if(!r.ok)throw new Error('Catálogo no disponible');
       const datos=await r.json();selector.replaceChildren();const vistos=new Set();
       for(const [titulo,filas] of [['Áreas y laboratorios',datos.areas],['Secciones de la terminal',datos.secciones]]) {

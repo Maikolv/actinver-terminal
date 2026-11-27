@@ -13,13 +13,20 @@ precio como si fuera vigente, servir solo en `127.0.0.1`.
 
 ## Directriz post-Reto (activa desde el 13-nov-2026, 15:00 CDMX)
 
-Al terminar el Reto, la terminal pasa a llamarse **help-quote-terminal**:
+Al terminar el Reto:
 - se quitan todas las reglas del Reto;
 - se prioriza el mejor portafolio de largo plazo e intradía;
-- se conservan todas las funciones;
-- el nombre nuevo se refleja en el código, en los documentos locales, en GitHub y en la memoria.
-Los límites duros de arriba no cambian. Los datos del Reto se archivan, no se borran. Renombrar el repositorio o la
-carpeta requiere confirmación del usuario. Detalle y pasos: `docs/directriz-post-reto.md`.
+- se conservan todas las funciones.
+
+**Nombre definitivo, decidido por el usuario el 27-nov-2026:** «Actinver Terminal». Ya está aplicado en:
+- el repositorio `Maikolv/actinver-terminal`;
+- la página `https://maikolv.github.io/actinver-terminal/`;
+- la carpeta local `actinver-terminal`;
+- el código y los documentos.
+
+El nombre «help-quote-terminal» quedó retirado. Los límites duros de arriba no cambian. Los datos del Reto se archivan, no se borran.
+
+Detalle: `docs/directriz-post-reto.md`.
 
 ## Restricción de costos vigente — 2-nov-2026
 
@@ -68,7 +75,6 @@ riesgo solo agrega ventas; sin portafolio principal se usa la propuesta automát
 Las pruebas de reglas del Reto usan el ajuste `reto_activo` de `tests/conftest.py`.
 
 Pendiente:
-- renombrar la carpeta (`scripts/renombrar-carpeta.ps1`, con Claude y Codex cerrados);
 - textos del Reto en los módulos internos (pronóstico «al cierre del Reto», etapas).
 
 ## Estado comprobado: ruta de inicio del 13-nov-2026

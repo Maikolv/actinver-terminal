@@ -45,7 +45,7 @@ Objetivo: que un evaluador o inversionista entienda en **30 segundos** qué hace
 ### Contenido digital (ya existe o se genera con el repo)
 
 - Video explicativo en bucle: `docs/video/actinver-terminal.mp4` (≈ 2 min).
-- Demo pública: https://maikolv.github.io/help-quote-terminal/ (QR).
+- Demo pública: https://maikolv.github.io/actinver-terminal/ (QR).
 - Terminal en modo demostración: `start.bat demo` (datos simulados; no muestra cuentas reales).
 - Reporte ejecutivo PDF y aviso legal (pestaña «Legal»).
 

@@ -3,7 +3,7 @@
 "use strict";
 const { chromium } = require("playwright");
 const fs = require("node:fs"), path = require("node:path");
-const ORIGEN = process.env.ORIGEN || "https://maikolv.github.io/help-quote-terminal/terminal/";
+const ORIGEN = process.env.ORIGEN || "https://maikolv.github.io/actinver-terminal/terminal/";
 const DIR = path.resolve(__dirname, "..", "data", "medios", "video", "capturas");
 const VISTAS = ["resumen", "ayuda", "legal", "portafolios", "propuestas", "mercado", "tiempo", "intradia", "ficha",
   "investigacion", "riesgo", "robustez", "modelos", "cartera", "seguimiento"];

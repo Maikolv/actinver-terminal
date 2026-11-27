@@ -4,7 +4,7 @@ Copie lo que está debajo de la línea en Codex, abierto en la carpeta del repos
 
 ---
 
-Trabajas en `help-quote-terminal` (FastAPI + SQLite + HTML/JS sin build). Responde en español. Lee `CLAUDE.md`,
+Trabajas en `actinver-terminal` (FastAPI + SQLite + HTML/JS sin build). Responde en español. Lee `CLAUDE.md`,
 `docs/propuesta-stand.md`, `docs/reporte-ejecutivo/reporte-ejecutivo.html` y `scripts/video_terminal.py`.
 Revisa `git status` antes de commitear: Claude puede estar trabajando en paralelo; incluye solo tus archivos.
 
@@ -28,7 +28,7 @@ Revisa `git status` antes de commitear: Claude puede estar trabajando en paralel
      - abrir «Mis portafolios» y marcar un portafolio como principal;
      - ver el plan.
    - Narración con la voz de Windows «Microsoft Sabina Desktop», como ya hace el script.
-   - Salida: `docs/video/help-quote-terminal-recorrido.mp4`, de 2–3 min, 1920×1080.
+   - Salida: `docs/video/actinver-terminal-recorrido.mp4`, de 2–3 min, 1920×1080.
    - Solo datos simulados.
 3. **Materiales del stand.** Archivos listos para imprenta en `docs/stand/`:
    - lona de 3 × 2 m;
@@ -37,7 +37,7 @@ Revisa `git status` antes de commitear: Claude puede estar trabajando en paralel
    - tarjeta 9 × 5 cm.
    - Formato: HTML/SVG con medidas reales a 150 dpi, más PDF exportado con Edge (`--print-to-pdf`).
    - Identidad: negro/grafito, rojo `#b3261e`, tipografía sans y el logo `web/static/favicon.svg`.
-   - Contenido: el de `docs/propuesta-stand.md`, con QR a https://maikolv.github.io/help-quote-terminal/. Genera el QR con una librería ya instalada o en SVG; no agregues dependencias pesadas.
+   - Contenido: el de `docs/propuesta-stand.md`, con QR a https://maikolv.github.io/actinver-terminal/. Genera el QR con una librería ya instalada o en SVG; no agregues dependencias pesadas.
 4. **Reporte ejecutivo.** Revisa `docs/reporte-ejecutivo/reporte-ejecutivo.pdf`:
    - que no queden tablas cortadas entre páginas;
    - que las imágenes se vean.

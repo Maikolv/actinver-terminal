@@ -21,7 +21,7 @@ auditorías del 18, 19, 20, 25 y 27 de octubre.
 
 ```text
 Trabaja en C:\Users\MIKE\Desktop\Repos\actinver-terminal (Actinver Terminal, Reto Actinver 2026; desde el
-13-nov-2026 15:00 se llamará help-quote-terminal según docs/directriz-post-reto.md). Lee CLAUDE.md,
+13-nov-2026 15:00 se llamará actinver-terminal según docs/directriz-post-reto.md). Lee CLAUDE.md,
 docs/auditoria-2026-10-28.md y docs/auditoria-2026-10-27.md antes de empezar.
 
 Límites (mandato v2, no negociables): sin dinero real ni órdenes; secretos solo en .env (nunca en logs, commits ni
