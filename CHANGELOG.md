@@ -2,6 +2,20 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 27-nov-2026 — Portafolio idóneo, terminal a pantalla completa en el video y versión única de 4 integrantes
+
+- **Portafolio idóneo** (Mis portafolios, id 7). El generador de la terminal y el Solver de la plantilla de Markowitz se aplicaron sobre los 12 instrumentos del último registro.
+  - Completa con el Ranking hasta 16 instrumentos, con tope de 10 % por emisora y covarianza muestral.
+  - Se eligió entre 36 configuraciones probadas fuera de muestra frente a 1/N.
+  - Sharpe fuera de muestra 4.02, contra 2.99 con los mismos 12 y tope de 40 %. 1/N tiene 4.44: la ventaja no está demostrada.
+  - Sección 4.6 del informe reescrita; Excel con P1 (idóneo) y P2 (12 instrumentos).
+- **Video:**
+  - La terminal ocupa todo el ancho, con barra de dirección 127.0.0.1:8765 y fichas de datos bajo la ventana. El panel lateral se retiró.
+  - Grabaciones separadas para 16:9 (1880×680) y 9:16 (1060×1100).
+  - Escenas nuevas: análisis técnico de MU, portafolios guardados y Alertas.
+  - Bloque de Telegram en el guion; falta el audio «Miguel 5».
+- **Versión de Miguel y Daniela retirada:** videos, ZIP, informe y guion de 2 integrantes, y opciones `2`/`dos` de los generadores.
+
 ## 25-nov-2026 — Video grabado en la terminal local y propuesta de Markowitz
 
 - **Video:** las 10 escenas se graban en la terminal local (`scripts/grabar_terminal.cjs`, solo lectura). Antes salían de la demo de GitHub Pages.

@@ -4,7 +4,7 @@
 
 **Voces (en off, nadie aparece a cámara):** Miguel, Daniela, Valeria y Camila.
 
-**Formato:** grabación de la pantalla de la terminal con voz en off; 1920×1080 para la presentación y 1080×1920 para TikTok. Duración: 2 min 30 s.
+**Formato:** grabación de la pantalla de la terminal con voz en off; 1920×1080 para la presentación y 1080×1920 para TikTok. Duración: 2 min 42 s.
 
 **Advertencia fija en pantalla:** «Proyecto escolar independiente. No afiliado a Grupo Actinver. No es asesoría de inversión.»
 
@@ -24,9 +24,10 @@
 | 1:16–1:26 | Camila | «Para el análisis fundamental, la terminal abre la ficha de cada emisora con sus reportes en la SEC; de ahí salen la liquidez, el apalancamiento, la rentabilidad y la razón precio-utilidad.» | Ficha técnica de MU; Mesa de investigación con publicaciones de la SEC |
 | 1:26–1:40 | Miguel | «Tercero, el riesgo. La terminal mide la desviación estándar y el VaR: en diecinueve de cada veinte días, la pérdida diaria no pasó de cinco punto tres por ciento. Esa volatilidad venía de concentrar casi la mitad del dinero en una sola acción.» | Pestaña Riesgo: VaR, CVaR, contribución por emisora |
 | 1:40–1:54 | Daniela | «El resultado final: el portafolio cerró en setecientos ochenta y cuatro mil pesos, menos veintiuno punto seis por ciento. En el mismo periodo, el NAFTRAC, que replica al índice de la Bolsa Mexicana, subió diez punto nueve por ciento. El mercado nos ganó.» | Gráfica de evolución del portafolio frente a NAFTRAC |
-| 1:54–2:06 | Valeria | «En la última semana rotamos hacia consumo y salud: FEMSA, Coca-Cola FEMSA, Arca Continental, Merck y Eli Lilly. Hoy la terminal permite elegir un portafolio principal y el plan dice qué vender, comprar o mantener, con su motivo.» | Mis portafolios → «Usar como principal»; Plan de acción |
-| 2:06–2:20 | Camila | «Lo que aprendimos: la IA acelera el análisis, pero no adivina el futuro. Ningún modelo superó fuera de muestra a repartir el dinero en partes iguales, y la terminal lo dice. El riesgo de concentración se mide antes de buscar rendimiento.» | Propuestas y Backtesting: estrategia de pesos iguales (1/N) |
-| 2:20–2:30 | Miguel | «Actinver Terminal: datos con procedencia, riesgo medido y decisiones informadas. Pruébala gratis en GitHub. No es asesoría de inversión.» | Página pública en GitHub Pages; advertencia legal |
+| 1:54–2:06 | Valeria | «En la última semana rotamos hacia consumo y salud: FEMSA, Coca-Cola FEMSA, Arca Continental, Merck y Eli Lilly. Hoy la terminal permite elegir un portafolio principal y el plan dice qué vender, comprar o mantener, con su motivo.» | Mis portafolios: portafolio idóneo y «Usar como principal» |
+| 2:06–2:18 | Miguel | «Y no tenemos que vigilar la pantalla todo el día: la terminal nos avisa por Telegram cuando hay un movimiento significativo, como una caída fuerte de una posición, o cuando el plan indica que algo debe cambiar. Solo avisa; la decisión siempre es nuestra.» | Alertas: umbrales, canal de Telegram y avisos |
+| 2:18–2:32 | Camila | «Lo que aprendimos: la IA acelera el análisis, pero no adivina el futuro. Ningún modelo superó fuera de muestra a repartir el dinero en partes iguales, y la terminal lo dice. El riesgo de concentración se mide antes de buscar rendimiento.» | Propuestas y Backtesting: estrategia de pesos iguales (1/N) |
+| 2:32–2:42 | Miguel | «Actinver Terminal: datos con procedencia, riesgo medido y decisiones informadas. Pruébala gratis en GitHub. No es asesoría de inversión.» | Página pública en GitHub Pages; advertencia legal |
 
 ## Correspondencia con el proyecto «Finanzas en la era de la IA»
 
@@ -41,11 +42,12 @@
 | Riesgo (desviación estándar, VaR) | 1:26–1:40 |
 | Resultado final y comparación contra el mercado | 1:40–1:54 |
 | Decisiones por acción | 1:54–2:06 |
-| Reflexión, errores y aprendizaje con IA | 2:06–2:20 |
+| Seguimiento con avisos de Telegram | 2:06–2:18 |
+| Reflexión, errores y aprendizaje con IA | 2:18–2:32 |
 
 ## Video final (24-nov-2026)
 
-Las voces se grabaron y el video está montado con estética de terminal financiera y la paleta de Actinver Terminal (`DESIGN.md`, tema oscuro: fondos #090a0c y #121419, rojo de identidad #d94848, texto #f3f4f6), en cuatro archivos en `entregables/video/`: 4 integrantes y Miguel y Daniela, cada uno en 16:9 y en 9:16.
+Las voces se grabaron y el video está montado con estética de terminal financiera y la paleta de Actinver Terminal (`DESIGN.md`, tema oscuro: fondos #090a0c y #121419, rojo de identidad #d94848, texto #f3f4f6), en dos archivos en `entregables/video/`: la versión de los 4 integrantes en 16:9 y en 9:16. La versión de Miguel y Daniela se eliminó el 27-nov-2026.
 
 1. `uv run python scripts/video_final.py necesidades` calcula cuántos segundos pide cada bloque; `node scripts/grabar_terminal.cjs` graba la terminal local (http://127.0.0.1:8765/, solo lectura: no pulsa botones que guarden o envíen) a 1060×770, el tamaño exacto de la ventana del video, sin recorte, escala ni cámara lenta, y anota en qué segundo queda lista cada vista.
 2. `uv run --with matplotlib python scripts/video_paneles.py` rehace con el mismo diseño las gráficas y tablas del informe (datos reales del Reto).

@@ -6,8 +6,8 @@ const { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, Tab
   BorderStyle, AlignmentType, LevelFormat, PageOrientation, Footer, PageNumber } = require("docx");
 
 const RAIZ = path.resolve(__dirname, "..");
-// Uso: node scripts/guiones_word.cjs [cuatro|dos]  — «dos» reparte las voces solo entre Miguel y Daniela.
-const DOS = process.argv[2] === "dos";
+// Uso: node scripts/guiones_word.cjs  — solo la versión de los 4 integrantes (la de 2 se retiró el 27-nov-2026).
+const DOS = false;
 let MD = fs.readFileSync(path.join(RAIZ, "docs", "video", "guiones-tiktok.md"), "utf8");
 if (DOS) MD = MD.replace(/Miguel, Daniela, Valeria y Camila/g, "Miguel y Daniela")
   .replace(/\| Valeria \|/g, "| Miguel |").replace(/\| Camila \|/g, "| Daniela |");

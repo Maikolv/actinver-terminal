@@ -1,8 +1,7 @@
 // Informe escrito del Concurso Finanzas IA (formato UVM) con datos REALES del archivo del Reto Actinver 2026.
 // Cifras: data/medios/informe/datos.json (scripts/informe_concurso_datos.py). Encabezado y pie: los de la plantilla
 // original (logos UVM). Lo que no existe en el archivo queda como «PENDIENTE: dato — fuente».
-//   node scripts/informe_concurso.cjs [4|2]   → entregables/Informe_Concurso_Finanzas_IA[_4_integrantes|_2_integrantes].docx
-//   (4 o 2: el anexo F solo lleva los videos de esa versión de voz)
+//   node scripts/informe_concurso.cjs   → entregables/Informe_Concurso_Finanzas_IA_4_integrantes.docx
 "use strict";
 const fs = require("node:fs"), path = require("node:path");
 const JSZip = require("jszip");
@@ -14,8 +13,9 @@ const {
 const RAIZ = path.resolve(__dirname, "..");
 const INF = path.join(RAIZ, "data", "medios", "informe");
 const PLANTILLA = path.join(RAIZ, "data", "medios", "plantilla", "plantilla.docx");
-const VERSION = { 4: "Equipo completo", 2: "Versión de 2" }[process.argv[2]];
-const SALIDA = path.join(RAIZ, "entregables", `Informe_Concurso_Finanzas_IA${VERSION ? `_${process.argv[2]}_integrantes` : ""}.docx`);
+// Solo la versión de los 4 integrantes (la de 2 se retiró el 27-nov-2026).
+const VERSION = "Equipo completo";
+const SALIDA = path.join(RAIZ, "entregables", "Informe_Concurso_Finanzas_IA_4_integrantes.docx");
 const d = JSON.parse(fs.readFileSync(path.join(INF, "datos.json"), "utf8"));
 // Datos personales del equipo: archivo privado fuera del repositorio (data/medios/equipo.json).
 const RUTA_EQ = path.join(RAIZ, "data", "medios", "equipo.json");
@@ -132,33 +132,39 @@ const VENTA = {
   "BMV:ALPEK": "Química con resultados débiles; se vendió con −14.0 % para concentrar el efectivo en consumo.",
 };
 
-// 4.6 Propuesta de Markowitz: resultado de markowitz.guardar (data/medios/propuesta/resultado.json, privado).
+// 4.6 Portafolio idóneo: markowitz.generar + guardar (data/medios/propuesta/{idoneo,resultado}.json, privados).
 function propuesta() {
-  const ruta = path.join(RAIZ, "data", "medios", "propuesta", "resultado.json");
-  if (!fs.existsSync(ruta)) return [];
-  const pr = JSON.parse(fs.readFileSync(ruta, "utf8")), m = pr.metricas, n1 = pr.metricas_1n, s = pr.especificacion;
-  const oos = pr.fuera_de_muestra, py = pr.proyeccion.elegido;
+  const P = path.join(RAIZ, "data", "medios", "propuesta");
+  if (!fs.existsSync(path.join(P, "idoneo.json"))) return [];
+  const id = JSON.parse(fs.readFileSync(path.join(P, "idoneo.json"), "utf8"));
+  const doce = fs.existsSync(path.join(P, "resultado.json")) ? JSON.parse(fs.readFileSync(path.join(P, "resultado.json"), "utf8")) : null;
+  const m = id.metricas, n1 = id.metricas_1n, s = id.especificacion, oos = id.fuera_de_muestra, py = id.proyeccion.elegido;
   const antes = Object.fromEntries(fin.posiciones.map((x) => [x.instrumento, x.peso]));
-  const filas = [...pr.activos].sort((a, b) => b.peso - a.peso);
-  return [h2("4.6 Propuesta del mejor portafolio con la plantilla de Markowitz"),
-    p(`Con el último registro confirmado (captura del 12-nov-2026, valor ${mxn(fin.valor)}) repartimos los mismos ${filas.length} instrumentos con la plantilla de Markowitz de la terminal (Teoría Moderna de Portafolios): máximo Sharpe, covarianza muestral de ${pr.datos.sesiones} sesiones (${pr.datos.inicio} a ${pr.datos.fin}), tasa libre de riesgo CETES 28 de Banxico (${pct(s.rf)}) y tope de ${pct(s.peso_max, 0)} por emisora (perfil agresivo del equipo). Es el mismo cálculo que hace Solver en el Excel entregado (Propuesta_Markowitz_Lynx_Market.xlsx) y queda guardado en «Mis portafolios» de Actinver Terminal.`),
-    imagen("propuesta_markowitz.png", 520, 303),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: "Figura 10. Pesos del último registro frente a la propuesta de Markowitz.", italics: true, size: 16, color: GRIS })] }),
-    tabla(["Instrumento", "Peso 12-nov", "Peso propuesto", "Títulos", "Monto", "E(r) anual", "σ anual"],
-      filas.map((a) => [a.id.split(":")[1], pct(antes[a.id], 1), pct(a.peso, 1), String(a.titulos), mxn(a.invertido), pct(a.rend, 1), pct(a.riesgo, 1)]),
+  const filas = [...id.activos].filter((a) => a.peso > 0.0005 || antes[a.id] != null).sort((a, b) => b.peso - a.peso);
+  const nuevos = id.generador.sugeridos.filter((x) => id.activos.find((a) => a.id === x)?.peso > 0.0005).map(sym);
+  const mrna = id.activos.find((a) => a.id === "SIC:MRNA");
+  const fila = (nom, r) => [nom, pct(r.metricas.rend, 1), pct(r.metricas.riesgo, 1), r.metricas.sharpe.toFixed(2),
+    r.fuera_de_muestra.propuesta.sharpe.toFixed(2), pct(r.fuera_de_muestra.propuesta.rend_total, 1), pct(r.fuera_de_muestra.propuesta.caida_maxima, 1)];
+  return [h2("4.6 Portafolio idóneo tras el último registro (plantilla de Markowitz)"),
+    p(`Partimos del último registro confirmado (captura del 12-nov-2026, valor ${mxn(fin.valor)}) y usamos las funciones de Actinver Terminal y su plantilla de Markowitz (Teoría Moderna de Portafolios): el Solver busca el máximo Sharpe con covarianza muestral de ${id.datos.sesiones} sesiones (${id.datos.inicio} a ${id.datos.fin}) y la tasa libre de riesgo de CETES 28 de Banxico (${pct(s.rf)}). Al generador le dimos los 12 instrumentos del registro y le pedimos completar hasta ${s.activos.length} con los mejores del Ranking que no se mueven igual (correlación ≤ 0.85). Propuso ${id.generador.sugeridos.map(sym).join(", ")}; el Solver decide cuánto pesa cada uno. Aplicamos la lección del Reto con un tope de ${pct(s.peso_max, 0)} por emisora.`),
+    p("Probamos varias configuraciones (de 12 a 20 instrumentos, topes de 10 % a 40 %, covarianza muestral o Ledoit-Wolf y con o sin ETF) y las comparamos fuera de muestra contra 1/N. Esta es la que mejor equilibra rendimiento, riesgo y diversificación con el mismo cálculo del Excel. Como la elegimos entre varias, su resultado fuera de muestra es algo optimista."),
+    imagen("propuesta_markowitz.png", 520, 347),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 160 }, children: [new TextRun({ text: "Figura 10. Pesos del último registro frente al portafolio idóneo.", italics: true, size: 16, color: GRIS })] }),
+    tabla(["Instrumento", "Peso 12-nov", "Peso idóneo", "Títulos", "Monto", "E(r) anual", "σ anual"],
+      filas.map((a) => [sym(a.id), antes[a.id] != null ? pct(antes[a.id], 1) : "nuevo", pct(a.peso, 1), String(a.titulos), mxn(a.invertido), pct(a.rend, 1), pct(a.riesgo, 1)]),
       [1250, 1150, 1300, 900, 1538, 1350, 1350]),
-    fuente(`Actinver Terminal, «Mis portafolios» (portafolio «${s.nombre}»); precios MXN ajustados; capital ${mxn(s.capital)}; efectivo sin invertir por títulos enteros ${mxn(pr.efectivo_restante)}.`),
-    tabla(["Métrica (ventana de 1 año)", "Propuesta (máx. Sharpe)", "Mínima varianza", "1/N (referencia)"],
-      [["Rendimiento esperado anual", pct(m.rend, 1), pct(pr.min_varianza.rend, 1), pct(n1.rend, 1)],
-       ["Riesgo (σ anual)", pct(m.riesgo, 1), pct(pr.min_varianza.riesgo, 1), pct(n1.riesgo, 1)],
-       ["Sharpe", m.sharpe.toFixed(2), pr.min_varianza.sharpe.toFixed(2), n1.sharpe.toFixed(2)]],
-      [3238, 2000, 1800, 1800]),
-    fuente("estimación con la historia de un año; no es un pronóstico."),
-    vineta([b("Qué cambia: "), "sube Target, Arca Continental, Chevron y Exxon (más rendimiento por unidad de riesgo y baja correlación entre sí) y baja FEMSA, Novavax y Eli Lilly; Merck y Pfizer quedan en cero porque, con estos datos, no mejoran el portafolio."]),
-    vineta([b("Riesgo: "), `σ anual de ${pct(m.riesgo, 1)} frente a ${pct(n1.riesgo, 1)} de repartir en partes iguales; caída máxima en la ventana ${pct(pr.caida_maxima, 1)} y peor día ${pct(pr.peor_dia, 1)}. Moderna aporta ${pct(filas.find((a) => a.id === "SIC:MRNA")?.contribucion_riesgo ?? 0, 0)} del riesgo con solo ${pct(filas.find((a) => a.id === "SIC:MRNA")?.peso ?? 0, 1)} del dinero: es la posición a vigilar.`]),
-    vineta([b("Prueba fuera de muestra (honestidad): "), `de ${oos.inicio} a ${oos.fin}, rebalanceando cada mes, la propuesta rindió ${pct(oos.propuesta.rend_total, 1)} contra ${pct(oos["1/N"].rend_total, 1)} de 1/N, pero con más riesgo: su Sharpe fue ${oos.propuesta.sharpe.toFixed(2)} contra ${oos["1/N"].sharpe.toFixed(2)} de 1/N. Un solo periodo no demuestra ventaja.`]),
-    vineta([b("Proyección a un año: "), `con capital de ${mxn(s.capital)}, valor esperado ${mxn(py.valor)} y rango del 90 % de ${mxn(py.valor_bajo)} a ${mxn(py.valor_alto)}. Los rendimientos de un año tan bueno para estas emisoras no se repiten necesariamente: es una extrapolación, no una promesa.`]),
-    p("Conclusión: si el Reto continuara, esta sería nuestra cartera de partida, por el mejor rendimiento por unidad de riesgo con los mismos instrumentos. La mantendríamos junto a la referencia 1/N y la revisaríamos cada mes, porque la evidencia fuera de muestra aún no la favorece en riesgo. No es asesoría de inversión.")];
+    fuente(`Actinver Terminal, «Mis portafolios» (portafolio «${s.nombre}»); capital ${mxn(s.capital)}; efectivo sin invertir por títulos enteros ${mxn(id.efectivo_restante)}. El Excel Propuesta_Markowitz_Lynx_Market.xlsx trae este modelo con Solver cargado.`),
+    tabla(["Portafolio", "E(r) anual", "σ anual", "Sharpe", "Sharpe fuera de muestra", "Rend. fuera de muestra", "Caída máx. fuera de muestra"],
+      [fila("Idóneo (16, tope 10 %)", id), ...(doce ? [fila("Mismos 12, tope 40 %", doce)] : []),
+       ["1/N (16 en partes iguales)", pct(n1.rend, 1), pct(n1.riesgo, 1), n1.sharpe.toFixed(2), oos["1/N"].sharpe.toFixed(2), pct(oos["1/N"].rend_total, 1), pct(oos["1/N"].caida_maxima, 1)]],
+      [2238, 1000, 1000, 900, 1300, 1200, 1200]),
+    fuente(`ventana de un año para las tres primeras columnas; prueba fuera de muestra de ${oos.inicio} a ${oos.fin}, rebalanceo cada 21 sesiones y comisión de ${(oos.comision * 100).toFixed(3)} % por peso operado.`),
+    vineta([b("Por qué es el idóneo: "), `ninguna emisora pasa de ${pct(s.peso_max, 0)}; el riesgo anual baja a ${pct(m.riesgo, 1)} (1/N: ${pct(n1.riesgo, 1)}), y suma consumo defensivo de EE. UU. (${nuevos.join(", ")}) a la rotación que hicimos en el Reto. Con el tope, el Sharpe fuera de muestra subió de ${doce ? doce.fuera_de_muestra.propuesta.sharpe.toFixed(2) : "—"} (mismos 12 con tope de 40 %) a ${oos.propuesta.sharpe.toFixed(2)}.`]),
+    vineta([b("Qué cambia: "), "FEMSA, KOF y Target bajan a 10 %. AbbVie, Exxon, Chevron y Arca Continental suben a 10 %. Merck y Pfizer salen porque, con estos datos, no mejoran el portafolio."]),
+    vineta([b("Riesgo a vigilar: "), `Moderna pesa ${pct(mrna.peso, 1)} pero aporta ${pct(mrna.contribucion_riesgo, 0)} del riesgo. Caída máxima en la ventana: ${pct(id.caida_maxima, 1)}. Peor día: ${pct(id.peor_dia, 1)}.`]),
+    vineta([b("Honestidad: "), `fuera de muestra rindió ${pct(oos.propuesta.rend_total, 1)} contra ${pct(oos["1/N"].rend_total, 1)} de 1/N, pero con un Sharpe menor (${oos.propuesta.sharpe.toFixed(2)} contra ${oos["1/N"].sharpe.toFixed(2)}). Más rendimiento no es lo mismo que más rendimiento por unidad de riesgo. Un periodo de seis meses no demuestra ventaja.`]),
+    vineta([b("Proyección a un año: "), `valor esperado de ${mxn(py.valor)}; rango del 90 % de ${mxn(py.valor_bajo)} a ${mxn(py.valor_alto)}. Es una extrapolación de un año muy bueno para estas emisoras, no una promesa.`]),
+    p("Seguimiento: en Actinver Terminal este portafolio está en «Mis portafolios» y puede marcarse como principal. Así, el plan de acción y los avisos de Telegram indican si hay un movimiento significativo o algo que cambiar. Los avisos solo informan: las decisiones y las órdenes son del equipo. No es asesoría de inversión.")];
 }
 
 const portada = [
@@ -271,7 +277,7 @@ const final = [h1("4. Informe final (Entregable 3)"),
   ...captura("p124_0.png", "Figura 8. Portafolio el 10-nov-2026 tras iniciar la rotación (corte O37, evidencia E068)."),
   ...captura("p126_0.png", "Figura 9. Portafolio el 11-nov-2026, 10:36 (corte O38, evidencia E070)."),
   p("Nota: las pantallas del portal no muestran el nombre del equipo; el código y el nickname se anotan en el anexo B."),
-  p("La gráfica general del comportamiento del portafolio está en la sección 4.1. El video del proyecto, en sus cuatro versiones, está en el anexo F con enlace y código QR."),
+  p("La gráfica general del comportamiento del portafolio está en la sección 4.1. El video del proyecto, en formato horizontal y vertical, está en el anexo F con enlace y código QR."),
   h2("4.4 Reflexión final"),
   vineta([b("Decisiones clave: "), "concentrar casi 50 % en MU al inicio (mayor impacto negativo) y rotar a consumo y salud en la última semana (redujo la volatilidad, pero tarde)."]),
   vineta([b("Errores: "), "no limitar el peso por emisora por debajo del tope del Reto; reaccionar a la caída del sector después y no antes; tomar posiciones pequeñas de bajo valor informativo (SLV, ACTDUAL, PFE)."]),
@@ -320,7 +326,7 @@ const anexos = [h1("Anexos"),
     : [p("Sección opcional según el formato; el equipo no incluye evidencias de asesorías.")]),
   h2("E. Herramienta de apoyo"), p("Actinver Terminal (proyecto independiente, sin afiliación con Grupo Actinver): https://github.com/Maikolv/help-quote-terminal. Solo informa y simula; no envía órdenes."),
   ...(VIDEOS.length ? [h2("F. Videos del proyecto"),
-  p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal en la computadora del equipo (solo lectura) y las gráficas del informe (datos reales del Reto). ${VERSION ? "Esta versión del informe enlaza el video" + (process.argv[2] === "4" ? " con las voces de los cuatro integrantes" : " narrado por dos integrantes") + ", en formato horizontal para YouTube y vertical para TikTok." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
+  p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal en la computadora del equipo (solo lectura) y las gráficas del informe (datos reales del Reto). ${VERSION ? "El video lleva las voces de los cuatro integrantes, en formato horizontal para YouTube y vertical para TikTok." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
   tablaVideos(),
   fuente(`YouTube «no listado»: lo ve cualquier persona con el enlace. TikTok «privado»: solo lo ve la cuenta que lo publicó; los archivos MP4 también están en ${eq.drive ? `la carpeta de Google Drive del equipo: ${eq.drive}` : "el ZIP"}.`)] : [])];
 

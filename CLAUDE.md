@@ -44,16 +44,17 @@ Antes de leer archivos completos, busca el fragmento mínimo con
 `uv run python scripts/indice_contexto.py buscar "<tema>"` (ver `docs/token-budget.md`).
 El arranque para vista previa está en `.claude/launch.json` (`actinver-terminal`, puerto 8765).
 
-## Estado comprobado: entrega del concurso (25-nov-2026)
+## Estado comprobado: entrega del concurso (27-nov-2026)
 
-- **Video:** grabado en la terminal local (`scripts/grabar_terminal.cjs`).
-- **Propuesta de Markowitz** sobre la última captura del Reto:
-  - en «Mis portafolios» (id 6, no es el principal);
+- **Solo la versión de 4 integrantes.** La de Miguel y Daniela se retiró.
+- **Video:** grabado en la terminal local a pantalla completa (`FORMATO=horizontal|vertical node scripts/grabar_terminal.cjs`).
+  - El bloque de Telegram espera el audio «Miguel 5» (`data/medios/video/voces/`). Sin él, `video_final.py` lo omite y lo avisa.
+- **Portafolio idóneo** (Markowitz sobre el último registro del Reto):
+  - en «Mis portafolios», id 7 (no es el principal); el de 12 instrumentos es el id 6;
   - en la sección 4.6 del informe;
   - en `entregables/Propuesta_Markowitz_Lynx_Market.xlsx`;
   - detalle en `docs/propuesta-markowitz-20261125.md`.
-- **Entregables en Google Drive:** carpeta compartida por enlace (solo lectura).
-- **Pendiente del usuario:** subir los 4 MP4 a Drive, YouTube y TikTok. Las herramientas solo suben hasta 10 MB.
+- **Google Drive:** carpeta compartida por enlace (solo lectura). Los MP4 los sube el usuario, porque las herramientas solo suben hasta 10 MB.
 
 ## Estado comprobado: portafolio principal y escenario real (14-nov-2026)
 

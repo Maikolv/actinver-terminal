@@ -1,13 +1,15 @@
 // Grabaciones en video de la terminal LOCAL del equipo (127.0.0.1:8765) para el video del concurso.
 // Solo lee: no pulsa botones que guarden o envíen nada y nunca abre la cuenta de Actinver.
-//   node scripts/grabar_terminal.cjs [nombre…]   → data/medios/video/grabaciones/<nombre>.webm
+//   FORMATO=horizontal|vertical node scripts/grabar_terminal.cjs [nombre…]   → data/medios/video/grabaciones/<formato>/<nombre>.webm
 "use strict";
 const { chromium } = require("playwright");
 const fs = require("node:fs"), path = require("node:path");
 const ORIGEN = process.env.ORIGEN || "http://127.0.0.1:8765/";
-const DIR = path.resolve(__dirname, "..", "data", "medios", "video", "grabaciones");
-// Mismo tamaño que la ventana del video (1060×770): se usa 1:1, sin recorte ni escala.
-const W = 1060, H = 770;
+const BASE = path.resolve(__dirname, "..", "data", "medios", "video", "grabaciones");
+// Mismo tamaño que el área de la terminal en el video (video_final.geometria «cont»): se usa 1:1, sin recorte ni escala.
+const FORMATO = process.env.FORMATO === "vertical" ? "vertical" : "horizontal";
+const [W, H] = FORMATO === "vertical" ? [1060, 1100] : [1880, 680];
+const DIR = path.join(BASE, FORMATO);
 
 const pausa = (p, ms) => p.waitForTimeout(ms);
 async function desplazar(p, total, pasos = 40, ms = 60) {  // desplazamiento suave, como una persona con la rueda
@@ -40,6 +42,15 @@ async function irA(p, panel, prefijo) {
     if (h) window.scrollTo({ top: h.getBoundingClientRect().top + window.scrollY - 8 });
   }, [panel, prefijo]);
   await pausa(p, 1200);
+}
+// Escribe MU en el buscador de la ficha (sin emisora elegida la ficha sale vacía) y espera la ficha.
+async function fichaMU(p) {
+  await vista(p, "ficha"); await pausa(p, 600);
+  const caja = p.locator("#panel-ficha input").first();
+  await caja.click({ timeout: 2000 }).catch(() => {}); await caja.fill("MU").catch(() => {}); await caja.press("Escape").catch(() => {});
+  await pausa(p, 500); await p.locator("#panel-ficha button", { hasText: "Ver ficha" }).click({ timeout: 2000 }).catch(() => {});
+  await p.waitForFunction(() => /MICRON/i.test(document.getElementById("panel-ficha")?.innerText || ""), null, { timeout: 60000 }).catch(() => {});
+  await pausa(p, 800);
 }
 async function agresivo(p) {
   await p.locator("#panel-portafolios").getByText("Agresivo", { exact: true }).first().click({ timeout: 3000 }).catch(() => {});
@@ -83,20 +94,25 @@ const ESCENAS = {
   },
   tiempo: async (p) => { await vista(p, "tiempo"); await pausa(p, 1000); await desplazar(p, 1000, 60, 90); await pausa(p, 1000); },
   ficha: async (p) => {
-    // Se escribe MU en el buscador de la ficha (sin emisora elegida la ficha sale vacía).
-    await vista(p, "ficha"); await pausa(p, 600);
-    const caja = p.locator("#panel-ficha input").first();
-    await caja.click({ timeout: 2000 }).catch(() => {}); await caja.fill("MU").catch(() => {}); await caja.press("Escape").catch(() => {});
-    await pausa(p, 500); await p.locator("#panel-ficha button", { hasText: "Ver ficha" }).click({ timeout: 2000 }).catch(() => {});
-    await p.waitForFunction(() => /MICRON/i.test(document.getElementById("panel-ficha")?.innerText || ""), null, { timeout: 60000 }).catch(() => {});
-    await pausa(p, 800);
+    await fichaMU(p);
     await p.evaluate(() => { const e = [...document.querySelectorAll("#panel-ficha *")].find((x) => x.children.length === 0 && /MICRON TECHNOLOGY/i.test(x.textContent));
       if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 60 }); });
     p._marca = (Date.now() - p._t0) / 1000;
-    await pausa(p, 2500); await desplazar(p, 850, 70, 90); await pausa(p, 1200);  // termina en la gráfica, antes de los widgets que la demo no trae
+    await pausa(p, 2500); await desplazar(p, 850, 70, 90); await pausa(p, 1200);
   },
+  // Lectura técnica de MU que calcula la terminal (medias, RSI, MACD, Bollinger).
+  tecnico: async (p) => {
+    await fichaMU(p);
+    await p.evaluate(() => { const e = [...document.querySelectorAll("#panel-ficha :is(h2, h3, h4)")].find((x) => /an[aá]lisis t[eé]cnico/i.test(x.textContent));
+      if (e) window.scrollTo({ top: e.getBoundingClientRect().top + window.scrollY - 8 }); });
+    p._marca = (Date.now() - p._t0) / 1000;
+    await pausa(p, 3000); await desplazar(p, 500, 60, 90); await pausa(p, 1500);
+  },
+  // Portafolios guardados: el idóneo de Markowitz y el botón «Usar como principal» (no se pulsa).
+  guardados: async (p) => { await vista(p, "portafolios"); await irA(p, "portafolios", "Portafolios guardados"); p._marca = (Date.now() - p._t0) / 1000; await pausa(p, 2500); await desplazar(p, 500, 60, 90); await pausa(p, 1500); },
+  // Alertas: umbrales, canales (Telegram) y avisos; no se pulsa «Enviar aviso de prueba».
+  alertas: async (p) => { await vista(p, "alertas"); await pausa(p, 1500); await desplazar(p, 600, 60, 90); await pausa(p, 2000); await desplazar(p, 700, 60, 90); await pausa(p, 1500); },
   investigacion: async (p) => { await vista(p, "investigacion"); await pausa(p, 1000); await desplazar(p, 1100, 60, 90); await pausa(p, 1000); },
-  // «Riesgo» necesita posiciones y la cuenta del Reto está archivada: se muestra el riesgo medido de un portafolio en «Mis portafolios».
   // «Riesgo» necesita posiciones y la cuenta del Reto está archivada: se muestran el riesgo y los escenarios de la propuesta.
   riesgo: async (p) => { await vista(p, "propuestas"); await pausa(p, 1500); await desplazar(p, 700, 60, 90); await pausa(p, 2500); await desplazar(p, 500, 50, 90); await pausa(p, 1500); },
   // Prueba fuera de muestra frente a 1/N en «Mis portafolios».
@@ -113,7 +129,7 @@ const ESCENAS = {
   const rutaMarcas = path.join(DIR, "marcas.json");
   const marcas = fs.existsSync(rutaMarcas) ? JSON.parse(fs.readFileSync(rutaMarcas, "utf8")) : {};
   // Segundos que pide cada bloque del video (python scripts/video_final.py necesidades).
-  const rutaNec = path.join(DIR, "necesarios.json");
+  const rutaNec = path.join(BASE, "necesarios.json");
   const necesarios = fs.existsSync(rutaNec) ? JSON.parse(fs.readFileSync(rutaNec, "utf8")) : {};
   for (const n of nombres) {
     const c = await b.newContext({ viewport: { width: W, height: H }, colorScheme: "dark", recordVideo: { dir: DIR, size: { width: W, height: H } } });

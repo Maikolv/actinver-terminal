@@ -40,11 +40,9 @@ REAL, DEMO = ("DATOS REALES DEL RETO", VERDE), ("TERMINAL PROPIA · 127.0.0.1", 
 VERSIONES = {
     "4_integrantes": ["Miguel 1", "Audio pt1", "valeria min 018-030", "Calle Bosques de México", "Miguel 2", "Audio pt2",
                       "valeria min 104-116", "Calle Bosques de México 2", "Miguel 3", "Audio pt3", "Valeria min 154 y 206",
-                      "Calle Bosques de México 3", "Miguel 4"],
-    "Miguel_y_Daniela": ["Miguel v Daniela 1", "Audio pt1", "Miguel v Daniela 2", "Cuarta Privada Moras 5", "Miguel v Daniela 3",
-                         "Audio pt2", "Miguel v Daniela 4", "Cuarta Privada Moras 6", "Miguel v Daniela 5", "Audio pt3",
-                         "Miguel v Daniela 6", "Cuarta Privada Moras 7", "Miguel v Daniela 7"],
+                      "Miguel 5", "Calle Bosques de México 3", "Miguel 4"],
 }
+OPCIONALES = {"Miguel 5"}  # bloque de Telegram: si falta el audio, el video se arma sin ese bloque y lo avisa
 
 _EQ = MED / "equipo.json"
 EQ = json.loads(_EQ.read_text(encoding="utf-8")) if _EQ.exists() else {}
@@ -58,7 +56,7 @@ def mxn(x):
 
 
 def bloques() -> list[dict]:
-    """Los 13 bloques del guion: código de función, título, procedencia, contenido y datos clave (reales)."""
+    """Los 14 bloques del guion: código de función, título, procedencia, contenido y datos clave (reales)."""
     d = json.loads((MED / "informe" / "datos.json").read_text(encoding="utf-8"))
     fm = json.loads((MED / "informe" / "fundamentales_mu.json").read_text(encoding="utf-8"))
     t, r, fin, bm = d["tecnico_mu"], d["riesgo"], d["final"], d["benchmark"]
@@ -85,7 +83,7 @@ def bloques() -> list[dict]:
         dict(cod="02 SEG", titulo="SEGUIMIENTO 06 → 31 OCT", origen=REAL, items=[("panel", "seguimiento")],
              datos=[("CAPTURAS DEL PORTAL", "34", BLANCO), ("MOVIMIENTOS", str(len(d["movimientos_octubre"])), BLANCO),
                     ("VALOR 30-OCT", mxn(d["corte_octubre"]["valor"]), BLANCO), ("RENDIMIENTO", pct(d["corte_octubre"]["rend"]), ROJO)]),
-        dict(cod="MU US GP", titulo="ANÁLISIS TÉCNICO · MICRON", origen=REAL, items=[("panel", "tecnico")],
+        dict(cod="MU US GP", titulo="ANÁLISIS TÉCNICO · MICRON", origen=REAL, items=[("rec", "tecnico"), ("panel", "tecnico")],
              datos=[("CIERRE USD", f"{t['cierre']:.2f}", AMBAR), ("SMA 20 / 50", f"{t['sma20']:.0f} / {t['sma50']:.0f}", AZUL),
                     ("RSI 14", f"{t['rsi14']:.1f}", BLANCO), ("MACD / SEÑAL", f"{t['macd']:.1f} / {t['senal']:.1f}", ROJO),
                     ("TENDENCIA", "BAJISTA", ROJO)]),
@@ -99,8 +97,11 @@ def bloques() -> list[dict]:
         dict(cod="PERF", titulo="RESULTADO vs MERCADO", origen=REAL, items=[("panel", "evolucion")],
              datos=[("VALOR FINAL", mxn(fin["valor"]), BLANCO), ("RENDIMIENTO", pct(fin["rend"]), ROJO),
                     ("NAFTRAC", pct(bm["rendimiento"]), VERDE), ("DIFERENCIA", f"{(fin['rend'] - bm['rendimiento']) * 100:+.2f} pp", ROJO)]),
-        dict(cod="PORT", titulo="ROTACIÓN · CONSUMO Y SALUD", origen=REAL, items=[("panel", "rotacion"), ("rec", "plan")],
+        dict(cod="PORT", titulo="ROTACIÓN · CONSUMO Y SALUD", origen=REAL, items=[("panel", "rotacion"), ("rec", "guardados")],
              datos=[(sym(x["instrumento"]), f"{x['peso'] * 100:.1f} %", col(x["rend"] or 0)) for x in finales]),
+        dict(cod="TG", titulo="AVISOS POR TELEGRAM", origen=DEMO, items=[("rec", "alertas")],
+             datos=[("DERIVA", "≥ 5 PP", AMBAR), ("STOP", "-8 %", ROJO), ("TOMA DE UTILIDAD", "+15 %", VERDE),
+                    ("CAÍDA DESDE MÁX.", "-10 %", ROJO), ("ÓRDENES", "NINGUNA · SOLO AVISA", BLANCO)]),
         dict(cod="BACK", titulo="LO QUE APRENDIMOS", origen=DEMO, items=[("rec", "propuestas"), ("rec", "backtesting")],
              datos=[("VENTAJA vs 1/N", "NO DEMOSTRADA", ROJO), ("LA IA", "ACELERA, NO ADIVINA", AMBAR),
                     ("PRIMERO", "MEDIR CONCENTRACIÓN", BLANCO), ("DESPUÉS", "BUSCAR RENDIMIENTO", BLANCO)]),
@@ -116,7 +117,7 @@ def textos() -> list[str]:
         c = [x.strip() for x in linea.strip().strip("|").split("|")]
         if len(c) == 4 and re.match(r"\d:\d\d–\d:\d\d", c[0]):
             out.append(re.sub(r"^«|»$", "", c[2]))
-    assert len(out) == 13, f"el guion tiene {len(out)} bloques"
+    assert len(out) == 14, f"el guion tiene {len(out)} bloques"
     return out
 
 
@@ -168,11 +169,16 @@ def trozos(texto: str, maximo: int) -> list[str]:
 
 
 def geometria(W, H):
+    """La ventana de la terminal ocupa todo el ancho; arriba, su barra de dirección (127.0.0.1:8765); abajo, fichas de datos."""
     if W > H:
-        return dict(W=W, H=H, barra=56, tit_y=70, tit_h=50, win=(40, 138, 1060, 770), pan=(1128, 138, 752, 770), fila_h=78,
-                    sub=(40, 922, 1840, 92), sub_f=34, cinta_y=1024, cinta_h=34, aviso_y=1062, aviso_f=14, max_sub=150)
-    return dict(W=W, H=H, barra=84, tit_y=100, tit_h=62, win=(10, 186, 1060, 770), pan=(10, 976, 1060, 420), fila_h=68,
-                sub=(30, 1410, 1020, 360), sub_f=46, cinta_y=1798, cinta_h=46, aviso_y=1862, aviso_f=22, max_sub=80)
+        g = dict(W=W, H=H, barra=56, tit_y=70, tit_h=50, win=(20, 128, 1880, 724), url_h=44, fichas=(20, 860, 1880, 62), cols=6,
+                 sub=(20, 930, 1880, 90), sub_f=32, cinta_y=1024, cinta_h=34, aviso_y=1062, aviso_f=14, max_sub=150, grab="horizontal")
+    else:
+        g = dict(W=W, H=H, barra=84, tit_y=100, tit_h=62, win=(10, 176, 1060, 1144), url_h=44, fichas=(10, 1330, 1060, 192), cols=2,
+                 sub=(30, 1530, 1020, 260), sub_f=42, cinta_y=1798, cinta_h=46, aviso_y=1862, aviso_f=22, max_sub=80, grab="vertical")
+    x, y, w, h = g["win"]
+    g["cont"] = (x, y + g["url_h"], w, h - g["url_h"])  # área que muestra la grabación: mismo tamaño que el viewport grabado
+    return g
 
 
 def chrome(g, destino):
@@ -186,13 +192,16 @@ def chrome(g, destino):
     der = f"{NOMBRE_EQUIPO.upper()}  │  RETO ACTINVER 2026  │  UVM" if NOMBRE_EQUIPO else "RETO ACTINVER 2026  │  UVM"
     d.text((W - 22, g["barra"] // 2), der, font=fuente(18 if W > H else 20, False), fill=GRIS, anchor="rm")
     x, y, w, h = g["win"]
-    d.rectangle([x - 3, y - 3, x + w + 2, y + h + 2], outline=LINEA, width=2)
-    for (cx, cy) in ((x - 3, y - 3), (x + w + 2, y - 3), (x - 3, y + h + 2), (x + w + 2, y + h + 2)):
-        d.rectangle([cx - 5, cy - 5, cx + 5, cy + 5], fill=MARCA)  # esquinas de la ventana
-    px, py, pw, ph = g["pan"]
-    d.rectangle([px, py, px + pw, py + ph], outline=LINEA, width=2)
-    d.rectangle([px, py, px + pw, py + 40], fill=BARRA)
-    d.text((px + 16, py + 20), "DATOS CLAVE", font=fuente(20 if W > H else 24), fill=AMBAR, anchor="lm")
+    d.rectangle([x - 2, y - 2, x + w + 1, y + h + 1], outline=LINEA, width=2)
+    d.rectangle([x, y, x + w, y + g["url_h"]], fill=BARRA)  # barra del navegador
+    for k, c in enumerate(((242, 119, 122), (180, 186, 196), (180, 186, 196))):
+        cx = x + 22 + k * 22
+        d.ellipse([cx - 6, y + 16, cx + 6, y + 28], fill=c)
+    ux = x + 100
+    d.rounded_rectangle([ux, y + 8, x + w - 16, y + g["url_h"] - 8], radius=13, fill=NEGRO, outline=LINEA)
+    d.text((ux + 16, y + g["url_h"] // 2), "127.0.0.1:8765", font=fuente(18 if W > H else 20), fill=BLANCO, anchor="lm")
+    d.text((x + w - 30, y + g["url_h"] // 2), "ACTINVER TERMINAL · LOCAL · SOLO LECTURA" if W > H else "LOCAL · SOLO LECTURA",
+           font=fuente(15 if W > H else 16, False), fill=GRIS, anchor="rm")
     sx, sy, sw, sh = g["sub"]
     d.rectangle([sx, sy, sx + 6, sy + sh], fill=MARCA)
     d.rectangle([0, g["cinta_y"], W, g["cinta_y"] + g["cinta_h"]], fill=BARRA)
@@ -221,14 +230,17 @@ def tira_titulo(b, g, destino):
     return im.width
 
 
-def fila_dato(et, val, color, g, destino):
-    pw, fh = g["pan"][2], g["fila_h"]
-    im = Image.new("RGBA", (pw - 4, fh), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+def ficha_dato(et, val, color, ancho, alto, g, destino):
+    """Ficha de un dato clave: etiqueta arriba, valor abajo, con el acento rojo de la terminal a la izquierda."""
     grande = g["W"] > g["H"]
-    d.text((16, fh // 2), et, font=fuente(20 if grande else 24, False), fill=GRIS, anchor="lm")
-    d.text((pw - 24, fh // 2), val, font=fuente(32 if grande else 34), fill=color, anchor="rm")
-    for x in range(16, pw - 24, 8):
-        d.point((x, fh - 2), fill=LINEA)
+    im = Image.new("RGBA", (ancho, alto), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, ancho - 1, alto - 1], fill=BARRA, outline=LINEA)
+    d.rectangle([0, 0, 4, alto - 1], fill=MARCA)
+    d.text((16, 6), et, font=fuente(15 if grande else 17, False), fill=GRIS, anchor="lt")
+    fv = fuente(26 if grande else 28)
+    while d.textlength(val, font=fv) > ancho - 28 and fv.size > 14:
+        fv = fuente(fv.size - 2)
+    d.text((16, alto - 6), val, font=fv, fill=color, anchor="lb")
     im.save(destino)
 
 
@@ -298,15 +310,15 @@ def voces() -> dict[str, Path]:
 CODEC = ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-r", FPS]
 
 
-def contenido(items, D, cw, ch, t, destino):
+def contenido(items, D, cw, ch, t, destino, grab):
     """Clip de la ventana de contenido: grabaciones con desplazamiento real o paneles con revelado y acercamiento lento."""
-    marcas = json.loads((GRAB / "marcas.json").read_text(encoding="utf-8"))
+    marcas = json.loads((grab / "marcas.json").read_text(encoding="utf-8"))
     partes = []
     for k, (tipo, nombre) in enumerate(items):
         d = D / len(items)
         out = t / f"c{k}.mp4"
         if tipo == "rec":
-            src = GRAB / f"{nombre}.webm"
+            src = grab / f"{nombre}.webm"
             ss = marcas.get(nombre, 0)
             # La grabación ya tiene el tamaño de la ventana y dura lo necesario: sin recorte, escala ni cámara lenta.
             ff("-ss", ss, "-i", src, "-vf", f"scale={cw}:{ch}:flags=lanczos,fps={FPS},"
@@ -319,7 +331,7 @@ def contenido(items, D, cw, ch, t, destino):
                "-f", "lavfi", "-t", f"{d:.3f}", "-i", f"color=c=0x090A0C:s={cw}x{ch}:r={FPS}",
                "-f", "lavfi", "-t", f"{d:.3f}", "-i", f"color=c=0xD94848:s=4x{ch}:r={FPS}",
                "-filter_complex",
-               f"[0:v]scale={cw * 2}:-2,zoompan=z='1+0.05*on/{n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={cw}x{ch}:fps={FPS}[z];"
+               f"[0:v]scale={cw * 2}:{ch * 2}:force_original_aspect_ratio=decrease,pad={cw * 2}:{ch * 2}:(ow-iw)/2:(oh-ih)/2:color=0x090A0C,zoompan=z='1+0.05*on/{n}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={cw}x{ch}:fps={FPS}[z];"
                f"[z][1:v]overlay=x='{cw}*min(max((t-0.15)/1.1,0),1)':y=0[a];"
                f"[a][2:v]overlay=x='{cw}*min(max((t-0.15)/1.1,0),1)-4':y=0:enable='lt(t,1.3)'",
                "-t", f"{d:.3f}", *CODEC, out)
@@ -333,8 +345,8 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
     """Un bloque completo: marco + contenido + título + datos + subtítulos + cinta, con la voz."""
     D = duracion(wav)
     W, H = g["W"], g["H"]
-    wx, wy, cw, ch = g["win"]
-    contenido(b["items"], D, cw, ch, t, t / "contenido.mp4")
+    wx, wy, cw, ch = g["cont"]
+    contenido(b["items"], D, cw, ch, t, t / "contenido.mp4", GRAB / g["grab"])
     ancho_tit = tira_titulo(b, g, t / "titulo.png")
     entradas = ["-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", base["chrome"], "-i", t / "contenido.mp4",
                 "-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", t / "titulo.png",
@@ -343,12 +355,17 @@ def segmento(b, texto, wav, g, base, t, offset, destino):
            f"[v0][2:v]overlay=x='if(lt(t,0.45),-w+({ancho_tit}+22)*t/0.45,22)':y={g['tit_y']}[v1]",
            f"[v1][3:v]overlay=x='-mod((t+{offset:.3f})*110,{base['seg']})':y={g['cinta_y']}[v2]"]
     n, ultimo = 4, "v2"
-    px, py, pw, ph = g["pan"]
+    fx, fy, fw, fh = g["fichas"]
+    cols = min(g["cols"], len(b["datos"]))
+    filas_f = -(-len(b["datos"]) // cols)
+    gap = 8
+    aw, ah = (fw - gap * (cols - 1)) // cols, (fh - gap * (filas_f - 1)) // filas_f
     for k, (et, val, c) in enumerate(b["datos"]):
-        p = t / f"fila{k}.png"; fila_dato(et, val, c, g, p)
+        p = t / f"ficha{k}.png"; ficha_dato(et, val, c, aw, ah, g, p)
         entradas += ["-loop", 1, "-framerate", FPS, "-t", f"{D:.3f}", "-i", p]
-        t0 = 0.6 + k * 0.28
-        fil.append(f"[{ultimo}][{n}:v]overlay=x='{px + 2}+max(0,{t0 + 0.25}-t)*{pw * 2}':y={py + 48 + k * g['fila_h']}:enable='gte(t,{t0})'[f{k}]")
+        t0 = 0.6 + k * 0.25
+        x0, y0 = fx + (k % cols) * (aw + gap), fy + (k // cols) * (ah + gap)
+        fil.append(f"[{ultimo}][{n}:v]overlay=x={x0}:y='{y0}+max(0,{t0 + 0.25}-t)*120':enable='gte(t,{t0})'[f{k}]")
         ultimo, n = f"f{k}", n + 1
     partes = trozos(texto, g["max_sub"])
     total = sum(len(p) for p in partes)
@@ -393,7 +410,7 @@ def tarjeta_video(lineas, seg, g, t, nombre, destino):
 def render(version: str, W: int, H: int):
     archivos = VERSIONES[version]
     disponibles = voces()
-    falta = [a for a in archivos if a not in disponibles]
+    falta = [a for a in archivos if a not in disponibles and a not in OPCIONALES]
     if falta:
         sys.exit(f"Faltan audios en {VOCES}: {falta}")
     SAL.mkdir(parents=True, exist_ok=True)
@@ -409,12 +426,15 @@ def render(version: str, W: int, H: int):
                        ("UNIVERSIDAD DEL VALLE DE MÉXICO · CAMPUS HISPANO", 22, GRIS)], 3.5, g, t, "intro", partes[0])
         offset = 0.0
         for i, (b, texto, arch) in enumerate(zip(bloques(), textos(), archivos)):
+            if arch not in disponibles:
+                print(f"  AVISO: falta el audio «{arch}»; el bloque {b['titulo']} queda fuera de este video", flush=True)
+                continue
             st = t / f"b{i:02d}"; st.mkdir()
             wav = st / "voz.wav"; audio(disponibles[arch], wav)
             out = t / f"seg{i:02d}.mp4"
             offset += segmento(b, texto, wav, g, base, st, offset, out)
             partes.append(out)
-            print(f"  {version} {W}x{H} bloque {i + 1}/13", flush=True)
+            print(f"  {version} {W}x{H} bloque {i + 1}/{len(archivos)}", flush=True)
         partes.append(t / "fin.mp4")
         tarjeta_video([(f"EQUIPO {NOMBRE_EQUIPO.upper()}".strip(), 44, AMBAR), *[(n.upper(), 26, BLANCO) for n in EQUIPO],
                        ("LIC. EN CONTADURÍA Y FINANZAS PÚBLICAS · UVM CAMPUS HISPANO", 20, GRIS),
@@ -432,7 +452,7 @@ def necesidades():
     disp, out = voces(), {}
     for archivos in VERSIONES.values():
         for b, arch in zip(bloques(), archivos):
-            d = (duracion(disp[arch]) + 0.5) / len(b["items"])
+            d = ((duracion(disp[arch]) if arch in disp else 14.0) + 0.5) / len(b["items"])  # sin audio todavía: 14 s
             for tipo, nombre in b["items"]:
                 if tipo == "rec":
                     out[nombre] = round(max(out.get(nombre, 0), d), 2)
