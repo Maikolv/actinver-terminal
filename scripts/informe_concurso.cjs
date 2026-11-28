@@ -325,6 +325,7 @@ const anexos = [h1("Anexos"),
     cuadricula(eq.constancias.cursos.map(([c], k) => [`c${k}.png`, `${k + 1}. ${c}`]))]
     : [p("Sección opcional según el formato; el equipo no incluye evidencias de asesorías.")]),
   h2("E. Herramienta de apoyo"), p("Actinver Terminal (proyecto independiente, sin afiliación con Grupo Actinver): https://github.com/Maikolv/actinver-terminal. Solo informa y simula; no envía órdenes."),
+  p("Demo en línea, sin instalar nada y con datos simulados: https://maikolv.github.io/actinver-terminal/terminal/. Tiene las secciones de la terminal local y permite probar el generador de portafolios con Markowitz, las simulaciones, el backtesting y el asistente."),
   ...(VIDEOS.length ? [h2("F. Videos del proyecto"),
   p(`El video presenta el proyecto con la estética de la terminal: grabaciones de Actinver Terminal en la computadora del equipo (solo lectura) y las gráficas del informe (datos reales del Reto). ${VERSION ? "El video lleva las voces de los cuatro integrantes y se entrega en formato horizontal (presentación y YouTube) y vertical (TikTok)." : "Hay dos versiones de voz, cada una en formato horizontal para YouTube y vertical para TikTok."} Escanea el código QR o abre el enlace.`),
   tablaVideos(),

@@ -2,6 +2,16 @@
 
 Formato libre en español (inspirado en Keep a Changelog). Fecha = día del commit, hora de México.
 
+## 27-nov-2026 — Demo que guarda en el navegador y enlace de la demo en el informe
+
+- **Demo de GitHub Pages:** guardar, editar, eliminar y abrir portafolios de «Mis portafolios», elegir el principal,
+  anotar en la bitácora y agregar o quitar instrumentos de la lista de seguimiento y del seguimiento de movimientos
+  ahora funcionan como en la terminal local; se guardan en el `localStorage` del visitante y sobreviven a recargar.
+  Prueba en Edge sin conexión: guardar → recargar → principal → abrir → bitácora → listas, sin errores de consola.
+  Node: 55 aprobadas. Siguen requiriendo la terminal local: descargar datos, importar, Excel, Telegram y cálculos con
+  especificaciones no precalculadas.
+- **Informe:** la sección E incluye el enlace de la demo (DOCX/PDF regenerados; Google Docs y PDF de Drive actualizados).
+
 ## 27-nov-2026 — Demo pública con los cálculos interactivos y cierre del desarrollo (por ahora)
 
 - **Demo de GitHub Pages más cercana a la terminal local:** además de las 23 secciones, ahora funcionan con respuestas
